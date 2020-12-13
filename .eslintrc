@@ -1,0 +1,47 @@
+{
+    "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "react-app"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 2018
+    },
+    "rules": {
+        "max-len": [
+            "warn",
+            {
+                "code": 140,
+                "ignorePattern": "^(import\\s.+\\sfrom\\s.+)|(export\\s.+);$",
+                "ignoreUrls": true
+            }
+        ],
+        "quotes": [
+            "warn",
+            "single"
+        ],
+        "react/jsx-indent-props": [
+            2,
+            "first"
+        ],
+        "@typescript-eslint/indent": [
+            "warn",
+            4,
+            {
+                "ignoredNodes": [
+                    "JSXElement *",
+                    "JSXElement"
+                ]
+            }
+        ],
+        "@typescript-eslint/semi": [
+            "warn",
+            "always"
+        ],
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-explicit-any": "off"
+    }
+}

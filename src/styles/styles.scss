@@ -1,0 +1,50 @@
+@import './bootstrap-utilities.scss';
+// @import './material.scss';
+@import './theme.scss';
+
+body {
+    margin: 0;
+
+    // Default font
+    font-family: var(--font-family-roboto);
+
+    // Theme colors
+    background: var(--theme-background-color);
+    color: var(--theme-background-text-color);
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+// .section-subheader {
+//     font-family: var(--font-family-google-sans);
+//     font-size: 16px;
+//     font-weight: 500;
+//     line-height: 24px;
+//     padding: 16px 0;
+// }
+
+// .section-raised {
+//     margin-bottom: 24px;
+//     background: rgba(255,255,255,0.92); // TODO Make this a common variable.
+//     // background: white;
+//     border-radius: 4px;
+//     box-shadow: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,.014), 0 1px 3px 0 rgba(0,0,0,0.12);
+
+//     .header {
+//         font-family: Google Sans, Roboto, sans-serif;
+//         font-size: 20px;
+//         font-weight: 500;
+//         padding: 16px;
+//     }
+
+//     .subheader {
+//         font-family: Google Sans, Roboto, sans-serif;
+//         font-size: 12px;
+//         padding: 16px;
+//     }
+
+// }

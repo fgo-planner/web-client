@@ -1,0 +1,42 @@
+$app-bar-main-height: 64px;
+
+.navigation-container {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+
+    .upper-section {
+        z-index: 2;
+        // height: $app-bar-main-height;
+        
+        .app-bar-container {
+            height: $app-bar-main-height;
+            transition: box-shadow 200ms 50ms linear;
+            
+            &.no-elevation {
+                box-shadow: 0px 1px 0px rgba(0,0,0,0.12); // Simulates 1px solid border
+            }
+        }
+    }
+
+    .lower-section {
+        display: flex;
+        height: calc(100vh - #{$app-bar-main-height});
+        // max-height: calc(100vh - #{$app-bar-main-height});
+
+        .nav-rail-container {
+            display: none; // Temporarily hide the nav-rail
+            z-index: 1;
+            box-shadow: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,.014), 0 1px 3px 0 rgba(0,0,0,0.12);
+        }
+        
+        .main-content-container {
+            flex: 1;
+            overflow: auto;
+        }
+    }
+}

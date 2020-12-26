@@ -8,7 +8,7 @@ export class Events extends RouteComponent {
         return (
             <Fragment>
                 <div>EVENTS</div>
-                <div>{this.props.match?.params['id']}</div>
+                <div>{(this.props.match?.params as any)['id']}</div>
             </Fragment>
         );
     }

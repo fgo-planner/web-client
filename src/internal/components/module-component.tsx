@@ -20,14 +20,13 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
         return this.renderRoutes(this.ModuleRoutes, this.props.parentPath);
     }
 
-    private renderRoutes(routes: RouteDefinitions, parentPath: string): ReactNode {
-        console.log(this.props.route);
+    private renderRoutes(routes?: RouteDefinitions, parentPath?: string): ReactNode {
         if (!routes || !routes.length) {
             return null;
         }
         return (
             <Switch>
-                {routes.map((route, i) => this.renderRoute(route, parentPath, i))}
+                {routes.map((route, i) => this.renderRoute(route, i, parentPath))}
 
                 {/*
                   * Generate a default empty path route to handle mismatched routes if needed. 
@@ -37,7 +36,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
         );
     }
 
-    private renderRoute(route: RouteDefinition, parentPath: string, defaultKey: number): ReactNode {
+    private renderRoute(route: RouteDefinition, defaultKey: number, parentPath?: string): ReactNode {
         this.validateRoute(route);
 
         /*
@@ -68,7 +67,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
             <Route path={path} exact={route.exact}
                    strict={route.strict}
                    key={route.key || defaultKey}
-                   render={props => this.renderRouteComponent(route, path, props)}>
+                   render={props => this.renderRouteComponent(route, props, path)}>
             </Route>
         );
     }
@@ -76,8 +75,14 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
     /**
      * Renders a redirected route.
      */
-    private renderRedirect(route: RouteDefinition, parentPath: string, path: string): ReactNode {
-        let redirectTo = route.redirectTo;
+    private renderRedirect(route: RouteDefinition, parentPath?: string, path?: string): ReactNode {
+        /* 
+         * route.redirectTo is never null/undefined because null check is performed
+         * before this method is called.
+         */
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        let redirectTo = route.redirectTo!;
+
         if (!route.redirectToAbsolute) {
             redirectTo = this.appendPaths(parentPath, redirectTo);
         }
@@ -92,7 +97,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
      * Renders a route or redirect an empty path. An route with an empty path
      * provides a fallback in the case that a matching route could not be found.
      */
-    private renderEmptyPathRoute(route: RouteDefinition, parentPath: string): ReactNode {
+    private renderEmptyPathRoute(route: RouteDefinition, parentPath?: string): ReactNode {
         let redirectTo = route.redirectTo;
         if (redirectTo != null) {
             if (!route.redirectToAbsolute) {
@@ -101,7 +106,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
             return <Redirect to={redirectTo} />;
         }
 
-        return <Route render={props => this.renderRouteComponent(route, parentPath, props)}></Route>;
+        return <Route render={props => this.renderRouteComponent(route, props, parentPath)}></Route>;
     }
 
     /**
@@ -109,7 +114,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
      * the user is not authenticated, then a redirect to the root URL is rendered
      * instead.
      */
-    private renderRouteComponent(route: RouteDefinition, path: string, routeProps: RouteComponentProps): ReactNode {
+    private renderRouteComponent(route: RouteDefinition, routeProps: RouteComponentProps, path?: string): ReactNode {
         if (route.authenticationRequired && !this.isLoggedIn) {
             /*
              * Redirect user if they are not authenticated but are trying to access a route
@@ -165,7 +170,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
      * children), then this will generate a default empty path route that will be
      * activated as a fallback when no matching routes are found.
      */
-    private generateDefaultEmptyPathRoute(routes: RouteDefinitions, parentPath: string): ReactNode {
+    private generateDefaultEmptyPathRoute(routes: RouteDefinitions, parentPath = '/'): ReactNode {
         /*
          * Check if there are any routes (excluding children) that contain an empty
          * path. If there is, then just return null as an empty path route has already
@@ -187,14 +192,14 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
         }
     }
 
-    private getAbsolutePath(parentPath: string, path: string) {
+    private getAbsolutePath(parentPath = '', path = '') {
         if (!path || path === '*') {
             return undefined;
         }
         return this.appendPaths(parentPath, path);
     }
 
-    private appendPaths(parentPath: string, path: string) {
+    private appendPaths(parentPath = '', path = '') {
         parentPath = parentPath.trim();
         path = path.trim();
         if (parentPath === '/') {

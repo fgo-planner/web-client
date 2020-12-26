@@ -5,8 +5,20 @@
             "components": [
                 "src/components"
             ],
+            "data": [
+                "src/data"
+            ],
             "internal": [
                 "src/internal"
+            ],
+            "services": [
+                "src/services"
+            ],
+            "styles": [
+                "src/styles"
+            ],
+            "utils": [
+                "src/utils"
             ]
         }
     }

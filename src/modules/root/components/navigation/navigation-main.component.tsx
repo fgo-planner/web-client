@@ -1,48 +1,67 @@
-import { Paper } from '@material-ui/core';
-import React, { Component, Fragment, ReactNode, UIEvent } from 'react';
-import { AppBar } from './app-bar.component';
-import './navigation-main.component.scss';
+import { Paper, Theme, withStyles } from '@material-ui/core';
+import { ClassNameMap, StyleRules } from '@material-ui/core/styles/withStyles';
+import { WithStylesProps } from 'internal';
+import React, { Component, ReactNode, UIEvent } from 'react';
+import { ThemeConstants } from 'styles';
+import { ThemeUtils } from 'utils';
+import { AppBar } from './app-bar/app-bar.component';
 
-type Props = {
-
-};
+type Props = WithStylesProps;
 
 type State = {
     appBarElevated: boolean;
 };
 
-export class NavigationMain extends Component<Props, State> {
+const style = (theme: Theme) => ({
+    root: {
+        position: 'fixed',
+        display: 'flex',
+        flexDirection: 'column',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '100vh'
+    },
+    upperSection: {
+        zIndex: 2
+    },
+    lowerSection: {
+        display: 'flex',
+        height: `calc(100vh - ${ThemeUtils.spacingInPixels(theme, ThemeConstants.AppBarHeightScale)})`
+    },
+    navRailContainer: {
+        display: 'none',
+        zIndex: 1,
+        boxShadow: '0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.014), 0 1px 3px 0 rgba(0,0,0,0.12)',
+    },
+    mainContent: {
+        flex: 1,
+        overflow: 'auto'
+    }
+} as StyleRules);
 
-    private readonly ElevatedAppBarScrollThreshold = 15;
+export const NavigationMain = withStyles(style)(class extends Component<Props, State> {
 
-    /**
-     * Elevation (in dp) of the elevated App Bar.
-     * @see https://material.io/design/environment/elevation.html
-     */
-    private readonly ElevatedAppBarElevation = 4;
+    private readonly styleClasses: ClassNameMap;
 
     constructor(props: Props) {
         super(props);
+        this.styleClasses = props.classes;
         this.state = {
             appBarElevated: false
         };
     }
 
     render(): ReactNode {
-        console.log(`${NavigationMain.name} RENDERED`)
         const scrollHandler = this.scrollHandler.bind(this);
         return (
-            <div className="navigation-container">
-                <div className="upper-section">
-                    <Paper className={`app-bar-container ${this.state.appBarElevated ? '' : 'no-elevation'}`}
-                           elevation={this.ElevatedAppBarElevation}
-                           square={true}>
-                        <AppBar></AppBar>
-                    </Paper>
+            <div className={this.styleClasses.root}>
+                <div className={this.styleClasses.upperSection}>
+                    <AppBar appBarElevated={this.state.appBarElevated} />
                 </div>
-                <div className="lower-section">
+                <div className={this.styleClasses.lowerSection}>
                     {/* TODO Add nav rail */}
-                    <div className="main-content-container" onScroll={scrollHandler}>
+                    <div className={this.styleClasses.mainContent} onScroll={scrollHandler}>
                         {this.props.children}
                     </div>
                 </div>
@@ -52,10 +71,10 @@ export class NavigationMain extends Component<Props, State> {
 
     private scrollHandler(event: UIEvent) {
         const scrollAmount = (event.target as Element)?.scrollTop;
-        const appBarElevated = scrollAmount > this.ElevatedAppBarScrollThreshold;
+        const appBarElevated = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
         if (appBarElevated !== this.state.appBarElevated) {
             this.setState({ appBarElevated });
         }
     }
 
-}
+});

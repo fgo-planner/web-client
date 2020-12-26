@@ -1,13 +1,16 @@
-import React, { Component, ReactNode, Fragment } from 'react';
-import { ThemeProvider, createMuiTheme, Button, Typography } from '@material-ui/core';
+import { Box, Button, createMuiTheme, ThemeProvider, Typography } from '@material-ui/core';
+import React, { Component, Fragment, ReactNode } from 'react';
+import overrides from '../../../../styles/material-ui-overrides';
+import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ThemeBackground } from './theme-background.component';
+import { Nullable } from 'internal';
 
 type Props = {
 
 };
 
 type State = {
-
+    backgroundImageUrl?: string | null;
 };
 
 /**
@@ -16,6 +19,7 @@ type State = {
 export class ThemeManager extends Component<Props, State> {
 
     private theme = createMuiTheme({
+        spacing: ThemeConstants.Spacing,
         palette: {
             primary: {
                 main: '#EC407A'
@@ -25,27 +29,23 @@ export class ThemeManager extends Component<Props, State> {
             }
 
         },
-        overrides: {
-            MuiButton: {
-                text: {
-                    textTransform: 'none'
-                },
-            }
-        }
+        overrides
     });
 
-    private backgroundImageUrl: string = null;
+    private backgroundImageUrl: Nullable<string>;
 
     private themeState = true;
 
     render(): ReactNode {
         return (
             <Fragment>
-                <ThemeBackground color={null} opacity={0.5} imageUrl={this.backgroundImageUrl}/>
+                <ThemeBackground opacity={0.5} imageUrl={this.backgroundImageUrl}/>
                 <ThemeProvider theme={this.theme}>
                     <Typography component={'div'}>
                         {this.props.children}
-                        <Button onClick={this.toggleTheme.bind(this)}>CHANGE THEME</Button>
+                        <Box mt={4}>
+                            <Button onClick={this.toggleTheme.bind(this)}>CHANGE THEME</Button>
+                        </Box>
                     </Typography>
                 </ThemeProvider>
             </Fragment>
@@ -55,6 +55,7 @@ export class ThemeManager extends Component<Props, State> {
     toggleTheme() {
         if (this.themeState = !this.themeState) {
             this.theme = createMuiTheme({
+                spacing: ThemeConstants.Spacing,
                 palette: {
                     primary: {
                         main: '#EC407A'
@@ -62,25 +63,20 @@ export class ThemeManager extends Component<Props, State> {
                     secondary: {
                         main: '#039BE5'
                     }
-        
+
                 },
-                overrides: {
-                    MuiButton: {
-                        text: {
-                            textTransform: 'none'
-                        },
-                    }
-                }
+                overrides
             });
-            this.backgroundImageUrl = null;
+            this.backgroundImageUrl = undefined;
         } else {
             this.theme = createMuiTheme({
+                spacing: ThemeConstants.Spacing,
                 palette: {
                     primary: {
-                        main: '#039BE5'
+                        main: '#FA9'
                     },
                     secondary: {
-                        main: '#EC407A'
+                        main: '#BADA55'
                     }
         
                 }

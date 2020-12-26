@@ -7,22 +7,22 @@ type Props = {
     /**
      * Background image URL. Overrides background color.
      */
-    imageUrl?: string;
+    imageUrl?: string | null;
 
     /**
      * Solid background color. Only used if no background image URL is provided.
      */
-    color?: string;
+    color?: string | null;
 
     /**
      * Background opacity.
      */
-    opacity?: number;
+    opacity?: number | null;
 
     /**
      * Background image blur.
      */
-    blur?: number;
+    blur?: number | null;
 
 };
 
@@ -45,12 +45,12 @@ export class ThemeBackground extends PureComponent<Props, State> {
     private get backgroundStyle(): CSSProperties {
         const props = this.props;
         const style: CSSProperties = {
-            backgroundColor: props.color
+            backgroundColor: props.color || undefined
         };
         if (props.imageUrl) {
             style.backgroundImage = `url(${props.imageUrl})`;
             if (props.blur) {
-                style.backdropFilter = `blur(${props.blur}px)`
+                style.backdropFilter = `blur(${props.blur}px)`;
             }
         }
         if (props.opacity != null) {

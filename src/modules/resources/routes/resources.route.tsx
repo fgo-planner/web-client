@@ -12,13 +12,13 @@ export class ResourcesRoute extends RouteComponent {
                 <Button variant="contained"
                         color="primary"
                         component={Link}
-                        to={`${this.props.location.pathname}/servants`}>
+                        to={`${this.props.location?.pathname}/servants`}>
                     Servants
                 </Button>
                 <Button variant="contained"
                         color="primary" 
                         component={Link}
-                        to={`${this.props.location.pathname}/events`}>
+                        to={`${this.props.location?.pathname}/events`}>
                      Events
                 </Button>
             </Fragment>

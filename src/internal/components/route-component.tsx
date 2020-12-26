@@ -1,16 +1,12 @@
 import { RouteDefinition } from 'internal';
 import { PureComponent } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps as ReactRouteComponentProps } from 'react-router-dom';
 
-type Props = {
+export type RouteComponentProps = {
     route?: RouteDefinition;
-    parentPath: string;
-} & Partial<RouteComponentProps>;
+    parentPath?: string;
+} & Partial<ReactRouteComponentProps>;
 
-type State = {
-
-};
-
-export abstract class RouteComponent<P = {}, S = {}> extends PureComponent<P & Props, S & State> {
+export abstract class RouteComponent<P = {}, S = {}> extends PureComponent<P & RouteComponentProps, S> {
 
 }

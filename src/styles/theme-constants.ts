@@ -1,0 +1,27 @@
+export class ThemeConstants {
+
+    /**
+     * The spacing transformation value.
+     */
+    static Spacing = 4;
+
+    //#region App bar
+
+    /**
+     * The height of the app bar as a factor of the spacing transformation value;
+     */
+    static AppBarHeightScale = 16;
+
+    /**
+     * Elevation (in dp) of the app bar when it's in the eleveated state.
+     * @see https://material.io/design/environment/elevation.html
+     */
+    static AppBarElevatedElevation = 4;
+
+    static AppBarElevatedScrollThreshold = 15;
+
+    //#endregion
+
+    static FontFamilyGoogleSans = 'Google Sans, Roboto, sans-serif';
+
+}

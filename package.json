@@ -1,5 +1,6 @@
 {
-  "name": "react-test",
+  "name": "fgo-servant-planner-web-client",
+  "description": "Web browser client for the FGO servant planner project.",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

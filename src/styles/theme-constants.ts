@@ -8,12 +8,18 @@ export class ThemeConstants {
     //#region App bar
 
     /**
-     * The height of the app bar as a factor of the spacing transformation value;
+     * The height of the app bar as a factor of the spacing transformation value.
      */
     static AppBarHeightScale = 16;
 
     /**
-     * Elevation (in dp) of the app bar when it's in the eleveated state.
+     * The size of the app bar avatar image as a factor of the spacing
+     * transformation value.
+     */
+    static AppBarAvatarSize = 11;
+
+    /**
+     * Elevation (in dp) of the app bar when it's in the elevated state.
      * @see https://material.io/design/environment/elevation.html
      */
     static AppBarElevatedElevation = 4;

@@ -15,7 +15,7 @@ export class ResourcesRoute extends RouteComponent {
                         to={`${this.props.location?.pathname}/servants`}>
                     Servants
                 </Button>
-                <Button variant="contained"
+                <Button variant="outlined"
                         color="primary" 
                         component={Link}
                         to={`${this.props.location?.pathname}/events`}>

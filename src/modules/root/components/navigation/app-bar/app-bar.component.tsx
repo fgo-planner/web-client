@@ -1,5 +1,5 @@
-import { Paper, Theme, withStyles } from '@material-ui/core';
-import { StyleRules } from '@material-ui/core/styles/withStyles';
+import { Paper, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { User } from 'data';
 import { Nullable, UserInfo, WithStylesProps, WithThemeProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
@@ -7,9 +7,9 @@ import { AuthService, UserService } from 'services';
 import { ThemeConstants } from 'styles';
 import { Container as Injectables } from 'typedi';
 import { ThemeUtils } from 'utils';
-import { AppBarAuthenticatedUser } from './app-bar-authenticated-user.component';
-import { AppBarGuestUser } from './app-bar-guest-user.component';
-import { User } from 'data';
+import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';
+import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
+import { Link } from 'react-router-dom';
 
 type Props = {
     appBarElevated: boolean;
@@ -30,12 +30,14 @@ const style = (theme: Theme) => ({
     contents: {
         display: 'flex',
         flexDirection: 'row',
+        alignItems: 'center',
         paddingLeft: theme.spacing(4)
     },
     title: {
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontSize: '24px',
-        lineHeight: ThemeUtils.spacingInPixels(theme, ThemeConstants.AppBarHeightScale),
+        color: theme.palette.text.primary,
+        textDecoration: 'none',
         marginRight: theme.spacing(6)
     }
 } as StyleRules);
@@ -45,9 +47,9 @@ const style = (theme: Theme) => ({
  */
 export const AppBar = withStyles(style, { withTheme: true })(class extends PureComponent<Props, State> {
 
-    private readonly _authService = Injectables.get(AuthService);
+    private _authService = Injectables.get(AuthService);
 
-    private readonly _userService = Injectables.get(UserService);
+    private _userService = Injectables.get(UserService);
 
     private _onCurrentUserChangeSubscription!: Subscription;
 
@@ -62,26 +64,26 @@ export const AppBar = withStyles(style, { withTheme: true })(class extends PureC
         this._onCurrentUserChangeSubscription = this._authService.onCurrentUserChange
             .subscribe(this._handleCurrentUserChange.bind(this));
     }
+    
+    componentWillUnmount() {
+        this._onCurrentUserChangeSubscription.unsubscribe();
+    }
 
     render(): ReactNode {
-        console.log("AppBar RENDERED");
         const styleClasses = this.props.classes;
+        const currentUser = this.state.currentUser;
         return (
             <Paper className={`${styleClasses.root} ${this.props.appBarElevated ? '' : 'no-elevation'}`}
                    elevation={ThemeConstants.AppBarElevatedElevation}
                    square={true}>
                 <div className={styleClasses.contents}>
-                    <div className={styleClasses.title}>
+                    <Link className={styleClasses.title} to="/">
                         FGO Servant Planner
-                    </div>
-                    {this.state.currentUser ? <AppBarAuthenticatedUser /> : <AppBarGuestUser />}
+                    </Link>
+                    {currentUser ? <AppBarAuthenticatedUser currentUser={currentUser} /> : <AppBarGuestUser />}
                 </div>
             </Paper>
         );
-    }
-
-    componentWillUnmount() {
-        this._onCurrentUserChangeSubscription.unsubscribe();
     }
 
     private async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {

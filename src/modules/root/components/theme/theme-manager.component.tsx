@@ -1,15 +1,16 @@
-import { Box, Button, createMuiTheme, ThemeProvider, Typography } from '@material-ui/core';
+import { Theme, ThemeProvider, Typography, createMuiTheme } from '@material-ui/core';
 import React, { Component, Fragment, ReactNode } from 'react';
-import overrides from '../../../../styles/material-ui-overrides';
-import { ThemeConstants } from '../../../../styles/theme-constants';
+import { Subscription } from 'rxjs';
+import { ThemeService } from 'services';
+import { Container as Injectables } from 'typedi';
 import { ThemeBackground } from './theme-background.component';
-import { Nullable } from 'internal';
 
 type Props = {
 
 };
 
 type State = {
+    theme: Theme;
     backgroundImageUrl?: string | null;
 };
 
@@ -18,72 +19,41 @@ type State = {
  */
 export class ThemeManager extends Component<Props, State> {
 
-    private theme = createMuiTheme({
-        spacing: ThemeConstants.Spacing,
-        palette: {
-            primary: {
-                main: '#EC407A'
-            },
-            secondary: {
-                main: '#039BE5'
-            }
+    private _themeService = Injectables.get(ThemeService);
 
-        },
-        overrides
-    });
+    private _onThemeChangeSubscription!: Subscription;
 
-    private backgroundImageUrl: Nullable<string>;
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            theme: createMuiTheme({}) // Initialize with default Material-UI theme
+        };
+    }
 
-    private themeState = true;
+    componentDidMount() {
+        this._onThemeChangeSubscription = this._themeService.onThemeChange
+            .subscribe(this._handleThemeChange.bind(this));
+    }
+
+    componentWillUnmount() {
+        this._onThemeChangeSubscription.unsubscribe();
+    }
 
     render(): ReactNode {
         return (
             <Fragment>
-                <ThemeBackground opacity={0.5} imageUrl={this.backgroundImageUrl}/>
-                <ThemeProvider theme={this.theme}>
+                <ThemeBackground opacity={0.5} imageUrl={this.state.backgroundImageUrl}/>
+                <ThemeProvider theme={this.state.theme}>
                     <Typography component={'div'}>
                         {this.props.children}
-                        <Box mt={4}>
-                            <Button onClick={this.toggleTheme.bind(this)}>CHANGE THEME</Button>
-                        </Box>
                     </Typography>
                 </ThemeProvider>
             </Fragment>
         );
     }
 
-    toggleTheme() {
-        if (this.themeState = !this.themeState) {
-            this.theme = createMuiTheme({
-                spacing: ThemeConstants.Spacing,
-                palette: {
-                    primary: {
-                        main: '#EC407A'
-                    },
-                    secondary: {
-                        main: '#039BE5'
-                    }
-
-                },
-                overrides
-            });
-            this.backgroundImageUrl = undefined;
-        } else {
-            this.theme = createMuiTheme({
-                spacing: ThemeConstants.Spacing,
-                palette: {
-                    primary: {
-                        main: '#FA9'
-                    },
-                    secondary: {
-                        main: '#BADA55'
-                    }
-        
-                }
-            });
-            this.backgroundImageUrl = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHw%3D&w=1000&q=80"
-        }
-        this.forceUpdate();
+    private _handleThemeChange(theme: Theme) {
+        this.setState({ theme });
     }
 
 }

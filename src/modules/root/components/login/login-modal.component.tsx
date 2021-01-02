@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Theme, Typography, withTheme } from '@material-ui/core';
-import { ModalComponent, ModalComponentProps, UserCredentials } from 'internal';
-import React, { ChangeEvent, ReactNode, SyntheticEvent } from 'react';
+import { ModalComponent, ModalComponentProps } from 'internal';
+import React, { ChangeEvent, FormEvent, ReactNode } from 'react';
 import { AuthService } from 'services';
 import { Container as Injectables } from 'typedi';
 
@@ -101,7 +101,7 @@ export const LoginModal = withTheme(class extends ModalComponent<Props, State> {
         });
     }
 
-    private async _login(event: SyntheticEvent): Promise<void> {
+    private async _login(event: FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault();
         this.setState({ 
             isLoggingIn: true,

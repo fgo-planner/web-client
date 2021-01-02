@@ -1,5 +1,4 @@
-import { Paper, Theme, withStyles } from '@material-ui/core';
-import { ClassNameMap, StyleRules } from '@material-ui/core/styles/withStyles';
+import { StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesProps } from 'internal';
 import React, { Component, ReactNode, UIEvent } from 'react';
 import { ThemeConstants } from 'styles';
@@ -36,32 +35,31 @@ const style = (theme: Theme) => ({
     },
     mainContent: {
         flex: 1,
-        overflow: 'auto'
+        overflow: 'auto',
+        background: theme.palette.background.paper,
+        color: theme.palette.text.primary
     }
 } as StyleRules);
 
 export const NavigationMain = withStyles(style)(class extends Component<Props, State> {
 
-    private readonly styleClasses: ClassNameMap;
-
     constructor(props: Props) {
         super(props);
-        this.styleClasses = props.classes;
         this.state = {
             appBarElevated: false
         };
     }
 
     render(): ReactNode {
-        const scrollHandler = this.scrollHandler.bind(this);
+        const styleClasses = this.props.classes;
         return (
-            <div className={this.styleClasses.root}>
-                <div className={this.styleClasses.upperSection}>
+            <div className={styleClasses.root}>
+                <div className={styleClasses.upperSection}>
                     <AppBar appBarElevated={this.state.appBarElevated} />
                 </div>
-                <div className={this.styleClasses.lowerSection}>
+                <div className={styleClasses.lowerSection}>
                     {/* TODO Add nav rail */}
-                    <div className={this.styleClasses.mainContent} onScroll={scrollHandler}>
+                    <div className={styleClasses.mainContent} onScroll={this.scrollHandler.bind(this)}>
                         {this.props.children}
                     </div>
                 </div>

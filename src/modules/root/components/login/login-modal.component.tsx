@@ -21,7 +21,7 @@ type State = {
 
 export const LoginModal = withTheme(class extends ModalComponent<Props, State> {
 
-    private readonly _authService = Injectables.get(AuthService);
+    private _authService = Injectables.get(AuthService);
 
     private get _loginFormDefaults(): LoginForm {
         return {
@@ -37,6 +37,9 @@ export const LoginModal = withTheme(class extends ModalComponent<Props, State> {
             loginForm: this._loginFormDefaults,
             isLoggingIn: false
         };
+
+        this._handleInputChange = this._handleInputChange.bind(this);
+        this._login = this._login.bind(this);
     }
 
     render(): ReactNode {
@@ -50,14 +53,14 @@ export const LoginModal = withTheme(class extends ModalComponent<Props, State> {
                         <div>
                             {this.state.errorMessage}
                         </div>
-                        <form id="login-form" onSubmit={this._login.bind(this)}>
+                        <form id="login-form" onSubmit={this._login}>
                             <div>
                                 <TextField label="Username"
                                            variant="outlined"
                                            id="username"
                                            name="username"
                                            value={this.state.loginForm.username}
-                                           onChange={this._handleInputChange.bind(this)}
+                                           onChange={this._handleInputChange}
                                            required />
                             </div>
                             <div>
@@ -67,7 +70,7 @@ export const LoginModal = withTheme(class extends ModalComponent<Props, State> {
                                            name="password"
                                            type="password"
                                            value={this.state.loginForm.password}
-                                           onChange={this._handleInputChange.bind(this)}
+                                           onChange={this._handleInputChange}
                                            required />
                             </div>
                         </form>

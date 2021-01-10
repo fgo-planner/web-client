@@ -48,6 +48,7 @@ export const NavigationMain = withStyles(style)(class extends Component<Props, S
         this.state = {
             appBarElevated: false
         };
+        this._scrollHandler = this._scrollHandler.bind(this);
     }
 
     render(): ReactNode {
@@ -59,7 +60,7 @@ export const NavigationMain = withStyles(style)(class extends Component<Props, S
                 </div>
                 <div className={styleClasses.lowerSection}>
                     {/* TODO Add nav rail */}
-                    <div className={styleClasses.mainContent} onScroll={this.scrollHandler.bind(this)}>
+                    <div className={styleClasses.mainContent} onScroll={this._scrollHandler}>
                         {this.props.children}
                     </div>
                 </div>
@@ -67,7 +68,7 @@ export const NavigationMain = withStyles(style)(class extends Component<Props, S
         );
     }
 
-    private scrollHandler(event: UIEvent) {
+    private _scrollHandler(event: UIEvent) {
         const scrollAmount = (event.target as Element)?.scrollTop;
         const appBarElevated = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
         if (appBarElevated !== this.state.appBarElevated) {

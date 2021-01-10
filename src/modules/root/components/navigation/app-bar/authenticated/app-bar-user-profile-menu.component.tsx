@@ -1,15 +1,15 @@
-import { Avatar, Divider, ListItemIcon, ListItemText, MenuItem, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { AccountCircle, ExitToApp, Settings, SportsEsports, WbSunny, NightsStay, Info, InfoOutlined } from '@material-ui/icons';
+import { Avatar, Divider, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { AccountCircle, ExitToApp, InfoOutlined, NightsStay, Settings, SportsEsports, WbSunny } from '@material-ui/icons';
 import { User } from 'data';
-import { ModalOnCloseHandler, WithStylesProps, WithThemeProps, ThemeMode } from 'internal';
+import { ModalOnCloseHandler, ThemeMode, WithStylesProps, WithThemeProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
+import { Subscription } from 'rxjs';
 import { AuthService, ThemeService } from 'services';
 import { ThemeConstants } from 'styles';
 import { Container as Injectables } from 'typedi';
 import { ThemeUtils } from 'utils';
-import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
-import { Subscription } from 'rxjs';
+import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 
 type Props = {
     anchorElement?: Element | null;
@@ -27,7 +27,8 @@ const style = (theme: Theme) => ({
     },
     menuHeader: {
         display: 'flex',
-        padding: theme.spacing(2, 4)
+        padding: theme.spacing(2, 4, 3, 4),
+        outline: 'none'
     },
     avatar: {
         width: ThemeUtils.spacingInPixels(theme, 14),
@@ -39,13 +40,13 @@ const style = (theme: Theme) => ({
     },
     username: {
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontSize: '16px',
+        fontSize: '1rem',
         fontWeight: 500,
         color: theme.palette.text.primary
     },
     email: {
         fontFamily: theme.typography.fontFamily,
-        fontSize: '14px',
+        fontSize: '0.875rem',
         color: theme.palette.text.secondary
     }
 } as StyleRules);
@@ -84,6 +85,8 @@ export const AppBarUserProfileMenu = withStyles(style, { withTheme: true })(clas
                               onClose={this.props.onClose}>
 
                 {this._renderMenuHeader()}
+
+                <Divider />
 
                 <AppBarActionMenuItem label="Profile" 
                                       icon={AccountCircle} 

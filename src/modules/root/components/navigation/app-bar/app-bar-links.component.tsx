@@ -21,10 +21,15 @@ const style = (theme: Theme) => ({
 
 export const AppBarLinks = withRouter(withStyles(style)(class extends PureComponent<Props> {
 
+    constructor(props: Props) {
+        super(props);
+        this._renderLink = this._renderLink.bind(this);
+    }
+
     render(): ReactNode {
         return (
             <div className={this.props.classes.root}>
-                {this.props.links.map(this._renderLink.bind(this))}
+                {this.props.links.map(this._renderLink)}
             </div>
         );
     }

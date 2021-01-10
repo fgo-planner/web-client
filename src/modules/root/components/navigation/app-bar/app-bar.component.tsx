@@ -38,7 +38,10 @@ const style = (theme: Theme) => ({
         fontSize: '24px',
         color: theme.palette.text.primary,
         textDecoration: 'none',
-        marginRight: theme.spacing(6)
+        marginRight: theme.spacing(6),
+        [theme.breakpoints.down('md')]: {
+            display: 'none'
+        },
     }
 } as StyleRules);
 
@@ -77,6 +80,7 @@ export const AppBar = withStyles(style, { withTheme: true })(class extends PureC
                    elevation={ThemeConstants.AppBarElevatedElevation}
                    square={true}>
                 <div className={styleClasses.contents}>
+                    {/* TODO Add logo */}
                     <Link className={styleClasses.title} to="/">
                         FGO Servant Planner
                     </Link>

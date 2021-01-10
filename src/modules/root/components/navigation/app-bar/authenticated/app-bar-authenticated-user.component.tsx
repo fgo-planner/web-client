@@ -5,6 +5,7 @@ import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from 'styles';
 import { ThemeUtils } from 'utils';
 import { AppBarLinks } from '../app-bar-links.component';
+import { AppBarGameAccountSelect } from './app-bar-game-account-select.component';
 import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
 
 type Props = {
@@ -23,7 +24,7 @@ const style = (theme: Theme) => ({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        padding: theme.spacing(0, 4)
+        paddingRight: theme.spacing(4)
     },
     avatar: {
         cursor: 'pointer',
@@ -87,6 +88,7 @@ export const AppBarAuthenticatedUser = withStyles(style, { withTheme: true })(cl
         return (
             <Fragment>
                 <div className={styleClasses.root}>
+                    <AppBarGameAccountSelect />
                     <AppBarLinks links={this.AccountLinks} />
                     <Box flex={1} />
                     <AppBarLinks links={[{ label: 'Resources' }]} />

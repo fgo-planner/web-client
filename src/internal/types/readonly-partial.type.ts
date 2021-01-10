@@ -1,0 +1,1 @@
+export type ReadonlyPartial<T> = Readonly<Partial<T>>;

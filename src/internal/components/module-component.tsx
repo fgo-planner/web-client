@@ -1,7 +1,10 @@
 import { LazyLoadFallback, NotFound } from 'components';
-import { RouteDefinition, RouteDefinitions } from 'internal';
+import { Nullable, RouteDefinition, RouteDefinitions, UserInfo } from 'internal';
 import React, { ReactNode, Suspense } from 'react';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
+import { Subscription } from 'rxjs';
+import { AuthService } from 'services';
+import { Container as Injectables } from 'typedi';
 import { RouteComponent } from './route-component';
 
 export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, S> {
@@ -9,8 +12,19 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
     protected readonly RedirectOnRouteMismatch: boolean = false;
 
     protected abstract readonly ModuleRoutes: RouteDefinitions;
+
+    private _authService = Injectables.get(AuthService);
+
+    private _onCurrentUserChangeSubscription!: Subscription;
+
+    componentDidMount() {
+        this._onCurrentUserChangeSubscription = this._authService.onCurrentUserChange
+            .subscribe(this._handleCurrentUserChange.bind(this));
+    }
     
-    private isLoggedIn = false; // TODO Implement this
+    componentWillUnmount() {
+        this._onCurrentUserChangeSubscription.unsubscribe();
+    }
 
     render(): ReactNode {
         return this.renderModuleRoutes();
@@ -115,12 +129,13 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
      * instead.
      */
     private renderRouteComponent(route: RouteDefinition, routeProps: RouteComponentProps, path?: string): ReactNode {
-        if (route.authenticationRequired && !this.isLoggedIn) {
+        if (route.authenticationRequired && !this._authService.isLoggedIn) {
             /*
              * Redirect user if they are not authenticated but are trying to access a route
              * that requires authentication.
              * 
              * TODO Define the redirect path as a constant.
+             * TODO Redirect to login page?
              */
             return <Redirect to="/"></Redirect>;
         }
@@ -209,6 +224,16 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
             path = path.substring(1);
         }
         return `${parentPath}/${path}`;
+    }
+    
+    private _handleCurrentUserChange(userInfo: Nullable<UserInfo>) {
+        /* 
+         * If user logged out, then re-render. This will trigger a redirect if the user
+         * is currently on an authenticated-only route.
+         */
+        if (!userInfo) {
+            this.forceUpdate();
+        }
     }
 
 }

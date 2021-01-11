@@ -48,7 +48,8 @@ export class RootModule extends ModuleComponent {
         },
         {
             path: '/user',
-            lazyComponent: React.lazy(() => import('../authenticated/authenticated.module'))
+            lazyComponent: React.lazy(() => import('../authenticated/authenticated.module')),
+            authenticationRequired: true
         },
         {
             component: ErrorRoute

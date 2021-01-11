@@ -43,10 +43,12 @@ export const AppBarAuthenticatedUser = withStyles(style, { withTheme: true })(cl
 
     private readonly AccountLinks: RouteLinkDefinitions = [
         {
-            label: 'My Servants'
+            label: 'My Servants',
+            route: '/user/account/servants'
         },
         {
-            label: 'My Items'
+            label: 'My Items',
+            route: '/user/account/items'
         },
         {
             label: 'Planner'

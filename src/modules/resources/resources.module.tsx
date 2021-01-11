@@ -1,6 +1,6 @@
 import { ModuleComponent, RouteDefinitions } from 'internal';
-import { Servants } from './routes/servants.route';
-import { Events } from './routes/events.route';
+import { ServantsRoute } from './routes/servants.route';
+import { EventsRoute } from './routes/events.route';
 import { ReactNode } from 'react';
 import { ResourcesRoute } from './routes/resources.route';
 
@@ -17,17 +17,17 @@ export default class ResourcesModule extends ModuleComponent {
         {
             path: '/servants',
             exact: true,
-            component: Servants
+            component: ServantsRoute
         },
         {
             path: '/events',
             exact: true,
-            component: Events
+            component: EventsRoute
         },
         // {
         //     path: '/:id',
         //     exact: true,
-        //     component: Events
+        //     component: EventsRoute
         // },
     ];
 

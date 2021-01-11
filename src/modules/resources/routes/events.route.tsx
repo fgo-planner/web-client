@@ -1,7 +1,7 @@
 import { RouteComponent } from 'internal';
 import React, { ReactNode, Fragment } from 'react';
 
-export class Events extends RouteComponent {
+export class EventsRoute extends RouteComponent {
 
     render(): ReactNode {
         console.log(this.props)

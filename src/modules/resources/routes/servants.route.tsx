@@ -1,7 +1,7 @@
 import { RouteComponent } from 'internal';
 import React, { ReactNode } from 'react';
 
-export class Servants extends RouteComponent {
+export class ServantsRoute extends RouteComponent {
 
     render(): ReactNode {
         return (

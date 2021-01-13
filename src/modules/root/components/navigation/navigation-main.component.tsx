@@ -2,7 +2,6 @@ import { StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesProps } from 'internal';
 import React, { Component, ReactNode, UIEvent } from 'react';
 import { ThemeConstants } from 'styles';
-import { ThemeUtils } from 'utils';
 import { AppBar } from './app-bar/app-bar.component';
 
 type Props = WithStylesProps;
@@ -26,7 +25,7 @@ const style = (theme: Theme) => ({
     },
     lowerSection: {
         display: 'flex',
-        height: `calc(100vh - ${ThemeUtils.spacingInPixels(theme, ThemeConstants.AppBarHeightScale)})`
+        height: `calc(100vh - ${theme.spacing(ThemeConstants.AppBarHeightScale)})`
     },
     navRailContainer: {
         display: 'none',

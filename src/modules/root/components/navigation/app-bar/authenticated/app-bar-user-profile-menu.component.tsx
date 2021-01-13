@@ -7,7 +7,6 @@ import { Subscription } from 'rxjs';
 import { AuthService, ThemeService } from 'services';
 import { ThemeConstants } from 'styles';
 import { Container as Injectables } from 'typedi';
-import { ThemeUtils } from 'utils';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
 import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 
@@ -31,9 +30,9 @@ const style = (theme: Theme) => ({
         outline: 'none'
     },
     avatar: {
-        width: ThemeUtils.spacingInPixels(theme, 14),
-        height: ThemeUtils.spacingInPixels(theme, 14),
-        marginRight: ThemeUtils.spacingInPixels(theme, 3)
+        width: theme.spacing(14),
+        height: theme.spacing(14),
+        marginRight: theme.spacing(3)
     },
     userInfo: {
         maxWidth: '180px' // TODO Un-hardcode this

@@ -5,7 +5,6 @@ import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { UserGameAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
-import { ThemeUtils } from 'utils';
 
 type Props = WithThemeProps & WithStylesProps;
 
@@ -16,11 +15,11 @@ type State = {
 
 const style = (theme: Theme) => ({
     root: {
-        width: ThemeUtils.spacingInPixels(theme, 56),
+        width: theme.spacing(56),
         background: theme.palette.background.default,
     },
     selectOption: {
-        height: ThemeUtils.spacingInPixels(theme, 10)
+        height: theme.spacing(10)
     }
 } as StyleRules);
 

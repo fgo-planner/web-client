@@ -3,7 +3,6 @@ import { User } from 'data';
 import { RouteLinkDefinitions, WithStylesProps, WithThemeProps } from 'internal';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from 'styles';
-import { ThemeUtils } from 'utils';
 import { AppBarLinks } from '../app-bar-links.component';
 import { AppBarGameAccountSelect } from './app-bar-game-account-select.component';
 import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
@@ -28,8 +27,8 @@ const style = (theme: Theme) => ({
     },
     avatar: {
         cursor: 'pointer',
-        width: ThemeUtils.spacingInPixels(theme, ThemeConstants.AppBarAvatarSize),
-        height: ThemeUtils.spacingInPixels(theme, ThemeConstants.AppBarAvatarSize)
+        width: theme.spacing(ThemeConstants.AppBarAvatarSize),
+        height: theme.spacing(ThemeConstants.AppBarAvatarSize)
     }
 } as StyleRules);
 

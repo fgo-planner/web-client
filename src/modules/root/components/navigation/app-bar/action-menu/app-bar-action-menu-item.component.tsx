@@ -3,7 +3,6 @@ import { SvgIconComponent } from '@material-ui/icons';
 import { WithStylesProps, WithThemeProps } from 'internal';
 import React, { MouseEventHandler } from 'react';
 import { Link } from 'react-router-dom';
-import { ThemeUtils } from 'utils';
 
 type Props = {
     label: string;
@@ -14,7 +13,7 @@ type Props = {
 
 const style = (theme: Theme) => ({
     root: {
-        height: ThemeUtils.spacingInPixels(theme, 10),
+        height: theme.spacing(10),
         '& .MuiListItemIcon-root': {
             color: theme.palette.text.hint,
             minWidth: 'initial',
@@ -27,16 +26,16 @@ const style = (theme: Theme) => ({
 } as StyleRules);
 
 export const AppBarActionMenuItem = React.memo(withStyles(style, { withTheme: true })((props: Props) => {
-    const Icon = props.icon;
+    const { label, to, onClick, classes } = props;
     return (
-        <MenuItem className={props.classes.root} 
-                  component={props.to ? Link : 'li'}
-                  to={props.to}
-                  onClick={props.onClick}>
+        <MenuItem className={classes.root} 
+                  component={to ? Link : 'li'}
+                  to={to}
+                  onClick={onClick}>
             <ListItemIcon>
-                <Icon />
+                <props.icon />
             </ListItemIcon>
-            <ListItemText primary={props.label} />
+            <ListItemText primary={label} />
         </MenuItem>
     );
 }));

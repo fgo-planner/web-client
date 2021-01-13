@@ -4,7 +4,6 @@ import { RouteLinkDefinition, RouteLinkDefinitions, WithStylesProps } from 'inte
 import React, { PureComponent, ReactNode } from 'react';
 import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { ThemeConstants } from 'styles';
-import { ThemeUtils } from 'utils';
 import { AppBarLink } from './app-bar-link.component';
 
 type Props = {
@@ -14,7 +13,7 @@ type Props = {
 const style = (theme: Theme) => ({
     root: {
         display: 'flex',
-        height: ThemeUtils.spacingInPixels(theme, ThemeConstants.AppBarHeightScale),
+        height: theme.spacing(ThemeConstants.AppBarHeightScale),
         margin: theme.spacing(0, 2)
     }
 } as StyleRules);

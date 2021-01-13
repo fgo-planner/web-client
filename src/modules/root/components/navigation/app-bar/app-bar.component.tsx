@@ -2,14 +2,13 @@ import { Paper, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { User } from 'data';
 import { Nullable, UserInfo, WithStylesProps, WithThemeProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { AuthService, UserService } from 'services';
 import { ThemeConstants } from 'styles';
 import { Container as Injectables } from 'typedi';
-import { ThemeUtils } from 'utils';
 import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';
 import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
-import { Link } from 'react-router-dom';
 
 type Props = {
     appBarElevated: boolean;
@@ -21,7 +20,7 @@ type State = {
 
 const style = (theme: Theme) => ({
     root: {
-        height: ThemeUtils.spacingInPixels(theme, ThemeConstants.AppBarHeightScale),
+        height: theme.spacing(ThemeConstants.AppBarHeightScale),
         transition: 'box-shadow 200ms 50ms linear',
         '&.no-elevation' : {
             boxShadow: '0px 1px 0px rgba(0,0,0,0.12)' // Simulates 1px solid border

@@ -1,8 +1,6 @@
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
 import { ModalOnCloseReason, RouteLinkDefinitions, WithStylesProps, WithThemeProps } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
-import { ThemeConstants } from 'styles';
-import { ThemeUtils } from 'utils';
 import { LoginModal } from '../../../login/login-modal.component';
 import { AppBarLinks } from '../app-bar-links.component';
 

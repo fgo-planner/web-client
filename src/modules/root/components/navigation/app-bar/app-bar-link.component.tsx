@@ -3,7 +3,6 @@ import { RouteLinkDefinition, WithStylesProps, WithThemeProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeConstants } from 'styles';
-import { ThemeUtils } from 'utils';
 
 type Props = {
     active?: boolean;
@@ -18,7 +17,7 @@ const style = (theme: Theme) => ({
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
         boxSizing: 'border-box',
-        lineHeight: ThemeUtils.spacingInPixels(theme, ThemeConstants.AppBarHeightScale),
+        lineHeight: `${theme.spacing(ThemeConstants.AppBarHeightScale)}px`,
         margin: theme.spacing(0, 2),
         padding: theme.spacing(0, 2),
         borderBottom: '4px solid transparent',

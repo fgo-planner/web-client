@@ -1,13 +1,10 @@
 import { fade, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { RouteLinkDefinition, WithStylesProps, WithThemeProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { ThemeConstants } from 'styles';
 
-type Props = {
-    active?: boolean;
-    link: RouteLinkDefinition;
-} & WithThemeProps & WithStylesProps;
+type Props = RouteLinkDefinition & ReactRouteComponentProps & WithThemeProps & WithStylesProps;
 
 const style = (theme: Theme) => ({
     root: {
@@ -31,35 +28,45 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const AppBarLink = withStyles(style, {withTheme: true})(class extends PureComponent<Props> {
 
-    private get _className(): string {
+export const AppBarLink = withRouter(withStyles(style, { withTheme: true })(class extends PureComponent<Props> {
+
+    render(): ReactNode {
+        const { route, label, onClick } = this.props;
+        const className = this._generateClassName();
+        if (route) {
+            // If route path was defined, then render it as a Link.
+            return (
+                <Link className={className} to={route} onClick={onClick}>
+                    {label}
+                </Link>
+            );
+        }
+        return (
+            <div className={className} onClick={onClick}>
+                {label}
+            </div>
+        );
+    }
+
+    private _generateClassName(): string {
         let className = this.props.classes.root;
-        if (this.props.active) {
+        if (this._isLinkActive()) {
             className += ` ${this.props.classes.active}`;
         }
         return className;
     }
 
-    render(): ReactNode {
-        if (this.props.link.route) {
-            return this._renderAsLink();
+    private _isLinkActive(): boolean {
+        const { route, exact, location } = this.props;
+        if (!route) {
+            return false;
         }
-        return (
-            <div className={this._className} onClick={this.props.link.onClick}>
-                {this.props.link.label}
-            </div>
-        );
+        if (exact) {
+            return location?.pathname === route;
+        } else {
+            return location?.pathname.startsWith(route);
+        }
     }
 
-    private _renderAsLink() {
-        return (
-            <Link className={this._className} 
-                  to={this.props.link.route as string} // Route is never undefined here.
-                  onClick={this.props.link.onClick}>
-                {this.props.link.label}
-            </Link>
-        )
-    }
-
-});
+}));

@@ -1,8 +1,9 @@
 import { Avatar, Box, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { User } from 'data';
-import { RouteLinkDefinitions, WithStylesProps, WithThemeProps } from 'internal';
+import { WithStylesProps, WithThemeProps } from 'internal';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from 'styles';
+import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
 import { AppBarGameAccountSelect } from './app-bar-game-account-select.component';
 import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
@@ -40,39 +41,6 @@ export const AppBarAuthenticatedUser = withStyles(style, { withTheme: true })(cl
     // Temporary
     private readonly AvatarImageUrl = 'https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png';
 
-    private readonly AccountLinks: RouteLinkDefinitions = [
-        {
-            label: 'My Servants',
-            route: '/user/account/servants'
-        },
-        {
-            label: 'My Items',
-            route: '/user/account/items'
-        },
-        {
-            label: 'Planner'
-        }
-    ];
-
-    // private readonly ResourceLink: RouteLinkDefinition = [
-    //     {
-    //         label: 'Servants',
-    //         route: '/resources/servants'
-    //     },
-    //     {
-    //         label: 'Items'
-    //     },
-    //     {
-    //         label: 'Events',
-    //         route: '/resources/events'
-    //     },
-    //     {
-    //         label: 'Login',
-    //         onClick: this._openLoginModal.bind(this)
-    //     }
-    // ];
-
-
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -90,11 +58,20 @@ export const AppBarAuthenticatedUser = withStyles(style, { withTheme: true })(cl
             <Fragment>
                 <div className={styleClasses.root}>
                     <AppBarGameAccountSelect />
-                    <AppBarLinks links={this.AccountLinks} />
+                    <AppBarLinks>
+                        <AppBarLink label="My Servants"
+                                    route="/user/account/servants" />
+                        <AppBarLink label="My Items"
+                                    route="/user/account/items" />
+                        <AppBarLink label="Planner"
+                                    route="/user/account/planner" />
+                    </AppBarLinks>
                     <Box flex={1} />
-                    <AppBarLinks links={[{ label: 'Resources' }]} />
+                    <AppBarLinks>
+                        <AppBarLink label="Resources" />
+                    </AppBarLinks>
                     <Avatar className={styleClasses.avatar}
-                            src={this.AvatarImageUrl} 
+                            src={this.AvatarImageUrl}
                             onClick={this._handleAvatarClick}
                     />
                 </div>

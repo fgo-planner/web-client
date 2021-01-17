@@ -1,3 +1,4 @@
+import { HttpOptions, Nullable } from 'internal';
 import { JwtUtils } from './jwt.utils';
 
 export class HttpUtils {
@@ -6,73 +7,100 @@ export class HttpUtils {
 
     private static ContentTypeHeader = 'Content-Type';
 
-    static async get<T = any>(url: string): Promise<T> {
-        const headers = this.appendAuthorizationHeader();
-        const options = {
+    static async get<T = any>(url: string, options?: HttpOptions): Promise<T> {
+        if (options?.params) {
+            url += `&${this._generateUrlParamsString(options.params)}`;
+        }
+        const headers = this._appendAuthorizationHeader();
+        const init = {
             method: 'GET',
             headers
         };
-        const response = await fetch(url, options);
+        const response = await fetch(url, init);
         return response.json();
     }
 
-    static async post<T = any>(url: string, body: string | object): Promise<T> {
+    static async post<T = any>(url: string, body: string | object, options?: HttpOptions): Promise<T> {
+        if (options?.params) {
+            url += `&${this._generateUrlParamsString(options.params)}`;
+        }
         const headers = {
-            [this.ContentTypeHeader]: this.inferContentType(body)
+            [this.ContentTypeHeader]: this._inferContentType(body)
         };
-        this.appendAuthorizationHeader(headers);
+        this._appendAuthorizationHeader(headers);
         if (typeof body === 'object') {
             body = JSON.stringify(body);
         }
-        const options = {
+        const init = {
             method: 'POST',
             body,
             headers
         };
-        const response = await fetch(url, options);
+        const response = await fetch(url, init);
         return response.json();
     }
 
-    static async put<T = any>(url: string, body: string | object): Promise<T> {
+    static async put<T = any>(url: string, body: string | object, options?: HttpOptions): Promise<T> {
+        if (options?.params) {
+            url += `&${this._generateUrlParamsString(options.params)}`;
+        }
         const headers = {
-            [this.ContentTypeHeader]: this.inferContentType(body)
+            [this.ContentTypeHeader]: this._inferContentType(body)
         };
-        this.appendAuthorizationHeader(headers);
+        this._appendAuthorizationHeader(headers);
         if (typeof body === 'object') {
             body = JSON.stringify(body);
         }
-        const options = {
+        const init = {
             method: 'PUT',
             body,
             headers
         };
-        const response = await fetch(url, options);
+        const response = await fetch(url, init);
         return response.json();
     }
 
-    static async delete<T = any>(url: string): Promise<T> {
-        const headers = this.appendAuthorizationHeader();
-        const options = {
+    static async delete<T = any>(url: string, options?: HttpOptions): Promise<T> {
+        if (options?.params) {
+            url += `&${this._generateUrlParamsString(options.params)}`;
+        }
+        const headers = this._appendAuthorizationHeader();
+        const init = {
             method: 'PUT',
             headers
         };
-        const response = await fetch(url, options);
+        const response = await fetch(url, init);
         return response.json();
     }
     
-    private static inferContentType(body: string | object): string {
+    private static _inferContentType(body: string | object): string {
         if (typeof body === 'object') {
             return 'application/json';
         }
         return 'text/plain';
     }
 
-    private static appendAuthorizationHeader(headers: Record<string, string> = {}): Record<string, string> {
+    private static _appendAuthorizationHeader(headers: Record<string, string> = {}): Record<string, string> {
         const token = JwtUtils.readTokenFromStorage();
         if (token !== null) {
             headers[this.AuthorizationHeader] = token;
         }
         return headers;
+    }
+
+    private static _generateUrlParamsString(params: Record<string, Nullable<string | number | boolean>>): string {
+        const urlParams = new URLSearchParams();
+        for (const key in params) {
+            let value = params[key];
+            if (value == null) {
+                continue;
+            }
+            if (typeof value !== 'string') {
+                value = String(value);
+            }
+            urlParams.append(key, value);
+        }
+        return urlParams.toString();
     }
 
 }

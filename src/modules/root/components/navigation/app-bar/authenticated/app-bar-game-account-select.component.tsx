@@ -81,22 +81,21 @@ export const AppBarGameAccountSelect = withStyles(style)(class extends PureCompo
     }
 
     private _handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
-        const value = event.target.value;
-        this._updateCurrentGameAccountId(value);
-    }
-
-    private _updateCurrentGameAccountId(accountId: string) {
+        const accountId = event.target.value;
         if (accountId === this.state.currentGameAccountId) {
             return;
         }
         this.setState({
             currentGameAccountId: accountId
         });
+        this._userGameAccountService.selectAccount(accountId);
     }
 
     private _handleCurrentGameAccountChange(account: Nullable<UserGameAccount>) {
         const accountId = account?._id || '';
-        this._updateCurrentGameAccountId(accountId);
+        this.setState({
+            currentGameAccountId: accountId
+        });
     }
 
     private _handleGameAccountListUpdated(accounts: ReadonlyPartialArray<UserGameAccount>) {

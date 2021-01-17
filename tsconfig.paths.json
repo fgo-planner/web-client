@@ -2,6 +2,10 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
+            // The name "constants" here is already in use by node-js.
+            "app-constants": [
+                "src/constants"
+            ],
             "components": [
                 "src/components"
             ],

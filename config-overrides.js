@@ -6,6 +6,7 @@ module.exports = function override(config) {
         ...config.resolve,
         alias: {
             ...config.alias,
+            'app-constants': path.resolve(__dirname, 'src/constants'),
             'components': path.resolve(__dirname, 'src/components'),
             'data': path.resolve(__dirname, 'src/data'),
             'internal': path.resolve(__dirname, 'src/internal'),

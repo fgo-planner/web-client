@@ -3,7 +3,7 @@ import { Nullable, ReadonlyPartialArray, UserInfo } from 'internal';
 import { BehaviorSubject } from 'rxjs';
 import { Container as Injectables, Service } from 'typedi';
 import { HttpUtils as Http } from 'utils';
-import { AuthService } from '../authentication/auth.service';
+import { AuthService } from '../../authentication/auth.service';
 
 @Service()
 export class UserGameAccountService {
@@ -29,12 +29,13 @@ export class UserGameAccountService {
 
     readonly onCurrentGameAccountChange!: BehaviorSubject<Nullable<UserGameAccount>>;
 
+    // TODO Make use of this
     readonly onCurrentGameAccountUpdated!: BehaviorSubject<Nullable<UserGameAccount>>;
 
     readonly onGameAccountListUpdated!: BehaviorSubject<ReadonlyPartialArray<UserGameAccount>>;
 
     constructor() {
-        this.onCurrentGameAccountChange = new BehaviorSubject<Nullable<Nullable<UserGameAccount>>>(null);
+        this.onCurrentGameAccountChange = new BehaviorSubject<Nullable<UserGameAccount>>(null);
         this.onCurrentGameAccountUpdated = new BehaviorSubject<Nullable<UserGameAccount>>(null);
         this.onGameAccountListUpdated = new BehaviorSubject<ReadonlyPartialArray<UserGameAccount>>([]);
 
@@ -59,6 +60,7 @@ export class UserGameAccountService {
 
     async updateAccount(gameAccount: Partial<UserGameAccount>): Promise<UserGameAccount> {
         return Http.post<UserGameAccount>(`${this.BaseUrl}`, gameAccount);
+        // TODO Push update to onCurrentGameAccountUpdated subject.
     }
 
     /**

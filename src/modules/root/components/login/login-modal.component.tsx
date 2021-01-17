@@ -61,7 +61,8 @@ export const LoginModal = withTheme(class extends ModalComponent<Props, State> {
                                            name="username"
                                            value={this.state.loginForm.username}
                                            onChange={this._handleInputChange}
-                                           required />
+                                           required
+                                />
                             </div>
                             <div>
                                 <TextField label="Password"
@@ -71,7 +72,8 @@ export const LoginModal = withTheme(class extends ModalComponent<Props, State> {
                                            type="password"
                                            value={this.state.loginForm.password}
                                            onChange={this._handleInputChange}
-                                           required />
+                                           required
+                                />
                             </div>
                         </form>
                     </DialogContent>

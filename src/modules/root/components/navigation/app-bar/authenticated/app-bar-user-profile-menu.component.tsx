@@ -1,7 +1,7 @@
 import { Avatar, Divider, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { AccountCircle, ExitToApp, InfoOutlined, NightsStay, Settings, SportsEsports, WbSunny } from '@material-ui/icons';
 import { User } from 'data';
-import { ModalOnCloseHandler, ThemeMode, WithStylesProps, WithThemeProps } from 'internal';
+import { ModalOnCloseHandler, ThemeMode, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { AuthService, ThemeService } from 'services';
@@ -14,7 +14,7 @@ type Props = {
     anchorElement?: Element | null;
     onClose?: ModalOnCloseHandler;
     currentUser: User;
-} & WithThemeProps & WithStylesProps;
+} & WithStylesProps;
 
 type State = {
     themeMode: ThemeMode;
@@ -50,7 +50,7 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const AppBarUserProfileMenu = withStyles(style, { withTheme: true })(class extends PureComponent<Props, State> {
+export const AppBarUserProfileMenu = withStyles(style)(class extends PureComponent<Props, State> {
 
     private _authService = Injectables.get(AuthService);
 

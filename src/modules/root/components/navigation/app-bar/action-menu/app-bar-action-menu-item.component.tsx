@@ -1,6 +1,6 @@
 import { ListItemIcon, ListItemText, MenuItem, StyledComponentProps, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { SvgIconComponent } from '@material-ui/icons';
-import { WithStylesProps, WithThemeProps } from 'internal';
+import { WithStylesProps } from 'internal';
 import React, { MouseEventHandler } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ type Props = {
     icon: SvgIconComponent;
     to?: string;
     onClick?: MouseEventHandler;
-} & WithThemeProps & WithStylesProps & StyledComponentProps;
+} & WithStylesProps & StyledComponentProps;
 
 const style = (theme: Theme) => ({
     root: {
@@ -25,7 +25,7 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const AppBarActionMenuItem = React.memo(withStyles(style, { withTheme: true })((props: Props) => {
+export const AppBarActionMenuItem = React.memo(withStyles(style)((props: Props) => {
     const { label, to, onClick, classes } = props;
     return (
         <MenuItem className={classes.root} 

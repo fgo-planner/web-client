@@ -1,12 +1,12 @@
 import { MenuItem, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
 import { UserGameAccount } from 'data';
-import { Nullable, ReadonlyPartialArray, WithStylesProps, WithThemeProps } from 'internal';
+import { Nullable, ReadonlyPartialArray, WithStylesProps } from 'internal';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { UserGameAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
 
-type Props = WithThemeProps & WithStylesProps;
+type Props = WithStylesProps;
 
 type State = {
     gameAccountList: ReadonlyPartialArray<UserGameAccount>;
@@ -23,7 +23,7 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const AppBarGameAccountSelect = withStyles(style, { withTheme: true })(class extends PureComponent<Props, State> {
+export const AppBarGameAccountSelect = withStyles(style)(class extends PureComponent<Props, State> {
 
     private _userGameAccountService = Injectables.get(UserGameAccountService);
 

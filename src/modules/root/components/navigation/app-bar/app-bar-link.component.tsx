@@ -1,10 +1,10 @@
 import { fade, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { RouteLinkDefinition, WithStylesProps, WithThemeProps } from 'internal';
+import { RouteLinkDefinition, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
 import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { ThemeConstants } from 'styles';
 
-type Props = RouteLinkDefinition & ReactRouteComponentProps & WithThemeProps & WithStylesProps;
+type Props = RouteLinkDefinition & ReactRouteComponentProps & WithStylesProps;
 
 const style = (theme: Theme) => ({
     root: {
@@ -29,7 +29,7 @@ const style = (theme: Theme) => ({
 } as StyleRules);
 
 
-export const AppBarLink = withRouter(withStyles(style, { withTheme: true })(class extends PureComponent<Props> {
+export const AppBarLink = withRouter(withStyles(style)(class extends PureComponent<Props> {
 
     render(): ReactNode {
         const { route, label, onClick } = this.props;

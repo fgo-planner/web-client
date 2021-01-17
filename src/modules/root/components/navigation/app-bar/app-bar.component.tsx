@@ -1,6 +1,6 @@
 import { Paper, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { User } from 'data';
-import { Nullable, UserInfo, WithStylesProps, WithThemeProps } from 'internal';
+import { Nullable, UserInfo, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
@@ -12,7 +12,7 @@ import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
 
 type Props = {
     appBarElevated: boolean;
-} & WithThemeProps & WithStylesProps;
+} & WithStylesProps;
 
 type State = {
     currentUser: User | null;
@@ -47,7 +47,7 @@ const style = (theme: Theme) => ({
 /**
  * The app bar component.
  */
-export const AppBar = withStyles(style, { withTheme: true })(class extends PureComponent<Props, State> {
+export const AppBar = withStyles(style)(class extends PureComponent<Props, State> {
 
     private _authService = Injectables.get(AuthService);
 
@@ -94,7 +94,6 @@ export const AppBar = withStyles(style, { withTheme: true })(class extends PureC
         if (userInfo) {
             // TODO Handle error
             const currentUser = await this._userService.getCurrentUser();
-            console.log(currentUser);
             this.setState({ currentUser });
         } else {
             this.setState({ currentUser: null });

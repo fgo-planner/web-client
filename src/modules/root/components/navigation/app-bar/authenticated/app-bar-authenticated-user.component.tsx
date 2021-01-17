@@ -1,6 +1,6 @@
 import { Avatar, Box, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { User } from 'data';
-import { WithStylesProps, WithThemeProps } from 'internal';
+import { WithStylesProps } from 'internal';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from 'styles';
 import { AppBarLink } from '../app-bar-link.component';
@@ -10,7 +10,7 @@ import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
 
 type Props = {
     currentUser: User;
-} & WithThemeProps & WithStylesProps;
+} & WithStylesProps;
 
 type State = {
     profileMenu: {
@@ -36,7 +36,7 @@ const style = (theme: Theme) => ({
 /**
  * Renders the app bar contents for an authenticated (logged in) user.
  */
-export const AppBarAuthenticatedUser = withStyles(style, { withTheme: true })(class extends PureComponent<Props, State> {
+export const AppBarAuthenticatedUser = withStyles(style)(class extends PureComponent<Props, State> {
 
     // Temporary
     private readonly AvatarImageUrl = 'https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png';

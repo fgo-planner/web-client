@@ -1,11 +1,11 @@
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
-import { ModalOnCloseReason, WithStylesProps, WithThemeProps } from 'internal';
+import { ModalOnCloseReason, WithStylesProps } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { LoginModal } from '../../../login/login-modal.component';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
 
-type Props = WithThemeProps & WithStylesProps;
+type Props = WithStylesProps;
 
 type State = {
     loginModalOpen: boolean;
@@ -24,7 +24,7 @@ const style = (theme: Theme) => ({
 /**
  * Renders the app bar contents for a guest (not logged in) user.
  */
-export const AppBarGuestUser = withStyles(style, { withTheme: true })(class extends PureComponent<Props, State> {
+export const AppBarGuestUser = withStyles(style)(class extends PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);

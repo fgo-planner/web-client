@@ -25,7 +25,7 @@ const style = (theme: Theme) => ({
     },
     lowerSection: {
         display: 'flex',
-        height: `calc(100vh - ${theme.spacing(ThemeConstants.AppBarHeightScale)})`
+        height: `calc(100vh - ${theme.spacing(ThemeConstants.AppBarHeightScale)}px)`
     },
     navRailContainer: {
         display: 'none',

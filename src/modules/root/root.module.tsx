@@ -61,7 +61,7 @@ export class RootModule extends ModuleComponent {
             <BrowserRouter>
                 <ThemeManager>
                     <NavigationMain>
-                        {this.renderModuleRoutes()}
+                        {this._renderModuleRoutes()}
                     </NavigationMain>
                 </ThemeManager>
             </BrowserRouter>

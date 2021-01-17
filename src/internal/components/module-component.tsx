@@ -27,61 +27,65 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
     }
 
     render(): ReactNode {
-        return this.renderModuleRoutes();
+        return this._renderModuleRoutes();
     }
 
-    protected renderModuleRoutes(): ReactNode {
-        return this.renderRoutes(this.ModuleRoutes, this.props.parentPath);
+    protected _renderModuleRoutes(): ReactNode {
+        return this._renderRoutes(this.ModuleRoutes, this.props.parentPath);
     }
 
-    private renderRoutes(routes?: RouteDefinitions, parentPath?: string): ReactNode {
+    private _renderRoutes(routes?: RouteDefinitions, parentPath?: string): ReactNode {
         if (!routes || !routes.length) {
             return null;
         }
         return (
             <Switch>
-                {routes.map((route, i) => this.renderRoute(route, i, parentPath))}
+                {routes.map((route, i) => this._renderRoute(route, i, parentPath))}
 
                 {/*
                   * Generate a default empty path route to handle mismatched routes if needed. 
                   */}
-                {this.generateDefaultEmptyPathRoute(routes, parentPath)}
+                {this._generateDefaultEmptyPathRoute(routes, parentPath)}
             </Switch>
         );
     }
 
-    private renderRoute(route: RouteDefinition, defaultKey: number, parentPath?: string): ReactNode {
-        this.validateRoute(route);
+    private _renderRoute(route: RouteDefinition, defaultKey: number, parentPath?: string): ReactNode {
+        this._validateRoute(route);
+
+        /*
+         * Generate a key to use for the rendered element.
+         */
+        const key = route.key || defaultKey;
 
         /*
          * Render an empty route if the path is empty or was not provided.
          */
         if (!route.path) {
-            return this.renderEmptyPathRoute(route, parentPath);
+            return this._renderEmptyPathRoute(route, key, parentPath);
         }
 
         /*
          * Generate an absolute path for the route by appending the route's path to the
          * parent path.
          */
-        const path = this.getAbsolutePath(parentPath, route.path);
+        const path = this._getAbsolutePath(parentPath, route.path);
 
         /*
          * If a redirect path was provided, then render a redirect for the route...
          */
         if (route.redirectTo != null) {
-            return this.renderRedirect(route, parentPath, path);
+            return this._renderRedirect(route, key, parentPath, path);
         }
 
         /*
          * ...otherwise, render the route with a normal component.
          */
-        console.log(`Rendered route at path ${path}`, route);
         return (
-            <Route path={path} exact={route.exact}
+            <Route key={key}
+                   path={path} exact={route.exact}
                    strict={route.strict}
-                   key={route.key || defaultKey}
-                   render={props => this.renderRouteComponent(route, props, path)}>
+                   render={props => this._renderRouteComponent(route, props, path)}>
             </Route>
         );
     }
@@ -89,7 +93,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
     /**
      * Renders a redirected route.
      */
-    private renderRedirect(route: RouteDefinition, parentPath?: string, path?: string): ReactNode {
+    private _renderRedirect(route: RouteDefinition, key: string | number, parentPath?: string, path?: string): ReactNode {
         /* 
          * route.redirectTo is never null/undefined because null check is performed
          * before this method is called.
@@ -98,10 +102,10 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
         let redirectTo = route.redirectTo!;
 
         if (!route.redirectToAbsolute) {
-            redirectTo = this.appendPaths(parentPath, redirectTo);
+            redirectTo = this._appendPaths(parentPath, redirectTo);
         }
         return (
-            <Route path={path} exact={route.exact} strict={route.strict}>
+            <Route key={key} path={path} exact={route.exact} strict={route.strict}>
                 <Redirect to={redirectTo} />;
             </Route>
         );
@@ -111,16 +115,16 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
      * Renders a route or redirect an empty path. An route with an empty path
      * provides a fallback in the case that a matching route could not be found.
      */
-    private renderEmptyPathRoute(route: RouteDefinition, parentPath?: string): ReactNode {
+    private _renderEmptyPathRoute(route: RouteDefinition, key: string | number, parentPath?: string): ReactNode {
         let redirectTo = route.redirectTo;
         if (redirectTo != null) {
             if (!route.redirectToAbsolute) {
-                redirectTo = this.appendPaths(parentPath, redirectTo);
+                redirectTo = this._appendPaths(parentPath, redirectTo);
             }
-            return <Redirect to={redirectTo} />;
+            return <Redirect key={key} to={redirectTo} />;
         }
 
-        return <Route render={props => this.renderRouteComponent(route, props, parentPath)}></Route>;
+        return <Route key={key} render={props => this._renderRouteComponent(route, props, parentPath)} />;
     }
 
     /**
@@ -128,7 +132,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
      * the user is not authenticated, then a redirect to the root URL is rendered
      * instead.
      */
-    private renderRouteComponent(route: RouteDefinition, routeProps: RouteComponentProps, path?: string): ReactNode {
+    private _renderRouteComponent(route: RouteDefinition, routeProps: RouteComponentProps, path?: string): ReactNode {
         if (route.authenticationRequired && !this._authService.isLoggedIn) {
             /*
              * Redirect user if they are not authenticated but are trying to access a route
@@ -146,7 +150,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
         if (route.component) {
             return (
                 <route.component route={route} parentPath={path} {...routeProps}>
-                    {this.renderRoutes(route.children, path)}
+                    {this._renderRoutes(route.children, path)}
                 </route.component>
             );
         }
@@ -160,7 +164,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
             return (
                 <Suspense fallback={route.lazyFallback || <LazyLoadFallback />}>
                     <route.lazyComponent route={route} parentPath={path} {...routeProps}>
-                        {this.renderRoutes(route.children, path)}
+                        {this._renderRoutes(route.children, path)}
                     </route.lazyComponent>
                 </Suspense>
             );
@@ -171,7 +175,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
      * Check if the provided route definition is valid. Throws error if it is not
      * valid.
      */
-    private validateRoute(route: RouteDefinition): void {
+    private _validateRoute(route: RouteDefinition): void {
         if (route == null) {
             throw new Error(`Route cannot be ${typeof route}.`);
         }
@@ -185,7 +189,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
      * children), then this will generate a default empty path route that will be
      * activated as a fallback when no matching routes are found.
      */
-    private generateDefaultEmptyPathRoute(routes: RouteDefinitions, parentPath = '/'): ReactNode {
+    private _generateDefaultEmptyPathRoute(routes: RouteDefinitions, parentPath = '/'): ReactNode {
         /*
          * Check if there are any routes (excluding children) that contain an empty
          * path. If there is, then just return null as an empty path route has already
@@ -207,14 +211,14 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
         }
     }
 
-    private getAbsolutePath(parentPath = '', path = '') {
+    private _getAbsolutePath(parentPath = '', path = '') {
         if (!path || path === '*') {
             return undefined;
         }
-        return this.appendPaths(parentPath, path);
+        return this._appendPaths(parentPath, path);
     }
 
-    private appendPaths(parentPath = '', path = '') {
+    private _appendPaths(parentPath = '', path = '') {
         parentPath = parentPath.trim();
         path = path.trim();
         if (parentPath === '/') {

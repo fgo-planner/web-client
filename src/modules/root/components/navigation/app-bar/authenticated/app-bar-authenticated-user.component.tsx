@@ -1,10 +1,14 @@
 import { Avatar, Box, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { User } from 'data';
-import { WithStylesProps } from 'internal';
+import { MasterAccount, User } from 'data';
+import { ReadonlyPartialArray, WithStylesProps } from 'internal';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
+import { Subscription } from 'rxjs';
+import { MasterAccountService } from 'services';
 import { ThemeConstants } from 'styles';
+import { Container as Injectables } from 'typedi';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
+import { AppBarMasterAccountAddButton } from './app-bar-master-account-add-button.component';
 import { AppBarMasterAccountSelect } from './app-bar-master-account-select.component';
 import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
 
@@ -16,6 +20,7 @@ type State = {
     profileMenu: {
         anchorElement?: Element | null;
     };
+    masterAccountList: ReadonlyPartialArray<MasterAccount>;
 };
 
 const style = (theme: Theme) => ({
@@ -41,46 +46,74 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
     // Temporary
     private readonly AvatarImageUrl = 'https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png';
 
+    private _masterAccountService = Injectables.get(MasterAccountService);
+
+    private _onMasterAccountListUpdatedSubscription!: Subscription;
+
     constructor(props: Props) {
         super(props);
         this.state = {
             profileMenu: {
                 anchorElement: null
-            }
+            },
+            masterAccountList: []
         };
         this._handleAvatarClick = this._handleAvatarClick.bind(this);
         this._handleProfileMenuClose = this._handleProfileMenuClose.bind(this);
     }
 
+    componentDidMount() {
+        this._onMasterAccountListUpdatedSubscription = this._masterAccountService.onMasterAccountListUpdated
+            .subscribe(this._handleMasterAccountListUpdated.bind(this));
+    }
+
+    componentWillUnmount() {
+        this._onMasterAccountListUpdatedSubscription.unsubscribe();
+    }
+
     render(): ReactNode {
-        const styleClasses = this.props.classes;
+        const { classes, currentUser } = this.props;
+        const { profileMenu } = this.state;
         return (
             <Fragment>
-                <div className={styleClasses.root}>
-                    <AppBarMasterAccountSelect />
-                    <AppBarLinks>
-                        <AppBarLink label="My Servants"
-                                    route="/user/account/servants" />
-                        <AppBarLink label="My Items"
-                                    route="/user/account/items" />
-                        <AppBarLink label="Planner"
-                                    route="/user/account/planner" />
-                    </AppBarLinks>
+                <div className={classes.root}>
+                    {this._renderMasterAccountElements()}
                     <Box flex={1} />
                     <AppBarLinks>
                         <AppBarLink label="Resources" />
                     </AppBarLinks>
-                    <Avatar className={styleClasses.avatar}
+                    <Avatar className={classes.avatar}
                             src={this.AvatarImageUrl}
                             onClick={this._handleAvatarClick}
                     />
                 </div>
-                <AppBarUserProfileMenu currentUser={this.props.currentUser}
-                                       anchorElement={this.state.profileMenu.anchorElement}
+                <AppBarUserProfileMenu currentUser={currentUser}
+                                       anchorElement={profileMenu.anchorElement}
                                        onClose={this._handleProfileMenuClose}
                 />
             </Fragment>
         );
+    }
+
+    /**
+     * Renders the elements relevant to master accounts.
+     */
+    private _renderMasterAccountElements(): ReactNode {
+        const { masterAccountList } = this.state;
+        if (!masterAccountList.length) {
+            return <AppBarMasterAccountAddButton />;
+        }
+        return [
+            <AppBarMasterAccountSelect masterAccountList={masterAccountList} />,
+            <AppBarLinks>
+                <AppBarLink label="My Servants"
+                            route="/user/account/servants" />
+                <AppBarLink label="My Items"
+                            route="/user/account/items" />
+                <AppBarLink label="Planner"
+                            route="/user/account/planner" />
+            </AppBarLinks>
+        ];
     }
 
     private _handleAvatarClick(event: MouseEvent): void {
@@ -98,6 +131,12 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
                 ...this.state.profileMenu,
                 anchorElement: null
             }
+        });
+    }
+
+    private _handleMasterAccountListUpdated(accounts: ReadonlyPartialArray<MasterAccount>) {
+        this.setState({
+            masterAccountList: accounts
         });
     }
 

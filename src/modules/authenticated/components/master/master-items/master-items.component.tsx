@@ -1,13 +1,12 @@
 import { Fab, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
+import { FabContainer, MasterItemsListView } from 'components';
 import { MasterAccount, MasterItem } from 'data';
 import { Nullable, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
-import { FabContainer } from '../../../../components/common/fab-container.component';
-import { MasterItemsListView } from '../../../../components/common/master-account/master-items-list-view/master-items-list-view.component';
 
 type Props = WithStylesProps;
 

@@ -46,6 +46,7 @@ export class MasterAccountService {
     async addAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
         const account = await Http.put<MasterAccount>(`${this.BaseUrl}`, masterAccount);
         await this._updateMasterAccountList(); // Reload account list
+        this._autoSelectAccount();
         return account;
     }
 

@@ -17,7 +17,10 @@ export class HttpUtils {
             headers
         };
         const response = await fetch(url, init);
-        return response.json();
+        if (response.ok) {
+            return response.json();
+        }
+        throw await response.json();
     }
 
     static async post<T = any>(url: string, body: string | object, options?: HttpOptions): Promise<T> {
@@ -37,7 +40,10 @@ export class HttpUtils {
             headers
         };
         const response = await fetch(url, init);
-        return response.json();
+        if (response.ok) {
+            return response.json();
+        }
+        throw await response.json();
     }
 
     static async put<T = any>(url: string, body: string | object, options?: HttpOptions): Promise<T> {
@@ -57,7 +63,10 @@ export class HttpUtils {
             headers
         };
         const response = await fetch(url, init);
-        return response.json();
+        if (response.ok) {
+            return response.json();
+        }
+        throw await response.json();
     }
 
     static async delete<T = any>(url: string, options?: HttpOptions): Promise<T> {
@@ -70,7 +79,10 @@ export class HttpUtils {
             headers
         };
         const response = await fetch(url, init);
-        return response.json();
+        if (response.ok) {
+            return response.json();
+        }
+        throw await response.json();
     }
     
     private static _inferContentType(body: string | object): string {

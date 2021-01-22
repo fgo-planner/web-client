@@ -6,10 +6,11 @@ import { Subscription } from 'rxjs';
 import { MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
 
-type Props = WithStylesProps;
+type Props = {
+    masterAccountList: ReadonlyPartialArray<MasterAccount>;
+} & WithStylesProps;
 
 type State = {
-    masterAccountList: ReadonlyPartialArray<MasterAccount>;
     currentMasterAccountId: string;
 };
 
@@ -29,14 +30,12 @@ export const AppBarMasterAccountSelect = withStyles(style)(class extends PureCom
 
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
-    private _onMasterAccountListUpdatedSubscription!: Subscription;
-
     constructor(props: Props) {
         super(props);
         this.state = {
-            masterAccountList: [],
             currentMasterAccountId: ''
         };
+
         this._renderSelectOption = this._renderSelectOption.bind(this);
         this._handleInputChange = this._handleInputChange.bind(this);
     }
@@ -44,35 +43,35 @@ export const AppBarMasterAccountSelect = withStyles(style)(class extends PureCom
     componentDidMount() {
         this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
-        this._onMasterAccountListUpdatedSubscription = this._masterAccountService.onMasterAccountListUpdated
-            .subscribe(this._handleMasterAccountListUpdated.bind(this));
     }
 
     componentWillUnmount() {
         this._onCurrentMasterAccountChangeSubscription.unsubscribe();
-        this._onMasterAccountListUpdatedSubscription.unsubscribe();
     }
 
     render(): ReactNode {
+        const { classes, masterAccountList } = this.props;
+        const { currentMasterAccountId } = this.state;
         return (
             <TextField select 
                        variant="outlined"
                        size="small"
-                       className={this.props.classes.root}
-                       value={this.state.currentMasterAccountId}
+                       className={classes.root}
+                       value={currentMasterAccountId}
                        onChange={this._handleInputChange}>
-                 {this.state.masterAccountList.map(this._renderSelectOption)}
+                 {masterAccountList.map(this._renderSelectOption)}
             </TextField>
         );
     }
 
     private _renderSelectOption(account: Partial<MasterAccount>, index: number): ReactNode {
+        const { classes } = this.props;
         let itemLabel = account.name || `Account ${index + 1}`;
         if (account.friendId) {
             itemLabel += ` (${account.friendId})`;
         }
         return (
-            <MenuItem className={this.props.classes.selectOption}
+            <MenuItem className={classes.selectOption}
                       value={account._id}
                       key={index}>
                 {itemLabel}
@@ -95,12 +94,6 @@ export const AppBarMasterAccountSelect = withStyles(style)(class extends PureCom
         const accountId = account?._id || '';
         this.setState({
             currentMasterAccountId: accountId
-        });
-    }
-
-    private _handleMasterAccountListUpdated(accounts: ReadonlyPartialArray<MasterAccount>) {
-        this.setState({
-            masterAccountList: accounts
         });
     }
 

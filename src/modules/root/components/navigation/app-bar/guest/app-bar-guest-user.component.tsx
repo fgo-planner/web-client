@@ -1,7 +1,7 @@
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
+import { LoginDialog } from 'components';
 import { ModalOnCloseReason, WithStylesProps } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
-import { LoginModal } from '../../../login/login-modal.component';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
 
@@ -32,8 +32,8 @@ export const AppBarGuestUser = withStyles(style)(class extends PureComponent<Pro
             loginModalOpen: false
         };
 
-        this._openLoginModal = this._openLoginModal.bind(this);
-        this._handleLoginModalClose = this._handleLoginModalClose.bind(this);
+        this._openLoginDialog = this._openLoginDialog.bind(this);
+        this._handleLoginDialogClose = this._handleLoginDialogClose.bind(this);
     }
  
     render(): ReactNode {
@@ -49,23 +49,23 @@ export const AppBarGuestUser = withStyles(style)(class extends PureComponent<Pro
                         <AppBarLink label="Events"
                                     route="/resources/events" />
                         <AppBarLink label="Login"
-                                    onClick={this._openLoginModal} />
+                                    onClick={this._openLoginDialog} />
                     </AppBarLinks>
                 </div>
-                <LoginModal open={this.state.loginModalOpen}
-                            onClose={this._handleLoginModalClose}
+                <LoginDialog open={this.state.loginModalOpen}
+                             onClose={this._handleLoginDialogClose}
                 />
             </Fragment>
         );
     }
 
-    private _openLoginModal(): void {
+    private _openLoginDialog(): void {
         this.setState({
             loginModalOpen: true
         });
     }
 
-    private _handleLoginModalClose(event: any, reason: ModalOnCloseReason) {
+    private _handleLoginDialogClose(event: any, reason: ModalOnCloseReason) {
         this.setState({
             loginModalOpen: false
         });

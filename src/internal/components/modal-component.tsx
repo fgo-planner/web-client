@@ -8,4 +8,10 @@ export type ModalComponentProps = {
 
 export abstract class ModalComponent<P = {}, S = {}> extends PureComponent<P & ModalComponentProps, S> {
 
+    protected _isMounted = true;
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
 }

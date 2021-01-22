@@ -1,7 +1,7 @@
 /**
- * Represents an instance of a servant that is owned by the player account.
+ * Represents an instance of a servant that is owned by a master.
  */
-export type UserGameAccountServant = {
+export type MasterServant = {
 
     instanceId: number;
 

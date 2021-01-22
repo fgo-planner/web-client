@@ -1,16 +1,16 @@
 import { MenuItem, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
-import { UserGameAccount } from 'data';
+import { MasterAccount } from 'data';
 import { Nullable, ReadonlyPartialArray, WithStylesProps } from 'internal';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { UserGameAccountService } from 'services';
+import { MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
 
 type Props = WithStylesProps;
 
 type State = {
-    gameAccountList: ReadonlyPartialArray<UserGameAccount>;
-    currentGameAccountId: string;
+    masterAccountList: ReadonlyPartialArray<MasterAccount>;
+    currentMasterAccountId: string;
 };
 
 const style = (theme: Theme) => ({
@@ -23,34 +23,34 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const AppBarGameAccountSelect = withStyles(style)(class extends PureComponent<Props, State> {
+export const AppBarMasterAccountSelect = withStyles(style)(class extends PureComponent<Props, State> {
 
-    private _userGameAccountService = Injectables.get(UserGameAccountService);
+    private _masterAccountService = Injectables.get(MasterAccountService);
 
-    private _onCurrentGameAccountChangeSubscription!: Subscription;
+    private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
-    private _onGameAccountListUpdatedSubscription!: Subscription;
+    private _onMasterAccountListUpdatedSubscription!: Subscription;
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            gameAccountList: [],
-            currentGameAccountId: ''
+            masterAccountList: [],
+            currentMasterAccountId: ''
         };
         this._renderSelectOption = this._renderSelectOption.bind(this);
         this._handleInputChange = this._handleInputChange.bind(this);
     }
 
     componentDidMount() {
-        this._onCurrentGameAccountChangeSubscription = this._userGameAccountService.onCurrentGameAccountChange
-            .subscribe(this._handleCurrentGameAccountChange.bind(this));
-        this._onGameAccountListUpdatedSubscription = this._userGameAccountService.onGameAccountListUpdated
-            .subscribe(this._handleGameAccountListUpdated.bind(this));
+        this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
+            .subscribe(this._handleCurrentMasterAccountChange.bind(this));
+        this._onMasterAccountListUpdatedSubscription = this._masterAccountService.onMasterAccountListUpdated
+            .subscribe(this._handleMasterAccountListUpdated.bind(this));
     }
 
     componentWillUnmount() {
-        this._onCurrentGameAccountChangeSubscription.unsubscribe();
-        this._onGameAccountListUpdatedSubscription.unsubscribe();
+        this._onCurrentMasterAccountChangeSubscription.unsubscribe();
+        this._onMasterAccountListUpdatedSubscription.unsubscribe();
     }
 
     render(): ReactNode {
@@ -59,14 +59,14 @@ export const AppBarGameAccountSelect = withStyles(style)(class extends PureCompo
                        variant="outlined"
                        size="small"
                        className={this.props.classes.root}
-                       value={this.state.currentGameAccountId}
+                       value={this.state.currentMasterAccountId}
                        onChange={this._handleInputChange}>
-                 {this.state.gameAccountList.map(this._renderSelectOption)}
+                 {this.state.masterAccountList.map(this._renderSelectOption)}
             </TextField>
         );
     }
 
-    private _renderSelectOption(account: Partial<UserGameAccount>, index: number): ReactNode {
+    private _renderSelectOption(account: Partial<MasterAccount>, index: number): ReactNode {
         let itemLabel = account.name || `Account ${index + 1}`;
         if (account.friendId) {
             itemLabel += ` (${account.friendId})`;
@@ -82,25 +82,25 @@ export const AppBarGameAccountSelect = withStyles(style)(class extends PureCompo
 
     private _handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
         const accountId = event.target.value;
-        if (accountId === this.state.currentGameAccountId) {
+        if (accountId === this.state.currentMasterAccountId) {
             return;
         }
         this.setState({
-            currentGameAccountId: accountId
+            currentMasterAccountId: accountId
         });
-        this._userGameAccountService.selectAccount(accountId);
+        this._masterAccountService.selectAccount(accountId);
     }
 
-    private _handleCurrentGameAccountChange(account: Nullable<UserGameAccount>) {
+    private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>) {
         const accountId = account?._id || '';
         this.setState({
-            currentGameAccountId: accountId
+            currentMasterAccountId: accountId
         });
     }
 
-    private _handleGameAccountListUpdated(accounts: ReadonlyPartialArray<UserGameAccount>) {
+    private _handleMasterAccountListUpdated(accounts: ReadonlyPartialArray<MasterAccount>) {
         this.setState({
-            gameAccountList: accounts
+            masterAccountList: accounts
         });
     }
 

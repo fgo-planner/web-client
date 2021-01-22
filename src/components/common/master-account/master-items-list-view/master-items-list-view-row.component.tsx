@@ -1,11 +1,11 @@
 import { fade, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
 import { GameItemConstants } from 'app-constants';
-import { GameItem, UserGameAccountItem } from 'data';
+import { GameItem, MasterItem } from 'data';
 import { WithStylesProps } from 'internal';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from 'styles';
 
-type ListViewDataItem = { item: GameItem; userData: UserGameAccountItem };
+type ListViewDataItem = { item: GameItem; masterData: MasterItem };
 
 type Props = {
     key: number;
@@ -44,7 +44,7 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const GameAccountItemsListViewRow = withStyles(style)(class extends PureComponent<Props, State> {
+export const MasterItemsListViewRow = withStyles(style)(class extends PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
@@ -71,7 +71,7 @@ export const GameAccountItemsListViewRow = withStyles(style)(class extends PureC
     }
 
     private _renderItemViewMode(item: ListViewDataItem): ReactNode {
-        return this.props.item.userData.quantity;
+        return this.props.item.masterData.quantity;
     }
 
     private _renderItemEditMode(item: ListViewDataItem): ReactNode {
@@ -80,7 +80,7 @@ export const GameAccountItemsListViewRow = withStyles(style)(class extends PureC
                        size="small"
                        type="number"
                        inputProps={{step: 1, min: 0}}
-                       value={this.props.item.userData.quantity}
+                       value={this.props.item.masterData.quantity}
                        onChange={event => this._handleItemQuantityChange(event, item)}
             />
         );
@@ -89,7 +89,7 @@ export const GameAccountItemsListViewRow = withStyles(style)(class extends PureC
     private _handleItemQuantityChange(event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, item: ListViewDataItem): void {
         const value = event.target.value;
         const quantity = Math.max(0, ~~Number(value));
-        this.props.item.userData.quantity = quantity;
+        this.props.item.masterData.quantity = quantity;
         // TODO Is it bad practice to modify an object in props?
         this.forceUpdate();
     }

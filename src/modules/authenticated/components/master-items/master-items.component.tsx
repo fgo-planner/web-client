@@ -1,22 +1,22 @@
 import { Fab, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
-import { UserGameAccount, UserGameAccountItem } from 'data';
+import { MasterAccount, MasterItem } from 'data';
 import { Nullable, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { UserGameAccountService } from 'services';
+import { MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
 import { FabContainer } from '../../../../components/common/fab-container.component';
-import { GameAccountItemsListView } from '../../../../components/common/game-account/game-account-items-list-view.component';
+import { MasterItemsListView } from '../../../../components/common/master-account/master-items-list-view/master-items-list-view.component';
 
 type Props = WithStylesProps;
 
 type State = {
-    userAccount?: UserGameAccount | null;
+    userAccount?: MasterAccount | null;
     /**
-     * Clone of the items array from the UserGameAccount object.
+     * Clone of the items array from the MasterAccount object.
      */
-    userItems: UserGameAccountItem[];
+    masterItems: MasterItem[];
     editMode: boolean;
 };
 
@@ -26,18 +26,18 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const GameAccountItems = withStyles(style)(class extends PureComponent<Props, State> {
+export const MasterItems = withStyles(style)(class extends PureComponent<Props, State> {
     
-    private _gameAccountService = Injectables.get(UserGameAccountService);
+    private _masterAccountService = Injectables.get(MasterAccountService);
 
-    private _onCurrentGameAccountChangeSubscription!: Subscription;
+    private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
-    private _onCurrentGameAccountUpdatedSubscription!: Subscription;
+    private _onCurrentMasterAccountUpdatedSubscription!: Subscription;
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            userItems: [],
+            masterItems: [],
             editMode: false
         };
 
@@ -47,23 +47,23 @@ export const GameAccountItems = withStyles(style)(class extends PureComponent<Pr
     }
 
     componentDidMount() {
-        this._onCurrentGameAccountChangeSubscription = this._gameAccountService.onCurrentGameAccountChange
-            .subscribe(this._handleCurrentGameAccountChange.bind(this));
-        this._onCurrentGameAccountUpdatedSubscription = this._gameAccountService.onCurrentGameAccountUpdated
-            .subscribe(this._handleCurrentGameAccountUpdated.bind(this));
+        this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
+            .subscribe(this._handleCurrentMasterAccountChange.bind(this));
+        this._onCurrentMasterAccountUpdatedSubscription = this._masterAccountService.onCurrentMasterAccountUpdated
+            .subscribe(this._handleCurrentMasterAccountUpdated.bind(this));
     }
 
     componentWillUnmount() {
-        this._onCurrentGameAccountChangeSubscription.unsubscribe();
-        this._onCurrentGameAccountUpdatedSubscription.unsubscribe();
+        this._onCurrentMasterAccountChangeSubscription.unsubscribe();
+        this._onCurrentMasterAccountUpdatedSubscription.unsubscribe();
     }
 
     render(): ReactNode {
         const { classes } = this.props;
-        const { userItems, editMode } = this.state;
+        const { masterItems, editMode } = this.state;
         return (
             <div className={classes.root}>
-                <GameAccountItemsListView editMode={editMode} userItems={userItems} />
+                <MasterItemsListView editMode={editMode} masterItems={masterItems} />
                 <FabContainer>
                     {this._renderFab(editMode)}
                 </FabContainer>
@@ -96,55 +96,55 @@ export const GameAccountItems = withStyles(style)(class extends PureComponent<Pr
     }
 
     private async _save(): Promise<void> {
-        const { userAccount, userItems } = this.state;
-        const accountUpdate: Partial<UserGameAccount> = {
+        const { userAccount, masterItems } = this.state;
+        const accountUpdate: Partial<MasterAccount> = {
             _id: userAccount?._id,
-            items: userItems
+            items: masterItems
         };
-        await this._gameAccountService.updateAccount(accountUpdate);
+        await this._masterAccountService.updateAccount(accountUpdate);
         this.setState({
             editMode: false
         });
     }
     
     private _cancel() {
-        const userItems = this._cloneItemsFromGameAccount(this.state.userAccount);
+        const masterItems = this._cloneItemsFromMasterAccount(this.state.userAccount);
         this.setState({
-            userItems,
+            masterItems,
             editMode: false
         });
     }
 
-    private _handleCurrentGameAccountChange(account: Nullable<UserGameAccount>) {
-        const userItems = this._cloneItemsFromGameAccount(account);
+    private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>) {
+        const masterItems = this._cloneItemsFromMasterAccount(account);
         this.setState({
             userAccount: account,
-            userItems,
+            masterItems,
             editMode: false
         });
     }
 
-    private _handleCurrentGameAccountUpdated(account: Nullable<UserGameAccount>) {
+    private _handleCurrentMasterAccountUpdated(account: Nullable<MasterAccount>) {
         if (account == null) {
             return;
         }
-        const userItems = this._cloneItemsFromGameAccount(account);
+        const masterItems = this._cloneItemsFromMasterAccount(account);
         this.setState({
             userAccount: account,
-            userItems
+            masterItems
             // TODO Also set editMode to false?
         });
     }
 
-    private _cloneItemsFromGameAccount(account: Nullable<UserGameAccount>) {
+    private _cloneItemsFromMasterAccount(account: Nullable<MasterAccount>) {
         if (!account) {
             return [];
         }
-        const userItems: UserGameAccountItem[] = [];
-        for (const userItem of account.items) {
-            userItems.push({ ...userItem });
+        const masterItems: MasterItem[] = [];
+        for (const masterItem of account.items) {
+            masterItems.push({ ...masterItem });
         }
-        return userItems;
+        return masterItems;
     }
 
 });

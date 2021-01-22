@@ -1,7 +1,7 @@
 import { ModuleComponent, RouteDefinitions } from 'internal';
-import { GameAccountHomeRoute } from './routes/game-account-home.route';
-import { GameAccountItemsRoute } from './routes/game-account-items.route';
-import { GameAccountServantsRoute } from './routes/game-account-servants.route';
+import { MasterAccountHomeRoute } from './routes/master-account-home.route';
+import { MasterItemsRoute } from './routes/master-items.route';
+import { MasterServantsRoute } from './routes/master-servants.route';
 
 export default class AuthenticatedModule extends ModuleComponent {
 
@@ -14,17 +14,17 @@ export default class AuthenticatedModule extends ModuleComponent {
         {
             path: '/account',
             exact: true,
-            component: GameAccountHomeRoute,
+            component: MasterAccountHomeRoute,
         },
         {
             path: '/account/servants',
             exact: true,
-            component: GameAccountServantsRoute
+            component: MasterServantsRoute
         },
         {
             path: '/account/items',
             exact: true,
-            component: GameAccountItemsRoute
+            component: MasterItemsRoute
         }
     ];
 

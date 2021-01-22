@@ -5,7 +5,7 @@ import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from 'styles';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
-import { AppBarGameAccountSelect } from './app-bar-game-account-select.component';
+import { AppBarMasterAccountSelect } from './app-bar-master-account-select.component';
 import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
 
 type Props = {
@@ -57,7 +57,7 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
         return (
             <Fragment>
                 <div className={styleClasses.root}>
-                    <AppBarGameAccountSelect />
+                    <AppBarMasterAccountSelect />
                     <AppBarLinks>
                         <AppBarLink label="My Servants"
                                     route="/user/account/servants" />

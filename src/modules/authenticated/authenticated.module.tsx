@@ -9,20 +9,20 @@ export default class AuthenticatedModule extends ModuleComponent {
         {
             path: '/',
             exact: true,
-            redirectTo: '/account'
+            redirectTo: '/master'
         },
         {
-            path: '/account',
+            path: '/master',
             exact: true,
             component: MasterAccountHomeRoute,
         },
         {
-            path: '/account/servants',
+            path: '/master/servants',
             exact: true,
             component: MasterServantsRoute
         },
         {
-            path: '/account/items',
+            path: '/master/items',
             exact: true,
             component: MasterItemsRoute
         }

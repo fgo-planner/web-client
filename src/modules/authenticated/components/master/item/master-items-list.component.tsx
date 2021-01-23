@@ -1,14 +1,16 @@
-import { Fab, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { Fab } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
 import { FabContainer, MasterItemsListView } from 'components';
 import { MasterAccount, MasterItem } from 'data';
-import { Nullable, WithStylesProps } from 'internal';
-import React, { PureComponent, ReactNode } from 'react';
+import { Nullable } from 'internal';
+import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
 
-type Props = WithStylesProps;
+type Props = {
+    
+};
 
 type State = {
     userAccount?: MasterAccount | null;
@@ -19,13 +21,7 @@ type State = {
     editMode: boolean;
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        padding: theme.spacing(2, 0)
-    }
-} as StyleRules);
-
-export const MasterItems = withStyles(style)(class extends PureComponent<Props, State> {
+export class MasterItemsList extends PureComponent<Props, State> {
     
     private _masterAccountService = Injectables.get(MasterAccountService);
 
@@ -58,15 +54,14 @@ export const MasterItems = withStyles(style)(class extends PureComponent<Props, 
     }
 
     render(): ReactNode {
-        const { classes } = this.props;
         const { masterItems, editMode } = this.state;
         return (
-            <div className={classes.root}>
+            <Fragment>
                 <MasterItemsListView editMode={editMode} masterItems={masterItems} />
                 <FabContainer>
                     {this._renderFab(editMode)}
                 </FabContainer>
-            </div>
+            </Fragment>
         );
     }
 
@@ -146,4 +141,4 @@ export const MasterItems = withStyles(style)(class extends PureComponent<Props, 
         return masterItems;
     }
 
-});
+}

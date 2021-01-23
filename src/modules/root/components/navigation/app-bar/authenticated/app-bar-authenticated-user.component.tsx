@@ -107,11 +107,11 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
             <AppBarMasterAccountSelect masterAccountList={masterAccountList} />,
             <AppBarLinks>
                 <AppBarLink label="My Servants"
-                            route="/user/account/servants" />
+                            route="/user/master/servants" />
                 <AppBarLink label="My Items"
-                            route="/user/account/items" />
+                            route="/user/master/items" />
                 <AppBarLink label="Planner"
-                            route="/user/account/planner" />
+                            route="/user/master/planner" />
             </AppBarLinks>
         ];
     }

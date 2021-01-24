@@ -8,6 +8,7 @@ import { ThemeConstants } from 'styles';
 import { Container as Injectables } from 'typedi';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
+import { AppBarResourcesMenu } from '../app-bar-resources-menu.component';
 import { AppBarMasterAccountAddButton } from './app-bar-master-account-add-button.component';
 import { AppBarMasterAccountSelect } from './app-bar-master-account-select.component';
 import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
@@ -18,7 +19,11 @@ type Props = {
 
 type State = {
     profileMenu: {
-        anchorElement?: Element | null;
+        anchorEl?: Element | null;
+    };
+    resourcesMenu: {
+        open: boolean;
+        anchorEl?: Element | null;
     };
     masterAccountList: ReadonlyPartialArray<MasterAccount>;
 };
@@ -52,12 +57,21 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
 
     constructor(props: Props) {
         super(props);
+
         this.state = {
             profileMenu: {
-                anchorElement: null
+                anchorEl: null
+            },
+            resourcesMenu: {
+                open: false,
+                anchorEl: null
             },
             masterAccountList: []
         };
+
+        this._handleResourcesLinkClick = this._handleResourcesLinkClick.bind(this);
+        this._handleResourcesLinkMouseOver = this._handleResourcesLinkMouseOver.bind(this);
+        this._handleResourcesLinkMouseOut = this._handleResourcesLinkMouseOut.bind(this);
         this._handleAvatarClick = this._handleAvatarClick.bind(this);
         this._handleProfileMenuClose = this._handleProfileMenuClose.bind(this);
     }
@@ -73,22 +87,29 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
 
     render(): ReactNode {
         const { classes, currentUser } = this.props;
-        const { profileMenu } = this.state;
+        const { profileMenu, resourcesMenu } = this.state;
         return (
             <Fragment>
                 <div className={classes.root}>
                     {this._renderMasterAccountElements()}
                     <Box flex={1} />
                     <AppBarLinks>
-                        <AppBarLink label="Resources" />
+                        <AppBarLink label="Resources"
+                                    onClick={this._handleResourcesLinkClick}
+                                    onMouseOver={this._handleResourcesLinkMouseOver}
+                                    onMouseOut={this._handleResourcesLinkMouseOut}
+                        />
                     </AppBarLinks>
                     <Avatar className={classes.avatar}
                             src={this.AvatarImageUrl}
                             onClick={this._handleAvatarClick}
                     />
                 </div>
+                <AppBarResourcesMenu open={resourcesMenu.open} 
+                                     anchorEl={resourcesMenu.anchorEl} 
+                />
                 <AppBarUserProfileMenu currentUser={currentUser}
-                                       anchorElement={profileMenu.anchorElement}
+                                       anchorEl={profileMenu.anchorEl}
                                        onClose={this._handleProfileMenuClose}
                 />
             </Fragment>
@@ -103,24 +124,54 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
         if (!masterAccountList.length) {
             return <AppBarMasterAccountAddButton />;
         }
-        return [
-            <AppBarMasterAccountSelect masterAccountList={masterAccountList} />,
-            <AppBarLinks>
-                <AppBarLink label="My Servants"
-                            route="/user/master/servants" />
-                <AppBarLink label="My Items"
-                            route="/user/master/items" />
-                <AppBarLink label="Planner"
-                            route="/user/master/planner" />
-            </AppBarLinks>
-        ];
+        return (
+            <Fragment>
+                <AppBarMasterAccountSelect key={0} masterAccountList={masterAccountList} />
+                <AppBarLinks key={1} >
+                    <AppBarLink label="My Servants"
+                                route="/user/master/servants" />
+                    <AppBarLink label="My Items"
+                                route="/user/master/items" />
+                    <AppBarLink label="Planner"
+                                route="/user/master/planner" />
+                </AppBarLinks>
+            </Fragment>
+        );
+    }
+
+    private _handleResourcesLinkClick(event: MouseEvent): void {
+        this.setState({
+            resourcesMenu: {
+                ...this.state.resourcesMenu,
+                open: !this.state.resourcesMenu.open
+            }
+        });
+    }
+
+    private _handleResourcesLinkMouseOver(event: MouseEvent): void {
+        this.setState({
+            resourcesMenu: {
+                ...this.state.resourcesMenu,
+                anchorEl: event.currentTarget,
+                open: true
+            }
+        });
+    }
+
+    private _handleResourcesLinkMouseOut(event: MouseEvent): void {
+        this.setState({
+            resourcesMenu: {
+                ...this.state.resourcesMenu,
+                open: false
+            }
+        });
     }
 
     private _handleAvatarClick(event: MouseEvent): void {
         this.setState({
             profileMenu: {
                 ...this.state.profileMenu,
-                anchorElement: event.currentTarget
+                anchorEl: event.currentTarget
             }
         });
     }
@@ -129,7 +180,7 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
         this.setState({
             profileMenu: {
                 ...this.state.profileMenu,
-                anchorElement: null
+                anchorEl: null
             }
         });
     }

@@ -1,15 +1,15 @@
-import { Menu, PopoverOrigin, StyledComponentProps, withTheme } from '@material-ui/core';
-import { ModalOnCloseHandler, WithThemeProps } from 'internal';
+import { Menu, PopoverOrigin, StyledComponentProps } from '@material-ui/core';
+import { ModalOnCloseHandler } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from 'styles';
 
 type Props = {
     className?: string;
-    anchorElement?: Element | null;
+    anchorEl?: Element | null;
     onClose?: ModalOnCloseHandler;
-} & WithThemeProps & StyledComponentProps;
+} & StyledComponentProps;
 
-export const AppBarActionMenu = withTheme(class extends PureComponent<Props> {
+export class AppBarActionMenu extends PureComponent<Props> {
 
     private readonly MenuAnchorOrigin: PopoverOrigin = {
         vertical: 'bottom',
@@ -22,18 +22,19 @@ export const AppBarActionMenu = withTheme(class extends PureComponent<Props> {
     };
 
     render(): ReactNode {
+        const { children, className, anchorEl, onClose } = this.props;
         return (
-            <Menu PaperProps={{ className: this.props.className }}
-                  anchorEl={this.props.anchorElement}
+            <Menu PaperProps={{ className }}
+                  anchorEl={anchorEl}
                   getContentAnchorEl={null}
                   anchorOrigin={this.MenuAnchorOrigin}
                   transformOrigin={this.MenuTransformOrigin}
-                  open={!!this.props.anchorElement}
-                  onClose={this.props.onClose}
+                  open={!!anchorEl}
+                  onClose={onClose}
                   keepMounted>
-                {this.props.children}
+                {children}
             </Menu>
         );
     }
 
-});
+};

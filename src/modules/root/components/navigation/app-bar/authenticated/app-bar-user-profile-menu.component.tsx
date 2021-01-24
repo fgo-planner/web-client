@@ -11,7 +11,7 @@ import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.co
 import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 
 type Props = {
-    anchorElement?: Element | null;
+    anchorEl?: Element | null;
     onClose?: ModalOnCloseHandler;
     currentUser: User;
 } & WithStylesProps;
@@ -80,7 +80,7 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
         const isLightMode = this.state.themeMode === 'light';
         return (
             <AppBarActionMenu className={this.props.classes.root}
-                              anchorElement={this.props.anchorElement}
+                              anchorEl={this.props.anchorEl}
                               onClose={this.props.onClose}>
 
                 {this._renderMenuHeader()}

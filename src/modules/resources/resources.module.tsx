@@ -1,8 +1,8 @@
 import { ModuleComponent, RouteDefinitions } from 'internal';
-import { ServantsRoute } from './routes/servants.route';
-import { EventsRoute } from './routes/events.route';
+import { GameServantsRoute } from './routes/game-servants.route';
+import { GameEventsRoute } from './routes/game-events.route';
+import { GameItemsRoute } from './routes/game-items.route';
 import { ReactNode } from 'react';
-import { ResourcesRoute } from './routes/resources.route';
 
 export default class ResourcesModule extends ModuleComponent {
 
@@ -12,17 +12,22 @@ export default class ResourcesModule extends ModuleComponent {
         {
             path: '/',
             exact: true,
-            component: ResourcesRoute
+            redirectTo: '/servants'
         },
         {
             path: '/servants',
             exact: true,
-            component: ServantsRoute
+            component: GameServantsRoute
+        },
+        {
+            path: '/items',
+            exact: true,
+            component: GameItemsRoute
         },
         {
             path: '/events',
             exact: true,
-            component: EventsRoute
+            component: GameEventsRoute
         },
         // {
         //     path: '/:id',

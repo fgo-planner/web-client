@@ -25,7 +25,7 @@ export class GameItemService {
     async getItems(): Promise<ItemsCache> {
         if (this._itemsCache) {
             /*
-             * Currently, the same cached items array instance is passed every time this
+             * Currently, the same instance of the cache array is returned every time this
              * method is called. This may need to be changed to pass a deep copy of the
              * array.
              */

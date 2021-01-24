@@ -31,19 +31,17 @@ const style = (theme: Theme) => ({
 
 export const AppBarResourcesMenu = withStyles(style)(class extends PureComponent<Props, State> {
 
-    private readonly MenuAnchorOrigin: PopoverOrigin = {
+    private readonly _menuAnchorOrigin: PopoverOrigin = {
         vertical: 'bottom',
         horizontal: 'right'
     };
     
-    private readonly MenuTransformOrigin: PopoverOrigin = {
+    private readonly _menuTransformOrigin: PopoverOrigin = {
         vertical: 'top',
         horizontal: 'right'
     };
 
-    private readonly MenuPaperProps: PaperProps = {
-        elevation: 1
-    };
+    private readonly _menuPaperProps: PaperProps;
 
     constructor(props: Props) {
         super(props);
@@ -53,6 +51,12 @@ export const AppBarResourcesMenu = withStyles(style)(class extends PureComponent
         };
 
         this._handleLinkClick = this._handleLinkClick.bind(this);
+
+        this._menuPaperProps = {
+            elevation: 2,
+            square: true,
+            className: props.classes.paper
+        };
     }
 
     componentDidUpdate() {
@@ -68,15 +72,14 @@ export const AppBarResourcesMenu = withStyles(style)(class extends PureComponent
         const { classes, open, anchorEl } = this.props;
         const { forceClosed } = this.state;
         return (
-            <HoverMenu classes={classes}
-                       open={open}
+            <HoverMenu open={open}
                        anchorEl={anchorEl}
                        getContentAnchorEl={null}
                        transitionDuration={100}
                        forceClosed={forceClosed}
-                       anchorOrigin={this.MenuAnchorOrigin}
-                       transformOrigin={this.MenuTransformOrigin}
-                       PaperProps={this.MenuPaperProps}>
+                       anchorOrigin={this._menuAnchorOrigin}
+                       transformOrigin={this._menuTransformOrigin}
+                       PaperProps={this._menuPaperProps}>
                 <MenuItem className={classes.link}
                           component={Link}
                           to="/resources/servants"

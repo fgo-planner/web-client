@@ -2,6 +2,7 @@ import { Box, fade, StyleRules, TextField, Theme, withStyles } from '@material-u
 import { GameItem, MasterItem } from 'data';
 import { WithStylesProps } from 'internal';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
+import NumberFormat from 'react-number-format';
 import { MasterItemsListViewRowLabel } from './master-items-list-view-row-label.component';
 
 type ListViewDataItem = { item: GameItem; masterData: MasterItem };
@@ -54,7 +55,12 @@ export const MasterItemsListViewRow = withStyles(style)(class extends PureCompon
     }
 
     private _renderItemViewMode(item: ListViewDataItem): ReactNode {
-        return item.masterData.quantity;
+        return (
+            <NumberFormat value={item.masterData.quantity}
+                          displayType="text"
+                          thousandSeparator={true} 
+            />
+        );
     }
 
     private _renderItemEditMode(item: ListViewDataItem): ReactNode {
@@ -64,12 +70,12 @@ export const MasterItemsListViewRow = withStyles(style)(class extends PureCompon
                        type="number"
                        inputProps={{step: 1, min: 0}}
                        value={item.masterData.quantity}
-                       onChange={event => this._handleItemQuantityChange(event, item)}
+                       onChange={this._handleItemQuantityChange}
             />
         );
     }
 
-    private _handleItemQuantityChange(event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, item: ListViewDataItem): void {
+    private _handleItemQuantityChange(event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void {
         const value = event.target.value;
         const quantity = Math.max(0, ~~Number(value));
 

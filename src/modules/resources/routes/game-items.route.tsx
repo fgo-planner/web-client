@@ -1,6 +1,8 @@
+import { Box } from '@material-ui/core';
 import { GameItem } from 'data';
 import { RouteComponent } from 'internal';
 import React, { Fragment, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { GameItemService } from 'services';
 import { Container as Injectables } from 'typedi';
 
@@ -19,16 +21,21 @@ export class GameItemsRoute extends RouteComponent {
         return (
             <Fragment>
                 <div>ITEMS</div>
-                {this._data.map(this._renderItem)}
+                {this._data.slice(0, 100).map(this._renderItem)}
             </Fragment>
         );
     }
 
     private _renderItem(item: Readonly<GameItem>, key: number) {
         return (
-            <div key={key}>
-                {item.name}
-            </div>
+            <Box key={key} display="flex">
+                <Link to={`items/${item._id}`}>
+                    {item._id}
+                </Link>
+                <div>
+                    {item.name}
+                </div>
+            </Box>
         );
     }
 

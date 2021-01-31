@@ -1,8 +1,9 @@
 import { ModuleComponent, RouteDefinitions } from 'internal';
-import { GameServantsRoute } from './routes/game-servants.route';
-import { GameEventsRoute } from './routes/game-events.route';
-import { GameItemsRoute } from './routes/game-items.route';
 import { ReactNode } from 'react';
+import { GameEventsRoute } from './routes/game-events.route';
+import { GameItemRoute } from './routes/game-item-route';
+import { GameItemsRoute } from './routes/game-items.route';
+import { GameServantsRoute } from './routes/game-servants.route';
 
 export default class ResourcesModule extends ModuleComponent {
 
@@ -23,6 +24,11 @@ export default class ResourcesModule extends ModuleComponent {
             path: '/items',
             exact: true,
             component: GameItemsRoute
+        },
+        {
+            path: '/items/:id',
+            exact: true,
+            component: GameItemRoute
         },
         {
             path: '/events',

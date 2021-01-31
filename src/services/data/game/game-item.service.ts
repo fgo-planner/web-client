@@ -18,8 +18,8 @@ export class GameItemService {
 
     private _itemCachePromise: Nullable<Promise<ItemsCache>>;
 
-    async getItem(id: number): Promise<GameItem> {
-        return Http.get<GameItem>(`${this.BaseUrl}/${id}`);
+    async getItem(id: number): Promise<Nullable<GameItem>> {
+        return Http.get<Nullable<GameItem>>(`${this.BaseUrl}/${id}`);
     }
 
     async getItems(): Promise<ItemsCache> {

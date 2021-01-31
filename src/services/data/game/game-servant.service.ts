@@ -18,8 +18,8 @@ export class GameServantService {
 
     private _servantCachePromise: Nullable<Promise<ServantsCache>>;
 
-    async getServant(id: number): Promise<GameServant> {
-        return Http.get<GameServant>(`${this.BaseUrl}/${id}`);
+    async getServant(id: number): Promise<Nullable<GameServant>> {
+        return Http.get<Nullable<GameServant>>(`${this.BaseUrl}/${id}`);
     }
 
     async getServants(): Promise<ServantsCache> {

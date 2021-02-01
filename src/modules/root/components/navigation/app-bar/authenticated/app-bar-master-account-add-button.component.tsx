@@ -38,7 +38,7 @@ export class AppBarMasterAccountAddButton extends PureComponent<Props, State> {
                     </Box>
                 </Button>
                 <MasterAccountAddDialog open={dialogOpen}
-                                       onClose={this._handleDialogClose}
+                                        onClose={this._handleDialogClose}
                 />
             </Fragment>
         );

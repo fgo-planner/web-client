@@ -5,3 +5,4 @@ export * from './master/item/list-view/master-items-list-view.component';
 export * from './menu/hover-menu.component';
 export * from './route-fallbacks/lazy-load-fallback.component';
 export * from './route-fallbacks/not-found.component';
+export * from './text-field-container.component';

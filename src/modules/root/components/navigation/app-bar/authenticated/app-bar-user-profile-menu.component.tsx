@@ -1,5 +1,5 @@
 import { Avatar, Divider, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { AccountCircle, ExitToApp, InfoOutlined, NightsStay, Settings, SportsEsports, WbSunny } from '@material-ui/icons';
+import { AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, InfoOutlined as InfoOutlinedIcon, NightsStay as NightsStayIcon, Settings as SettingsIcon, SupervisedUserCircleOutlined as SupervisedUserCircleIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
 import { User } from 'data';
 import { ModalOnCloseHandler, ThemeMode, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
@@ -88,30 +88,30 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
                 <Divider />
 
                 <AppBarActionMenuItem label="Profile" 
-                                      icon={AccountCircle} 
+                                      icon={AccountCircleIcon} 
                                       to="/user/profile"
                 />
                 <AppBarActionMenuItem label="Settings" 
-                                      icon={Settings} 
+                                      icon={SettingsIcon} 
                                       to="/user/settings"
                 />
-                <AppBarActionMenuItem label="Game Accounts" 
-                                      icon={SportsEsports} 
-                                      to="/user/game-accounts"
+                <AppBarActionMenuItem label="Master Accounts" 
+                                      icon={SupervisedUserCircleIcon} 
+                                      to="/user/master-accounts"
                 />
                 <AppBarActionMenuItem label="Log Out" 
-                                      icon={ExitToApp} 
+                                      icon={ExitToAppIcon} 
                                       onClick={this._logout}
                 />
 
                 <Divider />
 
                 <AppBarActionMenuItem label={`Appearance: ${isLightMode ? 'Light' : 'Dark'}`}
-                                      icon={isLightMode ? WbSunny : NightsStay} 
+                                      icon={isLightMode ? WbSunnyIcon : NightsStayIcon} 
                                       onClick={this._toggleThemeMode}
                 />
                 <AppBarActionMenuItem label="About" 
-                                      icon={InfoOutlined} 
+                                      icon={InfoOutlinedIcon} 
                 />
 
             </AppBarActionMenu>

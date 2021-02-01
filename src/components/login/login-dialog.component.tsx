@@ -1,28 +1,58 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, withTheme } from '@material-ui/core';
-import { ModalComponent, ModalComponentProps, UserCredentials, WithThemeProps } from 'internal';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
+import { TextFieldContainer } from 'components';
+import { Formik, FormikConfig, FormikProps } from 'formik';
+import { ModalComponent, ModalComponentProps, UserCredentials, WithStylesProps } from 'internal';
 import React, { ReactNode } from 'react';
 import { AuthService } from 'services';
 import { Container as Injectables } from 'typedi';
-import { LoginDialogForm } from './login-dialog-form.component';
+import { FormUtils } from 'utils';
+import * as Yup from 'yup';
 
-type Props = WithThemeProps;
+type Props = ModalComponentProps & WithStylesProps;
 
 type State = {
     isLoggingIn: boolean;
     errorMessage?: string | null;
 };
 
-export const LoginDialog = withTheme(class extends ModalComponent<Props, State> {
+const style = (theme: Theme) => ({
+    form: {
+        padding: theme.spacing(4, 2, 0, 2)
+    },
+    textFieldContainer: {
+        width: '256px'
+    }
+} as StyleRules);
+
+export const LoginDialog = withStyles(style)(class extends ModalComponent<Props, State> {
+
+    private readonly _formId = 'login-form';
+
+    private readonly _validationSchema = Yup.object().shape({
+        username: Yup.string().required('Username cannot be blank'),
+        password: Yup.string().required('Password cannot be blank')
+    });
+
+    private readonly _formikConfig: FormikConfig<UserCredentials> = {
+        initialValues: {
+            username: '',
+            password: ''
+        },
+        onSubmit: this._login.bind(this),
+        validationSchema: this._validationSchema,
+        validateOnBlur: true
+    };
 
     private _authService = Injectables.get(AuthService);
 
-    constructor(props: Props & ModalComponentProps) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
             isLoggingIn: false
         };
 
+        this._renderForm= this._renderForm.bind(this);
         this._login = this._login.bind(this);
         this._cancel = this._cancel.bind(this);
     }
@@ -39,7 +69,9 @@ export const LoginDialog = withTheme(class extends ModalComponent<Props, State> 
                         <div>
                             {errorMessage}
                         </div>
-                        <LoginDialogForm formId="login-form" onSubmit={this._login} />
+                        <Formik {...this._formikConfig}>
+                            {this._renderForm}
+                        </Formik>
                     </DialogContent>
                     <DialogActions>
                         <Button variant="contained"
@@ -49,7 +81,7 @@ export const LoginDialog = withTheme(class extends ModalComponent<Props, State> 
                         </Button>
                         <Button variant="contained"
                                 color="primary"
-                                form="login-form"
+                                form={this._formId}
                                 type="submit"
                                 disabled={isLoggingIn}>
                             Login
@@ -57,6 +89,47 @@ export const LoginDialog = withTheme(class extends ModalComponent<Props, State> 
                     </DialogActions>
                 </Typography>
             </Dialog>
+        );
+    }
+
+    private _renderForm(props: FormikProps<UserCredentials>): ReactNode {
+        const { classes } = this.props;
+        const { values, errors, touched, handleBlur, handleChange, handleSubmit } = props;
+        const touchedErrors = FormUtils.getErrorsForTouchedFields(errors, touched);
+        return (
+            <form className={classes.form} 
+                  id={this._formId} 
+                  noValidate
+                  onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
+            >
+                <TextFieldContainer className={classes.textFieldContainer}>
+                    <TextField variant="outlined"
+                               fullWidth
+                               label="Username"
+                               id="username"
+                               name="username"
+                               value={values.username}
+                               onChange={handleChange}
+                               onBlur={handleBlur}
+                               error={!!touchedErrors.username}
+                               helperText={touchedErrors.username}
+                    />
+                </TextFieldContainer>
+                <TextFieldContainer className={classes.textFieldContainer}>
+                    <TextField variant="outlined"
+                               fullWidth
+                               label="Password"
+                               id="password"
+                               name="password"
+                               type="password"
+                               value={values.password}
+                               onChange={handleChange}
+                               onBlur={handleBlur}
+                               error={!!touchedErrors.password}
+                               helperText={touchedErrors.password}
+                    />
+                </TextFieldContainer>
+            </form>
         );
     }
 

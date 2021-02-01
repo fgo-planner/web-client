@@ -19,7 +19,7 @@ Planned navigation outline:
         ↳ Events
     ↳ Authenticated (module)
         ↳ User Profile
-        ↳ Game Accounts
+        ↳ Master Accounts
             ↳ Profile
             ↳ Items
             ↳ Servants

@@ -1,10 +1,11 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography, withTheme } from '@material-ui/core';
-import { ModalComponent, ModalComponentProps, WithThemeProps } from 'internal';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
+import { TextFieldContainer } from 'components';
+import { ModalComponent, ModalComponentProps, WithStylesProps } from 'internal';
 import React, { ChangeEvent, FormEvent, ReactNode } from 'react';
 import { MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
 
-type Props = WithThemeProps;
+type Props = ModalComponentProps & WithStylesProps;
 
 type Form = {
     name: string;
@@ -17,7 +18,18 @@ type State = {
     errorMessage?: string | null;
 };
 
-export const MasterAccountAddDialog = withTheme(class extends ModalComponent<Props, State> {
+const style = (theme: Theme) => ({
+    form: {
+        padding: theme.spacing(4, 2, 0, 2)
+    },
+    textFieldContainer: {
+        width: '256px'
+    }
+} as StyleRules);
+
+export const MasterAccountAddDialog = withStyles(style)(class extends ModalComponent<Props, State> {
+    
+    private readonly _formId = 'master-account-form';
 
     private _masterAccountService = Injectables.get(MasterAccountService);
 
@@ -28,7 +40,7 @@ export const MasterAccountAddDialog = withTheme(class extends ModalComponent<Pro
         };
     }
 
-    constructor(props: Props & ModalComponentProps) {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
@@ -42,36 +54,40 @@ export const MasterAccountAddDialog = withTheme(class extends ModalComponent<Pro
     }
 
     render(): ReactNode {
+        const { classes } = this.props;
         const { formValues, isSubmitting, errorMessage } = this.state;
         return (
             <Dialog {...this.props}>
                 <Typography component={'div'}>
                     <DialogTitle>
-                        Add Account
+                        Add Master Account
                     </DialogTitle>
                     <DialogContent>
                         <div>
                             {errorMessage}
                         </div>
-                        <form id="login-form" onSubmit={this._submit}>
-                            <div>
-                                <TextField label="Nickname (Optional)"
-                                           variant="outlined"
+                        <form className={classes.form} id={this._formId} onSubmit={this._submit}>
+                            {/* TODO Add form validation */}
+                            <TextFieldContainer className={classes.textFieldContainer}>
+                                <TextField variant="outlined"
+                                           fullWidth
+                                           label="Nickname (Optional)"
                                            id="name"
                                            name="name"
                                            value={formValues.name}
                                            onChange={this._handleInputChange}
                                 />
-                            </div>
-                            <div>
-                                <TextField label="Friend ID (Optional)"
-                                           variant="outlined"
+                            </TextFieldContainer>
+                            <TextFieldContainer className={classes.textFieldContainer}>
+                                <TextField variant="outlined"
+                                           fullWidth
+                                           label="Friend ID (Optional)"
                                            id="friendId"
                                            name="friendId"
                                            value={formValues.friendId}
                                            onChange={this._handleInputChange}
                                 />
-                            </div>
+                            </TextFieldContainer>
                         </form>
                     </DialogContent>
                     <DialogActions>
@@ -82,7 +98,7 @@ export const MasterAccountAddDialog = withTheme(class extends ModalComponent<Pro
                         </Button>
                         <Button variant="contained"
                                 color="primary"
-                                form="login-form"
+                                form={this._formId}
                                 type="submit"
                                 disabled={isSubmitting}>
                             Add

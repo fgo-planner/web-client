@@ -5,19 +5,24 @@ const spacing = (scale: number) => {
     return `${ThemeConstants.Spacing * scale}px`;
 };
 
-const Options: ThemeOptions = {
-    overrides: {
-        MuiButton: {
-            root: {
-                textTransform: 'none'
+const overrides: ThemeOptions['overrides'] = {
+    MuiButton: {
+        root: {
+            textTransform: 'none'
+        }
+    },
+    MuiDialogTitle: {
+        root: {
+            '& >*': {
+                fontFamily: ThemeConstants.FontFamilyGoogleSans
             }
-        },
-        MuiTextField: {
-            root: {
-                margin: spacing(3)
-            }
+        }
+    },
+    MuiTextField: {
+        root: {
+            // margin: spacing(3)
         }
     }
 };
 
-export default Options.overrides;
+export default overrides;

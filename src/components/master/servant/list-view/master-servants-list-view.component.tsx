@@ -1,5 +1,5 @@
 import { Box, IconButton, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { Edit as EditIcon } from '@material-ui/icons';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@material-ui/icons';
 import { GameServant, MasterServant } from 'data';
 import { ReadonlyRecord, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
@@ -11,6 +11,7 @@ type Props = {
     editMode: boolean;
     viewLayout?: any; // TODO Make use of this
     onEditServant?: (servant: MasterServant) => void;
+    onDeleteServant?: (servant: MasterServant) => void;
 } & WithStylesProps;
 
 type State = {
@@ -62,7 +63,7 @@ export const MasterServantsListView = withStyles(style)(class extends PureCompon
 
     private _renderServant(masterServant: MasterServant): ReactNode {
         // TODO Clean this up
-        const { classes, editMode, onEditServant } = this.props;
+        const { classes, editMode, onEditServant, onDeleteServant } = this.props;
         const { gameServantMap } = this.state;
         const servant = gameServantMap[masterServant.gameId];
         if (!servant) {
@@ -80,11 +81,12 @@ export const MasterServantsListView = withStyles(style)(class extends PureCompon
                 <div>Fou (HP/ATK): {masterServant.fouHp ?? '\u2014'}/{masterServant.fouAtk ?? '\u2014'}</div>
                 <div>Skills: {masterServant.skillLevels[1] ?? '\u2014'}/{masterServant.skillLevels[2] ?? '\u2014'}/{masterServant.skillLevels[3] ?? '\u2014'}</div>
                 <div>Bond: {masterServant.bond ?? '\u2014'}</div>
-                {editMode &&
-                    <IconButton color="primary" onClick={e => onEditServant && onEditServant(masterServant)}>
-                        <EditIcon />
-                    </IconButton>
-                }
+                <IconButton color="primary" onClick={e => onEditServant && onEditServant(masterServant)}>
+                    <EditIcon />
+                </IconButton>
+                <IconButton color="secondary" onClick={e => onDeleteServant && onDeleteServant(masterServant)}>
+                    <DeleteIcon />
+                </IconButton>
             </Box>
         );
     }

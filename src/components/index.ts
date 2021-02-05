@@ -1,3 +1,4 @@
+export * from './dialogs/prompt-dialog.component';
 export * from './fab-container.component';
 export * from './input-field-container.component';
 export * from './login/login-dialog.component';

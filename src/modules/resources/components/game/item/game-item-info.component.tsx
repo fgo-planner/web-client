@@ -92,8 +92,8 @@ export const GameItemInfo = withStyles(style)(class extends PureComponent<Props,
                     <div>Total: {total.ascensions + total.skills * 3 + total.costumes}</div>
                 </Box>
                 <div>
-                    {servants.map(servant => (
-                        <Box display="flex" px={2} py={1}>
+                    {servants.map((servant, index) => (
+                        <Box key={index} display="flex" px={2} py={1}>
                             <div>{servant.servant.name}</div>
                             <Box px={2} />
                             <div>{servant.ascensions}, {servant.skills}({servant.skills * 3}), {servant.costumes}</div>

@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
-import { TextFieldContainer } from 'components';
+import { InputFieldContainer } from 'components';
 import { ModalComponent, ModalComponentProps, WithStylesProps } from 'internal';
 import React, { ChangeEvent, FormEvent, ReactNode } from 'react';
 import { MasterAccountService } from 'services';
@@ -22,7 +22,7 @@ const style = (theme: Theme) => ({
     form: {
         padding: theme.spacing(4, 2, 0, 2)
     },
-    textFieldContainer: {
+    inputFieldContainer: {
         width: '256px'
     }
 } as StyleRules);
@@ -57,7 +57,7 @@ export const MasterAccountAddDialog = withStyles(style)(class extends ModalCompo
         const { classes } = this.props;
         const { formValues, isSubmitting, errorMessage } = this.state;
         return (
-            <Dialog {...this.props}>
+            <Dialog {...this.props} classes={undefined}>
                 <Typography component={'div'}>
                     <DialogTitle>
                         Add Master Account
@@ -68,7 +68,7 @@ export const MasterAccountAddDialog = withStyles(style)(class extends ModalCompo
                         </div>
                         <form className={classes.form} id={this._formId} onSubmit={this._submit}>
                             {/* TODO Add form validation */}
-                            <TextFieldContainer className={classes.textFieldContainer}>
+                            <InputFieldContainer className={classes.inputFieldContainer}>
                                 <TextField variant="outlined"
                                            fullWidth
                                            label="Nickname (Optional)"
@@ -77,8 +77,8 @@ export const MasterAccountAddDialog = withStyles(style)(class extends ModalCompo
                                            value={formValues.name}
                                            onChange={this._handleInputChange}
                                 />
-                            </TextFieldContainer>
-                            <TextFieldContainer className={classes.textFieldContainer}>
+                            </InputFieldContainer>
+                            <InputFieldContainer className={classes.inputFieldContainer}>
                                 <TextField variant="outlined"
                                            fullWidth
                                            label="Friend ID (Optional)"
@@ -87,7 +87,7 @@ export const MasterAccountAddDialog = withStyles(style)(class extends ModalCompo
                                            value={formValues.friendId}
                                            onChange={this._handleInputChange}
                                 />
-                            </TextFieldContainer>
+                            </InputFieldContainer>
                         </form>
                     </DialogContent>
                     <DialogActions>

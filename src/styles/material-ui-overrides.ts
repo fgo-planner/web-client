@@ -7,7 +7,9 @@ const spacing = (scale: number) => {
 
 const overrides: ThemeOptions['overrides'] = {
     MuiButton: {
-        root: {
+        label: {
+            fontFamily: ThemeConstants.FontFamilyGoogleSans,
+            fontSize: '1rem',
             textTransform: 'none'
         }
     },

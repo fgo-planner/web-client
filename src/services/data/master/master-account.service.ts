@@ -29,7 +29,6 @@ export class MasterAccountService {
 
     readonly onCurrentMasterAccountChange!: BehaviorSubject<Nullable<MasterAccount>>;
 
-    // TODO Make use of this
     readonly onCurrentMasterAccountUpdated!: BehaviorSubject<Nullable<MasterAccount>>;
 
     readonly onMasterAccountListUpdated!: BehaviorSubject<ReadonlyPartialArray<MasterAccount>>;
@@ -60,8 +59,9 @@ export class MasterAccountService {
     }
 
     async updateAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
-        return Http.post<MasterAccount>(`${this.BaseUrl}`, masterAccount);
-        // TODO Push update to onCurrentMasterAccountUpdated subject.
+        const updated = await Http.post<MasterAccount>(`${this.BaseUrl}`, masterAccount);
+        this.onCurrentMasterAccountUpdated.next(updated);
+        return updated;
     }
 
     /**

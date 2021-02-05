@@ -1,1 +1,2 @@
-export * from './game-item.contants';
+export * from './game-item.constants';
+export * from './game-servant.constants';

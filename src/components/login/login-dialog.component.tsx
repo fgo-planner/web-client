@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
-import { TextFieldContainer } from 'components';
+import { InputFieldContainer } from 'components';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import { ModalComponent, ModalComponentProps, UserCredentials, WithStylesProps } from 'internal';
 import React, { ReactNode } from 'react';
@@ -19,7 +19,7 @@ const style = (theme: Theme) => ({
     form: {
         padding: theme.spacing(4, 2, 0, 2)
     },
-    textFieldContainer: {
+    inputFieldContainer: {
         width: '256px'
     }
 } as StyleRules);
@@ -60,7 +60,7 @@ export const LoginDialog = withStyles(style)(class extends ModalComponent<Props,
     render(): ReactNode {
         const { isLoggingIn, errorMessage } = this.state;
         return (
-            <Dialog {...this.props}>
+            <Dialog {...this.props} classes={undefined}>
                 <Typography component={'div'}>
                     <DialogTitle>
                         Login
@@ -102,7 +102,7 @@ export const LoginDialog = withStyles(style)(class extends ModalComponent<Props,
                   noValidate
                   onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
             >
-                <TextFieldContainer className={classes.textFieldContainer}>
+                <InputFieldContainer className={classes.inputFieldContainer}>
                     <TextField variant="outlined"
                                fullWidth
                                label="Username"
@@ -114,8 +114,8 @@ export const LoginDialog = withStyles(style)(class extends ModalComponent<Props,
                                error={!!touchedErrors.username}
                                helperText={touchedErrors.username}
                     />
-                </TextFieldContainer>
-                <TextFieldContainer className={classes.textFieldContainer}>
+                </InputFieldContainer>
+                <InputFieldContainer className={classes.inputFieldContainer}>
                     <TextField variant="outlined"
                                fullWidth
                                label="Password"
@@ -128,7 +128,7 @@ export const LoginDialog = withStyles(style)(class extends ModalComponent<Props,
                                error={!!touchedErrors.password}
                                helperText={touchedErrors.password}
                     />
-                </TextFieldContainer>
+                </InputFieldContainer>
             </form>
         );
     }

@@ -19,6 +19,7 @@ export type MasterServant = {
 
     fouHp?: number;
 
+    // TODO Skill levels should not be optional.
     skillLevels: {
 
         1?: number;
@@ -31,4 +32,4 @@ export type MasterServant = {
 
     noblePhantasmLevel: number;
 
-}
+};

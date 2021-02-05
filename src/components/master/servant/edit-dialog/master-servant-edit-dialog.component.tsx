@@ -2,7 +2,7 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormCon
 import { GameServantConstants } from 'app-constants';
 import { InputFieldContainer } from 'components';
 import { GameServant, MasterServant } from 'data';
-import { ModalComponent, ModalComponentProps, ReadonlyRecord, WithStylesProps } from 'internal';
+import { ModalComponent, ModalOnCloseHandler, ReadonlyRecord, WithStylesProps } from 'internal';
 import React, { ChangeEvent, FocusEvent, FormEvent, MouseEvent, ReactNode } from 'react';
 import { GameServantService } from 'services';
 import { Container as Injectables } from 'typedi';
@@ -13,9 +13,9 @@ type FormData = {
     gameId: number;
     level: string | number;
     ascensionLevel: string | number;
-    bond?: string | number;
-    fouAtk?: string | number;
-    fouHp?: string | number;
+    bond: string | number;
+    fouAtk: string | number;
+    fouHp: string | number;
     skillLevel1: string | number;
     skillLevel2: string | number;
     skillLevel3: string | number;
@@ -32,12 +32,11 @@ type Props = {
     dialogTitle?: string;
     submitButtonLabel?: string;
     open: boolean;
-} & ModalComponentProps<Omit<MasterServant, 'instanceId'>> & WithStylesProps;
+    onClose: ModalOnCloseHandler<Omit<MasterServant, 'instanceId'>>;
+} & WithStylesProps;
 
 type State = {
     formData: FormData;
-    gameServantList: ReadonlyArray<Readonly<GameServant>>;
-    gameServantMap: ReadonlyRecord<number, Readonly<GameServant>>;
 };
 
 const style = (theme: Theme) => ({
@@ -67,13 +66,15 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
 
     private _gameServantService = Injectables.get(GameServantService);
 
+    private _gameServantList: ReadonlyArray<Readonly<GameServant>> = [];
+
+    private _gameServantMap: ReadonlyRecord<number, Readonly<GameServant>> = {};
+
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            formData: this._convertToFormData(props.masterServant),
-            gameServantList: [],
-            gameServantMap: {}
+            formData: this._convertToFormData(props.masterServant)
         };
 
         this._renderForm = this._renderForm.bind(this);
@@ -82,7 +83,6 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
         this._handleSelectInputChange = this._handleSelectInputChange.bind(this);
         this._handleInputChange = this._handleInputChange.bind(this);
         this._handleAscensionInputChange = this._handleAscensionInputChange.bind(this);
-        this._handleIntegerInputBlur = this._handleIntegerInputBlur.bind(this);
         this._handleLevelInputBlur = this._handleLevelInputBlur.bind(this);
         this._handleFouInputBlur = this._handleFouInputBlur.bind(this);
         this._submit = this._submit.bind(this);
@@ -91,15 +91,17 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
 
     componentDidMount() {
         this._gameServantService.getServants().then(gameServantList => {
-            this.setState({ gameServantList });
+            this._gameServantList = gameServantList;
+            this.forceUpdate();
         });
         this._gameServantService.getServantsMap().then(gameServantMap => {
-            this.setState({ gameServantMap });
+            this._gameServantMap = gameServantMap;
+            this.forceUpdate();
         });
     }
 
     componentDidUpdate(prevProps: Props) {
-        const { open, masterServant } = this.props;
+        const {  masterServant, open } = this.props;
         if (masterServant !== prevProps.masterServant || (open && !prevProps.open)) {
             const formData = this._convertToFormData(masterServant);
             this.setState({ formData });
@@ -107,14 +109,9 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
     }
 
     render(): ReactNode {
-        const { dialogTitle, submitButtonLabel } = this.props;
-        const dialogProps: Props = {
-            ...this.props,
-            classes: {},
-            keepMounted: false
-        };
+        const { dialogTitle, submitButtonLabel, open, onClose } = this.props;
         return (
-            <Dialog {...dialogProps}>
+            <Dialog open={open} onClose={onClose} keepMounted={false}>
                 <Typography component={'div'}>
                     <DialogTitle>
                         {dialogTitle}
@@ -281,7 +278,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                                 value={formData.skillLevel2}
                                 onChange={this._handleSelectInputChange}
                             >
-                                <option>{/* Default blank option */}</option>
+                                <option>{'\u2014'}</option> {/* Blank option */}
                                 {GameServantConstants.SkillLevels.map(level => (
                                     <option key={level} value={level}>
                                         {level}
@@ -301,7 +298,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                                 value={formData.skillLevel3}
                                 onChange={this._handleSelectInputChange}
                             >
-                                <option>{/* Default blank option */}</option>
+                                <option>{'\u2014'}</option> {/* Blank option */}
                                 {GameServantConstants.SkillLevels.map(level => (
                                     <option key={level} value={level}>
                                         {level}
@@ -321,7 +318,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                                 value={formData.bond}
                                 onChange={this._handleSelectInputChange}
                             >
-                                <option>{/* Default blank option */}</option>
+                                <option>{/* Blank option */}</option>
                                 {GameServantConstants.BondLevels.map(level => (
                                     <option key={level} value={level}>
                                         {level}
@@ -337,8 +334,8 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
 
     private _renderServantNameField(): ReactNode {
         const { disableServantSelect } = this.props;
-        const { formData, gameServantList, gameServantMap } = this.state;
-        const servant = gameServantMap[formData.gameId];
+        const { formData } = this.state;
+        const servant = this._gameServantMap[formData.gameId];
         if (disableServantSelect) {
             return (
                 <TextField
@@ -352,7 +349,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
         }
         return (
             <MasterServantEditDialogAutocomplete 
-                servantList={gameServantList}
+                servantList={this._gameServantList}
                 selectedServant={servant}
                 onChange={this._handleSelectedServantChange}
             />
@@ -394,8 +391,8 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
     }
 
     private _handleAscensionInputChange(event: ChangeEvent<{ name?: string; value: any }>): void {
-        const { formData, gameServantMap } = this.state;
-        const servant = gameServantMap[formData.gameId];
+        const { formData } = this.state;
+        const servant = this._gameServantMap[formData.gameId];
         const { value } = event.target;
         const level = MasterServantUtils.roundToNearestValidLevel(Number(value), Number(formData.level), servant);
         formData.level = level;
@@ -403,17 +400,9 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
         this.forceUpdate();
     }
 
-    private _handleIntegerInputBlur(event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void {
-        const { formData } = this.state;
-        const { name, value, min, max } = event.target as HTMLInputElement;
-        const transformedValue = FormUtils.transformInputToInteger(value, Number(min), Number(max)) || 0;
-        FormUtils.assignValue(formData, name, transformedValue);
-        this.forceUpdate();
-    }
-
     private _handleLevelInputBlur(event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void {
-        const { formData, gameServantMap } = this.state;
-        const servant = gameServantMap[formData.gameId];
+        const { formData } = this.state;
+        const servant = this._gameServantMap[formData.gameId];
         const { value } = event.target;
         const level = FormUtils.transformInputToInteger(value, GameServantConstants.MinLevel, GameServantConstants.MaxLevel) || 1;
         const ascensionLevel = MasterServantUtils.roundToNearestValidAscensionLevel(level, Number(formData.ascensionLevel), servant);
@@ -435,12 +424,12 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
         const { onClose } = this.props;
         const { formData } = this.state;
         const masterServant = this._convertFromFormData(formData);
-        onClose && onClose(event, 'submit', masterServant);
+        onClose(event, 'submit', masterServant);
     }
 
     private _cancel(event: MouseEvent<HTMLButtonElement>): void {
         const { onClose } = this.props;
-        onClose && onClose(event, 'cancel');
+        onClose(event, 'cancel');
     }
 
     private _convertFromFormData(formData: FormData): Omit<MasterServant, 'instanceId'> {
@@ -462,12 +451,12 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
             level: Number(level),
             ascensionLevel: Number(ascensionLevel),
             bond: bond ? Number(bond) : undefined,
-            fouAtk: fouAtk === undefined || fouAtk === '' ? undefined : Number(fouAtk),
-            fouHp: fouHp === undefined || fouHp === '' ? undefined : Number(fouHp),
+            fouAtk: fouAtk === '' ? undefined : Number(fouAtk),
+            fouHp: fouHp === '' ? undefined : Number(fouHp),
             skillLevels: {
-                1: Number(skillLevel1),
-                2: Number(skillLevel2),
-                3: Number(skillLevel3)
+                1: Number(skillLevel1) || 1,
+                2: Number(skillLevel2) || undefined,
+                3: Number(skillLevel3) || undefined
             },
             noblePhantasmLevel: Number(noblePhantasmLevel)
         };
@@ -496,8 +485,8 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
             fouAtk: fouAtk ?? '',
             fouHp: fouHp ?? '',
             skillLevel1: skillLevels[1] || 1,
-            skillLevel2: skillLevels[2] || 1,
-            skillLevel3: skillLevels[3] || 1,
+            skillLevel2: skillLevels[2] || '',
+            skillLevel3: skillLevels[3] || '',
             noblePhantasmLevel: noblePhantasmLevel
         };
     }

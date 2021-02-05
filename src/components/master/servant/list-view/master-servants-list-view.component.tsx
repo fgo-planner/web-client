@@ -77,9 +77,9 @@ export const MasterServantsListView = withStyles(style)(class extends PureCompon
                 <div>{servant.name}</div>
                 <div>NP{masterServant.noblePhantasmLevel}</div>
                 <div>Level: {masterServant.level}</div>
-                <div>Fou (HP/ATK): {masterServant.fouHp ?? '-'}/{masterServant.fouAtk ?? '-'}</div>
-                <div>Skills: {masterServant.skillLevels[1] ?? '-'}/{masterServant.skillLevels[2] ?? '-'}/{masterServant.skillLevels[3] ?? '-'}</div>
-                <div>Bond: {masterServant.bond ?? '-'}</div>
+                <div>Fou (HP/ATK): {masterServant.fouHp ?? '\u2014'}/{masterServant.fouAtk ?? '\u2014'}</div>
+                <div>Skills: {masterServant.skillLevels[1] ?? '\u2014'}/{masterServant.skillLevels[2] ?? '\u2014'}/{masterServant.skillLevels[3] ?? '\u2014'}</div>
+                <div>Bond: {masterServant.bond ?? '\u2014'}</div>
                 {editMode &&
                     <IconButton color="primary" onClick={e => onEditServant && onEditServant(masterServant)}>
                         <EditIcon />

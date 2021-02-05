@@ -67,30 +67,18 @@ export const HoverMenu = withStyles(style)(class extends PureComponent<Props, St
     }
 
     render(): ReactNode {
-        const { classes } = this.props;
+        const { classes, closeDelay, forceClosed, ...menuProps } = this.props;
         const { open } = this.state;
-        const props = this._sanitizeProps(this.props);
         return (
-            <Menu {...props}
-                  classes={{ paper: classes.paper }}
-                  open={open}
-                  PopoverClasses={this._popoverClasses}
-                  PaperProps={this._generatePaperProps()}
-                  keepMounted
+            <Menu 
+                {...menuProps}
+                classes={{ paper: classes.paper }}
+                open={open}
+                PopoverClasses={this._popoverClasses}
+                PaperProps={this._generatePaperProps()}
+                keepMounted
             />
         );
-    }
-
-    /**
-     * Removes custom prop keys that are not handled correctly by the `Menu`
-     * component.
-     */
-    private _sanitizeProps(props: Props): Partial<Props> {
-        const result: Partial<Props> = { ...props };
-        delete result.classes;
-        delete result.closeDelay;
-        delete result.forceClosed;
-        return result;
     }
 
     private _generatePaperProps(): PaperProps {

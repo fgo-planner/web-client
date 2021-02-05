@@ -9,7 +9,7 @@ const overrides: ThemeOptions['overrides'] = {
     MuiButton: {
         label: {
             fontFamily: ThemeConstants.FontFamilyGoogleSans,
-            fontSize: '1rem',
+            letterSpacing: '0.25px',
             textTransform: 'none'
         }
     },

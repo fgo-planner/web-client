@@ -13,9 +13,7 @@ export class MasterServantUtils {
             level: 1,
             ascensionLevel: 0,
             skillLevels: {
-                1: 1,
-                2: 1,
-                3: 1
+                1: 1
             },
             noblePhantasmLevel: 1
         };

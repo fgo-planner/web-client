@@ -1,16 +1,8 @@
-$backdrop-blur: 2px;
+@import './backdrop-blur.scss';
 
 .MuiDialog-root {
 
     .MuiBackdrop-root {
-
-        /*
-         * Blurred backdrop effect
-         */
-        @supports ((-webkit-backdrop-filter: blur($backdrop-blur)) or (backdrop-filter: blur($backdrop-blur))) {
-            background-color: transparent;
-            -webkit-backdrop-filter: blur($backdrop-blur);
-            backdrop-filter: blur($backdrop-blur);
-        }
+        @include backdrop-blur();
     }
 }

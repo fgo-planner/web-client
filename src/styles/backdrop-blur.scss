@@ -1,0 +1,12 @@
+$backdrop-blur-amount: 2px;
+
+/**
+ * Blurred backdrop effect
+ */
+@mixin backdrop-blur($background-color: transparent) {
+    @supports ((-webkit-backdrop-filter: blur($backdrop-blur-amount)) or (backdrop-filter: blur($backdrop-blur-amount))) {
+        background: $background-color;
+        -webkit-backdrop-filter: blur($backdrop-blur-amount);
+        backdrop-filter: blur($backdrop-blur-amount);
+    }
+}

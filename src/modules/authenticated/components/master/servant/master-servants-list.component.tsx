@@ -1,12 +1,12 @@
 import { Fab } from '@material-ui/core';
 import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
-import { FabContainer, MasterServantEditDialog, MasterServantsListView, PromptDialog } from 'components';
+import { FabContainer, LoadingIndicator, MasterServantEditDialog, MasterServantsListView, PromptDialog } from 'components';
 import { GameServant, MasterAccount, MasterServant } from 'data';
 import { Nullable, ReadonlyRecord } from 'internal';
 import lodash from 'lodash';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { GameServantService, MasterAccountService } from 'services';
+import { GameServantService, LoadingIndicatorOverlayService, MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
 import { MasterServantUtils } from 'utils';
 
@@ -30,14 +30,16 @@ type State = {
     deleteServant?: MasterServant;
     deleteServantDialogOpen: boolean;
     deleteServantDialogPrompt?: string;
-    requestPending: boolean;
+    loadingIndicatorId?: string;
 };
 
 export class MasterServantsList extends PureComponent<Props, State> {
 
-    private _masterAccountService = Injectables.get(MasterAccountService);
+    private _loadingIndicatorService = Injectables.get(LoadingIndicatorOverlayService);
 
     private _gameServantService = Injectables.get(GameServantService);
+
+    private _masterAccountService = Injectables.get(MasterAccountService);
 
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
@@ -53,8 +55,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
             lastInstanceId: -1,
             editMode: false,
             editServantDialogOpen: false,
-            deleteServantDialogOpen: false,
-            requestPending: false,
+            deleteServantDialogOpen: false
         };
 
         this._edit = this._edit.bind(this);
@@ -93,7 +94,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
             editServant,
             editServantDialogOpen,
             deleteServantDialogOpen,
-            deleteServantDialogPrompt
+            deleteServantDialogPrompt,
         } = this.state;
 
         return (
@@ -130,26 +131,26 @@ export class MasterServantsList extends PureComponent<Props, State> {
     }
 
     private _renderFab(editMode: boolean): ReactNode {
-        const { requestPending } = this.state;
+        const { loadingIndicatorId } = this.state;
         const addButton = (
-            <Fab key="add" color="primary" onClick={this._onAddServantButtonClick} disabled={requestPending}>
+            <Fab key="add" color="primary" onClick={this._onAddServantButtonClick} disabled={!!loadingIndicatorId}>
                 <AddIcon />
             </Fab>
         );
         if (!editMode) {
             return [
                 addButton,
-                <Fab key="edit" color="primary" onClick={this._edit} disabled={requestPending}>
+                <Fab key="edit" color="primary" onClick={this._edit} disabled={!!loadingIndicatorId}>
                     <EditIcon />
                 </Fab>
             ];
         }
         return [
             addButton,
-            <Fab key="save" color="primary" onClick={this._save} disabled={requestPending}>
+            <Fab key="save" color="primary" onClick={this._save} disabled={!!loadingIndicatorId}>
                 <SaveIcon />
             </Fab>,
-            <Fab key="cancel" color="secondary" onClick={this._cancel} disabled={requestPending}>
+            <Fab key="cancel" color="secondary" onClick={this._cancel} disabled={!!loadingIndicatorId}>
                 <ClearIcon />
             </Fab>
         ];
@@ -261,7 +262,8 @@ export class MasterServantsList extends PureComponent<Props, State> {
         });
     }
 
-    private _handleDeleteServantDialogClose(event: MouseEvent, reason: any, value?: boolean) {
+    private _handleDeleteServantDialogClose(event: MouseEvent, value?: boolean) {
+        console.log('KSJDFLSDJFLSDJ', value)
         const { masterServants, editMode, deleteServant } = this.state;
         if (!value) {
             return this._closeDeleteServantDialog();
@@ -285,12 +287,16 @@ export class MasterServantsList extends PureComponent<Props, State> {
             _id: userAccount?._id,
             servants: masterServants
         });
+        let { loadingIndicatorId } = this.state;
+        if (!loadingIndicatorId) {
+            loadingIndicatorId = this._loadingIndicatorService.invoke();
+        }
         this.setState({
             editServant: undefined,
             editServantDialogOpen: false,
             deleteServant: undefined,
             deleteServantDialogOpen: false,
-            requestPending: true
+            loadingIndicatorId
         });
     }
 
@@ -309,6 +315,10 @@ export class MasterServantsList extends PureComponent<Props, State> {
         if (account == null) {
             return;
         }
+        const { loadingIndicatorId } = this.state;
+        if (loadingIndicatorId) {
+            this._loadingIndicatorService.waive(loadingIndicatorId);
+        }
         const masterServants = this._cloneServantsFromMasterAccount(account);
         const lastInstanceId = this._getLastInstanceId(masterServants);
         this.setState({
@@ -316,7 +326,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
             masterServants,
             lastInstanceId,
             editMode: false,
-            requestPending: false
+            loadingIndicatorId: undefined
         });
     }
 

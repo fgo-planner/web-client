@@ -2,8 +2,8 @@ import { createMuiTheme, Theme } from '@material-ui/core';
 import { ThemeMode } from 'internal';
 import { BehaviorSubject } from 'rxjs';
 import { Service } from 'typedi';
-import defaultDarkTheme from '../styles/theme-default-dark';
-import defaultLightTheme from '../styles/theme-default-light';
+import defaultDarkTheme from '../../styles/theme-default-dark';
+import defaultLightTheme from '../../styles/theme-default-light';
 
 @Service()
 export class ThemeService {

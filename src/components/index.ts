@@ -1,6 +1,7 @@
 export * from './dialogs/prompt-dialog.component';
 export * from './fab-container.component';
 export * from './input-field-container.component';
+export * from './loading-indicator.component';
 export * from './login/login-dialog.component';
 export * from './master/account/master-account-add-dialog.component';
 export * from './master/item/list-view/master-items-list-view.component';

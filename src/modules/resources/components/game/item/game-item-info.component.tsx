@@ -1,4 +1,5 @@
 import { Box, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { LoadingIndicator } from 'components';
 import { GameItem, GameServant, GameServantEnhancement } from 'data';
 import { Nullable, WithStylesProps } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
@@ -63,7 +64,7 @@ export const GameItemInfo = withStyles(style)(class extends PureComponent<Props,
     render(): ReactNode {
         const { item, itemLoading } = this.state;
         if (itemLoading) {
-            return <div>Loading...</div>;
+            return <LoadingIndicator />;
         }
         if (!item) {
             return <GameItemNotFound itemId={this.props.itemId} />;

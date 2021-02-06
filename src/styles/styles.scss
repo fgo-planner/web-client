@@ -1,6 +1,7 @@
 @import './theme-constants.scss';
 @import './material-ui-overrides.scss';
 @import './utilities.scss';
+@import './backdrop-blur.scss';
 
 .section-subheader {
     font-family: var(--font-family-google-sans);
@@ -8,4 +9,8 @@
     font-weight: 500;
     line-height: 24px;
     padding: 16px 0;
+}
+
+.backdrop-blur {
+    @include backdrop-blur();
 }

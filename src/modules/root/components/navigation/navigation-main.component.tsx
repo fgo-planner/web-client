@@ -3,6 +3,7 @@ import { WithStylesProps } from 'internal';
 import React, { Component, ReactNode, UIEvent } from 'react';
 import { ThemeConstants } from 'styles';
 import { AppBar } from './app-bar/app-bar.component';
+import { LoadingIndicatorOverlay } from './loading-indicator-overlay';
 
 type Props = WithStylesProps;
 
@@ -63,6 +64,7 @@ export const NavigationMain = withStyles(style)(class extends Component<Props, S
                         {this.props.children}
                     </div>
                 </div>
+                <LoadingIndicatorOverlay />
             </div>
         );
     }

@@ -5,7 +5,7 @@ import { MasterAccount, MasterItem } from 'data';
 import { Nullable } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { MasterAccountService } from 'services';
+import { LoadingIndicatorOverlayService, MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
 
 type Props = {
@@ -19,9 +19,12 @@ type State = {
      */
     masterItems: MasterItem[];
     editMode: boolean;
+    loadingIndicatorId?: string;
 };
 
 export class MasterItemsList extends PureComponent<Props, State> {
+    
+    private _loadingIndicatorService = Injectables.get(LoadingIndicatorOverlayService);
     
     private _masterAccountService = Injectables.get(MasterAccountService);
 
@@ -66,42 +69,46 @@ export class MasterItemsList extends PureComponent<Props, State> {
     }
 
     private _renderFab(editMode: boolean): ReactNode {
+        const { loadingIndicatorId } = this.state;
         if (!editMode) {
             return (
-                <Fab color="primary" onClick={this._edit}>
+                <Fab color="primary" onClick={this._edit} disabled={!!loadingIndicatorId}>
                     <EditIcon />
                 </Fab>
             );
         }
         return [
-            <Fab key="save" color="primary" onClick={this._save}>
+            <Fab key="save" color="primary" onClick={this._save} disabled={!!loadingIndicatorId}>
                 <SaveIcon />
             </Fab>,
-            <Fab key="cancel" color="secondary" onClick={this._cancel}>
+            <Fab key="cancel" color="secondary" onClick={this._cancel} disabled={!!loadingIndicatorId}>
                 <ClearIcon />
             </Fab>
         ];
     }
 
-    private _edit() {
+    private _edit(): void {
         this.setState({
             editMode: true
         });
     }
 
-    private async _save(): Promise<void> {
+    private _save(): void {
         const { userAccount, masterItems } = this.state;
-        const accountUpdate: Partial<MasterAccount> = {
+        this._masterAccountService.updateAccount({
             _id: userAccount?._id,
             items: masterItems
-        };
-        await this._masterAccountService.updateAccount(accountUpdate);
+        });
+        let { loadingIndicatorId } = this.state;
+        if (!loadingIndicatorId) {
+            loadingIndicatorId = this._loadingIndicatorService.invoke();
+        }
         this.setState({
-            editMode: false
+            loadingIndicatorId
         });
     }
     
-    private _cancel() {
+    private _cancel(): void {
         const masterItems = this._cloneItemsFromMasterAccount(this.state.userAccount);
         this.setState({
             masterItems,
@@ -109,7 +116,7 @@ export class MasterItemsList extends PureComponent<Props, State> {
         });
     }
 
-    private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>) {
+    private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {
         const masterItems = this._cloneItemsFromMasterAccount(account);
         this.setState({
             userAccount: account,
@@ -118,19 +125,24 @@ export class MasterItemsList extends PureComponent<Props, State> {
         });
     }
 
-    private _handleCurrentMasterAccountUpdated(account: Nullable<MasterAccount>) {
+    private _handleCurrentMasterAccountUpdated(account: Nullable<MasterAccount>): void {
         if (account == null) {
             return;
+        }
+        const { loadingIndicatorId } = this.state;
+        if (loadingIndicatorId) {
+            this._loadingIndicatorService.waive(loadingIndicatorId);
         }
         const masterItems = this._cloneItemsFromMasterAccount(account);
         this.setState({
             userAccount: account,
-            masterItems
-            // TODO Also set editMode to false?
+            masterItems,
+            editMode: false,
+            loadingIndicatorId: undefined
         });
     }
 
-    private _cloneItemsFromMasterAccount(account: Nullable<MasterAccount>) {
+    private _cloneItemsFromMasterAccount(account: Nullable<MasterAccount>): MasterItem[] {
         if (!account) {
             return [];
         }

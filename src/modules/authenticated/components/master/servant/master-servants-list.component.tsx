@@ -45,7 +45,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
 
     private _onCurrentMasterAccountUpdatedSubscription!: Subscription;
 
-    private _gameServantMap: ReadonlyRecord<number, Readonly<GameServant>> = {};
+    private _gameServantMap!: ReadonlyRecord<number, Readonly<GameServant>>;
 
     constructor(props: Props) {
         super(props);
@@ -87,6 +87,9 @@ export class MasterServantsList extends PureComponent<Props, State> {
     }
 
     render(): ReactNode {
+        if (!this._gameServantMap) {
+            return null;
+        }
 
         const {
             masterServants,
@@ -156,18 +159,18 @@ export class MasterServantsList extends PureComponent<Props, State> {
         ];
     }
 
-    private _edit() {
+    private _edit(): void {
         this.setState({
             editMode: true
         });
     }
 
-    private async _save(): Promise<void> {
+    private _save(): void {
         const { masterServants } = this.state;
         this._updateMasterAccount(masterServants);
     }
     
-    private _cancel() {
+    private _cancel(): void {
         const masterServants = this._cloneServantsFromMasterAccount(this.state.userAccount);
         this.setState({
             masterServants,
@@ -175,11 +178,11 @@ export class MasterServantsList extends PureComponent<Props, State> {
         });
     }
 
-    private _onAddServantButtonClick() {
+    private _onAddServantButtonClick(): void {
         this._openEditServantDialog();
     }
 
-    private _openEditServantDialog(masterServant?: MasterServant) {
+    private _openEditServantDialog(masterServant?: MasterServant): void {
         this.setState({
             editServant: masterServant,
             editServantDialogOpen: true,
@@ -244,7 +247,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
         });
     }
     
-    private _openDeleteServantDialog(masterServant: MasterServant) {
+    private _openDeleteServantDialog(masterServant: MasterServant): void {
         const servant = this._gameServantMap[masterServant.gameId];
         const deleteServantDialogPrompt = `Are you sure you want to remove ${servant?.name} from the servant list?`;
         this.setState({
@@ -262,7 +265,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
         });
     }
 
-    private _handleDeleteServantDialogClose(event: MouseEvent, value?: boolean) {
+    private _handleDeleteServantDialogClose(event: MouseEvent, value?: boolean): void {
         console.log('KSJDFLSDJFLSDJ', value)
         const { masterServants, editMode, deleteServant } = this.state;
         if (!value) {
@@ -300,7 +303,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
         });
     }
 
-    private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>) {
+    private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {
         const masterServants = this._cloneServantsFromMasterAccount(account);
         const lastInstanceId = this._getLastInstanceId(masterServants);
         this.setState({
@@ -311,7 +314,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
         });
     }
 
-    private _handleCurrentMasterAccountUpdated(account: Nullable<MasterAccount>) {
+    private _handleCurrentMasterAccountUpdated(account: Nullable<MasterAccount>): void {
         if (account == null) {
             return;
         }
@@ -330,14 +333,14 @@ export class MasterServantsList extends PureComponent<Props, State> {
         });
     }
 
-    private _getLastInstanceId(masterServants: MasterServant[]) {
+    private _getLastInstanceId(masterServants: MasterServant[]): number {
         if (!masterServants.length) {
             return -1;
         }
         return  Math.max(...masterServants.map(servant => servant.instanceId));
     }
 
-    private _cloneServantsFromMasterAccount(account: Nullable<MasterAccount>) {
+    private _cloneServantsFromMasterAccount(account: Nullable<MasterAccount>): MasterServant[] {
         if (!account) {
             return [];
         }

@@ -1,6 +1,6 @@
 import { Fab } from '@material-ui/core';
 import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
-import { FabContainer, LoadingIndicator, MasterServantEditDialog, MasterServantsListView, PromptDialog } from 'components';
+import { FabContainer, MasterServantEditDialog, MasterServantsListView, PromptDialog } from 'components';
 import { GameServant, MasterAccount, MasterServant } from 'data';
 import { Nullable, ReadonlyRecord } from 'internal';
 import lodash from 'lodash';

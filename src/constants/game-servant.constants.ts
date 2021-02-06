@@ -1,5 +1,9 @@
 export class GameServantConstants {
 
+    static readonly ThumbnailBaseUrl = 'https://assets.atlasacademy.io/GameData/JP/Faces/f_';
+
+    static readonly ThumbnailExtension = '.png';
+
     static readonly MinLevel = 1;
 
     static readonly MaxLevel = 100;

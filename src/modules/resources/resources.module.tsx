@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { GameEventsRoute } from './routes/game-events.route';
 import { GameItemRoute } from './routes/game-item-route';
 import { GameItemsRoute } from './routes/game-items.route';
+import { GameServantRoute } from './routes/game-servant.route';
 import { GameServantsRoute } from './routes/game-servants.route';
 
 export default class ResourcesModule extends ModuleComponent {
@@ -19,6 +20,11 @@ export default class ResourcesModule extends ModuleComponent {
             path: '/servants',
             exact: true,
             component: GameServantsRoute
+        },
+        {
+            path: '/servants/:id',
+            exact: true,
+            component: GameServantRoute
         },
         {
             path: '/items',

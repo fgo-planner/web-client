@@ -423,7 +423,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
         event.preventDefault();
         const { onClose } = this.props;
         const { formData } = this.state;
-        const masterServant = this._convertFromFormData(formData);
+        const masterServant = this._convertToMasterServant(formData);
         onClose(event, 'submit', masterServant);
     }
 
@@ -432,7 +432,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
         onClose(event, 'cancel');
     }
 
-    private _convertFromFormData(formData: FormData): Omit<MasterServant, 'instanceId'> {
+    private _convertToMasterServant(formData: FormData): Omit<MasterServant, 'instanceId'> {
         const {
             gameId,
             level,

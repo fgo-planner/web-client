@@ -14,7 +14,6 @@ export class MasterServantEditDialogAutocomplete extends PureComponent<Props> {
 
     constructor(props: Props) {
         super(props);
-        console.log(props.selectedServant)
         this._handleChange = this._handleChange.bind(this);
     }
 

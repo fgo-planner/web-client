@@ -2,7 +2,7 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormCon
 import { GameServantConstants } from 'app-constants';
 import { InputFieldContainer } from 'components';
 import { GameServant, MasterServant } from 'data';
-import { ModalComponent, ModalOnCloseHandler, ReadonlyRecord, WithStylesProps } from 'internal';
+import { ModalComponent, ModalOnCloseHandler, Nullable, ReadonlyRecord, WithStylesProps } from 'internal';
 import React, { ChangeEvent, FocusEvent, FormEvent, MouseEvent, ReactNode } from 'react';
 import { GameServantService } from 'services';
 import { Container as Injectables } from 'typedi';
@@ -22,18 +22,21 @@ type FormData = {
     noblePhantasmLevel: number;
 };
 
+type RenderedProps = {
+    disableServantSelect?: boolean;
+    dialogTitle?: string;
+    submitButtonLabel?: string;
+};
+
 type Props = {
     /**
      * The master servant to edit. If not provided, the dialog will instantiate a
      * new servant.
      */
     masterServant?: MasterServant;
-    disableServantSelect?: boolean;
-    dialogTitle?: string;
-    submitButtonLabel?: string;
     open: boolean;
     onClose: ModalOnCloseHandler<Omit<MasterServant, 'instanceId'>>;
-} & WithStylesProps;
+} & RenderedProps & WithStylesProps;
 
 type State = {
     formData: FormData;
@@ -70,6 +73,8 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
 
     private _gameServantMap: ReadonlyRecord<number, Readonly<GameServant>> = {};
 
+    private _propsSnapshot: Nullable<RenderedProps>;
+
     constructor(props: Props) {
         super(props);
 
@@ -79,6 +84,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
 
         this._renderForm = this._renderForm.bind(this);
         this._renderServantNameField = this._renderServantNameField.bind(this);
+        this._handleOnDialogExited = this._handleOnDialogExited.bind(this);
         this._handleSelectedServantChange = this._handleSelectedServantChange.bind(this);
         this._handleSelectInputChange = this._handleSelectInputChange.bind(this);
         this._handleInputChange = this._handleInputChange.bind(this);
@@ -89,7 +95,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
         this._cancel = this._cancel.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._gameServantService.getServants().then(gameServantList => {
             this._gameServantList = gameServantList;
             this.forceUpdate();
@@ -100,7 +106,24 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
         });
     }
 
-    componentDidUpdate(prevProps: Props) {
+    shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>): boolean {
+        if (!nextProps.open && this.props.open) {
+            const {
+                disableServantSelect,
+                dialogTitle,
+                submitButtonLabel
+            } = this.props;
+
+            this._propsSnapshot = {
+                disableServantSelect,
+                dialogTitle,
+                submitButtonLabel
+            };
+        }
+        return super.shouldComponentUpdate(nextProps, nextState);
+    }
+
+    componentDidUpdate(prevProps: Props): void {
         const {  masterServant, open } = this.props;
         if (masterServant !== prevProps.masterServant || (open && !prevProps.open)) {
             const formData = this._convertToFormData(masterServant);
@@ -109,9 +132,15 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
     }
 
     render(): ReactNode {
-        const { dialogTitle, submitButtonLabel, open, onClose } = this.props;
+        const { open, onClose } = this.props;
+        const { dialogTitle, submitButtonLabel } = this._propsSnapshot || this.props;
         return (
-            <Dialog open={open} onClose={onClose} keepMounted={false}>
+            <Dialog
+                open={open}
+                onClose={onClose}
+                keepMounted={false}
+                onExited={this._handleOnDialogExited}
+            >
                 <Typography component={'div'}>
                     <DialogTitle>
                         {dialogTitle}
@@ -333,8 +362,8 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
     }
 
     private _renderServantNameField(): ReactNode {
-        const { disableServantSelect } = this.props;
         const { formData } = this.state;
+        const { disableServantSelect } = this._propsSnapshot || this.props;
         const servant = this._gameServantMap[formData.gameId];
         if (disableServantSelect) {
             return (
@@ -354,6 +383,10 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                 onChange={this._handleSelectedServantChange}
             />
         );
+    }
+
+    private _handleOnDialogExited(): void {
+        this._propsSnapshot = null;
     }
 
     /**

@@ -1,3 +1,4 @@
+export * from './components/custom-pure-component';
 export * from './components/modal-component';
 export * from './components/module-component';
 export * from './components/route-component';

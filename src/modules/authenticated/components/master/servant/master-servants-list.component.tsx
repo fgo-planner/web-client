@@ -261,7 +261,8 @@ export class MasterServantsList extends PureComponent<Props, State> {
 
     private _closeDeleteServantDialog() {
         return this.setState({
-            deleteServantDialogOpen: false
+            deleteServantDialogOpen: false,
+            deleteServantDialogPrompt: undefined
         });
     }
 

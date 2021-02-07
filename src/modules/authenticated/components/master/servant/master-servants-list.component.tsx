@@ -229,7 +229,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
             /*
              * Merge changes into existing servant object.
              */
-            lodash.merge(editServant, data);
+            lodash.assign(editServant, data);
 
             /*
              * Just like the previous case, if not in edit mode, then push update

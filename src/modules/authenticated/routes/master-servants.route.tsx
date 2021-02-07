@@ -1,12 +1,12 @@
 import { RouteComponent } from 'internal';
 import React, { ReactNode } from 'react';
-import { MasterServantsList } from '../components/master/servant/master-servants-list.component';
+import { MasterServants } from '../components/master/servant/master-servants.component';
 
 export class MasterServantsRoute extends RouteComponent {
 
     render(): ReactNode {
         return (
-            <MasterServantsList />
+            <MasterServants />
         );
     }
 

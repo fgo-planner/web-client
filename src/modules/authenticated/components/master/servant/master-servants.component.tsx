@@ -1,6 +1,6 @@
 import { Fab } from '@material-ui/core';
 import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
-import { FabContainer, MasterServantEditDialog, MasterServantsListView, PromptDialog } from 'components';
+import { FabContainer, MasterServantEditDialog, MasterServantList, PromptDialog } from 'components';
 import { GameServant, MasterAccount, MasterServant } from 'data';
 import { Nullable, ReadonlyRecord } from 'internal';
 import lodash from 'lodash';
@@ -33,7 +33,7 @@ type State = {
     loadingIndicatorId?: string;
 };
 
-export class MasterServantsList extends PureComponent<Props, State> {
+export class MasterServants extends PureComponent<Props, State> {
 
     private _loadingIndicatorService = Injectables.get(LoadingIndicatorOverlayService);
 
@@ -102,7 +102,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
 
         return (
             <Fragment>
-                <MasterServantsListView
+                <MasterServantList
                     editMode={editMode}
                     masterServants={masterServants}
                     onEditServant={this._openEditServantDialog}

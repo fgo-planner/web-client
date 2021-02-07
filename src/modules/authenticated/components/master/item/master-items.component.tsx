@@ -1,6 +1,6 @@
 import { Fab } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
-import { FabContainer, MasterItemsListView } from 'components';
+import { FabContainer, MasterItemList } from 'components';
 import { MasterAccount, MasterItem } from 'data';
 import { Nullable } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
@@ -22,7 +22,7 @@ type State = {
     loadingIndicatorId?: string;
 };
 
-export class MasterItemsList extends PureComponent<Props, State> {
+export class MasterItems extends PureComponent<Props, State> {
     
     private _loadingIndicatorService = Injectables.get(LoadingIndicatorOverlayService);
     
@@ -60,7 +60,7 @@ export class MasterItemsList extends PureComponent<Props, State> {
         const { masterItems, editMode } = this.state;
         return (
             <Fragment>
-                <MasterItemsListView editMode={editMode} masterItems={masterItems} />
+                <MasterItemList editMode={editMode} masterItems={masterItems} />
                 <FabContainer>
                     {this._renderFab(editMode)}
                 </FabContainer>

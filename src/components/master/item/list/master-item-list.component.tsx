@@ -5,7 +5,7 @@ import { WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
 import { GameItemService } from 'services';
 import { Container as Injectables } from 'typedi';
-import { MasterItemsListViewRow } from './master-items-list-view-row.component';
+import { MasterItemListRow } from './master-item-list-row.component';
 
 type ItemCategory = { label: string; itemIds: ReadonlyArray<number> };
 
@@ -39,7 +39,7 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const MasterItemsListView = withStyles(style)(class extends PureComponent<Props, State> {
+export const MasterItemList = withStyles(style)(class extends PureComponent<Props, State> {
 
     private readonly ItemCategories: ReadonlyArray<ItemCategory> = [
         {
@@ -114,7 +114,7 @@ export const MasterItemsListView = withStyles(style)(class extends PureComponent
     private _renderItemRow(item: ListViewDataItem, key: number): ReactNode {
         const { editMode } = this.props;
         return (
-            <MasterItemsListViewRow key={key} item={item} editMode={editMode} />
+            <MasterItemListRow key={key} item={item} editMode={editMode} />
         );
     }
 

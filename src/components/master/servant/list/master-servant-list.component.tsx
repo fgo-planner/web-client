@@ -77,7 +77,7 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const MasterServantsListView = withStyles(style)(class extends PureComponent<Props, State> {
+export const MasterServantList = withStyles(style)(class extends PureComponent<Props, State> {
 
     private readonly _viewModeColumnWidths = {
         name: '35%',

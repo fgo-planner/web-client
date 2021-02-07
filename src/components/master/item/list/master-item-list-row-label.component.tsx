@@ -22,7 +22,7 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const MasterItemsListViewRowLabel = React.memo(withStyles(style)((props: Props) => {
+export const MasterItemListRowLabel = React.memo(withStyles(style)((props: Props) => {
     const { classes, item } = props;
     return (
         <Fragment>

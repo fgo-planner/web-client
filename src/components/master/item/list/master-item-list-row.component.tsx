@@ -3,7 +3,7 @@ import { GameItem, MasterItem } from 'data';
 import { WithStylesProps } from 'internal';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
 import NumberFormat from 'react-number-format';
-import { MasterItemsListViewRowLabel } from './master-items-list-view-row-label.component';
+import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 
 type ListViewDataItem = { item: GameItem; masterData: MasterItem };
 
@@ -33,7 +33,7 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const MasterItemsListViewRow = withStyles(style)(class extends PureComponent<Props, State> {
+export const MasterItemListRow = withStyles(style)(class extends PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
@@ -45,7 +45,7 @@ export const MasterItemsListViewRow = withStyles(style)(class extends PureCompon
         const { classes, key, item, editMode } = this.props;
         return (
             <div className={classes.root} key={key}>
-                <MasterItemsListViewRowLabel item={item.item} />
+                <MasterItemListRowLabel item={item.item} />
                 <Box flex={1} />
                 <div>
                     {editMode ? this._renderItemEditMode(item) : this._renderItemViewMode(item)}

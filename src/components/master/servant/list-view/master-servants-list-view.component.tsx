@@ -1,6 +1,6 @@
-import { Avatar, Box, fade, IconButton, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { Box, fade, IconButton, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
-import { GameServantConstants } from 'app-constants';
+import { GameServantBondIcon, GameServantClassIcon, GameServantThumbnail } from 'components';
 import { GameServant, MasterServant } from 'data';
 import { ReadonlyRecord, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
@@ -26,7 +26,7 @@ const style = (theme: Theme) => ({
     },
     header: {
         display: 'flex',
-        padding: theme.spacing(8, 0, 4, 0),
+        padding: theme.spacing(8, 0, 4, 4),
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
         textAlign: 'center',
@@ -35,22 +35,44 @@ const style = (theme: Theme) => ({
         display: 'flex',
         alignContent: 'center',
         alignItems: 'center',
+        textAlign: 'center',
         height: '64px',
+        paddingLeft: theme.spacing(4),
         borderTop: `1px solid ${theme.palette.divider}`,
         '&:hover': {
             background: fade(theme.palette.text.primary, 0.07)
         }
     },
+    servantInfo: {
+        display: 'flex',
+        alignItems: 'center',
+        '& > :not(:first-child)': {
+            paddingLeft: theme.spacing(4)
+        }
+    },
     skillLevels: {
         display: 'flex',
         textAlign: 'center',
-        justifyContent: 'center'
+        alignItems: 'center',
+        justifyContent: 'center',
+        '& .value': {
+            width: '20px'
+
+        }
     },
-    skillLevel: {
-        width: '20px'
+    bondLevel: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        '& .value': {
+            paddingLeft: theme.spacing(1.5),
+            width: '1.25rem',
+            textAlign: 'left'
+        }
     },
     actions: {
         display: 'flex',
+        alignItems: 'center',
         justifyContent: 'center'
     }
 } as StyleRules);
@@ -64,7 +86,7 @@ export const MasterServantsListView = withStyles(style)(class extends PureCompon
         fouHp: '12%',
         fouAtk: '12%',
         skillLevels: '12%',
-        bond: '12%',
+        bondLevel: '12%',
         actions: '120px'
     };
 
@@ -100,7 +122,7 @@ export const MasterServantsListView = withStyles(style)(class extends PureCompon
         const { classes } = this.props;
         return (
             <div className={classes.header}>
-                <Box flex={this._viewModeColumnWidths.name} textAlign="left" pl={4}>
+                <Box flex={this._viewModeColumnWidths.name}>
                     Servant
                 </Box>
                 <Box flex={this._viewModeColumnWidths.noblePhantasmLevel}>
@@ -118,7 +140,7 @@ export const MasterServantsListView = withStyles(style)(class extends PureCompon
                 <Box flex={this._viewModeColumnWidths.skillLevels}>
                     Skills
                 </Box>
-                <Box flex={this._viewModeColumnWidths.bond}>
+                <Box flex={this._viewModeColumnWidths.bondLevel}>
                     Bond
                 </Box>
                 <Box width={this._viewModeColumnWidths.actions}>
@@ -143,37 +165,50 @@ export const MasterServantsListView = withStyles(style)(class extends PureCompon
         return(
             <div key={masterServant.instanceId} className={classes.row}>
                 {this._renderServantName(masterServant, servant)}
-                <Box flex={this._viewModeColumnWidths.noblePhantasmLevel} textAlign="center">
+                <Box flex={this._viewModeColumnWidths.noblePhantasmLevel}>
                     {masterServant.noblePhantasmLevel}
                 </Box>
-                <Box flex={this._viewModeColumnWidths.level} textAlign="center">
+                <Box flex={this._viewModeColumnWidths.level}>
                     {masterServant.level}
                 </Box>
-                <Box flex={this._viewModeColumnWidths.fouHp} textAlign="center">
+                <Box flex={this._viewModeColumnWidths.fouHp}>
                     {masterServant.fouHp === undefined ? '\u2014' : `+${masterServant.fouHp }`}
                 </Box>
-                <Box flex={this._viewModeColumnWidths.fouAtk} textAlign="center">
+                <Box flex={this._viewModeColumnWidths.fouAtk}>
                     {masterServant.fouAtk === undefined ? '\u2014' : `+${masterServant.fouAtk }`}
                 </Box>
                 {this._renderSkillLevels(masterServant)}
-                <Box flex={this._viewModeColumnWidths.bond} textAlign="center">
-                    {masterServant.bond ?? '\u2014'}
-                </Box>
+                {this._renderBondLevel(masterServant)}
                 {this._renderActionButtons(masterServant)}
             </div>
         );
     }
 
     private _renderServantName(masterServant: MasterServant, servant: GameServant) {
+        const { classes } = this.props;
         const { ascensionLevel } = masterServant;
-        const ascIdx = ascensionLevel < 3 ? ascensionLevel : ascensionLevel - 1;
-        const imageUrl = `${GameServantConstants.ThumbnailBaseUrl}${servant._id}${ascIdx}${GameServantConstants.ThumbnailExtension}`;
+
+        // TODO Move this to a utility function
+        const stage = ascensionLevel < 3 ? ascensionLevel : ascensionLevel - 1;
+
         return (
-            <Box flex={this._viewModeColumnWidths.name} pl={4} display="flex" alignItems="center">
-                <Avatar src={imageUrl} variant="rounded" />
-                <Box pl={4}>
+            <Box className={classes.servantInfo} flex={this._viewModeColumnWidths.name}>
+                <GameServantThumbnail 
+                    variant="rounded"
+                    size={56}
+                    servant={servant}
+                    stage={stage as any}
+                />
+                <GameServantClassIcon
+                    servantClass={servant.class}
+                    rarity={servant.rarity}
+                />
+                <div className="rarity">
+                    {`${servant.rarity} \u2605`} 
+                </div>
+                <div>
                     {servant.name}
-                </Box>
+                </div>
             </Box>
         );
     }
@@ -182,17 +217,35 @@ export const MasterServantsListView = withStyles(style)(class extends PureCompon
         const { classes } = this.props;
         return (
             <Box className={classes.skillLevels} flex={this._viewModeColumnWidths.skillLevels}>
-                <Box className={classes.skillLevel}>
+                <Box className="value">
                     {masterServant.skillLevels[1] ?? '\u2013'}
                 </Box>
                 <div>/</div>
-                <Box className={classes.skillLevel}>
+                <Box className="value">
                     {masterServant.skillLevels[2] ?? '\u2013'}
                 </Box>
                 <div>/</div>
-                <Box className={classes.skillLevel}>
+                <Box className="value">
                     {masterServant.skillLevels[3] ?? '\u2013'}
                 </Box>
+            </Box>
+        );
+    }
+
+    private _renderBondLevel(masterServant: MasterServant) {
+        const { classes } = this.props;
+        const { bond } = masterServant;
+        if (bond == null) {
+            return (
+                <Box className={classes.bondLevel} flex={this._viewModeColumnWidths.bondLevel}>
+                    {'\u2014'}
+                </Box>
+            );
+        }
+        return (
+            <Box className={classes.bondLevel} flex={this._viewModeColumnWidths.bondLevel}>
+                <GameServantBondIcon bond={bond} size={28} />
+                <div className="value">{bond}</div>
             </Box>
         );
     }

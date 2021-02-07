@@ -9,6 +9,7 @@ export * from './game/servant/game-servant-deck.enum';
 export * from './game/servant/game-servant-enhancement.type';
 export * from './game/servant/game-servant-gender.enum';
 export * from './game/servant/game-servant-growth-curve.enum';
+export * from './game/servant/game-servant-rarity.type';
 export * from './game/servant/game-servant.type';
 export * from './master/master-account.type';
 export * from './master/master-item.type';

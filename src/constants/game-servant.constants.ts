@@ -1,8 +1,16 @@
 export class GameServantConstants {
 
-    static readonly ThumbnailBaseUrl = 'https://assets.atlasacademy.io/GameData/JP/Faces/f_';
+    static readonly ThumbnailBaseUrl = 'https://assets.atlasacademy.io/GameData/JP/Faces';
 
-    static readonly ThumbnailExtension = '.png';
+    static readonly ThumbnailExtension = 'png';
+
+    static readonly ClassIconBaseUrl = 'https://assets.atlasacademy.io/GameData/JP/ClassIcons';
+
+    static readonly ClassIconExtension = 'png';
+
+    static readonly BondIconBaseUrl = `${process.env.PUBLIC_URL}/assets/bond`;
+
+    static readonly BondIconExtension = 'png';
 
     static readonly MinLevel = 1;
 

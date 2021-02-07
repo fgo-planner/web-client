@@ -27,7 +27,7 @@ export const MasterItemsListViewRowLabel = React.memo(withStyles(style)((props: 
     return (
         <Fragment>
             <img className={classes.itemIcon}
-                 src={`${GameItemConstants.ImageBaseUrl}${item._id}${GameItemConstants.ImageExtension}`}
+                 src={`${GameItemConstants.ImageBaseUrl}/${item._id}.${GameItemConstants.ImageExtension}`}
                  alt={item.name}
             />
             <div className={classes.itemName}>

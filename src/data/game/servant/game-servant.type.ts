@@ -5,6 +5,7 @@ import { GameServantClass } from './game-servant-class.enum';
 import { GameServantEnhancement } from './game-servant-enhancement.type';
 import { GameServantGender } from './game-servant-gender.enum';
 import { GameServantGrowthCurve } from './game-servant-growth-curve.enum';
+import { GameServantRarity } from './game-servant-rarity.type';
 
 export type GameServant = Entity<number> & {
 
@@ -16,7 +17,7 @@ export type GameServant = Entity<number> & {
 
     class: GameServantClass;
 
-    rarity: number;
+    rarity: GameServantRarity;
 
     cost: number;
 

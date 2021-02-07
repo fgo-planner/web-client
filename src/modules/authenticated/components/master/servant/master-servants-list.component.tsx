@@ -15,7 +15,7 @@ type Props = {
 };
 
 type State = {
-    userAccount?: MasterAccount | null;
+    masterAccount?: MasterAccount | null;
     /**
      * Clone of the servants array from the MasterAccount object.
      */
@@ -171,7 +171,7 @@ export class MasterServantsList extends PureComponent<Props, State> {
     }
     
     private _cancel(): void {
-        const masterServants = this._cloneServantsFromMasterAccount(this.state.userAccount);
+        const masterServants = this._cloneServantsFromMasterAccount(this.state.masterAccount);
         this.setState({
             masterServants,
             editMode: false
@@ -266,7 +266,6 @@ export class MasterServantsList extends PureComponent<Props, State> {
     }
 
     private _handleDeleteServantDialogClose(event: MouseEvent, value?: boolean): void {
-        console.log('KSJDFLSDJFLSDJ', value)
         const { masterServants, editMode, deleteServant } = this.state;
         if (!value) {
             return this._closeDeleteServantDialog();
@@ -285,11 +284,15 @@ export class MasterServantsList extends PureComponent<Props, State> {
      * Sends master servant update request to the back-end.
      */
     private _updateMasterAccount(masterServants: MasterServant[]): void {
-        const { userAccount } = this.state;
-        this._masterAccountService.updateAccount({
-            _id: userAccount?._id,
+        const { masterAccount } = this.state;
+        
+        const update = {
+            _id: masterAccount?._id,
             servants: masterServants
-        });
+        };
+        this._masterAccountService.updateAccount(update)
+            .catch(this._handleUpdateError.bind(this));
+
         let { loadingIndicatorId } = this.state;
         if (!loadingIndicatorId) {
             loadingIndicatorId = this._loadingIndicatorService.invoke();
@@ -302,12 +305,31 @@ export class MasterServantsList extends PureComponent<Props, State> {
             loadingIndicatorId
         });
     }
+    
+    private _handleUpdateError(error: any): void {
+        // TODO Display error message to user.
+        console.error(error);
+        const { masterAccount } = this.state;
+        const masterServants = this._cloneServantsFromMasterAccount(masterAccount);
+        const lastInstanceId = this._getLastInstanceId(masterServants);
+        this._resetLoadingIndicator();
+        this.setState({
+            masterServants,
+            lastInstanceId,
+            editMode: false,
+            editServant: undefined,
+            editServantDialogOpen: false,
+            deleteServant: undefined,
+            deleteServantDialogOpen: false,
+            loadingIndicatorId: undefined
+        });
+    }
 
     private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {
         const masterServants = this._cloneServantsFromMasterAccount(account);
         const lastInstanceId = this._getLastInstanceId(masterServants);
         this.setState({
-            userAccount: account,
+            masterAccount: account,
             masterServants,
             lastInstanceId,
             editMode: false
@@ -318,19 +340,23 @@ export class MasterServantsList extends PureComponent<Props, State> {
         if (account == null) {
             return;
         }
-        const { loadingIndicatorId } = this.state;
-        if (loadingIndicatorId) {
-            this._loadingIndicatorService.waive(loadingIndicatorId);
-        }
         const masterServants = this._cloneServantsFromMasterAccount(account);
         const lastInstanceId = this._getLastInstanceId(masterServants);
+        this._resetLoadingIndicator();
         this.setState({
-            userAccount: account,
+            masterAccount: account,
             masterServants,
             lastInstanceId,
             editMode: false,
             loadingIndicatorId: undefined
         });
+    }
+
+    private _resetLoadingIndicator(): void {
+        const { loadingIndicatorId } = this.state;
+        if (loadingIndicatorId) {
+            this._loadingIndicatorService.waive(loadingIndicatorId);
+        }
     }
 
     private _getLastInstanceId(masterServants: MasterServant[]): number {

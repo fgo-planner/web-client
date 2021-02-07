@@ -13,7 +13,7 @@ type Props = {
 };
 
 type State = {
-    userAccount?: MasterAccount | null;
+    masterAccount?: MasterAccount | null;
     /**
      * Clone of the items array from the MasterAccount object.
      */
@@ -94,11 +94,15 @@ export class MasterItemsList extends PureComponent<Props, State> {
     }
 
     private _save(): void {
-        const { userAccount, masterItems } = this.state;
-        this._masterAccountService.updateAccount({
-            _id: userAccount?._id,
+        const { masterAccount, masterItems } = this.state;
+
+        const update = {
+            _id: masterAccount?._id,
             items: masterItems
-        });
+        };
+        this._masterAccountService.updateAccount(update)
+            .catch(this._handleUpdateError.bind(this));
+
         let { loadingIndicatorId } = this.state;
         if (!loadingIndicatorId) {
             loadingIndicatorId = this._loadingIndicatorService.invoke();
@@ -109,17 +113,30 @@ export class MasterItemsList extends PureComponent<Props, State> {
     }
     
     private _cancel(): void {
-        const masterItems = this._cloneItemsFromMasterAccount(this.state.userAccount);
+        const masterItems = this._cloneItemsFromMasterAccount(this.state.masterAccount);
         this.setState({
             masterItems,
             editMode: false
         });
     }
 
+    private _handleUpdateError(error: any): void {
+        // TODO Display error message to user.
+        console.error(error);
+        const { masterAccount } = this.state;
+        const masterItems = this._cloneItemsFromMasterAccount(masterAccount);
+        this._resetLoadingIndicator();
+        this.setState({
+            masterItems,
+            editMode: false,
+            loadingIndicatorId: undefined
+        });
+    }
+
     private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {
         const masterItems = this._cloneItemsFromMasterAccount(account);
         this.setState({
-            userAccount: account,
+            masterAccount: account,
             masterItems,
             editMode: false
         });
@@ -129,17 +146,21 @@ export class MasterItemsList extends PureComponent<Props, State> {
         if (account == null) {
             return;
         }
-        const { loadingIndicatorId } = this.state;
-        if (loadingIndicatorId) {
-            this._loadingIndicatorService.waive(loadingIndicatorId);
-        }
         const masterItems = this._cloneItemsFromMasterAccount(account);
+        this._resetLoadingIndicator();
         this.setState({
-            userAccount: account,
+            masterAccount: account,
             masterItems,
             editMode: false,
             loadingIndicatorId: undefined
         });
+    }
+
+    private _resetLoadingIndicator(): void {
+        const { loadingIndicatorId } = this.state;
+        if (loadingIndicatorId) {
+            this._loadingIndicatorService.waive(loadingIndicatorId);
+        }
     }
 
     private _cloneItemsFromMasterAccount(account: Nullable<MasterAccount>): MasterItem[] {

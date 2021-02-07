@@ -60,7 +60,7 @@ export class MasterAccountService {
 
     async updateAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
         const updated = await Http.post<MasterAccount>(`${this.BaseUrl}`, masterAccount);
-        this.onCurrentMasterAccountUpdated.next(updated);
+        this.onCurrentMasterAccountUpdated.next(this._currentMasterAccount = updated);
         return updated;
     }
 

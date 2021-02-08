@@ -9,11 +9,11 @@ export const ViewModeColumnWidths: {
     readonly actions: string | number;
 } = {
     name: '35%',
-    noblePhantasmLevel: '5%',
-    level: '12%',
-    fouHp: '12%',
-    fouAtk: '12%',
-    skillLevels: '12%',
-    bondLevel: '12%',
+    noblePhantasmLevel: '10%',
+    level: '11%',
+    fouHp: '11%',
+    fouAtk: '11%',
+    skillLevels: '11%',
+    bondLevel: '11%',
     actions: '120px'
 };

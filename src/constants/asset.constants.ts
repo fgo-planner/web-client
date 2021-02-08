@@ -10,6 +10,10 @@ export class AssetConstants {
 
     static readonly ItemImageBaseUrl = `${AssetConstants._AtlasAcademyAssetsBaseUrl}/Items`;
 
+    static readonly ServantAscensionOffIcon = `${AssetConstants._InternalIconAssetsBaseUrl}/ascension_off.png`;
+
+    static readonly ServantAscensionOnIcon = `${AssetConstants._InternalIconAssetsBaseUrl}/ascension_on.png`;
+
     static readonly ServantBondIconMap: { readonly [key in MasterServantBondLevel]: string } = {
         0: `${AssetConstants._InternalIconAssetsBaseUrl}/bond_0.png`,
         1: `${AssetConstants._InternalIconAssetsBaseUrl}/bond_1.png`,
@@ -30,6 +34,10 @@ export class AssetConstants {
     };
 
     static readonly ServantClassIconBaseUrl = `${AssetConstants._AtlasAcademyAssetsBaseUrl}/ClassIcons`;
+
+    static readonly ServantNoblePhantasmIconLargeUrl = `${AssetConstants._InternalIconAssetsBaseUrl}/np_large.png`;
+
+    static readonly ServantNoblePhantasmIconSmallUrl = `${AssetConstants._InternalIconAssetsBaseUrl}/np_small.png`;
 
     static readonly ServantThumbnailBaseUrl = `${AssetConstants._AtlasAcademyAssetsBaseUrl}/Faces`;
 

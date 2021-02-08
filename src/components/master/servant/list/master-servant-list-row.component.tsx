@@ -1,8 +1,9 @@
 import { fade, IconButton, StyleRules, Theme } from '@material-ui/core';
 import withStyles, { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Delete as DeleteIcon, DragIndicator as DragIndicatorIcon, Edit as EditIcon } from '@material-ui/icons';
+import { AssetConstants } from 'app-constants';
 import { GameServantBondIcon } from 'components';
-import { GameServant, MasterServant } from 'data';
+import { GameServant, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel } from 'data';
 import { WithStylesProps } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
@@ -41,10 +42,33 @@ const style = (theme: Theme) => ({
         opacity: 0.5
     },
     noblePhantasmLevel: {
-        flex: ViewModeColumnWidths.noblePhantasmLevel
+        flex: ViewModeColumnWidths.noblePhantasmLevel,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        '& img': {
+            paddingRight: theme.spacing(1),
+            width: '18px',
+            height: '18px'
+        }
     },
     level: {
-        flex: ViewModeColumnWidths.level
+        flex: ViewModeColumnWidths.level,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        '& .value': {
+            width: '28px',
+            textAlign: 'right',
+            paddingRight: theme.spacing(4)
+        },
+        '& img': {
+            width: '16px',
+            height: '16px'
+        },
+        '& .ascension': {
+            width: '16px'
+        }
     },
     fouHp: {
         flex: ViewModeColumnWidths.fouHp
@@ -87,6 +111,13 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 export const MasterServantListRow = withStyles(style, styleOptions)(class extends PureComponent<Props> {
 
+    constructor(props: Props) {
+        super(props);
+
+        this._handleEditButtonClick = this._handleEditButtonClick.bind(this);
+        this._handleDeleteButtonClick = this._handleDeleteButtonClick.bind(this);
+    }
+
     render(): ReactNode {
         const { classes, masterServant, index, editMode } = this.props;
         const rowContents = this._renderRowContents();
@@ -124,27 +155,53 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
                     masterServant={masterServant} 
                     editMode={editMode}
                 />
-                <div className={classes.noblePhantasmLevel}>
-                    {masterServant.noblePhantasmLevel}
-                </div>
-                <div className={classes.level}>
-                    {masterServant.level}
-                </div>
+                {this._renderNoblePhantasmLevel()}
+                {this._renderLevel()}
                 <div className={classes.fouHp}>
                     {masterServant.fouHp === undefined ? '\u2014' : `+${masterServant.fouHp }`}
                 </div>
                 <div className={classes.fouAtk}>
                     {masterServant.fouAtk === undefined ? '\u2014' : `+${masterServant.fouAtk }`}
                 </div>
-                {this._renderSkillLevels(masterServant)}
-                {this._renderBondLevel(masterServant)}
-                {this._renderActionButtons(masterServant)}
+                {this._renderSkillLevels()}
+                {this._renderBondLevel()}
+                {this._renderActionButtons()}
             </Fragment>
         );
     }
 
-    private _renderSkillLevels(masterServant: MasterServant) {
-        const { classes } = this.props;
+    private _renderNoblePhantasmLevel(): ReactNode {
+        const { masterServant, classes } = this.props;
+        return (
+            <div className={classes.noblePhantasmLevel}>
+                <img src={AssetConstants.ServantNoblePhantasmIconSmallUrl} alt="Noble Phantasm" />
+                <div>
+                    {masterServant.noblePhantasmLevel}
+                </div>
+            </div>
+        );
+    }
+
+    private _renderLevel(): ReactNode {
+        const { masterServant, classes } = this.props;
+        const ascensionLevel = masterServant.ascensionLevel;
+        const iconUrl = ascensionLevel ? AssetConstants.ServantAscensionOnIcon : AssetConstants.ServantAscensionOffIcon;
+        return (
+            <div className={classes.level}>
+                <div className="value">
+                    {masterServant.level}
+                </div>
+                <img src={iconUrl} alt="Ascension" />
+                <div className="ascension">
+                    {masterServant.ascensionLevel}
+                </div>
+                {/* TODO Add grail icon */}
+            </div>
+        );
+    }
+
+    private _renderSkillLevels(): ReactNode {
+        const { masterServant, classes } = this.props;
         return (
             <div className={classes.skillLevels}>
                 <div className="value">
@@ -162,10 +219,10 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
         );
     }
 
-    private _renderBondLevel(masterServant: MasterServant) {
-        const { classes } = this.props;
-        const { bond } = masterServant;
-        if (bond == null) {
+    private _renderBondLevel(): ReactNode {
+        const { masterServant, classes } = this.props;
+        const bondLevel = masterServant.bond;
+        if (bondLevel == null) {
             return (
                 <div className={classes.bondLevel}>
                     {'\u2014'}
@@ -174,33 +231,35 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
         }
         return (
             <div className={classes.bondLevel}>
-                <GameServantBondIcon bond={bond} size={28} />
-                <div className="value">{bond}</div>
+                <GameServantBondIcon bond={bondLevel} size={28} />
+                <div className="value">
+                    {bondLevel}
+                </div>
             </div>
         );
     }
 
-    private _renderActionButtons(masterServant: MasterServant) {
+    private _renderActionButtons(): ReactNode {
         const { classes } = this.props;
         return (
             <div className={classes.actions}>
-                <IconButton color="primary" onClick={() => this._handleEditButtonClick(masterServant)}>
+                <IconButton color="primary" onClick={this._handleEditButtonClick}>
                     <EditIcon />
                 </IconButton>
-                <IconButton color="secondary" onClick={() => this._handleDeleteButtonClick(masterServant)}>
+                <IconButton color="secondary" onClick={this._handleDeleteButtonClick}>
                     <DeleteIcon />
                 </IconButton>
             </div>
         );
     }
 
-    private _handleEditButtonClick(masterServant: MasterServant): void {
-        const { onEditServant } = this.props;
+    private _handleEditButtonClick(): void {
+        const { masterServant, onEditServant } = this.props;
         onEditServant && onEditServant(masterServant);
     }
 
-    private _handleDeleteButtonClick(masterServant: MasterServant): void {
-        const { onDeleteServant } = this.props;
+    private _handleDeleteButtonClick(): void {
+        const { masterServant, onDeleteServant } = this.props;
         onDeleteServant && onDeleteServant(masterServant);
     }
 

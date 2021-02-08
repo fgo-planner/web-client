@@ -84,7 +84,7 @@ const style = (theme: Theme) => ({
         }
     },
     actions: {
-        flex: ViewModeColumnWidths.actions,
+        width: ViewModeColumnWidths.actions,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'

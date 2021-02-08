@@ -1,7 +1,8 @@
-import { Box, makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React from 'react';
 import { ThemeConstants } from 'styles';
+import { StyleUtils } from 'utils';
 import { ViewModeColumnWidths } from './master-servant-list-column-widths';
 
 type Props = {
@@ -16,6 +17,33 @@ const style = (theme: Theme) => ({
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
         textAlign: 'center',
+    },
+    editMode: {
+        paddingLeft: theme.spacing(4 + 5)
+    },
+    label: {
+        flex: ViewModeColumnWidths.label
+    },
+    noblePhantasmLevel: {
+        flex: ViewModeColumnWidths.noblePhantasmLevel
+    },
+    level: {
+        flex: ViewModeColumnWidths.level
+    },
+    fouHp: {
+        flex: ViewModeColumnWidths.fouHp
+    },
+    fouAtk: {
+        flex: ViewModeColumnWidths.fouAtk
+    },
+    skillLevels: {
+        flex: ViewModeColumnWidths.skillLevels
+    },
+    bondLevel: {
+        flex: ViewModeColumnWidths.bondLevel
+    },
+    actions: {
+        width: ViewModeColumnWidths.actions
     }
 } as StyleRules);
 
@@ -27,39 +55,33 @@ const useStyles = makeStyles(style, styleOptions);
 
 export const MasterServantListHeader = React.memo(({ editMode }: Props) => {
     const classes = useStyles();
-    if (editMode) {
-        return (
-            <div className={classes.root}>
-                // TODO Implement this
-            </div>
-        );
-    }
+    const rootClassName = StyleUtils.appendClassNames(classes.root, editMode && classes.editMode);
     return (
-        <div className={classes.root}>
-            <Box flex={ViewModeColumnWidths.name}>
+        <div className={rootClassName}>
+            <div className={classes.label}>
                 Servant
-            </Box>
-            <Box flex={ViewModeColumnWidths.noblePhantasmLevel}>
+            </div>
+            <div className={classes.noblePhantasmLevel}>
                 NP
-            </Box>
-            <Box flex={ViewModeColumnWidths.level}>
+            </div>
+            <div className={classes.level}>
                 Level
-            </Box>
-            <Box flex={ViewModeColumnWidths.fouHp}>
+            </div>
+            <div className={classes.fouHp}>
                 Fou (HP)
-            </Box>
-            <Box flex={ViewModeColumnWidths.fouAtk}>
+            </div>
+            <div className={classes.fouAtk}>
                 Fou (Attack)
-            </Box>
-            <Box flex={ViewModeColumnWidths.skillLevels}>
+            </div>
+            <div className={classes.skillLevels}>
                 Skills
-            </Box>
-            <Box flex={ViewModeColumnWidths.bondLevel}>
+            </div>
+            <div className={classes.bondLevel}>
                 Bond
-            </Box>
-            <Box width={ViewModeColumnWidths.actions}>
+            </div>
+            <div className={classes.actions}>
                 Actions
-            </Box>
+            </div>
         </div>
     );
 });

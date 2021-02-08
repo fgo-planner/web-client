@@ -35,7 +35,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, e
     const artStage = MasterServantUtils.getArtStage(ascensionLevel);
 
     return (
-        <Box className={classes.root} flex={ViewModeColumnWidths.name}>
+        <Box className={classes.root} flex={ViewModeColumnWidths.label}>
             <GameServantThumbnail
                 variant="rounded"
                 size={56}

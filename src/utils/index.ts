@@ -1,3 +1,4 @@
+export * from './array.utils';
 export * from './form.utils';
 export * from './http.utils';
 export * from './jwt.utils';

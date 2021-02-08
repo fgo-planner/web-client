@@ -5,7 +5,7 @@ import { ThemeConstants } from 'styles';
 import { ViewModeColumnWidths } from './master-servant-list-column-widths';
 
 type Props = {
-    editMode: boolean;
+    editMode?: boolean;
     viewLayout?: any; // TODO Make use of this
 };
 

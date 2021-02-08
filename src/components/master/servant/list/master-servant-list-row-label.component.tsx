@@ -9,7 +9,7 @@ import { ViewModeColumnWidths } from './master-servant-list-column-widths';
 type Props = {
     servant: Readonly<GameServant>;
     masterServant: MasterServant;
-    editMode: boolean;
+    editMode?: boolean;
 };
 
 const style = (theme: Theme) => ({

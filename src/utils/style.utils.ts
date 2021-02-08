@@ -2,7 +2,7 @@ import { Nullable } from 'internal';
 
 export class StyleUtils {
 
-    static appendClassNames(...classNames: Nullable<string>[]) {
+    static appendClassNames(...classNames: Nullable<string | false>[]) {
         if (!classNames.length) {
             return '';
         }

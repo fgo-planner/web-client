@@ -1,45 +1,31 @@
-import { fade, IconButton, StyleRules, Theme } from '@material-ui/core';
+import { IconButton, StyleRules, Theme } from '@material-ui/core';
 import withStyles, { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Delete as DeleteIcon, DragIndicator as DragIndicatorIcon, Edit as EditIcon } from '@material-ui/icons';
+import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
 import { AssetConstants } from 'app-constants';
 import { GameServantBondIcon } from 'components';
-import { GameServant, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel } from 'data';
+import { GameServant, MasterServant } from 'data';
 import { WithStylesProps } from 'internal';
-import React, { Fragment, PureComponent, ReactNode } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
-import { StyleUtils } from 'utils';
+import React, { PureComponent, ReactNode } from 'react';
 import { ViewModeColumnWidths } from './master-servant-list-column-widths';
 import { MasterServantListRowLabel } from './master-servant-list-row-label.component';
 
 type Props = {
     servant: Readonly<GameServant> | undefined; // Not optional, but possible to be undefined.
     masterServant: MasterServant;
-    index: number;
-    editMode: boolean;
+    editMode?: boolean;
     onEditServant?: (servant: MasterServant) => void;
     onDeleteServant?: (servant: MasterServant) => void;
 } & WithStylesProps;
 
 const style = (theme: Theme) => ({
     root: {
+        flex: 1,
         display: 'flex',
         alignContent: 'center',
         alignItems: 'center',
         textAlign: 'center',
         height: '64px',
         paddingLeft: theme.spacing(4),
-        borderTop: `1px solid ${theme.palette.divider}`,
-        '&.dragging': {
-            borderBottom: `1px solid ${theme.palette.divider}`,
-        },
-        '&:hover': {
-            background: fade(theme.palette.text.primary, 0.07)
-        }
-    },
-    dragIndicator: {
-        cursor: 'grab',
-        margin: theme.spacing(0, 3, 0, -3),
-        opacity: 0.5
     },
     noblePhantasmLevel: {
         flex: ViewModeColumnWidths.noblePhantasmLevel,
@@ -119,37 +105,16 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
     }
 
     render(): ReactNode {
-        const { classes, masterServant, index, editMode } = this.props;
-        const rowContents = this._renderRowContents();
-        if (!editMode) {
+        const { classes, servant, masterServant, editMode } = this.props;
+        if (!servant) {
             return (
                 <div className={classes.root}>
-                    {rowContents}
+                    Unknown servant ID {masterServant.gameId};
                 </div>
             );
         }
         return (
-            <Draggable draggableId={`draggable-servant-${masterServant.instanceId}`} index={index}>
-                {(provided, snapshot) => (
-                    <div ref={provided.innerRef} {...provided.draggableProps} className={StyleUtils.appendClassNames(classes.root, snapshot.isDragging ? 'dragging' : undefined)}>
-                        <div {...provided.dragHandleProps} className={classes.dragIndicator}>
-                            <DragIndicatorIcon />
-                        </div>
-                        {rowContents}
-                    </div>
-                )}
-            </Draggable>
-        );
-    }
-
-    private _renderRowContents(): ReactNode {
-        // TODO Clean this up
-        const { classes, servant, masterServant, editMode } = this.props;
-        if (!servant) {
-            return `Unknown servant ID ${masterServant.gameId}`;
-        }
-        return (
-            <Fragment>
+            <div className={classes.root}>
                 <MasterServantListRowLabel 
                     servant={servant}
                     masterServant={masterServant} 
@@ -166,7 +131,7 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
                 {this._renderSkillLevels()}
                 {this._renderBondLevel()}
                 {this._renderActionButtons()}
-            </Fragment>
+            </div>
         );
     }
 

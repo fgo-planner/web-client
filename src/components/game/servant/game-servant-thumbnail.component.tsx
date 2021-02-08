@@ -17,7 +17,7 @@ const ThumbnailBaseUrl = AssetConstants.ServantThumbnailBaseUrl;
 
 const DefaultVariant = 'square';
 
-const DefaultStage = 1;
+const DefaultStage = 2;
 
 export const GameServantThumbnail = React.memo((props: Props) => {
 
@@ -32,7 +32,8 @@ export const GameServantThumbnail = React.memo((props: Props) => {
     } = props;
 
     const servantId = servant._id;
-    const imageUrl = `${ThumbnailBaseUrl}/f_${servantId}${stage ?? DefaultStage}.png`;
+    const imageVariant = (stage ?? DefaultStage) - 1;
+    const imageUrl = `${ThumbnailBaseUrl}/f_${servantId}${imageVariant}.png`;
 
     const avatar = (
         <Avatar

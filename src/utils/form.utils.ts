@@ -36,9 +36,9 @@ export class FormUtils {
     }
 
     /**
-     * Transforms the string input into an valid Fou upgrade value. If the input
-     * was not a valid number, then `undefined` is returned. If the input contains
-     * decimal values, then the number is truncated before returning.
+     * Transforms the string input into an valid Fou enhancement value. If the
+     * input was not a valid number, then `undefined` is returned. If the input
+     * contains decimal values, then the number is truncated before returning.
      * 
      * Valid Fou values are integers in multiples of 10 for values between 0 and
      * 1000, and integers in multiples of 20 for values between 1000 and 2000.

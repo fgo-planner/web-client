@@ -3,6 +3,7 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { GameServantClassIcon, GameServantThumbnail } from 'components';
 import { GameServant, MasterServant } from 'data';
 import React from 'react';
+import { MasterServantUtils } from 'utils';
 import { ViewModeColumnWidths } from './master-servant-list-column-widths';
 
 type Props = {
@@ -31,8 +32,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, e
     const classes = useStyles();
     const { ascensionLevel } = masterServant;
 
-    // TODO Move this to a utility function
-    const stage = ascensionLevel < 3 ? ascensionLevel : ascensionLevel - 1;
+    const artStage = MasterServantUtils.getArtStage(ascensionLevel);
 
     return (
         <Box className={classes.root} flex={ViewModeColumnWidths.name}>
@@ -40,7 +40,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, e
                 variant="rounded"
                 size={56}
                 servant={servant}
-                stage={stage as any}
+                stage={artStage}
                 enableLink
                 openInNewTab={editMode}
             />

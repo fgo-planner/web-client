@@ -1,5 +1,5 @@
 import { GameServantConstants } from 'app-constants';
-import { GameServant, MasterServant } from 'data';
+import { GameServant, MasterServant, MasterServantAscensionLevel } from 'data';
 
 export class MasterServantUtils {
 
@@ -31,6 +31,29 @@ export class MasterServantUtils {
         };
     }
 
+    /**
+     * Returns the servant art stage that corresponds to the given ascension level.
+     */
+    static getArtStage(ascension: MasterServantAscensionLevel): 1 | 2 | 3 | 4 {
+        switch (ascension) {
+        case 0:
+            return 1;
+        case 1:
+        case 2:
+            return 2;
+        case 3:
+            return 3;
+        case 4:
+            return 4;
+        }
+    }
+
+    /**
+     * Rounds the given number to the closest valid Fou enhancement value.
+     * 
+     * Valid Fou values are integers in multiples of 10 for values between 0 and
+     * 1000, and integers in multiples of 20 for values between 1000 and 2000.
+     */
     static roundToNearestValidFouValue(value: number): number {
         if (value < GameServantConstants.MinFou) {
             return GameServantConstants.MinFou;

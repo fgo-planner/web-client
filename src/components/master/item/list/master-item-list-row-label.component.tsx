@@ -1,13 +1,14 @@
-import { StyleRules, Theme, withStyles } from '@material-ui/core';
-import { GameItemConstants } from 'app-constants';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { AssetConstants } from 'app-constants';
 import { GameItem } from 'data';
-import { WithStylesProps } from 'internal';
 import React, { Fragment } from 'react';
 import { ThemeConstants } from 'styles';
 
 type Props = {
     item: GameItem;
-} & WithStylesProps;
+};
+
+const ImageBaseUrl = AssetConstants.ItemImageBaseUrl;
 
 const style = (theme: Theme) => ({
     itemIcon: {
@@ -22,12 +23,15 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const MasterItemListRowLabel = React.memo(withStyles(style)((props: Props) => {
-    const { classes, item } = props;
+const useStyles = makeStyles(style);
+
+export const MasterItemListRowLabel = React.memo((props: Props) => {
+    const { item } = props;
+    const classes = useStyles();
     return (
         <Fragment>
             <img className={classes.itemIcon}
-                 src={`${GameItemConstants.ImageBaseUrl}/${item._id}.${GameItemConstants.ImageExtension}`}
+                 src={`${ImageBaseUrl}/${item._id}.png`}
                  alt={item.name}
             />
             <div className={classes.itemName}>
@@ -35,4 +39,4 @@ export const MasterItemListRowLabel = React.memo(withStyles(style)((props: Props
             </div>
         </Fragment>
     );
-}));
+});

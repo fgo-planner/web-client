@@ -482,8 +482,8 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
         return {
             gameId,
             level: Number(level),
-            ascensionLevel: Number(ascensionLevel),
-            bond: bond ? Number(bond) : undefined,
+            ascensionLevel: Number(ascensionLevel) as any,
+            bond: bond ? Number(bond) as any : undefined,
             fouAtk: fouAtk === '' ? undefined : Number(fouAtk),
             fouHp: fouHp === '' ? undefined : Number(fouHp),
             skillLevels: {
@@ -491,7 +491,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                 2: Number(skillLevel2) || undefined,
                 3: Number(skillLevel3) || undefined
             },
-            noblePhantasmLevel: Number(noblePhantasmLevel)
+            noblePhantasmLevel: Number(noblePhantasmLevel) as any
         };
     }
 

@@ -1,5 +1,5 @@
 import { Avatar, AvatarProps, Box } from '@material-ui/core';
-import { GameServantConstants } from 'app-constants';
+import { AssetConstants } from 'app-constants';
 import { GameServant } from 'data';
 import React, { PropsWithChildren } from 'react';
 import { Link } from 'react-router-dom';
@@ -13,9 +13,7 @@ type Props = PropsWithChildren<{
     openInNewTab?: boolean;
 }>;
 
-const ThumbnailBaseUrl = GameServantConstants.ThumbnailBaseUrl;
-
-const ThumbnailExtension = GameServantConstants.ThumbnailExtension;
+const ThumbnailBaseUrl = AssetConstants.ServantThumbnailBaseUrl;
 
 const DefaultVariant = 'square';
 
@@ -34,7 +32,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
     } = props;
 
     const servantId = servant._id;
-    const imageUrl = `${ThumbnailBaseUrl}/f_${servantId}${stage ?? DefaultStage}.${ThumbnailExtension}`;
+    const imageUrl = `${ThumbnailBaseUrl}/f_${servantId}${stage ?? DefaultStage}.png`;
 
     const avatar = (
         <Avatar

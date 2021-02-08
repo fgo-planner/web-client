@@ -1,5 +1,5 @@
 import { Box, makeStyles, StyleRules } from '@material-ui/core';
-import { GameServantConstants } from 'app-constants';
+import { AssetConstants } from 'app-constants';
 import { GameServantClass, GameServantRarity } from 'data';
 import React from 'react';
 
@@ -9,9 +9,7 @@ type Props = {
     size?: string | number;
 };
 
-const ClassIconBaseUrl = GameServantConstants.ClassIconBaseUrl;
-
-const ClassIconExtension = GameServantConstants.ClassIconExtension;
+const ClassIconBaseUrl = AssetConstants.ServantClassIconBaseUrl;
 
 const ClassNumberMap: { readonly [key in GameServantClass]: number } = {
     [GameServantClass.Saber]: 1,
@@ -64,7 +62,7 @@ export const GameServantClassIcon = React.memo(({ servantClass, rarity, size }: 
     size = size || DefaultSize;
     const classNumber = ClassNumberMap[servantClass] || DefaultClassNumber;
     const rarityColor = RarityColorMap[rarity] ?? DefaultRarityColor;
-    const imageUrl = `${ClassIconBaseUrl}/class${rarityColor}_${classNumber}.${ClassIconExtension}`;
+    const imageUrl = `${ClassIconBaseUrl}/class${rarityColor}_${classNumber}.png`;
     return (
         <Box width={size} height={size}>
             <img className={classes.img} src={imageUrl} alt={servantClass} />

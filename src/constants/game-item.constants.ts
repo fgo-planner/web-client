@@ -1,9 +1,5 @@
 export class GameItemConstants {
 
-    static readonly ImageBaseUrl = 'https://assets.atlasacademy.io/GameData/JP/Items';
-
-    static readonly ImageExtension = 'png';
-
     /**
      * Skill gem item IDs.
      */

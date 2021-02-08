@@ -1,15 +1,12 @@
 import { Box, makeStyles, StyleRules } from '@material-ui/core';
-import { GameServantConstants } from 'app-constants';
+import { AssetConstants } from 'app-constants';
+import { MasterServantBondLevel } from 'data';
 import React from 'react';
 
 type Props = {
-    bond: number;
+    bond: MasterServantBondLevel;
     size?: string | number;
 };
-
-const BondIconBaseUrl = GameServantConstants.BondIconBaseUrl;
-
-const BondIconExtension = GameServantConstants.BondIconExtension;
 
 const DefaultSize = 50;
 
@@ -24,9 +21,8 @@ const useStyles = makeStyles(style);
 
 export const GameServantBondIcon = React.memo(({ bond, size }: Props) => {
     const classes = useStyles();
+    const imageUrl = AssetConstants.ServantBondIconMap[bond];
     size = size || DefaultSize;
-    const bondString = bond > 10 ? 'grailed' : String(bond);
-    const imageUrl = `${BondIconBaseUrl}/bond_${bondString}.${BondIconExtension}`;
     return (
         <Box width={size} height={size}>
             <img className={classes.img} src={imageUrl} alt={`Bond ${bond}`} />

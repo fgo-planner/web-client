@@ -202,7 +202,8 @@ export class MasterServants extends PureComponent<Props, State> {
             });
         }
 
-        const {  masterServants, lastInstanceId, editServant, editMode } = this.state;
+        const { masterServants, editServant, editMode } = this.state;
+        let { lastInstanceId } = this.state;
 
         /*
          * If the servant is being added (regardless of in edit mode or not), then
@@ -213,7 +214,7 @@ export class MasterServants extends PureComponent<Props, State> {
         if (!editServant) {
             const masterServant: MasterServant = {
                 ...data,
-                instanceId: lastInstanceId + 1
+                instanceId: ++lastInstanceId
             };
             masterServants.push(masterServant);
 
@@ -241,9 +242,10 @@ export class MasterServants extends PureComponent<Props, State> {
         }
         
         this.setState({
+            masterServants: [...masterServants], // FIXME Hacky way to force child to re-render
+            lastInstanceId,
             editServant: undefined,
-            editServantDialogOpen: false,
-            masterServants: [...masterServants] // FIXME Hacky way to force child to re-render
+            editServantDialogOpen: false
         });
     }
     

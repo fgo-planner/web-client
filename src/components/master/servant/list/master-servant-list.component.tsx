@@ -1,13 +1,13 @@
-import { fade, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { DragIndicator as DragIndicatorIcon } from '@material-ui/icons';
+import { DraggableListRowContainer, StaticListRowContainer } from 'components';
 import { GameServant, MasterServant } from 'data';
 import { ReadonlyRecord, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
-import { DragDropContext, Draggable, DraggableProvided, DraggableStateSnapshot, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
 import { GameServantService } from 'services';
 import { Container as Injectables } from 'typedi';
-import { ArrayUtils, StyleUtils } from 'utils';
+import { ArrayUtils } from 'utils';
 import { MasterServantListHeader } from './master-servant-list-header.component';
 import { MasterServantListRow } from './master-servant-list-row.component';
 
@@ -22,24 +22,7 @@ type Props = {
 const style = (theme: Theme) => ({
     root: {
         minWidth: `${theme.breakpoints.width('lg')}px`,
-    },
-    rowContainer: {
-        borderTop: `1px solid ${theme.palette.divider}`,
-        '&:hover': {
-            background: fade(theme.palette.text.primary, 0.07)
-        }
-    },
-    draggable: {
-        display: 'flex',
-        alignItems: 'center'
-    },
-    dragging: {
-        borderBottom: `1px solid ${theme.palette.divider}`,
-    },
-    dragHandle: {
-        margin: theme.spacing(0, -2, 0, 1),
-        opacity: 0.5
-    },
+    }
 } as StyleRules);
 
 const styleOptions: WithStylesOptions<Theme> = {
@@ -73,7 +56,7 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
         }
 
         const { classes, editMode, masterServants } = this.props;
-        
+
         if (!editMode) {
             return (
                 <div className={classes.root}>
@@ -107,32 +90,21 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
     }
 
     private _renderDraggable(masterServant: MasterServant, index: number): ReactNode {
-        const { classes } = this.props;
         const { instanceId } = masterServant;
-        console.log(masterServant)
+
         return (
-            <Draggable key={instanceId} draggableId={`draggable-servant-${instanceId}`} index={index}>
-                {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
-                    const className = StyleUtils.appendClassNames(
-                        classes.draggable,
-                        classes.rowContainer,
-                        snapshot.isDragging && classes.dragging
-                    );
-                    return (
-                        <div ref={provided.innerRef} {...provided.draggableProps} className={className}>
-                            <div {...provided.dragHandleProps} className={classes.dragHandle}>
-                                <DragIndicatorIcon />
-                            </div>
-                            {this._renderMasterServantRow(masterServant)}
-                        </div>
-                    );
-                }}
-            </Draggable>
+            <DraggableListRowContainer
+                key={instanceId}
+                draggableId={`draggable-servant-${instanceId}`}
+                index={index}
+            >
+                {this._renderMasterServantRow(masterServant)}
+            </DraggableListRowContainer>
         );
     }
 
     private _renderMasterServantRow(masterServant: MasterServant): ReactNode {
-        const { classes, editMode, onEditServant, onDeleteServant } = this.props;
+        const { editMode, onEditServant, onDeleteServant } = this.props;
         const servant = this._gameServantMap[masterServant.gameId];
         if (editMode) {
             return (
@@ -147,14 +119,14 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
             );
         }
         return (
-            <div key={masterServant.instanceId} className={classes.rowContainer}>
+            <StaticListRowContainer key={masterServant.instanceId}>
                 <MasterServantListRow
                     servant={servant}
                     masterServant={masterServant}
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}
                 />
-            </div>
+            </StaticListRowContainer>
         );
     }
 

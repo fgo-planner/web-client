@@ -13,6 +13,7 @@ export * from './types/generics/readonly-record.type';
 export * from './types/http-options.type';
 export * from './types/modal-on-close-handler.type';
 export * from './types/modal-on-close-reason.type';
+export * from './types/props/custom-style-props.type';
 export * from './types/props/form-props.type';
 export * from './types/props/modal-component-props.type';
 export * from './types/props/with-styles-props.type';

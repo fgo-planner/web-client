@@ -1,4 +1,5 @@
 import { Box, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { LoadingIndicator } from 'components';
 import { GameItem, GameServant, GameServantEnhancement } from 'data';
 import { Nullable, WithStylesProps } from 'internal';
@@ -34,11 +35,15 @@ type State = {
 
 const style = (theme: Theme) => ({
     root: {
-
+        // TODO Implement this
     }
 } as StyleRules);
 
-export const GameItemInfo = withStyles(style)(class extends PureComponent<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'GameItemInfo'
+};
+
+export const GameItemInfo = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     private _gameItemService = Injectables.get(GameItemService);
 
@@ -105,7 +110,7 @@ export const GameItemInfo = withStyles(style)(class extends PureComponent<Props,
         );
     }
 
-    private _loadItem(itemId: number) {
+    private _loadItem(itemId: number): void {
         this.setState({ 
             itemLoading: true
         });

@@ -1,4 +1,5 @@
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { GameItemConstants } from 'app-constants';
 import { GameItem, MasterItem } from 'data';
 import { WithStylesProps } from 'internal';
@@ -39,7 +40,11 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const MasterItemList = withStyles(style)(class extends PureComponent<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'MasterItemList'
+};
+
+export const MasterItemList = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     private readonly ItemCategories: ReadonlyArray<ItemCategory> = [
         {
@@ -80,11 +85,11 @@ export const MasterItemList = withStyles(style)(class extends PureComponent<Prop
         this._renderItemRow = this._renderItemRow.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._generateListViewData();
     }
     
-    componentDidUpdate(prevProps: Props) {
+    componentDidUpdate(prevProps: Props): void {
         if (this.props.masterItems !== prevProps.masterItems) {
             this._generateListViewData();
         }

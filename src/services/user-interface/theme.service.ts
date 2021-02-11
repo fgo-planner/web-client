@@ -49,7 +49,7 @@ export class ThemeService {
         return themeMode as ThemeMode;
     }
 
-    private _getDefaultThemeForMode(themeMode: ThemeMode) {
+    private _getDefaultThemeForMode(themeMode: ThemeMode): Theme {
         const themeOptions = themeMode === 'light' ? defaultLightTheme() : defaultDarkTheme();
         return createMuiTheme(themeOptions);
     }
@@ -58,7 +58,7 @@ export class ThemeService {
      * Helper method for setting the value of the `_themeMode` member variable.
      * Also writes the value to local storage.
      */
-    private _setThemeMode(themeMode: ThemeMode) {
+    private _setThemeMode(themeMode: ThemeMode): void {
         this._themeMode = themeMode;
         localStorage.setItem(ThemeService.ThemeModeKey, themeMode);
     }

@@ -1,6 +1,7 @@
 import { Avatar, Box, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { MasterAccount, User } from 'data';
-import { ReadonlyPartialArray, WithStylesProps } from 'internal';
+import { ModalOnCloseReason, ReadonlyPartialArray, WithStylesProps } from 'internal';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { MasterAccountService } from 'services';
@@ -43,10 +44,14 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'AppBarAuthenticatedUser'
+};
+
 /**
  * Renders the app bar contents for an authenticated (logged in) user.
  */
-export const AppBarAuthenticatedUser = withStyles(style)(class extends PureComponent<Props, State> {
+export const AppBarAuthenticatedUser = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     // Temporary
     private readonly AvatarImageUrl = 'https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png';
@@ -76,12 +81,12 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
         this._handleProfileMenuClose = this._handleProfileMenuClose.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._onMasterAccountListUpdatedSubscription = this._masterAccountService.onMasterAccountListUpdated
             .subscribe(this._handleMasterAccountListUpdated.bind(this));
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._onMasterAccountListUpdatedSubscription.unsubscribe();
     }
 
@@ -176,7 +181,7 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
         });
     }
 
-    private _handleProfileMenuClose(event: {}, reason: string): void {
+    private _handleProfileMenuClose(event: {}, reason: ModalOnCloseReason): void {
         this.setState({
             profileMenu: {
                 ...this.state.profileMenu,
@@ -185,7 +190,7 @@ export const AppBarAuthenticatedUser = withStyles(style)(class extends PureCompo
         });
     }
 
-    private _handleMasterAccountListUpdated(accounts: ReadonlyPartialArray<MasterAccount>) {
+    private _handleMasterAccountListUpdated(accounts: ReadonlyPartialArray<MasterAccount>): void {
         this.setState({
             masterAccountList: accounts
         });

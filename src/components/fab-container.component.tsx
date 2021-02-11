@@ -1,9 +1,10 @@
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { PropsWithChildren } from 'react';
 
 type Props = PropsWithChildren<{}>;
 
-const useStyles = makeStyles((theme: Theme) => ({
+const style = (theme: Theme) => ({
     root: {
         position: 'fixed',
         bottom: theme.spacing(6),
@@ -12,7 +13,13 @@ const useStyles = makeStyles((theme: Theme) => ({
             marginLeft: theme.spacing(4)
         }
     }
-} as StyleRules));
+} as StyleRules);
+
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'FabContainer'
+};
+
+const useStyles = makeStyles(style, styleOptions);
 
 export const FabContainer = React.memo(({ children }: Props) => {
     const classes = useStyles();

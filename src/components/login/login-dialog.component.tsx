@@ -1,4 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { InputFieldContainer } from 'components';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import { ModalComponent, ModalComponentProps, UserCredentials, WithStylesProps } from 'internal';
@@ -24,7 +25,11 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const LoginDialog = withStyles(style)(class extends ModalComponent<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'LoginDialog'
+};
+
+export const LoginDialog = withStyles(style, styleOptions)(class extends ModalComponent<Props, State> {
 
     private readonly _formId = 'login-form';
 
@@ -102,7 +107,7 @@ export const LoginDialog = withStyles(style)(class extends ModalComponent<Props,
                   noValidate
                   onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
             >
-                <InputFieldContainer className={classes.inputFieldContainer}>
+                <InputFieldContainer classes={classes}>
                     <TextField variant="outlined"
                                fullWidth
                                label="Username"
@@ -115,7 +120,7 @@ export const LoginDialog = withStyles(style)(class extends ModalComponent<Props,
                                helperText={touchedErrors.username}
                     />
                 </InputFieldContainer>
-                <InputFieldContainer className={classes.inputFieldContainer}>
+                <InputFieldContainer classes={classes}>
                     <TextField variant="outlined"
                                fullWidth
                                label="Password"
@@ -157,7 +162,7 @@ export const LoginDialog = withStyles(style)(class extends ModalComponent<Props,
         }
     }
 
-    private _cancel() {
+    private _cancel(): void {
         this.props.onClose({}, 'cancel');
     }
 

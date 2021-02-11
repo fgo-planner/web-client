@@ -30,12 +30,12 @@ export class ThemeManager extends Component<Props, State> {
         };
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._onThemeChangeSubscription = this._themeService.onThemeChange
             .subscribe(this._handleThemeChange.bind(this));
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._onThemeChangeSubscription.unsubscribe();
     }
 
@@ -52,7 +52,7 @@ export class ThemeManager extends Component<Props, State> {
         );
     }
 
-    private _handleThemeChange(theme: Theme) {
+    private _handleThemeChange(theme: Theme): void {
         this.setState({ theme });
     }
 

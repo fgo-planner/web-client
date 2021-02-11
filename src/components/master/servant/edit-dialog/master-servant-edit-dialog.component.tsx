@@ -1,4 +1,5 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, Select, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { GameServantConstants } from 'app-constants';
 import { InputFieldContainer } from 'components';
 import { GameServant, MasterServant } from 'data';
@@ -43,8 +44,6 @@ type State = {
 };
 
 const style = (theme: Theme) => ({
-    root: {
-    },
     form: {
         width: '500px',
         paddingTop: theme.spacing(4)
@@ -63,7 +62,11 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const MasterServantEditDialog = withStyles(style)(class extends ModalComponent<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'MasterServantEditDialog'
+};
+
+export const MasterServantEditDialog = withStyles(style, styleOptions)(class extends ModalComponent<Props, State> {
 
     private readonly _formId = 'servant-form';
 
@@ -181,10 +184,10 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                 onSubmit={this._submit}
             >
                 <Box className={classes.inputFieldGroup} display="flex">
-                    <InputFieldContainer className={classes.inputFieldContainer} flex="75%">
+                    <InputFieldContainer classes={classes} flex="75%">
                         {this._renderServantNameField()}
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer} flex="25%">
+                    <InputFieldContainer classes={classes} flex="25%">
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="noblePhantasmLevel">NP Level</InputLabel>
                             <Select
@@ -205,7 +208,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                     </InputFieldContainer>
                 </Box>
                 <Box className={classes.inputFieldGroup} display="flex">
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer classes={classes}>
                         <TextField
                             variant="outlined"
                             fullWidth
@@ -222,7 +225,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                             onBlur={this._handleLevelInputBlur}
                         />
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer classes={classes}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="ascensionLevel">Ascension</InputLabel>
                             <Select
@@ -241,7 +244,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer classes={classes}>
                         <TextField
                             variant="outlined"
                             fullWidth
@@ -258,7 +261,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                             onBlur={this._handleFouInputBlur}
                         />
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer classes={classes}>
                         <TextField
                             variant="outlined"
                             fullWidth
@@ -277,7 +280,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                     </InputFieldContainer>
                 </Box>
                 <Box className={classes.inputFieldGroup} display="flex">
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer classes={classes}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="skillLevel1">Skill 1</InputLabel>
                             <Select
@@ -296,7 +299,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer classes={classes}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="skillLevel2">Skill 2</InputLabel>
                             <Select
@@ -316,7 +319,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer classes={classes}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="skillLevel3">Skill 3</InputLabel>
                             <Select
@@ -336,7 +339,7 @@ export const MasterServantEditDialog = withStyles(style)(class extends ModalComp
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer classes={classes}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="bond">Bond</InputLabel>
                             <Select

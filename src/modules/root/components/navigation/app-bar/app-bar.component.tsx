@@ -1,4 +1,5 @@
 import { Paper, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { User } from 'data';
 import { Nullable, UserInfo, WithStylesProps } from 'internal';
 import React, { PureComponent, ReactNode } from 'react';
@@ -44,10 +45,14 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'AppBar'
+};
+
 /**
  * The app bar component.
  */
-export const AppBar = withStyles(style)(class extends PureComponent<Props, State> {
+export const AppBar = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     private _authService = Injectables.get(AuthService);
 
@@ -62,12 +67,12 @@ export const AppBar = withStyles(style)(class extends PureComponent<Props, State
         };
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._onCurrentUserChangeSubscription = this._authService.onCurrentUserChange
             .subscribe(this._handleCurrentUserChange.bind(this));
     }
     
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._onCurrentUserChangeSubscription.unsubscribe();
     }
 

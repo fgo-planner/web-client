@@ -44,14 +44,14 @@ export class MasterItems extends PureComponent<Props, State> {
         this._cancel = this._cancel.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
         this._onCurrentMasterAccountUpdatedSubscription = this._masterAccountService.onCurrentMasterAccountUpdated
             .subscribe(this._handleCurrentMasterAccountUpdated.bind(this));
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._onCurrentMasterAccountChangeSubscription.unsubscribe();
         this._onCurrentMasterAccountUpdatedSubscription.unsubscribe();
     }

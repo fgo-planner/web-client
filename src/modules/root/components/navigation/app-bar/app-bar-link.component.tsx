@@ -1,4 +1,5 @@
 import { fade, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { RouteLinkDefinition, WithStylesProps } from 'internal';
 import React, { MouseEventHandler, PureComponent, ReactNode } from 'react';
 import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
@@ -32,8 +33,11 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'AppBarLink'
+};
 
-export const AppBarLink = withRouter(withStyles(style)(class extends PureComponent<Props> {
+export const AppBarLink = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props> {
 
     render(): ReactNode {
         const { route, label, onClick, onMouseOver, onMouseOut } = this.props;

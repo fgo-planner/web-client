@@ -1,21 +1,28 @@
-import { StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesProps } from 'internal';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment } from 'react';
 
 type Props = {
     itemId: number | string;
-} & WithStylesProps;
+};
 
 const style = (theme: Theme) => ({
     root: {
-
+        // TODO Implement this
     }
 } as StyleRules);
 
-export const GameItemNotFound = React.memo(withStyles(style)((props: Props) => {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'GameItemNotFound'
+};
+
+const useStyles = makeStyles(style, styleOptions);
+
+export const GameItemNotFound = React.memo((props: Props) => {
+    const classes = useStyles();
     return (
         <Fragment>
             {`Item '${props.itemId}' could not be found.`}
         </Fragment>
     );
-}));
+});

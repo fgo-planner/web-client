@@ -39,7 +39,7 @@ export class MasterServantEditDialogAutocomplete extends PureComponent<Props> {
         return option.name || option.metadata?.displayName || String(option._id);
     }
 
-    private _isOptionSelected(option: Readonly<GameServant>, value: Readonly<GameServant>) {
+    private _isOptionSelected(option: Readonly<GameServant>, value: Readonly<GameServant>): boolean {
         return option._id === value._id;
     }
 
@@ -55,7 +55,7 @@ export class MasterServantEditDialogAutocomplete extends PureComponent<Props> {
         return <TextField {...params} label="Servant" variant="outlined" />;
     }
 
-    private _handleChange(event: ChangeEvent<{}>, servant: Nullable<Readonly<GameServant>>) {
+    private _handleChange(event: ChangeEvent<{}>, servant: Nullable<Readonly<GameServant>>): void {
         if (servant == null) {
             // Is this case possible?
             return;

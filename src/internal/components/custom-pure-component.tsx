@@ -8,7 +8,7 @@ export abstract class CustomPureComponent<P = {}, S = {}> extends Component<P, S
         return !this._shallowEquals(this.props, nextProps) || !this._shallowEquals(this.state, nextState);
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 

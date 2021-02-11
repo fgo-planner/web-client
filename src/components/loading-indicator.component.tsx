@@ -1,4 +1,5 @@
 import { Box, CircularProgress, makeStyles, StyleRules, Theme, useMediaQuery } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React from 'react';
 
 type Props = {
@@ -6,7 +7,7 @@ type Props = {
     zIndex?: number;
 };
 
-const useStyles = makeStyles((theme: Theme) => ({
+const style = () => ({
     root: {
         display: 'flex',
         // alignItems: 'center',
@@ -19,7 +20,13 @@ const useStyles = makeStyles((theme: Theme) => ({
     progressContainer: {
         paddingTop: '25vh'
     }
-} as StyleRules));
+} as StyleRules);
+
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'LoadingIndicator'
+};
+
+const useStyles = makeStyles(style, styleOptions);
 
 export const LoadingIndicator = React.memo(({ show, zIndex }: Props) => {
     if (show !== undefined && !show) {

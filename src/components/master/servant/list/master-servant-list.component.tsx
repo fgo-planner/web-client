@@ -43,7 +43,7 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
         this._handleDragEnd = this._handleDragEnd.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._gameServantService.getServantsMap().then(gameServantMap => {
             this._gameServantMap = gameServantMap;
             this.forceUpdate();

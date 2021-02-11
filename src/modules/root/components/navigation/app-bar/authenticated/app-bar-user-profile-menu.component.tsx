@@ -67,12 +67,12 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
         this._toggleThemeMode = this._toggleThemeMode.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._onThemeChangeSubscription = this._themeService.onThemeChange
             .subscribe(this._handleThemeChange.bind(this));
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._onThemeChangeSubscription.unsubscribe();
     }
 
@@ -143,7 +143,7 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
         this._themeService.toggleThemeMode();
     }
 
-    private _handleThemeChange(theme: Theme) {
+    private _handleThemeChange(theme: Theme): void {
         const themeMode = this._themeService.themeMode;
         this.setState({ themeMode });
     }

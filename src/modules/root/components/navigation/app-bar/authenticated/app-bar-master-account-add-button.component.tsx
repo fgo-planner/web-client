@@ -50,7 +50,7 @@ export class AppBarMasterAccountAddButton extends PureComponent<Props, State> {
         });
     }
 
-    private _handleDialogClose(event: any, reason: ModalOnCloseReason) {
+    private _handleDialogClose(event: any, reason: ModalOnCloseReason): void {
         /*
          * If the dialog was closed due to successful submit, then don't do anything
          * because this component most like has already been unmounted. Otherwise,

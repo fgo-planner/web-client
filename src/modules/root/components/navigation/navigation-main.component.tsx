@@ -1,4 +1,5 @@
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { WithStylesProps } from 'internal';
 import React, { Component, ReactNode, UIEvent } from 'react';
 import { ThemeConstants } from 'styles';
@@ -41,7 +42,11 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const NavigationMain = withStyles(style)(class extends Component<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'NavigationMain'
+};
+
+export const NavigationMain = withStyles(style, styleOptions)(class extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
@@ -69,7 +74,7 @@ export const NavigationMain = withStyles(style)(class extends Component<Props, S
         );
     }
 
-    private _handleScroll(event: UIEvent) {
+    private _handleScroll(event: UIEvent): void {
         const scrollAmount = (event.target as Element)?.scrollTop;
         const appBarElevated = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
         if (appBarElevated !== this.state.appBarElevated) {

@@ -17,12 +17,12 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
 
     private _onCurrentUserChangeSubscription!: Subscription;
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._onCurrentUserChangeSubscription = this._authService.onCurrentUserChange
             .subscribe(this._handleCurrentUserChange.bind(this));
     }
     
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._onCurrentUserChangeSubscription.unsubscribe();
     }
 
@@ -211,14 +211,14 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
         }
     }
 
-    private _getAbsolutePath(parentPath = '', path = '') {
+    private _getAbsolutePath(parentPath = '', path = ''): string | undefined {
         if (!path || path === '*') {
             return undefined;
         }
         return this._appendPaths(parentPath, path);
     }
 
-    private _appendPaths(parentPath = '', path = '') {
+    private _appendPaths(parentPath = '', path = ''): string {
         parentPath = parentPath.trim();
         path = path.trim();
         if (parentPath === '/') {
@@ -230,7 +230,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
         return `${parentPath}/${path}`;
     }
     
-    private _handleCurrentUserChange(userInfo: Nullable<UserInfo>) {
+    private _handleCurrentUserChange(userInfo: Nullable<UserInfo>): void {
         /* 
          * If user logged out, then re-render. This will trigger a redirect if the user
          * is currently on an authenticated-only route.

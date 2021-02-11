@@ -69,7 +69,7 @@ export class MasterServants extends PureComponent<Props, State> {
         this._handleDeleteServantDialogClose = this._handleDeleteServantDialogClose.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
         this._onCurrentMasterAccountUpdatedSubscription = this._masterAccountService.onCurrentMasterAccountUpdated
@@ -81,7 +81,7 @@ export class MasterServants extends PureComponent<Props, State> {
         });
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._onCurrentMasterAccountChangeSubscription.unsubscribe();
         this._onCurrentMasterAccountUpdatedSubscription.unsubscribe();
     }
@@ -259,7 +259,7 @@ export class MasterServants extends PureComponent<Props, State> {
         });
     }
 
-    private _closeDeleteServantDialog() {
+    private _closeDeleteServantDialog(): void {
         return this.setState({
             deleteServantDialogOpen: false,
             deleteServantDialogPrompt: undefined

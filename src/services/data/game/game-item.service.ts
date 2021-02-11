@@ -66,21 +66,21 @@ export class GameItemService {
         return Http.get<Page<GameItem>>(`${this.BaseUrl}/page`, { params });
     }
 
-    private _onItemsCacheLoaded(data: ReadonlyArray<GameItem>) {
+    private _onItemsCacheLoaded(data: ReadonlyArray<GameItem>): void {
         this._generateCacheMap(this._itemsCache = data);
         this._itemsCachePromise = null;
     }
 
-    private _onItemsCacheLoadError(error: any) {
+    private _onItemsCacheLoadError(error: any): void {
         this._invalidateCache();
     }
 
-    private _invalidateCache() {
+    private _invalidateCache(): void {
         this._itemsCache = null;
         this._itemsCacheMap = null;
     }
 
-    private _generateCacheMap(items: ReadonlyArray<GameItem>) {
+    private _generateCacheMap(items: ReadonlyArray<GameItem>): void {
         const cacheMap: Record<number, Readonly<GameItem>> = {};
         for (const item of items) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

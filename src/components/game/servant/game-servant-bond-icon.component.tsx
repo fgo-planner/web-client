@@ -1,4 +1,5 @@
-import { Box, makeStyles, StyleRules } from '@material-ui/core';
+import { Box, makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { AssetConstants } from 'app-constants';
 import { MasterServantBondLevel } from 'data';
 import React from 'react';
@@ -17,7 +18,11 @@ const style = () => ({
     }
 } as StyleRules);
 
-const useStyles = makeStyles(style);
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'GameServantBondIcon'
+};
+
+const useStyles = makeStyles(style, styleOptions);
 
 export const GameServantBondIcon = React.memo(({ bond, size }: Props) => {
     const classes = useStyles();

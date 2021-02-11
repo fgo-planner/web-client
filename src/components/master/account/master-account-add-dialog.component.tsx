@@ -1,4 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { InputFieldContainer } from 'components';
 import { ModalComponent, ModalComponentProps, WithStylesProps } from 'internal';
 import React, { ChangeEvent, FormEvent, ReactNode } from 'react';
@@ -27,7 +28,11 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const MasterAccountAddDialog = withStyles(style)(class extends ModalComponent<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'MasterAccountAddDialog'
+};
+
+export const MasterAccountAddDialog = withStyles(style, styleOptions)(class extends ModalComponent<Props, State> {
     
     private readonly _formId = 'master-account-form';
 
@@ -68,7 +73,7 @@ export const MasterAccountAddDialog = withStyles(style)(class extends ModalCompo
                         </div>
                         <form className={classes.form} id={this._formId} onSubmit={this._submit}>
                             {/* TODO Add form validation */}
-                            <InputFieldContainer className={classes.inputFieldContainer}>
+                            <InputFieldContainer classes={classes}>
                                 <TextField variant="outlined"
                                            fullWidth
                                            label="Nickname (Optional)"
@@ -78,7 +83,7 @@ export const MasterAccountAddDialog = withStyles(style)(class extends ModalCompo
                                            onChange={this._handleInputChange}
                                 />
                             </InputFieldContainer>
-                            <InputFieldContainer className={classes.inputFieldContainer}>
+                            <InputFieldContainer classes={classes}>
                                 <TextField variant="outlined"
                                            fullWidth
                                            label="Friend ID (Optional)"
@@ -146,7 +151,7 @@ export const MasterAccountAddDialog = withStyles(style)(class extends ModalCompo
         }
     }
 
-    private _cancel() {
+    private _cancel(): void {
         this.setState({
             formValues: this._defaultFormValues
         });

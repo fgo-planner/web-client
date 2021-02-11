@@ -71,21 +71,21 @@ export class GameServantService {
         return Http.get<Page<GameServant>>(`${this.BaseUrl}/page`, { params });
     }
 
-    private _onServantsCacheLoaded(data: ReadonlyArray<GameServant>) {
+    private _onServantsCacheLoaded(data: ReadonlyArray<GameServant>): void {
         this._generateCacheMap(this._servantsCache = data);
         this._servantsCachePromise = null;
     }
 
-    private _onServantsCacheLoadError(error: any) {
+    private _onServantsCacheLoadError(error: any): void {
         this._invalidateCache();
     }
 
-    private _invalidateCache() {
+    private _invalidateCache(): void {
         this._servantsCache = null;
         this._servantsCacheMap = null;
     }
 
-    private _generateCacheMap(servants: ReadonlyArray<GameServant>) {
+    private _generateCacheMap(servants: ReadonlyArray<GameServant>): void {
         const cacheMap: Record<number, Readonly<GameServant>> = {};
         for (const servant of servants) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

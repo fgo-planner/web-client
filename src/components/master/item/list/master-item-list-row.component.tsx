@@ -1,4 +1,5 @@
 import { Box, fade, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { GameItem, MasterItem } from 'data';
 import { WithStylesProps } from 'internal';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
@@ -12,10 +13,6 @@ type Props = {
     item: ListViewDataItem;
     editMode: boolean;
 } & WithStylesProps;
-
-type State = {
-
-};
 
 const style = (theme: Theme) => ({
     root: {
@@ -33,7 +30,11 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const MasterItemListRow = withStyles(style)(class extends PureComponent<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'MasterItemListRow'
+};
+
+export const MasterItemListRow = withStyles(style, styleOptions)(class extends PureComponent<Props> {
 
     constructor(props: Props) {
         super(props);

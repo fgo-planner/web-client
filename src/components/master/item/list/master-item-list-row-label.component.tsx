@@ -1,4 +1,5 @@
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { AssetConstants } from 'app-constants';
 import { GameItem } from 'data';
 import React, { Fragment } from 'react';
@@ -23,10 +24,13 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-const useStyles = makeStyles(style);
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'MasterItemListRowLabel'
+};
 
-export const MasterItemListRowLabel = React.memo((props: Props) => {
-    const { item } = props;
+const useStyles = makeStyles(style, styleOptions);
+
+export const MasterItemListRowLabel = React.memo(({ item }: Props) => {
     const classes = useStyles();
     return (
         <Fragment>

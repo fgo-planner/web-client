@@ -27,12 +27,12 @@ export class LoadingIndicatorOverlay extends PureComponent<Props, State> {
         };
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._onDisplayStatusChangeSubscription = this._loadingIndicatorService.onDisplayStatusChange
             .subscribe(show => this.setState({ show }));
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._onDisplayStatusChangeSubscription.unsubscribe();
     }
 

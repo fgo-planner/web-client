@@ -1,6 +1,7 @@
-import { Menu, MenuProps, PaperProps, PopoverClassKey, StyleRules, withStyles } from '@material-ui/core';
+import { Menu, MenuProps, PaperProps, PopoverClassKey, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { WithStylesProps } from 'internal';
-import React, { MouseEvent, PureComponent, ReactNode } from 'react';
+import React, { PureComponent, ReactNode } from 'react';
 
 type Props = {
     closeDelay?: number;
@@ -20,7 +21,11 @@ const style = () => ({
     }
 } as StyleRules);
 
-export const HoverMenu = withStyles(style)(class extends PureComponent<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'HoverMenu'
+};
+
+export const HoverMenu = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     private readonly _popoverClasses: Partial<Record<PopoverClassKey, string>>;
 
@@ -41,7 +46,7 @@ export const HoverMenu = withStyles(style)(class extends PureComponent<Props, St
         this._popoverClasses = { root: props.classes.root };
     }
 
-    componentDidUpdate(prevProps: Props) {
+    componentDidUpdate(prevProps: Props): void {
         const { open, forceClosed } = this.props;
         if (forceClosed) {
             if (!prevProps.forceClosed) {
@@ -62,7 +67,7 @@ export const HoverMenu = withStyles(style)(class extends PureComponent<Props, St
         }
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._isMounted = false;
     }
 
@@ -90,7 +95,7 @@ export const HoverMenu = withStyles(style)(class extends PureComponent<Props, St
         };
     }
 
-    private _handleMouseEnter(event: MouseEvent) {
+    private _handleMouseEnter(): void {
         /*
          * Need to set timeout here because the mouse enter event fires before the
          * componentDidUpdate` method.
@@ -100,12 +105,12 @@ export const HoverMenu = withStyles(style)(class extends PureComponent<Props, St
         });
     }
 
-    private _handleMouseLeave(event: MouseEvent) {
+    private _handleMouseLeave(): void {
         this._closeRequested = true;
         this._closeAfterDelay();
     }
 
-    private _closeAfterDelay() {
+    private _closeAfterDelay(): void {
         const { closeDelay } = this.props;
         setTimeout(() => {
             if (!this._closeRequested || !this._isMounted) {

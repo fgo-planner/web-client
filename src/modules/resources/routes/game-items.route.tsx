@@ -10,23 +10,25 @@ export class GameItemsRoute extends RouteComponent {
 
     private _gameItemService = Injectables.get(GameItemService);
 
-    private _data: ReadonlyArray<Readonly<GameItem>> = [];
+    private _gameItems: ReadonlyArray<Readonly<GameItem>> = [];
 
-    async componentDidMount() {
-        this._data = await this._gameItemService.getItems();
-        this.forceUpdate();
+    componentDidMount(): void {
+        this._gameItemService.getItems().then(gameItems => {
+            this._gameItems = gameItems;
+            this.forceUpdate();
+        });
     }
 
     render(): ReactNode {
         return (
             <Fragment>
                 <div>ITEMS</div>
-                {this._data.slice(0, 100).map(this._renderItem)}
+                {this._gameItems.slice(0, 100).map(this._renderItem)}
             </Fragment>
         );
     }
 
-    private _renderItem(item: Readonly<GameItem>, key: number) {
+    private _renderItem(item: Readonly<GameItem>, key: number): ReactNode {
         return (
             <Box key={key} display="flex">
                 <Link to={`items/${item._id}`}>

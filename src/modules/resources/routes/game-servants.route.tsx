@@ -8,23 +8,25 @@ export class GameServantsRoute extends RouteComponent {
 
     private _gameServantService = Injectables.get(GameServantService);
 
-    private _data: ReadonlyArray<Readonly<GameServant>> = [];
+    private _gameServants: ReadonlyArray<Readonly<GameServant>> = [];
 
-    async componentDidMount() {
-        this._data = await this._gameServantService.getServants();
-        this.forceUpdate();
+    componentDidMount(): void {
+        this._gameServantService.getServants().then(gameServants => {
+            this._gameServants = gameServants;
+            this.forceUpdate();
+        });
     }
 
     render(): ReactNode {
         return (
             <Fragment>
                 <div>SERVANTS</div>
-                {this._data.map(this._renderServant)}
+                {this._gameServants.map(this._renderServant)}
             </Fragment>
         );
     }
 
-    private _renderServant(servant: Readonly<GameServant>, key: number) {
+    private _renderServant(servant: Readonly<GameServant>, key: number): ReactNode {
         return (
             <div key={key}>
                 {servant.collectionNo} {servant.name}

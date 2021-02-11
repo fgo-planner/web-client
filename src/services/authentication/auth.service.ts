@@ -61,7 +61,7 @@ export class AuthService {
     /**
      * Loads user info from JWT in local storage.
      */
-    private _loadTokenFromStorage() {
+    private _loadTokenFromStorage(): void {
         const token = JwtUtils.readTokenFromStorage();
         if (token) {
             this._currentUser = JwtUtils.parseToken(token);

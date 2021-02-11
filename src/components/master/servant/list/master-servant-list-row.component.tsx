@@ -122,12 +122,8 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
                 />
                 {this._renderNoblePhantasmLevel()}
                 {this._renderLevel()}
-                <div className={classes.fouHp}>
-                    {masterServant.fouHp === undefined ? '\u2014' : `+${masterServant.fouHp }`}
-                </div>
-                <div className={classes.fouAtk}>
-                    {masterServant.fouAtk === undefined ? '\u2014' : `+${masterServant.fouAtk }`}
-                </div>
+                {this._renderFouLevel('fouHp')}
+                {this._renderFouLevel('fouAtk')}
                 {this._renderSkillLevels()}
                 {this._renderBondLevel()}
                 {this._renderActionButtons()}
@@ -161,6 +157,16 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
                     {masterServant.ascensionLevel}
                 </div>
                 {/* TODO Add grail icon */}
+            </div>
+        );
+    }
+
+    private _renderFouLevel(stat: 'fouHp' | 'fouAtk'): ReactNode {
+        const { masterServant, classes } = this.props;
+        const value = masterServant[stat];
+        return (
+            <div className={classes[stat]}>
+                {value === undefined ? '\u2014' : `+${value}`}
             </div>
         );
     }

@@ -1,4 +1,5 @@
 import { fade, MenuItem, PaperProps, PopoverOrigin, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { HoverMenu } from 'components';
 import { WithStylesProps } from 'internal';
 import React, { MouseEvent, PureComponent, ReactNode } from 'react';
@@ -29,7 +30,11 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const AppBarResourcesMenu = withStyles(style)(class extends PureComponent<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'AppBarResourcesMenu'
+};
+
+export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     private readonly _menuAnchorOrigin: PopoverOrigin = {
         vertical: 'bottom',

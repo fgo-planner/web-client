@@ -1,28 +1,35 @@
-import { StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesProps } from 'internal';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { CustomStyleProps } from 'internal';
 import React, { PropsWithChildren } from 'react';
 import { StyleUtils } from 'utils';
 
 type Props = PropsWithChildren<{
-    className?: string;
     width?: string;
     flex?: string | number;
-}> & WithStylesProps;
+}> & CustomStyleProps;
 
 const style = (theme: Theme) => ({
-    root: {
+    inputFieldContainer: {
         height: '96px',
         padding: theme.spacing(0, 2)
     }
     // TODO Add condensed height
 } as StyleRules);
 
-export const InputFieldContainer = React.memo(withStyles(style)((props: Props) => {
-    const { children, classes, className, width, flex } = props;
-    const classNames = StyleUtils.appendClassNames(classes.root, className);
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'InputFieldContainer'
+};
+
+const useStyles = makeStyles(style, styleOptions);
+
+export const InputFieldContainer = React.memo((props: Props) => {
+    const { children, className, width, flex } = props;
+    const classes = useStyles(props);
+    const classNames = StyleUtils.appendClassNames(classes.inputFieldContainer, className);
     return (
-        <div className={classNames} style={{ width, flex }} >
+        <div className={classNames} style={{ width, flex }}>
             {children}
         </div>
     );
-}));
+});

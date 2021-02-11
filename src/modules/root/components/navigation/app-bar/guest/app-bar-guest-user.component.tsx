@@ -1,4 +1,5 @@
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { LoginDialog } from 'components';
 import { ModalOnCloseReason, WithStylesProps } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
@@ -21,10 +22,14 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'AppBarGuestUser'
+};
+
 /**
  * Renders the app bar contents for a guest (not logged in) user.
  */
-export const AppBarGuestUser = withStyles(style)(class extends PureComponent<Props, State> {
+export const AppBarGuestUser = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
@@ -65,7 +70,7 @@ export const AppBarGuestUser = withStyles(style)(class extends PureComponent<Pro
         });
     }
 
-    private _handleLoginDialogClose(event: any, reason: ModalOnCloseReason) {
+    private _handleLoginDialogClose(event: any, reason: ModalOnCloseReason): void {
         this.setState({
             loginModalOpen: false
         });

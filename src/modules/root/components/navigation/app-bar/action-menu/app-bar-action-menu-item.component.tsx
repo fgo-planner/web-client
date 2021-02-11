@@ -1,6 +1,6 @@
-import { ListItemIcon, ListItemText, MenuItem, StyledComponentProps, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { ListItemIcon, ListItemText, makeStyles, MenuItem, StyleRules, Theme } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { SvgIconComponent } from '@material-ui/icons';
-import { WithStylesProps } from 'internal';
 import React, { MouseEventHandler } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ type Props = {
     icon: SvgIconComponent;
     to?: string;
     onClick?: MouseEventHandler;
-} & WithStylesProps & StyledComponentProps;
+};
 
 const style = (theme: Theme) => ({
     root: {
@@ -25,8 +25,15 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const AppBarActionMenuItem = React.memo(withStyles(style)((props: Props) => {
-    const { label, to, onClick, classes } = props;
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'AppBarActionMenuItem'
+};
+
+const useStyles = makeStyles(style, styleOptions);
+
+export const AppBarActionMenuItem = React.memo((props: Props) => {
+    const { label, to, onClick } = props;
+    const classes = useStyles();
     return (
         <MenuItem className={classes.root} 
                   component={to ? Link : 'li'}
@@ -38,4 +45,4 @@ export const AppBarActionMenuItem = React.memo(withStyles(style)((props: Props) 
             <ListItemText primary={label} />
         </MenuItem>
     );
-}));
+});

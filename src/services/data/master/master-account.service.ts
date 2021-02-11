@@ -96,12 +96,13 @@ export class MasterAccountService {
      * If the account list is not empty, then the first account in the list is
      * selected. Otherwise, the currently selected account will be set to null.
      */
-    private _autoSelectAccount() {
+    private _autoSelectAccount(): void {
         /*
          * If there are no accounts present, then set the current account to null.
          */
         if (!this._masterAccountList?.length) {
-            return this.selectAccount(null);
+            this.selectAccount(null);
+            return;
         }
 
         /*
@@ -134,7 +135,7 @@ export class MasterAccountService {
     /**
      * Helper method to check if an account ID exists in the list of accounts.
      */
-    private _masterAccountListContainsId(accountId: string) {
+    private _masterAccountListContainsId(accountId: string): boolean {
         return !!this._masterAccountList.find(account => account._id === accountId);
     }
 
@@ -157,7 +158,7 @@ export class MasterAccountService {
         this._autoSelectAccount();
     }
 
-    private _writeCurrentAccountToSessionStorage() {
+    private _writeCurrentAccountToSessionStorage(): void {
         const accountId = this._currentMasterAccount?._id;
         if (!accountId) {
             sessionStorage.removeItem(this.CurrentAccountIdKey);

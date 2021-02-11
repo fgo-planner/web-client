@@ -1,4 +1,5 @@
 import { MenuItem, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { MasterAccount } from 'data';
 import { Nullable, ReadonlyPartialArray, WithStylesProps } from 'internal';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
@@ -24,7 +25,11 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-export const AppBarMasterAccountSelect = withStyles(style)(class extends PureComponent<Props, State> {
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'AppBarMasterAccountSelect'
+};
+
+export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     private _masterAccountService = Injectables.get(MasterAccountService);
 
@@ -40,12 +45,12 @@ export const AppBarMasterAccountSelect = withStyles(style)(class extends PureCom
         this._handleInputChange = this._handleInputChange.bind(this);
     }
 
-    componentDidMount() {
+    componentDidMount(): void {
         this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
     }
 
-    componentWillUnmount() {
+    componentWillUnmount(): void {
         this._onCurrentMasterAccountChangeSubscription.unsubscribe();
     }
 
@@ -90,7 +95,7 @@ export const AppBarMasterAccountSelect = withStyles(style)(class extends PureCom
         this._masterAccountService.selectAccount(accountId);
     }
 
-    private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>) {
+    private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {
         const accountId = account?._id || '';
         this.setState({
             currentMasterAccountId: accountId

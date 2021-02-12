@@ -7,6 +7,9 @@ const spacing = (scale: number) => {
 
 const overrides: ThemeOptions['overrides'] = {
     MuiButton: {
+        contained: {
+            backgroundColor: '#FFF'
+        },
         label: {
             fontFamily: ThemeConstants.FontFamilyGoogleSans,
             letterSpacing: '0.25px',
@@ -18,6 +21,11 @@ const overrides: ThemeOptions['overrides'] = {
             '& >*': {
                 fontFamily: ThemeConstants.FontFamilyGoogleSans
             }
+        }
+    },
+    MuiFab: {
+        root: {
+            backgroundColor: '#FFF'
         }
     },
     MuiTextField: {

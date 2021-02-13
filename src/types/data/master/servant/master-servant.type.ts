@@ -19,9 +19,9 @@ export type MasterServant = {
 
     bond?: MasterServantBondLevel;
 
-    fouAtk?: number;
-
     fouHp?: number;
+
+    fouAtk?: number;
 
     skillLevels: {
 

@@ -1,7 +1,8 @@
 import { Fab } from '@material-ui/core';
-import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
+import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon, Publish as PublishIcon } from '@material-ui/icons';
 import lodash from 'lodash';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { Container as Injectables } from 'typedi';
 import { PromptDialog } from '../../../../../components/dialogs/prompt-dialog.component';
@@ -108,12 +109,14 @@ export class MasterServants extends PureComponent<Props, State> {
             <Fragment>
                 <MasterServantList
                     editMode={editMode}
+                    showActions
+                    openLinksInNewTab={editMode}
                     masterServants={masterServants}
                     onEditServant={this._openEditServantDialog}
                     onDeleteServant={this._openDeleteServantDialog}
                 />
                 <FabContainer>
-                    {this._renderFab(editMode)}
+                    {this._renderFab()}
                 </FabContainer>
                 <MasterServantEditDialog
                     open={editServantDialogOpen}
@@ -137,30 +140,38 @@ export class MasterServants extends PureComponent<Props, State> {
         );
     }
 
-    private _renderFab(editMode: boolean): ReactNode {
-        const { loadingIndicatorId } = this.state;
+    private _renderFab(): ReactNode {
+        const { editMode, loadingIndicatorId } = this.state;
+        const disabled = !!loadingIndicatorId;
         const addButton = (
-            <Fab key="add" color="primary" onClick={this._onAddServantButtonClick} disabled={!!loadingIndicatorId}>
+            <Fab color="primary" onClick={this._onAddServantButtonClick} disabled={disabled}>
                 <AddIcon />
             </Fab>
         );
         if (!editMode) {
-            return [
-                addButton,
-                <Fab key="edit" color="primary" onClick={this._edit} disabled={!!loadingIndicatorId}>
-                    <EditIcon />
-                </Fab>
-            ];
+            return (
+                <Fragment>
+                    <Fab component={Link} color="default" to="./data/import/servants" disabled={disabled}>
+                        <PublishIcon />
+                    </Fab>
+                    {addButton}
+                    <Fab color="primary" onClick={this._edit} disabled={disabled}>
+                        <EditIcon />
+                    </Fab>
+                </Fragment>
+            );
         }
-        return [
-            addButton,
-            <Fab key="save" color="primary" onClick={this._save} disabled={!!loadingIndicatorId}>
-                <SaveIcon />
-            </Fab>,
-            <Fab key="cancel" color="secondary" onClick={this._cancel} disabled={!!loadingIndicatorId}>
-                <ClearIcon />
-            </Fab>
-        ];
+        return (
+            <Fragment>
+                {addButton}
+                <Fab color="primary" onClick={this._save} disabled={disabled}>
+                    <SaveIcon />
+                </Fab>
+                <Fab color="secondary" onClick={this._cancel} disabled={disabled}>
+                    <ClearIcon />
+                </Fab>
+            </Fragment>
+        );
     }
 
     private _edit(): void {
@@ -318,7 +329,7 @@ export class MasterServants extends PureComponent<Props, State> {
         console.error(error);
         const { masterAccount } = this.state;
         const masterServants = this._cloneServantsFromMasterAccount(masterAccount);
-        const lastInstanceId = this._getLastInstanceId(masterServants);
+        const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
         this._resetLoadingIndicator();
         this.setState({
             masterServants,
@@ -334,7 +345,7 @@ export class MasterServants extends PureComponent<Props, State> {
 
     private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {
         const masterServants = this._cloneServantsFromMasterAccount(account);
-        const lastInstanceId = this._getLastInstanceId(masterServants);
+        const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
         this.setState({
             masterAccount: account,
             masterServants,
@@ -348,7 +359,7 @@ export class MasterServants extends PureComponent<Props, State> {
             return;
         }
         const masterServants = this._cloneServantsFromMasterAccount(account);
-        const lastInstanceId = this._getLastInstanceId(masterServants);
+        const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
         this._resetLoadingIndicator();
         this.setState({
             masterAccount: account,
@@ -364,13 +375,6 @@ export class MasterServants extends PureComponent<Props, State> {
         if (loadingIndicatorId) {
             this._loadingIndicatorService.waive(loadingIndicatorId);
         }
-    }
-
-    private _getLastInstanceId(masterServants: MasterServant[]): number {
-        if (!masterServants.length) {
-            return -1;
-        }
-        return  Math.max(...masterServants.map(servant => servant.instanceId));
     }
 
     private _cloneServantsFromMasterAccount(account: Nullable<MasterAccount>): MasterServant[] {

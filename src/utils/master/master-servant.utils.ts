@@ -71,7 +71,7 @@ export class MasterServantUtils {
      * Given a servant and their current level, rounds their ascension level to the
      * closest valid value.
      */
-    static roundToNearestValidAscensionLevel(level: number, ascension: number, servant: GameServant): number {
+    static roundToNearestValidAscensionLevel(level: number, ascension: number, servant: GameServant): MasterServantAscensionLevel {
         const { maxLevel } = servant;
         if (level > maxLevel - 10) {
             return 4;
@@ -119,6 +119,13 @@ export class MasterServantUtils {
             return Math.min(maxLevel - 40, level);
         }
         return GameServantConstants.MinLevel;
+    }
+
+    static getLastInstanceId(masterServants: MasterServant[]): number {
+        if (!masterServants.length) {
+            return -1;
+        }
+        return  Math.max(...masterServants.map(servant => servant.instanceId));
     }
 
 }

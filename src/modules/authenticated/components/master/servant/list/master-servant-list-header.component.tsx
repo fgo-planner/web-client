@@ -7,6 +7,7 @@ import { ViewModeColumnWidths } from './master-servant-list-column-widths';
 
 type Props = {
     editMode?: boolean;
+    showActions?: boolean;
     viewLayout?: any; // TODO Make use of this
 };
 
@@ -53,7 +54,7 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterServantListHeader = React.memo(({ editMode }: Props) => {
+export const MasterServantListHeader = React.memo(({ editMode, showActions }: Props) => {
     const classes = useStyles();
     const rootClassName = StyleUtils.appendClassNames(classes.root, editMode && classes.editMode);
     return (
@@ -79,9 +80,9 @@ export const MasterServantListHeader = React.memo(({ editMode }: Props) => {
             <div className={classes.bondLevel}>
                 Bond
             </div>
-            <div className={classes.actions}>
+            {showActions && <div className={classes.actions}>
                 Actions
-            </div>
+            </div>}
         </div>
     );
 });

@@ -13,7 +13,9 @@ import { MasterServantListRow } from './master-servant-list-row.component';
 
 type Props = {
     masterServants: MasterServant[];
-    editMode: boolean;
+    editMode?: boolean;
+    showActions?: boolean;
+    openLinksInNewTab?: boolean;
     viewLayout?: any; // TODO Make use of this
     onEditServant?: (servant: MasterServant) => void;
     onDeleteServant?: (servant: MasterServant) => void;
@@ -55,12 +57,12 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
             return null;
         }
 
-        const { classes, editMode, masterServants } = this.props;
+        const { classes, editMode, showActions, masterServants } = this.props;
 
         if (!editMode) {
             return (
                 <div className={classes.root}>
-                    <MasterServantListHeader />
+                    <MasterServantListHeader showActions={showActions} />
                     {masterServants.map(this._renderMasterServantRow)}
                 </div>
             );
@@ -104,7 +106,7 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
     }
 
     private _renderMasterServantRow(masterServant: MasterServant): ReactNode {
-        const { editMode, onEditServant, onDeleteServant } = this.props;
+        const { editMode, showActions, openLinksInNewTab, onEditServant, onDeleteServant } = this.props;
         const servant = this._gameServantMap[masterServant.gameId];
         if (editMode) {
             return (
@@ -115,6 +117,8 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}
                     editMode
+                    showActions={showActions}
+                    openLinksInNewTab={openLinksInNewTab}
                 />
             );
         }
@@ -125,6 +129,8 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
                     masterServant={masterServant}
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}
+                    showActions={showActions}
+                    openLinksInNewTab={openLinksInNewTab}
                 />
             </StaticListRowContainer>
         );

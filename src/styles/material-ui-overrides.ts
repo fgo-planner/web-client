@@ -10,10 +10,15 @@ const overrides: ThemeOptions['overrides'] = {
         contained: {
             backgroundColor: '#FFF'
         },
+        outlined: {
+            textTransform: 'none'
+        },
+        text: {
+            textTransform: 'none'
+        },
         label: {
             fontFamily: ThemeConstants.FontFamilyGoogleSans,
             letterSpacing: '0.25px',
-            textTransform: 'none'
         }
     },
     MuiDialogTitle: {

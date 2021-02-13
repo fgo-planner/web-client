@@ -10,7 +10,7 @@ type Props = PropsWithChildren<{
     size?: string | number;
     variant?: AvatarProps['variant'];
     enableLink?: boolean;
-    openInNewTab?: boolean;
+    openLinkInNewTab?: boolean;
 }>;
 
 const ThumbnailBaseUrl = AssetConstants.ServantThumbnailBaseUrl;
@@ -28,7 +28,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
         size,
         variant,
         enableLink,
-        openInNewTab
+        openLinkInNewTab
     } = props;
 
     const servantId = servant._id;
@@ -52,7 +52,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
     }
 
     const href = `/resources/servants/${servantId}`;
-    const target = openInNewTab ? '_blank' : undefined;
+    const target = openLinkInNewTab ? '_blank' : undefined;
     return <Link to={href} target={target}>{avatar}</Link>;
 
 });

@@ -1,5 +1,6 @@
 import { ModuleComponent } from '../../components/base/module-component';
 import { RouteDefinitions } from '../../types';
+import React from 'react';
 import { MasterAccountHomeRoute } from './routes/master-account-home.route';
 import { MasterItemsRoute } from './routes/master-items.route';
 import { MasterServantsRoute } from './routes/master-servants.route';
@@ -26,6 +27,11 @@ export default class AuthenticatedModule extends ModuleComponent {
             path: '/master/items',
             exact: true,
             component: MasterItemsRoute
+        },
+        {
+            path: '/master/data/import/servants',
+            exact: true,
+            lazyComponent: React.lazy(() => import('./routes/master-servant-import.route')),
         }
     ];
 

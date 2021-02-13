@@ -11,6 +11,7 @@ type Props = {
     servant: Readonly<GameServant>;
     masterServant: MasterServant;
     editMode?: boolean;
+    openLinksInNewTab?: boolean;
 };
 
 const style = (theme: Theme) => ({
@@ -29,7 +30,7 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterServantListRowLabel = React.memo(({ servant, masterServant, editMode }: Props) => {
+export const MasterServantListRowLabel = React.memo(({ servant, masterServant, openLinksInNewTab }: Props) => {
     const classes = useStyles();
     const { ascensionLevel } = masterServant;
 
@@ -43,7 +44,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, e
                 servant={servant}
                 stage={artStage}
                 enableLink
-                openInNewTab={editMode}
+                openLinkInNewTab={openLinksInNewTab}
             />
             <GameServantClassIcon
                 servantClass={servant.class}

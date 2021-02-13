@@ -12,6 +12,8 @@ type Props = {
     servant: Readonly<GameServant> | undefined; // Not optional, but possible to be undefined.
     masterServant: MasterServant;
     editMode?: boolean;
+    showActions?: boolean;
+    openLinksInNewTab?: boolean;
     onEditServant?: (servant: MasterServant) => void;
     onDeleteServant?: (servant: MasterServant) => void;
 } & WithStylesProps;
@@ -104,7 +106,7 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
     }
 
     render(): ReactNode {
-        const { classes, servant, masterServant, editMode } = this.props;
+        const { classes, servant, masterServant, editMode, openLinksInNewTab } = this.props;
         if (!servant) {
             return (
                 <div className={classes.root}>
@@ -118,6 +120,7 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
                     servant={servant}
                     masterServant={masterServant} 
                     editMode={editMode}
+                    openLinksInNewTab={openLinksInNewTab}
                 />
                 {this._renderNoblePhantasmLevel()}
                 {this._renderLevel()}
@@ -210,7 +213,10 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
     }
 
     private _renderActionButtons(): ReactNode {
-        const { classes } = this.props;
+        const { classes, showActions } = this.props;
+        if (!showActions) {
+            return null;
+        }
         return (
             <div className={classes.actions}>
                 <IconButton color="primary" onClick={this._handleEditButtonClick}>

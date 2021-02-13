@@ -92,6 +92,8 @@ export type GameServant = Entity<number> & {
 
         displayName?: string;
 
+        fgoManagerName?: string;
+
         links: ExternalLink[];
 
     };

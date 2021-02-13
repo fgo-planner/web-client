@@ -1,6 +1,6 @@
 import { fade, StyleRules, Theme } from '@material-ui/core';
 
-export default (theme: Theme) => ({
+const style =  (theme: Theme) => ({
     row: {
         borderTop: `1px solid ${theme.palette.divider}`,
         '&:hover': {
@@ -8,3 +8,5 @@ export default (theme: Theme) => ({
         }
     }
 } as StyleRules);
+
+export default style;

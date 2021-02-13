@@ -3,7 +3,7 @@ import { StyleRules, WithStylesOptions } from '@material-ui/core/styles/withStyl
 import { DragIndicator as DragIndicatorIcon, SvgIconComponent } from '@material-ui/icons';
 import React, { PropsWithChildren } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import { StyleUtils } from 'utils';
+import { StyleUtils } from '../../utils/style.utils';
 import listRowStyle from './list-row-style';
 
 type Props = PropsWithChildren<{

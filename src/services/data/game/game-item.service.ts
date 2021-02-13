@@ -1,7 +1,6 @@
-import { GameItem } from 'data';
-import { Nullable, Page, Pagination, ReadonlyRecord } from 'internal';
 import { Container as Injectables, Service } from 'typedi';
-import { HttpUtils as Http } from 'utils';
+import { GameItem, Nullable, Page, Pagination, ReadonlyRecord } from '../../../types';
+import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
 
 type ItemsCache = ReadonlyArray<Readonly<GameItem>>;

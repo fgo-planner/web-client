@@ -1,8 +1,8 @@
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { CustomStyleProps } from 'internal';
 import React, { PropsWithChildren } from 'react';
-import { StyleUtils } from 'utils';
+import { CustomStyleProps } from './../types';
+import { StyleUtils } from './../utils/style.utils';
 
 type Props = PropsWithChildren<{
     width?: string;

@@ -1,4 +1,5 @@
-import { ModuleComponent, RouteDefinitions } from 'internal';
+import { ModuleComponent } from '../../components/base/module-component';
+import { RouteDefinitions } from '../../types';
 import { MasterAccountHomeRoute } from './routes/master-account-home.route';
 import { MasterItemsRoute } from './routes/master-items.route';
 import { MasterServantsRoute } from './routes/master-servants.route';

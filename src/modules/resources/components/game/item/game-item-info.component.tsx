@@ -1,11 +1,11 @@
 import { Box, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { LoadingIndicator } from 'components';
-import { GameItem, GameServant, GameServantEnhancement } from 'data';
-import { Nullable, WithStylesProps } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
-import { GameItemService, GameServantService } from 'services';
 import { Container as Injectables } from 'typedi';
+import { LoadingIndicator } from '../../../../../components/loading-indicator.component';
+import { GameItemService } from '../../../../../services/data/game/game-item.service';
+import { GameServantService } from '../../../../../services/data/game/game-servant.service';
+import { GameItem, GameServant, GameServantEnhancement, Nullable, WithStylesProps } from '../../../../../types';
 import { GameItemNotFound } from './game-item-not-found.component';
 
 type TotalUsage = {

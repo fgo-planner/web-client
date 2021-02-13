@@ -1,4 +1,4 @@
-import { MasterServantBondLevel } from 'data';
+import { MasterServantBondLevel } from '../types';
 
 export class AssetConstants {
 

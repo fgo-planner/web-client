@@ -29,13 +29,13 @@ const styleOptions: WithStylesOptions<Theme> = {
 const useStyles = makeStyles(style, styleOptions);
 
 export const LoadingIndicator = React.memo(({ show, zIndex }: Props) => {
-    if (show !== undefined && !show) {
-        return null;
-    }
     const classes = useStyles();
     const breakpointSm = useMediaQuery((theme: Theme) => theme.breakpoints.only('sm'));
     const breakpointXs = useMediaQuery((theme: Theme) => theme.breakpoints.only('xs'));
     const indicatorSize = breakpointXs ? 120 : breakpointSm ? 150 : 160;
+    if (show !== undefined && !show) {
+        return null;
+    }
     return (
         <Box className={`${classes.root} backdrop-blur`} zIndex={zIndex ?? 1}>
             <div className={classes.progressContainer}>

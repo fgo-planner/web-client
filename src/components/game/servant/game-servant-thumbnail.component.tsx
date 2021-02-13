@@ -1,8 +1,8 @@
 import { Avatar, AvatarProps, Box } from '@material-ui/core';
-import { AssetConstants } from 'app-constants';
-import { GameServant } from 'data';
 import React, { PropsWithChildren } from 'react';
 import { Link } from 'react-router-dom';
+import { AssetConstants } from '../../../constants';
+import { GameServant } from '../../../types';
 
 type Props = PropsWithChildren<{
     servant: Readonly<GameServant>;

@@ -1,7 +1,7 @@
-import { Nullable, UserCredentials, UserInfo } from 'internal';
 import { BehaviorSubject } from 'rxjs';
 import { Service } from 'typedi';
-import { JwtUtils } from 'utils';
+import { Nullable, UserCredentials, UserInfo } from '../../types';
+import { JwtUtils } from '../../utils/jwt.utils';
 
 @Service()
 export class AuthService {

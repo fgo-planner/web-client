@@ -1,7 +1,5 @@
-import { RouteComponent } from 'internal';
-import React, { ReactNode, Fragment } from 'react';
-import { Button } from '@material-ui/core';
-import { Link } from 'react-router-dom';
+import React, { Fragment, ReactNode } from 'react';
+import { RouteComponent } from '../../../components/base/route-component';
 
 export class MasterAccountHomeRoute extends RouteComponent {
 

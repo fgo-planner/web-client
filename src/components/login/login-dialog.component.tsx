@@ -1,13 +1,14 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { InputFieldContainer } from 'components';
 import { Formik, FormikConfig, FormikProps } from 'formik';
-import { ModalComponent, ModalComponentProps, UserCredentials, WithStylesProps } from 'internal';
 import React, { ReactNode } from 'react';
-import { AuthService } from 'services';
 import { Container as Injectables } from 'typedi';
-import { FormUtils } from 'utils';
 import * as Yup from 'yup';
+import { AuthService } from '../../services/authentication/auth.service';
+import { ModalComponentProps, UserCredentials, WithStylesProps } from '../../types';
+import { FormUtils } from '../../utils/form.utils';
+import { ModalComponent } from '../base/modal-component';
+import { InputFieldContainer } from '../input-field-container.component';
 
 type Props = ModalComponentProps & WithStylesProps;
 

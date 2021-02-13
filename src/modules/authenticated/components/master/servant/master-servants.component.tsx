@@ -1,14 +1,18 @@
 import { Fab } from '@material-ui/core';
 import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
-import { FabContainer, MasterServantEditDialog, MasterServantList, PromptDialog } from 'components';
-import { GameServant, MasterAccount, MasterServant } from 'data';
-import { Nullable, ReadonlyRecord } from 'internal';
 import lodash from 'lodash';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { GameServantService, LoadingIndicatorOverlayService, MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
-import { MasterServantUtils } from 'utils';
+import { PromptDialog } from '../../../../../components/dialogs/prompt-dialog.component';
+import { FabContainer } from '../../../../../components/fab-container.component';
+import { GameServantService } from '../../../../../services/data/game/game-servant.service';
+import { MasterAccountService } from '../../../../../services/data/master/master-account.service';
+import { LoadingIndicatorOverlayService } from '../../../../../services/user-interface/loading-indicator-overlay.service';
+import { GameServant, MasterAccount, MasterServant, Nullable, ReadonlyRecord } from '../../../../../types';
+import { MasterServantUtils } from '../../../../../utils/master/master-servant.utils';
+import { MasterServantEditDialog } from './edit-dialog/master-servant-edit-dialog.component';
+import { MasterServantList } from './list/master-servant-list.component';
 
 type Props = {
     

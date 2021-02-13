@@ -1,6 +1,7 @@
 import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ModalProps } from '@material-ui/core';
-import { CustomPureComponent, Nullable } from 'internal';
 import React, { MouseEvent, ReactNode } from 'react';
+import { Nullable } from '../../types';
+import { CustomPureComponent } from '../base/custom-pure-component';
 
 type RenderedProps = {
     title?: string;

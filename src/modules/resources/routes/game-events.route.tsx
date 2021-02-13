@@ -1,5 +1,5 @@
-import { RouteComponent } from 'internal';
-import React, { ReactNode, Fragment } from 'react';
+import { Fragment, ReactNode } from 'react';
+import { RouteComponent } from '../../../components/base/route-component';
 
 export class GameEventsRoute extends RouteComponent {
 

@@ -1,10 +1,10 @@
 import { Box } from '@material-ui/core';
-import { GameItem } from 'data';
-import { RouteComponent } from 'internal';
-import React, { Fragment, ReactNode } from 'react';
+import { Fragment, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { GameItemService } from 'services';
 import { Container as Injectables } from 'typedi';
+import { RouteComponent } from '../../../components/base/route-component';
+import { GameItemService } from '../../../services/data/game/game-item.service';
+import { GameItem } from '../../../types';
 
 export class GameItemsRoute extends RouteComponent {
 

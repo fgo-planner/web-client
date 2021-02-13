@@ -1,8 +1,8 @@
-import { GameServant } from 'data';
-import { RouteComponent } from 'internal';
-import React, { Fragment, ReactNode } from 'react';
-import { GameServantService } from 'services';
+import { Fragment, ReactNode } from 'react';
 import { Container as Injectables } from 'typedi';
+import { RouteComponent } from '../../../components/base/route-component';
+import { GameServantService } from '../../../services/data/game/game-servant.service';
+import { GameServant } from '../../../types';
 
 export class GameServantsRoute extends RouteComponent {
 

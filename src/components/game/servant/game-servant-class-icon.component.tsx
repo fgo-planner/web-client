@@ -1,7 +1,7 @@
 import { Box, makeStyles, StyleRules } from '@material-ui/core';
-import { AssetConstants } from 'app-constants';
-import { GameServantClass, GameServantRarity } from 'data';
 import React from 'react';
+import { AssetConstants } from '../../../constants';
+import { GameServantClass, GameServantRarity } from '../../../types';
 
 type Props = {
     servantClass: GameServantClass;

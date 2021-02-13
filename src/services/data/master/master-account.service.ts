@@ -1,8 +1,7 @@
-import { MasterAccount } from 'data';
-import { Nullable, ReadonlyPartialArray, UserInfo } from 'internal';
 import { BehaviorSubject } from 'rxjs';
 import { Container as Injectables, Service } from 'typedi';
-import { HttpUtils as Http } from 'utils';
+import { MasterAccount, Nullable, ReadonlyPartialArray, UserInfo } from '../../../types';
+import { HttpUtils as Http } from '../../../utils/http.utils';
 import { AuthService } from '../../authentication/auth.service';
 
 @Service()

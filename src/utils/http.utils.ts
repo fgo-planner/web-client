@@ -1,5 +1,7 @@
-import { HttpOptions, Nullable } from 'internal';
+import { HttpOptions, Nullable } from '../types';
 import { JwtUtils } from './jwt.utils';
+
+type RequestBody = string | Record<string, unknown>;
 
 export class HttpUtils {
 
@@ -23,7 +25,7 @@ export class HttpUtils {
         throw await response.json();
     }
 
-    static async post<T = any>(url: string, body: string | object, options?: HttpOptions): Promise<T> {
+    static async post<T = any>(url: string, body: RequestBody, options?: HttpOptions): Promise<T> {
         if (options?.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
         }
@@ -46,7 +48,7 @@ export class HttpUtils {
         throw await response.json();
     }
 
-    static async put<T = any>(url: string, body: string | object, options?: HttpOptions): Promise<T> {
+    static async put<T = any>(url: string, body: RequestBody, options?: HttpOptions): Promise<T> {
         if (options?.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
         }
@@ -85,7 +87,7 @@ export class HttpUtils {
         throw await response.json();
     }
     
-    private static _inferContentType(body: string | object): string {
+    private static _inferContentType(body: RequestBody): string {
         if (typeof body === 'object') {
             return 'application/json';
         }

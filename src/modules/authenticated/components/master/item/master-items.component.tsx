@@ -1,12 +1,13 @@
 import { Fab } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
-import { FabContainer, MasterItemList } from 'components';
-import { MasterAccount, MasterItem } from 'data';
-import { Nullable } from 'internal';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { LoadingIndicatorOverlayService, MasterAccountService } from 'services';
 import { Container as Injectables } from 'typedi';
+import { FabContainer } from '../../../../../components/fab-container.component';
+import { MasterAccountService } from '../../../../../services/data/master/master-account.service';
+import { LoadingIndicatorOverlayService } from '../../../../../services/user-interface/loading-indicator-overlay.service';
+import { MasterAccount, MasterItem, Nullable } from '../../../../../types';
+import { MasterItemList } from './list/master-item-list.component';
 
 type Props = {
     

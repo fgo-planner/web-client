@@ -1,4 +1,4 @@
-import { Nullable } from 'internal';
+import { Nullable } from '../types';
 
 export class StyleUtils {
 

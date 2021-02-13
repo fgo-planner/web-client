@@ -1,8 +1,8 @@
 import { Box, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { AssetConstants } from 'app-constants';
-import { MasterServantBondLevel } from 'data';
 import React from 'react';
+import { AssetConstants } from '../../../constants';
+import { MasterServantBondLevel } from '../../../types';
 
 type Props = {
     bond: MasterServantBondLevel;

@@ -1,5 +1,5 @@
-import { GameServantConstants } from 'app-constants';
-import { GameServant, MasterServant, MasterServantAscensionLevel } from 'data';
+import { GameServantConstants } from '../../constants';
+import { GameServant, MasterServant, MasterServantAscensionLevel } from '../../types';
 
 export class MasterServantUtils {
 

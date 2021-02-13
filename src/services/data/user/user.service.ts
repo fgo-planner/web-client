@@ -1,6 +1,6 @@
-import { User } from 'data';
 import { Service } from 'typedi';
-import { HttpUtils as Http } from 'utils';
+import { User } from '../../../types';
+import { HttpUtils as Http } from '../../../utils/http.utils';
 
 @Service()
 export class UserService {

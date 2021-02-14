@@ -1,12 +1,14 @@
-import { RouteDefinitions } from './types';
-import { ModuleComponent }  from './components/base/module-component';
 import React, { ReactNode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { ModuleComponent } from './components/base/module-component';
 import { NavigationMain } from './components/navigation/navigation-main.component';
 import { ThemeManager } from './components/theme/theme-manager.component';
 import { ErrorRoute } from './routes/error.route';
+import { ForgotPasswordRoute } from './routes/forgot-password.route';
 import { HomeRoute } from './routes/home.route';
 import { LoginRoute } from './routes/login.route';
+import { RegistrationRoute } from './routes/registration.route';
+import { RouteDefinitions } from './types';
 
 /*
 Planned navigation outline:
@@ -49,6 +51,16 @@ export class RootModule extends ModuleComponent {
             path: '/login',
             exact: true,
             component: LoginRoute
+        },
+        {
+            path: '/register',
+            exact: true,
+            component: RegistrationRoute
+        },
+        {
+            path: '/forgot-password',
+            exact: true,
+            component: ForgotPasswordRoute
         },
         {
             path: '/resources',

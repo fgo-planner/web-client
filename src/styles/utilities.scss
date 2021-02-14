@@ -9,8 +9,20 @@
 .flex {
     display: flex;
 
-    &.row {
+    &.row-reverse {
         flex-direction: row;
+    }
+
+    &.column {
+        flex-direction: column;
+    }
+
+    &.row-reverse {
+        flex-direction: row-reverse;
+    }
+
+    &.column-reverse {
+        flex-direction: column-reverse;
     }
 
     &.align-start {

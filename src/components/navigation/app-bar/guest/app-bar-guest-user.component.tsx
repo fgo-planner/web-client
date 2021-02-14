@@ -82,11 +82,18 @@ export const AppBarGuestUser = withRouter(withStyles(style, styleOptions)(class 
     private _openLoginDialog(): void {
         const { location, history } = this.props;
         const pathname = location?.pathname;
-        if (pathname && (pathname.startsWith('/login') || pathname?.startsWith('/register'))) {
+
+        const redirect = pathname && (
+            pathname.startsWith('/login') ||
+            pathname.startsWith('/register') ||
+            pathname.startsWith('/forgot-password')
+        );
+
+        if (redirect) {
             history.push('/login');
-            return;
+        } else {
+            this.setState({ loginModalOpen: true });
         }
-        this.setState({ loginModalOpen: true });
     }
 
     private _handleLoginDialogClose(event: any, reason: ModalOnCloseReason): void {

@@ -1,4 +1,4 @@
-import { Button, fade, StyleRules, Theme, Typography, withStyles } from '@material-ui/core';
+import { Button, fade, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { ReactNode } from 'react';
 import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
@@ -49,11 +49,16 @@ const style = (theme: Theme) => ({
     form: {
         padding: theme.spacing(0, 8)
     },
-    actionButtons: {
+    actionsContainer: {
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-end',
         justifyContent: 'space-between',
         margin: theme.spacing(10, 6, 6, 6),
+    },
+    actionLinks: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'start'
     }
 } as StyleRules);
 
@@ -94,15 +99,25 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComp
                         formId={FormId}
                         onSubmit={this._login}
                     />
-                    <div className={classes.actionButtons}>
-                        <Button
-                            component={Link}
-                            variant="text"
-                            color="secondary"
-                            to="/register"
-                        >
-                            Create account
-                        </Button>
+                    <div className={classes.actionsContainer}>
+                        <div className={classes.actionLinks}>
+                            <Button
+                                component={Link}
+                                variant="text"
+                                color="secondary"
+                                to="/forgot-password"
+                            >
+                                Forgot password
+                            </Button>
+                            <Button
+                                component={Link}
+                                variant="text"
+                                color="secondary"
+                                to="/register"
+                            >
+                                Create account
+                            </Button>
+                        </div>
                         <Button
                             color="primary"
                             variant="contained"
@@ -111,28 +126,8 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComp
                             disabled={isLoggingIn}
                         >
                             Login
-                    </Button>
-
+                        </Button>
                     </div>
-                    {/* <div className={classes.actionButtons}>
-                        <Button
-                            component={Link}
-                            color="primary"
-                            variant="text"
-                            to="/register"
-                        >
-                            Create account
-                        </Button>
-                        <Button 
-                            color="primary" 
-                            variant="contained"
-                            type="submit"
-                            form={FormId}
-                            disabled={isLoggingIn}
-                        >
-                            Login
-                        </Button>
-                    </div> */}
                 </div>
             </div>
         );

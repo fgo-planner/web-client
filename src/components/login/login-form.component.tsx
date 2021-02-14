@@ -1,11 +1,11 @@
-import { PureComponent, ReactNode } from 'react';
-import { CustomStyleProps, UserCredentials, WithStylesProps } from '../../types';
-import * as Yup from 'yup';
-import { StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
-import { Formik, FormikConfig, FormikProps } from 'formik';
-import { InputFieldContainer } from '../input-field-container.component';
-import { FormUtils } from '../../utils/form.utils';
+import { Checkbox, FormControlLabel, FormGroup, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Formik, FormikConfig, FormikProps } from 'formik';
+import { PureComponent, ReactNode } from 'react';
+import * as Yup from 'yup';
+import { CustomStyleProps, UserCredentials, WithStylesProps } from '../../types';
+import { FormUtils } from '../../utils/form.utils';
+import { InputFieldContainer } from '../input-field-container.component';
 
 type Props = {
     formId: string;
@@ -18,7 +18,7 @@ const ValidationSchema = Yup.object().shape({
     password: Yup.string().required('Password cannot be blank')
 });
 
-const style = () => ({
+const style = (theme: Theme) => ({
     root: {
         boxSizing: 'border-box'
     },
@@ -36,7 +36,8 @@ export const LoginForm = withStyles(style, styleOptions)(class extends PureCompo
     private readonly _formikConfig: FormikConfig<UserCredentials> = {
         initialValues: {
             username: '',
-            password: ''
+            password: '',
+            noExpire: false
         },
         onSubmit: this.props.onSubmit,
         validationSchema: ValidationSchema,
@@ -88,7 +89,6 @@ export const LoginForm = withStyles(style, styleOptions)(class extends PureCompo
                             variant="outlined"
                             fullWidth
                             label="Username"
-                            id="username"
                             name="username"
                             value={values.username}
                             onChange={handleChange}
@@ -102,7 +102,6 @@ export const LoginForm = withStyles(style, styleOptions)(class extends PureCompo
                             variant="outlined"
                             fullWidth
                             label="Password"
-                            id="password"
                             name="password"
                             type="password"
                             value={values.password}
@@ -112,6 +111,18 @@ export const LoginForm = withStyles(style, styleOptions)(class extends PureCompo
                             helperText={touchedErrors.password}
                         />
                     </InputFieldContainer>
+                    <FormGroup>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    name="noExpire"
+                                    checked={values.noExpire}
+                                    onChange={handleChange}
+                                />
+                            }
+                            label="Stay signed in"
+                        />
+                    </FormGroup>
                 </div>
             </form>
         );

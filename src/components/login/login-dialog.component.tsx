@@ -29,8 +29,14 @@ const style = (theme: Theme) => ({
         width: '294px !important'
     },
     dialogActions: {
+        alignItems: 'flex-end',
         justifyContent: 'space-between',
         padding: theme.spacing(6)
+    },
+    actionLinks: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'start'
     }
 } as StyleRules);
 
@@ -88,15 +94,26 @@ export const LoginDialog = withStyles(style, styleOptions)(class extends ModalCo
                         />
                     </DialogContent>
                     <DialogActions className={classes.dialogActions}>
-                        <Button
-                            component={Link}
-                            variant="text"
-                            color="secondary"
-                            to="/register"
-                            onClick={this._cancel}
-                        >
-                            Create account
-                        </Button>
+                        <div className={classes.actionLinks}>
+                            <Button
+                                component={Link}
+                                variant="text"
+                                color="secondary"
+                                to="/forgot-password"
+                                onClick={this._cancel}
+                            >
+                                Forgot password
+                            </Button>
+                            <Button
+                                component={Link}
+                                variant="text"
+                                color="secondary"
+                                to="/register"
+                                onClick={this._cancel}
+                            >
+                                Create account
+                            </Button>
+                        </div>
                         <Button
                             variant="contained"
                             color="primary"

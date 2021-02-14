@@ -1,6 +1,7 @@
 import { Avatar, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
+import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { Container as Injectables } from 'typedi';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
@@ -15,7 +16,7 @@ import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
 
 type Props = {
     currentUser: User;
-} & WithStylesProps;
+} & WithStylesProps & ReactRouteComponentProps;
 
 type State = {
     profileMenu: {
@@ -50,7 +51,7 @@ const styleOptions: WithStylesOptions<Theme> = {
 /**
  * Renders the app bar contents for an authenticated (logged in) user.
  */
-export const AppBarAuthenticatedUser = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
+export const AppBarAuthenticatedUser = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     // Temporary
     private readonly AvatarImageUrl = 'https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png';
@@ -132,12 +133,21 @@ export const AppBarAuthenticatedUser = withStyles(style, styleOptions)(class ext
             <Fragment>
                 <AppBarMasterAccountSelect key={0} masterAccountList={masterAccountList} />
                 <AppBarLinks key={1} >
-                    <AppBarLink label="My Servants"
-                                route="/user/master/servants" />
-                    <AppBarLink label="My Items"
-                                route="/user/master/items" />
-                    <AppBarLink label="Planner"
-                                route="/user/master/planner" />
+                    <AppBarLink
+                        label="My Servants"
+                        route="/user/master/servants"
+                        active={this._isLinkActive('/user/master/servants')}
+                    />
+                    <AppBarLink
+                        label="My Items"
+                        route="/user/master/items"
+                        active={this._isLinkActive('/user/master/items')}
+                    />
+                    <AppBarLink
+                        label="Planner"
+                        route="/user/master/planner"
+                        active={this._isLinkActive('/user/master/planner')}
+                    />
                 </AppBarLinks>
             </Fragment>
         );
@@ -194,5 +204,17 @@ export const AppBarAuthenticatedUser = withStyles(style, styleOptions)(class ext
             masterAccountList: accounts
         });
     }
+    
+    private _isLinkActive(route: string, exact?: boolean): boolean {
+        const { location } = this.props;
+        if (!route) {
+            return false;
+        }
+        if (exact) {
+            return location?.pathname === route;
+        } else {
+            return location?.pathname.startsWith(route);
+        }
+    }
 
-});
+}));

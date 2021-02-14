@@ -6,6 +6,7 @@ import { NavigationMain } from './components/navigation/navigation-main.componen
 import { ThemeManager } from './components/theme/theme-manager.component';
 import { ErrorRoute } from './routes/error.route';
 import { HomeRoute } from './routes/home.route';
+import { LoginRoute } from './routes/login.route';
 
 /*
 Planned navigation outline:
@@ -43,6 +44,11 @@ export class RootModule extends ModuleComponent {
             path: '/',
             exact: true,
             component: HomeRoute
+        },
+        {
+            path: '/login',
+            exact: true,
+            component: LoginRoute
         },
         {
             path: '/resources',

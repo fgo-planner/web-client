@@ -1,15 +1,16 @@
 import { fade, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { MouseEventHandler, PureComponent, ReactNode } from 'react';
-import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { RouteLinkDefinition, WithStylesProps } from '../../../types';
 import { StyleUtils } from '../../../utils/style.utils';
 
 type Props = {
+    active?: boolean;
     onMouseOver?: MouseEventHandler;
     onMouseOut?: MouseEventHandler;
-} & RouteLinkDefinition & ReactRouteComponentProps & WithStylesProps;
+} & RouteLinkDefinition & WithStylesProps;
 
 const style = (theme: Theme) => ({
     root: {
@@ -37,13 +38,24 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'AppBarLink'
 };
 
-export const AppBarLink = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props> {
+export const AppBarLink = withStyles(style, styleOptions)(class extends PureComponent<Props> {
 
     render(): ReactNode {
-        const { route, label, onClick, onMouseOver, onMouseOut } = this.props;
-        const className = this._generateClassName();
+
+        const { 
+            classes,
+            active,
+            route, 
+            label, 
+            onClick, 
+            onMouseOver, 
+            onMouseOut 
+        } = this.props;
+
+        const className = StyleUtils.appendClassNames(classes.root, active && classes.active);
+
+        // If route path was defined, then render it as a Link.
         if (route) {
-            // If route path was defined, then render it as a Link.
             return (
                 <Link className={className} 
                       to={route}
@@ -54,6 +66,8 @@ export const AppBarLink = withRouter(withStyles(style, styleOptions)(class exten
                 </Link>
             );
         }
+
+        // Otherwise, render it as a div.
         return (
             <div className={className}          
                  onClick={onClick}
@@ -62,26 +76,7 @@ export const AppBarLink = withRouter(withStyles(style, styleOptions)(class exten
                 {label}
             </div>
         );
+
     }
 
-    private _generateClassName(): string {
-        const { root, active } = this.props.classes;
-        if (this._isLinkActive()) {
-            return StyleUtils.appendClassNames(root, active);
-        }
-        return root;
-    }
-
-    private _isLinkActive(): boolean {
-        const { route, exact, location } = this.props;
-        if (!route) {
-            return false;
-        }
-        if (exact) {
-            return location?.pathname === route;
-        } else {
-            return location?.pathname.startsWith(route);
-        }
-    }
-
-}));
+});

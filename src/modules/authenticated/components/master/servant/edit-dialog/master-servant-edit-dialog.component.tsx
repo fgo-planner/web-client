@@ -58,6 +58,7 @@ const style = (theme: Theme) => ({
     },
     inputFieldContainer: {
         flex: 1,
+        padding: theme.spacing(0, 2),
         [theme.breakpoints.down('sm')]: {
             flex: '100% !important'
         }

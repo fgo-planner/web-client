@@ -10,22 +10,10 @@ const overrides: ThemeOptions['overrides'] = {
         contained: {
             backgroundColor: '#FFF'
         },
-        outlined: {
-            textTransform: 'none'
-        },
-        text: {
-            textTransform: 'none'
-        },
         label: {
             fontFamily: ThemeConstants.FontFamilyGoogleSans,
             letterSpacing: '0.25px',
-        }
-    },
-    MuiDialogTitle: {
-        root: {
-            '& >*': {
-                fontFamily: ThemeConstants.FontFamilyGoogleSans
-            }
+            textTransform: 'none'
         }
     },
     MuiFab: {
@@ -36,6 +24,11 @@ const overrides: ThemeOptions['overrides'] = {
     MuiTextField: {
         root: {
             // margin: spacing(3)
+        }
+    },
+    MuiTypography: {
+        h6: {
+            fontFamily: ThemeConstants.FontFamilyGoogleSans
         }
     }
 };

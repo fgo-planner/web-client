@@ -12,7 +12,7 @@ type Props = PropsWithChildren<{
 const style = (theme: Theme) => ({
     root: {
         height: '96px',
-        padding: theme.spacing(0, 2)
+        boxSizing: 'border-box'
     }
     // TODO Add condensed height
 } as StyleRules);

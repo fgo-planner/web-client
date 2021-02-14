@@ -1,4 +1,4 @@
-import { Box, makeStyles, StyleRules } from '@material-ui/core';
+import { makeStyles, StyleRules } from '@material-ui/core';
 import React from 'react';
 import { AssetConstants } from '../../../constants';
 import { GameServantClass, GameServantRarity } from '../../../types';
@@ -64,8 +64,8 @@ export const GameServantClassIcon = React.memo(({ servantClass, rarity, size }: 
     const rarityColor = RarityColorMap[rarity] ?? DefaultRarityColor;
     const imageUrl = `${ClassIconBaseUrl}/class${rarityColor}_${classNumber}.png`;
     return (
-        <Box width={size} height={size}>
+        <div style={{width: size, height: size}}>
             <img className={classes.img} src={imageUrl} alt={servantClass} />
-        </Box>
+        </div>
     );
 });

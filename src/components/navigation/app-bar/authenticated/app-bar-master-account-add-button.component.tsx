@@ -1,4 +1,4 @@
-import { Box, Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { PersonAdd as PersonAddIcon } from '@material-ui/icons';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { ModalOnCloseReason } from '../../../../types';
@@ -29,13 +29,15 @@ export class AppBarMasterAccountAddButton extends PureComponent<Props, State> {
         const { dialogOpen } = this.state;
         return (
             <Fragment>
-                <Button variant="outlined" 
-                        color="primary"
-                        onClick={this._openDialog}>
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={this._openDialog}
+                >
                     <PersonAddIcon />
-                    <Box pl={2}>
+                    <div className="pl-2">
                         Add Account 
-                    </Box>
+                    </div>
                 </Button>
                 <MasterAccountAddDialog open={dialogOpen}
                                         onClose={this._handleDialogClose}

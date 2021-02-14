@@ -1,4 +1,4 @@
-import { Box, makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React from 'react';
 import { AssetConstants } from '../../../constants';
@@ -29,8 +29,8 @@ export const GameServantBondIcon = React.memo(({ bond, size }: Props) => {
     const imageUrl = AssetConstants.ServantBondIconMap[bond];
     size = size || DefaultSize;
     return (
-        <Box width={size} height={size}>
+        <div style={{width: size, height: size}}>
             <img className={classes.img} src={imageUrl} alt={`Bond ${bond}`} />
-        </Box>
+        </div>
     );
 });

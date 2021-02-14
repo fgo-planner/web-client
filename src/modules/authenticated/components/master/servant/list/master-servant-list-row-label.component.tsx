@@ -1,4 +1,4 @@
-import { Box, makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
@@ -18,6 +18,7 @@ const style = (theme: Theme) => ({
     root: {
         display: 'flex',
         alignItems: 'center',
+        flex: ViewModeColumnWidths.label,
         '& > :not(:first-child)': {
             paddingLeft: theme.spacing(4)
         }
@@ -37,7 +38,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, o
     const artStage = MasterServantUtils.getArtStage(ascensionLevel);
 
     return (
-        <Box className={classes.root} flex={ViewModeColumnWidths.label}>
+        <div className={classes.root}>
             <GameServantThumbnail
                 variant="rounded"
                 size={56}
@@ -56,7 +57,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, o
             <div>
                 {servant.name}
             </div>
-        </Box>
+        </div>
     );
     
 });

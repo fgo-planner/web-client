@@ -1,6 +1,8 @@
+$spacing: 4px;
+
 :root {
 
-    --spacing: 4px;
+    --spacing: $spacing;
 
     --app-bar-height: 64px;
 

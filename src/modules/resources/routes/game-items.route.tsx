@@ -1,4 +1,3 @@
-import { Box } from '@material-ui/core';
 import { Fragment, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Container as Injectables } from 'typedi';
@@ -30,14 +29,14 @@ export class GameItemsRoute extends RouteComponent {
 
     private _renderItem(item: Readonly<GameItem>, key: number): ReactNode {
         return (
-            <Box key={key} display="flex">
+            <div key={key} className="flex">
                 <Link to={`items/${item._id}`}>
                     {item._id}
                 </Link>
                 <div>
                     {item.name}
                 </div>
-            </Box>
+            </div>
         );
     }
 

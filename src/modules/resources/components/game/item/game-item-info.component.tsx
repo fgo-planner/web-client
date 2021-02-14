@@ -1,4 +1,4 @@
-import { Box, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { Container as Injectables } from 'typedi';
@@ -91,19 +91,19 @@ export const GameItemInfo = withStyles(style, styleOptions)(class extends PureCo
         const { servants, total } = itemUsage;
         return (
             <Fragment>
-                <Box p={2}>
+                <div className="p-2">
                     <div>Ascensions: {total.ascensions}</div>
                     <div>Per Skill (Total): {total.skills} ({total.skills * 3})</div>
                     <div>Costumes: {total.costumes}</div>
                     <div>Total: {total.ascensions + total.skills * 3 + total.costumes}</div>
-                </Box>
+                </div>
                 <div>
                     {servants.map((servant, index) => (
-                        <Box key={index} display="flex" px={2} py={1}>
+                        <div key={index} className="flex px-2 py-1">
                             <div>{servant.servant.name}</div>
-                            <Box px={2} />
+                            <div className="px-2" />
                             <div>{servant.ascensions}, {servant.skills}({servant.skills * 3}), {servant.costumes}</div>
-                        </Box>
+                        </div>
                     ))}
                 </div>
             </Fragment>

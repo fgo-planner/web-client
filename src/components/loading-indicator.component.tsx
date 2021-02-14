@@ -1,4 +1,4 @@
-import { Box, CircularProgress, makeStyles, StyleRules, Theme, useMediaQuery } from '@material-ui/core';
+import { CircularProgress, makeStyles, StyleRules, Theme, useMediaQuery } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React from 'react';
 
@@ -37,10 +37,10 @@ export const LoadingIndicator = React.memo(({ show, zIndex }: Props) => {
         return null;
     }
     return (
-        <Box className={`${classes.root} backdrop-blur`} zIndex={zIndex ?? 1}>
+        <div className={`${classes.root} backdrop-blur`} style={{ zIndex: zIndex ?? 1 }}>
             <div className={classes.progressContainer}>
                 <CircularProgress size={indicatorSize} thickness={3.7} />
             </div>
-        </Box>
+        </div>
     );
 });

@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, Select, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, Select, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, FocusEvent, FormEvent, MouseEvent, ReactNode } from 'react';
 import { Container as Injectables } from 'typedi';
@@ -50,6 +50,7 @@ const style = (theme: Theme) => ({
         paddingTop: theme.spacing(4)
     },
     inputFieldGroup: {
+        display: 'flex',
         flexWrap: 'nowrap',
         [theme.breakpoints.down('sm')]: {
             flexWrap: 'wrap'
@@ -184,7 +185,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                 noValidate
                 onSubmit={this._submit}
             >
-                <Box className={classes.inputFieldGroup} display="flex">
+                <div className={classes.inputFieldGroup}>
                     <InputFieldContainer classes={classes} flex="75%">
                         {this._renderServantNameField()}
                     </InputFieldContainer>
@@ -207,8 +208,8 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                </Box>
-                <Box className={classes.inputFieldGroup} display="flex">
+                </div>
+                <div className={classes.inputFieldGroup}>
                     <InputFieldContainer classes={classes}>
                         <TextField
                             variant="outlined"
@@ -279,8 +280,8 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                             onBlur={this._handleFouInputBlur}
                         />
                     </InputFieldContainer>
-                </Box>
-                <Box className={classes.inputFieldGroup} display="flex">
+                </div>
+                <div className={classes.inputFieldGroup}>
                     <InputFieldContainer classes={classes}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="skillLevel1">Skill 1</InputLabel>
@@ -360,7 +361,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                </Box>
+                </div>
             </form>
         );
     }

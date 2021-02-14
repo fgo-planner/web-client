@@ -1,5 +1,142 @@
+@import './theme-constants.scss';
+
 .truncate {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.flex {
+    display: flex;
+
+    &.row {
+        flex-direction: row;
+    }
+
+    &.align-start {
+        align-content: flex-start;
+        align-items: flex-start;
+    }
+
+    &.align-center {
+        align-content: center;
+        align-items: center;
+    }
+
+    &.align-end {
+        align-content: flex-end;
+        align-items: flex-end;
+    }
+
+    &.align-stretch {
+        align-content: stretch;
+        align-items: stretch;
+    }
+
+    &.justify-start {
+        justify-content: flex-start;
+    }
+
+    &.justify-center {
+        justify-content: center;
+    }
+
+    &.justify-end {
+        justify-content: flex-end;
+    }
+
+    &.justify-space-around {
+        justify-content: space-around;
+    }
+
+    &.justify-space-between {
+        justify-content: space-between;
+    }
+
+    &.justify-space-evenly {
+        justify-content: space-evenly;
+    }
+
+}
+
+.flex-fill {
+    flex: 1
+}
+
+$spacing-increments: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16;
+
+@for $i from 0 through 16 {
+    
+    $value: #{$i * $spacing};
+
+    .p-#{$i} {
+        padding: $value;
+    }
+
+    .pt-#{$i} {
+        padding-top: $value;
+    }
+    
+    .pr-#{$i} {
+        padding-right: $value;
+    }
+
+    .pb-#{$i} {
+        padding-bottom: $value;
+    }
+
+    .pl-#{$i} {
+        padding-left: $value;
+    }
+
+    .px-#{$i} {
+        padding-left: $value;
+        padding-right: $value;
+    }
+
+    .py-#{$i} {
+        padding-top: $value;
+        padding-bottom: $value;
+    }
+
+    .py-#{$i} {
+        padding-top: $value;
+        padding-bottom: $value;
+    }
+
+    .m-#{$i} {
+        margin: $value;
+    }
+
+    .mt-#{$i} {
+        margin-top: $value;
+    }
+    
+    .mr-#{$i} {
+        margin-right: $value;
+    }
+
+    .mb-#{$i} {
+        margin-bottom: $value;
+    }
+
+    .ml-#{$i} {
+        margin-left: $value;
+    }
+
+    .mx-#{$i} {
+        margin-left: $value;
+        margin-right: $value;
+    }
+
+    .my-#{$i} {
+        margin-top: $value;
+        margin-bottom: $value;
+    }
+
+    .my-#{$i} {
+        margin-top: $value;
+        margin-bottom: $value;
+    }
+
 }

@@ -1,4 +1,4 @@
-import { Box, fade, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
+import { fade, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
 import NumberFormat from 'react-number-format';
@@ -46,7 +46,7 @@ export const MasterItemListRow = withStyles(style, styleOptions)(class extends P
         return (
             <div className={classes.root} key={key}>
                 <MasterItemListRowLabel item={item.item} />
-                <Box flex={1} />
+                <div className="flex-fill" />
                 <div>
                     {editMode ? this._renderItemEditMode(item) : this._renderItemViewMode(item)}
                 </div>

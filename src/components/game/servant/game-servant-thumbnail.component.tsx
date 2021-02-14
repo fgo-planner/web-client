@@ -1,4 +1,4 @@
-import { Avatar, AvatarProps, Box } from '@material-ui/core';
+import { Avatar, AvatarProps } from '@material-ui/core';
 import React, { PropsWithChildren } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';
@@ -39,9 +39,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
         <Avatar
             src={imageUrl}
             variant={variant || DefaultVariant}
-            component={Box}
-            width={size}
-            height={size}
+            style={{width: size, height: size}}
         >
             {children || '?'}
         </Avatar>

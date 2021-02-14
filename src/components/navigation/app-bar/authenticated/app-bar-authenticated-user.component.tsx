@@ -1,4 +1,4 @@
-import { Avatar, Box, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { Avatar, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
@@ -96,7 +96,7 @@ export const AppBarAuthenticatedUser = withStyles(style, styleOptions)(class ext
             <Fragment>
                 <div className={classes.root}>
                     {this._renderMasterAccountElements()}
-                    <Box flex={1} />
+                    <div className="flex-fill" />
                     <AppBarLinks>
                         <AppBarLink label="Resources"
                                     onClick={this._handleResourcesLinkClick}

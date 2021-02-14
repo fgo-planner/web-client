@@ -186,10 +186,10 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                 onSubmit={this._submit}
             >
                 <div className={classes.inputFieldGroup}>
-                    <InputFieldContainer classes={classes} flex="75%">
+                    <InputFieldContainer className={classes.inputFieldContainer} flex="75%">
                         {this._renderServantNameField()}
                     </InputFieldContainer>
-                    <InputFieldContainer classes={classes} flex="25%">
+                    <InputFieldContainer className={classes.inputFieldContainer} flex="25%">
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="noblePhantasmLevel">NP Level</InputLabel>
                             <Select
@@ -210,7 +210,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                     </InputFieldContainer>
                 </div>
                 <div className={classes.inputFieldGroup}>
-                    <InputFieldContainer classes={classes}>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
                         <TextField
                             variant="outlined"
                             fullWidth
@@ -227,7 +227,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                             onBlur={this._handleLevelInputBlur}
                         />
                     </InputFieldContainer>
-                    <InputFieldContainer classes={classes}>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="ascensionLevel">Ascension</InputLabel>
                             <Select
@@ -246,7 +246,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                    <InputFieldContainer classes={classes}>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
                         <TextField
                             variant="outlined"
                             fullWidth
@@ -263,7 +263,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                             onBlur={this._handleFouInputBlur}
                         />
                     </InputFieldContainer>
-                    <InputFieldContainer classes={classes}>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
                         <TextField
                             variant="outlined"
                             fullWidth
@@ -282,7 +282,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                     </InputFieldContainer>
                 </div>
                 <div className={classes.inputFieldGroup}>
-                    <InputFieldContainer classes={classes}>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="skillLevel1">Skill 1</InputLabel>
                             <Select
@@ -301,7 +301,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                    <InputFieldContainer classes={classes}>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="skillLevel2">Skill 2</InputLabel>
                             <Select
@@ -321,7 +321,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                    <InputFieldContainer classes={classes}>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="skillLevel3">Skill 3</InputLabel>
                             <Select
@@ -341,7 +341,7 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
                             </Select>
                         </FormControl>
                     </InputFieldContainer>
-                    <InputFieldContainer classes={classes}>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
                         <FormControl variant="outlined" fullWidth>
                             <InputLabel htmlFor="bond">Bond</InputLabel>
                             <Select

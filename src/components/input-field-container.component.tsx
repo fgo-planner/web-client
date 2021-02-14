@@ -10,7 +10,7 @@ type Props = PropsWithChildren<{
 }> & CustomStyleProps;
 
 const style = (theme: Theme) => ({
-    inputFieldContainer: {
+    root: {
         height: '96px',
         padding: theme.spacing(0, 2)
     }
@@ -26,7 +26,7 @@ const useStyles = makeStyles(style, styleOptions);
 export const InputFieldContainer = React.memo((props: Props) => {
     const { children, className, width, flex } = props;
     const classes = useStyles(props);
-    const classNames = StyleUtils.appendClassNames(classes.inputFieldContainer, className);
+    const classNames = StyleUtils.appendClassNames(classes.root, className);
     return (
         <div className={classNames} style={{ width, flex }}>
             {children}

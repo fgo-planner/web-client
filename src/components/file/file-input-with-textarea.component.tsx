@@ -31,13 +31,13 @@ const DefaultDragOverlayIcon = FileCopyIcon;
 const DefaultDragOverlayText = 'Drop your file here';
 
 const style = (theme: Theme) => ({
-    fileInput: {
+    root: {
         position: 'relative',
         width: '100%',
         padding: theme.spacing(4),
         boxSizing: 'border-box'
     },
-    fileInputDragOverlay: {
+    dragOverlay: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -54,11 +54,11 @@ const style = (theme: Theme) => ({
         backgroundColor: fade(theme.palette.primary.light, 0.1),
         opacity: 0.69
     },
-    fileInputDragOverlayIcon: {
+    dragOverlayIcon: {
         fontSize: '4rem',
         paddingBottom: theme.spacing(4)
     },
-    fileInputDragOverlayText: {
+    dragOverlayText: {
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontSize: '2rem',
         // color: theme.palette.text.secondary
@@ -111,7 +111,7 @@ export const FileInputWithTextarea  = withStyles(style, styleOptions)(class exte
             isDragActive 
         } = state;
         
-        const classNames = StyleUtils.appendClassNames(classes.fileInput, className);
+        const classNames = StyleUtils.appendClassNames(classes.root, className);
 
         return (
             <div className={classNames} {...getRootProps()}>
@@ -137,9 +137,9 @@ export const FileInputWithTextarea  = withStyles(style, styleOptions)(class exte
         const { classes, dragOverlayText, dragOverlayIcon } = this.props;
         const DragOverlayIcon = dragOverlayIcon ?? DefaultDragOverlayIcon;
         return (
-            <div className={classes.fileInputDragOverlay}>
-                <DragOverlayIcon className={classes.fileInputDragOverlayIcon} />
-                <div className={classes.fileInputDragOverlayText}>
+            <div className={classes.dragOverlay}>
+                <DragOverlayIcon className={classes.dragOverlayIcon} />
+                <div className={classes.dragOverlayText}>
                     {dragOverlayText ?? DefaultDragOverlayText}
                 </div>
             </div>

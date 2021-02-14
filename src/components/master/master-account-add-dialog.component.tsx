@@ -74,24 +74,26 @@ export const MasterAccountAddDialog = withStyles(style, styleOptions)(class exte
                         </div>
                         <form className={classes.form} id={this._formId} onSubmit={this._submit}>
                             {/* TODO Add form validation */}
-                            <InputFieldContainer classes={classes}>
-                                <TextField variant="outlined"
-                                           fullWidth
-                                           label="Nickname (Optional)"
-                                           id="name"
-                                           name="name"
-                                           value={formValues.name}
-                                           onChange={this._handleInputChange}
+                            <InputFieldContainer className={classes.inputFieldContainer}>
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    label="Nickname (Optional)"
+                                    id="name"
+                                    name="name"
+                                    value={formValues.name}
+                                    onChange={this._handleInputChange}
                                 />
                             </InputFieldContainer>
-                            <InputFieldContainer classes={classes}>
-                                <TextField variant="outlined"
-                                           fullWidth
-                                           label="Friend ID (Optional)"
-                                           id="friendId"
-                                           name="friendId"
-                                           value={formValues.friendId}
-                                           onChange={this._handleInputChange}
+                            <InputFieldContainer className={classes.inputFieldContainer}>
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    label="Friend ID (Optional)"
+                                    id="friendId"
+                                    name="friendId"
+                                    value={formValues.friendId}
+                                    onChange={this._handleInputChange}
                                 />
                             </InputFieldContainer>
                         </form>

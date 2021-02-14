@@ -64,9 +64,10 @@ export const LoginDialog = withStyles(style, styleOptions)(class extends ModalCo
     }
 
     render(): ReactNode {
+        const { classes, ...dialogProps } = this.props;
         const { isLoggingIn, errorMessage } = this.state;
         return (
-            <Dialog {...this.props} classes={undefined}>
+            <Dialog {...dialogProps}>
                 <Typography component={'div'}>
                     <DialogTitle>
                         Login
@@ -100,15 +101,25 @@ export const LoginDialog = withStyles(style, styleOptions)(class extends ModalCo
 
     private _renderForm(props: FormikProps<UserCredentials>): ReactNode {
         const { classes } = this.props;
-        const { values, errors, touched, handleBlur, handleChange, handleSubmit } = props;
+        
+        const { 
+            values, 
+            errors, 
+            touched, 
+            handleBlur,
+            handleChange, 
+            handleSubmit 
+        } = props;
+        
         const touchedErrors = FormUtils.getErrorsForTouchedFields(errors, touched);
+
         return (
             <form className={classes.form} 
                   id={this._formId} 
                   noValidate
                   onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
             >
-                <InputFieldContainer classes={classes}>
+                <InputFieldContainer className={classes.inputFieldContainer}>
                     <TextField variant="outlined"
                                fullWidth
                                label="Username"
@@ -121,7 +132,7 @@ export const LoginDialog = withStyles(style, styleOptions)(class extends ModalCo
                                helperText={touchedErrors.username}
                     />
                 </InputFieldContainer>
-                <InputFieldContainer classes={classes}>
+                <InputFieldContainer className={classes.inputFieldContainer}>
                     <TextField variant="outlined"
                                fullWidth
                                label="Password"

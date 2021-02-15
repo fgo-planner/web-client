@@ -30,4 +30,6 @@ export class ThemeConstants {
 
     static FontFamilyGoogleSans = 'Google Sans, Roboto, sans-serif';
 
+    static FontFamilyRoboto = 'Roboto, sans-serif';
+
 }

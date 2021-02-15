@@ -1,5 +1,5 @@
 import { Fab, Tooltip } from '@material-ui/core';
-import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
+import { Clear as ClearIcon, Edit as EditIcon, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
 import lodash from 'lodash';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
@@ -111,8 +111,10 @@ const MasterServants = class extends PureComponent<Props, State> {
                 <MasterServantList
                     editMode={editMode}
                     showActions
+                    showAddServantRow
                     openLinksInNewTab={editMode}
                     masterServants={masterServants}
+                    onAddServant={this._onAddServantButtonClick}
                     onEditServant={this._openEditServantDialog}
                     onDeleteServant={this._openDeleteServantDialog}
                 />
@@ -141,18 +143,6 @@ const MasterServants = class extends PureComponent<Props, State> {
     private _renderFab(): ReactNode {
         const { editMode, loadingIndicatorId } = this.state;
         const disabled = !!loadingIndicatorId;
-        const addServantFab = (
-            <Tooltip key="add" title="Add servant">
-                <div>
-                    <Fab
-                        color="primary"
-                        onClick={this._onAddServantButtonClick}
-                        disabled={disabled}
-                        children={<AddIcon />}
-                    />
-                </div>
-            </Tooltip>
-        );
         if (!editMode) {
             return [
                 <Tooltip key="import" title="Import servant data">
@@ -166,7 +156,6 @@ const MasterServants = class extends PureComponent<Props, State> {
                         />
                     </div>
                 </Tooltip>,
-                addServantFab,
                 <Tooltip key="edit" title="Batch edit mode">
                     <div>
                         <Fab
@@ -190,7 +179,6 @@ const MasterServants = class extends PureComponent<Props, State> {
                     />
                 </div>
             </Tooltip>,
-            addServantFab,
             <Tooltip key="save" title="Save changes">
                 <div>
                     <Fab

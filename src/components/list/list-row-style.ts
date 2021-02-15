@@ -1,6 +1,6 @@
 import { fade, StyleRules, Theme } from '@material-ui/core';
 
-const style =  (theme: Theme) => ({
+const style = (theme: Theme) => ({
     row: {
         borderTop: `1px solid ${theme.palette.divider}`,
         '&:hover': {

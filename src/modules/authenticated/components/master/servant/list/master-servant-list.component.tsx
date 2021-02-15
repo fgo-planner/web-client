@@ -1,11 +1,13 @@
-import { StyleRules, Theme, withStyles } from '@material-ui/core';
+import { Button, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { PureComponent, ReactNode } from 'react';
+import { PersonAddOutlined } from '@material-ui/icons';
+import React, { MouseEventHandler, PureComponent, ReactNode } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
 import { Container as Injectables } from 'typedi';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
 import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { GameServantService } from '../../../../../../services/data/game/game-servant.service';
+import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { GameServant, MasterServant, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
 import { ArrayUtils } from '../../../../../../utils/array.utils';
 import { MasterServantListHeader } from './master-servant-list-header.component';
@@ -15,8 +17,10 @@ type Props = {
     masterServants: MasterServant[];
     editMode?: boolean;
     showActions?: boolean;
+    showAddServantRow?: boolean;
     openLinksInNewTab?: boolean;
     viewLayout?: any; // TODO Make use of this
+    onAddServant?: MouseEventHandler<HTMLButtonElement>;
     onEditServant?: (servant: MasterServant) => void;
     onDeleteServant?: (servant: MasterServant) => void;
 } & WithStylesProps;
@@ -24,6 +28,24 @@ type Props = {
 const style = (theme: Theme) => ({
     root: {
         minWidth: `${theme.breakpoints.width('lg')}px`,
+        marginBottom: theme.spacing(16)
+    },
+    addServantRow: {
+        borderTop: `1px solid ${theme.palette.divider}`,
+    },
+    addServantRowButton: {
+        width: '100%',
+        height: 64
+    },
+    addServantRowLabel: {
+        display: 'flex',
+        alignItems: 'center',
+        fontFamily: ThemeConstants.FontFamilyRoboto,
+        textTransform: 'uppercase',
+        fontSize: '1rem',
+        '& >div': {
+            paddingLeft: theme.spacing(3)
+        }
     }
 } as StyleRules);
 
@@ -64,6 +86,7 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
                 <div className={classes.root}>
                     <MasterServantListHeader showActions={showActions} />
                     {masterServants.map(this._renderMasterServantRow)}
+                    {this._renderAddServantRow()}
                 </div>
             );
         }
@@ -87,6 +110,7 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
                         {droppableRenderFunction}
                     </Droppable>
                 </DragDropContext>
+                {this._renderAddServantRow()}
             </div>
         );
     }
@@ -133,6 +157,27 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
                     openLinksInNewTab={openLinksInNewTab}
                 />
             </StaticListRowContainer>
+        );
+    }
+
+    private _renderAddServantRow(): ReactNode {
+        const { classes, showAddServantRow, onAddServant } = this.props;
+        if (!showAddServantRow) {
+            return null;
+        }
+        return (
+            <div className={classes.addServantRow}>
+                <Button
+                    className={classes.addServantRowButton}
+                    color="secondary"
+                    onClick={onAddServant}
+                >
+                    <div className={classes.addServantRowLabel}>
+                        <PersonAddOutlined />
+                        <div>Add servant</div>
+                    </div>
+                </Button>
+            </div>
         );
     }
 

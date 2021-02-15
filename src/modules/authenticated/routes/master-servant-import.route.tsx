@@ -214,7 +214,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
                     message={ParseFailMessage}
                     confirmButtonColor="primary"
                     confirmButtonLabel="OK"
-                    onAction={this._cancelImport}
+                    onClose={this._cancelImport}
                 />
             );
         }
@@ -229,7 +229,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
                     message={importStatus === 'success' ? ImportSuccessMessage : ImportFailMessage}
                     confirmButtonColor="primary"
                     confirmButtonLabel="OK"
-                    onAction={this._handleSuccessDialogAction}
+                    onClose={this._handleSuccessDialogAction}
                 />
             </Fragment>
         );

@@ -5,14 +5,14 @@ import { ModalOnCloseReason } from '../../../../types';
 import { MasterAccountAddDialog } from '../../../master/master-account-add-dialog.component';
 
 type Props = {
-
+    
 };
 
 type State = {
     dialogOpen: boolean;
 };
 
-export class AppBarMasterAccountAddButton extends PureComponent<Props, State> {
+export const AppBarMasterAccountAddButton = class extends PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
@@ -39,8 +39,11 @@ export class AppBarMasterAccountAddButton extends PureComponent<Props, State> {
                         Add Account 
                     </div>
                 </Button>
-                <MasterAccountAddDialog open={dialogOpen}
-                                        onClose={this._handleDialogClose}
+                <MasterAccountAddDialog
+                    PaperProps={{ style: { minWidth: 360 } }}
+                    showCloseIcon="never"
+                    open={dialogOpen}
+                    onClose={this._handleDialogClose}
                 />
             </Fragment>
         );
@@ -66,4 +69,4 @@ export class AppBarMasterAccountAddButton extends PureComponent<Props, State> {
         });
     }
 
-}
+};

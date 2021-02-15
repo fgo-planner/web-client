@@ -1,14 +1,15 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, Theme, Typography, withStyles } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Container as Injectables } from 'typedi';
 import { AuthService } from '../../services/authentication/auth.service';
-import { ModalComponentProps, UserCredentials, WithStylesProps } from '../../types';
-import { ModalComponent } from '../base/modal-component';
+import { DialogComponentProps, UserCredentials, WithStylesProps } from '../../types';
+import { DialogComponent } from '../base/dialog-component';
+import { DialogCloseButton } from '../dialogs/dialog-close-button.component';
 import { LoginForm } from './login-form.component';
 
-type Props = ModalComponentProps & WithStylesProps;
+type Props = DialogComponentProps & WithStylesProps;
 
 type State = {
     isLoggingIn: boolean;
@@ -18,15 +19,17 @@ type State = {
 const FormId = 'login-dialog-form';
 
 const style = (theme: Theme) => ({
+    root: {
+        background: 'blue',
+        color: 'purple',
+        width: 500
+    },
     errorMessage: {
         color: 'red',
         padding: theme.spacing(0, 2, 4, 2)
     },
     form: {
         padding: theme.spacing(2)
-    },
-    inputFieldContainer: {
-        width: '294px !important'
     },
     dialogActions: {
         alignItems: 'flex-end',
@@ -44,7 +47,7 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'LoginDialog'
 };
 
-export const LoginDialog = withStyles(style, styleOptions)(class extends ModalComponent<Props, State> {
+export const LoginDialog = withWidth()(withStyles(style, styleOptions)(class extends DialogComponent<Props, State> {
 
     private _authService = Injectables.get(AuthService);
 
@@ -67,19 +70,15 @@ export const LoginDialog = withStyles(style, styleOptions)(class extends ModalCo
     }
 
     render(): ReactNode {
-        const { classes, ...dialogProps } = this.props;
+        const { classes, showCloseIcon, ...dialogProps } = this.props;
         const { isLoggingIn, errorMessage } = this.state;
-
-        const loginFormClasses = {
-            root: classes.form, 
-            inputFieldContainer: classes.inputFieldContainer
-        };
-
+        const { fullScreen, closeIconEnabled } = this._computeFullScreenProps();
         return (
-            <Dialog {...dialogProps}>
+            <Dialog {...dialogProps} fullScreen={fullScreen}>
                 <Typography component={'div'}>
                     <DialogTitle>
                         Login
+                        {closeIconEnabled && <DialogCloseButton onClick={this._cancel}/>}
                     </DialogTitle>
                     <DialogContent>
                         {errorMessage && 
@@ -88,7 +87,7 @@ export const LoginDialog = withStyles(style, styleOptions)(class extends ModalCo
                             </div>
                         }
                         <LoginForm
-                            classes={loginFormClasses} 
+                            classes={{ root: classes.form }} 
                             formId={FormId}
                             onSubmit={this._login}
                         />
@@ -157,4 +156,4 @@ export const LoginDialog = withStyles(style, styleOptions)(class extends ModalCo
         this.props.onClose({}, 'cancel');
     }
 
-});
+}));

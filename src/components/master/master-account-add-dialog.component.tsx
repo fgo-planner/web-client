@@ -1,13 +1,14 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, FormEvent, ReactNode } from 'react';
 import { Container as Injectables } from 'typedi';
 import { MasterAccountService } from '../../services/data/master/master-account.service';
-import { ModalComponentProps, WithStylesProps } from '../../types';
-import { ModalComponent } from '../base/modal-component';
+import { DialogComponentProps, WithStylesProps } from '../../types';
+import { DialogComponent } from '../base/dialog-component';
+import { DialogCloseButton } from '../dialogs/dialog-close-button.component';
 import { InputFieldContainer } from '../input-field-container.component';
 
-type Props = ModalComponentProps & WithStylesProps;
+type Props = DialogComponentProps & WithStylesProps;
 
 type Form = {
     name: string;
@@ -22,10 +23,10 @@ type State = {
 
 const style = (theme: Theme) => ({
     form: {
-        padding: theme.spacing(4, 2, 0, 2)
+        padding: theme.spacing(2)
     },
     inputFieldContainer: {
-        width: '256px'
+        width: '100%'
     }
 } as StyleRules);
 
@@ -33,7 +34,7 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'MasterAccountAddDialog'
 };
 
-export const MasterAccountAddDialog = withStyles(style, styleOptions)(class extends ModalComponent<Props, State> {
+export const MasterAccountAddDialog = withWidth()(withStyles(style, styleOptions)(class extends DialogComponent<Props, State> {
     
     private readonly _formId = 'master-account-form';
 
@@ -60,13 +61,15 @@ export const MasterAccountAddDialog = withStyles(style, styleOptions)(class exte
     }
 
     render(): ReactNode {
-        const { classes } = this.props;
+        const { classes, ...dialogProps } = this.props;
         const { formValues, isSubmitting, errorMessage } = this.state;
+        const { fullScreen, closeIconEnabled, actionButtonVariant } = this._computeFullScreenProps();
         return (
-            <Dialog {...this.props} classes={undefined}>
+            <Dialog {...dialogProps} fullScreen={fullScreen}>
                 <Typography component={'div'}>
                     <DialogTitle>
                         Add Master Account
+                        {closeIconEnabled && <DialogCloseButton onClick={this._cancel}/>}
                     </DialogTitle>
                     <DialogContent>
                         <div>
@@ -99,12 +102,12 @@ export const MasterAccountAddDialog = withStyles(style, styleOptions)(class exte
                         </form>
                     </DialogContent>
                     <DialogActions>
-                        <Button variant="contained"
+                        <Button variant={actionButtonVariant}
                                 color="secondary" 
                                 onClick={this._cancel}>
                             Cancel
                         </Button>
-                        <Button variant="contained"
+                        <Button variant={actionButtonVariant}
                                 color="primary"
                                 form={this._formId}
                                 type="submit"
@@ -161,4 +164,4 @@ export const MasterAccountAddDialog = withStyles(style, styleOptions)(class exte
         this.props.onClose({}, 'cancel');
     }
 
-});
+}));

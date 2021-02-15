@@ -43,7 +43,7 @@ export const AppBarGuestUser = withRouter(withStyles(style, styleOptions)(class 
     }
  
     render(): ReactNode {
-        const {classes} = this.props;
+        const { classes } = this.props;
         const { loginModalOpen } = this.state;
         return (
             <Fragment>
@@ -72,6 +72,7 @@ export const AppBarGuestUser = withRouter(withStyles(style, styleOptions)(class 
                     </AppBarLinks>
                 </div>
                 <LoginDialog
+                    PaperProps={{ style: { minWidth: 360 } }}
                     open={loginModalOpen}
                     onClose={this._handleLoginDialogClose}
                 />

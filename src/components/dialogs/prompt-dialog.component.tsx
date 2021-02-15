@@ -1,7 +1,8 @@
-import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, ModalProps } from '@material-ui/core';
-import React, { MouseEvent, ReactNode } from 'react';
-import { Nullable } from '../../types';
-import { CustomPureComponent } from '../base/custom-pure-component';
+import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, withWidth } from '@material-ui/core';
+import React, { ReactNode } from 'react';
+import { DialogComponentProps, Nullable } from '../../types';
+import { DialogComponent } from '../base/dialog-component';
+import { DialogCloseButton } from './dialog-close-button.component';
 
 type RenderedProps = {
     title?: string;
@@ -12,15 +13,13 @@ type RenderedProps = {
     confirmButtonColor?: ButtonProps['color'];
 };
 
-type Props = {
-    onAction: (event: MouseEvent, value: boolean) => void;
-} & RenderedProps & Omit<ModalProps, 'children' | 'onExited'>;
+type Props = RenderedProps & Omit<DialogComponentProps, 'onExited'>;
 
 /**
  * Generic dialog for displaying a simple prompt with an action button and a
  * cancel button.
  */
-export class PromptDialog extends CustomPureComponent<Props> {
+export const PromptDialog = withWidth()(class extends DialogComponent<Props> {
 
     /**
      * Snapshot of the styling and text props. This allows the dialog to keep
@@ -66,27 +65,54 @@ export class PromptDialog extends CustomPureComponent<Props> {
     render(): ReactNode {
 
         const {
+            classes,
             title,
             prompt,
             cancelButtonLabel,
             cancelButtonColor,
             confirmButtonLabel,
             confirmButtonColor,
-            onAction,
+            onClose,
             ...dialogProps
         } = this._getProps();
 
+        const {
+            fullScreen,
+            closeIconEnabled,
+            actionButtonVariant
+        } = this._computeFullScreenProps();
+
+        const showTitle = title || closeIconEnabled;
+
         return (
-            <Dialog {...dialogProps} onExited={this._handleOnExited}>
-                {title && <DialogTitle>{title}</DialogTitle>}
+            <Dialog
+                {...dialogProps}
+                fullScreen={fullScreen}
+                onClose={onClose}
+                onExited={this._handleOnExited}
+            >
+                {showTitle &&
+                    <DialogTitle>
+                        {title}
+                        {closeIconEnabled && <DialogCloseButton onClick={e => onClose(e, 'cancel')} />}
+                    </DialogTitle>
+                }
                 <DialogContent>
                     {prompt && <DialogContentText>{prompt}</DialogContentText>}
                 </DialogContent>
                 <DialogActions>
-                    <Button color={cancelButtonColor} onClick={e => onAction(e, false)}>
+                    <Button
+                        variant={actionButtonVariant}
+                        color={cancelButtonColor} 
+                        onClick={e => onClose(e, 'cancel')}
+                    >
                         {cancelButtonLabel || 'Cancel'}
                     </Button>
-                    <Button color={confirmButtonColor} onClick={e => onAction(e, true)}>
+                    <Button 
+                        variant={actionButtonVariant}
+                        color={confirmButtonColor}
+                        onClick={e => onClose(e, 'submit')}
+                    >
                         {confirmButtonLabel || 'Confirm'}
                     </Button>
                 </DialogActions>
@@ -112,4 +138,4 @@ export class PromptDialog extends CustomPureComponent<Props> {
         };
     }
 
-}
+});

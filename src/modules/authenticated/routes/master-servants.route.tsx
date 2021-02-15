@@ -11,7 +11,7 @@ import { FabContainer } from '../../../components/fab-container.component';
 import { GameServantService } from '../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
-import { GameServant, MasterAccount, MasterServant, Nullable, ReadonlyRecord } from '../../../types';
+import { GameServant, MasterAccount, MasterServant, ModalOnCloseReason, Nullable, ReadonlyRecord } from '../../../types';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MasterServantEditDialog } from '../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantList } from '../components/master/servant/list/master-servant-list.component';
@@ -39,7 +39,7 @@ type State = {
     loadingIndicatorId?: string;
 };
 
-class MasterServants extends PureComponent<Props, State> {
+const MasterServants = class extends PureComponent<Props, State> {
 
     private _loadingIndicatorService = Injectables.get(LoadingIndicatorOverlayService);
 
@@ -134,8 +134,7 @@ class MasterServants extends PureComponent<Props, State> {
                     cancelButtonColor="secondary"
                     confirmButtonColor="primary"
                     confirmButtonLabel="Delete"
-                    onAction={this._handleDeleteServantDialogClose}
-                    onClose={this._closeDeleteServantDialog}
+                    onClose={this._handleDeleteServantDialogClose}
                 />
             </Fragment>
         );
@@ -284,9 +283,9 @@ class MasterServants extends PureComponent<Props, State> {
         });
     }
 
-    private _handleDeleteServantDialogClose(event: MouseEvent, value?: boolean): void {
+    private _handleDeleteServantDialogClose(event: MouseEvent, reason: ModalOnCloseReason): void {
         const { masterServants, editMode, deleteServant } = this.state;
-        if (!value) {
+        if (reason !== 'submit') {
             return this._closeDeleteServantDialog();
         }
         lodash.remove(masterServants, servant => servant.instanceId === deleteServant?.instanceId);
@@ -385,7 +384,7 @@ class MasterServants extends PureComponent<Props, State> {
         return account.servants.map(MasterServantUtils.clone);
     }
 
-}
+};
 
 export class MasterServantsRoute extends RouteComponent {
 

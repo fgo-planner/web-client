@@ -1,12 +1,13 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, Select, StyleRules, TextField, Theme, Typography, withStyles } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, Select, StyleRules, TextField, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, FocusEvent, FormEvent, MouseEvent, ReactNode } from 'react';
 import { Container as Injectables } from 'typedi';
-import { ModalComponent } from '../../../../../../components/base/modal-component';
+import { DialogComponent } from '../../../../../../components/base/dialog-component';
+import { DialogCloseButton } from '../../../../../../components/dialogs/dialog-close-button.component';
 import { InputFieldContainer } from '../../../../../../components/input-field-container.component';
 import { GameServantConstants } from '../../../../../../constants';
 import { GameServantService } from '../../../../../../services/data/game/game-servant.service';
-import { GameServant, MasterServant, ModalOnCloseHandler, Nullable, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
+import { DialogComponentProps, GameServant, MasterServant, Nullable, Optional, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
 import { FormUtils } from '../../../../../../utils/form.utils';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantEditDialogAutocomplete } from './master-servant-edit-dialog-autocomplete.component';
@@ -24,6 +25,8 @@ type FormData = {
     noblePhantasmLevel: number;
 };
 
+type ModalData = Optional<MasterServant, 'instanceId'>;
+
 type RenderedProps = {
     disableServantSelect?: boolean;
     dialogTitle?: string;
@@ -36,9 +39,10 @@ type Props = {
      * new servant.
      */
     masterServant?: MasterServant;
-    open: boolean;
-    onClose: ModalOnCloseHandler<Omit<MasterServant, 'instanceId'>>;
-} & RenderedProps & WithStylesProps;
+} & 
+RenderedProps & 
+WithStylesProps &
+Omit<DialogComponentProps<ModalData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 type State = {
     formData: FormData;
@@ -46,20 +50,19 @@ type State = {
 
 const style = (theme: Theme) => ({
     form: {
-        width: '500px',
         paddingTop: theme.spacing(4)
     },
     inputFieldGroup: {
         display: 'flex',
         flexWrap: 'nowrap',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('xs')]: {
             flexWrap: 'wrap'
         }
     },
     inputFieldContainer: {
         flex: 1,
         padding: theme.spacing(0, 2),
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('xs')]: {
             flex: '100% !important'
         }
     }
@@ -69,7 +72,7 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'MasterServantEditDialog'
 };
 
-export const MasterServantEditDialog = withStyles(style, styleOptions)(class extends ModalComponent<Props, State> {
+export const MasterServantEditDialog = withWidth()(withStyles(style, styleOptions)(class extends DialogComponent<Props, State, ModalData> {
 
     private readonly _formId = 'servant-form';
 
@@ -138,32 +141,35 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
     }
 
     render(): ReactNode {
-        const { open, onClose } = this.props;
+        const { classes, ...dialogProps } = this.props;
         const { dialogTitle, submitButtonLabel } = this._propsSnapshot || this.props;
+        const { fullScreen, closeIconEnabled, actionButtonVariant } = this._computeFullScreenProps();
         return (
             <Dialog
-                open={open}
-                onClose={onClose}
+                {...dialogProps}
+                PaperProps={{ style: { width: 600 } }}
+                fullScreen={fullScreen}
                 keepMounted={false}
                 onExited={this._handleOnDialogExited}
             >
                 <Typography component={'div'}>
                     <DialogTitle>
                         {dialogTitle}
+                        {closeIconEnabled && <DialogCloseButton onClick={this._cancel}/>}
                     </DialogTitle>
                     <DialogContent>
                         {this._renderForm()}
                     </DialogContent>
                     <DialogActions>
                         <Button
-                            variant="text"
+                            variant={actionButtonVariant}
                             color="secondary"
                             onClick={this._cancel}
                         >
                             Cancel
                         </Button>
                         <Button
-                            variant="text"
+                            variant={actionButtonVariant}
                             color="primary"
                             form={this._formId}
                             type="submit"
@@ -530,4 +536,4 @@ export const MasterServantEditDialog = withStyles(style, styleOptions)(class ext
         };
     }
 
-});
+}));

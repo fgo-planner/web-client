@@ -1,8 +1,10 @@
 import { makeStyles, StyleRules, Theme, Typography } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { PropsWithChildren } from 'react';
+import { CustomStyleProps } from '../types';
+import { StyleUtils } from '../utils/style.utils';
 
-type Props = PropsWithChildren<{}>;
+type Props = PropsWithChildren<{}> & CustomStyleProps;
 
 const style = (theme: Theme) => ({
     root: {
@@ -16,10 +18,12 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const PageTitle = React.memo(({ children }: Props) => {
-    const styles = useStyles();
+export const PageTitle = React.memo((props: Props) => {
+    const { children, className } = props;
+    const styles = useStyles(props);
+    const classNames = StyleUtils.appendClassNames(styles.root, className);
     return (
-        <Typography variant="h6" className={styles.root}>
+        <Typography variant="h6" className={classNames}>
             {children}
         </Typography>
     );

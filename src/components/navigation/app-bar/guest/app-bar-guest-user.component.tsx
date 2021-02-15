@@ -83,17 +83,18 @@ export const AppBarGuestUser = withRouter(withStyles(style, styleOptions)(class 
     private _openLoginDialog(): void {
         const { location, history } = this.props;
         const pathname = location?.pathname;
-
-        const redirect = pathname && (
-            pathname.startsWith('/login') ||
-            pathname.startsWith('/register') ||
-            pathname.startsWith('/forgot-password')
-        );
-
-        if (redirect) {
-            history.push('/login');
-        } else {
+        /*
+         * If the user is on a rearouses page, then show the dialog for logging in
+         * instead of redirecting to the login page. This is so the user can
+         * continue to view the resource page after logging in without
+         * interruption.
+         * 
+         * TODO Maybe this is not a good idea...
+         */
+        if (pathname?.includes('resources')) {
             this.setState({ loginModalOpen: true });
+        } else {
+            history.push('/login');
         }
     }
 

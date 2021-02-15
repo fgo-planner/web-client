@@ -5,7 +5,7 @@ import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } fro
 import { Container as Injectables } from 'typedi';
 import { RouteComponent } from '../components/base/route-component';
 import { LoginForm } from '../components/login/login-form.component';
-import { PageTitle } from '../components/page-title.component';
+import { PageTitle } from '../components/text/page-title.component';
 import { AuthService } from '../services/authentication/auth.service';
 import { UserCredentials, WithStylesProps } from '../types';
 

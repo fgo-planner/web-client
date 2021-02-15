@@ -4,8 +4,8 @@ import { Subscription } from 'rxjs';
 import { Container as Injectables } from 'typedi';
 import { AuthService } from '../../services/authentication/auth.service';
 import { Nullable, RouteDefinition, RouteDefinitions, UserInfo } from '../../types';
-import { LazyLoadFallback } from '../route-fallbacks/lazy-load-fallback.component';
-import { NotFound } from '../route-fallbacks/not-found.component';
+import { LazyLoadFallback } from '../route-fallback/lazy-load-fallback.component';
+import { NotFound } from '../route-fallback/not-found.component';
 import { RouteComponent } from './route-component';
 
 export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, S> {

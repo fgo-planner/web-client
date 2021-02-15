@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { RouteComponent } from '../components/base/route-component';
-import { PageTitle } from '../components/page-title.component';
+import { PageTitle } from '../components/text/page-title.component';
 
 export class ForgotPasswordRoute extends RouteComponent {
 

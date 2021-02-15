@@ -2,11 +2,11 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, 
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, FormEvent, ReactNode } from 'react';
 import { Container as Injectables } from 'typedi';
-import { MasterAccountService } from '../../services/data/master/master-account.service';
-import { DialogComponentProps, WithStylesProps } from '../../types';
-import { DialogComponent } from '../base/dialog-component';
-import { DialogCloseButton } from '../dialogs/dialog-close-button.component';
-import { InputFieldContainer } from '../input-field-container.component';
+import { MasterAccountService } from '../../../services/data/master/master-account.service';
+import { DialogComponentProps, WithStylesProps } from '../../../types';
+import { DialogComponent } from '../../base/dialog-component';
+import { DialogCloseButton } from '../../dialog/dialog-close-button.component';
+import { InputFieldContainer } from '../../input/input-field-container.component';
 
 type Props = DialogComponentProps & WithStylesProps;
 

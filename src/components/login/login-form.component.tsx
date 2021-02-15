@@ -5,7 +5,7 @@ import { PureComponent, ReactNode } from 'react';
 import * as Yup from 'yup';
 import { CustomStyleProps, UserCredentials, WithStylesProps } from '../../types';
 import { FormUtils } from '../../utils/form.utils';
-import { InputFieldContainer } from '../input-field-container.component';
+import { InputFieldContainer } from '../input/input-field-container.component';
 
 type Props = {
     formId: string;

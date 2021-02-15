@@ -6,7 +6,7 @@ import { Container as Injectables } from 'typedi';
 import { AuthService } from '../../services/authentication/auth.service';
 import { DialogComponentProps, UserCredentials, WithStylesProps } from '../../types';
 import { DialogComponent } from '../base/dialog-component';
-import { DialogCloseButton } from '../dialogs/dialog-close-button.component';
+import { DialogCloseButton } from '../dialog/dialog-close-button.component';
 import { LoginForm } from './login-form.component';
 
 type Props = DialogComponentProps & WithStylesProps;

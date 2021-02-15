@@ -7,9 +7,9 @@ import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'rea
 import { Subscription } from 'rxjs';
 import { Container as Injectables } from 'typedi';
 import { RouteComponent } from '../../../components/base/route-component';
-import { AlertDialog } from '../../../components/dialogs/alert-dialog.component';
-import { FabContainer } from '../../../components/fab-container.component';
-import { FileInputWithTextarea } from '../../../components/file/file-input-with-textarea.component';
+import { AlertDialog } from '../../../components/dialog/alert-dialog.component';
+import { FabContainer } from '../../../components/fab/fab-container.component';
+import { FileInputWithTextarea } from '../../../components/input/file-input-with-textarea.component';
 import { GameServantService } from '../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { FgoManagerMasterServantParser } from '../../../services/import/fgo-manager/fgo-manager-master-servant-parser';

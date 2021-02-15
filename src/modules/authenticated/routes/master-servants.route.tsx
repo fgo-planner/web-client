@@ -1,4 +1,4 @@
-import { Fab } from '@material-ui/core';
+import { Fab, Tooltip } from '@material-ui/core';
 import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
 import lodash from 'lodash';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
@@ -116,9 +116,7 @@ const MasterServants = class extends PureComponent<Props, State> {
                     onEditServant={this._openEditServantDialog}
                     onDeleteServant={this._openDeleteServantDialog}
                 />
-                <FabContainer>
-                    {this._renderFab()}
-                </FabContainer>
+                <FabContainer children={this._renderFab()} />
                 <MasterServantEditDialog
                     open={editServantDialogOpen}
                     dialogTitle={editServant ? 'Edit Servant Info' : 'Add Servant'}
@@ -143,35 +141,67 @@ const MasterServants = class extends PureComponent<Props, State> {
     private _renderFab(): ReactNode {
         const { editMode, loadingIndicatorId } = this.state;
         const disabled = !!loadingIndicatorId;
-        const addButton = (
-            <Fab color="primary" onClick={this._onAddServantButtonClick} disabled={disabled}>
-                <AddIcon />
-            </Fab>
+        const addServantFab = (
+            <Tooltip key="add" title="Add servant">
+                <div>
+                    <Fab
+                        color="primary"
+                        onClick={this._onAddServantButtonClick}
+                        disabled={disabled}
+                        children={<AddIcon />}
+                    />
+                </div>
+            </Tooltip>
         );
         if (!editMode) {
-            return (
-                <Fragment>
-                    <Fab component={Link} color="default" to="./data/import/servants" disabled={disabled}>
-                        <PublishIcon />
-                    </Fab>
-                    {addButton}
-                    <Fab color="primary" onClick={this._edit} disabled={disabled}>
-                        <EditIcon />
-                    </Fab>
-                </Fragment>
-            );
+            return [
+                <Tooltip key="import" title="Import servant data">
+                    <div>
+                        <Fab
+                            component={Link}
+                            color="default"
+                            to="./data/import/servants"
+                            disabled={disabled}
+                            children={<PublishIcon />}
+                        />
+                    </div>
+                </Tooltip>,
+                addServantFab,
+                <Tooltip key="edit" title="Batch edit mode">
+                    <div>
+                        <Fab
+                            color="primary"
+                            onClick={this._edit}
+                            disabled={disabled}
+                            children={<EditIcon />}
+                        />
+                    </div>
+                </Tooltip>
+            ];
         }
-        return (
-            <Fragment>
-                {addButton}
-                <Fab color="primary" onClick={this._save} disabled={disabled}>
-                    <SaveIcon />
-                </Fab>
-                <Fab color="secondary" onClick={this._cancel} disabled={disabled}>
-                    <ClearIcon />
-                </Fab>
-            </Fragment>
-        );
+        return [
+            <Tooltip key="cancel" title="Cancel">
+                <div>
+                    <Fab
+                        color="default"
+                        onClick={this._cancel}
+                        disabled={disabled}
+                        children={<ClearIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            addServantFab,
+            <Tooltip key="save" title="Save changes">
+                <div>
+                    <Fab
+                        color="primary"
+                        onClick={this._save}
+                        disabled={disabled}
+                        children={<SaveIcon />}
+                    />
+                </div>
+            </Tooltip>
+        ];
     }
 
     private _edit(): void {

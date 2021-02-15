@@ -1,4 +1,4 @@
-import { Fab } from '@material-ui/core';
+import { Fab, Tooltip } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
 import { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
@@ -63,29 +63,49 @@ class MasterItems extends PureComponent<Props, State> {
         return (
             <div className="py-2">
                 <MasterItemList editMode={editMode} masterItems={masterItems} />
-                <FabContainer>
-                    {this._renderFab(editMode)}
-                </FabContainer>
+                <FabContainer children={this._renderFab(editMode)} />
             </div>
         );
     }
 
     private _renderFab(editMode: boolean): ReactNode {
         const { loadingIndicatorId } = this.state;
+        const disabled = !!loadingIndicatorId;
         if (!editMode) {
             return (
-                <Fab color="primary" onClick={this._edit} disabled={!!loadingIndicatorId}>
-                    <EditIcon />
-                </Fab>
+                <Tooltip title="Edit">
+                    <div>
+                        <Fab
+                            color="primary"
+                            onClick={this._edit}
+                            disabled={disabled}
+                            children={<EditIcon />}
+                        />
+                    </div>
+                </Tooltip>
             );
         }
         return [
-            <Fab key="save" color="primary" onClick={this._save} disabled={!!loadingIndicatorId}>
-                <SaveIcon />
-            </Fab>,
-            <Fab key="cancel" color="secondary" onClick={this._cancel} disabled={!!loadingIndicatorId}>
-                <ClearIcon />
-            </Fab>
+            <Tooltip key="cancel" title="Cancel">
+                <div>
+                    <Fab
+                        color="default"
+                        onClick={this._cancel}
+                        disabled={disabled}
+                        children={<ClearIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="save" title="Save">
+                <div>
+                    <Fab
+                        color="primary"
+                        onClick={this._save}
+                        disabled={disabled}
+                        children={<SaveIcon />}
+                    />
+                </div>
+            </Tooltip>
         ];
     }
 

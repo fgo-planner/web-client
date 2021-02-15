@@ -132,10 +132,11 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
         const { parsedData } = this.state;
         return (
             <Fragment>
-                {parsedData ? this._renderParseResults(parsedData) : this._renderDataInputPrompt()}
-                <FabContainer>
-                    {this._renderFab()}
-                </FabContainer>
+                {parsedData ?
+                    this._renderParseResults(parsedData) :
+                    this._renderDataInputPrompt()
+                }
+                <FabContainer children={this._renderFab()} />
             </Fragment>
         );
     }
@@ -146,24 +147,37 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
         if (!parsedData) {
             const disabled = !importData?.trim().length || !!loadingIndicatorId;
             return (
-                <Tooltip key="import" title="Import data">
-                    <Fab color="primary" onClick={this._parseImportData} disabled={disabled}>
-                        <PublishIcon />
-                    </Fab>
+                <Tooltip title="Import data">
+                    <div>
+                        <Fab
+                            color="primary"
+                            onClick={this._parseImportData}
+                            disabled={disabled}
+                            children={<PublishIcon />}
+                        />
+                    </div>
                 </Tooltip>
             );
         }
 
         return [
             <Tooltip key="cancel" title="Cancel">
-                <Fab color="default" onClick={this._cancelImport}>
-                    <ClearIcon />
-                </Fab>
+                <div>
+                    <Fab
+                        color="default"
+                        onClick={this._cancelImport}
+                        children={<ClearIcon />}
+                    />
+                </div>
             </Tooltip>,
             <Tooltip key="submit" title="Confirm">
-                <Fab color="primary" onClick={this._finalizeImport}>
-                    <DoneIcon />
-                </Fab>
+                <div>
+                    <Fab
+                        color="primary"
+                        onClick={this._finalizeImport}
+                        children={<DoneIcon />}
+                    />
+                </div>
             </Tooltip>
         ];
     }

@@ -1,13 +1,14 @@
 import { HttpOptions, Nullable } from '../types';
+import { HttpResponseType } from '../types/internal/http-response-type.type';
 import { JwtUtils } from './jwt.utils';
 
 type RequestBody = string | Record<string, unknown>;
 
 export class HttpUtils {
 
-    private static AuthorizationHeader = 'Authorization';
+    private static readonly _AuthorizationHeader = 'Authorization';
 
-    private static ContentTypeHeader = 'Content-Type';
+    private static readonly _ContentTypeHeader = 'Content-Type';
 
     static async get<T = any>(url: string, options?: HttpOptions): Promise<T> {
         if (options?.params) {
@@ -19,10 +20,7 @@ export class HttpUtils {
             headers
         };
         const response = await fetch(url, init);
-        if (response.ok) {
-            return response.json();
-        }
-        throw await response.json();
+        return this._parseResponseBody(response, options) as any;
     }
 
     static async post<T = any>(url: string, body: RequestBody, options?: HttpOptions): Promise<T> {
@@ -30,7 +28,7 @@ export class HttpUtils {
             url += `&${this._generateUrlParamsString(options.params)}`;
         }
         const headers = {
-            [this.ContentTypeHeader]: this._inferContentType(body)
+            [this._ContentTypeHeader]: this._inferContentType(body)
         };
         this._appendAuthorizationHeader(headers);
         if (typeof body === 'object') {
@@ -42,10 +40,7 @@ export class HttpUtils {
             headers
         };
         const response = await fetch(url, init);
-        if (response.ok) {
-            return response.json();
-        }
-        throw await response.json();
+        return this._parseResponseBody(response, options) as any;
     }
 
     static async put<T = any>(url: string, body: RequestBody, options?: HttpOptions): Promise<T> {
@@ -53,7 +48,7 @@ export class HttpUtils {
             url += `&${this._generateUrlParamsString(options.params)}`;
         }
         const headers = {
-            [this.ContentTypeHeader]: this._inferContentType(body)
+            [this._ContentTypeHeader]: this._inferContentType(body)
         };
         this._appendAuthorizationHeader(headers);
         if (typeof body === 'object') {
@@ -65,10 +60,7 @@ export class HttpUtils {
             headers
         };
         const response = await fetch(url, init);
-        if (response.ok) {
-            return response.json();
-        }
-        throw await response.json();
+        return this._parseResponseBody(response, options) as any;
     }
 
     static async delete<T = any>(url: string, options?: HttpOptions): Promise<T> {
@@ -81,10 +73,7 @@ export class HttpUtils {
             headers
         };
         const response = await fetch(url, init);
-        if (response.ok) {
-            return response.json();
-        }
-        throw await response.json();
+        return this._parseResponseBody(response, options) as any;
     }
     
     private static _inferContentType(body: RequestBody): string {
@@ -97,7 +86,7 @@ export class HttpUtils {
     private static _appendAuthorizationHeader(headers: Record<string, string> = {}): Record<string, string> {
         const token = JwtUtils.readTokenFromStorage();
         if (token !== null) {
-            headers[this.AuthorizationHeader] = token;
+            headers[this._AuthorizationHeader] = token;
         }
         return headers;
     }
@@ -115,6 +104,31 @@ export class HttpUtils {
             urlParams.append(key, value);
         }
         return urlParams.toString();
+    }
+
+    private static async _parseResponseBody(response: Response, options?: HttpOptions): Promise<string | Record<string, any>> {
+        const contentType = response.headers.get(this._ContentTypeHeader);
+        let inferredResponseType: HttpResponseType;
+        if (response.ok && options?.responseType) {
+            inferredResponseType = options.responseType;
+        } else if (contentType?.includes('json')) {
+            inferredResponseType = 'json';
+        } else {
+            inferredResponseType = 'text';
+        }
+        if (!response.ok) {
+            const error = await this._getResponseBody(response, inferredResponseType);
+            throw Error(typeof error === 'string' ? error : error['message']);
+        }
+        return this._getResponseBody(response, inferredResponseType);
+    }
+
+    private static async _getResponseBody(response: Response, responseType: HttpResponseType): Promise<string | Record<string, any>> {
+        if (responseType === 'text') {
+            return response.text();
+        }
+        // TODO Fallback to text if json fails.
+        return response.json();
     }
 
 }

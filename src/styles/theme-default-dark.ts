@@ -1,8 +1,9 @@
-import overrides from './material-ui-overrides';
 import { ThemeOptions } from '@material-ui/core';
+import { pink } from '@material-ui/core/colors';
+import overrides from './material-ui-overrides';
 import { ThemeConstants } from './theme-constants';
 
-export default () => {
+const themeDefaultDark = () => {
     const theme: ThemeOptions = {
         spacing: ThemeConstants.Spacing,
         palette: {
@@ -15,10 +16,12 @@ export default () => {
                 main: '#BADA55'
             },
             secondary: {
-                main: '#FA9'
+                main: pink[200]
             }
         },
-        // overrides
+        overrides
     };
     return theme;
 };
+
+export default themeDefaultDark;

@@ -1,22 +1,25 @@
 import overrides from './material-ui-overrides';
 import { ThemeOptions } from '@material-ui/core';
 import { ThemeConstants } from './theme-constants';
+import { grey, lightBlue, pink } from '@material-ui/core/colors';
 
-export default () => {
+const themeDefaultLight = () => {
     const theme: ThemeOptions = {
         spacing: ThemeConstants.Spacing,
         palette: {
             background: {
-                default: '#FFF'
+                default: 'white'
             },
             primary: {
-                main: '#EC407A'
+                main: pink[400]
             },
             secondary: {
-                main: '#039BE5'
+                main: lightBlue[600]
             }
         },
         overrides
     };
     return theme;
 };
+
+export default themeDefaultLight;

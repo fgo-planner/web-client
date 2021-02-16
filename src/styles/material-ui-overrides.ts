@@ -1,4 +1,5 @@
 import { ThemeOptions } from '@material-ui/core';
+import { grey } from '@material-ui/core/colors';
 import { ThemeConstants } from './theme-constants';
 
 const spacing = (scale: number) => {
@@ -8,7 +9,7 @@ const spacing = (scale: number) => {
 const overrides: ThemeOptions['overrides'] = {
     MuiButton: {
         contained: {
-            backgroundColor: '#FFF'
+            backgroundColor: grey[50]
         },
         label: {
             fontFamily: ThemeConstants.FontFamilyGoogleSans,
@@ -18,7 +19,7 @@ const overrides: ThemeOptions['overrides'] = {
     },
     MuiFab: {
         root: {
-            backgroundColor: '#FFF'
+            backgroundColor: grey[50]
         }
     },
     MuiTextField: {

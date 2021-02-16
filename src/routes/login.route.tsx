@@ -12,7 +12,7 @@ import { UserCredentials, WithStylesProps } from '../types';
 type Props = ReactRouteComponentProps & WithStylesProps;
 
 type State = {
-    isLoggingIn: boolean;
+    awaitingResponse: boolean;
     errorMessage?: string | null;
 };
 
@@ -22,7 +22,7 @@ const style = (theme: Theme) => ({
     root: {
         display: 'flex',
         justifyContent: 'center',
-        marginTop: '20vh',
+        margin: '20vh 0',
         [theme.breakpoints.down('xs')]: {
             marginTop: 0
         }
@@ -74,7 +74,7 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComp
         super(props);
 
         this.state = {
-            isLoggingIn: false
+            awaitingResponse: false
         };
 
         this._login = this._login.bind(this);
@@ -82,7 +82,7 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComp
 
     render(): ReactNode {
         const { classes } = this.props;
-        const { isLoggingIn, errorMessage } = this.state;
+        const { awaitingResponse, errorMessage } = this.state;
         return (
             <div className={classes.root}>
                 <div className={classes.formContainer}>
@@ -123,7 +123,7 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComp
                             variant="contained"
                             type="submit"
                             form={FormId}
-                            disabled={isLoggingIn}
+                            disabled={awaitingResponse}
                         >
                             Login
                         </Button>
@@ -135,7 +135,7 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComp
 
     private async _login(values: UserCredentials): Promise<void> {
         this.setState({
-            isLoggingIn: true,
+            awaitingResponse: true,
             errorMessage: null
         });
         try {
@@ -143,7 +143,7 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComp
             this.props.history.push('/user');
         } catch (e) {
             this.setState({
-                isLoggingIn: false,
+                awaitingResponse: false,
                 errorMessage: String(e)
             });
         }

@@ -78,7 +78,6 @@ export const LoginForm = withStyles(style, styleOptions)(class extends PureCompo
 
         return (
             <form 
-                className={classes.form}
                 id={formId}
                 noValidate
                 onSubmit={e => { e.preventDefault(); handleSubmit(e); }}

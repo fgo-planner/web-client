@@ -102,16 +102,20 @@ export const MasterAccountAddDialog = withWidth()(withStyles(style, styleOptions
                         </form>
                     </DialogContent>
                     <DialogActions>
-                        <Button variant={actionButtonVariant}
-                                color="secondary" 
-                                onClick={this._cancel}>
+                        <Button
+                            variant={actionButtonVariant}
+                            color="secondary"
+                            onClick={this._cancel}
+                        >
                             Cancel
                         </Button>
-                        <Button variant={actionButtonVariant}
-                                color="primary"
-                                form={this._formId}
-                                type="submit"
-                                disabled={isSubmitting}>
+                        <Button
+                            variant={actionButtonVariant}
+                            color="primary"
+                            form={this._formId}
+                            type="submit"
+                            disabled={isSubmitting}
+                        >
                             Add
                         </Button>
                     </DialogActions>

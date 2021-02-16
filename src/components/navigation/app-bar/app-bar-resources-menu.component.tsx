@@ -77,30 +77,38 @@ export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends
         const { classes, open, anchorEl } = this.props;
         const { forceClosed } = this.state;
         return (
-            <HoverMenu open={open}
-                       anchorEl={anchorEl}
-                       getContentAnchorEl={null}
-                       transitionDuration={100}
-                       forceClosed={forceClosed}
-                       anchorOrigin={this._menuAnchorOrigin}
-                       transformOrigin={this._menuTransformOrigin}
-                       PaperProps={this._menuPaperProps}>
-                <MenuItem className={classes.link}
-                          component={Link}
-                          to="/resources/servants"
-                          onClick={this._handleLinkClick}>
+            <HoverMenu
+                open={open}
+                anchorEl={anchorEl}
+                getContentAnchorEl={null}
+                transitionDuration={100}
+                forceClosed={forceClosed}
+                anchorOrigin={this._menuAnchorOrigin}
+                transformOrigin={this._menuTransformOrigin}
+                PaperProps={this._menuPaperProps}
+            >
+                <MenuItem
+                    className={classes.link}
+                    component={Link}
+                    to="/resources/servants"
+                    onClick={this._handleLinkClick}
+                >
                     Servants
                 </MenuItem>
-                <MenuItem className={classes.link}
-                          component={Link}
-                          to="/resources/items"
-                          onClick={this._handleLinkClick}>
+                <MenuItem
+                    className={classes.link}
+                    component={Link}
+                    to="/resources/items"
+                    onClick={this._handleLinkClick}
+                >
                     Items
                 </MenuItem>
-                <MenuItem className={classes.link}
-                          component={Link}
-                          to="/resources/events"
-                          onClick={this._handleLinkClick}>
+                <MenuItem
+                    className={classes.link}
+                    component={Link}
+                    to="/resources/events"
+                    onClick={this._handleLinkClick}
+                >
                     Events
                 </MenuItem>
             </HoverMenu>

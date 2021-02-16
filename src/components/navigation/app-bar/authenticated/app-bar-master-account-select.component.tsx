@@ -57,13 +57,15 @@ export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class e
         const { classes, masterAccountList } = this.props;
         const { currentMasterAccountId } = this.state;
         return (
-            <TextField select 
-                       variant="outlined"
-                       size="small"
-                       className={classes.root}
-                       value={currentMasterAccountId}
-                       onChange={this._handleInputChange}>
-                 {masterAccountList.map(this._renderSelectOption)}
+            <TextField
+                select
+                variant="outlined"
+                size="small"
+                className={classes.root}
+                value={currentMasterAccountId}
+                onChange={this._handleInputChange}
+            >
+                {masterAccountList.map(this._renderSelectOption)}
             </TextField>
         );
     }
@@ -75,9 +77,11 @@ export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class e
             itemLabel += ` (${account.friendId})`;
         }
         return (
-            <MenuItem className={classes.selectOption}
-                      value={account._id}
-                      key={index}>
+            <MenuItem
+                className={classes.selectOption}
+                value={account._id}
+                key={index}
+            >
                 {itemLabel}
             </MenuItem>
         );

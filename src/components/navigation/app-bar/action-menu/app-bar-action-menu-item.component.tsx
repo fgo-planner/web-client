@@ -35,10 +35,12 @@ export const AppBarActionMenuItem = React.memo((props: Props) => {
     const { label, to, onClick } = props;
     const classes = useStyles();
     return (
-        <MenuItem className={classes.root} 
-                  component={to ? Link : 'li'}
-                  to={to}
-                  onClick={onClick}>
+        <MenuItem
+            className={classes.root}
+            component={to ? Link : 'li'}
+            to={to}
+            onClick={onClick}
+        >
             <ListItemIcon>
                 <props.icon />
             </ListItemIcon>

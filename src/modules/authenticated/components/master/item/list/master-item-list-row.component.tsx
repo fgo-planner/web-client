@@ -56,21 +56,23 @@ export const MasterItemListRow = withStyles(style, styleOptions)(class extends P
 
     private _renderItemViewMode(item: ListViewDataItem): ReactNode {
         return (
-            <NumberFormat value={item.masterData.quantity}
-                          displayType="text"
-                          thousandSeparator={true} 
+            <NumberFormat
+                value={item.masterData.quantity}
+                displayType="text"
+                thousandSeparator={true}
             />
         );
     }
 
     private _renderItemEditMode(item: ListViewDataItem): ReactNode {
         return (
-            <TextField variant="outlined"
-                       size="small"
-                       type="number"
-                       inputProps={{step: 1, min: 0}}
-                       value={item.masterData.quantity}
-                       onChange={this._handleItemQuantityChange}
+            <TextField
+                variant="outlined"
+                size="small"
+                type="number"
+                inputProps={{ step: 1, min: 0 }}
+                value={item.masterData.quantity}
+                onChange={this._handleItemQuantityChange}
             />
         );
     }

@@ -83,11 +83,12 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
          * ...otherwise, render the route with a normal component.
          */
         return (
-            <Route key={key}
-                   path={path} exact={route.exact}
-                   strict={route.strict}
-                   render={props => this._renderRouteComponent(route, props, path)}>
-            </Route>
+            <Route 
+                key={key}
+                path={path} exact={route.exact}
+                strict={route.strict}
+                render={props => this._renderRouteComponent(route, props, path)}
+            />
         );
     }
 

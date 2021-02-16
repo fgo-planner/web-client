@@ -34,9 +34,10 @@ export const MasterItemListRowLabel = React.memo(({ item }: Props) => {
     const classes = useStyles();
     return (
         <Fragment>
-            <img className={classes.itemIcon}
-                 src={`${ImageBaseUrl}/${item._id}.png`}
-                 alt={item.name}
+            <img
+                className={classes.itemIcon}
+                src={`${ImageBaseUrl}/${item._id}.png`}
+                alt={item.name}
             />
             <div className={classes.itemName}>
                 {item.name}

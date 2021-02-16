@@ -57,11 +57,13 @@ export const AppBarLink = withStyles(style, styleOptions)(class extends PureComp
         // If route path was defined, then render it as a Link.
         if (route) {
             return (
-                <Link className={className} 
-                      to={route}
-                      onClick={onClick}
-                      onMouseOver={onMouseOver}
-                      onMouseOut={onMouseOut}>
+                <Link
+                    className={className}
+                    to={route}
+                    onClick={onClick}
+                    onMouseOver={onMouseOver}
+                    onMouseOut={onMouseOut}
+                >
                     {label}
                 </Link>
             );
@@ -69,10 +71,12 @@ export const AppBarLink = withStyles(style, styleOptions)(class extends PureComp
 
         // Otherwise, render it as a div.
         return (
-            <div className={className}          
-                 onClick={onClick}
-                 onMouseEnter={onMouseOver}
-                 onMouseLeave={onMouseOut}>
+            <div
+                className={className}
+                onClick={onClick}
+                onMouseEnter={onMouseOver}
+                onMouseLeave={onMouseOut}
+            >
                 {label}
             </div>
         );

@@ -24,14 +24,16 @@ export class AppBarActionMenu extends PureComponent<Props> {
     render(): ReactNode {
         const { children, className, anchorEl, onClose } = this.props;
         return (
-            <Menu PaperProps={{ className }}
-                  anchorEl={anchorEl}
-                  getContentAnchorEl={null}
-                  anchorOrigin={this.MenuAnchorOrigin}
-                  transformOrigin={this.MenuTransformOrigin}
-                  open={!!anchorEl}
-                  onClose={onClose}
-                  keepMounted>
+            <Menu
+                PaperProps={{ className }}
+                anchorEl={anchorEl}
+                getContentAnchorEl={null}
+                anchorOrigin={this.MenuAnchorOrigin}
+                transformOrigin={this.MenuTransformOrigin}
+                open={!!anchorEl}
+                onClose={onClose}
+                keepMounted
+            >
                 {children}
             </Menu>
         );

@@ -79,41 +79,43 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
     render(): ReactNode {
         const isLightMode = this.state.themeMode === 'light';
         return (
-            <AppBarActionMenu className={this.props.classes.root}
-                              anchorEl={this.props.anchorEl}
-                              onClose={this.props.onClose}>
-
+            <AppBarActionMenu
+                className={this.props.classes.root}
+                anchorEl={this.props.anchorEl}
+                onClose={this.props.onClose}
+            >
                 {this._renderMenuHeader()}
-
                 <Divider />
-
-                <AppBarActionMenuItem label="Profile" 
-                                      icon={AccountCircleIcon} 
-                                      to="/user/profile"
+                <AppBarActionMenuItem
+                    label="Profile"
+                    icon={AccountCircleIcon}
+                    to="/user/profile"
                 />
-                <AppBarActionMenuItem label="Settings" 
-                                      icon={SettingsIcon} 
-                                      to="/user/settings"
+                <AppBarActionMenuItem
+                    label="Settings"
+                    icon={SettingsIcon}
+                    to="/user/settings"
                 />
-                <AppBarActionMenuItem label="Master Accounts" 
-                                      icon={SupervisedUserCircleIcon} 
-                                      to="/user/master-accounts"
+                <AppBarActionMenuItem
+                    label="Master Accounts"
+                    icon={SupervisedUserCircleIcon}
+                    to="/user/master-accounts"
                 />
-                <AppBarActionMenuItem label="Log Out" 
-                                      icon={ExitToAppIcon} 
-                                      onClick={this._logout}
+                <AppBarActionMenuItem
+                    label="Log Out"
+                    icon={ExitToAppIcon}
+                    onClick={this._logout}
                 />
-
                 <Divider />
-
-                <AppBarActionMenuItem label={`Appearance: ${isLightMode ? 'Light' : 'Dark'}`}
-                                      icon={isLightMode ? WbSunnyIcon : NightsStayIcon} 
-                                      onClick={this._toggleThemeMode}
+                <AppBarActionMenuItem
+                    label={`Appearance: ${isLightMode ? 'Light' : 'Dark'}`}
+                    icon={isLightMode ? WbSunnyIcon : NightsStayIcon}
+                    onClick={this._toggleThemeMode}
                 />
-                <AppBarActionMenuItem label="About" 
-                                      icon={InfoOutlinedIcon} 
+                <AppBarActionMenuItem
+                    label="About"
+                    icon={InfoOutlinedIcon}
                 />
-
             </AppBarActionMenu>
         );
     }

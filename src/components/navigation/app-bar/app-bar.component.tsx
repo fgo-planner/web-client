@@ -8,6 +8,7 @@ import { AuthService } from '../../../services/authentication/auth.service';
 import { UserService } from '../../../services/data/user/user.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { Nullable, User, UserInfo, WithStylesProps } from '../../../types';
+import { StyleUtils } from '../../../utils/style.utils';
 import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';
 import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
 
@@ -22,10 +23,11 @@ type State = {
 const style = (theme: Theme) => ({
     root: {
         height: theme.spacing(ThemeConstants.AppBarHeightScale),
-        transition: 'box-shadow 200ms 50ms linear',
-        '&.no-elevation' : {
-            boxShadow: '0px 1px 0px rgba(0,0,0,0.12)' // Simulates 1px solid border
-        }
+        transition: 'box-shadow 200ms 50ms linear'
+    },
+    noElevation: {
+        // Simulates 1px solid border
+        boxShadow: `0px 1px 0px ${theme.palette.divider}`
     },
     contents: {
         display: 'flex',
@@ -62,6 +64,7 @@ export const AppBar = withStyles(style, styleOptions)(class extends PureComponen
 
     constructor(props: Props) {
         super(props);
+        
         this.state = {
             currentUser: null
         };
@@ -71,21 +74,24 @@ export const AppBar = withStyles(style, styleOptions)(class extends PureComponen
         this._onCurrentUserChangeSubscription = this._authService.onCurrentUserChange
             .subscribe(this._handleCurrentUserChange.bind(this));
     }
-    
+
     componentWillUnmount(): void {
         this._onCurrentUserChangeSubscription.unsubscribe();
     }
 
     render(): ReactNode {
-        const styleClasses = this.props.classes;
-        const currentUser = this.state.currentUser;
+        const { classes, appBarElevated } = this.props;
+        const { currentUser } = this.state;
+        const classNames = StyleUtils.appendClassNames(classes.root, !appBarElevated && classes.noElevation);
         return (
-            <Paper className={`${styleClasses.root} ${this.props.appBarElevated ? '' : 'no-elevation'}`}
-                   elevation={ThemeConstants.AppBarElevatedElevation}
-                   square={true}>
-                <div className={styleClasses.contents}>
+            <Paper
+                className={classNames}
+                elevation={ThemeConstants.AppBarElevatedElevation}
+                square={true}
+            >
+                <div className={classes.contents}>
                     {/* TODO Add logo */}
-                    <Link className={styleClasses.title} to="/">
+                    <Link className={classes.title} to="/">
                         FGO Servant Planner
                     </Link>
                     {currentUser ? <AppBarAuthenticatedUser currentUser={currentUser} /> : <AppBarGuestUser />}
@@ -104,5 +110,5 @@ export const AppBar = withStyles(style, styleOptions)(class extends PureComponen
             this.setState({ currentUser: null });
         }
     }
-    
+
 });

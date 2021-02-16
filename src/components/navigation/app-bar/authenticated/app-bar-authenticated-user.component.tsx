@@ -99,23 +99,27 @@ export const AppBarAuthenticatedUser = withRouter(withStyles(style, styleOptions
                     {this._renderMasterAccountElements()}
                     <div className="flex-fill" />
                     <AppBarLinks>
-                        <AppBarLink label="Resources"
-                                    onClick={this._handleResourcesLinkClick}
-                                    onMouseOver={this._handleResourcesLinkMouseOver}
-                                    onMouseOut={this._handleResourcesLinkMouseOut}
+                        <AppBarLink
+                            label="Resources"
+                            onClick={this._handleResourcesLinkClick}
+                            onMouseOver={this._handleResourcesLinkMouseOver}
+                            onMouseOut={this._handleResourcesLinkMouseOut}
                         />
                     </AppBarLinks>
-                    <Avatar className={classes.avatar}
-                            src={this.AvatarImageUrl}
-                            onClick={this._handleAvatarClick}
+                    <Avatar
+                        className={classes.avatar}
+                        src={this.AvatarImageUrl}
+                        onClick={this._handleAvatarClick}
                     />
                 </div>
-                <AppBarResourcesMenu open={resourcesMenu.open} 
-                                     anchorEl={resourcesMenu.anchorEl} 
+                <AppBarResourcesMenu
+                    open={resourcesMenu.open}
+                    anchorEl={resourcesMenu.anchorEl}
                 />
-                <AppBarUserProfileMenu currentUser={currentUser}
-                                       anchorEl={profileMenu.anchorEl}
-                                       onClose={this._handleProfileMenuClose}
+                <AppBarUserProfileMenu
+                    currentUser={currentUser}
+                    anchorEl={profileMenu.anchorEl}
+                    onClose={this._handleProfileMenuClose}
                 />
             </Fragment>
         );

@@ -1,24 +1,16 @@
-import { ReactNode } from 'react';
-import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
-import { RouteComponent } from '../../../components/base/route-component';
+import React from 'react';
+import { useRouteMatch } from 'react-router-dom';
 import { GameItemInfo } from '../components/game/item/game-item-info.component';
 import { GameItemNotFound } from '../components/game/item/game-item-not-found.component';
 
-type Props = ReactRouteComponentProps<{ id: string }>;
-
-export const GameItemRoute = withRouter(class extends RouteComponent<Props> {
-
-    render(): ReactNode {
-        const { match } = this.props;
-        const itemId = Number(match.params['id']);
-        if (!itemId && itemId !== 0) {
-            return <GameItemNotFound itemId={match.params['id']} />;
-        }
-        return (
-            <div>
-                <GameItemInfo itemId={itemId} />
-            </div>
-        );
+const GameItem = React.memo(() => {
+    const match = useRouteMatch<{ id: string }>();
+    const { id } = match.params;
+    const itemId = Number(id);
+    if (!itemId && itemId !== 0) {
+        return <GameItemNotFound itemId={match.params['id']} />;
     }
-
+    return <GameItemInfo itemId={itemId} />;
 });
+
+export const GameItemRoute = React.memo(() => <GameItem />);

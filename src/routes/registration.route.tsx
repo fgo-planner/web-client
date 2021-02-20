@@ -1,11 +1,9 @@
 import { Button, Checkbox, fade, FormControlLabel, FormGroup, StyleRules, TextField, Theme, Tooltip, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Formik, FormikConfig, FormikHelpers, FormikProps } from 'formik';
-import { ChangeEvent, Fragment, ReactNode } from 'react';
+import React, { ChangeEvent, Fragment, PureComponent, ReactNode } from 'react';
 import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
-import { Container as Injectables } from 'typedi';
 import * as Yup from 'yup';
-import { RouteComponent } from '../components/base/route-component';
 import { InputFieldContainer } from '../components/input/input-field-container.component';
 import { PageTitle } from '../components/text/page-title.component';
 import { UserService } from '../services/data/user/user.service';
@@ -128,7 +126,7 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'Registration'
 };
 
-const Registration = withRouter(withStyles(style, styleOptions)(class extends RouteComponent<Props, State> {
+const Registration = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     private readonly _formikConfig: FormikConfig<FormData> = {
         initialValues: {
@@ -142,8 +140,6 @@ const Registration = withRouter(withStyles(style, styleOptions)(class extends Ro
         validationSchema: ValidationSchema,
         validateOnBlur: true
     };
-
-    private _userService = Injectables.get(UserService);
 
     constructor(props: Props) {
         super(props);
@@ -394,7 +390,7 @@ const Registration = withRouter(withStyles(style, styleOptions)(class extends Ro
         });
         try {
             const { confirmPassword, ...user } = formData;
-            await this._userService.register(user as any);
+            await UserService.register(user as any);
 
             // Wait 5 seconds before redirecting to login page
             const redirectTimeout = setTimeout(() => {
@@ -415,10 +411,4 @@ const Registration = withRouter(withStyles(style, styleOptions)(class extends Ro
 
 }));
 
-export class RegistrationRoute extends RouteComponent {
-
-    render(): ReactNode {
-        return <Registration />;
-    }
-
-}
+export const RegistrationRoute = React.memo(() => <Registration />);

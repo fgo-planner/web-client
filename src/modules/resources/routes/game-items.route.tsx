@@ -1,18 +1,14 @@
-import { Fragment, ReactNode } from 'react';
+import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Container as Injectables } from 'typedi';
-import { RouteComponent } from '../../../components/base/route-component';
 import { GameItemService } from '../../../services/data/game/game-item.service';
 import { GameItem } from '../../../types';
 
-export class GameItemsRoute extends RouteComponent {
-
-    private _gameItemService = Injectables.get(GameItemService);
+class GameItems extends PureComponent {
 
     private _gameItems: ReadonlyArray<Readonly<GameItem>> = [];
 
     componentDidMount(): void {
-        this._gameItemService.getItems().then(gameItems => {
+        GameItemService.getItems().then(gameItems => {
             this._gameItems = gameItems;
             this.forceUpdate();
         });
@@ -41,3 +37,5 @@ export class GameItemsRoute extends RouteComponent {
     }
 
 }
+
+export const GameItemsRoute = React.memo(() => <GameItems />);

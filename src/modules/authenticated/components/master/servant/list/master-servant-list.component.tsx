@@ -3,7 +3,6 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { PersonAddOutlined } from '@material-ui/icons';
 import React, { MouseEventHandler, PureComponent, ReactNode } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
-import { Container as Injectables } from 'typedi';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
 import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { GameServantService } from '../../../../../../services/data/game/game-servant.service';
@@ -55,8 +54,6 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 export const MasterServantList = withStyles(style, styleOptions)(class extends PureComponent<Props> {
 
-    private _gameServantService = Injectables.get(GameServantService);
-
     private _gameServantMap!: ReadonlyRecord<number, Readonly<GameServant>>;
 
     constructor(props: Props) {
@@ -68,7 +65,7 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
     }
 
     componentDidMount(): void {
-        this._gameServantService.getServantsMap().then(gameServantMap => {
+        GameServantService.getServantsMap().then(gameServantMap => {
             this._gameServantMap = gameServantMap;
             this.forceUpdate();
         });

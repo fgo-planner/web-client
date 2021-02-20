@@ -3,14 +3,17 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { MouseEventHandler, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { RouteLinkDefinition, WithStylesProps } from '../../../types';
+import { WithStylesProps } from '../../../types';
 import { StyleUtils } from '../../../utils/style.utils';
 
 type Props = {
     active?: boolean;
+    label: string;
+    route?: string;
+    onClick?: MouseEventHandler;
     onMouseOver?: MouseEventHandler;
     onMouseOut?: MouseEventHandler;
-} & RouteLinkDefinition & WithStylesProps;
+} & WithStylesProps;
 
 const style = (theme: Theme) => ({
     root: {

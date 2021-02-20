@@ -4,14 +4,13 @@ import lodash from 'lodash';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
-import { Container as Injectables } from 'typedi';
-import { RouteComponent } from '../../../components/base/route-component';
 import { PromptDialog } from '../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../components/fab/fab-container.component';
 import { GameServantService } from '../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
-import { GameServant, MasterAccount, MasterServant, ModalOnCloseReason, Nullable, ReadonlyRecord } from '../../../types';
+import { GameServant, MasterAccount, MasterServant, ModalOnCloseReason, Nullable, ReadonlyRecord, RouteComponentProps } from '../../../types';
+import { RouteComponent } from '../../../types/internal/route/route-component.type';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MasterServantEditDialog } from '../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantList } from '../components/master/servant/list/master-servant-list.component';
@@ -40,12 +39,6 @@ type State = {
 };
 
 const MasterServants = class extends PureComponent<Props, State> {
-
-    private _loadingIndicatorService = Injectables.get(LoadingIndicatorOverlayService);
-
-    private _gameServantService = Injectables.get(GameServantService);
-
-    private _masterAccountService = Injectables.get(MasterAccountService);
 
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
@@ -76,12 +69,12 @@ const MasterServants = class extends PureComponent<Props, State> {
     }
 
     componentDidMount(): void {
-        this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
+        this._onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
-        this._onCurrentMasterAccountUpdatedSubscription = this._masterAccountService.onCurrentMasterAccountUpdated
+        this._onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
             .subscribe(this._handleCurrentMasterAccountUpdated.bind(this));
 
-        this._gameServantService.getServantsMap().then(gameServantMap => {
+        GameServantService.getServantsMap().then(gameServantMap => {
             this._gameServantMap = gameServantMap;
             this.forceUpdate();
         });
@@ -326,12 +319,12 @@ const MasterServants = class extends PureComponent<Props, State> {
             _id: masterAccount?._id,
             servants: masterServants
         };
-        this._masterAccountService.updateAccount(update)
+        MasterAccountService.updateAccount(update)
             .catch(this._handleUpdateError.bind(this));
 
         let { loadingIndicatorId } = this.state;
         if (!loadingIndicatorId) {
-            loadingIndicatorId = this._loadingIndicatorService.invoke();
+            loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
         }
         this.setState({
             editServant: undefined,
@@ -391,7 +384,7 @@ const MasterServants = class extends PureComponent<Props, State> {
     private _resetLoadingIndicator(): void {
         const { loadingIndicatorId } = this.state;
         if (loadingIndicatorId) {
-            this._loadingIndicatorService.waive(loadingIndicatorId);
+            LoadingIndicatorOverlayService.waive(loadingIndicatorId);
         }
     }
 
@@ -404,10 +397,4 @@ const MasterServants = class extends PureComponent<Props, State> {
 
 };
 
-export class MasterServantsRoute extends RouteComponent {
-
-    render(): ReactNode {
-        return <MasterServants />;
-    }
-
-}
+export const MasterServantsRoute = React.memo(() => <MasterServants />);

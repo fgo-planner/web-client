@@ -1,8 +1,7 @@
 import React, { ReactNode, Suspense } from 'react';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { Subscription } from 'rxjs';
-import { Container as Injectables } from 'typedi';
-import { AuthService } from '../../services/authentication/auth.service';
+import { AuthenticationService } from '../../services/authentication/auth.service';
 import { Nullable, RouteDefinition, RouteDefinitions, UserInfo } from '../../types';
 import { LazyLoadFallback } from '../route-fallback/lazy-load-fallback.component';
 import { NotFound } from '../route-fallback/not-found.component';
@@ -14,12 +13,10 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
 
     protected abstract readonly ModuleRoutes: RouteDefinitions;
 
-    private _authService = Injectables.get(AuthService);
-
     private _onCurrentUserChangeSubscription!: Subscription;
 
     componentDidMount(): void {
-        this._onCurrentUserChangeSubscription = this._authService.onCurrentUserChange
+        this._onCurrentUserChangeSubscription = AuthenticationService.onCurrentUserChange
             .subscribe(this._handleCurrentUserChange.bind(this));
     }
     
@@ -135,7 +132,7 @@ export abstract class ModuleComponent<P = {}, S = {}> extends RouteComponent<P, 
      * instead.
      */
     private _renderRouteComponent(route: RouteDefinition, routeProps: RouteComponentProps, path?: string): ReactNode {
-        if (route.authenticationRequired && !this._authService.isLoggedIn) {
+        if (route.authenticationRequired && !AuthenticationService.isLoggedIn) {
             /*
              * Redirect user if they are not authenticated but are trying to access a route
              * that requires authentication.

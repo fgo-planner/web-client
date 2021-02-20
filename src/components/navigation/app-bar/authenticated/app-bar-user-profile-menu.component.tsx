@@ -2,8 +2,7 @@ import { Avatar, Divider, StyleRules, Theme, withStyles } from '@material-ui/cor
 import { AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, InfoOutlined as InfoOutlinedIcon, NightsStay as NightsStayIcon, Settings as SettingsIcon, SupervisedUserCircleOutlined as SupervisedUserCircleIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
 import React, { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { Container as Injectables } from 'typedi';
-import { AuthService } from '../../../../services/authentication/auth.service';
+import { AuthenticationService } from '../../../../services/authentication/auth.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ModalOnCloseHandler, ThemeMode, User, WithStylesProps } from '../../../../types';
@@ -52,23 +51,19 @@ const style = (theme: Theme) => ({
 
 export const AppBarUserProfileMenu = withStyles(style)(class extends PureComponent<Props, State> {
 
-    private _authService = Injectables.get(AuthService);
-
-    private _themeService = Injectables.get(ThemeService);
-
     private _onThemeChangeSubscription!: Subscription;
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            themeMode: this._themeService.themeMode
+            themeMode: ThemeService.themeMode
         };
         this._logout = this._logout.bind(this);
         this._toggleThemeMode = this._toggleThemeMode.bind(this);
     }
 
     componentDidMount(): void {
-        this._onThemeChangeSubscription = this._themeService.onThemeChange
+        this._onThemeChangeSubscription = ThemeService.onThemeChange
             .subscribe(this._handleThemeChange.bind(this));
     }
 
@@ -138,15 +133,15 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
     }
 
     private _logout(): void {
-        this._authService.logout();
+        AuthenticationService.logout();
     }
 
     private _toggleThemeMode(): void {
-        this._themeService.toggleThemeMode();
+        ThemeService.toggleThemeMode();
     }
 
     private _handleThemeChange(theme: Theme): void {
-        const themeMode = this._themeService.themeMode;
+        const themeMode = ThemeService.themeMode;
         this.setState({ themeMode });
     }
 

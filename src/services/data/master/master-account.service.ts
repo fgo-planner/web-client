@@ -1,64 +1,61 @@
 import { BehaviorSubject } from 'rxjs';
-import { Container as Injectables, Service } from 'typedi';
 import { MasterAccount, Nullable, ReadonlyPartialArray, UserInfo } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
-import { AuthService } from '../../authentication/auth.service';
+import { AuthenticationService } from '../../authentication/auth.service';
 
-@Service()
 export class MasterAccountService {
     
-    private readonly BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user/master-account`;
+    private static readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user/master-account`;
  
     /**
      * Key used for storing and retrieving the current master account ID from
      * session storage.
      */
-    private readonly CurrentAccountIdKey = 'current-master-account-id';
+    private static readonly _CurrentAccountIdKey = 'current-master-account-id';
 
-    private _authService = Injectables.get(AuthService);
-
-    private _currentMasterAccount: Nullable<MasterAccount>;
+    private static _currentMasterAccount: Nullable<MasterAccount>;
 
     /**
      * List of master accounts for the currently logged in user. The elements in
      * the list do not contain the entire master account data; only the _id, name,
      * and friendId fields are present.
      */
-    private _masterAccountList: ReadonlyPartialArray<MasterAccount> = [];
+    private static _masterAccountList: ReadonlyPartialArray<MasterAccount> = [];
 
-    readonly onCurrentMasterAccountChange!: BehaviorSubject<Nullable<MasterAccount>>;
+    static readonly onCurrentMasterAccountChange = new BehaviorSubject<Nullable<MasterAccount>>(null);
 
-    readonly onCurrentMasterAccountUpdated!: BehaviorSubject<Nullable<MasterAccount>>;
+    static readonly onCurrentMasterAccountUpdated = new BehaviorSubject<Nullable<MasterAccount>>(null);
 
-    readonly onMasterAccountListUpdated!: BehaviorSubject<ReadonlyPartialArray<MasterAccount>>;
+    static readonly onMasterAccountListUpdated = new BehaviorSubject<ReadonlyPartialArray<MasterAccount>>([]);
 
-    constructor() {
-        this.onCurrentMasterAccountChange = new BehaviorSubject<Nullable<MasterAccount>>(null);
-        this.onCurrentMasterAccountUpdated = new BehaviorSubject<Nullable<MasterAccount>>(null);
-        this.onMasterAccountListUpdated = new BehaviorSubject<ReadonlyPartialArray<MasterAccount>>([]);
-
-        this._authService.onCurrentUserChange.subscribe(this._handleCurrentUserChange.bind(this));
-        // TODO Unsubscribe?
+    /**
+     * Initialization method, simulates a static constructor.
+     */
+    private static _initialize(): void {
+        /*
+         * Static subscription the the subject, unsubscribe should not be needed.
+         */
+        AuthenticationService.onCurrentUserChange.subscribe(this._handleCurrentUserChange.bind(this));
     }
 
-    async addAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
-        const account = await Http.put<MasterAccount>(`${this.BaseUrl}`, masterAccount);
+    static async addAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
+        const account = await Http.put<MasterAccount>(`${this._BaseUrl}`, masterAccount);
         await this._updateMasterAccountList(); // Reload account list
         this._autoSelectAccount();
         return account;
     }
 
-    async getAccountsForCurrentUser(): Promise<Partial<MasterAccount>[]> {
+    static async getAccountsForCurrentUser(): Promise<Partial<MasterAccount>[]> {
         await this._updateMasterAccountList();
         return this._masterAccountList?.map(account => { return { ...account }; });
     }
 
-    async getAccount(id: string): Promise<MasterAccount> {
-        return Http.get<MasterAccount>(`${this.BaseUrl}/${id}`);
+    static async getAccount(id: string): Promise<MasterAccount> {
+        return Http.get<MasterAccount>(`${this._BaseUrl}/${id}`);
     }
 
-    async updateAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
-        const updated = await Http.post<MasterAccount>(`${this.BaseUrl}`, masterAccount);
+    static async updateAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
+        const updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount);
         this.onCurrentMasterAccountUpdated.next(this._currentMasterAccount = updated);
         return updated;
     }
@@ -67,8 +64,7 @@ export class MasterAccountService {
      * Sets the currently selected account. If the provided account ID is empty,
      * then the selected account will be set to null.
      */
-    async selectAccount(accountId: Nullable<string>): Promise<Nullable<MasterAccount>> {
-        console.log("selectAccount", accountId)
+    static async selectAccount(accountId: Nullable<string>): Promise<Nullable<MasterAccount>> {
         if (!accountId) {
             this.onCurrentMasterAccountChange.next(this._currentMasterAccount = null);
             this._writeCurrentAccountToSessionStorage();
@@ -95,7 +91,7 @@ export class MasterAccountService {
      * If the account list is not empty, then the first account in the list is
      * selected. Otherwise, the currently selected account will be set to null.
      */
-    private _autoSelectAccount(): void {
+    private static _autoSelectAccount(): void {
         /*
          * If there are no accounts present, then set the current account to null.
          */
@@ -117,7 +113,7 @@ export class MasterAccountService {
          * If there was an account ID session storage, and it is present in the account
          * list, then select it.
          */
-        currentMasterAccountId = sessionStorage.getItem(this.CurrentAccountIdKey);
+        currentMasterAccountId = sessionStorage.getItem(this._CurrentAccountIdKey);
         if (currentMasterAccountId && this._masterAccountListContainsId(currentMasterAccountId)) {
             this.selectAccount(currentMasterAccountId);
             return;
@@ -134,7 +130,7 @@ export class MasterAccountService {
     /**
      * Helper method to check if an account ID exists in the list of accounts.
      */
-    private _masterAccountListContainsId(accountId: string): boolean {
+    private static _masterAccountListContainsId(accountId: string): boolean {
         return !!this._masterAccountList.find(account => account._id === accountId);
     }
 
@@ -142,12 +138,12 @@ export class MasterAccountService {
      * Helper method for retrieving the account list for the current user and
      * pushing it to the subject.
      */
-    private async _updateMasterAccountList(): Promise<void> {
-        this._masterAccountList = await Http.get<Partial<MasterAccount>[]>(`${this.BaseUrl}/current-user`);
+    private static async _updateMasterAccountList(): Promise<void> {
+        this._masterAccountList = await Http.get<Partial<MasterAccount>[]>(`${this._BaseUrl}/current-user`);
         this.onMasterAccountListUpdated.next(this._masterAccountList);
     }
 
-    private async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
+    private static async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
         if (!userInfo) {
             this.onCurrentMasterAccountChange.next(this._currentMasterAccount = null);
             this.onMasterAccountListUpdated.next(this._masterAccountList = []);
@@ -157,13 +153,16 @@ export class MasterAccountService {
         this._autoSelectAccount();
     }
 
-    private _writeCurrentAccountToSessionStorage(): void {
+    private static _writeCurrentAccountToSessionStorage(): void {
         const accountId = this._currentMasterAccount?._id;
         if (!accountId) {
-            sessionStorage.removeItem(this.CurrentAccountIdKey);
+            sessionStorage.removeItem(this._CurrentAccountIdKey);
         } else {
-            sessionStorage.setItem(this.CurrentAccountIdKey, accountId);
+            sessionStorage.setItem(this._CurrentAccountIdKey, accountId);
         }
     }
 
 }
+
+// Call the static initialization method.
+(MasterAccountService as any)._initialize();

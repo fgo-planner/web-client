@@ -2,7 +2,6 @@ import { MenuItem, StyleRules, TextField, Theme, withStyles } from '@material-ui
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { Container as Injectables } from 'typedi';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { MasterAccount, Nullable, ReadonlyPartialArray, WithStylesProps } from '../../../../types';
 
@@ -30,8 +29,6 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
-    private _masterAccountService = Injectables.get(MasterAccountService);
-
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
     constructor(props: Props) {
@@ -45,7 +42,7 @@ export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class e
     }
 
     componentDidMount(): void {
-        this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
+        this._onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
     }
 
@@ -95,7 +92,7 @@ export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class e
         this.setState({
             currentMasterAccountId: accountId
         });
-        this._masterAccountService.selectAccount(accountId);
+        MasterAccountService.selectAccount(accountId);
     }
 
     private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {

@@ -1,9 +1,7 @@
 import { Fab, Tooltip } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
-import { PureComponent, ReactNode } from 'react';
+import React, { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { Container as Injectables } from 'typedi';
-import { RouteComponent } from '../../../components/base/route-component';
 import { FabContainer } from '../../../components/fab/fab-container.component';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
@@ -26,10 +24,6 @@ type State = {
 
 class MasterItems extends PureComponent<Props, State> {
     
-    private _loadingIndicatorService = Injectables.get(LoadingIndicatorOverlayService);
-    
-    private _masterAccountService = Injectables.get(MasterAccountService);
-
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
     private _onCurrentMasterAccountUpdatedSubscription!: Subscription;
@@ -47,9 +41,9 @@ class MasterItems extends PureComponent<Props, State> {
     }
 
     componentDidMount(): void {
-        this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
+        this._onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
-        this._onCurrentMasterAccountUpdatedSubscription = this._masterAccountService.onCurrentMasterAccountUpdated
+        this._onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
             .subscribe(this._handleCurrentMasterAccountUpdated.bind(this));
     }
 
@@ -122,12 +116,12 @@ class MasterItems extends PureComponent<Props, State> {
             _id: masterAccount?._id,
             items: masterItems
         };
-        this._masterAccountService.updateAccount(update)
+        MasterAccountService.updateAccount(update)
             .catch(this._handleUpdateError.bind(this));
 
         let { loadingIndicatorId } = this.state;
         if (!loadingIndicatorId) {
-            loadingIndicatorId = this._loadingIndicatorService.invoke();
+            loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
         }
         this.setState({
             loadingIndicatorId
@@ -181,7 +175,7 @@ class MasterItems extends PureComponent<Props, State> {
     private _resetLoadingIndicator(): void {
         const { loadingIndicatorId } = this.state;
         if (loadingIndicatorId) {
-            this._loadingIndicatorService.waive(loadingIndicatorId);
+            LoadingIndicatorOverlayService.waive(loadingIndicatorId);
         }
     }
 
@@ -198,10 +192,4 @@ class MasterItems extends PureComponent<Props, State> {
 
 }
 
-export class MasterItemsRoute extends RouteComponent {
-
-    render(): ReactNode {
-        return <MasterItems />;
-    }
-
-}
+export const MasterItemsRoute = React.memo(() => <MasterItems />);

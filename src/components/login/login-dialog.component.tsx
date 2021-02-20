@@ -2,8 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, 
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Container as Injectables } from 'typedi';
-import { AuthService } from '../../services/authentication/auth.service';
+import { AuthenticationService } from '../../services/authentication/auth.service';
 import { DialogComponentProps, UserCredentials, WithStylesProps } from '../../types';
 import { DialogComponent } from '../base/dialog-component';
 import { DialogCloseButton } from '../dialog/dialog-close-button.component';
@@ -48,8 +47,6 @@ const styleOptions: WithStylesOptions<Theme> = {
 };
 
 export const LoginDialog = withWidth()(withStyles(style, styleOptions)(class extends DialogComponent<Props, State> {
-
-    private _authService = Injectables.get(AuthService);
 
     constructor(props: Props) {
         super(props);
@@ -134,7 +131,7 @@ export const LoginDialog = withWidth()(withStyles(style, styleOptions)(class ext
             errorMessage: null
         });
         try {
-            await this._authService.login(values);
+            await AuthenticationService.login(values);
 
             // Only update the state if the component is still mounted.
             if (this._isMounted) {

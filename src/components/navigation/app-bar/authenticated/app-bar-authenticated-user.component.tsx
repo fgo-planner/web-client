@@ -3,7 +3,6 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
-import { Container as Injectables } from 'typedi';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { MasterAccount, ModalOnCloseReason, ReadonlyPartialArray, User, WithStylesProps } from '../../../../types';
@@ -56,8 +55,6 @@ export const AppBarAuthenticatedUser = withRouter(withStyles(style, styleOptions
     // Temporary
     private readonly AvatarImageUrl = 'https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png';
 
-    private _masterAccountService = Injectables.get(MasterAccountService);
-
     private _onMasterAccountListUpdatedSubscription!: Subscription;
 
     constructor(props: Props) {
@@ -82,7 +79,7 @@ export const AppBarAuthenticatedUser = withRouter(withStyles(style, styleOptions
     }
 
     componentDidMount(): void {
-        this._onMasterAccountListUpdatedSubscription = this._masterAccountService.onMasterAccountListUpdated
+        this._onMasterAccountListUpdatedSubscription = MasterAccountService.onMasterAccountListUpdated
             .subscribe(this._handleMasterAccountListUpdated.bind(this));
     }
 

@@ -1,9 +1,8 @@
-import 'reflect-metadata';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { RootModule as Root } from './root.module';
 import reportWebVitals from './reportWebVitals';
+import { RootModule as Root } from './root.module';
 import './styles/styles.scss';
 
 const element = (

@@ -1,14 +1,9 @@
-import { ReactNode } from 'react';
-import { RouteComponent } from '../components/base/route-component';
+import React from 'react';
 
-export class ErrorRoute extends RouteComponent {
-
-    render(): ReactNode {
-        return (
-            <div>
-                ERROR
-            </div>
-        );
-    }
-
-}
+export const ErrorRoute = React.memo(() => {
+    return (
+        <div>
+            ERROR
+        </div>
+    );
+});

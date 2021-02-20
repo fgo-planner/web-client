@@ -1,7 +1,6 @@
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
-import { Container as Injectables } from 'typedi';
 import { LoadingIndicator } from '../../../../../components/loading-indicator.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
 import { GameServantService } from '../../../../../services/data/game/game-servant.service';
@@ -44,10 +43,6 @@ const styleOptions: WithStylesOptions<Theme> = {
 };
 
 export const GameItemInfo = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
-
-    private _gameItemService = Injectables.get(GameItemService);
-
-    private _gameServantService = Injectables.get(GameServantService);
 
     constructor(props: Props) {
         super(props);
@@ -114,7 +109,7 @@ export const GameItemInfo = withStyles(style, styleOptions)(class extends PureCo
         this.setState({ 
             itemLoading: true
         });
-        this._gameItemService.getItem(itemId).then(async item => {
+        GameItemService.getItem(itemId).then(async item => {
             const itemUsage = await this._computeItemUsage(item);
             this.setState({
                 itemLoading: false,
@@ -136,7 +131,7 @@ export const GameItemInfo = withStyles(style, styleOptions)(class extends PureCo
             skills: 0,
             costumes: 0
         };
-        const servants = await this._gameServantService.getServants();
+        const servants = await GameServantService.getServants();
         for (const servant of servants) {
             const { skillMaterials, ascensionMaterials } = servant;
 

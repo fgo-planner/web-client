@@ -1,8 +1,17 @@
-import { HttpOptions, Nullable } from '../types';
-import { HttpResponseType } from '../types/internal/http-response-type.type';
+import { Nullable } from '../types';
 import { JwtUtils } from './jwt.utils';
 
 type RequestBody = string | Record<string, unknown>;
+
+// TODO Export this if needed
+type HttpOptions = {
+    params?: Record<string, Nullable<string | number | boolean>>;
+    responseType?: HttpResponseType;
+};
+
+// TODO Export this if needed
+// TODO add more types
+type HttpResponseType = 'json' | 'text';
 
 export class HttpUtils {
 

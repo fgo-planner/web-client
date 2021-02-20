@@ -3,8 +3,7 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
-import { Container as Injectables } from 'typedi';
-import { AuthService } from '../../../services/authentication/auth.service';
+import { AuthenticationService } from '../../../services/authentication/auth.service';
 import { UserService } from '../../../services/data/user/user.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { Nullable, User, UserInfo, WithStylesProps } from '../../../types';
@@ -56,10 +55,6 @@ const styleOptions: WithStylesOptions<Theme> = {
  */
 export const AppBar = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
-    private _authService = Injectables.get(AuthService);
-
-    private _userService = Injectables.get(UserService);
-
     private _onCurrentUserChangeSubscription!: Subscription;
 
     constructor(props: Props) {
@@ -71,7 +66,7 @@ export const AppBar = withStyles(style, styleOptions)(class extends PureComponen
     }
 
     componentDidMount(): void {
-        this._onCurrentUserChangeSubscription = this._authService.onCurrentUserChange
+        this._onCurrentUserChangeSubscription = AuthenticationService.onCurrentUserChange
             .subscribe(this._handleCurrentUserChange.bind(this));
     }
 
@@ -104,7 +99,7 @@ export const AppBar = withStyles(style, styleOptions)(class extends PureComponen
         console.log(userInfo);
         if (userInfo) {
             // TODO Handle error
-            const currentUser = await this._userService.getCurrentUser();
+            const currentUser = await UserService.getCurrentUser();
             this.setState({ currentUser });
         } else {
             this.setState({ currentUser: null });

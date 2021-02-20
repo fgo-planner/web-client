@@ -1,25 +1,23 @@
-import { Service } from 'typedi';
 import { BehaviorSubject } from 'rxjs';
 
-@Service()
 export class LoadingIndicatorOverlayService {
 
-    private readonly _idSet = new Set<string>();
+    private static readonly _InvocationIdSet = new Set<string>();
 
-    readonly onDisplayStatusChange = new BehaviorSubject<boolean>(false);
+    static readonly onDisplayStatusChange = new BehaviorSubject<boolean>(false);
 
-    invoke(): string {
+    static invoke(): string {
         const id = String(new Date().getTime());
-        this._idSet.add(id);
+        this._InvocationIdSet.add(id);
         if (!this.onDisplayStatusChange.value) {
             this.onDisplayStatusChange.next(true);
         }
         return id;
     }
 
-    waive(id: string): void {
-        this._idSet.delete(id);
-        if (!this._idSet.size) {
+    static waive(id: string): void {
+        this._InvocationIdSet.delete(id);
+        if (!this._InvocationIdSet.size) {
             this.onDisplayStatusChange.next(false);
         }
     }

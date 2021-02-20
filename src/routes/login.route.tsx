@@ -1,12 +1,10 @@
 import { Button, fade, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { ReactNode } from 'react';
+import React, { PureComponent, ReactNode } from 'react';
 import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
-import { Container as Injectables } from 'typedi';
-import { RouteComponent } from '../components/base/route-component';
 import { LoginForm } from '../components/login/login-form.component';
 import { PageTitle } from '../components/text/page-title.component';
-import { AuthService } from '../services/authentication/auth.service';
+import { AuthenticationService } from '../services/authentication/auth.service';
 import { UserCredentials, WithStylesProps } from '../types';
 
 type Props = ReactRouteComponentProps & WithStylesProps;
@@ -66,9 +64,7 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'Login'
 };
 
-const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComponent<Props, State> {
-
-    private _authService = Injectables.get(AuthService);
+const Login = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
@@ -139,7 +135,7 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComp
             errorMessage: null
         });
         try {
-            await this._authService.login(values);
+            await AuthenticationService.login(values);
             this.props.history.push('/user');
         } catch (e) {
             this.setState({
@@ -151,10 +147,4 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends RouteComp
 
 }));
 
-export class LoginRoute extends RouteComponent {
-
-    render(): ReactNode {
-        return <Login />;
-    }
-
-};
+export const LoginRoute = React.memo(() => <Login />);

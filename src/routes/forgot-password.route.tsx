@@ -1,11 +1,6 @@
-import { ReactNode } from 'react';
-import { RouteComponent } from '../components/base/route-component';
+import React from 'react';
 import { PageTitle } from '../components/text/page-title.component';
 
-export class ForgotPasswordRoute extends RouteComponent {
-
-    render(): ReactNode {
-        return <PageTitle>Forgot Password</PageTitle>;
-    }
-    
-}
+export const ForgotPasswordRoute = React.memo(() => {
+    return <PageTitle>Forgot Password</PageTitle>;
+});

@@ -1,7 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, TextField, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, FormEvent, ReactNode } from 'react';
-import { Container as Injectables } from 'typedi';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { DialogComponentProps, WithStylesProps } from '../../../types';
 import { DialogComponent } from '../../base/dialog-component';
@@ -37,8 +36,6 @@ const styleOptions: WithStylesOptions<Theme> = {
 export const MasterAccountAddDialog = withWidth()(withStyles(style, styleOptions)(class extends DialogComponent<Props, State> {
     
     private readonly _formId = 'master-account-form';
-
-    private _masterAccountService = Injectables.get(MasterAccountService);
 
     private get _defaultFormValues(): Form {
         return {
@@ -142,7 +139,7 @@ export const MasterAccountAddDialog = withWidth()(withStyles(style, styleOptions
         });
         try {
             const { name, friendId } = this.state.formValues;
-            await this._masterAccountService.addAccount({ name, friendId });
+            await MasterAccountService.addAccount({ name, friendId });
 
             // Only update the state if the component is still mounted.
             if (this._isMounted) {

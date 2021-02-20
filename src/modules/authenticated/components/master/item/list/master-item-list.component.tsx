@@ -1,7 +1,6 @@
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { PureComponent, ReactNode } from 'react';
-import { Container as Injectables } from 'typedi';
 import { GameItemConstants } from '../../../../../../constants';
 import { GameItemService } from '../../../../../../services/data/game/game-item.service';
 import { GameItem, MasterItem, WithStylesProps } from '../../../../../../types';
@@ -72,8 +71,6 @@ export const MasterItemList = withStyles(style, styleOptions)(class extends Pure
         },
     ];
 
-    private _gameItemService = Injectables.get(GameItemService);
-
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -125,7 +122,7 @@ export const MasterItemList = withStyles(style, styleOptions)(class extends Pure
     private async _generateListViewData(): Promise<void> {
 
         try {
-            const itemsMap = await this._gameItemService.getItemsMap();
+            const itemsMap = await GameItemService.getItemsMap();
 
             /*
              * Convert the user account items into a map for faster lookup.

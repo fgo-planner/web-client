@@ -5,7 +5,6 @@ import React, { createRef, Fragment, PureComponent, ReactNode } from 'react';
 import { DropzoneRef } from 'react-dropzone';
 import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
-import { Container as Injectables } from 'typedi';
 import { RouteComponent } from '../../../components/base/route-component';
 import { AlertDialog } from '../../../components/dialog/alert-dialog.component';
 import { FabContainer } from '../../../components/fab/fab-container.component';
@@ -73,12 +72,6 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const MasterServantImport = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
-    private _loadingIndicatorService = Injectables.get(LoadingIndicatorOverlayService);
-
-    private _gameServantService = Injectables.get(GameServantService);
-
-    private _masterAccountService = Injectables.get(MasterAccountService);
-
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
     private _onCurrentMasterAccountUpdatedSubscription!: Subscription;
@@ -101,9 +94,9 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
     }
 
     componentDidMount(): void {
-        this._onCurrentMasterAccountChangeSubscription = this._masterAccountService.onCurrentMasterAccountChange
+        this._onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
-        this._onCurrentMasterAccountUpdatedSubscription = this._masterAccountService.onCurrentMasterAccountUpdated
+        this._onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
             .subscribe(this._handleCurrentMasterAccountUpdated.bind(this));
     }
 
@@ -123,7 +116,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
              * Allow the loading indicator to spin for half more second before hiding it.
              */
             setTimeout(() => {
-                this._loadingIndicatorService.waive(loadingIndicatorId);
+                LoadingIndicatorOverlayService.waive(loadingIndicatorId);
             }, 500);
         }
     }
@@ -268,7 +261,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
         }
 
         // Activate the loading indicator before parsing.
-        const loadingIndicatorId = this._loadingIndicatorService.invoke();
+        const loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
         this.setState({ loadingIndicatorId });
 
         let lastInstanceId = -1;
@@ -278,7 +271,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
 
         // Set timeout to allow the loading indicator to be rendered first.
         setTimeout(async () => {
-            const gameServants = await this._gameServantService.getServants();
+            const gameServants = await GameServantService.getServants();
             const parser = new FgoManagerMasterServantParser(importData, gameServants);
             const parsedData = parser.parse(lastInstanceId + 1);
             this.setState({
@@ -300,7 +293,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
             return;
         }
 
-        const loadingIndicatorId = this._loadingIndicatorService.invoke();
+        const loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
         this.setState({ loadingIndicatorId });
 
         // Combine existing and imported servants
@@ -310,7 +303,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
         ];
 
         try {
-            await this._masterAccountService.updateAccount({
+            await MasterAccountService.updateAccount({
                 _id: masterAccount._id,
                 servants
             });
@@ -320,7 +313,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
             this.setState({ importStatus: 'fail' });
         }
 
-        this._loadingIndicatorService.waive(loadingIndicatorId);
+        LoadingIndicatorOverlayService.waive(loadingIndicatorId);
     }
 
     private _handleSuccessDialogAction() {
@@ -346,10 +339,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
 
 }));
 
-export default class MasterServantImportRoute extends RouteComponent {
+// TODO Don't export this
+export const GameServantRoute = React.memo(() => <MasterServantImport />);
 
-    render(): ReactNode {
-        return <MasterServantImport />;
-    }
-
-}
+export default GameServantRoute;

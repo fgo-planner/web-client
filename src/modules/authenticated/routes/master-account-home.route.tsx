@@ -1,14 +1,9 @@
-import React, { Fragment, ReactNode } from 'react';
-import { RouteComponent } from '../../../components/base/route-component';
+import React, { Fragment } from 'react';
 
-export class MasterAccountHomeRoute extends RouteComponent {
-
-    render(): ReactNode {
-        return (
-            <Fragment>
-                Account HOME!
-            </Fragment>
-        )
-    }
-
-}
+export const MasterAccountHomeRoute = React.memo(() => {
+    return (
+        <Fragment>
+            Account HOME!
+        </Fragment>
+    );
+});

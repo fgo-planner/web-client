@@ -1,7 +1,6 @@
 import { createMuiTheme, Theme, ThemeProvider, Typography } from '@material-ui/core';
 import { Component, Fragment, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
-import { Container as Injectables } from 'typedi';
 import { ThemeService } from '../../services/user-interface/theme.service';
 import { ThemeBackground } from './theme-background.component';
 
@@ -19,8 +18,6 @@ type State = {
  */
 export class ThemeManager extends Component<Props, State> {
 
-    private _themeService = Injectables.get(ThemeService);
-
     private _onThemeChangeSubscription!: Subscription;
 
     constructor(props: Props) {
@@ -31,7 +28,7 @@ export class ThemeManager extends Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this._onThemeChangeSubscription = this._themeService.onThemeChange
+        this._onThemeChangeSubscription = ThemeService.onThemeChange
             .subscribe(this._handleThemeChange.bind(this));
     }
 

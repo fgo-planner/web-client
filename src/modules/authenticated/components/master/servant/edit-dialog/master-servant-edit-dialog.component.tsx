@@ -1,7 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, Select, StyleRules, TextField, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, FocusEvent, FormEvent, MouseEvent, ReactNode } from 'react';
-import { Container as Injectables } from 'typedi';
 import { DialogComponent } from '../../../../../../components/base/dialog-component';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { InputFieldContainer } from '../../../../../../components/input/input-field-container.component';
@@ -76,8 +75,6 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
 
     private readonly _formId = 'servant-form';
 
-    private _gameServantService = Injectables.get(GameServantService);
-
     private _gameServantList: ReadonlyArray<Readonly<GameServant>> = [];
 
     private _gameServantMap: ReadonlyRecord<number, Readonly<GameServant>> = {};
@@ -105,11 +102,11 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
     }
 
     componentDidMount(): void {
-        this._gameServantService.getServants().then(gameServantList => {
+        GameServantService.getServants().then(gameServantList => {
             this._gameServantList = gameServantList;
             this.forceUpdate();
         });
-        this._gameServantService.getServantsMap().then(gameServantMap => {
+        GameServantService.getServantsMap().then(gameServantMap => {
             this._gameServantMap = gameServantMap;
             this.forceUpdate();
         });

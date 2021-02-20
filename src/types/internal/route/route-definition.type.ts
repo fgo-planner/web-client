@@ -1,5 +1,6 @@
-import { LazyExoticComponent, ReactNode } from 'react';
-import { RouteComponent } from '../../components/base/route-component';
+import { ReactNode } from 'react';
+import { LazyRouteComponent } from './lazy-route-component.type';
+import { RouteComponent } from './route-component.type';
 
 export type RouteDefinition = {
     
@@ -15,9 +16,9 @@ export type RouteDefinition = {
 
     readonly strict?: boolean;
 
-    readonly component?: typeof RouteComponent;
+    readonly component?: RouteComponent;
 
-    readonly lazyComponent?: LazyExoticComponent<any>;
+    readonly lazyComponent?: LazyRouteComponent;
 
     readonly lazyFallback?: ReactNode;
 

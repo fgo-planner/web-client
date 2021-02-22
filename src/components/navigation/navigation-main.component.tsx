@@ -1,16 +1,12 @@
-import { StyleRules, Theme, withStyles } from '@material-ui/core';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Component, ReactNode, UIEvent } from 'react';
+import React, { PropsWithChildren, UIEvent, useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { WithStylesProps } from '../../types';
 import { AppBar } from './app-bar/app-bar.component';
 import { LoadingIndicatorOverlay } from './loading-indicator-overlay';
 
-type Props = WithStylesProps;
-
-type State = {
-    appBarElevated: boolean;
-};
+type Props = PropsWithChildren<{}>;
 
 const style = (theme: Theme) => ({
     root: {
@@ -46,40 +42,46 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'NavigationMain'
 };
 
-export const NavigationMain = withStyles(style, styleOptions)(class extends Component<Props, State> {
+const useStyles = makeStyles(style, styleOptions);
 
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            appBarElevated: false
-        };
-        this._handleScroll = this._handleScroll.bind(this);
-    }
+export const NavigationMain = React.memo((props: Props) => {
+    const classes = useStyles();
+    const history = useHistory();
+    const mainContentRef = useRef<HTMLDivElement>(null);
+    const [ appBarElevated, setAppBarElevated ] = useState(false);
 
-    render(): ReactNode {
-        const styleClasses = this.props.classes;
-        return (
-            <div className={styleClasses.root}>
-                <div className={styleClasses.upperSection}>
-                    <AppBar appBarElevated={this.state.appBarElevated} />
-                </div>
-                <div className={styleClasses.lowerSection}>
-                    {/* TODO Add nav rail */}
-                    <div className={styleClasses.mainContent} onScroll={this._handleScroll}>
-                        {this.props.children}
-                    </div>
-                </div>
-                <LoadingIndicatorOverlay />
-            </div>
-        );
-    }
+    useEffect(() => {
+        const unsubscribeHistoryListener = history.listen(() => {
+            mainContentRef.current?.scrollTo(0, 0);
+        });
+        return (() => unsubscribeHistoryListener());
+    }, [ history ]);
 
-    private _handleScroll(event: UIEvent): void {
+    const handleScroll = (event: UIEvent): void => {
         const scrollAmount = (event.target as Element)?.scrollTop;
-        const appBarElevated = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
-        if (appBarElevated !== this.state.appBarElevated) {
-            this.setState({ appBarElevated });
+        const isElevated = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
+        if (isElevated !== appBarElevated) {
+            setAppBarElevated(isElevated);
         }
-    }
+    };
+    
+    return (
+        <div className={classes.root}>
+            <div className={classes.upperSection}>
+                <AppBar appBarElevated={appBarElevated} />
+            </div>
+            <div className={classes.lowerSection}>
+                {/* TODO Add nav rail */}
+                <div 
+                    ref={mainContentRef} 
+                    className={classes.mainContent} 
+                    onScroll={handleScroll}
+                >
+                    {props.children}
+                </div>
+            </div>
+            <LoadingIndicatorOverlay />
+        </div>
+    );
 
 });

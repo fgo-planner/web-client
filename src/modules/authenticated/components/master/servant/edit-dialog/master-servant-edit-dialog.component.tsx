@@ -138,9 +138,25 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
     }
 
     render(): ReactNode {
-        const { classes, ...dialogProps } = this.props;
-        const { dialogTitle, submitButtonLabel } = this._propsSnapshot || this.props;
-        const { fullScreen, closeIconEnabled, actionButtonVariant } = this._computeFullScreenProps();
+
+        const {
+            classes,
+            disableServantSelect,
+            dialogTitle,
+            submitButtonLabel,
+            masterServant,
+            ...dialogProps
+        } = {
+            ...this.props,
+            ...this._propsSnapshot
+        };
+
+        const { 
+            fullScreen, 
+            closeIconEnabled, 
+            actionButtonVariant 
+        } = this._computeFullScreenProps();
+
         return (
             <Dialog
                 {...dialogProps}

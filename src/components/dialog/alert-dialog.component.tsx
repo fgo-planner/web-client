@@ -65,7 +65,10 @@ export const AlertDialog = withWidth()(class extends DialogComponent<Props> {
             confirmButtonColor,
             onClose,
             ...dialogProps
-        } = this._getProps();
+        } = {
+            ...this.props,
+            ...this._propsSnapshot
+        };
 
         const {
             fullScreen,
@@ -106,20 +109,6 @@ export const AlertDialog = withWidth()(class extends DialogComponent<Props> {
  
     private _handleOnExited(): void {
         this._propsSnapshot = null;
-    }
-
-    /**
-     * If the a props snapshot is present, then returns the current props merged
-     * with the snapshot. Otherwise, the current props are returned.
-     */
-    private _getProps(): Props {
-        if (!this._propsSnapshot) {
-            return this.props;
-        }
-        return {
-            ...this.props,
-            ...this._propsSnapshot
-        };
     }
 
 });

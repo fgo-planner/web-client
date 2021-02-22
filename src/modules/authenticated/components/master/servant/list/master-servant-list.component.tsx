@@ -27,6 +27,7 @@ type Props = {
 const style = (theme: Theme) => ({
     root: {
         minWidth: `${theme.breakpoints.width('lg')}px`,
+        borderBottom: `1px solid ${theme.palette.divider}`,
         marginBottom: theme.spacing(16)
     },
     addServantRow: {

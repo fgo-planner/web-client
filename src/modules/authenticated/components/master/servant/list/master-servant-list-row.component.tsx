@@ -28,8 +28,8 @@ const style = (theme: Theme) => ({
         height: '64px',
         paddingLeft: theme.spacing(4),
     },
-    noblePhantasmLevel: {
-        flex: ViewModeColumnWidths.noblePhantasmLevel,
+    npLevel: {
+        flex: ViewModeColumnWidths.npLevel,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -122,7 +122,7 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
                     editMode={editMode}
                     openLinksInNewTab={openLinksInNewTab}
                 />
-                {this._renderNoblePhantasmLevel()}
+                {this._renderNpLevel()}
                 {this._renderLevel()}
                 {this._renderFouLevel('fouHp')}
                 {this._renderFouLevel('fouAtk')}
@@ -133,13 +133,13 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
         );
     }
 
-    private _renderNoblePhantasmLevel(): ReactNode {
+    private _renderNpLevel(): ReactNode {
         const { masterServant, classes } = this.props;
         return (
-            <div className={classes.noblePhantasmLevel}>
+            <div className={classes.npLevel}>
                 <img src={AssetConstants.ServantNoblePhantasmIconSmallUrl} alt="Noble Phantasm" />
                 <div>
-                    {masterServant.noblePhantasmLevel}
+                    {masterServant.np}
                 </div>
             </div>
         );
@@ -147,16 +147,16 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
 
     private _renderLevel(): ReactNode {
         const { masterServant, classes } = this.props;
-        const ascensionLevel = masterServant.ascensionLevel;
-        const iconUrl = ascensionLevel ? AssetConstants.ServantAscensionOnIcon : AssetConstants.ServantAscensionOffIcon;
+        const { ascension, level } = masterServant;
+        const iconUrl = ascension ? AssetConstants.ServantAscensionOnIcon : AssetConstants.ServantAscensionOffIcon;
         return (
             <div className={classes.level}>
                 <div className="value">
-                    {masterServant.level}
+                    {level}
                 </div>
                 <img src={iconUrl} alt="Ascension" />
                 <div className="ascension">
-                    {masterServant.ascensionLevel}
+                    {ascension}
                 </div>
                 {/* TODO Add grail icon */}
             </div>
@@ -178,15 +178,15 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
         return (
             <div className={classes.skillLevels}>
                 <div className="value">
-                    {masterServant.skillLevels[1] ?? '\u2013'}
+                    {masterServant.skills[1] ?? '\u2013'}
                 </div>
                 /
                 <div className="value">
-                    {masterServant.skillLevels[2] ?? '\u2013'}
+                    {masterServant.skills[2] ?? '\u2013'}
                 </div>
                 /
                 <div className="value">
-                    {masterServant.skillLevels[3] ?? '\u2013'}
+                    {masterServant.skills[3] ?? '\u2013'}
                 </div>
             </div>
         );

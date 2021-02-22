@@ -33,9 +33,9 @@ const useStyles = makeStyles(style, styleOptions);
 
 export const MasterServantListRowLabel = React.memo(({ servant, masterServant, openLinksInNewTab }: Props) => {
     const classes = useStyles();
-    const { ascensionLevel } = masterServant;
+    const { ascension } = masterServant;
 
-    const artStage = MasterServantUtils.getArtStage(ascensionLevel);
+    const artStage = MasterServantUtils.getArtStage(ascension);
 
     return (
         <div className={classes.root}>

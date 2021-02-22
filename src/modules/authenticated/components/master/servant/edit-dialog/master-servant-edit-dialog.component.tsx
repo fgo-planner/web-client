@@ -13,15 +13,15 @@ import { MasterServantEditDialogAutocomplete } from './master-servant-edit-dialo
 
 type FormData = {
     gameId: number;
+    np: number;
     level: string | number;
-    ascensionLevel: string | number;
+    ascension: string | number;
     bond: string | number;
     fouAtk: string | number;
     fouHp: string | number;
-    skillLevel1: string | number;
-    skillLevel2: string | number;
-    skillLevel3: string | number;
-    noblePhantasmLevel: number;
+    skill1: string | number;
+    skill2: string | number;
+    skill3: string | number;
 };
 
 type ModalData = Optional<MasterServant, 'instanceId'>;
@@ -195,13 +195,13 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
                     </InputFieldContainer>
                     <InputFieldContainer className={classes.inputFieldContainer} flex="25%">
                         <FormControl variant="outlined" fullWidth>
-                            <InputLabel htmlFor="noblePhantasmLevel">NP Level</InputLabel>
+                            <InputLabel htmlFor="np">NP Level</InputLabel>
                             <Select
                                 native
-                                id="noblePhantasmLevel"
-                                name="noblePhantasmLevel"
+                                id="np"
+                                name="np"
                                 label="NP Level"
-                                value={formData.noblePhantasmLevel}
+                                value={formData.np}
                                 onChange={this._handleSelectInputChange}
                             >
                                 {GameServantConstants.NoblePhantasmLevels.map(level => (
@@ -233,13 +233,13 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
                     </InputFieldContainer>
                     <InputFieldContainer className={classes.inputFieldContainer}>
                         <FormControl variant="outlined" fullWidth>
-                            <InputLabel htmlFor="ascensionLevel">Ascension</InputLabel>
+                            <InputLabel htmlFor="ascension">Ascension</InputLabel>
                             <Select
                                 native
-                                id="ascensionLevel"
-                                name="ascensionLevel"
+                                id="ascension"
+                                name="ascension"
                                 label="Ascension"
-                                value={formData.ascensionLevel}
+                                value={formData.ascension}
                                 onChange={this._handleAscensionInputChange}
                             >
                                 {GameServantConstants.AscensionLevels.map(level => (
@@ -288,13 +288,13 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
                 <div className={classes.inputFieldGroup}>
                     <InputFieldContainer className={classes.inputFieldContainer}>
                         <FormControl variant="outlined" fullWidth>
-                            <InputLabel htmlFor="skillLevel1">Skill 1</InputLabel>
+                            <InputLabel htmlFor="skill1">Skill 1</InputLabel>
                             <Select
                                 native
-                                id="skillLevel1"
-                                name="skillLevel1"
+                                id="skill1"
+                                name="skill1"
                                 label="Skill 1"
-                                value={formData.skillLevel1}
+                                value={formData.skill1}
                                 onChange={this._handleSelectInputChange}
                             >
                                 {GameServantConstants.SkillLevels.map(level => (
@@ -307,13 +307,13 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
                     </InputFieldContainer>
                     <InputFieldContainer className={classes.inputFieldContainer}>
                         <FormControl variant="outlined" fullWidth>
-                            <InputLabel htmlFor="skillLevel2">Skill 2</InputLabel>
+                            <InputLabel htmlFor="skill2">Skill 2</InputLabel>
                             <Select
                                 native
-                                id="skillLevel2"
-                                name="skillLevel2"
+                                id="skill2"
+                                name="skill2"
                                 label="Skill 2"
-                                value={formData.skillLevel2}
+                                value={formData.skill2}
                                 onChange={this._handleSelectInputChange}
                             >
                                 <option>{'\u2014'}</option> {/* Blank option */}
@@ -327,13 +327,13 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
                     </InputFieldContainer>
                     <InputFieldContainer className={classes.inputFieldContainer}>
                         <FormControl variant="outlined" fullWidth>
-                            <InputLabel htmlFor="skillLevel3">Skill 3</InputLabel>
+                            <InputLabel htmlFor="skill3">Skill 3</InputLabel>
                             <Select
                                 native
-                                id="skillLevel3"
-                                name="skillLevel3"
+                                id="skill3"
+                                name="skill3"
                                 label="Skill 3"
-                                value={formData.skillLevel3}
+                                value={formData.skill3}
                                 onChange={this._handleSelectInputChange}
                             >
                                 <option>{'\u2014'}</option> {/* Blank option */}
@@ -438,7 +438,7 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
         const { value } = event.target;
         const level = MasterServantUtils.roundToNearestValidLevel(Number(value), Number(formData.level), servant);
         formData.level = level;
-        formData.ascensionLevel = value;
+        formData.ascension = value;
         this.forceUpdate();
     }
 
@@ -447,9 +447,9 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
         const servant = this._gameServantMap[formData.gameId];
         const { value } = event.target;
         const level = FormUtils.transformInputToInteger(value, GameServantConstants.MinLevel, GameServantConstants.MaxLevel) || 1;
-        const ascensionLevel = MasterServantUtils.roundToNearestValidAscensionLevel(level, Number(formData.ascensionLevel), servant);
+        const ascension = MasterServantUtils.roundToNearestValidAscensionLevel(level, Number(formData.ascension), servant);
         formData.level = level;
-        formData.ascensionLevel = ascensionLevel;
+        formData.ascension = ascension;
         this.forceUpdate();
     }
 
@@ -477,30 +477,30 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
     private _convertToMasterServant(formData: FormData): Omit<MasterServant, 'instanceId'> {
         const {
             gameId,
+            np,
             level,
-            ascensionLevel,
+            ascension,
             bond,
             fouAtk,
             fouHp,
-            skillLevel1,
-            skillLevel2,
-            skillLevel3,
-            noblePhantasmLevel
+            skill1,
+            skill2,
+            skill3
         } = formData;
 
         return {
             gameId,
+            np: Number(np) as any,
             level: Number(level),
-            ascensionLevel: Number(ascensionLevel) as any,
+            ascension: Number(ascension) as any,
             bond: bond ? Number(bond) as any : undefined,
             fouAtk: fouAtk === '' ? undefined : Number(fouAtk),
             fouHp: fouHp === '' ? undefined : Number(fouHp),
-            skillLevels: {
-                1: Number(skillLevel1) || 1,
-                2: Number(skillLevel2) || undefined,
-                3: Number(skillLevel3) || undefined
-            },
-            noblePhantasmLevel: Number(noblePhantasmLevel) as any
+            skills: {
+                1: Number(skill1) || 1,
+                2: Number(skill2) || undefined,
+                3: Number(skill3) || undefined
+            }
         };
     }
 
@@ -510,26 +510,26 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
         }
         const {
             gameId,
+            np,
             level,
-            ascensionLevel,
+            ascension,
             bond,
             fouAtk,
             fouHp,
-            skillLevels,
-            noblePhantasmLevel
+            skills
         } = masterServant;
 
         return {
             gameId,
+            np,
             level,
-            ascensionLevel,
+            ascension,
             bond: bond ?? '',
             fouAtk: fouAtk ?? '',
             fouHp: fouHp ?? '',
-            skillLevel1: skillLevels[1] || 1,
-            skillLevel2: skillLevels[2] || '',
-            skillLevel3: skillLevels[3] || '',
-            noblePhantasmLevel: noblePhantasmLevel
+            skill1: skills[1] || 1,
+            skill2: skills[2] || '',
+            skill3: skills[3] || ''
         };
     }
 

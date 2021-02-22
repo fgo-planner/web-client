@@ -1,6 +1,6 @@
 export const ViewModeColumnWidths: {
     readonly label: string | number;
-    readonly noblePhantasmLevel: string | number;
+    readonly npLevel: string | number;
     readonly level: string | number;
     readonly fouHp: string | number;
     readonly fouAtk: string | number;
@@ -9,7 +9,7 @@ export const ViewModeColumnWidths: {
     readonly actions: string | number;
 } = {
     label: '35%',
-    noblePhantasmLevel: '10%',
+    npLevel: '10%',
     level: '11%',
     fouHp: '11%',
     fouAtk: '11%',

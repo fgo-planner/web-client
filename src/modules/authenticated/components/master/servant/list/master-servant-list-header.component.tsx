@@ -25,8 +25,8 @@ const style = (theme: Theme) => ({
     label: {
         flex: ViewModeColumnWidths.label
     },
-    noblePhantasmLevel: {
-        flex: ViewModeColumnWidths.noblePhantasmLevel
+    npLevel: {
+        flex: ViewModeColumnWidths.npLevel
     },
     level: {
         flex: ViewModeColumnWidths.level
@@ -62,7 +62,7 @@ export const MasterServantListHeader = React.memo(({ editMode, showActions }: Pr
             <div className={classes.label}>
                 Servant
             </div>
-            <div className={classes.noblePhantasmLevel}>
+            <div className={classes.npLevel}>
                 NP
             </div>
             <div className={classes.level}>

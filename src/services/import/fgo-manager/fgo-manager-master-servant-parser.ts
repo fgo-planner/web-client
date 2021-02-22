@@ -104,29 +104,29 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
     private _parseRow(row: string[], headerMap: Record<FgoManagerColumn, number>, instanceId: number): MasterServant {
         const gameServant = this._parseGameServant(row, headerMap);
         const gameId = gameServant._id;
+        const np = this._parseNoblePhantasmLevel(row, headerMap);
         const level = this._parseLevel(row, headerMap);
-        const ascensionLevel = MasterServantUtils.roundToNearestValidAscensionLevel(level, 0, gameServant);
+        const ascension = MasterServantUtils.roundToNearestValidAscensionLevel(level, 0, gameServant);
         const bond = this._parseBondLevel(row, headerMap);
         const fouHp = this._parseFouValue(row, headerMap, 'FouHp');
         const fouAtk = this._parseFouValue(row, headerMap, 'FouAtk');
-        const skillLevel1 = this._parseSkillLevel(row, headerMap, 1) || 1;
-        const skillLevel2 = this._parseSkillLevel(row, headerMap, 2);
-        const skillLevel3 = this._parseSkillLevel(row, headerMap, 3);
-        const noblePhantasmLevel = this._parseNoblePhantasmLevel(row, headerMap);
+        const skill1 = this._parseSkillLevel(row, headerMap, 1) || 1;
+        const skill2 = this._parseSkillLevel(row, headerMap, 2);
+        const skill3 = this._parseSkillLevel(row, headerMap, 3);
         return {
             instanceId,
             gameId,
+            np,
             level,
-            ascensionLevel,
+            ascension,
             bond,
             fouHp,
             fouAtk,
-            skillLevels: {
-                1: skillLevel1,
-                2: skillLevel2,
-                3: skillLevel3
-            },
-            noblePhantasmLevel
+            skills: {
+                1: skill1,
+                2: skill2,
+                3: skill3
+            }
         };
     }
 
@@ -142,6 +142,20 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         return result;
     }
 
+    private _parseNoblePhantasmLevel(row: string[], headerMap: Record<FgoManagerColumn, number>): MasterServantNoblePhantasmLevel {
+        const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.NoblePhantasmLevel);
+        if (!value) {
+            return 1;
+        }
+        const cleanValue = value.substr(FgoManagerMasterServantParser._NoblePhantasmLevelPrefix.length);
+        let result = Number(cleanValue);
+        if (isNaN(result)) {
+            throw Error(`'${value}' is not a NP level value.`);
+        }
+        result = ~~MathUtils.clamp(result, GameServantConstants.MinNoblePhantasmLevel, GameServantConstants.MaxNoblePhantasmLevel);
+        return result as MasterServantNoblePhantasmLevel;
+    }
+    
     private _parseLevel(row: string[], headerMap: Record<FgoManagerColumn, number>): number {
         const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.Level);
         if (!value) {
@@ -197,20 +211,6 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         }
         result = ~~MathUtils.clamp(result, GameServantConstants.MinSkillLevel, GameServantConstants.MaxSkillLevel);
         return result;
-    }
-
-    private _parseNoblePhantasmLevel(row: string[], headerMap: Record<FgoManagerColumn, number>): MasterServantNoblePhantasmLevel {
-        const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.NoblePhantasmLevel);
-        if (!value) {
-            return 1;
-        }
-        const cleanValue = value.substr(FgoManagerMasterServantParser._NoblePhantasmLevelPrefix.length);
-        let result = Number(cleanValue);
-        if (isNaN(result)) {
-            throw Error(`'${value}' is not a NP level value.`);
-        }
-        result = ~~MathUtils.clamp(result, GameServantConstants.MinNoblePhantasmLevel, GameServantConstants.MaxNoblePhantasmLevel);
-        return result as MasterServantNoblePhantasmLevel;
     }
 
     private _parseDataFromRow(row: string[], headerMap: Record<FgoManagerColumn, number>, column: FgoManagerColumn): string | undefined {

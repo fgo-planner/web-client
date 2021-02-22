@@ -10,12 +10,12 @@ export class MasterServantUtils {
         return {
             instanceId: 0,
             gameId: 100100, // TODO Un-hardcode this
+            np: 1,
             level: 1,
-            ascensionLevel: 0,
-            skillLevels: {
+            ascension: 0,
+            skills: {
                 1: 1
             },
-            noblePhantasmLevel: 1
         };
     }
 
@@ -25,8 +25,8 @@ export class MasterServantUtils {
     static clone(masterServant: MasterServant): MasterServant {
         return {
             ...masterServant,
-            skillLevels: {
-                ...masterServant.skillLevels
+            skills: {
+                ...masterServant.skills
             }
         };
     }

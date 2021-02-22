@@ -9,8 +9,7 @@ import { FabContainer } from '../../../components/fab/fab-container.component';
 import { GameServantService } from '../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
-import { GameServant, MasterAccount, MasterServant, ModalOnCloseReason, Nullable, ReadonlyRecord, RouteComponentProps } from '../../../types';
-import { RouteComponent } from '../../../types/internal/route/route-component.type';
+import { GameServant, MasterAccount, MasterServant, ModalOnCloseReason, Nullable, ReadonlyRecord } from '../../../types';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MasterServantEditDialog } from '../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantList } from '../components/master/servant/list/master-servant-list.component';
@@ -228,47 +227,67 @@ const MasterServants = class extends PureComponent<Props, State> {
             });
         }
 
-        const { masterServants, editServant, editMode } = this.state;
-        let { lastInstanceId } = this.state;
+        const { editServant, editMode } = this.state;
+        let { masterServants, lastInstanceId } = this.state;
 
         /*
          * If the servant is being added (regardless of in edit mode or not), then
          * `editServant` will be undefined. Conversely, if an existing servant is being
-         * edited, then `editServant` should be defined. Note that it is not possible
-         * to edit an existing servant when not in edit mode.
+         * edited, then `editServant` should be defined.
          */
         if (!editServant) {
             const masterServant: MasterServant = {
                 ...data,
                 instanceId: ++lastInstanceId
             };
-            masterServants.push(masterServant);
 
-            /*
-             * If not in edit mode, then push update immediately. Otherwise, the save
-             * button is responsible for triggering the update.
-             */
-            if (!editMode) {
+            if (editMode) {
+                /*
+                 * In edit mode, the master servant array will need to be rebuilt to trigger a
+                 * re-render after updating the component state.
+                 */
+                masterServants = [
+                    ...masterServants,
+                    masterServant
+                ];
+
+            } else {
+                /*
+                 * Otherwise, the update can be pushed to the server immediately. The response
+                 * from the server will trigger a re-render of the component and its children,
+                 * so no need to update the state.
+                 */
+                masterServants.push(masterServant);
                 return this._updateMasterAccount(masterServants);
             }
-            
+
         } else {
             /*
              * Merge changes into existing servant object.
              */
             lodash.assign(editServant, data);
 
-            /*
-             * Just like the previous case, if not in edit mode, then push update
-             * immediately.
-             */
-            if (!editMode) {
+            if (editMode) {
+                /*
+                 * Just like the previous case, in edit mode, the master servant will need to
+                 * be rebuilt to trigger a re-render after updating the component state. The
+                 * updated servant will also have to be rebuilt to trigger re-render of some
+                 * children components.
+                 */
+                masterServants = masterServants.map(servant => {
+                    return servant === editServant ? { ...editServant } : servant;
+                });
+
+            } else {
+                /*
+                 * Otherwise, just immediately push update to server and return.
+                 */
                 return this._updateMasterAccount(masterServants);
-            }
+            }            
         }
         
         this.setState({
-            masterServants: [...masterServants], // FIXME Hacky way to force child to re-render
+            masterServants,
             lastInstanceId,
             editServant: undefined,
             editServantDialogOpen: false

@@ -1,6 +1,6 @@
 export * from './data/entity.type';
 export * from './data/game/item/game-item-background.enum';
-export * from './data/game/item/game-item-type.enum';
+export * from './data/game/item/game-item-usage.enum';
 export * from './data/game/item/game-item.type';
 export * from './data/game/servant/game-servant-attribute.enum';
 export * from './data/game/servant/game-servant-card-type.enum';

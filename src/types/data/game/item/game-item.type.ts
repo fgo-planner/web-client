@@ -1,6 +1,6 @@
 import { Entity } from '../../entity.type';
 import { GameItemBackground } from './game-item-background.enum';
-import { GameItemType } from './game-item-type.enum';
+import { GameItemUsage } from './game-item-usage.enum';
 
 /**
  * An inventory item.
@@ -12,12 +12,14 @@ import { GameItemType } from './game-item-type.enum';
  */
 export type GameItem = Entity<number> & {
 
-    name?: string;
+    name: string;
 
     nameJp?: string;
 
+    description?: string;
+
     background: GameItemBackground;
 
-    type: GameItemType;
+    uses: GameItemUsage[];
 
-}
+};

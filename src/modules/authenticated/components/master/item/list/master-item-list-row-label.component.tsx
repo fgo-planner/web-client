@@ -1,7 +1,7 @@
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment } from 'react';
-import { AssetConstants } from '../../../../../../constants';
+import { GameItemThumbnail } from '../../../../../../components/game/item/game-item-thumbnail.component';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { GameItem } from '../../../../../../types';
 
@@ -9,13 +9,7 @@ type Props = {
     item: GameItem;
 };
 
-const ImageBaseUrl = AssetConstants.ItemImageBaseUrl;
-
 const style = (theme: Theme) => ({
-    itemIcon: {
-        width: '48px',
-        height: '48px'
-    },
     itemName: {
         padding: theme.spacing(0, 4),
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
@@ -34,10 +28,11 @@ export const MasterItemListRowLabel = React.memo(({ item }: Props) => {
     const classes = useStyles();
     return (
         <Fragment>
-            <img
-                className={classes.itemIcon}
-                src={`${ImageBaseUrl}/${item._id}.png`}
-                alt={item.name}
+            <GameItemThumbnail
+                item={item}
+                size={52}
+                showBackground
+                enableLink
             />
             <div className={classes.itemName}>
                 {item.name}

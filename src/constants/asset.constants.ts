@@ -1,4 +1,4 @@
-import { MasterServantBondLevel } from '../types';
+import { GameItemBackground, MasterServantBondLevel } from '../types';
 
 export class AssetConstants {
 
@@ -6,9 +6,19 @@ export class AssetConstants {
 
     private static readonly _InternalIconAssetsBaseUrl = `${AssetConstants._InternalAssetsBaseUrl}/icons`;
 
+    private static readonly _InternalThumbnailAssetsBaseUrl = `${AssetConstants._InternalAssetsBaseUrl}/thumbnails`;
+
     private static readonly _AtlasAcademyAssetsBaseUrl = 'https://assets.atlasacademy.io/GameData/JP';
 
     static readonly ItemImageBaseUrl = `${AssetConstants._AtlasAcademyAssetsBaseUrl}/Items`;
+
+    static readonly ItemBackgroundMap: { readonly [ key in GameItemBackground ]: string } = {
+        [GameItemBackground.None]: `${AssetConstants._InternalThumbnailAssetsBaseUrl}/blank.png`,
+        [GameItemBackground.Bronze]: `${AssetConstants._InternalThumbnailAssetsBaseUrl}/item_bg_bronze.png`,
+        [GameItemBackground.Silver]: `${AssetConstants._InternalThumbnailAssetsBaseUrl}/item_bg_silver.png`,
+        [GameItemBackground.Gold]: `${AssetConstants._InternalThumbnailAssetsBaseUrl}/item_bg_gold.png`,
+        [GameItemBackground.QPReward]: `${AssetConstants._InternalThumbnailAssetsBaseUrl}/item_bg_qp.png`,
+    };
 
     static readonly ServantAscensionOffIcon = `${AssetConstants._InternalIconAssetsBaseUrl}/ascension_off.png`;
 

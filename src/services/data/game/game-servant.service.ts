@@ -1,10 +1,12 @@
-import { GameServant, Nullable, Page, Pagination, ReadonlyRecord } from '../../../types';
+import { CacheMap, GameServant, Nullable, Page, Pagination, ReadonlyRecord } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
 
 type ServantsCache = ReadonlyArray<Readonly<GameServant>>;
 
-type ServantsCacheMap = ReadonlyRecord<number, Readonly<GameServant>>;
+type ServantsCacheMap = CacheMap<number, GameServant>;
+
+export type GameServantMap = ServantsCacheMap;
 
 export class GameServantService {
 

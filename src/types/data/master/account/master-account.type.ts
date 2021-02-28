@@ -21,4 +21,4 @@ export type MasterAccount = Entity<string> & {
 
     servants: MasterServant[];
 
-}
+};

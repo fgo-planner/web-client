@@ -1,8 +1,9 @@
+import React from 'react';
 import { ModuleComponent } from '../../components/base/module-component';
 import { RouteDefinitions } from '../../types';
-import React from 'react';
 import { MasterAccountHomeRoute } from './routes/master-account-home.route';
 import { MasterItemsRoute } from './routes/master-items.route';
+import { MasterServantStatsRoute } from './routes/master-servant-stats.route';
 import { MasterServantsRoute } from './routes/master-servants.route';
 
 export default class AuthenticatedModule extends ModuleComponent {
@@ -22,6 +23,11 @@ export default class AuthenticatedModule extends ModuleComponent {
             path: '/master/servants',
             exact: true,
             component: MasterServantsRoute
+        },
+        {
+            path: '/master/servants/stats',
+            exact: true,
+            component: MasterServantStatsRoute
         },
         {
             path: '/master/items',

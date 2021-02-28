@@ -7,6 +7,7 @@ import { InputFieldContainer } from '../../../../../../components/input/input-fi
 import { GameServantConstants } from '../../../../../../constants';
 import { GameServantService } from '../../../../../../services/data/game/game-servant.service';
 import { DialogComponentProps, GameServant, MasterServant, Nullable, Optional, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
+import { MasterServantSkillLevel } from '../../../../../../types/data/master/servant/master-servant-skill-level.type';
 import { FormUtils } from '../../../../../../utils/form.utils';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantEditDialogAutocomplete } from './master-servant-edit-dialog-autocomplete.component';
@@ -513,9 +514,9 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
             fouAtk: fouAtk === '' ? undefined : Number(fouAtk),
             fouHp: fouHp === '' ? undefined : Number(fouHp),
             skills: {
-                1: Number(skill1) || 1,
-                2: Number(skill2) || undefined,
-                3: Number(skill3) || undefined
+                1: Number(skill1) as MasterServantSkillLevel || 1,
+                2: Number(skill2) as MasterServantSkillLevel || undefined,
+                3: Number(skill3) as MasterServantSkillLevel || undefined
             }
         };
     }

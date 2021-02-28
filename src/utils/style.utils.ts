@@ -31,4 +31,9 @@ export class StyleUtils {
         return result;
     }
 
+    static insetBoxShadow(boxShadow: string): string {
+        boxShadow = boxShadow.replaceAll(/,\s*(\d+px)/gi, ', inset $1');
+        return `inset ${boxShadow}`;
+    }
+
 }

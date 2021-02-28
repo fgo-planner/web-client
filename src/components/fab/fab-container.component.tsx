@@ -7,6 +7,7 @@ type Props = PropsWithChildren<{}>;
 const style = (theme: Theme) => ({
     root: {
         display: 'flex',
+        alignItems: 'flex-end',
         position: 'fixed',
         bottom: theme.spacing(6),
         right: theme.spacing(8),

@@ -8,7 +8,7 @@ const themeDefaultLight = () => {
         spacing: ThemeConstants.Spacing,
         palette: {
             background: {
-                default: 'white'
+                // default: 'white'
             },
             primary: {
                 main: pink[400]

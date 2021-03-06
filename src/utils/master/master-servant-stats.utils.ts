@@ -290,15 +290,16 @@ export class MasterServantStatsUtils {
         const key = statKey as string;
 
         if (fouHp !== undefined) {
-            averageFou['gay'] = 
             averageFou[key] += fouHp;
             averageFou.overall += fouHp;
             fouValuesCount[key] += 1;
             fouValuesCount.overall += 1;
             if (fouHp >= 1000) {
                 maxHpFouCount[key] += 1;
+                maxHpFouCount.overall += 1;
                 if (fouHp === 2000) {
                     maxGoldHpFouCount[key] += 1;
+                    maxGoldHpFouCount.overall += 1;
                 }
             }
         }
@@ -309,16 +310,20 @@ export class MasterServantStatsUtils {
             fouValuesCount.overall += 1;
             if (fouAtk >= 1000) {
                 maxAtkFouCount[key] += 1;
+                maxAtkFouCount.overall += 1;
                 if (fouAtk === 2000) {
                     maxGoldAtkFouCount[key] += 1;
+                    maxGoldAtkFouCount.overall += 1;
                 }
             }
         }
         if (fouHp !== undefined && fouAtk !== undefined) {
             if (fouHp >= 1000 && fouAtk >= 1000) {
                 doubleMaxFouCount[key] += 1;
+                doubleMaxFouCount.overall += 1;
                 if (fouHp === 2000 && fouAtk === 2000) {
                     doubleMaxGoldFouCount[key] += 1;
+                    doubleMaxGoldFouCount.overall += 1;
                 }
             }
         }

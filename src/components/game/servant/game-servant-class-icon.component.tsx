@@ -1,17 +1,27 @@
-import { makeStyles, StyleRules } from '@material-ui/core';
+import { makeStyles, StyleRules, Tooltip, TooltipProps } from '@material-ui/core';
 import React from 'react';
 import { AssetConstants } from '../../../constants';
-import { GameServantClass, GameServantRarity } from '../../../types';
+import { GameServantClass, GameServantClassDisplayMap, GameServantRarity, ReadonlyRecord } from '../../../types';
+
+type ClassIconName = GameServantClass | 'Extra' | 'All';
 
 type Props = {
-    servantClass: GameServantClass;
+    servantClass: ClassIconName;
     rarity: GameServantRarity;
     size?: string | number;
+    tooltip?: boolean;
+    tooltipPlacement?: TooltipProps['placement'];
 };
 
 const ClassIconBaseUrl = AssetConstants.ServantClassIconBaseUrl;
 
-const ClassNumberMap: { readonly [key in GameServantClass]: number } = {
+const ClassNameMap: ReadonlyRecord<ClassIconName, string> = {
+    ...GameServantClassDisplayMap,
+    'Extra': 'Extra',
+    'All': 'All'
+};
+
+const ClassNumberMap: ReadonlyRecord<ClassIconName, number> = {
     [GameServantClass.Saber]: 1,
     [GameServantClass.Archer]: 2,
     [GameServantClass.Lancer]: 3,
@@ -30,10 +40,12 @@ const ClassNumberMap: { readonly [key in GameServantClass]: number } = {
     [GameServantClass.BeastIIIR]: 24,
     [GameServantClass.BeastIIIL]: 26,
     [GameServantClass.BeastFalse]: 27,
-    [GameServantClass.Unknown]: 12
+    [GameServantClass.Unknown]: 12,
+    'Extra': 1002,
+    'All': 0 // TODO Find the code for this
 };
 
-const RarityColorMap: { readonly [key in GameServantRarity]: number } = {
+const RarityColorMap: ReadonlyRecord<GameServantRarity, number> = {
     0: 0,
     1: 1,
     2: 1,
@@ -57,15 +69,34 @@ const style = () => ({
 
 const useStyles = makeStyles(style);
 
-export const GameServantClassIcon = React.memo(({ servantClass, rarity, size }: Props) => {
+export const GameServantClassIcon = React.memo((props: Props) => {
+
+    const {
+        servantClass,
+        rarity,
+        tooltip,
+        tooltipPlacement
+    } = props;
+
     const classes = useStyles();
-    size = size || DefaultSize;
+
+    const size = props.size || DefaultSize;
     const classNumber = ClassNumberMap[servantClass] || DefaultClassNumber;
     const rarityColor = RarityColorMap[rarity] ?? DefaultRarityColor;
     const imageUrl = `${ClassIconBaseUrl}/class${rarityColor}_${classNumber}.png`;
-    return (
-        <div style={{width: size, height: size}}>
+
+    const icon = (
+        <div style={{ width: size, height: size }}>
             <img className={classes.img} src={imageUrl} alt={servantClass} />
         </div>
     );
+
+    if (tooltip) {
+        return (
+            <Tooltip title={ClassNameMap[servantClass]} placement={tooltipPlacement}>
+                {icon}
+            </Tooltip>
+        );
+    }
+    return icon;
 });

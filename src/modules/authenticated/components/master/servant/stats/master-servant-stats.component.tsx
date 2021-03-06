@@ -1,6 +1,7 @@
 import { Button, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
 import { PageTitle } from '../../../../../../components/text/page-title.component';
 import { GameServantMap, GameServantService } from '../../../../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../../../../services/data/master/master-account.service';
@@ -9,11 +10,28 @@ import { MasterServantStatsUtils, ServantStatsByClass, ServantStatsByRarity } fr
 import { StyleUtils } from '../../../../../../utils/style.utils';
 import { MasterServantStatsTable } from './master-servant-stats-table.component';
 
-const renderRarityStatsHeaderLabel = (value: string | number): ReactNode => {
+const renderRarityHeaderLabel = (value: string | number): ReactNode => {
     if (value === 'overall') {
         return 'Overall';
     }
     return `${value} \u2605`;
+};
+
+const renderClassHeaderLabel = (value: string | number): ReactNode => {
+    if (value === 'overall') {
+        return 'Overall';
+    }
+    return (
+        <div className="flex justify-center">
+            <GameServantClassIcon
+                servantClass={value as any}
+                rarity={3}
+                size={24}
+                tooltip
+                tooltipPlacement="top"
+            />
+        </div>
+    );
 };
 
 const style = (theme: Theme) => ({
@@ -123,14 +141,14 @@ export const MasterServantStats = React.memo(() => {
         setStatsMode(statsMode === 'byClass' ? 'byRarity' : 'byClass');
     }, [statsMode]);
 
-    const renderStats = useCallback((): JSX.Element | null =>  {
+    const renderStats = useCallback((): JSX.Element | null => {
         if (statsByRarity) {
             return (
                 <MasterServantStatsTable
                     classes={classes}
                     stats={statsByRarity}
                     dataColumnWidth="11%"
-                    headerLabelRenderer={renderRarityStatsHeaderLabel}
+                    headerLabelRenderer={renderRarityHeaderLabel}
                 />
             );
         } else if (statsByClass) {
@@ -139,6 +157,7 @@ export const MasterServantStats = React.memo(() => {
                     classes={classes}
                     stats={statsByClass}
                     dataColumnWidth="8.5%"
+                    headerLabelRenderer={renderClassHeaderLabel}
                 />
             );
         }

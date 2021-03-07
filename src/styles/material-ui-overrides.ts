@@ -1,12 +1,20 @@
-import { ThemeOptions } from '@material-ui/core';
 import { grey } from '@material-ui/core/colors';
+import { Overrides as CoreOverrides } from '@material-ui/core/styles/overrides';
+import { SpeedDialActionClassKey } from '@material-ui/lab';
+import { CSSProperties } from '@material-ui/styles';
 import { ThemeConstants } from './theme-constants';
+
+type Override<T extends string> = Partial<Record<T, CSSProperties | (() => CSSProperties)>>;
+
+type Overrides = {
+    MuiSpeedDialAction?: Override<SpeedDialActionClassKey>;
+} & CoreOverrides;
 
 const spacing = (scale: number) => {
     return `${ThemeConstants.Spacing * scale}px`;
 };
 
-const overrides: ThemeOptions['overrides'] = {
+const overrides: Overrides = {
     MuiButton: {
         contained: {
             backgroundColor: grey[50]
@@ -25,6 +33,15 @@ const overrides: ThemeOptions['overrides'] = {
     MuiTextField: {
         root: {
             // margin: spacing(3)
+        }
+    },
+    MuiSpeedDialAction: {
+        fab: {
+            color: 'initial',
+            backgroundColor: grey[50],
+            '&:hover': {
+                backgroundColor: '#d5d5d5'
+            }
         }
     },
     MuiTypography: {

@@ -1,6 +1,9 @@
 import { Fab, Tooltip } from '@material-ui/core';
-import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
+import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, Save as SaveIcon } from '@material-ui/icons';
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
 import React, { PureComponent, ReactNode } from 'react';
+import { withRouter } from 'react-router';
+import { RouteComponentProps as ReactRouteComponentProps } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { FabContainer } from '../../../components/fab/fab-container.component';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
@@ -8,9 +11,7 @@ import { LoadingIndicatorOverlayService } from '../../../services/user-interface
 import { MasterAccount, MasterItem, Nullable } from '../../../types';
 import { MasterItemList } from '../components/master/item/list/master-item-list.component';
 
-type Props = {
-    
-};
+type Props = ReactRouteComponentProps;
 
 type State = {
     masterAccount?: MasterAccount | null;
@@ -19,10 +20,11 @@ type State = {
      */
     masterItems: MasterItem[];
     editMode: boolean;
+    speedDialOpen: boolean;
     loadingIndicatorId?: string;
 };
 
-class MasterItems extends PureComponent<Props, State> {
+const MasterItems = withRouter(class extends PureComponent<Props, State> {
     
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
@@ -32,12 +34,14 @@ class MasterItems extends PureComponent<Props, State> {
         super(props);
         this.state = {
             masterItems: [],
-            editMode: false
+            editMode: false,
+            speedDialOpen: false
         };
 
         this._edit = this._edit.bind(this);
         this._save = this._save.bind(this);
         this._cancel = this._cancel.bind(this);
+        this._toggleSpeedDial = this._toggleSpeedDial.bind(this);
     }
 
     componentDidMount(): void {
@@ -63,11 +67,12 @@ class MasterItems extends PureComponent<Props, State> {
     }
 
     private _renderFab(editMode: boolean): ReactNode {
-        const { loadingIndicatorId } = this.state;
+        const { history } = this.props;
+        const { speedDialOpen, loadingIndicatorId } = this.state;
         const disabled = !!loadingIndicatorId;
         if (!editMode) {
-            return (
-                <Tooltip title="Edit">
+            return [
+                <Tooltip key="edit" title="Edit">
                     <div>
                         <Fab
                             color="primary"
@@ -76,8 +81,24 @@ class MasterItems extends PureComponent<Props, State> {
                             children={<EditIcon />}
                         />
                     </div>
-                </Tooltip>
-            );
+                </Tooltip>,
+                <SpeedDial
+                    key="speed-dial"
+                    ariaLabel="Why is this needed?"
+                    FabProps={{
+                        color: 'default'
+                    }}
+                    icon={<SpeedDialIcon />}
+                    open={speedDialOpen}
+                    onClick={this._toggleSpeedDial}
+                >
+                    <SpeedDialAction
+                        icon={<EqualizerIcon />}
+                        tooltipTitle="Item stats"
+                        onClick={() => history.push('items/stats')}
+                    />
+                </SpeedDial>
+            ];
         }
         return [
             <Tooltip key="cancel" title="Cancel">
@@ -179,6 +200,13 @@ class MasterItems extends PureComponent<Props, State> {
         }
     }
 
+    private _toggleSpeedDial(): void {
+        const { speedDialOpen } = this.state;
+        this.setState({
+            speedDialOpen: !speedDialOpen
+        });
+    }
+
     private _cloneItemsFromMasterAccount(account: Nullable<MasterAccount>): MasterItem[] {
         if (!account) {
             return [];
@@ -190,6 +218,6 @@ class MasterItems extends PureComponent<Props, State> {
         return masterItems;
     }
 
-}
+});
 
 export const MasterItemsRoute = React.memo(() => <MasterItems />);

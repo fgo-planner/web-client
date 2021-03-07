@@ -6,6 +6,8 @@ type ItemsCache = ReadonlyArray<Readonly<GameItem>>;
 
 type ItemsCacheMap = ReadonlyRecord<number, Readonly<GameItem>>;
 
+export type GameItemMap = ItemsCacheMap;
+
 export class GameItemService {
 
     private static readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-item`;

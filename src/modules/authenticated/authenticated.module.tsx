@@ -2,6 +2,7 @@ import React from 'react';
 import { ModuleComponent } from '../../components/base/module-component';
 import { RouteDefinitions } from '../../types';
 import { MasterAccountHomeRoute } from './routes/master-account-home.route';
+import { MasterItemStatsRoute } from './routes/master-item-stats.route';
 import { MasterItemsRoute } from './routes/master-items.route';
 import { MasterServantStatsRoute } from './routes/master-servant-stats.route';
 import { MasterServantsRoute } from './routes/master-servants.route';
@@ -33,6 +34,11 @@ export default class AuthenticatedModule extends ModuleComponent {
             path: '/master/items',
             exact: true,
             component: MasterItemsRoute
+        },
+        {
+            path: '/master/items/stats',
+            exact: true,
+            component: MasterItemStatsRoute
         },
         {
             path: '/master/data/import/servants',

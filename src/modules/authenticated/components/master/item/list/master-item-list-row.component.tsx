@@ -45,7 +45,7 @@ export const MasterItemListRow = withStyles(style, styleOptions)(class extends P
         const { classes, key, item, editMode } = this.props;
         return (
             <div className={classes.root} key={key}>
-                <MasterItemListRowLabel item={item.item} />
+                <MasterItemListRowLabel item={item.item} editMode={editMode} />
                 <div className="flex-fill" />
                 <div>
                     {editMode ? this._renderItemEditMode(item) : this._renderItemViewMode(item)}

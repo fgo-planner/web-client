@@ -7,6 +7,7 @@ import { GameItem } from '../../../../../../types';
 
 type Props = {
     item: GameItem;
+    editMode?: boolean;
 };
 
 const style = (theme: Theme) => ({
@@ -24,7 +25,7 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterItemListRowLabel = React.memo(({ item }: Props) => {
+export const MasterItemListRowLabel = React.memo(({ item, editMode }: Props) => {
     const classes = useStyles();
     return (
         <Fragment>
@@ -32,7 +33,7 @@ export const MasterItemListRowLabel = React.memo(({ item }: Props) => {
                 item={item}
                 size={52}
                 showBackground
-                enableLink
+                enableLink={!editMode}
             />
             <div className={classes.itemName}>
                 {item.name}

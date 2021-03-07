@@ -4,12 +4,12 @@ import NumberFormat from 'react-number-format';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { GameServantConstants } from '../../../../../../constants';
 import { WithStylesProps } from '../../../../../../types';
-import { ServantStatsSet } from '../../../../../../utils/master/master-servant-stats.utils';
+import { ServantStats } from '../../../../../../utils/master/master-servant-stats.utils';
 import { StyleUtils } from '../../../../../../utils/style.utils';
 import { MasterServantExpandableStats } from './master-servant-expandable-stats.component';
 
 type Props = {
-    stats: ServantStatsSet<Record<string, number>>;
+    stats: ServantStats<Record<string, number>>;
     dataColumnWidth?: string | number;
     headerLabelRenderer?: (value: string | number) => ReactNode;
 } & WithStylesProps;

@@ -93,7 +93,7 @@ export const GameServantClassIcon = React.memo((props: Props) => {
 
     if (tooltip) {
         return (
-            <Tooltip title={ClassNameMap[servantClass]} placement={tooltipPlacement}>
+            <Tooltip title={ClassNameMap[servantClass] ?? ''} placement={tooltipPlacement}>
                 {icon}
             </Tooltip>
         );

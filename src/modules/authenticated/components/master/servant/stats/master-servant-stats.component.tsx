@@ -1,4 +1,4 @@
-import { Button, makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
@@ -6,8 +6,9 @@ import { PageTitle } from '../../../../../../components/text/page-title.componen
 import { GameServantMap, GameServantService } from '../../../../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../../../../services/data/master/master-account.service';
 import { MasterAccount, Nullable } from '../../../../../../types';
-import { MasterServantStatsUtils, ServantStatsByClass, ServantStatsByRarity } from '../../../../../../utils/master/master-servant-stats.utils';
+import { MasterServantStatsUtils, ServantStatsGroupedByClass, ServantStatsGroupedByRarity } from '../../../../../../utils/master/master-servant-stats.utils';
 import { StyleUtils } from '../../../../../../utils/style.utils';
+import { MasterServantStatsFilter, ServantStatsFilterResult } from './master-servant-stats-filter.component';
 import { MasterServantStatsTable } from './master-servant-stats-table.component';
 
 const renderRarityHeaderLabel = (value: string | number): ReactNode => {
@@ -89,9 +90,8 @@ export const MasterServantStats = React.memo(() => {
     const classes = useStyles();
     const [gameServantMap, setGameServantMap] = useState<GameServantMap>();
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-    const [statsMode, setStatsMode] = useState<'byRarity' | 'byClass'>('byRarity');
-    const [statsByRarity, setStatsByRarity] = useState<Nullable<ServantStatsByRarity>>();
-    const [statsByClass, setStatsByClass] = useState<Nullable<ServantStatsByClass>>();
+    const [filter, setFilter] = useState<ServantStatsFilterResult>();
+    const [stats, setStats] = useState<ServantStatsGroupedByRarity | ServantStatsGroupedByClass>();
 
     /*
      * Retrieve game servant map.
@@ -122,61 +122,54 @@ export const MasterServantStats = React.memo(() => {
         };
     }, []);
 
+    const handleFilterChange = useCallback((filter: ServantStatsFilterResult): void => {
+        setFilter(filter);
+    }, []);
+
     useEffect(() => {
-        if (!gameServantMap || !masterAccount) {
+        if (!gameServantMap || !masterAccount || !filter) {
             return;
         }
-        if (statsMode === 'byRarity') {
-            const statsByRarity = MasterServantStatsUtils.generateStatsByRarity(gameServantMap, masterAccount);
-            setStatsByRarity(statsByRarity);
-            setStatsByClass(undefined);
+        let stats;
+        if (filter.groupBy === 'rarity') {
+            stats = MasterServantStatsUtils.generateStatsGroupedByRarity(gameServantMap, masterAccount, filter);
         } else {
-            const statsByClass = MasterServantStatsUtils.generateStatsByClass(gameServantMap, masterAccount);
-            setStatsByClass(statsByClass);
-            setStatsByRarity(undefined);
+            stats = MasterServantStatsUtils.generateStatsGroupedByClass(gameServantMap, masterAccount, filter);
         }
-    }, [gameServantMap, masterAccount, statsMode]);
+        setStats(stats);
+    }, [gameServantMap, masterAccount, filter]);
 
-    const toggleStatsMode = useCallback(() => {
-        setStatsMode(statsMode === 'byClass' ? 'byRarity' : 'byClass');
-    }, [statsMode]);
-
-    const renderStats = useCallback((): JSX.Element | null => {
-        if (statsByRarity) {
-            return (
-                <MasterServantStatsTable
-                    classes={classes}
-                    stats={statsByRarity}
-                    dataColumnWidth="11%"
-                    headerLabelRenderer={renderRarityHeaderLabel}
-                />
-            );
-        } else if (statsByClass) {
-            return (
-                <MasterServantStatsTable
-                    classes={classes}
-                    stats={statsByClass}
-                    dataColumnWidth="8.5%"
-                    headerLabelRenderer={renderClassHeaderLabel}
-                />
-            );
+    /*
+     * Render the stats table.
+     */
+    let statsTable: ReactNode = null;
+    if (filter && stats) {
+        let dataColumnWidth: string;
+        let headerLabelRenderer: (value: string | number) => ReactNode;
+        if (filter.groupBy === 'rarity') {
+            dataColumnWidth = '11%';
+            headerLabelRenderer = renderRarityHeaderLabel;
+        } else {
+            dataColumnWidth = '8.5%';
+            headerLabelRenderer = renderClassHeaderLabel;
         }
-        return null;
-    }, [classes, statsByRarity, statsByClass]);
+        statsTable = (
+            <MasterServantStatsTable
+                classes={classes}
+                stats={stats}
+                dataColumnWidth={dataColumnWidth}
+                headerLabelRenderer={headerLabelRenderer}
+            />
+        );
+    }
 
     return (
         <div>
             <PageTitle>Servant Stats</PageTitle>
-            <div className="flex justify-end pb-4 px-8">
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={toggleStatsMode}
-                >
-                    Toggle Display
-                </Button>
+            <div className="px-4">
+                <MasterServantStatsFilter onFilterChange={handleFilterChange}></MasterServantStatsFilter>
             </div>
-            {renderStats()}
+            {statsTable}
         </div>
     );
 

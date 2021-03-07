@@ -5,7 +5,7 @@ import { CustomStyleProps } from '../../types';
 import { StyleUtils } from '../../utils/style.utils';
 
 type Props = PropsWithChildren<{
-    width?: string;
+    width?: string | number;
     flex?: string | number;
 }> & CustomStyleProps;
 

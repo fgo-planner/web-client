@@ -1,17 +1,18 @@
-import { Fab, Tooltip } from '@material-ui/core';
-import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, Save as SaveIcon } from '@material-ui/icons';
-import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
+import { Fab, IconButton, Tooltip } from '@material-ui/core';
+import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
 import React, { PureComponent, ReactNode } from 'react';
-import { withRouter } from 'react-router';
-import { RouteComponentProps as ReactRouteComponentProps } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { FabContainer } from '../../../components/fab/fab-container.component';
+import { NavigationRail } from '../../../components/navigation/navigation-rail.component';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
 import { MasterAccount, MasterItem, Nullable } from '../../../types';
 import { MasterItemList } from '../components/master/item/list/master-item-list.component';
 
-type Props = ReactRouteComponentProps;
+type Props = {
+    
+};
 
 type State = {
     masterAccount?: MasterAccount | null;
@@ -20,11 +21,11 @@ type State = {
      */
     masterItems: MasterItem[];
     editMode: boolean;
-    speedDialOpen: boolean;
     loadingIndicatorId?: string;
+    showNavRail: boolean;
 };
 
-const MasterItems = withRouter(class extends PureComponent<Props, State> {
+const MasterItems = class extends PureComponent<Props, State> {
     
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
@@ -35,13 +36,12 @@ const MasterItems = withRouter(class extends PureComponent<Props, State> {
         this.state = {
             masterItems: [],
             editMode: false,
-            speedDialOpen: false
+            showNavRail: true
         };
 
         this._edit = this._edit.bind(this);
         this._save = this._save.bind(this);
         this._cancel = this._cancel.bind(this);
-        this._toggleSpeedDial = this._toggleSpeedDial.bind(this);
     }
 
     componentDidMount(): void {
@@ -57,21 +57,52 @@ const MasterItems = withRouter(class extends PureComponent<Props, State> {
     }
 
     render(): ReactNode {
-        const { masterItems, editMode } = this.state;
+        const { masterItems, editMode, showNavRail } = this.state;
         return (
-            <div className="py-2">
-                <MasterItemList editMode={editMode} masterItems={masterItems} />
+            <NavigationRail
+                contents={this._renderNavRailContents()}
+                show={showNavRail && !editMode}
+                disableAnimations
+            >
+                <div className="py-4">
+                    <MasterItemList editMode={editMode} masterItems={masterItems} />
+                </div>
                 <FabContainer children={this._renderFab(editMode)} />
-            </div>
+            </NavigationRail>
         );
     }
 
+    private _renderNavRailContents(): ReactNode {
+        return [
+            <Tooltip key="stats" title="Item stats" placement="right">
+                <div>
+                    <IconButton
+                        component={Link}
+                        to="items/stats"
+                        children={<EqualizerIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="import" title="Upload item data" placement="right">
+                <div>
+                    {/* TODO Implement this */}
+                    <IconButton children={<PublishIcon />} disabled />
+                </div>
+            </Tooltip>,
+            <Tooltip key="export" title="Download item data" placement="right">
+                <div>
+                    {/* TODO Implement this */}
+                    <IconButton children={<GetApp />} disabled />
+                </div>
+            </Tooltip>
+        ];
+    }
+
     private _renderFab(editMode: boolean): ReactNode {
-        const { history } = this.props;
-        const { speedDialOpen, loadingIndicatorId } = this.state;
+        const { loadingIndicatorId } = this.state;
         const disabled = !!loadingIndicatorId;
         if (!editMode) {
-            return [
+            return (
                 <Tooltip key="edit" title="Edit">
                     <div>
                         <Fab
@@ -81,24 +112,8 @@ const MasterItems = withRouter(class extends PureComponent<Props, State> {
                             children={<EditIcon />}
                         />
                     </div>
-                </Tooltip>,
-                <SpeedDial
-                    key="speed-dial"
-                    ariaLabel="Why is this needed?"
-                    FabProps={{
-                        color: 'default'
-                    }}
-                    icon={<SpeedDialIcon />}
-                    open={speedDialOpen}
-                    onClick={this._toggleSpeedDial}
-                >
-                    <SpeedDialAction
-                        icon={<EqualizerIcon />}
-                        tooltipTitle="Item stats"
-                        onClick={() => history.push('items/stats')}
-                    />
-                </SpeedDial>
-            ];
+                </Tooltip>
+            );
         }
         return [
             <Tooltip key="cancel" title="Cancel">
@@ -200,13 +215,6 @@ const MasterItems = withRouter(class extends PureComponent<Props, State> {
         }
     }
 
-    private _toggleSpeedDial(): void {
-        const { speedDialOpen } = this.state;
-        this.setState({
-            speedDialOpen: !speedDialOpen
-        });
-    }
-
     private _cloneItemsFromMasterAccount(account: Nullable<MasterAccount>): MasterItem[] {
         if (!account) {
             return [];
@@ -218,6 +226,6 @@ const MasterItems = withRouter(class extends PureComponent<Props, State> {
         return masterItems;
     }
 
-});
+};
 
 export const MasterItemsRoute = React.memo(() => <MasterItems />);

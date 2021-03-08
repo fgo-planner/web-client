@@ -102,7 +102,7 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
 
         return (
             <div className={classes.root}>
-                <MasterServantListHeader editMode />
+                <MasterServantListHeader showActions={showActions} editMode />
                 <DragDropContext onDragEnd={this._handleDragEnd}>
                     <Droppable droppableId="droppable-servant-list">
                         {droppableRenderFunction}

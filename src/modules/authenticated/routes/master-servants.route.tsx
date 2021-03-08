@@ -1,12 +1,12 @@
-import { Fab, Tooltip } from '@material-ui/core';
-import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
-import { SpeedDial, SpeedDialAction, SpeedDialIcon } from '@material-ui/lab';
+import { Fab, IconButton, Tooltip } from '@material-ui/core';
+import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
 import lodash from 'lodash';
-import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
-import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
+import React, { MouseEvent, PureComponent, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { PromptDialog } from '../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../components/fab/fab-container.component';
+import { NavigationRail } from '../../../components/navigation/navigation-rail.component';
 import { GameServantService } from '../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
@@ -15,7 +15,9 @@ import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MasterServantEditDialog } from '../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantList } from '../components/master/servant/list/master-servant-list.component';
 
-type Props = ReactRouteComponentProps;
+type Props = {
+
+};
 
 type State = {
     masterAccount?: MasterAccount | null;
@@ -33,11 +35,11 @@ type State = {
     deleteServant?: MasterServant;
     deleteServantDialogOpen: boolean;
     deleteServantDialogPrompt?: string;
-    speedDialOpen: boolean;
+    showNavRail: boolean;
     loadingIndicatorId?: string;
 };
 
-const MasterServants = withRouter(class extends PureComponent<Props, State> {
+const MasterServants = class extends PureComponent<Props, State> {
 
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
@@ -54,7 +56,7 @@ const MasterServants = withRouter(class extends PureComponent<Props, State> {
             editMode: false,
             editServantDialogOpen: false,
             deleteServantDialogOpen: false,
-            speedDialOpen: false
+            showNavRail: true
         };
 
         this._edit = this._edit.bind(this);
@@ -66,7 +68,6 @@ const MasterServants = withRouter(class extends PureComponent<Props, State> {
         this._openDeleteServantDialog = this._openDeleteServantDialog.bind(this);
         this._closeDeleteServantDialog = this._closeDeleteServantDialog.bind(this);
         this._handleDeleteServantDialogClose = this._handleDeleteServantDialogClose.bind(this);
-        this._toggleSpeedDial = this._toggleSpeedDial.bind(this);
     }
 
     componentDidMount(): void {
@@ -98,10 +99,15 @@ const MasterServants = withRouter(class extends PureComponent<Props, State> {
             editServantDialogOpen,
             deleteServantDialogOpen,
             deleteServantDialogPrompt,
+            showNavRail
         } = this.state;
 
         return (
-            <Fragment>
+            <NavigationRail 
+                contents={this._renderNavRailContents()}
+                show={showNavRail && !editMode}
+                disableAnimations
+            >
                 <MasterServantList
                     editMode={editMode}
                     showActions
@@ -130,16 +136,62 @@ const MasterServants = withRouter(class extends PureComponent<Props, State> {
                     confirmButtonLabel="Delete"
                     onClose={this._handleDeleteServantDialogClose}
                 />
-            </Fragment>
+            </NavigationRail>
         );
     }
 
+    private _renderNavRailContents(): ReactNode {
+        return [
+            /*
+            <Tooltip key="hide" title="Hide menu"  placement="right">
+                <div>
+                    <IconButton
+                        onClick={() => this.setState({ showNavRail: !this.state.showNavRail })}
+                        children={<ChevronLeftIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            */
+            <Tooltip key="add" title="Add servant" placement="right">
+                <div>
+                    <IconButton
+                        onClick={this._onAddServantButtonClick}
+                        children={<AddIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="stats" title="Servant stats" placement="right">
+                <div>
+                    <IconButton
+                        component={Link}
+                        to="servants/stats"
+                        children={<EqualizerIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="import" title="Upload servant data" placement="right">
+                <div>
+                    <IconButton
+                        component={Link}
+                        to="./data/import/servants"
+                        children={<PublishIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="export" title="Download servant data" placement="right">
+                <div>
+                    {/* TODO Implement this */}
+                    <IconButton children={<GetApp />} disabled />
+                </div>
+            </Tooltip>
+        ];
+    }
+
     private _renderFab(): ReactNode {
-        const { history } = this.props;
-        const { editMode, speedDialOpen, loadingIndicatorId } = this.state;
+        const { editMode, loadingIndicatorId } = this.state;
         const disabled = !!loadingIndicatorId;
         if (!editMode) {
-            return [
+            return (
                 <Tooltip key="edit" title="Batch edit mode">
                     <div>
                         <Fab
@@ -149,29 +201,8 @@ const MasterServants = withRouter(class extends PureComponent<Props, State> {
                             children={<EditIcon />}
                         />
                     </div>
-                </Tooltip>,
-                <SpeedDial
-                    key="speed-dial"
-                    ariaLabel="Why is this needed?"
-                    FabProps={{
-                        color: 'default'
-                    }}
-                    icon={<SpeedDialIcon />}
-                    open={speedDialOpen}
-                    onClick={this._toggleSpeedDial}
-                >
-                    <SpeedDialAction
-                        icon={<EqualizerIcon />}
-                        tooltipTitle="Servant stats"
-                        onClick={() => history.push('servants/stats')}
-                    />
-                    <SpeedDialAction
-                        icon={<PublishIcon />}
-                        tooltipTitle="Import servant data"
-                        onClick={() => history.push('./data/import/servants')}
-                    />
-                </SpeedDial>
-            ];
+                </Tooltip>
+            );
         }
         return [
             <Tooltip key="cancel" title="Cancel">
@@ -419,13 +450,6 @@ const MasterServants = withRouter(class extends PureComponent<Props, State> {
             LoadingIndicatorOverlayService.waive(loadingIndicatorId);
         }
     }
-    
-    private _toggleSpeedDial(): void {
-        const { speedDialOpen } = this.state;
-        this.setState({
-            speedDialOpen: !speedDialOpen
-        });
-    }
 
     private _cloneServantsFromMasterAccount(account: Nullable<MasterAccount>): MasterServant[] {
         if (!account) {
@@ -434,6 +458,6 @@ const MasterServants = withRouter(class extends PureComponent<Props, State> {
         return account.servants.map(MasterServantUtils.clone);
     }
 
-});
+};
 
 export const MasterServantsRoute = React.memo(() => <MasterServants />);

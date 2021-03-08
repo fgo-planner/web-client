@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { ThemeConstants } from '../../styles/theme-constants';
 import { AppBar } from './app-bar/app-bar.component';
 import { LoadingIndicatorOverlay } from './loading-indicator-overlay';
+import { NavigationRail } from './navigation-rail.component';
 
 type Props = PropsWithChildren<{}>;
 
@@ -24,11 +25,6 @@ const style = (theme: Theme) => ({
     lowerSection: {
         display: 'flex',
         height: `calc(100vh - ${theme.spacing(ThemeConstants.AppBarHeightScale)}px)`
-    },
-    navRailContainer: {
-        display: 'none',
-        zIndex: 1,
-        boxShadow: '0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.014), 0 1px 3px 0 rgba(0,0,0,0.12)',
     },
     mainContent: {
         flex: 1,
@@ -71,7 +67,6 @@ export const NavigationMain = React.memo((props: Props) => {
                 <AppBar appBarElevated={appBarElevated} />
             </div>
             <div className={classes.lowerSection}>
-                {/* TODO Add nav rail */}
                 <div 
                     ref={mainContentRef} 
                     className={classes.mainContent} 

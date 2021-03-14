@@ -13,6 +13,16 @@ type Props = {
     includeUnownedServants?: boolean;
 };
 
+const InventoryColumnTooltip = 'Current amount in inventory';
+
+const UsedColumnTooltip = 'Amount used for servant upgrades';
+
+const TargetColumnTooltip = 'Amount needed to max out remaining servants';
+
+const TargetColumnTooltipInclUnowned = `${TargetColumnTooltip}, including servants that have not yet been summoned`;
+
+const DifferenceColumnTooltip = 'Additional amount that needs to be acquired in order to fullfil the \'Max Upgrades\' column';
+
 const ColumnWidth = '17%';
 
 const ItemIds = [
@@ -122,23 +132,23 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
                     <TableRow>
                         <TableCell />
                         <TableCell align="center" width={ColumnWidth}>
-                            <Tooltip title="Current amount in inventory" placement="top">
+                            <Tooltip title={InventoryColumnTooltip} placement="top">
                                 <div>Inventory</div>
                             </Tooltip>
                         </TableCell>
                         <TableCell align="center" width={ColumnWidth}>
-                            <Tooltip title="Amount used for servant upgrades" placement="top">
+                            <Tooltip title={UsedColumnTooltip} placement="top">
                                 <div>Used</div>
                             </Tooltip>
                         </TableCell>
                         <TableCell align="center" width={ColumnWidth}>
-                            <Tooltip title="Amount needed to max out remaining servants" placement="top">
+                            <Tooltip title={includeUnownedServants ? TargetColumnTooltipInclUnowned : TargetColumnTooltip} placement="top" >
                                 <div>Max Upgrades</div>
                             </Tooltip>
                         </TableCell>
                         <TableCell align="center" width={ColumnWidth}>
-                            <Tooltip title="Additional amount needed to fullfil the 'Max Upgrades' column" placement="top">
-                                <div>Short</div>
+                            <Tooltip title={DifferenceColumnTooltip} placement="top">
+                                <div>Difference</div>
                             </Tooltip>
                         </TableCell>
                     </TableRow>

@@ -88,6 +88,8 @@ export type GameServant = Entity<number> & {
 
     };
 
+    costumeMaterials?: Record<number, GameServantEnhancement>;
+
     metadata: {
 
         displayName?: string;

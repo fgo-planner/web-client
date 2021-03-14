@@ -1,6 +1,7 @@
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
+import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { LoadingIndicator } from '../../../../../components/loading-indicator.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
 import { GameServantService } from '../../../../../services/data/game/game-servant.service';
@@ -79,13 +80,14 @@ export const GameItemInfo = withStyles(style, styleOptions)(class extends PureCo
     }
 
     private _renderUsage(): ReactNode {
-        const { itemUsage } = this.state;
-        if (!itemUsage) {
+        const { itemUsage, item } = this.state;
+        if (!itemUsage || !item) {
             return null;
         }
         const { servants, total } = itemUsage;
         return (
             <Fragment>
+                <GameItemThumbnail item={item} />
                 <div className="p-2">
                     <div>Ascensions: {total.ascensions}</div>
                     <div>Per Skill (Total): {total.skills} ({total.skills * 3})</div>
@@ -133,7 +135,7 @@ export const GameItemInfo = withStyles(style, styleOptions)(class extends PureCo
         };
         const servants = await GameServantService.getServants();
         for (const servant of servants) {
-            const { skillMaterials, ascensionMaterials } = servant;
+            const { skillMaterials, ascensionMaterials, costumeMaterials } = servant;
 
             const skills = this._computeEnhancementsUsage(skillMaterials, itemId);
             totalUsage.skills += skills;
@@ -141,12 +143,15 @@ export const GameItemInfo = withStyles(style, styleOptions)(class extends PureCo
             const ascensions = this._computeEnhancementsUsage(ascensionMaterials, itemId);
             totalUsage.ascensions += ascensions;
 
-            if (skills || ascensions) {
+            const costumes = this._computeEnhancementsUsage(costumeMaterials, itemId);
+            totalUsage.costumes += costumes;
+
+            if (skills || ascensions || costumes) {
                 servantUsage.push({
                     servant,
                     skills,
                     ascensions,
-                    costumes: 0
+                    costumes
                 });
             }
         }

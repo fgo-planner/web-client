@@ -70,11 +70,16 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
                 <TableCell>
                     <div className="flex align-center">
                         <div className={classes.thumbnailContainer}>
-                            <GameItemThumbnail item={item} size={42} showBackground />
+                            <GameItemThumbnail
+                                item={item}
+                                size={42}
+                                showBackground
+                                enableLink
+                            />
                         </div>
                         <div className="pl-4">
+                            {/* TODO Make this a link */}
                             {item.name}
-
                         </div>
                     </div>
                 </TableCell>

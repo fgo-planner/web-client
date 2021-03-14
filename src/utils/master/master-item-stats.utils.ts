@@ -67,38 +67,45 @@ export class MasterItemStatsUtils {
         const skill2 = masterServant.skills[2] ?? 0;
         const skill3 = masterServant.skills[3] ?? 0;
 
-        let skillLevel = 1;
-        for (const skillUpgrade of Object.values(servant.skillMaterials)) {
-
+        for (const [key, skill] of Object.entries(servant.skillMaterials)) {
+            const skillLevel = Number(key);
             const skillUpgradeCount =
                 (skill1 > skillLevel ? 1 : 0) +
                 (skill2 > skillLevel ? 1 : 0) +
                 (skill3 > skillLevel ? 1 : 0);
-
-            this._updateForEnhancement(stats, skillUpgrade, true, 3, skillUpgradeCount);
-            skillLevel++;
+            this._updateForEnhancement(stats, skill, true, 3, skillUpgradeCount);
         }
 
         // Some servants (Mash) don't have ascension materials
         if (servant.ascensionMaterials) {
-            let ascensionLevel = 1;
-            for (const ascension of Object.values(servant.ascensionMaterials)) {
+            for (const [key, ascension] of Object.entries(servant.ascensionMaterials)) {
+                const ascensionLevel = Number(key);
                 const ascended =  masterServant.ascension >= ascensionLevel;
                 this._updateForEnhancement(stats, ascension, true, 1, ascended ? 1 : 0);
-                ascensionLevel++;
             }
         }
 
-        // TODO Add costumes
+        if (servant.costumeMaterials) {
+            for (const [key, costume] of Object.entries(servant.costumeMaterials)) {
+                const costumeId = Number(key);
+                const costumeUnlocked =  masterServant.costumes?.indexOf(costumeId) !== -1;
+                this._updateForEnhancement(stats, costume, true, 1, costumeUnlocked ? 1 : 0);
+            }
+        }
     }
 
     private static _updateForUnownedServant(stats: Record<number, ItemStat>, servant: GameServant): void {
-        for (const skillUpgrade of Object.values(servant.skillMaterials)) {
-            this._updateForEnhancement(stats, skillUpgrade, false, 3);
+        for (const skill of Object.values(servant.skillMaterials)) {
+            this._updateForEnhancement(stats, skill, false, 3);
         }
         if (servant.ascensionMaterials) {
             for (const ascension of Object.values(servant.ascensionMaterials)) {
                 this._updateForEnhancement(stats, ascension);
+            }
+        }
+        if (servant.costumeMaterials) {
+            for (const costume of Object.values(servant.costumeMaterials)) {
+                this._updateForEnhancement(stats, costume);
             }
         }
     }

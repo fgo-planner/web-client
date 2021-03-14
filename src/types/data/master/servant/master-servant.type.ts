@@ -34,6 +34,8 @@ export type MasterServant = {
 
     };
 
+    costumes?: number[];
+
     acquired?: Date;
 
 };

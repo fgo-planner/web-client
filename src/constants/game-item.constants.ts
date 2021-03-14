@@ -86,7 +86,8 @@ export class GameItemConstants {
         6538, // Bell
         6541, // Arrowhead
         6543, // Crown
-        6545  // Vein
+        6545, // Vein
+        6547  // Rainbow Yarn
     ];
 
     /**
@@ -110,7 +111,8 @@ export class GameItemConstants {
         6540, // Mirror
         6542, // Egg
         6544, // Shard
-        6546  // Fruit
+        6546, // Fruit
+        6548  // Demonic Flame
     ];
 
     static readonly OtherEnhancementMaterials: ReadonlyArray<number> = [

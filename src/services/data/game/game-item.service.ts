@@ -1,10 +1,12 @@
-import { GameItem, Nullable, Page, Pagination, ReadonlyRecord } from '../../../types';
+import { CacheArray, CacheMap, GameItem, Nullable, Page, Pagination } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
 
-type ItemsCache = ReadonlyArray<Readonly<GameItem>>;
+type ItemsCache = CacheArray<GameItem>;
 
-type ItemsCacheMap = ReadonlyRecord<number, Readonly<GameItem>>;
+type ItemsCacheMap = CacheMap<number, GameItem>;
+
+export type GameItemList = ItemsCache;
 
 export type GameItemMap = ItemsCacheMap;
 

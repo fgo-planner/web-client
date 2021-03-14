@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { PromptDialog } from '../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../components/fab/fab-container.component';
 import { NavigationRail } from '../../../components/navigation/navigation-rail.component';
+import { PageTitle } from '../../../components/text/page-title.component';
 import { GameServantService } from '../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
@@ -108,6 +109,12 @@ const MasterServants = class extends PureComponent<Props, State> {
                 show={showNavRail && !editMode}
                 disableAnimations
             >
+                <PageTitle>
+                    {editMode ?
+                        'Edit Servant Roster' :
+                        'Servant Roster'
+                    }
+                </PageTitle>
                 <MasterServantList
                     editMode={editMode}
                     showActions

@@ -4,6 +4,7 @@ import React, { PureComponent, ReactNode } from 'react';
 import { GameItemConstants } from '../../../../../../constants';
 import { GameItemService } from '../../../../../../services/data/game/game-item.service';
 import { GameItem, MasterItem, WithStylesProps } from '../../../../../../types';
+import { MasterItemListHeader } from './master-item-list-header.component';
 import { MasterItemListRow } from './master-item-list-row.component';
 
 type ItemCategory = { label: string; itemIds: ReadonlyArray<number> };
@@ -26,12 +27,10 @@ type State = {
 
 const style = (theme: Theme) => ({
     root: {
-        maxWidth: `${theme.breakpoints.width('md')}px`,
-        padding: theme.spacing(0, 4),
-        margin: 'auto'
+        paddingBottom: theme.spacing(16)
     },
     itemCategory: {
-        paddingBottom: theme.spacing(2),
+        paddingBottom: theme.spacing(8),
         '& .section-subheader': {
             paddingTop: theme.spacing(2)
         }
@@ -104,9 +103,7 @@ export const MasterItemList = withStyles(style, styleOptions)(class extends Pure
         const { classes } = this.props;
         return (
             <div className={classes.itemCategory} key={key}>
-                <div className="section-subheader">
-                    {category.label}
-                </div>
+                <MasterItemListHeader categoryLabel={category.label} showQuantityLabel={key === 0} />
                 {category.items.map(this._renderItemRow)}
             </div>
         );

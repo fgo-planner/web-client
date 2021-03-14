@@ -2,7 +2,6 @@ import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment } from 'react';
 import { GameItemThumbnail } from '../../../../../../components/game/item/game-item-thumbnail.component';
-import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { GameItem } from '../../../../../../types';
 
 type Props = {
@@ -12,10 +11,7 @@ type Props = {
 
 const style = (theme: Theme) => ({
     itemName: {
-        padding: theme.spacing(0, 4),
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontSize: '14px',
-        fontWeight: 500
+        padding: theme.spacing(0, 4)
     }
 } as StyleRules);
 
@@ -31,7 +27,7 @@ export const MasterItemListRowLabel = React.memo(({ item, editMode }: Props) => 
         <Fragment>
             <GameItemThumbnail
                 item={item}
-                size={52}
+                size={56}
                 showBackground
                 enableLink={!editMode}
             />

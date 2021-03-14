@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { FabContainer } from '../../../components/fab/fab-container.component';
 import { NavigationRail } from '../../../components/navigation/navigation-rail.component';
+import { PageTitle } from '../../../components/text/page-title.component';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
 import { MasterAccount, MasterItem, Nullable } from '../../../types';
@@ -64,9 +65,13 @@ const MasterItems = class extends PureComponent<Props, State> {
                 show={showNavRail && !editMode}
                 disableAnimations
             >
-                <div className="py-4">
-                    <MasterItemList editMode={editMode} masterItems={masterItems} />
-                </div>
+                <PageTitle>
+                    {editMode ?
+                        'Edit Item Inventory' :
+                        'Item Inventory'
+                    }
+                </PageTitle>
+                <MasterItemList editMode={editMode} masterItems={masterItems} />
                 <FabContainer children={this._renderFab(editMode)} />
             </NavigationRail>
         );

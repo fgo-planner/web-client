@@ -14,7 +14,7 @@ type Props = {
 const style = (theme: Theme) => ({
     root: {
         display: 'flex',
-        padding: theme.spacing(8, 0, 4, 4),
+        padding: theme.spacing(4, 0, 4, 4),
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
         textAlign: 'center',

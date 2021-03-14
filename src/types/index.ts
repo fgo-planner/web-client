@@ -22,6 +22,7 @@ export * from './data/pagination.type';
 export * from './data/user-credentials.type';
 export * from './data/user/user.type';
 export * from './internal/game/servant/game-servant-class-simplified.type';
+export * from './internal/generics/cache-array.type';
 export * from './internal/generics/cache-map.type';
 export * from './internal/generics/nullable.type';
 export * from './internal/generics/optional.type';

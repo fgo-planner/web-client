@@ -1,7 +1,8 @@
-import { fade, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
+import { StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
 import NumberFormat from 'react-number-format';
+import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { GameItem, MasterItem, WithStylesProps } from '../../../../../../types';
 import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 
@@ -19,13 +20,7 @@ const style = (theme: Theme) => ({
         alignContent: 'center',
         alignItems: 'center',
         height: '64px',
-        padding: theme.spacing(0, 4),
-        '&:not(:last-child)': {
-            borderBottom: `1px solid ${theme.palette.divider}`
-        },
-        '&:hover': {
-            background: fade(theme.palette.text.primary, 0.07)
-        }
+        padding: theme.spacing(0, 8, 0, 4)
     }
 } as StyleRules);
 
@@ -44,13 +39,15 @@ export const MasterItemListRow = withStyles(style, styleOptions)(class extends P
     render(): ReactNode {
         const { classes, key, item, editMode } = this.props;
         return (
-            <div className={classes.root} key={key}>
-                <MasterItemListRowLabel item={item.item} editMode={editMode} />
-                <div className="flex-fill" />
-                <div>
-                    {editMode ? this._renderItemEditMode(item) : this._renderItemViewMode(item)}
+            <StaticListRowContainer>
+                <div className={classes.root} key={key}>
+                    <MasterItemListRowLabel item={item.item} editMode={editMode} />
+                    <div className="flex-fill" />
+                    <div>
+                        {editMode ? this._renderItemEditMode(item) : this._renderItemViewMode(item)}
+                    </div>
                 </div>
-            </div>
+            </StaticListRowContainer>
         );
     }
 

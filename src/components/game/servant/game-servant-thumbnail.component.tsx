@@ -19,21 +19,26 @@ const DefaultVariant = 'square';
 
 const DefaultStage = 2;
 
+const DefaultSize = 56;
+
 export const GameServantThumbnail = React.memo((props: Props) => {
 
     const {
         children,
         servant,
         stage,
-        size,
         variant,
         enableLink,
         openLinkInNewTab
     } = props;
 
+    let {size} = props;
+
     const servantId = servant._id;
     const imageVariant = (stage ?? DefaultStage) - 1;
     const imageUrl = `${ThumbnailBaseUrl}/f_${servantId}${imageVariant}.png`;
+
+    size = size || DefaultSize;
 
     const avatar = (
         <Avatar

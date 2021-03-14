@@ -15,6 +15,8 @@ type Props = {
 
 const ImageBaseUrl = AssetConstants.ItemImageBaseUrl;
 
+const DefaultSize = 42;
+
 const style = (theme: Theme) => ({
     thumbnailContainer: {
         position: 'relative'
@@ -47,10 +49,11 @@ export const GameItemThumbnail = React.memo((props: Props) => {
     const {
         item,
         showBackground,
-        size,
         enableLink,
         openLinkInNewTab
     } = props;
+
+    let { size } = props;
 
     const classes = useStyles();
 
@@ -59,6 +62,7 @@ export const GameItemThumbnail = React.memo((props: Props) => {
 
     const imageUrl = `${ImageBaseUrl}/${itemId}.png`;
 
+    size = size || DefaultSize;
     const sizeStyle = {
         width: size,
         height: size

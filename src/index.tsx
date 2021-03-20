@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { PageMetadata } from './components/page-metadata.component';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { RootModule as Root } from './root.module';
@@ -7,6 +8,7 @@ import './styles/styles.scss';
 
 const element = (
     <React.StrictMode>
+        <PageMetadata />
         <Root parentPath="/" />
     </React.StrictMode>
 );

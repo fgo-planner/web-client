@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import defaultDarkTheme from '../../styles/theme-default-dark';
 import defaultLightTheme from '../../styles/theme-default-light';
 import { ThemeMode } from '../../types';
+import { PageMetadataService } from './page-metadata.service';
 
 export class ThemeService {
 
@@ -28,6 +29,7 @@ export class ThemeService {
     private static _initialize(): void {
         this._themeMode = this._loadThemeModeFromStorage();
         const theme = this._getDefaultThemeForMode(this._themeMode);
+        this._setThemeColorMeta(theme);
         this._onThemeChange = new BehaviorSubject<Theme>(theme);
     }
 
@@ -38,6 +40,7 @@ export class ThemeService {
             this._setThemeMode('light');
         }
         const theme = this._getDefaultThemeForMode(this._themeMode);
+        this._setThemeColorMeta(theme);
         this._onThemeChange.next(theme);
     }
 
@@ -65,6 +68,13 @@ export class ThemeService {
     private static _setThemeMode(themeMode: ThemeMode): void {
         this._themeMode = themeMode;
         localStorage.setItem(this._ThemeModeKey, themeMode);
+    }
+
+    /**
+     * Sets the `theme-color` metadata.
+     */
+    private static _setThemeColorMeta(theme: Theme): void {
+        PageMetadataService.setThemeColor(theme.palette.background.default);
     }
 
 }

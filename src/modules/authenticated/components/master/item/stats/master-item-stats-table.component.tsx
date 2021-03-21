@@ -1,4 +1,4 @@
-import { makeStyles, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
+import { fade, makeStyles, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode } from 'react';
 import NumberFormat from 'react-number-format';
@@ -50,6 +50,9 @@ const style = (theme: Theme) => ({
         borderTop: `1px solid ${theme.palette.divider}`,
         '& .MuiTableCell-root': {
             borderBottom: 'none'
+        },
+        '&:hover': {
+            background: fade(theme.palette.text.primary, 0.07)
         }
     },
     thumbnailContainer: {

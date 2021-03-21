@@ -1,4 +1,4 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
@@ -50,6 +50,9 @@ const style = (theme: Theme) => ({
         borderTop: `1px solid ${theme.palette.divider}`,
         '& .MuiTableCell-root': {
             borderBottom: 'none'
+        },
+        '&:hover': {
+            background: fade(theme.palette.text.primary, 0.07)
         }
     },
     expandable: {

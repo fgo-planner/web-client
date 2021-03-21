@@ -1,6 +1,6 @@
 {
-  "name": "fgo-servant-planner-web-client",
-  "description": "Web browser client for the FGO servant planner project.",
+  "name": "fgo-planner-web-client",
+  "description": "Web browser client for the FGO Planner project.",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

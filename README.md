@@ -1,1 +1,1 @@
-fgo-tracker-web-client-react
+fgo-planner-web-client

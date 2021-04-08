@@ -3,6 +3,8 @@ import { GameServant, GameServantEnhancement, MasterAccount, MasterServant } fro
 import { MapUtils } from '../map.utils';
 
 export type ItemStat = {
+    ownedServantsCost: number;
+    allServantsCost: number;
     inventory: number;
     used: number;
     ownedServantsDebt: number;
@@ -133,13 +135,16 @@ export class MasterItemStatsUtils {
         for (const material of enhancement.materials) {
             const quantity = material.quantity;
             const stat = MapUtils.getOrDefault(stats, material.itemId, this._instantiateItemStat);
+            const cost = quantity * maxUpgrades;
             if (!owned) {
-                const debt = quantity * maxUpgrades;
-                stat.allServantsDebt += debt;
+                stat.allServantsCost += cost;
+                stat.allServantsDebt += cost;
             } else {
                 const used = upgradeCount * quantity;
-                const debt = quantity * maxUpgrades - used;
+                const debt = cost - used;
                 stat.used += used;
+                stat.ownedServantsCost += cost;
+                stat.allServantsCost += cost;
                 stat.ownedServantsDebt += debt;
                 stat.allServantsDebt += debt;
             }
@@ -148,13 +153,16 @@ export class MasterItemStatsUtils {
         // QP Stats
         const quantity = enhancement.qp;
         const stat = stats[this._QPItemId];
+        const cost = quantity * maxUpgrades;
         if (!owned) {
-            const debt = quantity * maxUpgrades;
-            stat.allServantsDebt += debt;
+            stat.allServantsCost += cost;
+            stat.allServantsDebt += cost;
         } else {
             const used = upgradeCount * quantity;
-            const debt = quantity * maxUpgrades - used;
+            const debt = cost - used;
             stat.used += used;
+            stat.ownedServantsCost += cost;
+            stat.allServantsCost += cost;
             stat.ownedServantsDebt += debt;
             stat.allServantsDebt += debt;
         }
@@ -162,6 +170,8 @@ export class MasterItemStatsUtils {
 
     private static _instantiateItemStat(): ItemStat {
         return {
+            ownedServantsCost: 0,
+            allServantsCost: 0,
             inventory: 0,
             used: 0,
             ownedServantsDebt: 0,

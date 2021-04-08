@@ -13,17 +13,21 @@ type Props = {
     includeUnownedServants?: boolean;
 };
 
+const CostColumnTooltip = 'Amount needed for servant enhancements';
+
+const CostColumnTooltipInclUnowned = `${CostColumnTooltip}, including servants that have not yet been summoned`;
+
+const UsedColumnTooltip = 'Amount used for servant enhancements';
+
 const InventoryColumnTooltip = 'Current amount in inventory';
 
-const UsedColumnTooltip = 'Amount used for servant upgrades';
+const DebtColumnTooltip = 'Amount needed for remaining servant enhancements';
 
-const TargetColumnTooltip = 'Amount needed to max out remaining servants';
+const DebtColumnTooltipInclUnowned = `${DebtColumnTooltip}, including servants that have not yet been summoned`;
 
-const TargetColumnTooltipInclUnowned = `${TargetColumnTooltip}, including servants that have not yet been summoned`;
+const DifferenceColumnTooltip = 'Additional amount that needs to be acquired in order to fullfil the \'Remaining Needed\' column';
 
-const DifferenceColumnTooltip = 'Additional amount that needs to be acquired in order to fullfil the \'Max Upgrades\' column';
-
-const ColumnWidth = '17%';
+const ColumnWidth = '15%';
 
 const ItemIds = [
     ...GameItemConstants.SkillGems,
@@ -76,8 +80,16 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
             // TODO Throw exception
             return null;
         }
-        const { inventory, used, ownedServantsDebt, allServantsDebt } = stat;
-        const target = includeUnownedServants ? allServantsDebt : ownedServantsDebt;
+        const {
+            ownedServantsCost,
+            allServantsCost,
+            inventory,
+            used,
+            ownedServantsDebt,
+            allServantsDebt
+        } = stat;
+        const cost = includeUnownedServants ? allServantsCost : ownedServantsCost;
+        const debt = includeUnownedServants ? allServantsDebt : ownedServantsDebt;
         return (
             <TableRow key={itemId} className={classes.dataRow}>
                 <TableCell>
@@ -100,7 +112,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
                     <NumberFormat
                         thousandSeparator
                         displayType="text"
-                        value={inventory}
+                        value={cost}
                     />
                 </TableCell>
                 <TableCell align="center">
@@ -114,14 +126,21 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
                     <NumberFormat
                         thousandSeparator
                         displayType="text"
-                        value={target}
+                        value={inventory}
                     />
                 </TableCell>
                 <TableCell align="center">
                     <NumberFormat
                         thousandSeparator
                         displayType="text"
-                        value={Math.max(0, target - inventory)}
+                        value={debt}
+                    />
+                </TableCell>
+                <TableCell align="center">
+                    <NumberFormat
+                        thousandSeparator
+                        displayType="text"
+                        value={Math.max(0, debt - inventory)}
                     />
                 </TableCell>
             </TableRow>
@@ -135,23 +154,28 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
                     <TableRow>
                         <TableCell />
                         <TableCell align="center" width={ColumnWidth}>
-                            <Tooltip title={InventoryColumnTooltip} placement="top">
-                                <div>Inventory</div>
+                            <Tooltip title={includeUnownedServants ? CostColumnTooltipInclUnowned : CostColumnTooltip} placement="top">
+                                <div>Total Needed</div>
                             </Tooltip>
                         </TableCell>
                         <TableCell align="center" width={ColumnWidth}>
                             <Tooltip title={UsedColumnTooltip} placement="top">
-                                <div>Used</div>
+                                <div>Total Consumed</div>
                             </Tooltip>
                         </TableCell>
                         <TableCell align="center" width={ColumnWidth}>
-                            <Tooltip title={includeUnownedServants ? TargetColumnTooltipInclUnowned : TargetColumnTooltip} placement="top" >
-                                <div>Max Upgrades</div>
+                            <Tooltip title={InventoryColumnTooltip} placement="top">
+                                <div>Current Inventory</div>
+                            </Tooltip>
+                        </TableCell>
+                        <TableCell align="center" width={ColumnWidth}>
+                            <Tooltip title={includeUnownedServants ? DebtColumnTooltipInclUnowned : DebtColumnTooltip} placement="top" >
+                                <div>Remaining Needed</div>
                             </Tooltip>
                         </TableCell>
                         <TableCell align="center" width={ColumnWidth}>
                             <Tooltip title={DifferenceColumnTooltip} placement="top">
-                                <div>Difference</div>
+                                <div>Deficit</div>
                             </Tooltip>
                         </TableCell>
                     </TableRow>

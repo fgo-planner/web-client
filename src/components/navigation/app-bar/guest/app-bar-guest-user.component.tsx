@@ -1,16 +1,18 @@
-import { StyleRules, Theme, withStyles } from '@material-ui/core';
+import { IconButton, makeStyles, PaperProps, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { Fragment, PureComponent, ReactNode } from 'react';
-import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
-import { ModalOnCloseReason, WithStylesProps } from '../../../../types';
+import { NightsStay as NightsStayIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
+import React, { Fragment, useCallback, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import { ThemeService } from '../../../../services/user-interface/theme.service';
+import { ModalOnCloseReason } from '../../../../types';
 import { LoginDialog } from '../../../login/login-dialog.component';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
 
-type Props = WithStylesProps & ReactRouteComponentProps;
-
-type State = {
-    loginModalOpen: boolean;
+const LoginDialogPaperProps: PaperProps = { 
+    style: { 
+        minWidth: 360 
+    } 
 };
 
 const style = (theme: Theme) => ({
@@ -19,6 +21,7 @@ const style = (theme: Theme) => ({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        alignItems: 'center',
         padding: theme.spacing(0, 4)
     }
 } as StyleRules);
@@ -27,85 +30,38 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'AppBarGuestUser'
 };
 
+const useStyles = makeStyles(style, styleOptions);
+
 /**
  * Renders the app bar contents for a guest (not logged in) user.
  */
-export const AppBarGuestUser = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
+export const AppBarGuestUser = React.memo(() => {
+    const classes = useStyles();
+    const location = useLocation();
+    const history = useHistory();
+    const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
 
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            loginModalOpen: false
-        };
-
-        this._openLoginDialog = this._openLoginDialog.bind(this);
-        this._handleLoginDialogClose = this._handleLoginDialogClose.bind(this);
-    }
- 
-    render(): ReactNode {
-        const { classes } = this.props;
-        const { loginModalOpen } = this.state;
-        return (
-            <Fragment>
-                <div className={classes.root}>
-                    <AppBarLinks>
-                        <AppBarLink
-                            label="Servants"
-                            route="/resources/servants"
-                            active={this._isLinkActive('/resources/servants') && !loginModalOpen}
-                        />
-                        <AppBarLink
-                            label="Items"
-                            route="/resources/items"
-                            active={this._isLinkActive('/resources/items') && !loginModalOpen}
-                        />
-                        <AppBarLink
-                            label="Events"
-                            route="/resources/events"
-                            active={this._isLinkActive('/resources/events') && !loginModalOpen}
-                        />
-                        <AppBarLink
-                            label="Login"
-                            onClick={this._openLoginDialog}
-                            active={this._isLinkActive('/login') || loginModalOpen}
-                        />
-                    </AppBarLinks>
-                </div>
-                <LoginDialog
-                    PaperProps={{ style: { minWidth: 360 } }}
-                    open={loginModalOpen}
-                    onClose={this._handleLoginDialogClose}
-                />
-            </Fragment>
-        );
-    }
-
-    private _openLoginDialog(): void {
-        const { location, history } = this.props;
-        const pathname = location?.pathname;
+    const openLoginDialog = useCallback((): void => {
+        const pathname = location.pathname;
         /*
-         * If the user is on a rearouses page, then show the dialog for logging in
-         * instead of redirecting to the login page. This is so the user can
-         * continue to view the resource page after logging in without
-         * interruption.
+         * If the user is on a resources page, then show the dialog for logging in
+         * instead of redirecting to the login page. This is so the user can continue
+         * to view the resource page after logging in without interruption.
          * 
          * TODO Maybe this is not a good idea...
          */
         if (pathname?.includes('resources')) {
-            this.setState({ loginModalOpen: true });
+            setLoginModalOpen(true);
         } else {
             history.push('/login');
         }
-    }
+    }, [location.pathname, history]);
 
-    private _handleLoginDialogClose(event: any, reason: ModalOnCloseReason): void {
-        this.setState({
-            loginModalOpen: false
-        });
-    }
+    const handleLoginDialogClose = useCallback((event: any, reason: ModalOnCloseReason): void => {
+        setLoginModalOpen(false);
+    }, []);
 
-    private _isLinkActive(route: string, exact?: boolean): boolean {
-        const { location } = this.props;
+    const isLinkActive = (route: string, exact?: boolean): boolean => {
         if (!route) {
             return false;
         }
@@ -114,6 +70,44 @@ export const AppBarGuestUser = withRouter(withStyles(style, styleOptions)(class 
         } else {
             return location?.pathname.startsWith(route);
         }
-    }
+    };
 
-}));
+    return (
+        <Fragment>
+            <div className={classes.root}>
+                <AppBarLinks>
+                    <AppBarLink
+                        label="Servants"
+                        route="/resources/servants"
+                        active={isLinkActive('/resources/servants') && !loginModalOpen}
+                    />
+                    <AppBarLink
+                        label="Items"
+                        route="/resources/items"
+                        active={isLinkActive('/resources/items') && !loginModalOpen}
+                    />
+                    <AppBarLink
+                        label="Events"
+                        route="/resources/events"
+                        active={isLinkActive('/resources/events') && !loginModalOpen}
+                    />
+                    <AppBarLink
+                        label="Login"
+                        onClick={openLoginDialog}
+                        active={isLinkActive('/login') || loginModalOpen}
+                    />
+                </AppBarLinks>
+                <IconButton
+                    onClick={() => ThemeService.toggleThemeMode()}
+                    children={ThemeService.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
+                />
+            </div>
+            <LoginDialog
+                PaperProps={LoginDialogPaperProps}
+                open={loginModalOpen}
+                onClose={handleLoginDialogClose}
+            />
+        </Fragment>
+    );
+
+});

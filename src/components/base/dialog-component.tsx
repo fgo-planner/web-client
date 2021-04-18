@@ -14,6 +14,10 @@ const DefaultActionButtonVariant = 'text';
 
 const DefaultFullscreenActionButtonVariant = 'contained';
 
+/**
+ * @deprecated New dialogs should be function components and should use the
+ * `useAutoResizeDialog` hook to compute full screen props.
+ */
 export abstract class DialogComponent<P extends Props<T>, S = {}, T = {}> extends ModalComponent<P, S> {
 
     shouldComponentUpdate(nextProps: Readonly<P>, nextState: Readonly<S>): boolean {

@@ -3,6 +3,8 @@ import { MasterAccount, Nullable, ReadonlyPartialArray, UserInfo } from '../../.
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { AuthenticationService } from '../../authentication/auth.service';
 
+export type MasterAccountList = ReadonlyPartialArray<MasterAccount>;
+
 export class MasterAccountService {
     
     private static readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user/master-account`;
@@ -20,13 +22,13 @@ export class MasterAccountService {
      * the list do not contain the entire master account data; only the _id, name,
      * and friendId fields are present.
      */
-    private static _masterAccountList: ReadonlyPartialArray<MasterAccount> = [];
+    private static _masterAccountList: MasterAccountList = [];
 
     static readonly onCurrentMasterAccountChange = new BehaviorSubject<Nullable<MasterAccount>>(null);
 
     static readonly onCurrentMasterAccountUpdated = new BehaviorSubject<Nullable<MasterAccount>>(null);
 
-    static readonly onMasterAccountListUpdated = new BehaviorSubject<ReadonlyPartialArray<MasterAccount>>([]);
+    static readonly onMasterAccountListUpdated = new BehaviorSubject<MasterAccountList>([]);
 
     /**
      * Initialization method, simulates a static constructor.
@@ -45,7 +47,7 @@ export class MasterAccountService {
         return account;
     }
 
-    static async getAccountsForCurrentUser(): Promise<Partial<MasterAccount>[]> {
+    static async getAccountsForCurrentUser(): Promise<MasterAccountList> {
         await this._updateMasterAccountList();
         return this._masterAccountList?.map(account => { return { ...account }; });
     }
@@ -58,6 +60,13 @@ export class MasterAccountService {
         const updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount);
         this.onCurrentMasterAccountUpdated.next(this._currentMasterAccount = updated);
         return updated;
+    }
+
+    static async deleteAccount(id: string): Promise<MasterAccount> {
+        const deleted = await Http.delete<MasterAccount>(`${this._BaseUrl}/${id}`);
+        await this._updateMasterAccountList(); // Reload account list
+        this._autoSelectAccount();
+        return deleted;
     }
 
     /**

@@ -2,6 +2,7 @@ import React from 'react';
 import { ModuleComponent } from '../../components/base/module-component';
 import { RouteDefinitions } from '../../types';
 import { MasterAccountHomeRoute } from './routes/master-account-home.route';
+import { MasterAccountsRoute } from './routes/master-accounts.route';
 import { MasterItemStatsRoute } from './routes/master-item-stats.route';
 import { MasterItemsRoute } from './routes/master-items.route';
 import { MasterServantStatsRoute } from './routes/master-servant-stats.route';
@@ -16,9 +17,14 @@ export default class AuthenticatedModule extends ModuleComponent {
             redirectTo: '/master'
         },
         {
+            path: '/master-accounts',
+            exact: true,
+            component: MasterAccountsRoute
+        },
+        {
             path: '/master',
             exact: true,
-            component: MasterAccountHomeRoute,
+            component: MasterAccountHomeRoute
         },
         {
             path: '/master/servants',

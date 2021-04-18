@@ -78,7 +78,7 @@ export class HttpUtils {
         }
         const headers = this._appendAuthorizationHeader();
         const init = {
-            method: 'PUT',
+            method: 'DELETE',
             headers
         };
         const response = await fetch(url, init);

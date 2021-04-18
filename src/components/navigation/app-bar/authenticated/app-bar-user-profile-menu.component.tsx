@@ -1,6 +1,6 @@
 import { Avatar, Divider, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, InfoOutlined as InfoOutlinedIcon, NightsStay as NightsStayIcon, Settings as SettingsIcon, SupervisedUserCircleOutlined as SupervisedUserCircleIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
-import React, { PureComponent, ReactNode } from 'react';
+import { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../../../../services/authentication/auth.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';

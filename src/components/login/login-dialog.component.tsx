@@ -18,11 +18,6 @@ type State = {
 const FormId = 'login-dialog-form';
 
 const style = (theme: Theme) => ({
-    root: {
-        background: 'blue',
-        color: 'purple',
-        width: 500
-    },
     errorMessage: {
         color: 'red',
         padding: theme.spacing(0, 2, 4, 2)

@@ -18,7 +18,7 @@ const getActionButtonVariant = (fullScreen: boolean): ButtonProps['variant'] => 
     return fullScreen ? DefaultFullscreenActionButtonVariant : DefaultActionButtonVariant;
 };
 
-export const useAutoResizeDialog = (props: DialogComponentProps) => {
+export const useAutoResizeDialog = (props: DialogComponentProps<any>) => {
     const isXs = useMediaQuery((theme: Theme) => theme.breakpoints.only('xs'));
     /**
      * If the `fullScreen` property was provided as a prop, then use its value.

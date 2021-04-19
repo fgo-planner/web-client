@@ -12,4 +12,4 @@ export type DialogComponentProps<T = {}> = {
      * - `never`: Never show the close button.
      */
     showCloseIcon?: 'auto' | 'always' | 'never';
-} & DialogProps & ModalComponentProps<T> & Partial<WithWidthProps>;
+} & Omit<DialogProps, 'children' | 'onClose'> & ModalComponentProps<T> & Partial<WithWidthProps>;

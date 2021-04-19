@@ -24,7 +24,7 @@ const generateDeleteAccountDialogPrompt = (masterAccount: ReadonlyPartial<Master
     const { name, friendId } = masterAccount;
     let prompt = 'Are you sure you want to delete the account';
     if (name) {
-        prompt += ` '${name }'`;
+        prompt += ` '${name}'`;
     }
     if (friendId) {
         prompt += ` with friend ID ${friendId}`;

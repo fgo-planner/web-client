@@ -5,6 +5,7 @@ import { MasterAccountHomeRoute } from './routes/master-account-home.route';
 import { MasterAccountsRoute } from './routes/master-accounts.route';
 import { MasterItemStatsRoute } from './routes/master-item-stats.route';
 import { MasterItemsRoute } from './routes/master-items.route';
+import { MasterPlansRoute } from './routes/master-plans.route';
 import { MasterServantStatsRoute } from './routes/master-servant-stats.route';
 import { MasterServantsRoute } from './routes/master-servants.route';
 
@@ -45,6 +46,11 @@ export default class AuthenticatedModule extends ModuleComponent {
             path: '/master/items/stats',
             exact: true,
             component: MasterItemStatsRoute
+        },
+        {
+            path: '/master/planner',
+            exact: true,
+            component: MasterPlansRoute
         },
         {
             path: '/master/data/import/servants',

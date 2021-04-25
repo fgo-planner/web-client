@@ -1,8 +1,9 @@
 import { Avatar, Divider, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, InfoOutlined as InfoOutlinedIcon, NightsStay as NightsStayIcon, Settings as SettingsIcon, SupervisedUserCircleOutlined as SupervisedUserCircleIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
+import { AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, InfoOutlined as InfoOutlinedIcon, NightsStay as NightsStayIcon, Settings as SettingsIcon, SupervisedUserCircleOutlined as SupervisedUserCircleIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
 import { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../../../../services/authentication/auth.service';
+import { BackgroundMusicService } from '../../../../services/user-interface/background-music.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ModalOnCloseHandler, ThemeMode, User, WithStylesProps } from '../../../../types';
@@ -17,6 +18,7 @@ type Props = {
 
 type State = {
     themeMode: ThemeMode;
+    isBackgroundMusicPlaying: boolean;
 };
 
 const style = (theme: Theme) => ({
@@ -53,18 +55,24 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
 
     private _onThemeChangeSubscription!: Subscription;
 
+    private _onPlayStatusChangeSubscription!: Subscription;
+
     constructor(props: Props) {
         super(props);
         this.state = {
-            themeMode: ThemeService.themeMode
+            themeMode: ThemeService.themeMode,
+            isBackgroundMusicPlaying: false
         };
         this._logout = this._logout.bind(this);
         this._toggleThemeMode = this._toggleThemeMode.bind(this);
+        this._handleBackgroundMusicButtonClick = this._handleBackgroundMusicButtonClick.bind(this);
     }
 
     componentDidMount(): void {
         this._onThemeChangeSubscription = ThemeService.onThemeChange
             .subscribe(this._handleThemeChange.bind(this));
+        this._onPlayStatusChangeSubscription = BackgroundMusicService.onPlayStatusChange
+            .subscribe(this._handleBackgroundMusicPlayStatusChange.bind(this));
     }
 
     componentWillUnmount(): void {
@@ -72,7 +80,8 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
     }
 
     render(): ReactNode {
-        const isLightMode = this.state.themeMode === 'light';
+        const { themeMode, isBackgroundMusicPlaying } = this.state;
+        const isLightMode = themeMode === 'light';
         return (
             <AppBarActionMenu
                 className={this.props.classes.root}
@@ -108,6 +117,11 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
                     onClick={this._toggleThemeMode}
                 />
                 <AppBarActionMenuItem
+                    label={`Music: ${isBackgroundMusicPlaying ? 'On' : 'Off'}`}
+                    icon={isBackgroundMusicPlaying ? VolumeUpIcon : VolumeOffIcon}
+                    onClick={this._handleBackgroundMusicButtonClick}
+                />
+                <AppBarActionMenuItem
                     label="About"
                     icon={InfoOutlinedIcon}
                 />
@@ -140,9 +154,21 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
         ThemeService.toggleThemeMode();
     }
 
+    private _handleBackgroundMusicButtonClick(): void {
+        if (this.state.isBackgroundMusicPlaying) {
+            BackgroundMusicService.pause();
+        } else {
+            BackgroundMusicService.play();
+        }
+    }
+
     private _handleThemeChange(theme: Theme): void {
         const themeMode = ThemeService.themeMode;
         this.setState({ themeMode });
+    }
+
+    private _handleBackgroundMusicPlayStatusChange(isPlaying: boolean): void {
+        this.setState({ isBackgroundMusicPlaying: isPlaying });
     }
 
 });

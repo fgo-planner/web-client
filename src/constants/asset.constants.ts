@@ -8,6 +8,8 @@ export class AssetConstants {
 
     private static readonly _InternalThumbnailAssetsBaseUrl = `${AssetConstants._InternalAssetsBaseUrl}/thumbnails`;
 
+    private static readonly _InternalSoundAssetsBaseUrl = `${AssetConstants._InternalAssetsBaseUrl}/sounds`;
+
     private static readonly _AtlasAcademyAssetsBaseUrl = 'https://assets.atlasacademy.io/GameData/JP';
 
     static readonly ItemImageBaseUrl = `${AssetConstants._AtlasAcademyAssetsBaseUrl}/Items`;
@@ -50,5 +52,7 @@ export class AssetConstants {
     static readonly ServantNoblePhantasmIconSmallUrl = `${AssetConstants._InternalIconAssetsBaseUrl}/np_small.png`;
 
     static readonly ServantThumbnailBaseUrl = `${AssetConstants._AtlasAcademyAssetsBaseUrl}/Faces`;
+
+    static readonly BackgroundMusic = `${AssetConstants._InternalSoundAssetsBaseUrl}/background.mp3`;
 
 }

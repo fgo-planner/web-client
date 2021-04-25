@@ -1,10 +1,11 @@
 import { IconButton, makeStyles, PaperProps, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { NightsStay as NightsStayIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
-import React, { Fragment, useCallback, useState } from 'react';
+import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
+import { BackgroundMusicService } from '../../../../services/user-interface/background-music.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
-import { ModalOnCloseReason } from '../../../../types';
+import { ModalOnCloseReason, ThemeMode } from '../../../../types';
 import { LoginDialog } from '../../../login/login-dialog.component';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
@@ -39,7 +40,22 @@ export const AppBarGuestUser = React.memo(() => {
     const classes = useStyles();
     const location = useLocation();
     const history = useHistory();
+
     const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
+    const [themeMode, setThemeMode] = useState<ThemeMode>();
+    const [isBackgroundMusicPlaying, setBackgroundMusicPlaying] = useState<boolean>();
+
+    useEffect(() => {
+        const onThemeChangeSubscription = ThemeService.onThemeChange
+            .subscribe(() => setThemeMode(ThemeService.themeMode));
+        const onPlayStatusChangeSubscription = BackgroundMusicService.onPlayStatusChange
+            .subscribe(setBackgroundMusicPlaying);
+
+        return () => {
+            onThemeChangeSubscription.unsubscribe();
+            onPlayStatusChangeSubscription.unsubscribe();
+        };
+    }, []);
 
     const openLoginDialog = useCallback((): void => {
         const pathname = location.pathname;
@@ -99,7 +115,11 @@ export const AppBarGuestUser = React.memo(() => {
                 </AppBarLinks>
                 <IconButton
                     onClick={() => ThemeService.toggleThemeMode()}
-                    children={ThemeService.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
+                    children={themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
+                />
+                <IconButton
+                    onClick={() => isBackgroundMusicPlaying ? BackgroundMusicService.pause() : BackgroundMusicService.play()}
+                    children={isBackgroundMusicPlaying ? <VolumeUpIcon /> : <VolumeOffIcon />}
                 />
             </div>
             <LoginDialog

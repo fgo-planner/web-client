@@ -5,6 +5,7 @@ export * from './data/game/item/game-item.type';
 export * from './data/game/servant/game-servant-attribute.enum';
 export * from './data/game/servant/game-servant-card-type.enum';
 export * from './data/game/servant/game-servant-class.enum';
+export * from './data/game/servant/game-servant-costume.type';
 export * from './data/game/servant/game-servant-deck.enum';
 export * from './data/game/servant/game-servant-enhancement.type';
 export * from './data/game/servant/game-servant-gender.enum';

@@ -2,6 +2,7 @@ import { Entity } from '../../entity.type';
 import { ExternalLink } from '../../external-link.type';
 import { GameServantAttribute } from './game-servant-attribute.enum';
 import { GameServantClass } from './game-servant-class.enum';
+import { GameServantCostume } from './game-servant-costume.type';
 import { GameServantEnhancement } from './game-servant-enhancement.type';
 import { GameServantGender } from './game-servant-gender.enum';
 import { GameServantGrowthCurve } from './game-servant-growth-curve.enum';
@@ -88,7 +89,7 @@ export type GameServant = Entity<number> & {
 
     };
 
-    costumeMaterials?: Record<number, GameServantEnhancement>;
+    costumes: Record<number, GameServantCostume>;
 
     metadata: {
 

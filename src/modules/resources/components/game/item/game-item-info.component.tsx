@@ -135,7 +135,8 @@ export const GameItemInfo = withStyles(style, styleOptions)(class extends PureCo
         };
         const servants = await GameServantService.getServants();
         for (const servant of servants) {
-            const { skillMaterials, ascensionMaterials, costumeMaterials } = servant;
+            const { skillMaterials, ascensionMaterials } = servant;
+            const costumeMaterials = Object.values(servant.costumes).map(c => c.materials);
 
             const skills = this._computeEnhancementsUsage(skillMaterials, itemId);
             totalUsage.skills += skills;

@@ -87,12 +87,10 @@ export class MasterItemStatsUtils {
             }
         }
 
-        if (servant.costumeMaterials) {
-            for (const [key, costume] of Object.entries(servant.costumeMaterials)) {
-                const costumeId = Number(key);
-                const costumeUnlocked =  masterServant.costumes?.indexOf(costumeId) !== -1;
-                this._updateForEnhancement(stats, costume, true, 1, costumeUnlocked ? 1 : 0);
-            }
+        for (const [key, costume] of Object.entries(servant.costumes)) {
+            const costumeId = Number(key);
+            const costumeUnlocked =  masterServant.costumes?.indexOf(costumeId) !== -1;
+            this._updateForEnhancement(stats, costume.materials, true, 1, costumeUnlocked ? 1 : 0);
         }
     }
 
@@ -105,10 +103,8 @@ export class MasterItemStatsUtils {
                 this._updateForEnhancement(stats, ascension);
             }
         }
-        if (servant.costumeMaterials) {
-            for (const costume of Object.values(servant.costumeMaterials)) {
-                this._updateForEnhancement(stats, costume);
-            }
+        for (const costume of Object.values(servant.costumes)) {
+            this._updateForEnhancement(stats, costume.materials);
         }
     }
 

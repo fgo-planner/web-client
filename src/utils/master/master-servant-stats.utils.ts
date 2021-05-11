@@ -85,7 +85,7 @@ export class MasterServantStatsUtils {
                 isUnique = true;
             }
 
-            this._populateStats(statsByRarity, servant.rarity, masterServant, isUnique);
+            this._populateStats(statsByRarity, servant.rarity, masterServant, masterAccount.bondLevels, isUnique);
         }
         this._computeStatAverages(statsByRarity);
 
@@ -134,7 +134,7 @@ export class MasterServantStatsUtils {
             }
 
             const simplifiedClass = GameServantUtils.convertToSimplifiedClass(servant.class);
-            this._populateStats(statsByClass, simplifiedClass, masterServant, isUnique);
+            this._populateStats(statsByClass, simplifiedClass, masterServant, masterAccount.bondLevels, isUnique);
         }
         this._computeStatAverages(statsByClass);
 
@@ -172,13 +172,13 @@ export class MasterServantStatsUtils {
         stats: ServantStats<T>,
         statKey: Partial<keyof T>,
         masterServant: MasterServant,
+        bondLevelMap: Record<number, MasterServantBondLevel | undefined>,
         isUnique: boolean
     ): void {
 
         const {
             np,
             ascension,
-            bond,
             fouHp,
             fouAtk,
             skills
@@ -188,9 +188,7 @@ export class MasterServantStatsUtils {
             totalCount,
             uniqueCount,
             npLevels,
-            ascensionLevels,
-            bondLevelValuesCount,
-            bondLevels
+            ascensionLevels
         } = stats as ServantStats<Record<string, number>>;
 
         const key = statKey as string;
@@ -236,12 +234,10 @@ export class MasterServantStatsUtils {
          * Only counted once for each unique servant. If there are duplicate servants,
          * they should have the same bond level anyways.
          */
-        if (bond !== undefined && isUnique) {
-            bondLevels[bond][key] += 1;
-            bondLevels[bond].overall += 1;
-            bondLevelValuesCount[key] += 1;
-            bondLevelValuesCount.overall += 1;
+        if (isUnique) {
+            this._populateBondStats(stats, key, bondLevelMap[masterServant.gameId]);
         }
+
     }
 
     private static _populateSkillStats<T extends Record<string, number>>(
@@ -339,6 +335,27 @@ export class MasterServantStatsUtils {
                 }
             }
         }
+    }
+
+    private static _populateBondStats<T extends Record<string, number>>(
+        stats: ServantStats<T>,
+        statKey: string,
+        bond: MasterServantBondLevel | undefined
+    ): void {
+
+        if (bond === undefined) {
+            return;
+        }
+
+        const {
+            bondLevelValuesCount,
+            bondLevels
+        } = stats as ServantStats<Record<string, number>>;
+
+        bondLevels[bond][statKey] += 1;
+        bondLevels[bond].overall += 1;
+        bondLevelValuesCount[statKey] += 1;
+        bondLevelValuesCount.overall += 1;
     }
 
     private static _computeStatAverages<T extends Record<string, number>>(stats: ServantStats<T>): void {

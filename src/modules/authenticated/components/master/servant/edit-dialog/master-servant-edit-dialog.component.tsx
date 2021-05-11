@@ -6,7 +6,7 @@ import { DialogCloseButton } from '../../../../../../components/dialog/dialog-cl
 import { InputFieldContainer } from '../../../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../../../constants';
 import { GameServantService } from '../../../../../../services/data/game/game-servant.service';
-import { DialogComponentProps, GameServant, MasterServant, Nullable, Optional, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
+import { DialogComponentProps, GameServant, MasterServant, MasterServantBondLevel, Nullable, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
 import { MasterServantSkillLevel } from '../../../../../../types/data/master/servant/master-servant-skill-level.type';
 import { FormUtils } from '../../../../../../utils/form.utils';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
@@ -17,15 +17,20 @@ type FormData = {
     np: number;
     level: string | number;
     ascension: string | number;
-    bond: string | number;
     fouAtk: string | number;
     fouHp: string | number;
     skill1: string | number;
     skill2: string | number;
     skill3: string | number;
+    bond: string | number;
+    unlockedCostumes: Record<number, boolean>;
 };
 
-type ModalData = Optional<MasterServant, 'instanceId'>;
+type ModalData = {
+    masterServant: Omit<MasterServant, 'instanceId'>;
+    bond: MasterServantBondLevel | undefined,
+    costumes: Array<number>
+};
 
 type RenderedProps = {
     disableServantSelect?: boolean;
@@ -39,6 +44,8 @@ type Props = {
      * new servant.
      */
     masterServant?: MasterServant;
+    bondLevels: Record<number, MasterServantBondLevel | undefined>;
+    unlockedCostumes: Array<number>;
 } & 
 RenderedProps & 
 WithStylesProps &
@@ -85,8 +92,10 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
     constructor(props: Props) {
         super(props);
 
+        const {  masterServant } = props;
+
         this.state = {
-            formData: this._convertToFormData(props.masterServant)
+            formData: this._convertToFormData(masterServant)
         };
 
         this._renderForm = this._renderForm.bind(this);
@@ -131,7 +140,7 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
     }
 
     componentDidUpdate(prevProps: Props): void {
-        const {  masterServant, open } = this.props;
+        const { masterServant, open } = this.props;
         if (masterServant !== prevProps.masterServant || (open && !prevProps.open)) {
             const formData = this._convertToFormData(masterServant);
             this.setState({ formData });
@@ -429,9 +438,15 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
 
     private _handleSelectedServantChange(event: ChangeEvent<{}>, value: GameServant): void {
         const { formData } = this.state;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        formData.gameId = value._id!!;
-        this.forceUpdate();
+        const gameId =  value._id;
+        if (formData.gameId !== gameId) {
+            const { bondLevels } = this.props;
+            const servant = this._gameServantMap[gameId];
+            formData.gameId = gameId;
+            formData.bond = bondLevels[gameId] ?? '';
+            formData.unlockedCostumes = this._generateUnlockedCostumesMap(servant);
+            this.forceUpdate();
+        }
     }
 
     private _handleSelectInputChange(event: ChangeEvent<{ name?: string; value: any }>): void {
@@ -483,7 +498,12 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
         const { onClose } = this.props;
         const { formData } = this.state;
         const masterServant = this._convertToMasterServant(formData);
-        onClose(event, 'submit', masterServant);
+        const data = {
+            masterServant,
+            bond: formData.bond === '' ? undefined : Number(formData.bond) as MasterServantBondLevel,
+            costumes: []
+        };
+        onClose(event, 'submit', data);
     }
 
     private _cancel(event: MouseEvent<HTMLButtonElement>): void {
@@ -491,7 +511,7 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
         onClose(event, 'cancel');
     }
 
-    private _convertToMasterServant(formData: FormData): Omit<MasterServant, 'instanceId'> {
+    private _convertToMasterServant(formData: FormData): Omit<MasterServant, 'instanceId'> & { bond: number } {
         const {
             gameId,
             np,
@@ -521,33 +541,53 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
         };
     }
 
-    private _convertToFormData(masterServant?: MasterServant): FormData {
+    private _convertToFormData(masterServant: MasterServant | undefined): FormData {
+        const { bondLevels } = this.props;
+
         if (!masterServant) {
             masterServant = MasterServantUtils.instantiate();
         }
+
         const {
             gameId,
             np,
             level,
             ascension,
-            bond,
             fouAtk,
             fouHp,
             skills
         } = masterServant;
+
+        const servant = this._gameServantMap[gameId];
+        const unlockedCostumesMap = this._generateUnlockedCostumesMap(servant);
 
         return {
             gameId,
             np,
             level,
             ascension,
-            bond: bond ?? '',
+            bond: bondLevels[gameId] ?? '',
             fouAtk: fouAtk ?? '',
             fouHp: fouHp ?? '',
             skill1: skills[1] || 1,
             skill2: skills[2] || '',
-            skill3: skills[3] || ''
+            skill3: skills[3] || '',
+            unlockedCostumes: unlockedCostumesMap
         };
+    }
+
+    private _generateUnlockedCostumesMap(servant: GameServant | undefined): Record<number, boolean> {
+        if (!servant) {
+            return {};
+        }
+        const { unlockedCostumes } = this.props;
+        const unlockedCostumesMap: Record<number, boolean> = {};
+        for (const key of Object.keys(servant.costumes)) {
+            const costumeId = Number(key);
+            const costumeUnlocked = unlockedCostumes.indexOf(costumeId) !== -1;
+            unlockedCostumesMap[costumeId] = costumeUnlocked;
+        }
+        return unlockedCostumesMap;
     }
 
 }));

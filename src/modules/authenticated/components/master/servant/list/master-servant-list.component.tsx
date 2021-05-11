@@ -1,19 +1,20 @@
 import { Button, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { PersonAddOutlined } from '@material-ui/icons';
-import React, { MouseEventHandler, PureComponent, ReactNode } from 'react';
+import { MouseEventHandler, PureComponent, ReactNode } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
 import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { GameServantService } from '../../../../../../services/data/game/game-servant.service';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { GameServant, MasterServant, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
+import { GameServant, MasterServant, MasterServantBondLevel, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
 import { ArrayUtils } from '../../../../../../utils/array.utils';
 import { MasterServantListHeader } from './master-servant-list-header.component';
 import { MasterServantListRow } from './master-servant-list-row.component';
 
 type Props = {
     masterServants: MasterServant[];
+    bondLevels: Record<number, MasterServantBondLevel | undefined>;
     editMode?: boolean;
     showActions?: boolean;
     showAddServantRow?: boolean;
@@ -128,13 +129,25 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
     }
 
     private _renderMasterServantRow(masterServant: MasterServant): ReactNode {
-        const { editMode, showActions, openLinksInNewTab, onEditServant, onDeleteServant } = this.props;
-        const servant = this._gameServantMap[masterServant.gameId];
+        const {
+            bondLevels,
+            editMode,
+            showActions,
+            openLinksInNewTab,
+            onEditServant,
+            onDeleteServant
+        } = this.props;
+
+        const servantId = masterServant.gameId;
+        const servant = this._gameServantMap[servantId];
+        const bondLevel = bondLevels[servantId];
+
         if (editMode) {
             return (
                 <MasterServantListRow
                     key={masterServant.instanceId}
                     servant={servant}
+                    bond={bondLevel}
                     masterServant={masterServant}
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}
@@ -144,10 +157,12 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
                 />
             );
         }
+
         return (
             <StaticListRowContainer key={masterServant.instanceId}>
                 <MasterServantListRow
                     servant={servant}
+                    bond={bondLevel}
                     masterServant={masterServant}
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}

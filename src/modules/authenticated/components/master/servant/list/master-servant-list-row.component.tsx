@@ -4,13 +4,14 @@ import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
 import React, { PureComponent, ReactNode } from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { AssetConstants } from '../../../../../../constants';
-import { GameServant, MasterServant, WithStylesProps } from '../../../../../../types';
+import { GameServant, MasterServant, MasterServantBondLevel, WithStylesProps } from '../../../../../../types';
 import { ViewModeColumnWidths } from './master-servant-list-column-widths';
 import { MasterServantListRowLabel } from './master-servant-list-row-label.component';
 
 type Props = {
     servant: Readonly<GameServant> | undefined; // Not optional, but possible to be undefined.
     masterServant: MasterServant;
+    bond: MasterServantBondLevel | undefined;
     editMode?: boolean;
     showActions?: boolean;
     openLinksInNewTab?: boolean;
@@ -193,9 +194,8 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
     }
 
     private _renderBondLevel(): ReactNode {
-        const { masterServant, classes } = this.props;
-        const bondLevel = masterServant.bond;
-        if (bondLevel == null) {
+        const { bond, classes } = this.props;
+        if (bond == null) {
             return (
                 <div className={classes.bondLevel}>
                     {'\u2014'}
@@ -204,9 +204,9 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
         }
         return (
             <div className={classes.bondLevel}>
-                <GameServantBondIcon bond={bondLevel} size={28} />
+                <GameServantBondIcon bond={bond} size={28} />
                 <div className="value">
-                    {bondLevel}
+                    {bond}
                 </div>
             </div>
         );

@@ -41,6 +41,7 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
     parse(startInstanceId: number): MasterServantParserResult {
         const results: MasterServantParserResult = {
             masterServants: [],
+            bondLevels: {},
             errors: [],
             warnings: []
         };
@@ -67,11 +68,12 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
     private _parse(results: MasterServantParserResult, data: string[][], startInstanceId: number): MasterServantParserResult {
         const headerData = data[1]; // Header is on second row.
         const headerMap = this._parseHeader(headerData);
+        const bondLevels = results.bondLevels;
         let instanceId = startInstanceId;
         for (let r = 2, length = data.length; r < length; r++) {
             const row = data[r];
             try {
-                const masterServant = this._parseRow(row, headerMap, instanceId++);
+                const masterServant = this._parseRow(row, headerMap, instanceId++, bondLevels);
                 results.masterServants.push(masterServant);
             } catch (e) {
                 const message: string = typeof e === 'string' ? e : e.message;
@@ -102,7 +104,13 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         throw Error(`Column '${columnName} could not be found.`);
     }
 
-    private _parseRow(row: string[], headerMap: Record<FgoManagerColumn, number>, instanceId: number): MasterServant {
+    private _parseRow(
+        row: string[],
+        headerMap: Record<FgoManagerColumn, number>,
+        instanceId: number,
+        bondLevels: Record<number, MasterServantBondLevel>
+    ): MasterServant {
+
         const gameServant = this._parseGameServant(row, headerMap);
         const gameId = gameServant._id;
         const np = this._parseNoblePhantasmLevel(row, headerMap);
@@ -114,13 +122,17 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         const skill1 = this._parseSkillLevel(row, headerMap, 1) || 1;
         const skill2 = this._parseSkillLevel(row, headerMap, 2);
         const skill3 = this._parseSkillLevel(row, headerMap, 3);
+
+        if (bond !== undefined) {
+            bondLevels[gameId] = bond;
+        }
+
         return {
             instanceId,
             gameId,
             np,
             level,
             ascension,
-            bond,
             fouHp,
             fouAtk,
             skills: {

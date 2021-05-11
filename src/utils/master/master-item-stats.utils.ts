@@ -27,6 +27,8 @@ export class MasterItemStatsUtils {
         this._populateInventory(stats, masterAccount);
 
         const ownedServants = new Set<number>();
+        const unlockedCostumes = new Set<number>(masterAccount.costumes);
+
         for (const masterServant of masterAccount.servants) {
             const servantId = masterServant.gameId;
             const servant = gameServantMap[servantId];
@@ -35,7 +37,7 @@ export class MasterItemStatsUtils {
                 continue;
             }
             ownedServants.add(masterServant.gameId);
-            this._updateForOwnedServant(stats, servant, masterServant);
+            this._updateForOwnedServant(stats, servant, masterServant, unlockedCostumes);
         }
 
         for (const servant of Object.values(gameServantMap)) {
@@ -64,7 +66,13 @@ export class MasterItemStatsUtils {
         stats[this._QPItemId] = stat;
     }
 
-    private static _updateForOwnedServant(stats: Record<number, ItemStat>, servant: GameServant, masterServant: MasterServant): void {
+    private static _updateForOwnedServant(
+        stats: Record<number, ItemStat>,
+        servant: GameServant,
+        masterServant: MasterServant,
+        unlockedCostumes: Set<number>
+    ): void {
+
         const skill1 = masterServant.skills[1];
         const skill2 = masterServant.skills[2] ?? 0;
         const skill3 = masterServant.skills[3] ?? 0;
@@ -89,12 +97,16 @@ export class MasterItemStatsUtils {
 
         for (const [key, costume] of Object.entries(servant.costumes)) {
             const costumeId = Number(key);
-            const costumeUnlocked =  masterServant.costumes?.indexOf(costumeId) !== -1;
+            const costumeUnlocked = unlockedCostumes.has(costumeId);
             this._updateForEnhancement(stats, costume.materials, true, 1, costumeUnlocked ? 1 : 0);
         }
     }
 
-    private static _updateForUnownedServant(stats: Record<number, ItemStat>, servant: GameServant): void {
+    private static _updateForUnownedServant(
+        stats: Record<number, ItemStat>,
+        servant: GameServant
+    ): void {
+
         for (const skill of Object.values(servant.skillMaterials)) {
             this._updateForEnhancement(stats, skill, false, 3);
         }
@@ -104,6 +116,11 @@ export class MasterItemStatsUtils {
             }
         }
         for (const costume of Object.values(servant.costumes)) {
+            /*
+             * TODO Maybe refer to the unlocked servant costumes? It shouldn't be needed
+             * though, because it's not possible to unlock a costume without owning the
+             * servant.
+             */
             this._updateForEnhancement(stats, costume.materials);
         }
     }

@@ -12,4 +12,4 @@ export type MasterPlanServantEnhancements = {
 
     }
 
-} & Partial<Pick<MasterServant, 'level' | 'ascension' | 'fouAtk' | 'fouHp' | 'costumes'>>;
+} & Partial<Pick<MasterServant, 'level' | 'ascension' | 'fouAtk' | 'fouHp' >>;

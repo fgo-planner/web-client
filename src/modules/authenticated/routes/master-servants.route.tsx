@@ -11,7 +11,7 @@ import { PageTitle } from '../../../components/text/page-title.component';
 import { GameServantService } from '../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
-import { GameServant, MasterAccount, MasterServant, ModalOnCloseReason, Nullable, ReadonlyRecord } from '../../../types';
+import { GameServant, MasterAccount, MasterServant, MasterServantBondLevel, ModalOnCloseReason, Nullable, ReadonlyRecord } from '../../../types';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MasterServantEditDialog } from '../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantList } from '../components/master/servant/list/master-servant-list.component';
@@ -23,9 +23,18 @@ type Props = {
 type State = {
     masterAccount?: MasterAccount | null;
     /**
-     * Clone of the servants array from the MasterAccount object.
+     * Clone of the `servants` array from the MasterAccount object.
      */
     masterServants: MasterServant[];
+    /**
+     * Clone of the `bondLevels` map from the MasterAccount object.
+     */
+    bondLevels: Record<number, MasterServantBondLevel | undefined>;
+    /**
+     * Clone of the `costumes` map from the MasterAccount object.
+     */
+    unlockedCostumes: Array<number>;
+    // TODO Do we really need to clone the structures above?
     lastInstanceId: number;
     editMode: boolean;
     /**
@@ -53,6 +62,8 @@ const MasterServants = class extends PureComponent<Props, State> {
 
         this.state = {
             masterServants: [],
+            bondLevels: {},
+            unlockedCostumes: [],
             lastInstanceId: -1,
             editMode: false,
             editServantDialogOpen: false,
@@ -95,6 +106,8 @@ const MasterServants = class extends PureComponent<Props, State> {
 
         const {
             masterServants,
+            bondLevels,
+            unlockedCostumes,
             editMode,
             editServant,
             editServantDialogOpen,
@@ -121,6 +134,7 @@ const MasterServants = class extends PureComponent<Props, State> {
                     showAddServantRow
                     openLinksInNewTab={editMode}
                     masterServants={masterServants}
+                    bondLevels={bondLevels}
                     onAddServant={this._onAddServantButtonClick}
                     onEditServant={this._openEditServantDialog}
                     onDeleteServant={this._openDeleteServantDialog}
@@ -132,6 +146,8 @@ const MasterServants = class extends PureComponent<Props, State> {
                     submitButtonLabel={editMode ? 'Done' : 'Save'}
                     disableServantSelect={!!editServant}
                     masterServant={editServant}
+                    bondLevels={bondLevels}
+                    unlockedCostumes={unlockedCostumes}
                     onClose={this._handleAddServantDialogClose}
                 />
                 <PromptDialog
@@ -242,14 +258,17 @@ const MasterServants = class extends PureComponent<Props, State> {
     }
 
     private _save(): void {
-        const { masterServants } = this.state;
-        this._updateMasterAccount(masterServants);
+        const { masterServants, bondLevels, unlockedCostumes } = this.state;
+        this._updateMasterAccount(masterServants, bondLevels, unlockedCostumes);
     }
     
     private _cancel(): void {
-        const masterServants = this._cloneServantsFromMasterAccount(this.state.masterAccount);
+        const { masterAccount } = this.state;
+        const { masterServants, bondLevels, unlockedCostumes } = this._cloneFromMasterAccount(masterAccount);
         this.setState({
             masterServants,
+            bondLevels,
+            unlockedCostumes,
             editMode: false
         });
     }
@@ -267,7 +286,12 @@ const MasterServants = class extends PureComponent<Props, State> {
         });
     }
 
-    private _handleAddServantDialogClose(event: any, reason: any, data?: Omit<MasterServant, 'instanceId'>): void {
+    private _handleAddServantDialogClose(
+        event: any,
+        reason: any,
+        data?: { masterServant: Omit<MasterServant, 'instanceId'>, bond: MasterServantBondLevel | undefined, costumes: Array<number> }
+    ): void {
+        
         /*
          * If `data` is undefined, then changes were cancelled.
          */
@@ -278,8 +302,21 @@ const MasterServants = class extends PureComponent<Props, State> {
             });
         }
 
-        const { editServant, editMode } = this.state;
+        const { editServant, editMode, bondLevels, unlockedCostumes } = this.state;
         let { masterServants, lastInstanceId } = this.state;
+        const servantId = data.masterServant.gameId;
+
+        bondLevels[servantId] = data.bond;
+
+        /*
+         * Update the unlocked costumes list.
+         *
+         * TODO Move this to a separate method/function.
+         */
+        const servant = this._gameServantMap[servantId];
+        const costumesIds = Object.keys(servant.costumes).map(Number);
+        unlockedCostumes.filter(c => costumesIds.indexOf(c) === -1);
+        unlockedCostumes.push(...data.costumes);
 
         /*
          * If the servant is being added (regardless of in edit mode or not), then
@@ -288,7 +325,7 @@ const MasterServants = class extends PureComponent<Props, State> {
          */
         if (!editServant) {
             const masterServant: MasterServant = {
-                ...data,
+                ...data.masterServant,
                 instanceId: ++lastInstanceId
             };
 
@@ -301,7 +338,7 @@ const MasterServants = class extends PureComponent<Props, State> {
                     ...masterServants,
                     masterServant
                 ];
-
+                
             } else {
                 /*
                  * Otherwise, the update can be pushed to the server immediately. The response
@@ -309,7 +346,7 @@ const MasterServants = class extends PureComponent<Props, State> {
                  * so no need to update the state.
                  */
                 masterServants.push(masterServant);
-                return this._updateMasterAccount(masterServants);
+                return this._updateMasterAccount(masterServants, bondLevels, unlockedCostumes);
             }
 
         } else {
@@ -333,12 +370,13 @@ const MasterServants = class extends PureComponent<Props, State> {
                 /*
                  * Otherwise, just immediately push update to server and return.
                  */
-                return this._updateMasterAccount(masterServants);
+                return this._updateMasterAccount(masterServants, bondLevels, unlockedCostumes);
             }            
         }
         
         this.setState({
             masterServants,
+            bondLevels,
             lastInstanceId,
             editServant: undefined,
             editServantDialogOpen: false
@@ -365,13 +403,20 @@ const MasterServants = class extends PureComponent<Props, State> {
     }
 
     private _handleDeleteServantDialogClose(event: MouseEvent, reason: ModalOnCloseReason): void {
-        const { masterServants, editMode, deleteServant } = this.state;
+        const {
+            masterServants,
+            bondLevels,
+            unlockedCostumes,
+            editMode,
+            deleteServant
+        } = this.state;
         if (reason !== 'submit') {
             return this._closeDeleteServantDialog();
         }
         lodash.remove(masterServants, servant => servant.instanceId === deleteServant?.instanceId);
+        // TODO Remove bond/costume data if the last instance of the servant is removed.
         if (!editMode) {
-            return this._updateMasterAccount(masterServants);
+            return this._updateMasterAccount(masterServants, bondLevels, unlockedCostumes);
         }
         this.setState({
             deleteServantDialogOpen: false,
@@ -382,12 +427,19 @@ const MasterServants = class extends PureComponent<Props, State> {
     /**
      * Sends master servant update request to the back-end.
      */
-    private _updateMasterAccount(masterServants: MasterServant[]): void {
+    private _updateMasterAccount(
+        masterServants: MasterServant[],
+        bondLevels: Record<number, MasterServantBondLevel | undefined>,
+        unlockedCostumes: number[]
+    ): void {
+
         const { masterAccount } = this.state;
         
-        const update = {
+        const update: Partial<MasterAccount> = {
             _id: masterAccount?._id,
-            servants: masterServants
+            servants: masterServants,
+            bondLevels: bondLevels as Record<number, MasterServantBondLevel>,
+            costumes: unlockedCostumes
         };
         MasterAccountService.updateAccount(update)
             .catch(this._handleUpdateError.bind(this));
@@ -409,11 +461,13 @@ const MasterServants = class extends PureComponent<Props, State> {
         // TODO Display error message to user.
         console.error(error);
         const { masterAccount } = this.state;
-        const masterServants = this._cloneServantsFromMasterAccount(masterAccount);
+        const { masterServants, bondLevels, unlockedCostumes } = this._cloneFromMasterAccount(masterAccount);
         const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
         this._resetLoadingIndicator();
         this.setState({
             masterServants,
+            bondLevels,
+            unlockedCostumes,
             lastInstanceId,
             editMode: false,
             editServant: undefined,
@@ -425,11 +479,13 @@ const MasterServants = class extends PureComponent<Props, State> {
     }
 
     private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {
-        const masterServants = this._cloneServantsFromMasterAccount(account);
+        const { masterServants, bondLevels, unlockedCostumes } = this._cloneFromMasterAccount(account);
         const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
         this.setState({
             masterAccount: account,
             masterServants,
+            bondLevels,
+            unlockedCostumes,
             lastInstanceId,
             editMode: false
         });
@@ -439,12 +495,14 @@ const MasterServants = class extends PureComponent<Props, State> {
         if (account == null) {
             return;
         }
-        const masterServants = this._cloneServantsFromMasterAccount(account);
+        const { masterServants, bondLevels, unlockedCostumes } = this._cloneFromMasterAccount(account);
         const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
         this._resetLoadingIndicator();
         this.setState({
             masterAccount: account,
             masterServants,
+            bondLevels,
+            unlockedCostumes,
             lastInstanceId,
             editMode: false,
             loadingIndicatorId: undefined
@@ -458,11 +516,19 @@ const MasterServants = class extends PureComponent<Props, State> {
         }
     }
 
-    private _cloneServantsFromMasterAccount(account: Nullable<MasterAccount>): MasterServant[] {
+    private _cloneFromMasterAccount(account: Nullable<MasterAccount>): Pick<State, 'masterServants' | 'bondLevels' | 'unlockedCostumes'> {
         if (!account) {
-            return [];
+            return {
+                masterServants: [],
+                bondLevels: {},
+                unlockedCostumes: []
+            };
         }
-        return account.servants.map(MasterServantUtils.clone);
+        return {
+            masterServants: account.servants.map(MasterServantUtils.clone),
+            bondLevels: lodash.cloneDeep(account.bondLevels),
+            unlockedCostumes: [...account.costumes]
+        };
     }
 
 };

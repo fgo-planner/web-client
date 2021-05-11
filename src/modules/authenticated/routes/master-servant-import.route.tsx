@@ -5,7 +5,6 @@ import React, { createRef, Fragment, PureComponent, ReactNode } from 'react';
 import { DropzoneRef } from 'react-dropzone';
 import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
-import { RouteComponent } from '../../../components/base/route-component';
 import { AlertDialog } from '../../../components/dialog/alert-dialog.component';
 import { FabContainer } from '../../../components/fab/fab-container.component';
 import { FileInputWithTextarea } from '../../../components/input/file-input-with-textarea.component';
@@ -212,7 +211,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
     private _renderParseResults(parsedData: MasterServantParserResult): ReactNode {
         const { classes } = this.props;
         const { importStatus } = this.state;
-        const { masterServants } = parsedData;
+        const { masterServants, bondLevels } = parsedData;
         // TODO Display errors and warning
         if (!masterServants.length) {
             return (
@@ -230,7 +229,11 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
                 <div className={classes.importResultsHelperText}>
                     {ParseResultHelperText}
                 </div>
-                <MasterServantList openLinksInNewTab masterServants={masterServants} />
+                <MasterServantList
+                    openLinksInNewTab
+                    masterServants={masterServants}
+                    bondLevels={bondLevels}
+                />
                 <AlertDialog
                     open={importStatus !== 'none'}
                     message={importStatus === 'success' ? ImportSuccessMessage : ImportFailMessage}
@@ -296,16 +299,28 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
         const loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
         this.setState({ loadingIndicatorId });
 
-        // Combine existing and imported servants
+        /*
+         * Combine existing and imported servants.
+         */
         const servants = [
             ...masterAccount.servants,
             ...parsedData.masterServants
         ];
 
+        /*
+         * Combine existing and imported bond level data. The imported data
+         * will overwrite the existing data.
+         */
+        const bondLevels = {
+            ...masterAccount.bondLevels,
+            ...parsedData.bondLevels
+        };
+
         try {
             await MasterAccountService.updateAccount({
                 _id: masterAccount._id,
-                servants
+                servants,
+                bondLevels
             });
             this.setState({ importStatus: 'success' });
         } catch (error) {

@@ -1,7 +1,7 @@
 import { Button, Fab, StyleRules, Theme, Tooltip, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Clear as ClearIcon, Done as DoneIcon, Publish as PublishIcon } from '@material-ui/icons';
-import React, { createRef, Fragment, PureComponent, ReactNode } from 'react';
+import React, { createRef, Fragment, PureComponent, ReactNode, UIEvent } from 'react';
 import { DropzoneRef } from 'react-dropzone';
 import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
@@ -14,7 +14,9 @@ import { GameServantService } from '../../../services/data/game/game-servant.ser
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { FgoManagerMasterServantParser } from '../../../services/import/fgo-manager/fgo-manager-master-servant-parser';
 import { MasterServantParserResult } from '../../../services/import/master-servant-parser-result.type';
+import { AppBarService } from '../../../services/user-interface/app-bar.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
+import { ThemeConstants } from '../../../styles/theme-constants';
 import { MasterAccount, Nullable, WithStylesProps } from '../../../types';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MasterServantListHeader } from '../components/master/servant/list/master-servant-list-header.component';
@@ -93,6 +95,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
         this._cancelImport = this._cancelImport.bind(this);
         this._finalizeImport = this._finalizeImport.bind(this);
         this._handleSuccessDialogAction = this._handleSuccessDialogAction.bind(this);
+        this._handleScroll = this._handleScroll.bind(this);
     }
 
     componentDidMount(): void {
@@ -105,6 +108,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
     componentWillUnmount(): void {
         this._onCurrentMasterAccountChangeSubscription.unsubscribe();
         this._onCurrentMasterAccountUpdatedSubscription.unsubscribe();
+        AppBarService.setElevated(false);
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
@@ -229,7 +233,7 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
         }
         return (
             <Fragment>
-                <LayoutPageScrollable>
+                <LayoutPageScrollable onScrollHandler={this._handleScroll}>
                     <div className={classes.importResultsHelperText}>
                         {ParseResultHelperText}
                     </div>
@@ -360,6 +364,12 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
         }
         this.setState({ masterAccount });
     }
+
+    private _handleScroll(event: UIEvent<HTMLDivElement>): void {
+        const scrollAmount = (event.target as Element)?.scrollTop;
+        const appBarElevated = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
+        AppBarService.setElevated(appBarElevated);
+    };
 
 }));
 

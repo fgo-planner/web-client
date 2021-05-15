@@ -1,7 +1,13 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, UIEventHandler } from 'react';
 
 type Props = PropsWithChildren<{
-    scrollContainerRef?: React.LegacyRef<HTMLDivElement>
+    scrollContainerRef?: React.LegacyRef<HTMLDivElement>,
+
+    /**
+     * For use with class components.
+     * @deprecated Use function components whenever possible.
+     */
+    onScrollHandler?: UIEventHandler<HTMLDivElement>
 }>;
 
 const Style: React.CSSProperties = {
@@ -9,8 +15,8 @@ const Style: React.CSSProperties = {
     height: '100%'
 };
 
-export const LayoutPageScrollable = React.memo(({ children, scrollContainerRef }: Props) => (
-    <div style={Style} ref={scrollContainerRef}>
+export const LayoutPageScrollable = React.memo(({ children, scrollContainerRef, onScrollHandler }: Props) => (
+    <div style={Style} ref={scrollContainerRef} onScroll={onScrollHandler}>
         {children}
     </div>
 ));

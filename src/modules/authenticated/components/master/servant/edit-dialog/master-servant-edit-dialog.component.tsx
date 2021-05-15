@@ -498,9 +498,10 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
         const { onClose } = this.props;
         const { formData } = this.state;
         const masterServant = this._convertToMasterServant(formData);
+        const bond = formData.bond === '' ? undefined : Number(formData.bond) as MasterServantBondLevel;
         const data = {
             masterServant,
-            bond: formData.bond === '' ? undefined : Number(formData.bond) as MasterServantBondLevel,
+            bond,
             costumes: []
         };
         onClose(event, 'submit', data);
@@ -511,13 +512,12 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
         onClose(event, 'cancel');
     }
 
-    private _convertToMasterServant(formData: FormData): Omit<MasterServant, 'instanceId'> & { bond: number } {
+    private _convertToMasterServant(formData: FormData): Omit<MasterServant, 'instanceId'> {
         const {
             gameId,
             np,
             level,
             ascension,
-            bond,
             fouAtk,
             fouHp,
             skill1,
@@ -530,7 +530,6 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
             np: Number(np) as any,
             level: Number(level),
             ascension: Number(ascension) as any,
-            bond: bond ? Number(bond) as any : undefined,
             fouAtk: fouAtk === '' ? undefined : Number(fouAtk),
             fouHp: fouHp === '' ? undefined : Number(fouHp),
             skills: {

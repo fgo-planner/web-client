@@ -78,7 +78,7 @@ const MasterServants = class extends PureComponent<Props, State> {
         this._cancel = this._cancel.bind(this);
         this._onAddServantButtonClick = this._onAddServantButtonClick.bind(this);
         this._openEditServantDialog = this._openEditServantDialog.bind(this);
-        this._handleAddServantDialogClose = this._handleAddServantDialogClose.bind(this);
+        this._handleEditServantDialogClose = this._handleEditServantDialogClose.bind(this);
         this._openDeleteServantDialog = this._openDeleteServantDialog.bind(this);
         this._closeDeleteServantDialog = this._closeDeleteServantDialog.bind(this);
         this._handleDeleteServantDialogClose = this._handleDeleteServantDialogClose.bind(this);
@@ -162,7 +162,7 @@ const MasterServants = class extends PureComponent<Props, State> {
                     masterServant={editServant}
                     bondLevels={bondLevels}
                     unlockedCostumes={unlockedCostumes}
-                    onClose={this._handleAddServantDialogClose}
+                    onClose={this._handleEditServantDialogClose}
                 />
                 <PromptDialog
                     open={deleteServantDialogOpen}
@@ -300,7 +300,7 @@ const MasterServants = class extends PureComponent<Props, State> {
         });
     }
 
-    private _handleAddServantDialogClose(
+    private _handleEditServantDialogClose(
         event: any,
         reason: any,
         data?: { masterServant: Omit<MasterServant, 'instanceId'>, bond: MasterServantBondLevel | undefined, costumes: Array<number> }
@@ -367,7 +367,7 @@ const MasterServants = class extends PureComponent<Props, State> {
             /*
              * Merge changes into existing servant object.
              */
-            lodash.assign(editServant, data);
+            lodash.assign(editServant, data.masterServant);
 
             if (editMode) {
                 /*

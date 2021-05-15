@@ -2,12 +2,12 @@ import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Fo
 import { WithStylesOptions } from '@material-ui/styles';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
-import { InputFieldContainer } from '../../../../../components/input/input-field-container.component';
-import { useAutoResizeDialog } from '../../../../../hooks/use-auto-resize-dialog.hooks';
-import { MasterPlanService } from '../../../../../services/data/master/master-plan.service';
-import { DialogComponentProps, MasterPlan } from '../../../../../types';
-import { FormUtils } from '../../../../../utils/form.utils';
+import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
+import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
+import { useAutoResizeDialog } from '../../../../hooks/use-auto-resize-dialog.hook';
+import { MasterPlanService } from '../../../../services/data/master/master-plan.service';
+import { DialogComponentProps, MasterPlan } from '../../../../types';
+import { FormUtils } from '../../../../utils/form.utils';
 
 type Props = {
     masterAccountId: string | undefined;

@@ -9,7 +9,6 @@ import { GameServantService } from '../../../../../../services/data/game/game-se
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { GameServant, MasterServant, MasterServantBondLevel, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
 import { ArrayUtils } from '../../../../../../utils/array.utils';
-import { MasterServantListHeader } from './master-servant-list-header.component';
 import { MasterServantListRow } from './master-servant-list-row.component';
 
 type Props = {
@@ -18,6 +17,7 @@ type Props = {
     editMode?: boolean;
     showActions?: boolean;
     showAddServantRow?: boolean;
+    borderRight?: boolean;
     openLinksInNewTab?: boolean;
     viewLayout?: any; // TODO Make use of this
     onAddServant?: MouseEventHandler<HTMLButtonElement>;
@@ -28,22 +28,22 @@ type Props = {
 const style = (theme: Theme) => ({
     root: {
         minWidth: `${theme.breakpoints.width('lg')}px`,
-        borderBottom: `1px solid ${theme.palette.divider}`,
-        marginBottom: theme.spacing(16)
     },
     addServantRow: {
-        borderTop: `1px solid ${theme.palette.divider}`,
+        borderTopWidth: 1,
+        borderTopStyle: 'solid',
+        borderTopColor: theme.palette.divider
     },
     addServantRowButton: {
         width: '100%',
-        height: 64
+        height: 54
     },
     addServantRowLabel: {
         display: 'flex',
         alignItems: 'center',
         fontFamily: ThemeConstants.FontFamilyRoboto,
         textTransform: 'uppercase',
-        fontSize: '1rem',
+        fontSize: '0.875rem',
         '& >div': {
             paddingLeft: theme.spacing(3)
         }
@@ -78,12 +78,11 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
             return null;
         }
 
-        const { classes, editMode, showActions, masterServants } = this.props;
+        const { classes, editMode, masterServants } = this.props;
 
         if (!editMode) {
             return (
                 <div className={classes.root}>
-                    <MasterServantListHeader showActions={showActions} />
                     {masterServants.map(this._renderMasterServantRow)}
                     {this._renderAddServantRow()}
                 </div>
@@ -103,7 +102,6 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
 
         return (
             <div className={classes.root}>
-                <MasterServantListHeader showActions={showActions} editMode />
                 <DragDropContext onDragEnd={this._handleDragEnd}>
                     <Droppable droppableId="droppable-servant-list">
                         {droppableRenderFunction}
@@ -115,25 +113,32 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
     }
 
     private _renderDraggable(masterServant: MasterServant, index: number): ReactNode {
+        const { masterServants, borderRight } = this.props;
         const { instanceId } = masterServant;
+
+        const lastRow = index === masterServants.length - 1;
 
         return (
             <DraggableListRowContainer
                 key={instanceId}
                 draggableId={`draggable-servant-${instanceId}`}
                 index={index}
+                borderBottom={!lastRow}
+                borderRight={borderRight}
             >
-                {this._renderMasterServantRow(masterServant)}
+                {this._renderMasterServantRow(masterServant, index)}
             </DraggableListRowContainer>
         );
     }
 
-    private _renderMasterServantRow(masterServant: MasterServant): ReactNode {
+    private _renderMasterServantRow(masterServant: MasterServant, index: number): ReactNode {
         const {
+            masterServants,
             bondLevels,
             editMode,
             showActions,
             openLinksInNewTab,
+            borderRight,
             onEditServant,
             onDeleteServant
         } = this.props;
@@ -141,6 +146,7 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
         const servantId = masterServant.gameId;
         const servant = this._gameServantMap[servantId];
         const bondLevel = bondLevels[servantId];
+        const lastRow = index === masterServants.length - 1;
 
         if (editMode) {
             return (
@@ -159,7 +165,11 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
         }
 
         return (
-            <StaticListRowContainer key={masterServant.instanceId}>
+            <StaticListRowContainer
+                key={masterServant.instanceId}
+                borderBottom={!lastRow}
+                borderRight={borderRight}
+            >
                 <MasterServantListRow
                     servant={servant}
                     bond={bondLevel}

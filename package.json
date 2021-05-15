@@ -21,6 +21,7 @@
     "@types/react-helmet": "^6.1.0",
     "@types/react-router-dom": "^5.1.6",
     "@types/yup": "^0.29.11",
+    "clsx": "^1.1.1",
     "csv-parse": "^4.15.1",
     "formik": "^2.2.6",
     "jsonwebtoken": "^8.5.1",

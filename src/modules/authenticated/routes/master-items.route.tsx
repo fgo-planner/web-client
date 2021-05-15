@@ -4,6 +4,7 @@ import React, { PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { FabContainer } from '../../../components/fab/fab-container.component';
+import { LayoutPanelScrollable } from '../../../components/layout/layout-panel-scrollable.component';
 import { NavigationRail } from '../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../components/text/page-title.component';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
@@ -60,20 +61,28 @@ const MasterItems = class extends PureComponent<Props, State> {
     render(): ReactNode {
         const { masterItems, editMode, showNavRail } = this.state;
         return (
-            <NavigationRail
-                contents={this._renderNavRailContents()}
-                show={showNavRail && !editMode}
-                disableAnimations
-            >
+            <div className="flex column full-height">
                 <PageTitle>
                     {editMode ?
                         'Edit Item Inventory' :
                         'Item Inventory'
                     }
                 </PageTitle>
-                <MasterItemList editMode={editMode} masterItems={masterItems} />
+                <NavigationRail
+                    className="flex column"
+                    contents={this._renderNavRailContents()}
+                    show={showNavRail && !editMode}
+                    disableAnimations
+                >
+                    <div>
+                        
+                    </div>
+                    <LayoutPanelScrollable className="py-4 pr-4 full-height">
+                        <MasterItemList editMode={editMode} masterItems={masterItems} />
+                    </LayoutPanelScrollable>
+                </NavigationRail>
                 <FabContainer children={this._renderFab(editMode)} />
-            </NavigationRail>
+            </div>
         );
     }
 

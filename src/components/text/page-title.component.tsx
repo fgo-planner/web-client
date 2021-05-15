@@ -8,7 +8,8 @@ type Props = PropsWithChildren<{}> & CustomStyleProps;
 
 const style = (theme: Theme) => ({
     root: {
-        padding: theme.spacing(4, 6, 8, 6)
+        // padding: theme.spacing(4, 6, 8, 6)
+        padding: theme.spacing(4, 6, 0, 6)
     }
 } as StyleRules);
 

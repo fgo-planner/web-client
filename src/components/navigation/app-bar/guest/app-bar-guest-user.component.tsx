@@ -4,8 +4,8 @@ import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as V
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { BackgroundMusicService } from '../../../../services/user-interface/background-music.service';
-import { ThemeService } from '../../../../services/user-interface/theme.service';
-import { ModalOnCloseReason, ThemeMode } from '../../../../types';
+import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
+import { ModalOnCloseReason } from '../../../../types';
 import { LoginDialog } from '../../../login/login-dialog.component';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
@@ -42,12 +42,12 @@ export const AppBarGuestUser = React.memo(() => {
     const history = useHistory();
 
     const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
-    const [themeMode, setThemeMode] = useState<ThemeMode>();
+    const [themeInfo, setThemeInfo] = useState<ThemeInfo>();
     const [isBackgroundMusicPlaying, setBackgroundMusicPlaying] = useState<boolean>();
 
     useEffect(() => {
         const onThemeChangeSubscription = ThemeService.onThemeChange
-            .subscribe(() => setThemeMode(ThemeService.themeMode));
+            .subscribe(setThemeInfo);
         const onPlayStatusChangeSubscription = BackgroundMusicService.onPlayStatusChange
             .subscribe(setBackgroundMusicPlaying);
 
@@ -115,7 +115,7 @@ export const AppBarGuestUser = React.memo(() => {
                 </AppBarLinks>
                 <IconButton
                     onClick={() => ThemeService.toggleThemeMode()}
-                    children={themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
+                    children={themeInfo?.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
                 />
                 <IconButton
                     onClick={() => isBackgroundMusicPlaying ? BackgroundMusicService.pause() : BackgroundMusicService.play()}

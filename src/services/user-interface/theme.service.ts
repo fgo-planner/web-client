@@ -1,9 +1,17 @@
-import { createMuiTheme, Theme } from '@material-ui/core';
+import { createMuiTheme, Theme, ThemeOptions } from '@material-ui/core';
 import { BehaviorSubject } from 'rxjs';
+import { AssetConstants } from '../../constants';
 import defaultDarkTheme from '../../styles/theme-default-dark';
 import defaultLightTheme from '../../styles/theme-default-light';
-import { ThemeMode } from '../../types';
 import { PageMetadataService } from './page-metadata.service';
+
+export type ThemeMode = 'light' | 'dark';
+
+export type ThemeInfo = {
+    theme: Theme;
+    themeMode: ThemeMode;
+    backgroundImageUrl?: string;
+};
 
 export class ThemeService {
 
@@ -13,24 +21,23 @@ export class ThemeService {
      */
     private static readonly _ThemeModeKey = 'theme_mode';
 
-    private static _onThemeChange: BehaviorSubject<Theme>;
+    private static _onThemeChange: BehaviorSubject<ThemeInfo>;
     static get onThemeChange() {
         return this._onThemeChange;
     }
 
     private static _themeMode: ThemeMode;
-    static get themeMode() {
-        return this._themeMode;
-    }
+
+    private static _backgroundImage: string | undefined;
 
     /**
      * Initialization method, simulates a static constructor.
      */
     private static _initialize(): void {
-        this._themeMode = this._loadThemeModeFromStorage();
-        const theme = this._getDefaultThemeForMode(this._themeMode);
-        this._setThemeColorMeta(theme);
-        this._onThemeChange = new BehaviorSubject<Theme>(theme);
+        const themeMode = this._themeMode = this._loadThemeModeFromStorage();
+        const themeInfo = this._getDefaultThemeForMode(themeMode);
+        this._setThemeColorMeta(themeInfo.theme);
+        this._onThemeChange = new BehaviorSubject<ThemeInfo>(themeInfo);
     }
 
     static toggleThemeMode(): void {
@@ -39,9 +46,9 @@ export class ThemeService {
         } else {
             this._setThemeMode('light');
         }
-        const theme = this._getDefaultThemeForMode(this._themeMode);
-        this._setThemeColorMeta(theme);
-        this._onThemeChange.next(theme);
+        const themeInfo = this._getDefaultThemeForMode(this._themeMode);
+        this._setThemeColorMeta(themeInfo.theme);
+        this._onThemeChange.next(themeInfo);
     }
 
     private static _loadThemeModeFromStorage(): ThemeMode {
@@ -56,9 +63,18 @@ export class ThemeService {
         return themeMode as ThemeMode;
     }
 
-    private static _getDefaultThemeForMode(themeMode: ThemeMode): Theme {
-        const themeOptions = themeMode === 'light' ? defaultLightTheme() : defaultDarkTheme();
-        return createMuiTheme(themeOptions);
+    private static _getDefaultThemeForMode(themeMode: ThemeMode): ThemeInfo {
+        let themeOptions: ThemeOptions;
+        let backgroundImageUrl: string;
+        if (themeMode === 'light') {
+            themeOptions = defaultLightTheme();
+            backgroundImageUrl = AssetConstants.DefaultLightThemeBackground;
+        } else {
+            themeOptions = defaultDarkTheme();
+            backgroundImageUrl = AssetConstants.DefaultDarkThemeBackground;
+        }
+        const theme = createMuiTheme(themeOptions);
+        return { theme, themeMode, backgroundImageUrl };
     }
 
     /**

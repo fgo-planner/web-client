@@ -8,6 +8,8 @@ import { Subscription } from 'rxjs';
 import { AlertDialog } from '../../../components/dialog/alert-dialog.component';
 import { FabContainer } from '../../../components/fab/fab-container.component';
 import { FileInputWithTextarea } from '../../../components/input/file-input-with-textarea.component';
+import { LayoutPageScrollable } from '../../../components/layout/layout-page-scrollable.component';
+import { LayoutPanelContainer } from '../../../components/layout/layout-panel-container.component';
 import { GameServantService } from '../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { FgoManagerMasterServantParser } from '../../../services/import/fgo-manager/fgo-manager-master-servant-parser';
@@ -15,6 +17,7 @@ import { MasterServantParserResult } from '../../../services/import/master-serva
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
 import { MasterAccount, Nullable, WithStylesProps } from '../../../types';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
+import { MasterServantListHeader } from '../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../components/master/servant/list/master-servant-list.component';
 
 type Props = ReactRouteComponentProps & WithStylesProps;
@@ -226,14 +229,20 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
         }
         return (
             <Fragment>
-                <div className={classes.importResultsHelperText}>
-                    {ParseResultHelperText}
-                </div>
-                <MasterServantList
-                    openLinksInNewTab
-                    masterServants={masterServants}
-                    bondLevels={bondLevels}
-                />
+                <LayoutPageScrollable>
+                    <div className={classes.importResultsHelperText}>
+                        {ParseResultHelperText}
+                    </div>
+                    <LayoutPanelContainer className="p-4">
+                        <MasterServantListHeader />
+                        <MasterServantList
+                            openLinksInNewTab
+                            masterServants={masterServants}
+                            bondLevels={bondLevels}
+                        />
+                    </LayoutPanelContainer>
+                    <div className="py-10" />
+                </LayoutPageScrollable>
                 <AlertDialog
                     open={importStatus !== 'none'}
                     message={importStatus === 'success' ? ImportSuccessMessage : ImportFailMessage}

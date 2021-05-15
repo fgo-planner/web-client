@@ -18,6 +18,7 @@ const style = (theme: Theme) => ({
         padding: theme.spacing(4, 8, 4, 6),
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
+        fontSize: '0.875rem'
     },
     editMode: {
         paddingLeft: theme.spacing(4 + 5)

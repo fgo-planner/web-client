@@ -1,7 +1,7 @@
 import { IconButton, StyleRules, Theme } from '@material-ui/core';
 import withStyles, { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
-import React, { PureComponent, ReactNode } from 'react';
+import { PureComponent, ReactNode } from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { AssetConstants } from '../../../../../../constants';
 import { GameServant, MasterServant, MasterServantBondLevel, WithStylesProps } from '../../../../../../types';
@@ -26,8 +26,9 @@ const style = (theme: Theme) => ({
         alignContent: 'center',
         alignItems: 'center',
         textAlign: 'center',
-        height: '64px',
+        height: '52px',
         paddingLeft: theme.spacing(4),
+        fontSize: '0.875rem'
     },
     npLevel: {
         flex: ViewModeColumnWidths.npLevel,
@@ -48,7 +49,7 @@ const style = (theme: Theme) => ({
         '& .value': {
             width: '28px',
             textAlign: 'right',
-            paddingRight: theme.spacing(4)
+            paddingRight: theme.spacing(3)
         },
         '& img': {
             width: '16px',
@@ -71,7 +72,7 @@ const style = (theme: Theme) => ({
         alignItems: 'center',
         justifyContent: 'center',
         '& .value': {
-            width: '24px'
+            width: '1.25rem'
         },
     },
     bondLevel: {

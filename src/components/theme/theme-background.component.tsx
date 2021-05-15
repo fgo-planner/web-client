@@ -1,62 +1,66 @@
-import { CSSProperties } from '@material-ui/core/styles/withStyles';
-import { PureComponent, ReactNode } from 'react';
-import './theme-background.component.scss';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { CSSProperties, WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import clsx from 'clsx';
+import React from 'react';
+import { BackgroundImageContext, BackgroundImageContextProps } from '../../contexts/background-image.context';
+import { ComponentStyleProps } from '../../types/internal/props/component-style-props.type';
 
-type Props = {
+type Props = ComponentStyleProps;
 
-    /**
-     * Background image URL. Overrides background color.
-     */
-    imageUrl?: string | null;
-
-    /**
-     * Solid background color. Only used if no background image URL is provided.
-     */
-    color?: string | null;
-
-    /**
-     * Background opacity.
-     */
-    opacity?: number | null;
-
-    /**
-     * Background image blur.
-     */
-    blur?: number | null;
-
+const generateBackgroundStyle = (imageUrl?: string, blur?: number): CSSProperties => {
+    const style: CSSProperties = {};
+    if (imageUrl) {
+        style.backgroundImage = `url(${imageUrl})`;
+    };
+    if (blur) {
+        style.backdropFilter = `blur(${blur}px)`;
+    }
+    return style;
 };
 
-type State = {
+const style = (theme: Theme) => ({
+    root: {
+        position: 'fixed',
+        zIndex: -9999,
+        overflow: 'hidden'
+    },
+    background: {
+        width: '100vw',
+        height: '100vh',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+    }
+} as StyleRules);
 
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'ThemeBackground'
 };
 
-export class ThemeBackground extends PureComponent<Props, State> {
+const useStyles = makeStyles(style, styleOptions);
 
-    render(): ReactNode {
-        return (
-            <div className="background-container">
-                <div className="background" style={this.backgroundStyle}>
+export const ThemeBackground = React.memo((props: Props) => {
 
-                </div>
-            </div>
-        );
-    }
+    const {
+        className,
+        style
+    } = props;
 
-    private get backgroundStyle(): CSSProperties {
-        const props = this.props;
-        const style: CSSProperties = {
-            backgroundColor: props.color || undefined
-        };
-        if (props.imageUrl) {
-            style.backgroundImage = `url(${props.imageUrl})`;
-            if (props.blur) {
-                style.backdropFilter = `blur(${props.blur}px)`;
-            }
-        }
-        if (props.opacity != null) {
-            style.opacity = props.opacity;
-        }
-        return style;
-    }
+    const classes = useStyles();
 
-}
+    return (
+        <div className={clsx(classes.root, className)} style={style}>
+            <BackgroundImageContext.Consumer>
+                {({ imageUrl, blur }: BackgroundImageContextProps) => {
+                    const backgroundStyle = generateBackgroundStyle(imageUrl, blur);
+                    if (!imageUrl) {
+                        return null;
+                    }
+                    return (
+                        <div className={classes.background} style={backgroundStyle} />
+                    );
+                }}
+            </BackgroundImageContext.Consumer>
+        </div>
+    );
+
+});

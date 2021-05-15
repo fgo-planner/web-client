@@ -41,7 +41,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, o
         <div className={classes.root}>
             <GameServantThumbnail
                 variant="rounded"
-                size={56}
+                size={48}
                 servant={servant}
                 stage={artStage}
                 enableLink

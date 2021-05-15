@@ -1,13 +1,15 @@
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { CSSProperties, WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import clsx from 'clsx';
 import React, { PropsWithChildren, ReactNode } from 'react';
+import { ComponentStyleProps } from '../../types/internal/props/component-style-props.type';
 
 type Props = PropsWithChildren<{
     contents?: ReactNode;
     width?: number | string;
     show?: boolean;
     disableAnimations?: boolean
-}>;
+}> & ComponentStyleProps;
 
 const DefaultWidth = 56;
 
@@ -17,7 +19,8 @@ const TransitionTimingFunction = 'ease-in-out';
 
 const style = (theme: Theme) => ({
     root: {
-        display: 'flex'
+        display: 'flex',
+        overflow: 'hidden'
     },
     navigationRail: {
         display: 'flex',
@@ -26,10 +29,6 @@ const style = (theme: Theme) => ({
         height: '100%',
         position: 'fixed',
         paddingTop: theme.spacing(2),
-        backgroundColor: theme.palette.background.paper,
-        borderRightWidth: 1,
-        borderRightStyle: 'solid',
-        borderRightColor: theme.palette.divider,
         transition: `left ${TransitionDuration}ms ${TransitionTimingFunction}`,
         '& >*': {
             // https://material.io/components/navigation-rail#specs
@@ -39,6 +38,7 @@ const style = (theme: Theme) => ({
     },
     childrenContainer: {
         flex: 1,
+        height: '100%',
         transition: `margin ${TransitionDuration}ms ${TransitionTimingFunction}` 
     }
 } as StyleRules);
@@ -54,7 +54,9 @@ export const NavigationRail = React.memo((props: Props) => {
         children,
         contents,
         show,
-        disableAnimations
+        disableAnimations,
+        className,
+        style
     } = props;
 
     let { width } = props;
@@ -75,7 +77,7 @@ export const NavigationRail = React.memo((props: Props) => {
     };
 
     return (
-        <div className={classes.root}>
+        <div className={clsx(classes.root, className)} style={style}>
             <div className={classes.navigationRail} style={navigationRailStyle}>
                 {contents}
             </div>

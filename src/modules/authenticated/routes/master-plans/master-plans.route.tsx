@@ -1,15 +1,18 @@
 import { Fab, PaperProps, Tooltip } from '@material-ui/core';
 import { Add as AddIcon } from '@material-ui/icons';
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PromptDialog } from '../../../components/dialog/prompt-dialog.component';
-import { FabContainer } from '../../../components/fab/fab-container.component';
-import { PageTitle } from '../../../components/text/page-title.component';
-import { MasterAccountService } from '../../../services/data/master/master-account.service';
-import { MasterPlanService } from '../../../services/data/master/master-plan.service';
-import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
-import { MasterPlan, ModalOnCloseReason, ReadonlyPartial, ReadonlyPartialArray } from '../../../types';
-import { MasterPlanList } from '../components/master/plan/list/master-plan-list.component';
-import { MasterPlanAddDialog } from '../components/master/plan/master-plan-add-dialog';
+import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
+import { FabContainer } from '../../../../components/fab/fab-container.component';
+import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
+import { PageTitle } from '../../../../components/text/page-title.component';
+import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { MasterPlanService } from '../../../../services/data/master/master-plan.service';
+import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
+import { MasterPlan, ModalOnCloseReason, ReadonlyPartial, ReadonlyPartialArray } from '../../../../types';
+import { MasterPlanAddDialog } from './master-plan-add-dialog';
+import { MasterPlanList } from './master-plan-list.component';
+import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
+import { useElevateAppBarOnScroll } from '../../../../hooks/use-elevate-app-bar-on-scroll.hook';
 
 const AddPlanDialogPaperProps: PaperProps = {
     style: {
@@ -85,6 +88,8 @@ export const MasterPlansRoute = React.memo(() => {
         };
     }, [loadMasterPlans]);
 
+    const scrollContainer = useElevateAppBarOnScroll();
+
     const deletePlanDialogPrompt = useMemo(() => {
         if (!deletePlanTarget) {
             return '';
@@ -124,13 +129,23 @@ export const MasterPlansRoute = React.memo(() => {
 
     return (
         <Fragment>
-            <PageTitle>
-                My Plans
-            </PageTitle>
-            <MasterPlanList
-                masterPlans={masterPlans}
-                onDeletePlan={handleDeletePlan}
-            />
+            <LayoutPageScrollable scrollContainerRef={scrollContainer}>
+                <PageTitle>
+                    My Plans
+                </PageTitle>
+                <LayoutPanelContainer className="p-4">
+                    {masterPlans.length ?
+                        <MasterPlanList
+                            masterPlans={masterPlans}
+                            onDeletePlan={handleDeletePlan}
+                        /> :
+                        <div>
+                            No plans found
+                    </div>
+                    }
+                </LayoutPanelContainer>
+                <div className="py-10" />
+            </LayoutPageScrollable>
             <MasterPlanAddDialog
                 open={addPlanDialogOpen}
                 PaperProps={AddPlanDialogPaperProps}

@@ -1,13 +1,16 @@
 import { Fab, PaperProps, Tooltip } from '@material-ui/core';
 import { Add as AddIcon } from '@material-ui/icons';
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { PromptDialog } from '../../../components/dialog/prompt-dialog.component';
-import { FabContainer } from '../../../components/fab/fab-container.component';
-import { MasterAccountAddDialog } from '../../../components/master/account/master-account-add-dialog.component';
-import { PageTitle } from '../../../components/text/page-title.component';
-import { MasterAccountList as MasterAccountListType, MasterAccountService } from '../../../services/data/master/master-account.service';
-import { MasterAccount, ModalOnCloseReason, ReadonlyPartial } from '../../../types';
-import { MasterAccountList } from '../components/master/account/list/master-account-list.component';
+import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
+import { FabContainer } from '../../../../components/fab/fab-container.component';
+import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
+import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
+import { MasterAccountAddDialog } from '../../../../components/master/account/master-account-add-dialog.component';
+import { PageTitle } from '../../../../components/text/page-title.component';
+import { useElevateAppBarOnScroll } from '../../../../hooks/use-elevate-app-bar-on-scroll.hook';
+import { MasterAccountList as MasterAccountListType, MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { MasterAccount, ModalOnCloseReason, ReadonlyPartial } from '../../../../types';
+import { MasterAccountList } from './master-account-list.component';
 
 const AddAccountDialogPaperProps: PaperProps = {
     style: {
@@ -52,6 +55,8 @@ export const MasterAccountsRoute = React.memo(() => {
         };
     }, []);
 
+    const scrollContainer = useElevateAppBarOnScroll();
+
     const deleteAccountDialogPrompt = useMemo(() => {
         if (!deleteAccountTarget) {
             return '';
@@ -86,15 +91,20 @@ export const MasterAccountsRoute = React.memo(() => {
 
     return (
         <Fragment>
-            <PageTitle>
-                Master Accounts
-            </PageTitle>
-            {!masterAccountList ? <div>Loading...</div> :
-                <MasterAccountList 
-                    masterAccountList={masterAccountList}
-                    onDeleteAccount={handleDeleteAccount}
-                />
-            }
+            <LayoutPageScrollable scrollContainerRef={scrollContainer}>
+                <PageTitle>
+                    Master Accounts
+                </PageTitle>
+                <LayoutPanelContainer className="p-4">
+                    {!masterAccountList ? <div>Loading...</div> :
+                        <MasterAccountList
+                            masterAccountList={masterAccountList}
+                            onDeleteAccount={handleDeleteAccount}
+                        />
+                    }
+                </LayoutPanelContainer>
+                <div className="py-10" />
+            </LayoutPageScrollable>
             <MasterAccountAddDialog
                 PaperProps={AddAccountDialogPaperProps}
                 open={addAccountDialogOpen}

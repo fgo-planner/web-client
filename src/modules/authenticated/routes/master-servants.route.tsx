@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { PromptDialog } from '../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../components/fab/fab-container.component';
+import { LayoutPanelScrollable } from '../../../components/layout/layout-panel-scrollable.component';
 import { NavigationRail } from '../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../components/text/page-title.component';
 import { GameServantService } from '../../../services/data/game/game-servant.service';
@@ -14,6 +15,7 @@ import { LoadingIndicatorOverlayService } from '../../../services/user-interface
 import { GameServant, MasterAccount, MasterServant, MasterServantBondLevel, ModalOnCloseReason, Nullable, ReadonlyRecord } from '../../../types';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MasterServantEditDialog } from '../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
+import { MasterServantListHeader } from '../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../components/master/servant/list/master-servant-list.component';
 
 type Props = {
@@ -117,28 +119,40 @@ const MasterServants = class extends PureComponent<Props, State> {
         } = this.state;
 
         return (
-            <NavigationRail 
-                contents={this._renderNavRailContents()}
-                show={showNavRail && !editMode}
-                disableAnimations
-            >
+            <div className="flex column full-height">
                 <PageTitle>
                     {editMode ?
                         'Edit Servant Roster' :
                         'Servant Roster'
                     }
                 </PageTitle>
-                <MasterServantList
-                    editMode={editMode}
-                    showActions
-                    showAddServantRow
-                    openLinksInNewTab={editMode}
-                    masterServants={masterServants}
-                    bondLevels={bondLevels}
-                    onAddServant={this._onAddServantButtonClick}
-                    onEditServant={this._openEditServantDialog}
-                    onDeleteServant={this._openDeleteServantDialog}
-                />
+                <NavigationRail
+                    className="flex column"
+                    contents={this._renderNavRailContents()}
+                    show={showNavRail && !editMode}
+                    disableAnimations
+                >
+                    <LayoutPanelScrollable
+                        className="py-4 pr-4 full-height"
+                        headerContents={
+                            <MasterServantListHeader showActions editMode={editMode} />
+                        }
+                        children={
+                            <MasterServantList
+                                editMode={editMode}
+                                showActions
+                                showAddServantRow
+                                borderRight
+                                openLinksInNewTab={editMode}
+                                masterServants={masterServants}
+                                bondLevels={bondLevels}
+                                onAddServant={this._onAddServantButtonClick}
+                                onEditServant={this._openEditServantDialog}
+                                onDeleteServant={this._openDeleteServantDialog}
+                            />
+                        }
+                    />
+                </NavigationRail>
                 <FabContainer children={this._renderFab()} />
                 <MasterServantEditDialog
                     open={editServantDialogOpen}
@@ -159,7 +173,7 @@ const MasterServants = class extends PureComponent<Props, State> {
                     confirmButtonLabel="Delete"
                     onClose={this._handleDeleteServantDialogClose}
                 />
-            </NavigationRail>
+            </div>
         );
     }
 

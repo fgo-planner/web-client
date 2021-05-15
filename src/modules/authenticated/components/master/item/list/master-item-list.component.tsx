@@ -27,7 +27,7 @@ type State = {
 
 const style = (theme: Theme) => ({
     root: {
-        paddingBottom: theme.spacing(16)
+        paddingBottom: theme.spacing(12)
     },
     itemCategory: {
         paddingBottom: theme.spacing(8),

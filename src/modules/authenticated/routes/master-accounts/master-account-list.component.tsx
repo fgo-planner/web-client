@@ -1,13 +1,15 @@
-import { fade, IconButton, Link as MuiLink, makeStyles, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
+import { fade, IconButton, makeStyles, Link as MuiLink, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
 import { DeleteForever as DeleteForeverIcon } from '@material-ui/icons';
 import { WithStylesOptions } from '@material-ui/styles';
 import React from 'react';
+import NumberFormat from 'react-number-format';
 import { Link } from 'react-router-dom';
-import { MasterPlan, ReadonlyPartial, ReadonlyPartialArray } from '../../../../../../types';
+import { MasterAccountList as MasterAccountListType } from '../../../../services/data/master/master-account.service';
+import { MasterAccount, ReadonlyPartial } from '../../../../types';
 
 type Props = {
-    masterPlans: ReadonlyPartialArray<MasterPlan>;
-    onDeletePlan: (masterPlan: ReadonlyPartial<MasterPlan>) => void;
+    masterAccountList: MasterAccountListType;
+    onDeleteAccount: (masterAccount: ReadonlyPartial<MasterAccount>) => void;
 };
 
 const style = (theme: Theme) => ({
@@ -26,12 +28,12 @@ const style = (theme: Theme) => ({
 } as StyleRules);
 
 const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterPlanList'
+    classNamePrefix: 'MasterAccountList'
 };
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterPlanList = React.memo(({ masterPlans, onDeletePlan }: Props) => {
+export const MasterAccountList = React.memo(({ masterAccountList, onDeleteAccount }: Props) => {
     const classes = useStyles();
 
     return (
@@ -39,22 +41,28 @@ export const MasterPlanList = React.memo(({ masterPlans, onDeletePlan }: Props) 
             <Table className={classes.table}>
                 <TableHead>
                     <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Description</TableCell>
+                        <TableCell>Account Name</TableCell>
+                        <TableCell align="center">Friend ID</TableCell>
                         <TableCell />
                         <TableCell width={69} align="center">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {masterPlans.map(masterPlan => (
-                        <TableRow key={masterPlan._id} className={classes.dataRow}>
-                            <TableCell className="truncate">
+                    {masterAccountList.map((masterAccount, i) => (
+                        <TableRow key={masterAccount._id} className={classes.dataRow}>
+                            <TableCell>
                                 <MuiLink component={Link} to='./master' underline="none">
-                                    {masterPlan.name || 'No Name'}
+                                    {masterAccount.name || `Account ${i + 1}`}
                                 </MuiLink>
                             </TableCell>
-                            <TableCell className="truncate">
-                                {masterPlan.description || '\u2013'}
+                            <TableCell align="center">
+                                {!masterAccount.friendId ? '\u2013' :
+                                    <NumberFormat
+                                        thousandSeparator
+                                        displayType="text"
+                                        value={masterAccount.friendId}
+                                    />
+                                }
                             </TableCell>
                             <TableCell />
                             <TableCell align="center">
@@ -62,7 +70,7 @@ export const MasterPlanList = React.memo(({ masterPlans, onDeletePlan }: Props) 
                                     <IconButton
                                         className={classes.actionButton}
                                         color="secondary"
-                                        onClick={() => onDeletePlan(masterPlan)}
+                                        onClick={() => onDeleteAccount(masterAccount)}
                                         children={<DeleteForeverIcon />}
                                     />
                                 </Tooltip>

@@ -27,7 +27,7 @@ export const MasterItemListRowLabel = React.memo(({ item, editMode }: Props) => 
         <Fragment>
             <GameItemThumbnail
                 item={item}
-                size={56}
+                size={42}
                 showBackground
                 enableLink={!editMode}
             />

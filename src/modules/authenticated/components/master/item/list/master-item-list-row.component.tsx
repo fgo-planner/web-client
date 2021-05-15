@@ -19,8 +19,9 @@ const style = (theme: Theme) => ({
         display: 'flex',
         alignContent: 'center',
         alignItems: 'center',
-        height: '64px',
-        padding: theme.spacing(0, 8, 0, 4)
+        height: 52,
+        padding: theme.spacing(0, 8, 0, 4),
+        fontSize: '0.875rem'
     }
 } as StyleRules);
 
@@ -39,7 +40,7 @@ export const MasterItemListRow = withStyles(style, styleOptions)(class extends P
     render(): ReactNode {
         const { classes, key, item, editMode } = this.props;
         return (
-            <StaticListRowContainer>
+            <StaticListRowContainer borderTop borderRight>
                 <div className={classes.root} key={key}>
                     <MasterItemListRowLabel item={item.item} editMode={editMode} />
                     <div className="flex-fill" />

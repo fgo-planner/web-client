@@ -45,5 +45,4 @@ export * from './internal/props/with-theme-props.type';
 export * from './internal/props/with-width-props.type';
 export * from './internal/route/route-definition.type';
 export * from './internal/text-field-change-event.type';
-export * from './internal/theme-mode.type';
 export * from './internal/user-info.type';

@@ -58,7 +58,7 @@ const DefaultClassNumber = 12;
 
 const DefaultRarityColor = 1;
 
-const DefaultSize = 28;
+const DefaultSize = 24;
 
 const style = () => ({
     img: {

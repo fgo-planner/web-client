@@ -4,9 +4,9 @@ import { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../../../../services/authentication/auth.service';
 import { BackgroundMusicService } from '../../../../services/user-interface/background-music.service';
-import { ThemeService } from '../../../../services/user-interface/theme.service';
+import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseHandler, ThemeMode, User, WithStylesProps } from '../../../../types';
+import { ModalOnCloseHandler, User, WithStylesProps } from '../../../../types';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
 import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 
@@ -17,7 +17,7 @@ type Props = {
 } & WithStylesProps;
 
 type State = {
-    themeMode: ThemeMode;
+    themeInfo?: ThemeInfo;
     isBackgroundMusicPlaying: boolean;
 };
 
@@ -60,7 +60,6 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
     constructor(props: Props) {
         super(props);
         this.state = {
-            themeMode: ThemeService.themeMode,
             isBackgroundMusicPlaying: false
         };
         this._logout = this._logout.bind(this);
@@ -80,8 +79,8 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
     }
 
     render(): ReactNode {
-        const { themeMode, isBackgroundMusicPlaying } = this.state;
-        const isLightMode = themeMode === 'light';
+        const { themeInfo, isBackgroundMusicPlaying } = this.state;
+        const isLightMode = themeInfo?.themeMode === 'light';
         return (
             <AppBarActionMenu
                 className={this.props.classes.root}
@@ -162,9 +161,8 @@ export const AppBarUserProfileMenu = withStyles(style)(class extends PureCompone
         }
     }
 
-    private _handleThemeChange(theme: Theme): void {
-        const themeMode = ThemeService.themeMode;
-        this.setState({ themeMode });
+    private _handleThemeChange(themeInfo: ThemeInfo): void {
+        this.setState({ themeInfo });
     }
 
     private _handleBackgroundMusicPlayStatusChange(isPlaying: boolean): void {

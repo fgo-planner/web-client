@@ -1,8 +1,8 @@
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import clsx from 'clsx';
 import React from 'react';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { StyleUtils } from '../../../../../../utils/style.utils';
 import { ViewModeColumnWidths } from './master-servant-list-column-widths';
 
 type Props = {
@@ -15,9 +15,13 @@ const style = (theme: Theme) => ({
     root: {
         display: 'flex',
         padding: theme.spacing(4, 0, 4, 4),
+        borderBottomWidth: 1,
+        borderBottomStyle: 'solid',
+        borderBottomColor: theme.palette.divider,
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
         textAlign: 'center',
+        fontSize: '0.875rem'
     },
     editMode: {
         paddingLeft: theme.spacing(4 + 5)
@@ -56,7 +60,7 @@ const useStyles = makeStyles(style, styleOptions);
 
 export const MasterServantListHeader = React.memo(({ editMode, showActions }: Props) => {
     const classes = useStyles();
-    const rootClassName = StyleUtils.appendClassNames(classes.root, editMode && classes.editMode);
+    const rootClassName = clsx(classes.root, editMode && classes.editMode);
     return (
         <div className={rootClassName}>
             <div className={classes.label}>

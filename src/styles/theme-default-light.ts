@@ -1,14 +1,15 @@
+import { fade, ThemeOptions } from '@material-ui/core';
+import { lightBlue, pink } from '@material-ui/core/colors';
 import overrides from './material-ui-overrides';
-import { ThemeOptions } from '@material-ui/core';
 import { ThemeConstants } from './theme-constants';
-import { grey, lightBlue, pink } from '@material-ui/core/colors';
 
 const themeDefaultLight = () => {
     const theme: ThemeOptions = {
         spacing: ThemeConstants.Spacing,
         palette: {
             background: {
-                // default: 'white'
+                default: fade('#FFFFFF', 0.69),
+                paper: '#FFFFFF'
             },
             primary: {
                 main: pink[400]

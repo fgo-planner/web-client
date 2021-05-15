@@ -1,32 +1,38 @@
 import { Paper, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { PureComponent, ReactNode } from 'react';
+import clsx from 'clsx';
+import { PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../../../services/authentication/auth.service';
 import { UserService } from '../../../services/data/user/user.service';
+import { AppBarService } from '../../../services/user-interface/app-bar.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { Nullable, User, UserInfo, WithStylesProps } from '../../../types';
-import { StyleUtils } from '../../../utils/style.utils';
+import { ThemeBackground } from '../../theme/theme-background.component';
 import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';
 import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
 
-type Props = {
-    appBarElevated: boolean;
-} & WithStylesProps;
+type Props = WithStylesProps;
 
 type State = {
     currentUser: User | null;
+    elevated?: boolean;
 };
 
 const style = (theme: Theme) => ({
     root: {
         height: theme.spacing(ThemeConstants.AppBarHeightScale),
-        transition: 'box-shadow 200ms 50ms linear'
+        backgroundColor: theme.palette.background.default,
+        transition: 'box-shadow 200ms 50ms linear',
     },
     noElevation: {
         // Simulates 1px solid border
-        boxShadow: `0px 1px 0px ${theme.palette.divider}`
+        // boxShadow: `0px 1px 0px ${theme.palette.divider}`
+        boxShadow: 'none'
+    },
+    backgroundImage: {
+        height: theme.spacing(ThemeConstants.AppBarHeightScale),
     },
     contents: {
         display: 'flex',
@@ -57,39 +63,48 @@ export const AppBar = withStyles(style, styleOptions)(class extends PureComponen
 
     private _onCurrentUserChangeSubscription!: Subscription;
 
+    private _onElevatedChangeSubscription!: Subscription;
+
     constructor(props: Props) {
         super(props);
-        
+
         this.state = {
-            currentUser: null
+            currentUser: null,
         };
     }
 
     componentDidMount(): void {
         this._onCurrentUserChangeSubscription = AuthenticationService.onCurrentUserChange
             .subscribe(this._handleCurrentUserChange.bind(this));
+        this._onElevatedChangeSubscription = AppBarService.onElevatedChange
+            .subscribe(elevated => this.setState({ elevated }));
     }
 
     componentWillUnmount(): void {
         this._onCurrentUserChangeSubscription.unsubscribe();
+        this._onElevatedChangeSubscription.unsubscribe();
     }
 
     render(): ReactNode {
-        const { classes, appBarElevated } = this.props;
-        const { currentUser } = this.state;
-        const classNames = StyleUtils.appendClassNames(classes.root, !appBarElevated && classes.noElevation);
+        const { classes } = this.props;
+        const { currentUser, elevated } = this.state;
+        const classNames = clsx(classes.root, !elevated && classes.noElevation);
         return (
             <Paper
                 className={classNames}
                 elevation={ThemeConstants.AppBarElevatedElevation}
                 square={true}
             >
+                <ThemeBackground className={classes.backgroundImage} />
                 <div className={classes.contents}>
                     {/* TODO Add logo */}
                     <Link className={classes.title} to="/">
                         FGO Servant Planner
                     </Link>
-                    {currentUser ? <AppBarAuthenticatedUser currentUser={currentUser} /> : <AppBarGuestUser />}
+                    {currentUser ?
+                        <AppBarAuthenticatedUser currentUser={currentUser} /> :
+                        <AppBarGuestUser />
+                    }
                 </div>
             </Paper>
         );

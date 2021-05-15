@@ -47,7 +47,6 @@ type State = {
     deleteServant?: MasterServant;
     deleteServantDialogOpen: boolean;
     deleteServantDialogPrompt?: string;
-    showNavRail: boolean;
     loadingIndicatorId?: string;
 };
 
@@ -69,8 +68,7 @@ const MasterServants = class extends PureComponent<Props, State> {
             lastInstanceId: -1,
             editMode: false,
             editServantDialogOpen: false,
-            deleteServantDialogOpen: false,
-            showNavRail: true
+            deleteServantDialogOpen: false
         };
 
         this._edit = this._edit.bind(this);
@@ -114,8 +112,7 @@ const MasterServants = class extends PureComponent<Props, State> {
             editServant,
             editServantDialogOpen,
             deleteServantDialogOpen,
-            deleteServantDialogPrompt,
-            showNavRail
+            deleteServantDialogPrompt
         } = this.state;
 
         return (
@@ -126,33 +123,33 @@ const MasterServants = class extends PureComponent<Props, State> {
                         'Servant Roster'
                     }
                 </PageTitle>
-                <NavigationRail
-                    className="flex column"
-                    contents={this._renderNavRailContents()}
-                    show={showNavRail && !editMode}
-                    disableAnimations
-                >
-                    <LayoutPanelScrollable
-                        className="py-4 pr-4 full-height"
-                        headerContents={
-                            <MasterServantListHeader showActions editMode={editMode} />
-                        }
-                        children={
-                            <MasterServantList
-                                editMode={editMode}
-                                showActions
-                                showAddServantRow
-                                borderRight
-                                openLinksInNewTab={editMode}
-                                masterServants={masterServants}
-                                bondLevels={bondLevels}
-                                onAddServant={this._onAddServantButtonClick}
-                                onEditServant={this._openEditServantDialog}
-                                onDeleteServant={this._openDeleteServantDialog}
-                            />
-                        }
-                    />
-                </NavigationRail>
+                <div className="flex overflow-hidden">
+                    <NavigationRail>
+                        {this._renderNavRailContents()}
+                    </NavigationRail>
+                    <div className="flex flex-fill">
+                        <LayoutPanelScrollable
+                            className="py-4 pr-4 full-height flex-fill"
+                            headerContents={
+                                <MasterServantListHeader showActions editMode={editMode} />
+                            }
+                            children={
+                                <MasterServantList
+                                    editMode={editMode}
+                                    showActions
+                                    showAddServantRow
+                                    borderRight
+                                    openLinksInNewTab={editMode}
+                                    masterServants={masterServants}
+                                    bondLevels={bondLevels}
+                                    onAddServant={this._onAddServantButtonClick}
+                                    onEditServant={this._openEditServantDialog}
+                                    onDeleteServant={this._openDeleteServantDialog}
+                                />
+                            }
+                        />
+                    </div>
+                </div>
                 <FabContainer children={this._renderFab()} />
                 <MasterServantEditDialog
                     open={editServantDialogOpen}

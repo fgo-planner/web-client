@@ -24,7 +24,6 @@ type State = {
     masterItems: MasterItem[];
     editMode: boolean;
     loadingIndicatorId?: string;
-    showNavRail: boolean;
 };
 
 const MasterItems = class extends PureComponent<Props, State> {
@@ -37,8 +36,7 @@ const MasterItems = class extends PureComponent<Props, State> {
         super(props);
         this.state = {
             masterItems: [],
-            editMode: false,
-            showNavRail: true
+            editMode: false
         };
 
         this._edit = this._edit.bind(this);
@@ -59,7 +57,7 @@ const MasterItems = class extends PureComponent<Props, State> {
     }
 
     render(): ReactNode {
-        const { masterItems, editMode, showNavRail } = this.state;
+        const { masterItems, editMode } = this.state;
         return (
             <div className="flex column full-height">
                 <PageTitle>
@@ -68,19 +66,14 @@ const MasterItems = class extends PureComponent<Props, State> {
                         'Item Inventory'
                     }
                 </PageTitle>
-                <NavigationRail
-                    className="flex column"
-                    contents={this._renderNavRailContents()}
-                    show={showNavRail && !editMode}
-                    disableAnimations
-                >
-                    <div>
-                        
-                    </div>
-                    <LayoutPanelScrollable className="py-4 pr-4 full-height">
+                <div className="flex overflow-hidden">
+                    <NavigationRail>
+                        {this._renderNavRailContents()}
+                    </NavigationRail>
+                    <LayoutPanelScrollable className="py-4 pr-4 full-height flex-fill">
                         <MasterItemList editMode={editMode} masterItems={masterItems} />
                     </LayoutPanelScrollable>
-                </NavigationRail>
+                </div>
                 <FabContainer children={this._renderFab(editMode)} />
             </div>
         );

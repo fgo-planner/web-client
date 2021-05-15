@@ -47,7 +47,10 @@ const style = (theme: Theme) => ({
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
         fontSize: '0.875rem',
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
+        borderBottomWidth: 1,
+        borderBottomStyle: 'solid',
+        borderBottomColor: theme.palette.divider
     },
     dataRow: {
         display: 'flex',

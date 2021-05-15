@@ -78,6 +78,7 @@ const style = (theme: Theme) => ({
         borderStyle: 'solid',
         borderColor: fade(theme.palette.text.primary, 0.23),
         borderRadius: 8,
+        backgroundColor: theme.palette.background.paper,
         [theme.breakpoints.down('xs')]: {
             width: '100%',
             border: 'none'
@@ -166,7 +167,7 @@ const Registration = withRouter(withStyles(style, styleOptions)(class extends Pu
         return (
             <div className={classes.root}>
                 <div className={classes.formContainer}>
-                    <PageTitle>
+                    <PageTitle className="pb-8">
                         {success ? 'Success!' : 'Create Account'}
                     </PageTitle>
                     {success ? 

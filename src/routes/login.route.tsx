@@ -35,6 +35,7 @@ const style = (theme: Theme) => ({
         borderStyle: 'solid',
         borderColor: fade(theme.palette.text.primary, 0.23),
         borderRadius: 8,
+        backgroundColor: theme.palette.background.paper,
         [theme.breakpoints.down('xs')]: {
             width: '100%',
             border: 'none'
@@ -82,7 +83,7 @@ const Login = withRouter(withStyles(style, styleOptions)(class extends PureCompo
         return (
             <div className={classes.root}>
                 <div className={classes.formContainer}>
-                    <PageTitle>
+                    <PageTitle className="pb-8">
                         Login
                     </PageTitle>
                     {errorMessage && 

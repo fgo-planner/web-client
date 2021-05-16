@@ -5,7 +5,7 @@ import { GameServantClassIcon } from '../../../../../../components/game/servant/
 import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { GameServant, MasterServant } from '../../../../../../types';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
-import { ViewModeColumnWidths } from './master-servant-list-column-widths';
+import { MasterServantListColumnWidths as ColumnWidths } from './master-servant-list-columns';
 
 type Props = {
     servant: Readonly<GameServant>;
@@ -18,10 +18,18 @@ const style = (theme: Theme) => ({
     root: {
         display: 'flex',
         alignItems: 'center',
-        flex: ViewModeColumnWidths.label,
+        flex: ColumnWidths.label,
+        /**
+         * This fixes text truncation issues inside flex box.
+         * @see https://css-tricks.com/flexbox-truncated-text/
+         */
+        minWidth: 0,
         '& > :not(:first-child)': {
             paddingLeft: theme.spacing(4)
         }
+    },
+    rarity: {
+        minWidth: 24
     }
 } as StyleRules);
 
@@ -51,10 +59,10 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, o
                 servantClass={servant.class}
                 rarity={servant.rarity}
             />
-            <div className="rarity">
+            <div className={classes.rarity}>
                 {`${servant.rarity} \u2605`}
             </div>
-            <div>
+            <div className="truncate">
                 {servant.name}
             </div>
         </div>

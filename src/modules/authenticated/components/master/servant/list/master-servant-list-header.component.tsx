@@ -3,11 +3,12 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import clsx from 'clsx';
 import React from 'react';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { ViewModeColumnWidths } from './master-servant-list-column-widths';
+import { ReadonlyPartial } from '../../../../../../types';
+import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
 
 type Props = {
     editMode?: boolean;
-    showActions?: boolean;
+    visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
 };
 
@@ -27,28 +28,28 @@ const style = (theme: Theme) => ({
         paddingLeft: theme.spacing(4 + 5)
     },
     label: {
-        flex: ViewModeColumnWidths.label
+        flex: ColumnWidths.label
     },
     npLevel: {
-        flex: ViewModeColumnWidths.npLevel
+        flex: ColumnWidths.npLevel
     },
     level: {
-        flex: ViewModeColumnWidths.level
+        flex: ColumnWidths.level
     },
     fouHp: {
-        flex: ViewModeColumnWidths.fouHp
+        flex: ColumnWidths.fouHp
     },
     fouAtk: {
-        flex: ViewModeColumnWidths.fouAtk
+        flex: ColumnWidths.fouAtk
     },
     skillLevels: {
-        flex: ViewModeColumnWidths.skillLevels
+        flex: ColumnWidths.skillLevels
     },
     bondLevel: {
-        flex: ViewModeColumnWidths.bondLevel
+        flex: ColumnWidths.bondLevel
     },
     actions: {
-        width: ViewModeColumnWidths.actions
+        width: ColumnWidths.actions
     }
 } as StyleRules);
 
@@ -58,34 +59,60 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterServantListHeader = React.memo(({ editMode, showActions }: Props) => {
+export const MasterServantListHeader = React.memo(({ editMode, visibleColumns }: Props) => {
+    
+    const {
+        npLevel,
+        level,
+        fouHp,
+        fouAtk,
+        skillLevels,
+        bondLevel,
+        actions
+    } = visibleColumns || {};
+
     const classes = useStyles();
+
     const rootClassName = clsx(classes.root, editMode && classes.editMode);
+
     return (
         <div className={rootClassName}>
             <div className={classes.label}>
                 Servant
             </div>
-            <div className={classes.npLevel}>
-                NP
-            </div>
-            <div className={classes.level}>
-                Level
-            </div>
-            <div className={classes.fouHp}>
-                Fou (HP)
-            </div>
-            <div className={classes.fouAtk}>
-                Fou (Attack)
-            </div>
-            <div className={classes.skillLevels}>
-                Skills
-            </div>
-            <div className={classes.bondLevel}>
-                Bond
-            </div>
-            {showActions && <div className={classes.actions}>
-                Actions
+            {npLevel &&
+                <div className={classes.npLevel}>
+                    NP
+                </div>
+            }
+            {level &&
+                <div className={classes.level}>
+                    Level
+                </div>
+            }
+            {fouHp &&
+                <div className={classes.fouHp}>
+                    Fou (HP)
+                </div>
+            }
+            {fouAtk &&
+                <div className={classes.fouAtk}>
+                    Fou (ATK)
+                </div>
+            }
+            {skillLevels &&
+                <div className={classes.skillLevels}>
+                    Skills
+                </div>
+            }
+            {bondLevel &&
+                <div className={classes.bondLevel}>
+                    Bond
+                </div>
+            }
+            {actions &&
+                <div className={classes.actions}>
+                    Actions
             </div>}
         </div>
     );

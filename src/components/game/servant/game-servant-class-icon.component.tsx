@@ -1,5 +1,5 @@
 import { makeStyles, StyleRules, Tooltip, TooltipProps } from '@material-ui/core';
-import React from 'react';
+import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../../constants';
 import { GameServantClass, GameServantClassDisplayMap, GameServantRarity, ReadonlyRecord } from '../../../types';
 
@@ -81,12 +81,18 @@ export const GameServantClassIcon = React.memo((props: Props) => {
     const classes = useStyles();
 
     const size = props.size || DefaultSize;
+    const elemStyle = useMemo((): CSSProperties => ({
+        minWidth: size,
+        maxWidth: size,
+        height: size
+    }), [size]);
+
     const classNumber = ClassNumberMap[servantClass] || DefaultClassNumber;
     const rarityColor = RarityColorMap[rarity] ?? DefaultRarityColor;
     const imageUrl = `${ClassIconBaseUrl}/class${rarityColor}_${classNumber}.png`;
 
     const icon = (
-        <div style={{ width: size, height: size }}>
+        <div style={elemStyle}>
             <img className={classes.img} src={imageUrl} alt={servantClass} />
         </div>
     );

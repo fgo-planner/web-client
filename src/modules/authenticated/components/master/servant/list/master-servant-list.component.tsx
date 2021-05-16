@@ -1,33 +1,35 @@
-import { Button, StyleRules, Theme, withStyles } from '@material-ui/core';
+import { Button, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { PersonAddOutlined } from '@material-ui/icons';
-import { MouseEventHandler, PureComponent, ReactNode } from 'react';
+import React, { MouseEventHandler, ReactNode, useCallback } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
 import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
-import { GameServantService } from '../../../../../../services/data/game/game-servant.service';
+import { GameServantMap } from '../../../../../../services/data/game/game-servant.service';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { GameServant, MasterServant, MasterServantBondLevel, ReadonlyRecord, WithStylesProps } from '../../../../../../types';
+import { MasterServant, MasterServantBondLevel, ReadonlyPartial } from '../../../../../../types';
 import { ArrayUtils } from '../../../../../../utils/array.utils';
+import { MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRow } from './master-servant-list-row.component';
 
 type Props = {
+    gameServantMap: GameServantMap,
     masterServants: MasterServant[];
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
     editMode?: boolean;
-    showActions?: boolean;
     showAddServantRow?: boolean;
-    borderRight?: boolean;
     openLinksInNewTab?: boolean;
+    borderRight?: boolean;
+    visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
     onAddServant?: MouseEventHandler<HTMLButtonElement>;
     onEditServant?: (servant: MasterServant) => void;
     onDeleteServant?: (servant: MasterServant) => void;
-} & WithStylesProps;
+};
 
 const style = (theme: Theme) => ({
     root: {
-        minWidth: `${theme.breakpoints.width('lg')}px`,
+        // minWidth: `${theme.breakpoints.width('lg')}px`,
     },
     addServantRow: {
         borderTopWidth: 1,
@@ -54,97 +56,40 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'MasterServantList'
 };
 
-export const MasterServantList = withStyles(style, styleOptions)(class extends PureComponent<Props> {
+const useStyles = makeStyles(style, styleOptions);
 
-    private _gameServantMap!: ReadonlyRecord<number, Readonly<GameServant>>;
+export const MasterServantList = React.memo((props: Props) => {
+    const {
+        gameServantMap,
+        masterServants,
+        bondLevels,
+        editMode,
+        showAddServantRow,
+        openLinksInNewTab,
+        borderRight,
+        visibleColumns,
+        onAddServant,
+        onEditServant,
+        onDeleteServant
+    } = props;
 
-    constructor(props: Props) {
-        super(props);
+    const classes = useStyles();
 
-        this._renderDraggable = this._renderDraggable.bind(this);
-        this._renderMasterServantRow = this._renderMasterServantRow.bind(this);
-        this._handleDragEnd = this._handleDragEnd.bind(this);
-    }
-
-    componentDidMount(): void {
-        GameServantService.getServantsMap().then(gameServantMap => {
-            this._gameServantMap = gameServantMap;
-            this.forceUpdate();
-        });
-    }
-
-    render(): ReactNode {
-        if (!this._gameServantMap) {
-            return null;
+    const handleDragEnd = useCallback((result: DropResult): void => {
+        if (!result.destination) {
+            return;
         }
-
-        const { classes, editMode, masterServants } = this.props;
-
-        if (!editMode) {
-            return (
-                <div className={classes.root}>
-                    {masterServants.map(this._renderMasterServantRow)}
-                    {this._renderAddServantRow()}
-                </div>
-            );
+        const sourceIndex = result.source.index;
+        const destinationIndex = result.destination.index;
+        if (sourceIndex === destinationIndex) {
+            return;
         }
+        ArrayUtils.moveElement(masterServants, sourceIndex, destinationIndex);
+    }, [masterServants]);
 
-        /*
-         * Create a new anonymous function here instead of using a class member
-         * function to force the Droppable to re-render.
-         */
-        const droppableRenderFunction = (provided: DroppableProvided) => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-                {masterServants.map(this._renderDraggable)}
-                {provided.placeholder}
-            </div>
-        );
-
-        return (
-            <div className={classes.root}>
-                <DragDropContext onDragEnd={this._handleDragEnd}>
-                    <Droppable droppableId="droppable-servant-list">
-                        {droppableRenderFunction}
-                    </Droppable>
-                </DragDropContext>
-                {this._renderAddServantRow()}
-            </div>
-        );
-    }
-
-    private _renderDraggable(masterServant: MasterServant, index: number): ReactNode {
-        const { masterServants, borderRight } = this.props;
-        const { instanceId } = masterServant;
-
-        const lastRow = index === masterServants.length - 1;
-
-        return (
-            <DraggableListRowContainer
-                key={instanceId}
-                draggableId={`draggable-servant-${instanceId}`}
-                index={index}
-                borderBottom={!lastRow}
-                borderRight={borderRight}
-            >
-                {this._renderMasterServantRow(masterServant, index)}
-            </DraggableListRowContainer>
-        );
-    }
-
-    private _renderMasterServantRow(masterServant: MasterServant, index: number): ReactNode {
-        const {
-            masterServants,
-            bondLevels,
-            editMode,
-            showActions,
-            openLinksInNewTab,
-            borderRight,
-            onEditServant,
-            onDeleteServant
-        } = this.props;
-
+    const renderMasterServantRow = (masterServant: MasterServant, index: number): ReactNode => {
         const servantId = masterServant.gameId;
-        const servant = this._gameServantMap[servantId];
+        const servant = gameServantMap[servantId];
         const bondLevel = bondLevels[servantId];
         const lastRow = index === masterServants.length - 1;
 
@@ -158,8 +103,8 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}
                     editMode
-                    showActions={showActions}
                     openLinksInNewTab={openLinksInNewTab}
+                    visibleColumns={visibleColumns}
                 />
             );
         }
@@ -176,18 +121,14 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
                     masterServant={masterServant}
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}
-                    showActions={showActions}
                     openLinksInNewTab={openLinksInNewTab}
+                    visibleColumns={visibleColumns}
                 />
             </StaticListRowContainer>
         );
-    }
+    };
 
-    private _renderAddServantRow(): ReactNode {
-        const { classes, showAddServantRow, onAddServant } = this.props;
-        if (!showAddServantRow) {
-            return null;
-        }
+    const renderAddServantRow = (): ReactNode => {
         return (
             <div className={classes.addServantRow}>
                 <Button
@@ -202,19 +143,49 @@ export const MasterServantList = withStyles(style, styleOptions)(class extends P
                 </Button>
             </div>
         );
+    };
+
+    if (!editMode) {
+        return (
+            <div className={classes.root}>
+                {masterServants.map(renderMasterServantRow)}
+                {showAddServantRow && renderAddServantRow()}
+            </div>
+        );
     }
 
-    private _handleDragEnd(result: DropResult): void {
-        if (!result.destination) {
-            return;
-        }
-        const sourceIndex = result.source.index;
-        const destinationIndex = result.destination.index;
-        if (sourceIndex === destinationIndex) {
-            return;
-        }
-        const { masterServants } = this.props;
-        ArrayUtils.moveElement(masterServants, sourceIndex, destinationIndex);
-    }
+    const renderDraggable = (masterServant: MasterServant, index: number): ReactNode => {
+        const { instanceId } = masterServant;
+
+        const lastRow = index === masterServants.length - 1;
+
+        return (
+            <DraggableListRowContainer
+                key={instanceId}
+                draggableId={`draggable-servant-${instanceId}`}
+                index={index}
+                borderBottom={!lastRow}
+                borderRight={borderRight}
+            >
+                {renderMasterServantRow(masterServant, index)}
+            </DraggableListRowContainer>
+        );
+    };
+
+    return (
+        <div className={classes.root}>
+            <DragDropContext onDragEnd={handleDragEnd}>
+                <Droppable droppableId="droppable-servant-list">
+                    {(provided: DroppableProvided) => (
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                            {masterServants.map(renderDraggable)}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
+            {showAddServantRow && renderAddServantRow()}
+        </div>
+    );
 
 });

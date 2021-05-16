@@ -1,6 +1,7 @@
 import { fade, ThemeOptions } from '@material-ui/core';
 import { lightBlue, pink } from '@material-ui/core/colors';
 import overrides from './material-ui-overrides';
+import breakpoints from './theme-breakpoints';
 import { ThemeConstants } from './theme-constants';
 
 const themeDefaultLight = () => {
@@ -18,6 +19,7 @@ const themeDefaultLight = () => {
                 main: lightBlue[600]
             }
         },
+        breakpoints,
         overrides
     };
     return theme;

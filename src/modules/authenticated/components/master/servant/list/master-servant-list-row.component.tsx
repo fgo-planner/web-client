@@ -4,8 +4,8 @@ import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
 import { PureComponent, ReactNode } from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { AssetConstants } from '../../../../../../constants';
-import { GameServant, MasterServant, MasterServantBondLevel, WithStylesProps } from '../../../../../../types';
-import { ViewModeColumnWidths } from './master-servant-list-column-widths';
+import { GameServant, MasterServant, MasterServantBondLevel, ReadonlyPartial, WithStylesProps } from '../../../../../../types';
+import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRowLabel } from './master-servant-list-row-label.component';
 
 type Props = {
@@ -13,8 +13,8 @@ type Props = {
     masterServant: MasterServant;
     bond: MasterServantBondLevel | undefined;
     editMode?: boolean;
-    showActions?: boolean;
     openLinksInNewTab?: boolean;
+    visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     onEditServant?: (servant: MasterServant) => void;
     onDeleteServant?: (servant: MasterServant) => void;
 } & WithStylesProps;
@@ -31,7 +31,7 @@ const style = (theme: Theme) => ({
         fontSize: '0.875rem'
     },
     npLevel: {
-        flex: ViewModeColumnWidths.npLevel,
+        flex: ColumnWidths.npLevel,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -42,7 +42,7 @@ const style = (theme: Theme) => ({
         }
     },
     level: {
-        flex: ViewModeColumnWidths.level,
+        flex: ColumnWidths.level,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -60,13 +60,13 @@ const style = (theme: Theme) => ({
         }
     },
     fouHp: {
-        flex: ViewModeColumnWidths.fouHp
+        flex: ColumnWidths.fouHp
     },
     fouAtk: {
-        flex: ViewModeColumnWidths.fouAtk
+        flex: ColumnWidths.fouAtk
     },
     skillLevels: {
-        flex: ViewModeColumnWidths.skillLevels,
+        flex: ColumnWidths.skillLevels,
         display: 'flex',
         textAlign: 'center',
         alignItems: 'center',
@@ -76,7 +76,7 @@ const style = (theme: Theme) => ({
         },
     },
     bondLevel: {
-        flex: ViewModeColumnWidths.bondLevel,
+        flex: ColumnWidths.bondLevel,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -87,7 +87,7 @@ const style = (theme: Theme) => ({
         }
     },
     actions: {
-        width: ViewModeColumnWidths.actions,
+        width: ColumnWidths.actions,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -108,7 +108,25 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
     }
 
     render(): ReactNode {
-        const { classes, servant, masterServant, editMode, openLinksInNewTab } = this.props;
+        const {
+            classes,
+            servant,
+            masterServant,
+            editMode,
+            openLinksInNewTab,
+            visibleColumns
+        } = this.props;
+
+        const {
+            npLevel,
+            level,
+            fouHp,
+            fouAtk,
+            skillLevels,
+            bondLevel,
+            actions
+        } = visibleColumns || {};
+
         if (!servant) {
             return (
                 <div className={classes.root}>
@@ -124,13 +142,13 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
                     editMode={editMode}
                     openLinksInNewTab={openLinksInNewTab}
                 />
-                {this._renderNpLevel()}
-                {this._renderLevel()}
-                {this._renderFouLevel('fouHp')}
-                {this._renderFouLevel('fouAtk')}
-                {this._renderSkillLevels()}
-                {this._renderBondLevel()}
-                {this._renderActionButtons()}
+                {npLevel && this._renderNpLevel()}
+                {level && this._renderLevel()}
+                {fouHp && this._renderFouLevel('fouHp')}
+                {fouAtk && this._renderFouLevel('fouAtk')}
+                {skillLevels && this._renderSkillLevels()}
+                {bondLevel && this._renderBondLevel()}
+                {actions && this._renderActionButtons()}
             </div>
         );
     }
@@ -214,10 +232,7 @@ export const MasterServantListRow = withStyles(style, styleOptions)(class extend
     }
 
     private _renderActionButtons(): ReactNode {
-        const { classes, showActions } = this.props;
-        if (!showActions) {
-            return null;
-        }
+        const { classes } = this.props;
         return (
             <div className={classes.actions}>
                 <IconButton color="primary" onClick={this._handleEditButtonClick}>

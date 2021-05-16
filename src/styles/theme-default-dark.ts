@@ -1,6 +1,7 @@
 import { fade, ThemeOptions } from '@material-ui/core';
 import { pink } from '@material-ui/core/colors';
 import overrides from './material-ui-overrides';
+import breakpoints from './theme-breakpoints';
 import { ThemeConstants } from './theme-constants';
 
 const themeDefaultDark = () => {
@@ -23,6 +24,7 @@ const themeDefaultDark = () => {
             },
             divider: '#001E3C'
         },
+        breakpoints,
         overrides
     };
     return theme;

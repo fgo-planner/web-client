@@ -10,7 +10,7 @@ import { FabContainer } from '../../../components/fab/fab-container.component';
 import { FileInputWithTextarea } from '../../../components/input/file-input-with-textarea.component';
 import { LayoutPageScrollable } from '../../../components/layout/layout-page-scrollable.component';
 import { LayoutPanelContainer } from '../../../components/layout/layout-panel-container.component';
-import { GameServantService } from '../../../services/data/game/game-servant.service';
+import { GameServantMap, GameServantService } from '../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { FgoManagerMasterServantParser } from '../../../services/import/fgo-manager/fgo-manager-master-servant-parser';
 import { MasterServantParserResult } from '../../../services/import/master-servant-parser-result.type';
@@ -19,6 +19,7 @@ import { LoadingIndicatorOverlayService } from '../../../services/user-interface
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { MasterAccount, Nullable, WithStylesProps } from '../../../types';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
+import { MasterServantListVisibleColumns } from '../components/master/servant/list/master-servant-list-columns';
 import { MasterServantListHeader } from '../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../components/master/servant/list/master-servant-list.component';
 
@@ -76,11 +77,24 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const MasterServantImport = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
+    // TODO Make this responsive.
+    private readonly _ServantListVisibleColumns: MasterServantListVisibleColumns = {
+        npLevel: true,
+        level: true,
+        bondLevel: true,
+        fouHp: true,
+        fouAtk: true,
+        skillLevels: true,
+        actions: false
+    };
+
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
     private _onCurrentMasterAccountUpdatedSubscription!: Subscription;
 
     private _dropzoneRef = createRef<DropzoneRef>();
+
+    private _gameServantMap!: GameServantMap;
 
     constructor(props: Props) {
         super(props);
@@ -103,6 +117,10 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
         this._onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
             .subscribe(this._handleCurrentMasterAccountUpdated.bind(this));
+        GameServantService.getServantsMap().then(gameServantMap => {
+            this._gameServantMap = gameServantMap;
+            this.forceUpdate();
+        });
     }
 
     componentWillUnmount(): void {
@@ -128,6 +146,9 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
     }
 
     render(): ReactNode {
+        if (!this._gameServantMap) {
+            return null;
+        }
         const { parsedData } = this.state;
         return (
             <Fragment>
@@ -238,11 +259,15 @@ const MasterServantImport = withRouter(withStyles(style, styleOptions)(class ext
                         {ParseResultHelperText}
                     </div>
                     <LayoutPanelContainer className="p-4">
-                        <MasterServantListHeader />
+                        <MasterServantListHeader 
+                            visibleColumns={this._ServantListVisibleColumns}
+                        />
                         <MasterServantList
+                            gameServantMap={this._gameServantMap}
                             openLinksInNewTab
                             masterServants={masterServants}
                             bondLevels={bondLevels}
+                            visibleColumns={this._ServantListVisibleColumns}
                         />
                     </LayoutPanelContainer>
                     <div className="py-10" />

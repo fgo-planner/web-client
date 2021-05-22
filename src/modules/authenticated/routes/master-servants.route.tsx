@@ -71,6 +71,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
     const [unlockedCostumes, setUnlockedCostumes] = useState<Array<number>>([]);
     // TODO Do we really need to clone the structures above?
     const [lastInstanceId, setLastInstanceId] = useState<number>(-1);
+    const [activeServant, setActiveServant] = useState<MasterServant>();
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editServant, setEditServant] = useState<MasterServant>();
     const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
@@ -471,11 +472,13 @@ export const MasterServantsRoute = React.memo((props: Props) => {
                                 gameServantMap={gameServantMap}
                                 masterServants={masterServants}
                                 bondLevels={bondLevels}
+                                activeServant={activeServant}
                                 editMode={editMode}
                                 showAddServantRow={editMode}
                                 borderRight
                                 visibleColumns={visibleColumns}
                                 openLinksInNewTab={editMode}
+                                onActivateServant={setActiveServant}
                                 onAddServant={handleAddServantButtonClick}
                                 onEditServant={openEditServantDialog}
                                 onDeleteServant={openDeleteServantDialog}

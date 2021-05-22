@@ -1,7 +1,7 @@
 import { Button, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { PersonAddOutlined } from '@material-ui/icons';
-import React, { MouseEventHandler, ReactNode, useCallback } from 'react';
+import React, { ReactNode, useCallback } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
 import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
@@ -16,13 +16,15 @@ type Props = {
     gameServantMap: GameServantMap,
     masterServants: MasterServant[];
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
+    activeServant?: MasterServant;
     editMode?: boolean;
     showAddServantRow?: boolean;
     openLinksInNewTab?: boolean;
     borderRight?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
-    onAddServant?: MouseEventHandler<HTMLButtonElement>;
+    onActivateServant?: (servant: MasterServant) => void;
+    onAddServant?: () => void;
     onEditServant?: (servant: MasterServant) => void;
     onDeleteServant?: (servant: MasterServant) => void;
 };
@@ -63,11 +65,13 @@ export const MasterServantList = React.memo((props: Props) => {
         gameServantMap,
         masterServants,
         bondLevels,
+        activeServant,
         editMode,
         showAddServantRow,
         openLinksInNewTab,
         borderRight,
         visibleColumns,
+        onActivateServant,
         onAddServant,
         onEditServant,
         onDeleteServant
@@ -91,8 +95,7 @@ export const MasterServantList = React.memo((props: Props) => {
         const servantId = masterServant.gameId;
         const servant = gameServantMap[servantId];
         const bondLevel = bondLevels[servantId];
-        const lastRow = index === masterServants.length - 1;
-
+        
         if (editMode) {
             return (
                 <MasterServantListRow
@@ -100,25 +103,31 @@ export const MasterServantList = React.memo((props: Props) => {
                     servant={servant}
                     bond={bondLevel}
                     masterServant={masterServant}
+                    onActivateServant={onActivateServant}
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}
-                    editMode
                     openLinksInNewTab={openLinksInNewTab}
                     visibleColumns={visibleColumns}
+                    editMode
                 />
             );
         }
+
+        const active = activeServant?.instanceId === masterServant.instanceId;
+        const lastRow = index === masterServants.length - 1;
 
         return (
             <StaticListRowContainer
                 key={masterServant.instanceId}
                 borderBottom={!lastRow}
                 borderRight={borderRight}
+                active={active}
             >
                 <MasterServantListRow
                     servant={servant}
                     bond={bondLevel}
                     masterServant={masterServant}
+                    onActivateServant={onActivateServant}
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}
                     openLinksInNewTab={openLinksInNewTab}
@@ -156,7 +165,8 @@ export const MasterServantList = React.memo((props: Props) => {
 
     const renderDraggable = (masterServant: MasterServant, index: number): ReactNode => {
         const { instanceId } = masterServant;
-
+        
+        const active = activeServant?.instanceId === masterServant.instanceId;
         const lastRow = index === masterServants.length - 1;
 
         return (
@@ -166,6 +176,7 @@ export const MasterServantList = React.memo((props: Props) => {
                 index={index}
                 borderBottom={!lastRow}
                 borderRight={borderRight}
+                active={active}
             >
                 {renderMasterServantRow(masterServant, index)}
             </DraggableListRowContainer>

@@ -5,6 +5,7 @@ import React, { PropsWithChildren } from 'react';
 import listRowStyle from './list-row-style';
 
 type Props = PropsWithChildren<{
+    active?: boolean;
     borderTop?: boolean;
     borderRight?: boolean;
     borderBottom?: boolean;
@@ -21,6 +22,7 @@ export const StaticListRowContainer = React.memo((props: Props) => {
 
     const {
         children,
+        active,
         borderTop,
         borderRight,
         borderBottom,
@@ -31,6 +33,7 @@ export const StaticListRowContainer = React.memo((props: Props) => {
 
     const className = clsx(
         classes.row,
+        active && classes.active,
         borderTop && classes.borderTop,
         borderRight && classes.borderRight,
         borderBottom && classes.borderBottom,

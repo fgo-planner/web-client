@@ -8,6 +8,7 @@ import listRowStyle from './list-row-style';
 
 type Props = PropsWithChildren<{
     classes?: any;
+    active?: boolean;
     borderTop?: boolean;
     borderRight?: boolean;
     borderBottom?: boolean;
@@ -48,6 +49,7 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
         draggableId,
         index,
         dragHandleIcon,
+        active,
         borderTop,
         borderRight,
         borderBottom,
@@ -65,6 +67,7 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
                     classes.row,
                     classes.draggable,
                     snapshot.isDragging && classes.dragging,
+                    active && classes.active,
                     borderTop && classes.borderTop,
                     borderRight && classes.borderRight,
                     borderBottom && classes.borderBottom,

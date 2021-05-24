@@ -3,7 +3,7 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
 import { PageTitle } from '../../../../../../components/text/page-title.component';
-import { GameServantMap, GameServantService } from '../../../../../../services/data/game/game-servant.service';
+import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { MasterAccountService } from '../../../../../../services/data/master/master-account.service';
 import { MasterAccount, Nullable } from '../../../../../../types';
 import { MasterServantStatsUtils, ServantStatsGroupedByClass, ServantStatsGroupedByRarity } from '../../../../../../utils/master/master-servant-stats.utils';
@@ -91,19 +91,11 @@ const useStyles = makeStyles(style, styleOptions);
 
 export const MasterServantStats = React.memo(() => {
     const classes = useStyles();
-    const [gameServantMap, setGameServantMap] = useState<GameServantMap>();
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [filter, setFilter] = useState<ServantStatsFilterResult>();
     const [stats, setStats] = useState<ServantStatsGroupedByRarity | ServantStatsGroupedByClass>();
 
-    /*
-     * Retrieve game servant map.
-     */
-    useEffect(() => {
-        GameServantService.getServantsMap().then(gameServantMap => {
-            setGameServantMap(gameServantMap);
-        });
-    }, []);
+    const gameServantMap = useGameServantMap();
 
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange

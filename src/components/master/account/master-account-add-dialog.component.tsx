@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, makeStyles, StyleRules, TextField, Theme, Typography } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
-import { useAutoResizeDialog } from '../../../hooks/use-auto-resize-dialog.hook';
+import { useAutoResizeDialog } from '../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { DialogComponentProps } from '../../../types';
 import { DialogCloseButton } from '../../dialog/dialog-close-button.component';

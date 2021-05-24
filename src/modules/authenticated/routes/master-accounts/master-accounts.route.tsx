@@ -7,7 +7,7 @@ import { LayoutPageScrollable } from '../../../../components/layout/layout-page-
 import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
 import { MasterAccountAddDialog } from '../../../../components/master/account/master-account-add-dialog.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
-import { useElevateAppBarOnScroll } from '../../../../hooks/use-elevate-app-bar-on-scroll.hook';
+import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { MasterAccountList as MasterAccountListType, MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { MasterAccount, ModalOnCloseReason, ReadonlyPartial } from '../../../../types';
 import { MasterAccountList } from './master-account-list.component';

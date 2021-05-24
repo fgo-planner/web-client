@@ -1,38 +1,20 @@
 import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { PageTitle } from '../../../components/text/page-title.component';
-import { GameItemMap, GameItemService } from '../../../services/data/game/game-item.service';
-import { GameServantMap, GameServantService } from '../../../services/data/game/game-servant.service';
+import { useGameItemMap } from '../../../hooks/data/use-game-item-map.hook';
+import { useGameServantMap } from '../../../hooks/data/use-game-servant-map.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { MasterAccount, Nullable } from '../../../types';
 import { ItemStats, MasterItemStatsUtils } from '../../../utils/master/master-item-stats.utils';
 import { MasterItemStatsTable } from '../components/master/item/stats/master-item-stats-table.component';
 
 export const MasterItemStatsRoute = React.memo(() => {
-    const [gameServantMap, setGameServantMap] = useState<GameServantMap>();
-    const [gameItemMap, setGameItemMap] = useState<GameItemMap>();
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [stats, setStats] = useState<ItemStats>();
     const [includeUnownedServants, setIncludeUnownedServants] = useState<boolean>(false);
 
-    /*
-     * Retrieve game servant map.
-     */
-    useEffect(() => {
-        GameServantService.getServantsMap().then(gameServantMap => {
-            setGameServantMap(gameServantMap);
-        });
-    }, []);
-
-    /*
-     * Retrieve game item map.
-     */
-    useEffect(() => {
-        GameItemService.getItemsMap().then(gameItemMap => {
-            setGameItemMap(gameItemMap);
-        });
-    }, []);
-
+    const gameServantMap = useGameServantMap();
+    const gameItemMap = useGameItemMap();
 
     /*
      * Master account subscriptions

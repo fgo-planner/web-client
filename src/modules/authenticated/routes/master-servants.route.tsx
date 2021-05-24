@@ -8,8 +8,8 @@ import { FabContainer } from '../../../components/fab/fab-container.component';
 import { LayoutPanelScrollable } from '../../../components/layout/layout-panel-scrollable.component';
 import { NavigationRail } from '../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../components/text/page-title.component';
-import { useActiveBreakpoints } from '../../../hooks/use-active-breakpoints.hook';
-import { GameServantMap, GameServantService } from '../../../services/data/game/game-servant.service';
+import { useGameServantMap } from '../../../hooks/data/use-game-servant-map.hook';
+import { useActiveBreakpoints } from '../../../hooks/user-interface/use-active-breakpoints.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
 import { MasterAccount, MasterServant, MasterServantBondLevel, ModalOnCloseReason, Nullable } from '../../../types';
@@ -55,7 +55,6 @@ const cloneFromMasterAccount = (account: Nullable<MasterAccount>): MasterAccount
 
 export const MasterServantsRoute = React.memo((props: Props) => {
 
-    const [gameServantMap, setGameServantMap] = useState<GameServantMap>();
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     /**
      * Clone of the `servants` array from the MasterAccount object.
@@ -80,6 +79,8 @@ export const MasterServantsRoute = React.memo((props: Props) => {
     // const [deleteServantDialogPrompt, setDeleteServantDialogPrompt] = useState<string>();
     const [loadingIndicatorId, setLoadingIndicatorId] = useState<string>();
 
+    const gameServantMap = useGameServantMap();
+
     const { md, lg, xl } = useActiveBreakpoints();
 
     const visibleColumns = useMemo((): MasterServantListVisibleColumns => ({
@@ -91,15 +92,6 @@ export const MasterServantsRoute = React.memo((props: Props) => {
         skillLevels: md,
         actions: false
     }), [md, lg, xl]);
-
-    /*
-     * Retrieve game servant map.
-     */
-    useEffect(() => {
-        GameServantService.getServantsMap().then(gameServantMap => {
-            setGameServantMap(gameServantMap);
-        });
-    }, []);
 
     const deleteServantDialogPrompt = useMemo((): string | undefined => {
         if (!gameServantMap || !deleteServant) {
@@ -469,7 +461,6 @@ export const MasterServantsRoute = React.memo((props: Props) => {
                         }
                         children={
                             <MasterServantList
-                                gameServantMap={gameServantMap}
                                 masterServants={masterServants}
                                 bondLevels={bondLevels}
                                 activeServant={activeServant}

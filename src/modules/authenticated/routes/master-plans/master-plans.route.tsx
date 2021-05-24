@@ -3,16 +3,16 @@ import { Add as AddIcon } from '@material-ui/icons';
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
+import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
 import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
+import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { MasterPlanService } from '../../../../services/data/master/master-plan.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { MasterPlan, ModalOnCloseReason, ReadonlyPartial, ReadonlyPartialArray } from '../../../../types';
 import { MasterPlanAddDialog } from './master-plan-add-dialog';
 import { MasterPlanList } from './master-plan-list.component';
-import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
-import { useElevateAppBarOnScroll } from '../../../../hooks/use-elevate-app-bar-on-scroll.hook';
 
 const AddPlanDialogPaperProps: PaperProps = {
     style: {

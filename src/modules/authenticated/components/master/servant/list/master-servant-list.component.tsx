@@ -5,7 +5,7 @@ import React, { ReactNode, useCallback } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
 import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
-import { GameServantMap } from '../../../../../../services/data/game/game-servant.service';
+import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { MasterServant, MasterServantBondLevel, ReadonlyPartial } from '../../../../../../types';
 import { ArrayUtils } from '../../../../../../utils/array.utils';
@@ -13,7 +13,6 @@ import { MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRow } from './master-servant-list-row.component';
 
 type Props = {
-    gameServantMap: GameServantMap,
     masterServants: MasterServant[];
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
     activeServant?: MasterServant;
@@ -62,7 +61,6 @@ const useStyles = makeStyles(style, styleOptions);
 
 export const MasterServantList = React.memo((props: Props) => {
     const {
-        gameServantMap,
         masterServants,
         bondLevels,
         activeServant,
@@ -91,15 +89,21 @@ export const MasterServantList = React.memo((props: Props) => {
         ArrayUtils.moveElement(masterServants, sourceIndex, destinationIndex);
     }, [masterServants]);
 
+    const gameServantMap = useGameServantMap();
+    
+    if (!gameServantMap) {
+        return null;
+    }
+
     const renderMasterServantRow = (masterServant: MasterServant, index: number): ReactNode => {
-        const servantId = masterServant.gameId;
-        const servant = gameServantMap[servantId];
-        const bondLevel = bondLevels[servantId];
+        const { gameId, instanceId } = masterServant;
+        const servant = gameServantMap[gameId];
+        const bondLevel = bondLevels[gameId];
         
         if (editMode) {
             return (
                 <MasterServantListRow
-                    key={masterServant.instanceId}
+                    key={instanceId}
                     servant={servant}
                     bond={bondLevel}
                     masterServant={masterServant}
@@ -113,12 +117,12 @@ export const MasterServantList = React.memo((props: Props) => {
             );
         }
 
-        const active = activeServant?.instanceId === masterServant.instanceId;
+        const active = activeServant?.instanceId === instanceId;
         const lastRow = index === masterServants.length - 1;
 
         return (
             <StaticListRowContainer
-                key={masterServant.instanceId}
+                key={instanceId}
                 borderBottom={!lastRow}
                 borderRight={borderRight}
                 active={active}
@@ -166,7 +170,7 @@ export const MasterServantList = React.memo((props: Props) => {
     const renderDraggable = (masterServant: MasterServant, index: number): ReactNode => {
         const { instanceId } = masterServant;
         
-        const active = activeServant?.instanceId === masterServant.instanceId;
+        const active = activeServant?.instanceId === instanceId;
         const lastRow = index === masterServants.length - 1;
 
         return (

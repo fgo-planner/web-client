@@ -1,13 +1,10 @@
-import { fade, makeStyles, StyleRules, Theme, Typography } from '@material-ui/core';
+import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import { GameItemThumbnail } from '../../../components/game/item/game-item-thumbnail.component';
-import { LayoutPanelContainer } from '../../../components/layout/layout-panel-container.component';
 import { LayoutPanelScrollable } from '../../../components/layout/layout-panel-scrollable.component';
 import { PageTitle } from '../../../components/text/page-title.component';
-import { useElevateAppBarOnScroll } from '../../../hooks/use-elevate-app-bar-on-scroll.hook';
-import { GameItemList, GameItemService } from '../../../services/data/game/game-item.service';
+import { useGameItemList } from '../../../hooks/data/use-game-item-list.hook';
 
 const style = (theme: Theme) => ({
     header: {
@@ -46,12 +43,7 @@ const useStyles = makeStyles(style);
 export const GameItemsRoute = React.memo(() => {
     const classes = useStyles();
 
-    const [gameItems, setGameItems] = useState<GameItemList>([]);
-
-    useEffect(() => {
-        GameItemService.getItems()
-            .then(setGameItems);
-    }, []);
+    const gameItems = useGameItemList();
 
     // const scrollContainer = useElevateAppBarOnScroll();
 
@@ -64,7 +56,7 @@ export const GameItemsRoute = React.memo(() => {
                     <div className={classes.header}>HEADER TEST</div>
                 }
             >
-                {gameItems.map((item, key) => (
+                {gameItems?.map((item, key) => (
                     <div key={key} className={clsx(classes.row, 'flex align-center')}>
                         <GameItemThumbnail
                             item={item}

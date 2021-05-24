@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { AppBarService } from '../services/user-interface/app-bar.service';
-import { ThemeConstants } from '../styles/theme-constants';
+import { AppBarService } from '../../services/user-interface/app-bar.service';
+import { ThemeConstants } from '../../styles/theme-constants';
 
 const handleScroll = (event: Event): void => {
     const scrollAmount = (event.target as Element)?.scrollTop;

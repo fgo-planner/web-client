@@ -1,11 +1,12 @@
 import { Avatar, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
+import { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { BasicUser } from '../../../../services/data/user/user.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { MasterAccount, ModalOnCloseReason, ReadonlyPartialArray, User, WithStylesProps } from '../../../../types';
+import { MasterAccount, ModalOnCloseReason, ReadonlyPartialArray, WithStylesProps } from '../../../../types';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
 import { AppBarResourcesMenu } from '../app-bar-resources-menu.component';
@@ -14,7 +15,7 @@ import { AppBarMasterAccountSelect } from './app-bar-master-account-select.compo
 import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
 
 type Props = {
-    currentUser: User;
+    currentUser: BasicUser;
 } & WithStylesProps & ReactRouteComponentProps;
 
 type State = {

@@ -1,6 +1,8 @@
 import { User } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 
+export type BasicUser = Pick<User, '_id' | 'username' | 'email'>;
+
 export class UserService {
 
     private static readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user`;
@@ -15,9 +17,9 @@ export class UserService {
         return Http.post<User>(url, {}, { responseType: 'text' });
     }
 
-    static async getCurrentUser(): Promise<User> {
+    static async getCurrentUser(): Promise<BasicUser> {
         const url = `${this._BaseUrl}/current-user`;
-        return Http.get<User>(url);
+        return Http.get<BasicUser>(url);
     }
 
 }

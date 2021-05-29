@@ -23,6 +23,8 @@ export * from './data/master/servant/master-servant-noble-phantasm-level.type';
 export * from './data/master/servant/master-servant.type';
 export * from './data/page.type';
 export * from './data/pagination.type';
+export * from './data/rgb-color.type';
+export * from './data/rgba-color.type';
 export * from './data/user-credentials.type';
 export * from './data/user/user.type';
 export * from './internal/game/servant/game-servant-class-simplified.type';

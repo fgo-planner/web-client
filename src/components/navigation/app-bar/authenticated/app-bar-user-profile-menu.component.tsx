@@ -3,17 +3,18 @@ import { AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, InfoOut
 import { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../../../../services/authentication/auth.service';
+import { BasicUser } from '../../../../services/data/user/user.service';
 import { BackgroundMusicService } from '../../../../services/user-interface/background-music.service';
 import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseHandler, User, WithStylesProps } from '../../../../types';
+import { ModalOnCloseHandler, WithStylesProps } from '../../../../types';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
 import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 
 type Props = {
     anchorEl?: Element | null;
     onClose?: ModalOnCloseHandler;
-    currentUser: User;
+    currentUser: BasicUser;
 } & WithStylesProps;
 
 type State = {

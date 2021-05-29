@@ -5,10 +5,10 @@ import { PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../../../services/authentication/auth.service';
-import { UserService } from '../../../services/data/user/user.service';
+import { BasicUser, UserService } from '../../../services/data/user/user.service';
 import { AppBarService } from '../../../services/user-interface/app-bar.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { Nullable, User, UserInfo, WithStylesProps } from '../../../types';
+import { Nullable, UserInfo, WithStylesProps } from '../../../types';
 import { ThemeBackground } from '../../theme/theme-background.component';
 import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';
 import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
@@ -16,7 +16,7 @@ import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
 type Props = WithStylesProps;
 
 type State = {
-    currentUser: User | null;
+    currentUser: BasicUser | null;
     elevated?: boolean;
 };
 

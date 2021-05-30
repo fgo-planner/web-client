@@ -56,7 +56,7 @@ export const LayoutPanelScrollable = React.memo((props: Props) => {
 
     return (
         <LayoutPanelContainer className={className} style={style}>
-            <div className={classes.container}>
+            <div className={classes.container + ' test'}>
                 {headerContents &&
                     <div className={clsx(headerBorder && classes.headerBorder)}>
                         {headerContents}

@@ -40,7 +40,7 @@ export const MasterItemListRow = withStyles(style, styleOptions)(class extends P
     render(): ReactNode {
         const { classes, key, item, editMode } = this.props;
         return (
-            <StaticListRowContainer borderTop borderRight>
+            <StaticListRowContainer borderTop>
                 <div className={classes.root} key={key}>
                     <MasterItemListRowLabel item={item.item} editMode={editMode} />
                     <div className="flex-fill" />

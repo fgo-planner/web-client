@@ -5,7 +5,7 @@ import { FileCopy as FileCopyIcon, SvgIconComponent } from '@material-ui/icons';
 import React, { ChangeEvent, PropsWithChildren, PureComponent, ReactNode } from 'react';
 import Dropzone, { DropzoneRef, DropzoneState } from 'react-dropzone';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { CustomStyleProps, WithStylesProps } from '../../types';
+import { ComponentStyleProps, WithStylesProps } from '../../types';
 import { StyleUtils } from '../../utils/style.utils';
 
 type Props = PropsWithChildren<{
@@ -20,7 +20,7 @@ type Props = PropsWithChildren<{
     dragOverlayText?: string;
     value?: string;
     onValueChange?: (value: string) => void;
-}> & CustomStyleProps & WithStylesProps;
+}> & ComponentStyleProps & WithStylesProps;
 
 const DefaultTextareaVariant = 'outlined';
 

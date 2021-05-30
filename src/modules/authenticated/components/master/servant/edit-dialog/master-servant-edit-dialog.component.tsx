@@ -5,7 +5,7 @@ import { DialogComponent } from '../../../../../../components/base/dialog-compon
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { DialogComponentProps, MasterServant, MasterServantBondLevel, Nullable, WithStylesProps } from '../../../../../../types';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
-import { FormId, MasterServantEditForm, SubmitData } from '../edit-form/master-servant-edit-form.component';
+import { MasterServantEditForm, SubmitData } from '../edit-form/master-servant-edit-form.component';
 
 type RenderedProps = {
     disableServantSelect?: boolean;
@@ -30,6 +30,8 @@ type Props = {
 type State = {
     masterServant: MasterServant;
 };
+
+const FormId = 'master-servant-edit-dialog-form';
 
 const style = (theme: Theme) => ({
     form: {
@@ -136,12 +138,12 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
                     </DialogTitle>
                     <DialogContent>
                         <MasterServantEditForm
+                            formId={FormId}
                             masterServant={this.state.masterServant} // Use masterServant from state, not from props.
                             bondLevels={bondLevels}
                             unlockedCostumes={unlockedCostumes}
                             onSubmit={this._submit}
                             servantSelectDisabled={disableServantSelect}
-                            showServantSelect
                         />
                     </DialogContent>
                     <DialogActions>

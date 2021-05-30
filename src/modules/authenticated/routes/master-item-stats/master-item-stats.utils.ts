@@ -1,8 +1,8 @@
-import { GameServantMap } from '../../services/data/game/game-servant.service';
-import { GameServant, GameServantEnhancement, MasterAccount, MasterServant } from '../../types';
-import { MapUtils } from '../map.utils';
+import { GameServantMap } from '../../../../services/data/game/game-servant.service';
+import { GameServant, GameServantEnhancement, MasterAccount, MasterServant } from '../../../../types';
+import { MapUtils } from '../../../../utils/map.utils';
 
-export type ItemStat = {
+export type MasterItemStat = {
     ownedServantsCost: number;
     allServantsCost: number;
     inventory: number;
@@ -11,18 +11,18 @@ export type ItemStat = {
     allServantsDebt: number;
 };
 
-export type ItemStats = Record<number, ItemStat>;
+export type MasterItemStats = Record<number, MasterItemStat>;
 
 export class MasterItemStatsUtils {
 
     // TODO Move this to constants file
     private static readonly _QPItemId = 5;
 
-    static generateStats(gameServantMap: GameServantMap, masterAccount: MasterAccount): ItemStats {
+    static generateStats(gameServantMap: GameServantMap, masterAccount: MasterAccount): MasterItemStats {
 
         const start = window.performance.now();
 
-        const stats: Record<number, ItemStat> = {};
+        const stats: Record<number, MasterItemStat> = {};
 
         this._populateInventory(stats, masterAccount);
 
@@ -55,7 +55,7 @@ export class MasterItemStatsUtils {
 
     }
 
-    private static _populateInventory(stats: Record<number, ItemStat>, masterAccount: MasterAccount): void {
+    private static _populateInventory(stats: Record<number, MasterItemStat>, masterAccount: MasterAccount): void {
         for (const masterItem of masterAccount.items) {
             const stat = this._instantiateItemStat();
             stat.inventory = masterItem.quantity;
@@ -67,7 +67,7 @@ export class MasterItemStatsUtils {
     }
 
     private static _updateForOwnedServant(
-        stats: Record<number, ItemStat>,
+        stats: Record<number, MasterItemStat>,
         servant: GameServant,
         masterServant: MasterServant,
         unlockedCostumes: Set<number>
@@ -86,7 +86,6 @@ export class MasterItemStatsUtils {
             this._updateForEnhancement(stats, skill, true, 3, skillUpgradeCount);
         }
 
-        // Some servants (Mash) don't have ascension materials
         if (servant.ascensionMaterials) {
             for (const [key, ascension] of Object.entries(servant.ascensionMaterials)) {
                 const ascensionLevel = Number(key);
@@ -103,7 +102,7 @@ export class MasterItemStatsUtils {
     }
 
     private static _updateForUnownedServant(
-        stats: Record<number, ItemStat>,
+        stats: Record<number, MasterItemStat>,
         servant: GameServant
     ): void {
 
@@ -138,16 +137,15 @@ export class MasterItemStatsUtils {
      * the 3 that has been upgraded.
      */
     private static _updateForEnhancement(
-        stats: Record<number, ItemStat>,
+        stats: Record<number, MasterItemStat>,
         enhancement: GameServantEnhancement,
         owned = false,
         maxUpgrades = 1,
         upgradeCount = 0
     ): void {
 
-        for (const material of enhancement.materials) {
-            const quantity = material.quantity;
-            const stat = MapUtils.getOrDefault(stats, material.itemId, this._instantiateItemStat);
+        for (const { itemId, quantity } of enhancement.materials) {
+            const stat = MapUtils.getOrDefault(stats, itemId, this._instantiateItemStat);
             const cost = quantity * maxUpgrades;
             if (!owned) {
                 stat.allServantsCost += cost;
@@ -181,7 +179,7 @@ export class MasterItemStatsUtils {
         }
     }
 
-    private static _instantiateItemStat(): ItemStat {
+    private static _instantiateItemStat(): MasterItemStat {
         return {
             ownedServantsCost: 0,
             allServantsCost: 0,

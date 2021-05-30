@@ -2,9 +2,9 @@ import { makeStyles, StyleRules, Theme, Typography } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import clsx from 'clsx';
 import React, { PropsWithChildren } from 'react';
-import { CustomStyleProps } from '../../types';
+import { ComponentStyleProps } from '../../types';
 
-type Props = PropsWithChildren<{}> & CustomStyleProps;
+type Props = PropsWithChildren<{}> & ComponentStyleProps;
 
 const style = (theme: Theme) => ({
     root: {

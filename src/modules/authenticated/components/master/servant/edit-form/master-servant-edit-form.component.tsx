@@ -14,12 +14,18 @@ import { MasterServantUtils } from '../../../../../../utils/master/master-servan
 import { MasterServantEditFormAutocomplete } from './master-servant-edit-form-autocomplete.component';
 
 type Props = {
-    masterServant: MasterServant;
+    formId: string;
+    masterServant: Readonly<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
     unlockedCostumes: Array<number>;
-    showServantSelect?: boolean;
     servantSelectDisabled?: boolean;
-    // onSelectedServantChange?: (servant: GameServant) => void;
+    layout?: 'dialog' | 'panel';
+    readonly?: boolean;
+    /**
+     * Called when stats are changed via the form. For performance reasons, this is
+     * only called for some fields on blur instead of on change.
+     */
+    onStatsChange?: (data: SubmitData) => void;
     onSubmit?: (event: FormEvent<HTMLFormElement>, data: SubmitData) => void;
 } & ComponentStyleProps;
 
@@ -42,8 +48,6 @@ export type SubmitData = {
     bond: MasterServantBondLevel | undefined,
     costumes: Array<number>
 };
-
-export const FormId = 'servant-form';
 
 const generateUnlockedCostumesMap = (
     servant: GameServant | undefined,
@@ -171,12 +175,14 @@ export const MasterServantEditForm = React.memo((props: Props) => {
     const classes = useStyles();
 
     const {
+        formId,
         masterServant,
         bondLevels,
         unlockedCostumes,
-        showServantSelect,
         servantSelectDisabled,
-        // onSelectedServantChange,
+        readonly,
+        layout,
+        onStatsChange,
         onSubmit,
         className
     } = props;
@@ -189,18 +195,29 @@ export const MasterServantEditForm = React.memo((props: Props) => {
 
     const gameServantMap = useGameServantMap();
 
-    /*
-     * Initialization
-     */
     useEffect(() => {
-        if (formData || !gameServantMap) {
+        if (!gameServantMap) {
             return;
         }
         const servant = gameServantMap[masterServant.gameId];
-        const initialFormData = convertToFormData(servant, masterServant, bondLevels, unlockedCostumes);
-        setFormData(initialFormData);
+        const formData = convertToFormData(servant, masterServant, bondLevels, unlockedCostumes);
+        setFormData(formData);
         setServant(servant);
-    }, [formData, gameServantMap, masterServant, bondLevels, unlockedCostumes]);
+    }, [gameServantMap, masterServant, bondLevels, unlockedCostumes]);
+
+    const handleStatsChange = useCallback((): void => {
+        if (!formData || !onStatsChange) {
+            return;
+        }
+        const masterServant = convertToMasterServant(formData);
+        const bond = formData.bond === '' ? undefined : Number(formData.bond) as MasterServantBondLevel;
+        const data = {
+            masterServant,
+            bond,
+            costumes: []
+        };
+        onStatsChange(data);
+    }, [formData, onStatsChange]);
 
     const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: GameServant): void => {
         if (!formData) {
@@ -222,8 +239,9 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         }
         const { name, value } = event.target;
         FormUtils.assignValue(formData, name!!, value);
+        handleStatsChange();
         forceUpdate();
-    }, [formData, forceUpdate]);
+    }, [formData, forceUpdate, handleStatsChange]);
 
     const handleInputChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         if (!formData) {
@@ -241,9 +259,11 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         const { value } = event.target;
         const level = MasterServantUtils.roundToNearestValidLevel(Number(value), Number(formData.level), servant);
         formData.level = level;
-        formData.ascension = value;
-        forceUpdate();
-    }, [formData, servant, forceUpdate]);
+        if (formData.ascension !== value) {
+            formData.ascension = value;
+            handleStatsChange();
+        }
+    }, [formData, servant, handleStatsChange]);
 
     const handleLevelInputBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         if (!formData || !servant) {
@@ -254,8 +274,9 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         const ascension = MasterServantUtils.roundToNearestValidAscensionLevel(level, Number(formData.ascension), servant);
         formData.level = level;
         formData.ascension = ascension;
+        handleStatsChange();
         forceUpdate();
-    }, [formData, servant, forceUpdate]);
+    }, [formData, servant, forceUpdate, handleStatsChange]);
 
     const handleFouInputBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         if (!formData) {
@@ -264,12 +285,13 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         const { name, value } = event.target;
         const transformedValue = FormUtils.transformInputToFouValue(value) ?? '';
         FormUtils.assignValue(formData, name, transformedValue);
+        handleStatsChange();
         forceUpdate();
-    }, [formData, forceUpdate]);
+    }, [formData, forceUpdate, handleStatsChange]);
 
     const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
-        if (!formData || !onSubmit) {
+        if (!formData || readonly || !onSubmit) {
             return;
         }
         const masterServant = convertToMasterServant(formData);
@@ -280,201 +302,293 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             costumes: []
         };
         onSubmit(event, data);
-    }, [formData, onSubmit]);
+    }, [formData, readonly, onSubmit]);
 
     if (!formData || !servant) {
         return null;
     }
 
+    const npField = (
+        <FormControl variant="outlined" fullWidth>
+            <InputLabel htmlFor="np">NP Level</InputLabel>
+            <Select
+                native
+                id={`${formId}-np`}
+                name="np"
+                label="NP Level"
+                value={formData.np}
+                onChange={handleSelectInputChange}
+                disabled={readonly}
+            >
+                {GameServantConstants.NoblePhantasmLevels.map(level => (
+                    <option key={level} value={level}>
+                        {level}
+                    </option>
+                ))}
+            </Select>
+        </FormControl>
+    );
+
+    const levelField = (
+        <TextField
+            variant="outlined"
+            fullWidth
+            label="Servant Level"
+            name="level"
+            type="number"
+            inputProps={{
+                step: 1,
+                min: GameServantConstants.MinLevel,
+                max: GameServantConstants.MaxLevel
+            }}
+            value={formData.level}
+            onChange={handleInputChange}
+            onBlur={handleLevelInputBlur}
+            disabled={readonly}
+        />
+    );
+
+    const ascensionField = (
+        <FormControl variant="outlined" fullWidth>
+            <InputLabel htmlFor="ascension">Ascension</InputLabel>
+            <Select
+                native
+                id={`${formId}-ascension`}
+                name="ascension"
+                label="Ascension"
+                value={formData.ascension}
+                onChange={handleAscensionInputChange}
+                disabled={readonly}
+            >
+                {GameServantConstants.AscensionLevels.map(level => (
+                    <option key={level} value={level}>
+                        {level}
+                    </option>
+                ))}
+            </Select>
+        </FormControl>
+    );
+
+    const fouHpField = (
+        <TextField
+            variant="outlined"
+            fullWidth
+            label="HP Fou"
+            name="fouHp"
+            type="number"
+            inputProps={{
+                step: getFouInputStepSize(formData.fouHp),
+                min: GameServantConstants.MinFou,
+                max: GameServantConstants.MaxFou
+            }}
+            value={formData.fouHp}
+            onChange={handleInputChange}
+            onBlur={handleFouInputBlur}
+            disabled={readonly}
+        />
+    );
+
+    const fouAtkField = (
+        <TextField
+            variant="outlined"
+            fullWidth
+            label="Atk. Fou"
+            name="fouAtk"
+            type="number"
+            inputProps={{
+                step: getFouInputStepSize(formData.fouAtk),
+                min: GameServantConstants.MinFou,
+                max: GameServantConstants.MaxFou
+            }}
+            value={formData.fouAtk}
+            onChange={handleInputChange}
+            onBlur={handleFouInputBlur}
+            disabled={readonly}
+        />
+    );
+
+    const skill1Field = (
+        <FormControl variant="outlined" fullWidth>
+            <InputLabel htmlFor="skill1">Skill 1</InputLabel>
+            <Select
+                native
+                id={`${formId}-skill1`}
+                name="skill1"
+                label="Skill 1"
+                value={formData.skill1}
+                onChange={handleSelectInputChange}
+                disabled={readonly}
+            >
+                {GameServantConstants.SkillLevels.map(level => (
+                    <option key={level} value={level}>
+                        {level}
+                    </option>
+                ))}
+            </Select>
+        </FormControl>
+    );
+
+    const skill2Field = (
+        <FormControl variant="outlined" fullWidth>
+            <InputLabel htmlFor="skill2">Skill 2</InputLabel>
+            <Select
+                native
+                id={`${formId}-skill2`}
+                name="skill2"
+                label="Skill 2"
+                value={formData.skill2}
+                onChange={handleSelectInputChange}
+                disabled={readonly}
+            >
+                <option>{'\u2014'}</option> {/* Blank option */}
+                {GameServantConstants.SkillLevels.map(level => (
+                    <option key={level} value={level}>
+                        {level}
+                    </option>
+                ))}
+            </Select>
+        </FormControl>
+    );
+
+    const skill3Field = (
+        <FormControl variant="outlined" fullWidth>
+            <InputLabel htmlFor="skill3">Skill 3</InputLabel>
+            <Select
+                native
+                id={`${formId}-skill3`}
+                name="skill3"
+                label="Skill 3"
+                value={formData.skill3}
+                onChange={handleSelectInputChange}
+                disabled={readonly}
+            >
+                <option>{'\u2014'}</option> {/* Blank option */}
+                {GameServantConstants.SkillLevels.map(level => (
+                    <option key={level} value={level}>
+                        {level}
+                    </option>
+                ))}
+            </Select>
+        </FormControl>
+    );
+
+    const bondField = (
+        <FormControl variant="outlined" fullWidth>
+            <InputLabel htmlFor="bond">Bond</InputLabel>
+            <Select
+                native
+                id={`${formId}-bond`}
+                name="bond"
+                label="Bond"
+                value={formData.bond}
+                onChange={handleSelectInputChange}
+                disabled={readonly}
+            >
+                <option>{/* Blank option */}</option>
+                {GameServantConstants.BondLevels.map(level => (
+                    <option key={level} value={level}>
+                        {level}
+                    </option>
+                ))}
+            </Select>
+        </FormControl>
+    );
+
+    if (layout === 'panel') {
+        // Panel layout
+        return (
+            <form
+                className={className}
+                id={formId}
+                noValidate
+                onSubmit={handleSubmit}
+            >
+                <div className={classes.inputFieldGroup}>
+                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                        {levelField}
+                    </InputFieldContainer>
+                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                        {ascensionField}
+                    </InputFieldContainer>
+                </div>
+                <div className={classes.inputFieldGroup}>
+                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                        {fouHpField}
+                    </InputFieldContainer>
+                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                        {fouAtkField}
+                    </InputFieldContainer>
+                </div>
+                <div className={classes.inputFieldGroup}>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
+                        {skill1Field}
+                    </InputFieldContainer>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
+                        {skill2Field}
+                    </InputFieldContainer>
+                    <InputFieldContainer className={classes.inputFieldContainer}>
+                        {skill3Field}
+                    </InputFieldContainer>
+                </div>
+                <div className={classes.inputFieldGroup}>
+                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                        {npField}
+                    </InputFieldContainer>
+                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                        {bondField}
+                    </InputFieldContainer>
+                </div>
+            </form>
+        );
+    }
+
+    // Dialog layout
     return (
         <form
             className={className}
-            id={FormId}
+            id={formId}
             noValidate
             onSubmit={handleSubmit}
         >
             <div className={classes.inputFieldGroup}>
-                {showServantSelect &&
-                    <InputFieldContainer className={classes.inputFieldContainer} flex="75%">
-                        <MasterServantEditFormAutocomplete
-                            servantList={gameServantList}
-                            selectedServant={servant}
-                            onChange={handleSelectedServantChange}
-                            disabled={servantSelectDisabled}
-                        />
-                    </InputFieldContainer>
-                }
+                <InputFieldContainer className={classes.inputFieldContainer} flex="75%">
+                    <MasterServantEditFormAutocomplete
+                        servantList={gameServantList}
+                        selectedServant={servant}
+                        onChange={handleSelectedServantChange}
+                        disabled={servantSelectDisabled || readonly}
+                    />
+                </InputFieldContainer>
                 <InputFieldContainer className={classes.inputFieldContainer} flex="25%">
-                    <FormControl variant="outlined" fullWidth>
-                        <InputLabel htmlFor="np">NP Level</InputLabel>
-                        <Select
-                            native
-                            id="np"
-                            name="np"
-                            label="NP Level"
-                            value={formData.np}
-                            onChange={handleSelectInputChange}
-                        >
-                            {GameServantConstants.NoblePhantasmLevels.map(level => (
-                                <option key={level} value={level}>
-                                    {level}
-                                </option>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    {npField}
                 </InputFieldContainer>
             </div>
             <div className={classes.inputFieldGroup}>
                 <InputFieldContainer className={classes.inputFieldContainer}>
-                    <TextField
-                        variant="outlined"
-                        fullWidth
-                        label="Servant Level"
-                        name="level"
-                        type="number"
-                        inputProps={{
-                            step: 1,
-                            min: GameServantConstants.MinLevel,
-                            max: GameServantConstants.MaxLevel
-                        }}
-                        value={formData.level}
-                        onChange={handleInputChange}
-                        onBlur={handleLevelInputBlur}
-                    />
+                    {levelField}
                 </InputFieldContainer>
                 <InputFieldContainer className={classes.inputFieldContainer}>
-                    <FormControl variant="outlined" fullWidth>
-                        <InputLabel htmlFor="ascension">Ascension</InputLabel>
-                        <Select
-                            native
-                            id="ascension"
-                            name="ascension"
-                            label="Ascension"
-                            value={formData.ascension}
-                            onChange={handleAscensionInputChange}
-                        >
-                            {GameServantConstants.AscensionLevels.map(level => (
-                                <option key={level} value={level}>
-                                    {level}
-                                </option>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    {ascensionField}
                 </InputFieldContainer>
                 <InputFieldContainer className={classes.inputFieldContainer}>
-                    <TextField
-                        variant="outlined"
-                        fullWidth
-                        label="HP Fou"
-                        name="fouHp"
-                        type="number"
-                        inputProps={{
-                            step: getFouInputStepSize(formData.fouHp),
-                            min: GameServantConstants.MinFou,
-                            max: GameServantConstants.MaxFou
-                        }}
-                        value={formData.fouHp}
-                        onChange={handleInputChange}
-                        onBlur={handleFouInputBlur}
-                    />
+                    {fouHpField}
                 </InputFieldContainer>
                 <InputFieldContainer className={classes.inputFieldContainer}>
-                    <TextField
-                        variant="outlined"
-                        fullWidth
-                        label="Atk. Fou"
-                        name="fouAtk"
-                        type="number"
-                        inputProps={{
-                            step: getFouInputStepSize(formData.fouAtk),
-                            min: GameServantConstants.MinFou,
-                            max: GameServantConstants.MaxFou
-                        }}
-                        value={formData.fouAtk}
-                        onChange={handleInputChange}
-                        onBlur={handleFouInputBlur}
-                    />
+                    {fouAtkField}
                 </InputFieldContainer>
             </div>
             <div className={classes.inputFieldGroup}>
                 <InputFieldContainer className={classes.inputFieldContainer}>
-                    <FormControl variant="outlined" fullWidth>
-                        <InputLabel htmlFor="skill1">Skill 1</InputLabel>
-                        <Select
-                            native
-                            id="skill1"
-                            name="skill1"
-                            label="Skill 1"
-                            value={formData.skill1}
-                            onChange={handleSelectInputChange}
-                        >
-                            {GameServantConstants.SkillLevels.map(level => (
-                                <option key={level} value={level}>
-                                    {level}
-                                </option>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    {skill1Field}
                 </InputFieldContainer>
                 <InputFieldContainer className={classes.inputFieldContainer}>
-                    <FormControl variant="outlined" fullWidth>
-                        <InputLabel htmlFor="skill2">Skill 2</InputLabel>
-                        <Select
-                            native
-                            id="skill2"
-                            name="skill2"
-                            label="Skill 2"
-                            value={formData.skill2}
-                            onChange={handleSelectInputChange}
-                        >
-                            <option>{'\u2014'}</option> {/* Blank option */}
-                            {GameServantConstants.SkillLevels.map(level => (
-                                <option key={level} value={level}>
-                                    {level}
-                                </option>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    {skill2Field}
                 </InputFieldContainer>
                 <InputFieldContainer className={classes.inputFieldContainer}>
-                    <FormControl variant="outlined" fullWidth>
-                        <InputLabel htmlFor="skill3">Skill 3</InputLabel>
-                        <Select
-                            native
-                            id="skill3"
-                            name="skill3"
-                            label="Skill 3"
-                            value={formData.skill3}
-                            onChange={handleSelectInputChange}
-                        >
-                            <option>{'\u2014'}</option> {/* Blank option */}
-                            {GameServantConstants.SkillLevels.map(level => (
-                                <option key={level} value={level}>
-                                    {level}
-                                </option>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    {skill3Field}
                 </InputFieldContainer>
                 <InputFieldContainer className={classes.inputFieldContainer}>
-                    <FormControl variant="outlined" fullWidth>
-                        <InputLabel htmlFor="bond">Bond</InputLabel>
-                        <Select
-                            native
-                            id="bond"
-                            name="bond"
-                            label="Bond"
-                            value={formData.bond}
-                            onChange={handleSelectInputChange}
-                        >
-                            <option>{/* Blank option */}</option>
-                            {GameServantConstants.BondLevels.map(level => (
-                                <option key={level} value={level}>
-                                    {level}
-                                </option>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    {bondField}
                 </InputFieldContainer>
             </div>
         </form>

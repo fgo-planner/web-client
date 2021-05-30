@@ -1,4 +1,5 @@
 import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { WithStylesOptions } from '@material-ui/styles';
 import clsx from 'clsx';
 import React from 'react';
 import { GameItemThumbnail } from '../../../components/game/item/game-item-thumbnail.component';
@@ -19,9 +20,6 @@ const style = (theme: Theme) => ({
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         borderBottomColor: theme.palette.divider,
-        borderRightWidth: 1,
-        borderRightStyle: 'solid',
-        borderRightColor: theme.palette.divider,
         '&:hover': {
             background: fade(theme.palette.text.primary, 0.07)
         }
@@ -34,24 +32,20 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-// const styleOptions: WithStylesOptions<Theme> = {
-//     classNamePrefix: 'LayoutPanelContainer'
-// };
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'GameItemsRoute'
+};
 
-const useStyles = makeStyles(style);
+const useStyles = makeStyles(style, styleOptions);
 
 export const GameItemsRoute = React.memo(() => {
     const classes = useStyles();
-
     const gameItems = useGameItemList();
-
-    // const scrollContainer = useElevateAppBarOnScroll();
-
     return (
         <div className="flex column full-height">
             <PageTitle>Item List</PageTitle>
             <LayoutPanelScrollable
-                className="m-4"
+                className="m-4 scrollbar-track-border"
                 headerContents={
                     <div className={classes.header}>HEADER TEST</div>
                 }

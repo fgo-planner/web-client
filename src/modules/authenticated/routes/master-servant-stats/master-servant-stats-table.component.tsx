@@ -1,15 +1,15 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import React, { ReactNode, useState } from 'react';
 import NumberFormat from 'react-number-format';
-import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
-import { GameServantConstants } from '../../../../../../constants';
-import { WithStylesProps } from '../../../../../../types';
-import { ServantStats } from '../../../../../../utils/master/master-servant-stats.utils';
-import { StyleUtils } from '../../../../../../utils/style.utils';
-import { MasterServantExpandableStats } from './master-servant-expandable-stats.component';
+import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
+import { GameServantConstants } from '../../../../constants';
+import { WithStylesProps } from '../../../../types';
+import { StyleUtils } from '../../../../utils/style.utils';
+import { MasterServantStatsExpandablePanel } from './master-servant-expandable-stats.component';
+import { MasterServantStats } from './master-servant-stats.utils';
 
 type Props = {
-    stats: ServantStats<Record<string, number>>;
+    stats: MasterServantStats<Record<string, number>>;
     dataColumnWidth?: string | number;
     headerLabelRenderer?: (value: string | number) => ReactNode;
 } & WithStylesProps;
@@ -163,7 +163,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                 </TableBody>
             </Table>
 
-            <MasterServantExpandableStats expanded={accordionStates.npLevels}>
+            <MasterServantStatsExpandablePanel expanded={accordionStates.npLevels}>
                 <Table className={classes.table}>
                     <TableBody className={classes.accordionTableBody}>
                         {GameServantConstants.NoblePhantasmLevels.map(level => (
@@ -190,7 +190,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                         </TableRow>
                     </TableBody>
                 </Table>
-            </MasterServantExpandableStats>
+            </MasterServantStatsExpandablePanel>
 
             <Table className={classes.table}>
                 <TableBody>
@@ -217,7 +217,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                 </TableBody>
             </Table>
 
-            <MasterServantExpandableStats expanded={accordionStates.ascensionLevels}>
+            <MasterServantStatsExpandablePanel expanded={accordionStates.ascensionLevels}>
                 <Table className={classes.table}>
                     <TableBody className={classes.accordionTableBody}>
                         {GameServantConstants.AscensionLevels.map(level => (
@@ -234,7 +234,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                         ))}
                     </TableBody>
                 </Table>
-            </MasterServantExpandableStats>
+            </MasterServantStatsExpandablePanel>
 
             <Table className={classes.table}>
                 <TableBody>
@@ -261,7 +261,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                 </TableBody>
             </Table>
 
-            <MasterServantExpandableStats expanded={accordionStates.skillLevels}>
+            <MasterServantStatsExpandablePanel expanded={accordionStates.skillLevels}>
                 <Table className={classes.table}>
                     <TableBody className={classes.accordionTableBody}>
                         {GameServantConstants.SkillLevels.map(level => (
@@ -298,7 +298,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                         </TableRow>
                     </TableBody>
                 </Table>
-            </MasterServantExpandableStats>
+            </MasterServantStatsExpandablePanel>
 
             <Table className={classes.table}>
                 <TableBody>
@@ -325,7 +325,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                 </TableBody>
             </Table>
 
-            <MasterServantExpandableStats expanded={accordionStates.bondLevels}>
+            <MasterServantStatsExpandablePanel expanded={accordionStates.bondLevels}>
                 <Table className={classes.table}>
                     <TableBody className={classes.accordionTableBody}>
                         {GameServantConstants.BondLevels.map(level => (
@@ -347,7 +347,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                         ))}
                     </TableBody>
                 </Table>
-            </MasterServantExpandableStats>
+            </MasterServantStatsExpandablePanel>
 
 
             <Table className={classes.table}>
@@ -375,7 +375,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                 </TableBody>
             </Table>
 
-            <MasterServantExpandableStats expanded={accordionStates.fouEnhancement}>
+            <MasterServantStatsExpandablePanel expanded={accordionStates.fouEnhancement}>
                 <Table className={classes.table}>
                     <TableBody className={classes.accordionTableBody}>
                         <TableRow className={classes.dataRow}>
@@ -440,7 +440,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
                         </TableRow>
                     </TableBody>
                 </Table>
-            </MasterServantExpandableStats>
+            </MasterServantStatsExpandablePanel>
 
         </TableContainer>
     );

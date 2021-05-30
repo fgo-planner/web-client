@@ -7,6 +7,7 @@ import { ComponentStyleProps } from '../../types/internal/props/component-style-
 type Props = PropsWithChildren<{
     title?: string;
     titlePosition?: 'outside' | 'inside';
+    autoHeight?: boolean;
 }> & ComponentStyleProps;
 
 const DefaultTitlePosition = 'outside';
@@ -20,6 +21,10 @@ const style = (theme: Theme) => ({
         height: '100%',
         backgroundColor: fade(theme.palette.background.paper, 0.95),
         borderRadius: theme.spacing(4)
+    },
+    autoHeight: {
+        height: 'initial',
+        maxHeight: '100%'
     },
     title: {
         fontSize: '1.125rem',
@@ -39,13 +44,14 @@ export const LayoutPanelContainer = React.memo((props: Props) => {
     const {
         children,
         title,
+        autoHeight,
         className,
         style
     } = props;
 
     const titlePosition = props.titlePosition || DefaultTitlePosition;
 
-    const classes = useStyles();
+    const classes = useStyles(props);
 
     const renderTitle = (): ReactNode => (
         <Typography variant="h6" className={clsx(classes.title, titlePosition)}>
@@ -56,7 +62,7 @@ export const LayoutPanelContainer = React.memo((props: Props) => {
     return (
         <div className={clsx(classes.root, className)} style={style}>
             {title && titlePosition === 'outside' && renderTitle()}
-            <div className={classes.background}>
+            <div className={clsx(classes.background, autoHeight && classes.autoHeight)}>
                 {title && titlePosition === 'inside' && renderTitle()}
                 {children}
             </div>

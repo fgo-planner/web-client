@@ -6,6 +6,7 @@ import { GameServant, Nullable } from '../../../../../../types';
 type Props = {
     selectedServant: GameServant;
     servantList: ReadonlyArray<Readonly<GameServant>>;
+    size?: 'small' | 'medium';
     disabled?: boolean;
     onChange?: (event: ChangeEvent<{}>, value: GameServant) => void;
 };
@@ -31,6 +32,7 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
     const {
         selectedServant,
         servantList,
+        size,
         disabled,
         onChange
     } = props;
@@ -47,6 +49,7 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
         return (
             <TextField
                 variant="outlined"
+                size={size}
                 fullWidth
                 label="Servant"
                 value={selectedServant.name}
@@ -60,6 +63,7 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
             autoHighlight
             autoSelect
             fullWidth
+            size={size}
             options={servantList as Array<Readonly<GameServant>>}
             noOptionsText="No results"
             getOptionLabel={getOptionLabel}

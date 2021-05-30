@@ -1,16 +1,16 @@
 import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
 import React, { ReactNode, useEffect, useState } from 'react';
-import { PageTitle } from '../../../components/text/page-title.component';
-import { useGameItemMap } from '../../../hooks/data/use-game-item-map.hook';
-import { useGameServantMap } from '../../../hooks/data/use-game-servant-map.hook';
-import { MasterAccountService } from '../../../services/data/master/master-account.service';
-import { MasterAccount, Nullable } from '../../../types';
-import { ItemStats, MasterItemStatsUtils } from '../../../utils/master/master-item-stats.utils';
-import { MasterItemStatsTable } from '../components/master/item/stats/master-item-stats-table.component';
+import { PageTitle } from '../../../../components/text/page-title.component';
+import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
+import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { MasterAccount, Nullable } from '../../../../types';
+import { MasterItemStats, MasterItemStatsUtils } from './master-item-stats.utils';
+import { MasterItemStatsTable } from './master-item-stats-table.component';
 
 export const MasterItemStatsRoute = React.memo(() => {
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-    const [stats, setStats] = useState<ItemStats>();
+    const [stats, setStats] = useState<MasterItemStats>();
     const [includeUnownedServants, setIncludeUnownedServants] = useState<boolean>(false);
 
     const gameServantMap = useGameServantMap();

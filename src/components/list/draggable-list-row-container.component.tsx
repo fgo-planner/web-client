@@ -10,9 +10,7 @@ type Props = PropsWithChildren<{
     classes?: any;
     active?: boolean;
     borderTop?: boolean;
-    borderRight?: boolean;
     borderBottom?: boolean;
-    borderLeft?: boolean;
     draggableId: string;
     index: number;
     dragHandleIcon?: SvgIconComponent;
@@ -51,9 +49,7 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
         dragHandleIcon,
         active,
         borderTop,
-        borderRight,
-        borderBottom,
-        borderLeft
+        borderBottom
     } = props;
 
     const classes = useStyles(props);
@@ -69,9 +65,7 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
                     snapshot.isDragging && classes.dragging,
                     active && classes.active,
                     borderTop && classes.borderTop,
-                    borderRight && classes.borderRight,
-                    borderBottom && classes.borderBottom,
-                    borderLeft && classes.borderLeft
+                    borderBottom && classes.borderBottom
                 );
                 return (
                     <div ref={provided.innerRef} {...provided.draggableProps} className={className}>

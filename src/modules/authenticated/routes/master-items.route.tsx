@@ -70,7 +70,7 @@ const MasterItems = class extends PureComponent<Props, State> {
                     <NavigationRail>
                         {this._renderNavRailContents()}
                     </NavigationRail>
-                    <LayoutPanelScrollable className="py-4 pr-4 full-height flex-fill">
+                    <LayoutPanelScrollable className="py-4 pr-4 full-height flex-fill scrollbar-track-border">
                         <MasterItemList editMode={editMode} masterItems={masterItems} />
                     </LayoutPanelScrollable>
                 </div>

@@ -77,6 +77,10 @@ export type GameServant = Entity<number> & {
 
     };
 
+    /**
+     * Materials required to ascend the servant. This can be undefined because
+     * some servants (Mash) don't use materials for ascension.
+     */
     ascensionMaterials?: {
 
         1: GameServantEnhancement;

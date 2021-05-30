@@ -1,27 +1,27 @@
-import { Fab, IconButton, Tooltip } from '@material-ui/core';
+import { Fab, IconButton, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
 import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
+import { WithStylesOptions } from '@material-ui/styles';
 import lodash from 'lodash';
-import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { PromptDialog } from '../../../components/dialog/prompt-dialog.component';
-import { FabContainer } from '../../../components/fab/fab-container.component';
-import { LayoutPanelScrollable } from '../../../components/layout/layout-panel-scrollable.component';
-import { NavigationRail } from '../../../components/navigation/navigation-rail.component';
-import { PageTitle } from '../../../components/text/page-title.component';
-import { useGameServantMap } from '../../../hooks/data/use-game-servant-map.hook';
-import { useActiveBreakpoints } from '../../../hooks/user-interface/use-active-breakpoints.hook';
-import { MasterAccountService } from '../../../services/data/master/master-account.service';
-import { LoadingIndicatorOverlayService } from '../../../services/user-interface/loading-indicator-overlay.service';
-import { MasterAccount, MasterServant, MasterServantBondLevel, ModalOnCloseReason, Nullable } from '../../../types';
-import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
-import { MasterServantEditDialog } from '../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
-import { MasterServantListVisibleColumns } from '../components/master/servant/list/master-servant-list-columns';
-import { MasterServantListHeader } from '../components/master/servant/list/master-servant-list-header.component';
-import { MasterServantList } from '../components/master/servant/list/master-servant-list.component';
-
-type Props = {
-
-};
+import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
+import { FabContainer } from '../../../../components/fab/fab-container.component';
+import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
+import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
+import { PageTitle } from '../../../../components/text/page-title.component';
+import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
+import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
+import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
+import { MasterAccount, MasterServant, MasterServantBondLevel, ModalOnCloseReason, Nullable } from '../../../../types';
+import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
+import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
+import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
+import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
+import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
+import { MasterServantInfoPanel } from './master-servant-info-panel.component';
 
 type MasterAccountClonedData = {
     /**
@@ -53,7 +53,45 @@ const cloneFromMasterAccount = (account: Nullable<MasterAccount>): MasterAccount
     };
 };
 
-export const MasterServantsRoute = React.memo((props: Props) => {
+const findByGameIdAndInstanceId = (
+    masterServants: Array<MasterServant>,
+    gameId: number,
+    instanceId: number
+): MasterServant | undefined => {
+
+    for (const masterServant of masterServants) {
+        if (masterServant.instanceId === instanceId) {
+            if (masterServant.gameId === gameId) {
+                return masterServant;
+            }
+            break;
+        }
+    }
+};
+
+const style = (theme: Theme) => ({
+    infoPanelContainer: {
+        width: 320,
+        height: 'calc(100% - 84px)',
+        padding: theme.spacing(4, 4, 4, 0),
+        boxSizing: 'border-box',
+        [theme.breakpoints.down('lg')]: {
+            width: 300
+        }
+    }
+} as StyleRules);
+
+const styleOptions: WithStylesOptions<Theme> = {
+    classNamePrefix: 'MasterServants'
+};
+
+const useStyles = makeStyles(style, styleOptions);
+
+export const MasterServantsRoute = React.memo(() => {
+
+    const forceUpdate = useForceUpdate();
+
+    const classes = useStyles();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     /**
@@ -70,28 +108,31 @@ export const MasterServantsRoute = React.memo((props: Props) => {
     const [unlockedCostumes, setUnlockedCostumes] = useState<Array<number>>([]);
     // TODO Do we really need to clone the structures above?
     const [lastInstanceId, setLastInstanceId] = useState<number>(-1);
-    const [activeServant, setActiveServant] = useState<MasterServant>();
+    // const [activeServant, setActiveServant] = useState<MasterServant>();
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editServant, setEditServant] = useState<MasterServant>();
     const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
     const [deleteServant, setDeleteServant] = useState<MasterServant>();
     const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
     // const [deleteServantDialogPrompt, setDeleteServantDialogPrompt] = useState<string>();
-    const [loadingIndicatorId, setLoadingIndicatorId] = useState<string>();
+    // const [loadingIndicatorId, setLoadingIndicatorId] = useState<string>();
+
+    const activeServantRef = useRef<MasterServant>();
+    const loadingIndicatorIdRef = useRef<string>();
 
     const gameServantMap = useGameServantMap();
 
-    const { md, lg, xl } = useActiveBreakpoints();
+    const { sm, md, lg, xl } = useActiveBreakpoints();
 
     const visibleColumns = useMemo((): MasterServantListVisibleColumns => ({
         npLevel: lg,
-        level: md,
+        level: sm,
         bondLevel: xl,
         fouHp: lg,
         fouAtk: lg,
-        skillLevels: md,
+        skillLevels: sm,
         actions: false
-    }), [md, lg, xl]);
+    }), [sm, lg, xl]);
 
     const deleteServantDialogPrompt = useMemo((): string | undefined => {
         if (!gameServantMap || !deleteServant) {
@@ -102,11 +143,32 @@ export const MasterServantsRoute = React.memo((props: Props) => {
     }, [gameServantMap, deleteServant]);
 
     const resetLoadingIndicator = useCallback((): void => {
+        const loadingIndicatorId = loadingIndicatorIdRef.current;
         if (loadingIndicatorId) {
             LoadingIndicatorOverlayService.waive(loadingIndicatorId);
-            setLoadingIndicatorId(undefined);
+            loadingIndicatorIdRef.current = undefined;
+            forceUpdate();
         }
-    }, [loadingIndicatorId]);
+    }, [loadingIndicatorIdRef, forceUpdate]);
+    
+    /**
+     * If the `masterServants` reference changes (due to data being reloaded, etc.)
+     * and there is an `activeServant`, then update the `activeServant` reference
+     * with the copy from the new `masterServants` reference.
+     */
+    const updateActiveServantRef = useCallback((masterServants: Array<MasterServant>) => {
+        const activeServant = activeServantRef.current;
+        if (!activeServant) {
+            return;
+        }
+        const { gameId, instanceId } = activeServant;
+        const masterServant = findByGameIdAndInstanceId(masterServants, gameId, instanceId);
+        // If it is the same reference, then no need to update.
+        if (masterServant === activeServant) {
+            return;
+        }
+        activeServantRef.current = masterServant;
+    }, [activeServantRef]);
 
     /**
      * onCurrentMasterAccountChange subscriptions
@@ -116,6 +178,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
             .subscribe(account => {
                 const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(account);
                 const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
+                updateActiveServantRef(masterServants);
                 setMasterAccount(account);
                 setMasterServants(masterServants);
                 setBondLevels(bondLevels);
@@ -125,7 +188,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, []);
+    }, [updateActiveServantRef]);
 
     /**
      * onCurrentMasterAccountUpdated subscriptions
@@ -138,6 +201,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
                 }
                 const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(account);
                 const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
+                updateActiveServantRef(masterServants);
                 resetLoadingIndicator();
                 setMasterAccount(account);
                 setMasterServants(masterServants);
@@ -148,7 +212,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
             });
 
         return () => onCurrentMasterAccountUpdatedSubscription.unsubscribe();
-    }, [resetLoadingIndicator]);
+    }, [resetLoadingIndicator, updateActiveServantRef]);
 
     const handleUpdateError = useCallback((error: any): void => {
         // TODO Display error message to user.
@@ -156,6 +220,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
         const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(masterAccount);
         const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
         resetLoadingIndicator();
+        updateActiveServantRef(masterServants);
         setMasterServants(masterServants);
         setBondLevels(bondLevels);
         setUnlockedCostumes(unlockedCostumes);
@@ -165,7 +230,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
         setEditServantDialogOpen(false);
         setDeleteServant(undefined);
         setDeleteServantDialogOpen(false);
-    }, [masterAccount, resetLoadingIndicator]);
+    }, [masterAccount, resetLoadingIndicator, updateActiveServantRef]);
 
     /**
      * Sends master servant update request to the back-end.
@@ -184,17 +249,25 @@ export const MasterServantsRoute = React.memo((props: Props) => {
         MasterAccountService.updateAccount(update)
             .catch(handleUpdateError);
 
-        let _loadingIndicatorId = loadingIndicatorId;
-        if (!_loadingIndicatorId) {
-            _loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
+        let loadingIndicatorId = loadingIndicatorIdRef.current;
+        if (!loadingIndicatorId) {
+            loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
         }
+        loadingIndicatorIdRef.current = loadingIndicatorId;
 
         setEditServant(undefined);
         setEditServantDialogOpen(false);
         setDeleteServant(undefined);
         setDeleteServantDialogOpen(false);
-        setLoadingIndicatorId(_loadingIndicatorId);
-    }, [loadingIndicatorId, masterAccount?._id, handleUpdateError]);
+    }, [loadingIndicatorIdRef, masterAccount?._id, handleUpdateError]);
+
+    const handleFormChange = useCallback((): void => {
+        const activeServant = activeServantRef.current;
+        if (!activeServant) {
+            return;
+        }
+        setMasterServants([...masterServants]); // Hacky way to force list to re-render
+    }, [activeServantRef, masterServants]);
 
     const handleEditButtonClick = useCallback((): void => {
         setEditMode(true);
@@ -205,12 +278,14 @@ export const MasterServantsRoute = React.memo((props: Props) => {
     }, [masterServants, bondLevels, unlockedCostumes, updateMasterAccount]);
     
     const handleCancelButtonClick = useCallback((): void => {
+        // Re-clone data from master account
         const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(masterAccount);
+        updateActiveServantRef(masterServants);
         setMasterServants(masterServants);
         setBondLevels(bondLevels);
         setUnlockedCostumes(unlockedCostumes);
         setEditMode(false);
-    }, [masterAccount]);
+    }, [masterAccount, updateActiveServantRef]);
 
     const openEditServantDialog = useCallback((masterServant?: MasterServant): void => {
         if (!editMode) {
@@ -304,6 +379,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
             });
         }
         
+        updateActiveServantRef(_masterServants);
         setMasterServants(_masterServants);
         setBondLevels(bondLevels); // This should not be needed
         setLastInstanceId(_lastInstanceId);
@@ -316,6 +392,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
         editMode,
         editServant,
         lastInstanceId,
+        updateActiveServantRef,
         closeEditServantDialog
     ]);
 
@@ -354,6 +431,11 @@ export const MasterServantsRoute = React.memo((props: Props) => {
         closeDeleteServantDialog,
         updateMasterAccount
     ]);
+
+    const handleActiveServantChange = useCallback((activeServant: MasterServant): void => {
+        activeServantRef.current = activeServant;
+        forceUpdate();
+    }, [activeServantRef, forceUpdate]);
 
     if (!gameServantMap) {
         return null;
@@ -409,7 +491,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
                     <Fab
                         color="primary"
                         onClick={handleEditButtonClick}
-                        disabled={!!loadingIndicatorId}
+                        disabled={!!loadingIndicatorIdRef.current}
                         children={<EditIcon />}
                     />
                 </div>
@@ -422,7 +504,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
                     <Fab
                         color="default"
                         onClick={handleCancelButtonClick}
-                        disabled={!!loadingIndicatorId}
+                        disabled={!!loadingIndicatorIdRef.current}
                         children={<ClearIcon />}
                     />
                 </div>
@@ -432,7 +514,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
                     <Fab
                         color="primary"
                         onClick={handleSaveButtonClick}
-                        disabled={!!loadingIndicatorId}
+                        disabled={!!loadingIndicatorIdRef.current}
                         children={<SaveIcon />}
                     />
                 </div>
@@ -452,7 +534,7 @@ export const MasterServantsRoute = React.memo((props: Props) => {
                 <NavigationRail children={navigationRailContents} />
                 <div className="flex flex-fill">
                     <LayoutPanelScrollable
-                        className="py-4 pr-4 full-height flex-fill"
+                        className="py-4 pr-4 full-height flex-fill scrollbar-track-border"
                         headerContents={
                             <MasterServantListHeader 
                                 editMode={editMode}
@@ -463,19 +545,29 @@ export const MasterServantsRoute = React.memo((props: Props) => {
                             <MasterServantList
                                 masterServants={masterServants}
                                 bondLevels={bondLevels}
-                                activeServant={activeServant}
+                                activeServant={activeServantRef.current}
                                 editMode={editMode}
                                 showAddServantRow={editMode}
-                                borderRight
                                 visibleColumns={visibleColumns}
                                 openLinksInNewTab={editMode}
-                                onActivateServant={setActiveServant}
+                                onActivateServant={handleActiveServantChange}
                                 onAddServant={handleAddServantButtonClick}
                                 onEditServant={openEditServantDialog}
                                 onDeleteServant={openDeleteServantDialog}
                             />
                         }
                     />
+                    {md && <div className={classes.infoPanelContainer}>
+                        <LayoutPanelContainer className="flex column full-height" autoHeight>
+                            <MasterServantInfoPanel 
+                                activeServant={activeServantRef.current}
+                                bondLevels={bondLevels}
+                                unlockedCostumes={unlockedCostumes}
+                                editMode={editMode}
+                                onStatsChange={handleFormChange}
+                            />
+                        </LayoutPanelContainer>
+                    </div>}
                 </div>
             </div>
             <FabContainer children={fabContainerContents} />

@@ -19,7 +19,6 @@ type Props = {
     editMode?: boolean;
     showAddServantRow?: boolean;
     openLinksInNewTab?: boolean;
-    borderRight?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
     onActivateServant?: (servant: MasterServant) => void;
@@ -60,6 +59,7 @@ const styleOptions: WithStylesOptions<Theme> = {
 const useStyles = makeStyles(style, styleOptions);
 
 export const MasterServantList = React.memo((props: Props) => {
+    
     const {
         masterServants,
         bondLevels,
@@ -67,7 +67,6 @@ export const MasterServantList = React.memo((props: Props) => {
         editMode,
         showAddServantRow,
         openLinksInNewTab,
-        borderRight,
         visibleColumns,
         onActivateServant,
         onAddServant,
@@ -99,6 +98,7 @@ export const MasterServantList = React.memo((props: Props) => {
         const { gameId, instanceId } = masterServant;
         const servant = gameServantMap[gameId];
         const bondLevel = bondLevels[gameId];
+        const active = activeServant?.instanceId === instanceId;
         
         if (editMode) {
             return (
@@ -107,24 +107,23 @@ export const MasterServantList = React.memo((props: Props) => {
                     servant={servant}
                     bond={bondLevel}
                     masterServant={masterServant}
-                    onActivateServant={onActivateServant}
                     onEditServant={onEditServant}
                     onDeleteServant={onDeleteServant}
                     openLinksInNewTab={openLinksInNewTab}
                     visibleColumns={visibleColumns}
+                    onActivateServant={onActivateServant}
+                    active={active}
                     editMode
                 />
             );
         }
 
-        const active = activeServant?.instanceId === instanceId;
         const lastRow = index === masterServants.length - 1;
 
         return (
             <StaticListRowContainer
                 key={instanceId}
                 borderBottom={!lastRow}
-                borderRight={borderRight}
                 active={active}
             >
                 <MasterServantListRow
@@ -136,6 +135,7 @@ export const MasterServantList = React.memo((props: Props) => {
                     onDeleteServant={onDeleteServant}
                     openLinksInNewTab={openLinksInNewTab}
                     visibleColumns={visibleColumns}
+                    active={active}
                 />
             </StaticListRowContainer>
         );
@@ -179,7 +179,6 @@ export const MasterServantList = React.memo((props: Props) => {
                 draggableId={`draggable-servant-${instanceId}`}
                 index={index}
                 borderBottom={!lastRow}
-                borderRight={borderRight}
                 active={active}
             >
                 {renderMasterServantRow(masterServant, index)}

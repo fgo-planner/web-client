@@ -1,7 +1,7 @@
 import { Accordion, AccordionDetails, AccordionSummary, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { PropsWithChildren } from 'react';
-import { StyleUtils } from '../../../../../../utils/style.utils';
+import { StyleUtils } from '../../../../utils/style.utils';
 
 type Props = PropsWithChildren<{
     expanded: boolean
@@ -26,12 +26,12 @@ const style = (theme: Theme) => ({
 } as StyleRules);
 
 const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantExpandableStats'
+    classNamePrefix: 'MasterServantStatsExpandablePanel'
 };
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterServantExpandableStats = React.memo(({ children, expanded }: Props) => {
+export const MasterServantStatsExpandablePanel = React.memo(({ children, expanded }: Props) => {
     const classes = useStyles();
     return (
         <Accordion className={classes.accordion} expanded={expanded}>

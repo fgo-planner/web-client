@@ -17,20 +17,10 @@ const style = (theme: Theme) => ({
         borderTopStyle: 'solid',
         borderTopColor: theme.palette.divider,
     },
-    borderRight: {
-        borderRightWidth: 1,
-        borderRightStyle: 'solid',
-        borderRightColor: theme.palette.divider,
-    },
     borderBottom: {
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         borderBottomColor: theme.palette.divider,
-    },
-    borderLeft: {
-        borderLeftWidth: 1,
-        borderLeftStyle: 'solid',
-        borderLeftColor: theme.palette.divider,
     }
 } as StyleRules);
 

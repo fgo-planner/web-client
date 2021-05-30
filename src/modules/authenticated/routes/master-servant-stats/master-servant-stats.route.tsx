@@ -1,15 +1,15 @@
 import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { WithStylesOptions } from '@material-ui/styles';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
-import { PageTitle } from '../../../../../../components/text/page-title.component';
-import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { MasterAccountService } from '../../../../../../services/data/master/master-account.service';
-import { MasterAccount, Nullable } from '../../../../../../types';
-import { MasterServantStatsUtils, ServantStatsGroupedByClass, ServantStatsGroupedByRarity } from '../../../../../../utils/master/master-servant-stats.utils';
-import { StyleUtils } from '../../../../../../utils/style.utils';
-import { MasterServantStatsFilter, ServantStatsFilterResult } from './master-servant-stats-filter.component';
+import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
+import { PageTitle } from '../../../../components/text/page-title.component';
+import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { MasterAccount, Nullable } from '../../../../types';
+import { StyleUtils } from '../../../../utils/style.utils';
+import { MasterServantStatsFilter, MasterServantStatsFilterResult } from './master-servant-stats-filter.component';
 import { MasterServantStatsTable } from './master-servant-stats-table.component';
+import { MasterServantStatsGroupedByClass, MasterServantStatsGroupedByRarity, MasterServantStatsUtils } from './master-servant-stats.utils';
 
 const renderRarityHeaderLabel = (value: string | number): ReactNode => {
     if (value === 'overall') {
@@ -89,11 +89,14 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterServantStats = React.memo(() => {
+/**
+ * TODO Merge this into the `master-servant-stats.route.tsx` file.
+ */
+export const MasterServantStatsRoute = React.memo(() => {
     const classes = useStyles();
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-    const [filter, setFilter] = useState<ServantStatsFilterResult>();
-    const [stats, setStats] = useState<ServantStatsGroupedByRarity | ServantStatsGroupedByClass>();
+    const [filter, setFilter] = useState<MasterServantStatsFilterResult>();
+    const [stats, setStats] = useState<MasterServantStatsGroupedByRarity | MasterServantStatsGroupedByClass>();
 
     const gameServantMap = useGameServantMap();
 
@@ -117,7 +120,7 @@ export const MasterServantStats = React.memo(() => {
         };
     }, []);
 
-    const handleFilterChange = useCallback((filter: ServantStatsFilterResult): void => {
+    const handleFilterChange = useCallback((filter: MasterServantStatsFilterResult): void => {
         setFilter(filter);
     }, []);
 

@@ -1,18 +1,18 @@
-import { GameServantConstants } from '../../constants';
-import { GameServantMap } from '../../services/data/game/game-servant.service';
-import { GameServant, GameServantClass, GameServantClassSimplified, GameServantRarity, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel } from '../../types';
-import { MasterServantSkillLevel } from '../../types/data/master/servant/master-servant-skill-level.type';
-import { GameServantUtils } from '../game/game-servant.utils';
+import { GameServantConstants } from '../../../../constants';
+import { GameServantMap } from '../../../../services/data/game/game-servant.service';
+import { GameServant, GameServantClass, GameServantClassSimplified, GameServantRarity, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel } from '../../../../types';
+import { MasterServantSkillLevel } from '../../../../types/data/master/servant/master-servant-skill-level.type';
+import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 
-type ServantStatGroupedByRarity = {
+type MasterServantStatGroupedByRarity = {
     [key in GameServantRarity]: number
 } & { overall: number };
 
-type ServantStatGroupedByClass = {
+type MasterServantStatGroupedByClass = {
     [key in GameServantClassSimplified]: number
 } & { overall: number };
 
-export type ServantStats<T> = {
+export type MasterServantStats<T> = {
     totalCount: T;
     uniqueCount: T;
     npLevels: Record<MasterServantNoblePhantasmLevel | 'total', T>;
@@ -36,13 +36,13 @@ export type ServantStats<T> = {
     averageBondLevel: T;
 };
 
-export type ServantStatsGroupedByRarity = ServantStats<ServantStatGroupedByRarity>;
+export type MasterServantStatsGroupedByRarity = MasterServantStats<MasterServantStatGroupedByRarity>;
 
-export type ServantStatsGroupedByClass = ServantStats<ServantStatGroupedByClass>;
+export type MasterServantStatsGroupedByClass = MasterServantStats<MasterServantStatGroupedByClass>;
 
-export type ServantStatsGroupBy = 'rarity' | 'class';
+export type MasterServantStatsGroupBy = 'rarity' | 'class';
 
-export type ServantStatsFilter = {
+export type MasterServantStatsFilterOptions = {
     classes: Set<GameServantClassSimplified>;
     rarities: Set<GameServantRarity>;
 };
@@ -55,8 +55,8 @@ export class MasterServantStatsUtils {
     static generateStatsGroupedByRarity(
         gameServantMap: GameServantMap,
         masterAccount: MasterAccount,
-        filter: ServantStatsFilter
-    ): ServantStatsGroupedByRarity {
+        filter: MasterServantStatsFilterOptions
+    ): MasterServantStatsGroupedByRarity {
 
         const start = window.performance.now();
 
@@ -103,8 +103,8 @@ export class MasterServantStatsUtils {
     static generateStatsGroupedByClass(
         gameServantMap: GameServantMap,
         masterAccount: MasterAccount,
-        filter: ServantStatsFilter
-    ): ServantStatsGroupedByClass {
+        filter: MasterServantStatsFilterOptions
+    ): MasterServantStatsGroupedByClass {
 
         const start = window.performance.now();
 
@@ -151,7 +151,7 @@ export class MasterServantStatsUtils {
 
     private static _isServantEligible(
         servant: GameServant,
-        filter: Partial<ServantStatsFilter>
+        filter: Partial<MasterServantStatsFilterOptions>
     ): boolean {
 
         if (filter.classes) {
@@ -169,7 +169,7 @@ export class MasterServantStatsUtils {
     }
 
     private static _populateStats<T extends Record<string, number>>(
-        stats: ServantStats<T>,
+        stats: MasterServantStats<T>,
         statKey: Partial<keyof T>,
         masterServant: MasterServant,
         bondLevelMap: Record<number, MasterServantBondLevel | undefined>,
@@ -189,7 +189,7 @@ export class MasterServantStatsUtils {
             uniqueCount,
             npLevels,
             ascensionLevels
-        } = stats as ServantStats<Record<string, number>>;
+        } = stats as MasterServantStats<Record<string, number>>;
 
         const key = statKey as string;
 
@@ -241,7 +241,7 @@ export class MasterServantStatsUtils {
     }
 
     private static _populateSkillStats<T extends Record<string, number>>(
-        stats: ServantStats<T>,
+        stats: MasterServantStats<T>,
         statKey: Partial<keyof T>,
         skills: MasterServant['skills']
     ): void {
@@ -250,7 +250,7 @@ export class MasterServantStatsUtils {
             skillLevels,
             tripleNinesCount,
             tripleTensCount,
-        } = stats as ServantStats<Record<string, number>>;
+        } = stats as MasterServantStats<Record<string, number>>;
 
         const key = statKey as string;
 
@@ -278,7 +278,7 @@ export class MasterServantStatsUtils {
     }
 
     private static _populateFouStats<T extends Record<string, number>>(
-        stats: ServantStats<T>,
+        stats: MasterServantStats<T>,
         statKey: Partial<keyof T>,
         fouHp: number | undefined,
         fouAtk: number | undefined
@@ -293,7 +293,7 @@ export class MasterServantStatsUtils {
             doubleMaxGoldFouCount,
             fouValuesCount,
             averageFou
-        } = stats as ServantStats<Record<string, number>>;
+        } = stats as MasterServantStats<Record<string, number>>;
 
         const key = statKey as string;
 
@@ -338,7 +338,7 @@ export class MasterServantStatsUtils {
     }
 
     private static _populateBondStats<T extends Record<string, number>>(
-        stats: ServantStats<T>,
+        stats: MasterServantStats<T>,
         statKey: string,
         bond: MasterServantBondLevel | undefined
     ): void {
@@ -350,7 +350,7 @@ export class MasterServantStatsUtils {
         const {
             bondLevelValuesCount,
             bondLevels
-        } = stats as ServantStats<Record<string, number>>;
+        } = stats as MasterServantStats<Record<string, number>>;
 
         bondLevels[bond][statKey] += 1;
         bondLevels[bond].overall += 1;
@@ -358,7 +358,7 @@ export class MasterServantStatsUtils {
         bondLevelValuesCount.overall += 1;
     }
 
-    private static _computeStatAverages<T extends Record<string, number>>(stats: ServantStats<T>): void {
+    private static _computeStatAverages<T extends Record<string, number>>(stats: MasterServantStats<T>): void {
 
         const {
             totalCount,
@@ -373,7 +373,7 @@ export class MasterServantStatsUtils {
             bondLevels,
             bondLevelValuesCount,
             averageBondLevel
-        } = stats as ServantStats<Record<string, number>>;
+        } = stats as MasterServantStats<Record<string, number>>;
 
         // All the sub-stats should have the same keys.
         const keys = Object.keys(totalCount);
@@ -438,7 +438,7 @@ export class MasterServantStatsUtils {
 
     //#region Data instantiation methods
 
-    private static _instantiateStatsSet<T>(instantiate: () => T): ServantStats<T> {
+    private static _instantiateStatsSet<T>(instantiate: () => T): MasterServantStats<T> {
         return {
             totalCount: instantiate(),
             uniqueCount: instantiate(),
@@ -506,11 +506,11 @@ export class MasterServantStatsUtils {
         };
     }
 
-    private static _instantiateStatsGroupedByRarity(): ServantStatsGroupedByRarity {
+    private static _instantiateStatsGroupedByRarity(): MasterServantStatsGroupedByRarity {
         return this._instantiateStatsSet(this._instantiateStatByRarity);
     }
 
-    private static _instantiateStatByRarity(): ServantStatGroupedByRarity {
+    private static _instantiateStatByRarity(): MasterServantStatGroupedByRarity {
         return {
             0: 0,
             1: 0,
@@ -522,10 +522,10 @@ export class MasterServantStatsUtils {
         };
     }
 
-    private static _instantiateStatsGroupedByClass(): ServantStatsGroupedByClass {
+    private static _instantiateStatsGroupedByClass(): MasterServantStatsGroupedByClass {
         return this._instantiateStatsSet(this._instantiateStatByClass);
     }
-    private static _instantiateStatByClass(): ServantStatGroupedByClass {
+    private static _instantiateStatByClass(): MasterServantStatGroupedByClass {
         return {
             [GameServantClass.Saber]: 0,
             [GameServantClass.Archer]: 0,

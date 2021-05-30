@@ -9,16 +9,16 @@ const style = (theme: Theme) => ({
         '& *::-webkit-scrollbar': {
             width: theme.spacing(2)
         },
-        /*
-        '& *::-webkit-scrollbar-track': {
-            borderLeftWidth: 1,
-            borderLeftStyle: 'solid',
-            borderLeftColor: theme.palette.divider,
-        },
-        */
         '& *::-webkit-scrollbar-thumb': {
             backgroundColor: theme.palette.primary.main,
             borderRadius: theme.spacing(1)
+        },
+        '& .scrollbar-track-border': {
+            '& *::-webkit-scrollbar-track': {
+                borderLeftWidth: 1,
+                borderLeftStyle: 'solid',
+                borderLeftColor: theme.palette.divider,
+            }
         }
     }
 } as StyleRules);

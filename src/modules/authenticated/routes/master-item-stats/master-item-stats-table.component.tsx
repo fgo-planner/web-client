@@ -2,16 +2,16 @@ import { makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode } from 'react';
 import NumberFormat from 'react-number-format';
-import { GameItemThumbnail } from '../../../../../../components/game/item/game-item-thumbnail.component';
-import { LayoutPanelScrollable } from '../../../../../../components/layout/layout-panel-scrollable.component';
-import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
-import { GameItemConstants } from '../../../../../../constants';
-import { GameItemMap } from '../../../../../../services/data/game/game-item.service';
-import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { ItemStats } from '../../../../../../utils/master/master-item-stats.utils';
+import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
+import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
+import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
+import { GameItemConstants } from '../../../../constants';
+import { GameItemMap } from '../../../../services/data/game/game-item.service';
+import { ThemeConstants } from '../../../../styles/theme-constants';
+import { MasterItemStats } from './master-item-stats.utils';
 
 type Props = {
-    stats: ItemStats;
+    stats: MasterItemStats;
     gameItemMap: GameItemMap;
     includeUnownedServants?: boolean;
 };
@@ -105,7 +105,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
         const debt = includeUnownedServants ? allServantsDebt : ownedServantsDebt;
         
         return (
-            <StaticListRowContainer key={itemId} borderBottom={index !== ItemIds.length -1} borderRight>
+            <StaticListRowContainer key={itemId} borderBottom={index !== ItemIds.length -1}>
                 <div className={classes.dataRow}>
                     <div className={classes.labelCell}>
                         <div className={classes.thumbnailContainer}>
@@ -163,7 +163,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
 
     return (
         <LayoutPanelScrollable
-            className="p-4 full-height"
+            className="p-4 full-height scrollbar-track-border"
             headerContents={
                 <div className={classes.header}>
                     <Tooltip title={includeUnownedServants ? CostColumnTooltipInclUnowned : CostColumnTooltip} placement="top">

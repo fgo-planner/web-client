@@ -1,17 +1,17 @@
 import { Checkbox, ListItemText, makeStyles, MenuItem, MenuProps, StyleRules, TextField, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
-import { InputFieldContainer } from '../../../../../../components/input/input-field-container.component';
-import { GameServantConstants } from '../../../../../../constants';
-import { GameServantClassSimplified, GameServantRarity, TextFieldChangeEvent } from '../../../../../../types';
-import { ServantStatsFilter, ServantStatsGroupBy } from '../../../../../../utils/master/master-servant-stats.utils';
+import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
+import { GameServantConstants } from '../../../../constants';
+import { GameServantClassSimplified, GameServantRarity, TextFieldChangeEvent } from '../../../../types';
+import { MasterServantStatsFilterOptions, MasterServantStatsGroupBy } from './master-servant-stats.utils';
 
-export type ServantStatsFilterResult = {
-    groupBy: ServantStatsGroupBy;
-} & ServantStatsFilter;
+export type MasterServantStatsFilterResult = {
+    groupBy: MasterServantStatsGroupBy;
+} & MasterServantStatsFilterOptions;
 
 type Props = {
-    onFilterChange: (filter: ServantStatsFilterResult) => void;
+    onFilterChange: (filter: MasterServantStatsFilterResult) => void;
 };
 
 /**
@@ -60,7 +60,7 @@ const useStyles = makeStyles(style, styleOptions);
 
 export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) => {
     const classes = useStyles();
-    const [groupBy, setGroupBy] = useState<ServantStatsGroupBy>('rarity');
+    const [groupBy, setGroupBy] = useState<MasterServantStatsGroupBy>('rarity');
     const [classFilter, setClassFilter] = useState<GameServantClassSimplified[]>([...ClassFilterOptions]);
     const [rarityFilter, setRarityFilter] = useState<GameServantRarity[]>([...GameServantConstants.RarityValues]);
 
@@ -73,7 +73,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
     }, [onFilterChange, groupBy, classFilter, rarityFilter]);
 
     const handleStatsGroupByChange = useCallback((event: TextFieldChangeEvent): void => {
-        const value = event.target.value as ServantStatsGroupBy;
+        const value = event.target.value as MasterServantStatsGroupBy;
         setGroupBy(value);
         // Reset filters depending on the new groupBy value.
         if (value === 'rarity') {

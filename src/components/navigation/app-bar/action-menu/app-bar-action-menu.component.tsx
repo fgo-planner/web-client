@@ -1,13 +1,13 @@
-import { Menu, PopoverOrigin, StyledComponentProps } from '@material-ui/core';
+import { Menu, PopoverOrigin } from '@material-ui/core';
 import React, { PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseHandler } from '../../../../types';
+import { ComponentStyleProps, ModalOnCloseHandler } from '../../../../types';
 
 type Props = {
     className?: string;
     anchorEl?: Element | null;
     onClose?: ModalOnCloseHandler;
-} & StyledComponentProps;
+} & ComponentStyleProps;
 
 export class AppBarActionMenu extends PureComponent<Props> {
 

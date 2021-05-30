@@ -3,14 +3,14 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import { PureComponent, ReactNode } from 'react';
 import * as Yup from 'yup';
-import { CustomStyleProps, UserCredentials, WithStylesProps } from '../../types';
+import { ComponentStyleProps, UserCredentials, WithStylesProps } from '../../types';
 import { FormUtils } from '../../utils/form.utils';
 import { InputFieldContainer } from '../input/input-field-container.component';
 
 type Props = {
     formId: string;
     onSubmit: FormikConfig<UserCredentials>['onSubmit'];
-} & WithStylesProps & CustomStyleProps;
+} & WithStylesProps & ComponentStyleProps;
 
 
 const ValidationSchema = Yup.object().shape({

@@ -5,6 +5,7 @@ import React, { ReactNode, useCallback } from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { AssetConstants } from '../../../../../../constants';
 import { GameServant, MasterServant, MasterServantBondLevel, ReadonlyPartial } from '../../../../../../types';
+import { ObjectUtils } from '../../../../../../utils/object.utils';
 import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRowLabel } from './master-servant-list-row-label.component';
 
@@ -12,6 +13,7 @@ type Props = {
     servant: Readonly<GameServant> | undefined; // Not optional, but possible to be undefined.
     masterServant: MasterServant;
     bond: MasterServantBondLevel | undefined;
+    active?: boolean;
     editMode?: boolean;
     openLinksInNewTab?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
@@ -20,7 +22,14 @@ type Props = {
     onDeleteServant?: (servant: MasterServant) => void;
 };
 
-const renderNpLevel = (masterServant: MasterServant, classes: ClassNameMap): ReactNode => {
+const shouldSkipUpdate = (prevProps: Readonly<Props>, nextProps: Readonly<Props>): boolean => {
+    if (!ObjectUtils.isShallowEquals(prevProps, nextProps)) {
+        return false;
+    }
+    return !nextProps.active;
+};
+
+const renderNpLevel = (classes: ClassNameMap, masterServant: MasterServant): ReactNode => {
     return (
         <div className={classes.npLevel}>
             <img src={AssetConstants.ServantNoblePhantasmIconSmallUrl} alt="Noble Phantasm" />
@@ -31,7 +40,7 @@ const renderNpLevel = (masterServant: MasterServant, classes: ClassNameMap): Rea
     );
 };
 
-const renderLevel = (masterServant: MasterServant, classes: ClassNameMap): ReactNode => {
+const renderLevel = (classes: ClassNameMap, masterServant: MasterServant): ReactNode => {
     const { ascension, level } = masterServant;
     const iconUrl = ascension ? AssetConstants.ServantAscensionOnIcon : AssetConstants.ServantAscensionOffIcon;
     return (
@@ -48,7 +57,7 @@ const renderLevel = (masterServant: MasterServant, classes: ClassNameMap): React
     );
 };
 
-const renderFouLevel = (masterServant: MasterServant, classes: ClassNameMap, stat: 'fouHp' | 'fouAtk'): ReactNode => {
+const renderFouLevel = (classes: ClassNameMap, masterServant: MasterServant, stat: 'fouHp' | 'fouAtk'): ReactNode => {
     const value = masterServant[stat];
     return (
         <div className={classes[stat]}>
@@ -57,7 +66,7 @@ const renderFouLevel = (masterServant: MasterServant, classes: ClassNameMap, sta
     );
 };
 
-const renderSkillLevels = (masterServant: MasterServant, classes: ClassNameMap): ReactNode => {
+const renderSkillLevels = (classes: ClassNameMap, masterServant: MasterServant): ReactNode => {
     return (
         <div className={classes.skillLevels}>
             <div className="value">
@@ -243,14 +252,14 @@ export const MasterServantListRow = React.memo((props: Props) => {
                 editMode={editMode}
                 openLinksInNewTab={openLinksInNewTab}
             />
-                {npLevel && renderNpLevel(masterServant, classes)}
-                {level && renderLevel(masterServant, classes)}
-                {fouHp && renderFouLevel(masterServant, classes, 'fouHp')}
-                {fouAtk && renderFouLevel(masterServant, classes, 'fouAtk')}
-                {skillLevels && renderSkillLevels(masterServant, classes)}
+                {npLevel && renderNpLevel(classes, masterServant)}
+                {level && renderLevel(classes, masterServant)}
+                {fouHp && renderFouLevel(classes, masterServant, 'fouHp')}
+                {fouAtk && renderFouLevel(classes, masterServant, 'fouAtk')}
+                {skillLevels && renderSkillLevels(classes, masterServant)}
                 {bondLevel && renderBondLevel(classes, bond)}
                 {actionButtons}
         </div>
     );
 
-});
+}, shouldSkipUpdate);

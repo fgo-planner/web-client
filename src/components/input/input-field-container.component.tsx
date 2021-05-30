@@ -1,35 +1,37 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { PropsWithChildren } from 'react';
-import { CustomStyleProps } from '../../types';
-import { StyleUtils } from '../../utils/style.utils';
+import React, { CSSProperties, PropsWithChildren, useMemo } from 'react';
+import { ComponentStyleProps } from '../../types';
 
 type Props = PropsWithChildren<{
     width?: string | number;
     flex?: string | number;
-}> & CustomStyleProps;
+    size?: 'medium' | 'small';
+}> & ComponentStyleProps;
 
-const style = (theme: Theme) => ({
-    root: {
-        height: '96px',
-        boxSizing: 'border-box'
-    }
-    // TODO Add condensed height
-} as StyleRules);
+const HeightSmall = 72;
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'InputFieldContainer'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+const HeightMedium = 96;
 
 export const InputFieldContainer = React.memo((props: Props) => {
-    const { children, className, width, flex } = props;
-    const classes = useStyles(props);
-    const classNames = StyleUtils.appendClassNames(classes.root, className);
+
+    const {
+        children,
+        className,
+        width,
+        flex,
+        size
+    } = props;
+
+    const style: CSSProperties = useMemo(() => ({
+        width,
+        flex,
+        height: size === 'small' ? HeightSmall : HeightMedium,
+        boxSizing: 'border-box'
+    }), [width, flex, size]);
+
     return (
-        <div className={classNames} style={{ width, flex }}>
+        <div className={className} style={style}>
             {children}
         </div>
     );
+    
 });

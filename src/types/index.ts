@@ -37,7 +37,7 @@ export * from './internal/generics/readonly-partial.type';
 export * from './internal/generics/readonly-record.type';
 export * from './internal/modal-on-close-handler.type';
 export * from './internal/modal-on-close-reason.type';
-export * from './internal/props/custom-style-props.type';
+export * from './internal/props/component-style-props.type';
 export * from './internal/props/dialog-component-props.type';
 export * from './internal/props/form-props.type';
 export * from './internal/props/modal-component-props.type';

@@ -7,9 +7,7 @@ import listRowStyle from './list-row-style';
 type Props = PropsWithChildren<{
     active?: boolean;
     borderTop?: boolean;
-    borderRight?: boolean;
     borderBottom?: boolean;
-    borderLeft?: boolean;
 }>;
 
 const styleOptions: WithStylesOptions<Theme> = {
@@ -24,9 +22,7 @@ export const StaticListRowContainer = React.memo((props: Props) => {
         children,
         active,
         borderTop,
-        borderRight,
-        borderBottom,
-        borderLeft
+        borderBottom
     } = props;
 
     const classes = useStyles();
@@ -35,9 +31,7 @@ export const StaticListRowContainer = React.memo((props: Props) => {
         classes.row,
         active && classes.active,
         borderTop && classes.borderTop,
-        borderRight && classes.borderRight,
-        borderBottom && classes.borderBottom,
-        borderLeft && classes.borderLeft
+        borderBottom && classes.borderBottom
     );
 
     return (

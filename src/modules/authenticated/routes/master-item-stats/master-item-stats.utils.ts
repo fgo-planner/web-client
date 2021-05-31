@@ -36,8 +36,11 @@ export class MasterItemStatsUtils {
                 // TODO Log/throw error
                 continue;
             }
-            ownedServants.add(masterServant.gameId);
-            this._updateForOwnedServant(stats, servant, masterServant, unlockedCostumes);
+            const isDuplicate = ownedServants.has(servantId);
+            if (!isDuplicate) {
+                ownedServants.add(servantId);
+            }
+            this._updateForOwnedServant(stats, servant, masterServant, unlockedCostumes, !isDuplicate);
         }
 
         for (const servant of Object.values(gameServantMap)) {
@@ -70,7 +73,8 @@ export class MasterItemStatsUtils {
         stats: Record<number, MasterItemStat>,
         servant: GameServant,
         masterServant: MasterServant,
-        unlockedCostumes: Set<number>
+        unlockedCostumes: Set<number>,
+        isUnique: boolean
     ): void {
 
         const skill1 = masterServant.skills[1];
@@ -94,10 +98,12 @@ export class MasterItemStatsUtils {
             }
         }
 
-        for (const [key, costume] of Object.entries(servant.costumes)) {
-            const costumeId = Number(key);
-            const costumeUnlocked = unlockedCostumes.has(costumeId);
-            this._updateForEnhancement(stats, costume.materials, true, 1, costumeUnlocked ? 1 : 0);
+        if (isUnique) {
+            for (const [key, costume] of Object.entries(servant.costumes)) {
+                const costumeId = Number(key);
+                const costumeUnlocked = unlockedCostumes.has(costumeId);
+                this._updateForEnhancement(stats, costume.materials, true, 1, costumeUnlocked ? 1 : 0);
+            }
         }
     }
 

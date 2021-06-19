@@ -60,7 +60,8 @@ export class GameItemConstants {
         6527, // Stinger
         6530, // Fluid
         6533, // Stake
-        6534  // Bullet
+        6534, // Bullet
+        6549  // Bell of Amnesty
     ];
 
     /**
@@ -87,7 +88,8 @@ export class GameItemConstants {
         6541, // Arrowhead
         6543, // Crown
         6545, // Vein
-        6547  // Rainbow Yarn
+        6547, // Rainbow Yarn
+        6550  // Scales of Fantasies
     ];
 
     /**
@@ -119,5 +121,7 @@ export class GameItemConstants {
         6999, // Lore
         7999, // Grail
     ];
+
+    static readonly QpItemId = 5;
 
 }

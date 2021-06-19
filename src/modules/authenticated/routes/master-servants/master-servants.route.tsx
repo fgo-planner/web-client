@@ -95,27 +95,24 @@ export const MasterServantsRoute = React.memo(() => {
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     /**
-     * Clone of the `servants` array from the MasterAccount object.
+     * Clone of the `servants` array from the `MasterAccount` object.
      */
     const [masterServants, setMasterServants] = useState<Array<MasterServant>>([]);
     /**
-     * Clone of the `bondLevels` map from the MasterAccount object.
+     * Clone of the `bondLevels` map from the `MasterAccount` object.
      */
     const [bondLevels, setBondLevels] = useState<Record<number, MasterServantBondLevel | undefined>>({});
     /**
-     * Clone of the `costumes` map from the MasterAccount object.
+     * Clone of the `costumes` map from the `MasterAccount` object.
      */
     const [unlockedCostumes, setUnlockedCostumes] = useState<Array<number>>([]);
     // TODO Do we really need to clone the structures above?
     const [lastInstanceId, setLastInstanceId] = useState<number>(-1);
-    // const [activeServant, setActiveServant] = useState<MasterServant>();
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editServant, setEditServant] = useState<MasterServant>();
     const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
     const [deleteServant, setDeleteServant] = useState<MasterServant>();
     const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
-    // const [deleteServantDialogPrompt, setDeleteServantDialogPrompt] = useState<string>();
-    // const [loadingIndicatorId, setLoadingIndicatorId] = useState<string>();
 
     const activeServantRef = useRef<MasterServant>();
     const loadingIndicatorIdRef = useRef<string>();
@@ -442,9 +439,9 @@ export const MasterServantsRoute = React.memo(() => {
     }
 
     /**
-     * NavigationRail contents
+     * NavigationRail children
      */
-    const navigationRailContents: ReactNode = [
+    const navigationRailChildNodes: ReactNode = [
         <Tooltip key="add" title="Add servant" placement="right">
             <div>
                 <IconButton
@@ -481,11 +478,11 @@ export const MasterServantsRoute = React.memo(() => {
     ];
 
     /**
-     * FabContainer contents
+     * FabContainer children
      */
-    let fabContainerContents: ReactNode;
+    let fabContainerChildNodes: ReactNode;
     if (!editMode) {
-        fabContainerContents = (
+        fabContainerChildNodes = (
             <Tooltip key="edit" title="Batch edit mode">
                 <div>
                     <Fab
@@ -498,7 +495,7 @@ export const MasterServantsRoute = React.memo(() => {
             </Tooltip>
         );
     } else {
-        fabContainerContents = [
+        fabContainerChildNodes = [
             <Tooltip key="cancel" title="Cancel">
                 <div>
                     <Fab
@@ -531,7 +528,7 @@ export const MasterServantsRoute = React.memo(() => {
                 }
             </PageTitle>
             <div className="flex overflow-hidden">
-                <NavigationRail children={navigationRailContents} />
+                <NavigationRail children={navigationRailChildNodes} />
                 <div className="flex flex-fill">
                     <LayoutPanelScrollable
                         className="py-4 pr-4 full-height flex-fill scrollbar-track-border"
@@ -570,7 +567,7 @@ export const MasterServantsRoute = React.memo(() => {
                     </div>}
                 </div>
             </div>
-            <FabContainer children={fabContainerContents} />
+            <FabContainer children={fabContainerChildNodes} />
             <MasterServantEditDialog
                 open={editServantDialogOpen}
                 dialogTitle={editServant ? 'Edit Servant Info' : 'Add Servant'}

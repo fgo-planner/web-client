@@ -1,8 +1,8 @@
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import clsx from 'clsx';
 import React from 'react';
-import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { StyleUtils } from '../../../../../../utils/style.utils';
+import { ThemeConstants } from '../../../../styles/theme-constants';
 
 type Props = {
     categoryLabel: string;
@@ -33,7 +33,7 @@ const useStyles = makeStyles(style, styleOptions);
 
 export const MasterItemListHeader = React.memo(({ categoryLabel, showQuantityLabel, editMode }: Props) => {
     const classes = useStyles();
-    const rootClassName = StyleUtils.appendClassNames(classes.root, editMode && classes.editMode);
+    const rootClassName = clsx(classes.root, editMode && classes.editMode);
     return (
         <div className={rootClassName}>
             <div className={classes.label}>

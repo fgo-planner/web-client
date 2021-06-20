@@ -1,6 +1,6 @@
 import { fade, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { MouseEventHandler, PureComponent, ReactNode } from 'react';
+import { MouseEventHandler, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { WithStylesProps } from '../../../types';
@@ -8,7 +8,7 @@ import { StyleUtils } from '../../../utils/style.utils';
 
 type Props = {
     active?: boolean;
-    label: string;
+    label: ReactNode;
     route?: string;
     onClick?: MouseEventHandler;
     onMouseOver?: MouseEventHandler;
@@ -17,13 +17,14 @@ type Props = {
 
 const style = (theme: Theme) => ({
     root: {
+        display: 'flex',
+        alignItems: 'center',
         cursor: 'pointer',
         color: theme.palette.primary.main,
         textDecoration: 'none',
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
         boxSizing: 'border-box',
-        lineHeight: `${theme.spacing(ThemeConstants.AppBarHeightScale)}px`,
         margin: theme.spacing(0, 2),
         padding: theme.spacing(0, 2),
         borderBottom: '4px solid transparent',

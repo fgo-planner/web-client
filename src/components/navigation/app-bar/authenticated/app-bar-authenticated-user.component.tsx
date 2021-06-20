@@ -1,5 +1,6 @@
 import { Avatar, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { HomeOutlined as HomeOutlinedIcon } from '@material-ui/icons';
 import { Fragment, MouseEvent, PureComponent, ReactNode } from 'react';
 import { RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { Subscription } from 'rxjs';
@@ -134,7 +135,12 @@ export const AppBarAuthenticatedUser = withRouter(withStyles(style, styleOptions
         return (
             <Fragment>
                 <AppBarMasterAccountSelect key={0} masterAccountList={masterAccountList} />
-                <AppBarLinks key={1} >
+                <AppBarLinks key={1}>
+                    <AppBarLink
+                        label={<HomeOutlinedIcon />}
+                        route="/user/master"
+                        active={this._isLinkActive('/user/master', true)}
+                    />
                     <AppBarLink
                         label="My Servants"
                         route="/user/master/servants"

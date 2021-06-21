@@ -4,7 +4,7 @@ import { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../../../../services/authentication/auth.service';
 import { BasicUser } from '../../../../services/data/user/user.service';
-import { BackgroundMusicService } from '../../../../services/user-interface/background-music.service';
+import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ModalOnCloseHandler, WithStylesProps } from '../../../../types';

@@ -3,7 +3,7 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { BackgroundMusicService } from '../../../../services/user-interface/background-music.service';
+import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
 import { ModalOnCloseReason } from '../../../../types';
 import { LoginDialog } from '../../../login/login-dialog.component';

@@ -12,6 +12,7 @@ export * from './data/game/servant/game-servant-gender.enum';
 export * from './data/game/servant/game-servant-growth-curve.enum';
 export * from './data/game/servant/game-servant-rarity.type';
 export * from './data/game/servant/game-servant.type';
+export * from './data/game/soundtrack/game-soundtrack.type';
 export * from './data/master/account/master-account.type';
 export * from './data/master/item/master-item.type';
 export * from './data/master/plan/master-plan-servant-enhancements.type';

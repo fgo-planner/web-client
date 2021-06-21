@@ -13,7 +13,8 @@ const style = (theme: Theme) => ({
         right: theme.spacing(8),
         '& >*': {
             marginLeft: theme.spacing(4)
-        }
+        },
+        zIndex: 2
     }
 } as StyleRules);
 

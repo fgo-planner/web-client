@@ -1,5 +1,5 @@
 import { Entity } from '../../entity.type';
-import { MasterItem } from '../item/master-item.type';
+import { GameItemQuantity } from '../../game/item/game-item-quantity.type';
 import { MasterPlanServant } from './master-plan-servant.type';
 
 export type MasterPlan = Entity<string> & {
@@ -20,7 +20,7 @@ export type MasterPlan = Entity<string> & {
 
     inventory: {
 
-        items: MasterItem[];
+        items: GameItemQuantity[];
     
         qp: number;
     

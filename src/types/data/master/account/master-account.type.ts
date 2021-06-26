@@ -1,5 +1,5 @@
 import { Entity } from '../../entity.type';
-import { MasterItem } from '../item/master-item.type';
+import { GameItemQuantity } from '../../game/item/game-item-quantity.type';
 import { MasterServantBondLevel } from '../servant/master-servant-bond-level.type';
 import { MasterServant } from '../servant/master-servant.type';
 
@@ -18,7 +18,7 @@ export type MasterAccount = Entity<string> & {
 
     qp: number;
 
-    items: MasterItem[];
+    items: GameItemQuantity[];
 
     servants: MasterServant[];
 

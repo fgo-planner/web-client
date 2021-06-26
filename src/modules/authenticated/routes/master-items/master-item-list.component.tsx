@@ -4,13 +4,13 @@ import React, { ReactNode, useMemo } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { GameItemMap } from '../../../../services/data/game/game-item.service';
-import { GameItem, MasterItem } from '../../../../types';
+import { GameItem, GameItemQuantity } from '../../../../types';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { MasterItemListRow } from './master-item-list-row.component';
 
 type ItemCategory = { label: string; itemIds: ReadonlyArray<number> };
 
-type ListViewDataItem = { item: GameItem; masterData: MasterItem };
+type ListViewDataItem = { item: GameItem; masterData: GameItemQuantity };
 
 type ListViewDataCategory = { label: string; items: Array<ListViewDataItem> };
 
@@ -19,7 +19,7 @@ type ListViewData = Array<ListViewDataCategory>;
 type Props = {
     editMode: boolean;
     viewLayout?: any; // TODO Make use of this
-    masterItems: MasterItem[];
+    masterItems: Array<GameItemQuantity>;
 };
 
 const ItemCategories: ReadonlyArray<ItemCategory> = [
@@ -52,11 +52,11 @@ const ItemCategories: ReadonlyArray<ItemCategory> = [
     },
 ];
 
-const generateListViewData = (masterItems: Array<MasterItem>, gameItemMap: GameItemMap): ListViewData => {
+const generateListViewData = (masterItems: Array<GameItemQuantity>, gameItemMap: GameItemMap): ListViewData => {
     /*
      * Convert the user account items into a map for faster lookup.
      */
-    const masterItemsMap: { [key: number]: MasterItem } = {};
+    const masterItemsMap: { [key: number]: GameItemQuantity } = {};
     for (const masterItem of masterItems) {
         masterItemsMap[masterItem.itemId] = masterItem;
     }

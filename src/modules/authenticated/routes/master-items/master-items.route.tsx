@@ -10,14 +10,14 @@ import { GameItemConstants } from '../../../../constants';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { MasterAccount, MasterItem, Nullable } from '../../../../types';
+import { GameItemQuantity, MasterAccount, Nullable } from '../../../../types';
 import { MasterItemList } from './master-item-list.component';
 
-const cloneItemsFromMasterAccount = (account: Nullable<MasterAccount>): Array<MasterItem> => {
+const cloneItemsFromMasterAccount = (account: Nullable<MasterAccount>): Array<GameItemQuantity> => {
     if (!account) {
         return [];
     }
-    const masterItems: MasterItem[] = [];
+    const masterItems: GameItemQuantity[] = [];
     for (const masterItem of account.items) {
         masterItems.push({ ...masterItem });
     }
@@ -39,7 +39,7 @@ export const MasterItemsRoute = React.memo(() => {
     /**
      * Clone of the `items` array from the `MasterAccount` object.
      */
-    const [masterItems, setMasterItems] = useState<Array<MasterItem>>([]);
+    const [masterItems, setMasterItems] = useState<Array<GameItemQuantity>>([]);
     const [editMode, setEditMode] = useState<boolean>(false);
 
     const loadingIndicatorIdRef = useRef<string>();

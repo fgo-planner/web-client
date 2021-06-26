@@ -25,6 +25,16 @@ const prioritySort = (a: GameSoundtrack, b: GameSoundtrack): number => {
     return a.priority - b.priority;
 };
 
+/**
+ * Returns a copy of the given soundtrack list sorted by `priority`.
+ */
+const sortByPriority = (gameSoundtrackList: GameSoundtrackList | undefined): GameSoundtrackList => {
+    if (!gameSoundtrackList?.length) {
+        return [];
+    }
+    return [...gameSoundtrackList].sort(prioritySort);
+};
+
 const style = (theme: Theme) => ({
     root: {
         paddingBottom: theme.spacing(20)
@@ -76,10 +86,7 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
     const gameSoundtrackList = useGameSoundtrackList();
 
     const gameSoundtrackSortedList: GameSoundtrackList = useMemo(() => {
-        if (!gameSoundtrackList?.length) {
-            return [];
-        }
-        return [...gameSoundtrackList].sort(prioritySort);
+        return sortByPriority(gameSoundtrackList);
     }, [gameSoundtrackList]);
 
     const handleUnlockToggle = useCallback((id: number, value: boolean) => {

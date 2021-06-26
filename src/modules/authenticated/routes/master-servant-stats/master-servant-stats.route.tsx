@@ -1,6 +1,6 @@
 import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/styles';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
@@ -102,9 +102,7 @@ export const MasterServantStatsRoute = React.memo(() => {
 
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
-            .subscribe(account => {
-                setMasterAccount(account);
-            });
+            .subscribe(setMasterAccount);
 
         const onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
             .subscribe(account => {
@@ -118,10 +116,6 @@ export const MasterServantStatsRoute = React.memo(() => {
             onCurrentMasterAccountChangeSubscription.unsubscribe();
             onCurrentMasterAccountUpdatedSubscription.unsubscribe();
         };
-    }, []);
-
-    const handleFilterChange = useCallback((filter: MasterServantStatsFilterResult): void => {
-        setFilter(filter);
     }, []);
 
     useEffect(() => {
@@ -140,8 +134,10 @@ export const MasterServantStatsRoute = React.memo(() => {
     /*
      * Render the stats table.
      */
-    let statsTable: ReactNode = null;
-    if (filter && stats) {
+    const statsTableNode: ReactNode = useMemo(() => {
+        if (!filter || !stats) {
+            return null;
+        }
         let dataColumnWidth: string;
         let headerLabelRenderer: (value: string | number) => ReactNode;
         if (filter.groupBy === 'rarity') {
@@ -151,7 +147,7 @@ export const MasterServantStatsRoute = React.memo(() => {
             dataColumnWidth = '8.5%';
             headerLabelRenderer = renderClassHeaderLabel;
         }
-        statsTable = (
+        return (
             <MasterServantStatsTable
                 classes={classes}
                 stats={stats}
@@ -159,15 +155,15 @@ export const MasterServantStatsRoute = React.memo(() => {
                 headerLabelRenderer={headerLabelRenderer}
             />
         );
-    }
+    }, [classes, filter, stats]);
 
     return (
         <div>
             <PageTitle>Servant Stats</PageTitle>
             <div className="px-4">
-                <MasterServantStatsFilter onFilterChange={handleFilterChange}></MasterServantStatsFilter>
+                <MasterServantStatsFilter onFilterChange={setFilter}></MasterServantStatsFilter>
             </div>
-            {statsTable}
+            {statsTableNode}
         </div>
     );
 

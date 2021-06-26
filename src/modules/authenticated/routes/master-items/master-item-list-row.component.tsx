@@ -4,11 +4,11 @@ import React, { ChangeEvent, ReactNode, useCallback } from 'react';
 import NumberFormat from 'react-number-format';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { GameItem, MasterItem } from '../../../../types';
+import { GameItem, GameItemQuantity } from '../../../../types';
 import { MathUtils } from '../../../../utils/math.utils';
 import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 
-type ListViewDataItem = { item: GameItem; masterData: MasterItem };
+type ListViewDataItem = { item: GameItem; masterData: GameItemQuantity };
 
 type Props = {
     key: number;

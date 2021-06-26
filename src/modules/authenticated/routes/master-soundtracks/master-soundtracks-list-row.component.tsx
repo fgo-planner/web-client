@@ -103,10 +103,13 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
         }
         return (
             <div className={classes.unlockedStatus}>
-                <Checkbox checked={unlocked} onChange={handleUnlockCheckboxChange} />
+                {soundtrack.material && <Checkbox
+                    checked={unlocked}
+                    onChange={handleUnlockCheckboxChange}
+                />}
             </div>
         );
-    }, [classes, editMode, unlocked, handleUnlockCheckboxChange]);
+    }, [classes, soundtrack, editMode, unlocked, handleUnlockCheckboxChange]);
 
     const unlockMaterialNode: ReactNode = useMemo(() => {
         if (!gameItemMap || !soundtrack.material) {

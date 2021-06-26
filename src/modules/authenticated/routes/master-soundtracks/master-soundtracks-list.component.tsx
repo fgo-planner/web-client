@@ -1,8 +1,10 @@
 import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode, useCallback } from 'react';
+import { useMemo } from 'react';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
+import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
 import { GameSoundtrack } from '../../../../types';
 import { MasterSoundtracksListRow } from './master-soundtracks-list-row.component';
 
@@ -14,6 +16,14 @@ type Props = {
 };
 
 const SoundtrackThumbnailSize = 42;
+
+/**
+ * Sort function for sorting soundtrack list by `priority` values in ascending
+ * order.
+ */
+const prioritySort = (a: GameSoundtrack, b: GameSoundtrack): number => {
+    return a.priority - b.priority;
+};
 
 const style = (theme: Theme) => ({
     root: {
@@ -65,6 +75,13 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
 
     const gameSoundtrackList = useGameSoundtrackList();
 
+    const gameSoundtrackSortedList: GameSoundtrackList = useMemo(() => {
+        if (!gameSoundtrackList?.length) {
+            return [];
+        }
+        return [...gameSoundtrackList].sort(prioritySort);
+    }, [gameSoundtrackList]);
+
     const handleUnlockToggle = useCallback((id: number, value: boolean) => {
         if (value) {
             if (!masterSoundtrackSet.has(id)) {
@@ -79,13 +96,13 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
         }
     }, [masterSoundtrackSet, forceUpdate]);
 
-    if (!gameSoundtrackList?.length) {
+    if (!gameSoundtrackSortedList.length) {
         return null;
     }
 
     const renderSoundtrackRow = (soundtrack: GameSoundtrack): ReactNode => {
         const soundtrackId = soundtrack._id;
-        const unlocked = masterSoundtrackSet.has(soundtrackId);
+        const unlocked = masterSoundtrackSet.has(soundtrackId) || !soundtrack.material;
         return (
             <MasterSoundtracksListRow
                 key={soundtrackId}
@@ -101,7 +118,7 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
 
     return (
         <div className={classes.root}>
-            {gameSoundtrackList.map(renderSoundtrackRow)}
+            {gameSoundtrackSortedList.map(renderSoundtrackRow)}
         </div>
     );
 

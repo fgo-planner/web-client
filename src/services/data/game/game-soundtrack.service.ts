@@ -52,6 +52,7 @@ export class GameSoundtrackService {
     }
 
     private static _onSoundtracksCacheLoaded(data: ReadonlyArray<GameSoundtrack>): void {
+        this._soundtracksCache = data;
         this._soundtracksCachePromise = null;
     }
 

@@ -1,6 +1,7 @@
 import { makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode } from 'react';
+import { useMemo } from 'react';
 import NumberFormat from 'react-number-format';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
@@ -8,25 +9,35 @@ import { StaticListRowContainer } from '../../../../components/list/static-list-
 import { GameItemConstants } from '../../../../constants';
 import { GameItemMap } from '../../../../services/data/game/game-item.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { MasterItemStats } from './master-item-stats.utils';
+import { MasterItemStats, MasterItemStatsFilterOptions } from './master-item-stats.utils';
 
 type Props = {
     stats: MasterItemStats;
     gameItemMap: GameItemMap;
-    includeUnownedServants?: boolean;
+    filter: Readonly<MasterItemStatsFilterOptions>;
 };
 
 const CostColumnTooltip = 'Amount needed for servant enhancements';
 
 const CostColumnTooltipInclUnowned = `${CostColumnTooltip}, including servants that have not yet been summoned`;
 
+const CostColumnTooltipInclSoundtracks = `${CostColumnTooltip} and soundtracks unlocks`;
+
+const CostColumnTooltipInclUnownedAndSoundtracks = `${CostColumnTooltipInclUnowned}, and soundtracks unlocks`;
+
 const UsedColumnTooltip = 'Amount used for servant enhancements';
+
+const UsedColumnTooltipInclSoundtrack = `${UsedColumnTooltip} and soundtracks unlocks`;
 
 const InventoryColumnTooltip = 'Current amount in inventory';
 
 const DebtColumnTooltip = 'Amount needed for remaining servant enhancements';
 
 const DebtColumnTooltipInclUnowned = `${DebtColumnTooltip}, including servants that have not yet been summoned`;
+
+const DebtColumnTooltipInclSoundtracks = `${DebtColumnTooltip} and soundtracks unlocks`;
+
+const DebtColumnTooltipInclUnownedAndSoundtracks = `${DebtColumnTooltipInclUnowned}, and soundtracks unlocks`;
 
 const DifferenceColumnTooltip = 'Additional amount that needs to be acquired in order to fullfil the \'Remaining Needed\' column';
 
@@ -81,8 +92,43 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUnownedServants }: Props) => {
+export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: Props) => {
+
+    const { includeUnownedServants, includeSoundtracks } = filter;
+
     const classes = useStyles();
+
+    const costColumnTooltip = useMemo(() => {
+        if (!includeUnownedServants && !includeSoundtracks) {
+            return CostColumnTooltip;
+        } else if (includeUnownedServants) {
+            return CostColumnTooltipInclUnowned;
+        } else if (includeSoundtracks) {
+            return CostColumnTooltipInclSoundtracks;
+        } else {
+            return CostColumnTooltipInclUnownedAndSoundtracks;
+        }
+    }, [includeUnownedServants, includeSoundtracks]);
+
+    const usedColumnTooltip = useMemo(() => {
+        if (!includeSoundtracks) {
+            return UsedColumnTooltip;
+        } else {
+            return UsedColumnTooltipInclSoundtrack;
+        }
+    }, [includeSoundtracks]);
+
+    const debtColumnTooltip = useMemo(() => {
+        if (!includeUnownedServants && !includeSoundtracks) {
+            return DebtColumnTooltip;
+        } else if (includeUnownedServants) {
+            return DebtColumnTooltipInclUnowned;
+        } else if (includeSoundtracks) {
+            return DebtColumnTooltipInclSoundtracks;
+        } else {
+            return DebtColumnTooltipInclUnownedAndSoundtracks;
+        }
+    }, [includeUnownedServants, includeSoundtracks]);
 
     const renderItem = (itemId: number, index: number): ReactNode => {
         const item = gameItemMap[itemId];
@@ -92,18 +138,8 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
             return null;
         }
 
-        const {
-            ownedServantsCost,
-            allServantsCost,
-            inventory,
-            used,
-            ownedServantsDebt,
-            allServantsDebt
-        } = stat;
+        const { inventory, used, cost, debt } = stat;
 
-        const cost = includeUnownedServants ? allServantsCost : ownedServantsCost;
-        const debt = includeUnownedServants ? allServantsDebt : ownedServantsDebt;
-        
         return (
             <StaticListRowContainer key={itemId} borderBottom={index !== ItemIds.length -1}>
                 <div className={classes.dataRow}>
@@ -166,16 +202,16 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, includeUno
             className="p-4 full-height scrollbar-track-border"
             headerContents={
                 <div className={classes.header}>
-                    <Tooltip title={includeUnownedServants ? CostColumnTooltipInclUnowned : CostColumnTooltip} placement="top">
+                    <Tooltip title={costColumnTooltip} placement="top">
                         <div className={classes.dataCell}>Total Needed</div>
                     </Tooltip>
-                    <Tooltip title={UsedColumnTooltip} placement="top">
+                    <Tooltip title={usedColumnTooltip} placement="top">
                         <div className={classes.dataCell}>Total Consumed</div>
                     </Tooltip>
                     <Tooltip title={InventoryColumnTooltip} placement="top">
                         <div className={classes.dataCell}>Current Inventory</div>
                     </Tooltip>
-                    <Tooltip title={includeUnownedServants ? DebtColumnTooltipInclUnowned : DebtColumnTooltip} placement="top" >
+                    <Tooltip title={debtColumnTooltip} placement="top" >
                         <div className={classes.dataCell}>Remaining Needed</div>
                     </Tooltip>
                     <Tooltip title={DifferenceColumnTooltip} placement="top">

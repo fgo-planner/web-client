@@ -1,14 +1,19 @@
 import { GameServantMap } from '../../../../services/data/game/game-servant.service';
+import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
 import { GameServant, GameServantEnhancement, MasterAccount, MasterServant } from '../../../../types';
 import { MapUtils } from '../../../../utils/map.utils';
 
 export type MasterItemStat = {
-    ownedServantsCost: number;
-    allServantsCost: number;
     inventory: number;
     used: number;
-    ownedServantsDebt: number;
-    allServantsDebt: number;
+    cost: number;
+    debt: number;
+};
+
+export type MasterItemStatsFilterOptions = {
+    includeUnownedServants: boolean;
+    includeCostumes: boolean;
+    includeSoundtracks: boolean;
 };
 
 export type MasterItemStats = Record<number, MasterItemStat>;
@@ -18,16 +23,27 @@ export class MasterItemStatsUtils {
     // TODO Move this to constants file
     private static readonly _QPItemId = 5;
 
-    static generateStats(gameServantMap: GameServantMap, masterAccount: MasterAccount): MasterItemStats {
+    static generateStats(
+        gameServantMap: GameServantMap,
+        gameSoundtrackList: GameSoundtrackList,
+        masterAccount: MasterAccount,
+        filter: MasterItemStatsFilterOptions
+    ): MasterItemStats {
 
         const start = window.performance.now();
+
+        const {
+            includeUnownedServants,
+            includeCostumes,
+            includeSoundtracks
+        } = filter;
 
         const stats: Record<number, MasterItemStat> = {};
 
         this._populateInventory(stats, masterAccount);
 
         const ownedServants = new Set<number>();
-        const unlockedCostumes = new Set<number>(masterAccount.costumes);
+        const unlockedCostumes = new Set<number>(masterAccount.costumes); // TODO Only populate this when `includeCostumes` is true
 
         for (const masterServant of masterAccount.servants) {
             const servantId = masterServant.gameId;
@@ -40,22 +56,28 @@ export class MasterItemStatsUtils {
             if (!isDuplicate) {
                 ownedServants.add(servantId);
             }
-            this._updateForOwnedServant(stats, servant, masterServant, unlockedCostumes, !isDuplicate);
+            this._updateForOwnedServant(stats, servant, masterServant, unlockedCostumes, includeCostumes, !isDuplicate);
         }
 
-        for (const servant of Object.values(gameServantMap)) {
-            const servantId = servant._id;
-            if (ownedServants.has(servantId)) {
-                continue;
+        if (includeUnownedServants) {
+            for (const servant of Object.values(gameServantMap)) {
+                const servantId = servant._id;
+                if (ownedServants.has(servantId)) {
+                    continue;
+                }
+                this._updateForUnownedServant(stats, servant, includeCostumes);
             }
-            this._updateForUnownedServant(stats, servant);
+        }
+
+        if (includeSoundtracks) {
+            const unlockedSoundtracks = new Set<number>(masterAccount.soundtracks);
+            this._updateForSoundtracks(stats, gameSoundtrackList, unlockedSoundtracks);
         }
 
         const end = window.performance.now();
         console.log(`Stats by class took ${(end - start).toFixed(2)}ms to compute.`);
-        console.log(stats);
-        return stats;
 
+        return stats;
     }
 
     private static _populateInventory(stats: Record<number, MasterItemStat>, masterAccount: MasterAccount): void {
@@ -74,6 +96,7 @@ export class MasterItemStatsUtils {
         servant: GameServant,
         masterServant: MasterServant,
         unlockedCostumes: Set<number>,
+        includeCostumes: boolean,
         isUnique: boolean
     ): void {
 
@@ -87,46 +110,49 @@ export class MasterItemStatsUtils {
                 (skill1 > skillLevel ? 1 : 0) +
                 (skill2 > skillLevel ? 1 : 0) +
                 (skill3 > skillLevel ? 1 : 0);
-            this._updateForEnhancement(stats, skill, true, 3, skillUpgradeCount);
+            this._updateForServantEnhancement(stats, skill, true, 3, skillUpgradeCount);
         }
 
         if (servant.ascensionMaterials) {
             for (const [key, ascension] of Object.entries(servant.ascensionMaterials)) {
                 const ascensionLevel = Number(key);
-                const ascended =  masterServant.ascension >= ascensionLevel;
-                this._updateForEnhancement(stats, ascension, true, 1, ascended ? 1 : 0);
+                const ascended = masterServant.ascension >= ascensionLevel;
+                this._updateForServantEnhancement(stats, ascension, true, 1, ascended ? 1 : 0);
             }
         }
 
-        if (isUnique) {
+        if (isUnique && includeCostumes) {
             for (const [key, costume] of Object.entries(servant.costumes)) {
                 const costumeId = Number(key);
                 const costumeUnlocked = unlockedCostumes.has(costumeId);
-                this._updateForEnhancement(stats, costume.materials, true, 1, costumeUnlocked ? 1 : 0);
+                this._updateForServantEnhancement(stats, costume.materials, true, 1, costumeUnlocked ? 1 : 0);
             }
         }
     }
 
     private static _updateForUnownedServant(
         stats: Record<number, MasterItemStat>,
-        servant: GameServant
+        servant: GameServant,
+        includeCostumes: boolean
     ): void {
 
         for (const skill of Object.values(servant.skillMaterials)) {
-            this._updateForEnhancement(stats, skill, false, 3);
+            this._updateForServantEnhancement(stats, skill, false, 3);
         }
         if (servant.ascensionMaterials) {
             for (const ascension of Object.values(servant.ascensionMaterials)) {
-                this._updateForEnhancement(stats, ascension);
+                this._updateForServantEnhancement(stats, ascension);
             }
         }
-        for (const costume of Object.values(servant.costumes)) {
-            /*
-             * TODO Maybe refer to the unlocked servant costumes? It shouldn't be needed
-             * though, because it's not possible to unlock a costume without owning the
-             * servant.
-             */
-            this._updateForEnhancement(stats, costume.materials);
+        if (includeCostumes) {
+            for (const costume of Object.values(servant.costumes)) {
+                /*
+                * TODO Maybe refer to the unlocked servant costumes? It shouldn't be needed
+                * though, because it's not possible to unlock a costume without owning the
+                * servant.
+                */
+                this._updateForServantEnhancement(stats, costume.materials);
+            }
         }
     }
 
@@ -142,7 +168,7 @@ export class MasterItemStatsUtils {
      * it has not been performed. For skills, this is the number of skills out of
      * the 3 that has been upgraded.
      */
-    private static _updateForEnhancement(
+    private static _updateForServantEnhancement(
         stats: Record<number, MasterItemStat>,
         enhancement: GameServantEnhancement,
         owned = false,
@@ -153,17 +179,14 @@ export class MasterItemStatsUtils {
         for (const { itemId, quantity } of enhancement.materials) {
             const stat = MapUtils.getOrDefault(stats, itemId, this._instantiateItemStat);
             const cost = quantity * maxUpgrades;
+            stat.cost += cost;
             if (!owned) {
-                stat.allServantsCost += cost;
-                stat.allServantsDebt += cost;
+                stat.debt += cost;
             } else {
                 const used = upgradeCount * quantity;
                 const debt = cost - used;
                 stat.used += used;
-                stat.ownedServantsCost += cost;
-                stat.allServantsCost += cost;
-                stat.ownedServantsDebt += debt;
-                stat.allServantsDebt += debt;
+                stat.debt += debt;
             }
         }
 
@@ -171,28 +194,45 @@ export class MasterItemStatsUtils {
         const quantity = enhancement.qp;
         const stat = stats[this._QPItemId];
         const cost = quantity * maxUpgrades;
+        stat.cost += cost;
         if (!owned) {
-            stat.allServantsCost += cost;
-            stat.allServantsDebt += cost;
+            stat.debt += cost;
         } else {
             const used = upgradeCount * quantity;
             const debt = cost - used;
             stat.used += used;
-            stat.ownedServantsCost += cost;
-            stat.allServantsCost += cost;
-            stat.ownedServantsDebt += debt;
-            stat.allServantsDebt += debt;
+            stat.debt += debt;
+        }
+    }
+
+    private static _updateForSoundtracks(
+        stats: Record<number, MasterItemStat>,
+        gameSoundtrackList: GameSoundtrackList,
+        unlockedSoundtracks: Set<number>
+    ): void {
+
+        for (const { _id, material } of gameSoundtrackList) {
+            if (!material) {
+                continue;
+            }
+            const owned = unlockedSoundtracks.has(_id);
+            const stat = stats[material.itemId];
+            const cost = material.quantity;
+            stat.cost += cost;
+            if (!owned) {
+                stat.debt += cost;
+            } else {
+                stat.used += cost;
+            }
         }
     }
 
     private static _instantiateItemStat(): MasterItemStat {
         return {
-            ownedServantsCost: 0,
-            allServantsCost: 0,
             inventory: 0,
             used: 0,
-            ownedServantsDebt: 0,
-            allServantsDebt: 0
+            cost: 0,
+            debt: 0
         };
     }
 

@@ -20,7 +20,8 @@ const style = (theme: Theme) => ({
     background: {
         height: '100%',
         backgroundColor: fade(theme.palette.background.paper, 0.95),
-        borderRadius: theme.spacing(4)
+        borderRadius: theme.spacing(4),
+        overflow: 'hidden'
     },
     autoHeight: {
         height: 'initial',

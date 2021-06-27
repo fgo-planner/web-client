@@ -1,5 +1,6 @@
-import { Checkbox, ListItemText, makeStyles, MenuItem, MenuProps, StyleRules, TextField, Theme } from '@material-ui/core';
+import { Checkbox, IconButton, ListItemText, makeStyles, MenuItem, MenuProps, StyleRules, TextField, Theme, Tooltip } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Replay as ReplayIcon } from '@material-ui/icons';
 import React, { ChangeEvent, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../constants';
@@ -46,6 +47,11 @@ const renderMultiSelectValue = (value: unknown): ReactNode => {
 };
 
 const style = (theme: Theme) => ({
+    root: {
+        display: 'flex',
+        height: 64,
+        margin: theme.spacing(6, 0, -2, 0)
+    },
     multiSelectCheckbox: {
         marginLeft: theme.spacing(-2),
         paddingRight: theme.spacing(3)
@@ -140,6 +146,12 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
         const values = event.target.value as string[];
         handleMultiSelectChange(values, rarityFilter, GameServantConstants.RarityValues, setRarityFilter);
     }, [rarityFilter, handleMultiSelectChange]);
+
+    const handleResetFilterClick = useCallback(() => {
+        // Do not reset the `groupBy` value here.
+        setClassFilter([...ClassFilterOptions]);
+        setRarityFilter([...GameServantConstants.RarityValues]);
+    }, []);
 
     const multiSelectCheckboxClasses = { root: classes.multiSelectCheckbox };
 
@@ -251,7 +263,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
     }
 
     return (
-        <div className="flex">
+        <div className={classes.root}>
             <InputFieldContainer className="px-2" width={240}>
                 {groupBySelect}
             </InputFieldContainer>
@@ -260,6 +272,15 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 {classFilterSelect}
                 {rarityFilterSelect}
             </InputFieldContainer>
+            <Tooltip key="reset" title="Reset filters" placement="right">
+                <div>
+                    <IconButton
+                        color="secondary"
+                        children={<ReplayIcon />}
+                        onClick={handleResetFilterClick}
+                    />
+                </div>
+            </Tooltip>
         </div>
     );
 });

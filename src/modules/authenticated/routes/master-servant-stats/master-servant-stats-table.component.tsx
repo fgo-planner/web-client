@@ -1,72 +1,74 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import NumberFormat from 'react-number-format';
 import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
+import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
 import { GameServantConstants } from '../../../../constants';
-import { WithStylesProps } from '../../../../types';
-import { StyleUtils } from '../../../../utils/style.utils';
-import { MasterServantStatsExpandablePanel } from './master-servant-expandable-stats.component';
+import { MasterServantStatPanelData, MasterServantStatPanelRow, MasterServantStatsExpandablePanel } from './master-servant-stats-expandable-panel.component';
 import { MasterServantStats } from './master-servant-stats.utils';
 
 type Props = {
     stats: MasterServantStats<Record<string, number>>;
     dataColumnWidth?: string | number;
     headerLabelRenderer?: (value: string | number) => ReactNode;
-} & WithStylesProps;
-
-type AccordionExpansionStates = {
-    npLevels: boolean,
-    ascensionLevels: boolean,
-    skillLevels: boolean,
-    fouEnhancement: boolean,
-    bondLevels: boolean
 };
 
-const DefaultColumnWidth = '6.9%';
+const TotalServantsLabel = 'Total Servants';
+
+const UniqueServantsLabel = 'Unique Servants';
+
+const AverageNpLevelLabel = 'Average NP Level';
+
+const TotalNpLevelsLabel = 'Total NP Levels';
+
+const AverageAscensionLevelLabel = 'Average Ascension Level';
+
+const AverageSkillLevelLabel = 'Average Skill Level';
+
+const TripleNinesLabel = '9/9/9+ Servants';
+
+const TripleTensLabel = '10/10/10 Servants';
+
+const AverageBondLevelLabel = 'Average Bond Level';
+
+const AverageFouLabel = 'Average Fou Enhancement';
+
+const MaxHpFouLabel = 'Max HP Fous';
+
+const MaxAtkFouLabel = 'Max Attack Fous';
+
+const MaxGoldHpFouLabel = 'Max Gold HP Fous';
+
+const MaxGoldAtkFouLabel = 'Max Gold Attack Fous';
+
+const DoubleMaxFouLabel = '1000/1000 Servants';
+
+const DoubleMaxGoldFouLabel = '2000/2000 Servants';
+
+const applyFormatOneDecimal = (value: number): ReactNode => (
+    <NumberFormat
+        value={value}
+        decimalScale={1}
+        fixedDecimalScale
+        displayType="text"
+    />
+);
+
+const applyFormatThreeDecimals = (value: number): ReactNode => (
+    <NumberFormat
+        value={value}
+        decimalScale={3}
+        fixedDecimalScale
+        displayType="text"
+    />
+);
 
 export const MasterServantStatsTable = React.memo((props: Props) => {
+
     const {
-        classes,
         stats,
         dataColumnWidth,
         headerLabelRenderer
     } = props;
-
-    const [accordionStates, setAccordionStates] = useState<AccordionExpansionStates>({
-        npLevels: false,
-        ascensionLevels: false,
-        skillLevels: false,
-        fouEnhancement: false,
-        bondLevels: false
-    });
-
-    const toggleAccordion = (name: keyof AccordionExpansionStates): void => {
-        const state = accordionStates[name];
-        setAccordionStates({
-            ...accordionStates,
-            [name]: !state
-        });
-    };
-
-    const toggleNpLevelsAccordion = (): void => {
-        toggleAccordion('npLevels');
-    };
-
-    const toggleAscensionLevelsAccordion = (): void => {
-        toggleAccordion('ascensionLevels');
-    };
-
-    const toggleSkillLevelsAccordion = (): void => {
-        toggleAccordion('skillLevels');
-    };
-
-    const toggleFouEnhancementAccordion = (): void => {
-        toggleAccordion('fouEnhancement');
-    };
-
-    const toggleBondLevelsAccordion = (): void => {
-        toggleAccordion('bondLevels');
-    };
 
     const {
         totalCount,
@@ -90,358 +92,202 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
         averageBondLevel
     } = stats;
 
-    // All the sub-stats should have the same keys.
-    const statKeys = Object.keys(totalCount);
+    const headerData: MasterServantStatPanelData = useMemo(() => {
+        /*
+         * We can use `totalCount` here because all of the stat sets should have the
+         * same keys.
+         */
+        const values = Object.keys(totalCount).map((key: string) => {
+            if (headerLabelRenderer) {
+                return headerLabelRenderer(key);
+            } else {
+                return key === 'overall' ? 'Overall' : key;
+            }
+        });
+        return { header: { values } };
+    }, [headerLabelRenderer, totalCount]);
 
-    const expandableDataRowClassNames = StyleUtils.appendClassNames(classes.dataRow, classes.expandable);
-    const columnWidth = dataColumnWidth ?? DefaultColumnWidth;
+    const totalServantsData: MasterServantStatPanelData = useMemo(() => {
+        const header: MasterServantStatPanelRow = {
+            label: TotalServantsLabel,
+            values: Object.values(totalCount)
+        };
+        return { header };
+    }, [totalCount]);
 
-    const renderHeaderCell = (key: string) => {
-        let headerLabel: ReactNode;
-        if (headerLabelRenderer) {
-            headerLabel = headerLabelRenderer(key);
-        } else {
-            headerLabel = key === 'overall' ? 'Overall' : key;
+    const uniqueServantsData: MasterServantStatPanelData = useMemo(() => {
+        const header: MasterServantStatPanelRow = {
+            label: UniqueServantsLabel,
+            values: Object.values(uniqueCount)
+        };
+        return { header };
+    }, [uniqueCount]);
+
+    const npLevelData: MasterServantStatPanelData = useMemo(() => {
+        const header: MasterServantStatPanelRow = {
+            label: AverageNpLevelLabel,
+            values: Object.values(averageNpLevel).map(applyFormatThreeDecimals)
+        };
+        const rows: MasterServantStatPanelRow[] = [];
+        for (const [key, value] of Object.entries(npLevels)) {
+            rows.push({
+                label: key === 'total' ? TotalNpLevelsLabel : `NP ${key} Servants`,
+                values: Object.values(value)
+            });
         }
-        return (
-            <TableCell key={key} align="center" width={columnWidth}>
-                {headerLabel}
-            </TableCell>
-        );
-    };
+        return { header, rows };
+    }, [averageNpLevel, npLevels]);
+
+    const ascensionLevelData: MasterServantStatPanelData = useMemo(() => {
+        const header: MasterServantStatPanelRow = {
+            label: AverageAscensionLevelLabel,
+            values: Object.values(averageAscensionLevel).map(applyFormatThreeDecimals)
+        };
+        const rows: MasterServantStatPanelRow[] = [];
+        for (const [key, value] of Object.entries(ascensionLevels)) {
+            rows.push({
+                label: `Ascension ${key} Servants`,
+                values: Object.values(value)
+            });
+        }
+        return { header, rows };
+    }, [ascensionLevels, averageAscensionLevel]);
+
+    const skillLevelData: MasterServantStatPanelData = useMemo(() => {
+        const header: MasterServantStatPanelRow = {
+            label: AverageSkillLevelLabel,
+            values: Object.values(averageSkillLevel).map(applyFormatThreeDecimals)
+        };
+        const rows: MasterServantStatPanelRow[] = [];
+        for (const [key, value] of Object.entries(skillLevels)) {
+            rows.push({
+                label: `Level ${key} Skills`,
+                values: Object.values(value)
+            });
+        }
+        rows.push({
+            label: TripleNinesLabel,
+            values: Object.values(tripleNinesCount)
+        });
+        rows.push({
+            label: TripleTensLabel,
+            values: Object.values(tripleTensCount)
+        });
+        return { header, rows };
+    }, [averageSkillLevel, skillLevels, tripleNinesCount, tripleTensCount]);
+
+    const bondLevelData: MasterServantStatPanelData = useMemo(() => {
+        const header: MasterServantStatPanelRow = {
+            label: AverageBondLevelLabel,
+            values: Object.values(averageBondLevel).map(applyFormatThreeDecimals)
+        };
+        const rows: MasterServantStatPanelRow[] = [];
+        for (const bondLevel of GameServantConstants.BondLevels) {
+            rows.push({
+                label: (
+                    <div className="flex">
+                        <GameServantBondIcon bond={bondLevel} size={20} />
+                        <div className="pl-2">
+                            {bondLevel}
+                        </div>
+                    </div>
+                ),
+                values: Object.values(bondLevels[bondLevel])
+            });
+        }
+        return { header, rows };
+    }, [averageBondLevel, bondLevels]);
+
+    const fouEnhancementData: MasterServantStatPanelData = useMemo(() => {
+        const header: MasterServantStatPanelRow = {
+            label: AverageFouLabel,
+            values: Object.values(averageFou).map(applyFormatOneDecimal)
+        };
+        const rows: MasterServantStatPanelRow[] = [];
+        rows.push({
+            label: MaxHpFouLabel,
+            values: Object.values(maxHpFouCount)
+        });
+        rows.push({
+            label: MaxAtkFouLabel,
+            values: Object.values(maxAtkFouCount)
+        });
+        rows.push({
+            label: MaxGoldHpFouLabel,
+            values: Object.values(maxGoldHpFouCount)
+        });
+        rows.push({
+            label: MaxGoldAtkFouLabel,
+            values: Object.values(maxGoldAtkFouCount)
+        });
+        rows.push({
+            label: DoubleMaxFouLabel,
+            values: Object.values(doubleMaxFouCount)
+        });
+        rows.push({
+            label: DoubleMaxGoldFouLabel,
+            values: Object.values(doubleMaxGoldFouCount)
+        });
+        return { header, rows };
+    }, [averageFou, doubleMaxFouCount, doubleMaxGoldFouCount, maxAtkFouCount, maxGoldAtkFouCount, maxGoldHpFouCount, maxHpFouCount]);
+
+    const expandablePanelNodes: ReactNode = [
+        <MasterServantStatsExpandablePanel
+            key="totalServantsData"
+            data={totalServantsData}
+            dataColumnWidth={dataColumnWidth}
+        />,
+        <MasterServantStatsExpandablePanel
+            key="uniqueServantsData"
+            data={uniqueServantsData}
+            dataColumnWidth={dataColumnWidth}
+            borderTop
+        />,
+        <MasterServantStatsExpandablePanel
+            key="npLevelData"
+            data={npLevelData}
+            dataColumnWidth={dataColumnWidth}
+            borderTop
+        />,
+        <MasterServantStatsExpandablePanel
+            key="ascensionLevelData"
+            data={ascensionLevelData}
+            dataColumnWidth={dataColumnWidth}
+            borderTop
+        />,
+        <MasterServantStatsExpandablePanel
+            key="skillLevelData"
+            data={skillLevelData}
+            dataColumnWidth={dataColumnWidth}
+            borderTop
+        />,
+        <MasterServantStatsExpandablePanel
+            key="bondLevelData"
+            data={bondLevelData}
+            dataColumnWidth={dataColumnWidth}
+            borderTop
+        />,
+        <MasterServantStatsExpandablePanel
+            key="fouEnhancementData"
+            data={fouEnhancementData}
+            dataColumnWidth={dataColumnWidth}
+            borderTop
+        />
+    ];
 
     return (
-        <TableContainer className={classes.tableContainer}>
-            <Table className={classes.table}>
-                <TableHead>
-                    <TableRow>
-                        <TableCell />
-                        {statKeys.map(renderHeaderCell)}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    <TableRow className={classes.dataRow}>
-                        <TableCell component="th">
-                            Total Servants
-                        </TableCell>
-                        {statKeys.map(key => (
-                            <TableCell key={key} align="center">
-                                {totalCount[key]}
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                    <TableRow className={classes.dataRow}>
-                        <TableCell component="th">
-                            Unique Servants
-                        </TableCell>
-                        {statKeys.map(key => (
-                            <TableCell key={key} align="center">
-                                {uniqueCount[key]}
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                    <TableRow className={expandableDataRowClassNames}>
-                        <TableCell component="th" onClick={toggleNpLevelsAccordion}>
-                            Average NP Level
-                        </TableCell>
-                        {statKeys.map(key => (
-                            <TableCell
-                                key={key}
-                                align="center"
-                                width={columnWidth}
-                                onClick={toggleNpLevelsAccordion}
-                            >
-                                <NumberFormat
-                                    value={averageNpLevel[key]}
-                                    decimalScale={3}
-                                    fixedDecimalScale
-                                    displayType="text"
-                                />
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableBody>
-            </Table>
-
-            <MasterServantStatsExpandablePanel expanded={accordionStates.npLevels}>
-                <Table className={classes.table}>
-                    <TableBody className={classes.accordionTableBody}>
-                        {GameServantConstants.NoblePhantasmLevels.map(level => (
-                            <TableRow key={level} className={classes.dataRow}>
-                                <TableCell component="th" className={classes.accordionFirstCell}>
-                                    {`NP${level}`}
-                                </TableCell>
-                                {statKeys.map(key => (
-                                    <TableCell key={key} align="center" width={columnWidth}>
-                                        {npLevels[level][key]}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                        <TableRow className={classes.dataRow}>
-                            <TableCell component="th" className={classes.accordionFirstCell}>
-                                Total NP Levels
-                                </TableCell>
-                            {statKeys.map(key => (
-                                <TableCell key={key} align="center">
-                                    {npLevels.total[key]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </MasterServantStatsExpandablePanel>
-
-            <Table className={classes.table}>
-                <TableBody>
-                    <TableRow className={expandableDataRowClassNames}>
-                        <TableCell component="th" onClick={toggleAscensionLevelsAccordion}>
-                            Average Ascension Level
-                        </TableCell>
-                        {statKeys.map(key => (
-                            <TableCell
-                                key={key}
-                                align="center"
-                                width={columnWidth}
-                                onClick={toggleAscensionLevelsAccordion}
-                            >
-                                <NumberFormat
-                                    value={averageAscensionLevel[key]}
-                                    decimalScale={3}
-                                    fixedDecimalScale
-                                    displayType="text"
-                                />
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableBody>
-            </Table>
-
-            <MasterServantStatsExpandablePanel expanded={accordionStates.ascensionLevels}>
-                <Table className={classes.table}>
-                    <TableBody className={classes.accordionTableBody}>
-                        {GameServantConstants.AscensionLevels.map(level => (
-                            <TableRow key={level} className={classes.dataRow}>
-                                <TableCell component="th" className={classes.accordionFirstCell}>
-                                    {`Ascension ${level}`}
-                                </TableCell>
-                                {statKeys.map(key => (
-                                    <TableCell key={key} align="center" width={columnWidth}>
-                                        {ascensionLevels[level][key]}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </MasterServantStatsExpandablePanel>
-
-            <Table className={classes.table}>
-                <TableBody>
-                    <TableRow className={expandableDataRowClassNames}>
-                        <TableCell component="th" onClick={toggleSkillLevelsAccordion}>
-                            Average Skill Level
-                        </TableCell>
-                        {statKeys.map(key => (
-                            <TableCell
-                                key={key}
-                                align="center"
-                                width={columnWidth}
-                                onClick={toggleSkillLevelsAccordion}
-                            >
-                                <NumberFormat
-                                    value={averageSkillLevel[key]}
-                                    decimalScale={3}
-                                    fixedDecimalScale
-                                    displayType="text"
-                                />
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableBody>
-            </Table>
-
-            <MasterServantStatsExpandablePanel expanded={accordionStates.skillLevels}>
-                <Table className={classes.table}>
-                    <TableBody className={classes.accordionTableBody}>
-                        {GameServantConstants.SkillLevels.map(level => (
-                            <TableRow key={level} className={classes.dataRow}>
-                                <TableCell component="th" className={classes.accordionFirstCell}>
-                                    {`Level ${level} Skills`}
-                                </TableCell>
-                                {statKeys.map(key => (
-                                    <TableCell key={key} align="center" width={columnWidth}>
-                                        {skillLevels[level][key]}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                        <TableRow className={classes.dataRow}>
-                            <TableCell component="th" className={classes.accordionFirstCell}>
-                                9/9/9+ Servants
-                            </TableCell>
-                            {statKeys.map(key => (
-                                <TableCell key={key} align="center">
-                                    {tripleNinesCount[key]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                        <TableRow className={classes.dataRow}>
-                            <TableCell component="th" className={classes.accordionFirstCell}>
-                                10/10/10 Servants
-                            </TableCell>
-                            {statKeys.map(key => (
-                                <TableCell key={key} align="center">
-                                    {tripleTensCount[key]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </MasterServantStatsExpandablePanel>
-
-            <Table className={classes.table}>
-                <TableBody>
-                    <TableRow className={expandableDataRowClassNames}>
-                        <TableCell component="th" onClick={toggleBondLevelsAccordion}>
-                            Average Bond Level
-                        </TableCell>
-                        {statKeys.map(key => (
-                            <TableCell
-                                key={key}
-                                align="center"
-                                width={columnWidth}
-                                onClick={toggleBondLevelsAccordion}
-                            >
-                                <NumberFormat
-                                    value={averageBondLevel[key]}
-                                    decimalScale={3}
-                                    fixedDecimalScale
-                                    displayType="text"
-                                />
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableBody>
-            </Table>
-
-            <MasterServantStatsExpandablePanel expanded={accordionStates.bondLevels}>
-                <Table className={classes.table}>
-                    <TableBody className={classes.accordionTableBody}>
-                        {GameServantConstants.BondLevels.map(level => (
-                            <TableRow key={level} className={classes.dataRow}>
-                                <TableCell component="th" className={classes.accordionFirstCell}>
-                                    <div className="flex">
-                                        <GameServantBondIcon bond={level} size={20} />
-                                        <div className="pl-2">
-                                            {level}
-                                        </div>
-                                    </div>
-                                </TableCell>
-                                {statKeys.map(key => (
-                                    <TableCell key={key} align="center" width={columnWidth}>
-                                        {bondLevels[level][key]}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </MasterServantStatsExpandablePanel>
-
-
-            <Table className={classes.table}>
-                <TableBody>
-                    <TableRow className={expandableDataRowClassNames}>
-                        <TableCell component="th" onClick={toggleFouEnhancementAccordion}>
-                            Average Fou Enhancement
-                        </TableCell>
-                        {statKeys.map(key => (
-                            <TableCell
-                                key={key}
-                                align="center"
-                                width={columnWidth}
-                                onClick={toggleFouEnhancementAccordion}
-                            >
-                                <NumberFormat
-                                    value={averageFou[key]}
-                                    decimalScale={1}
-                                    fixedDecimalScale
-                                    displayType="text"
-                                />
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableBody>
-            </Table>
-
-            <MasterServantStatsExpandablePanel expanded={accordionStates.fouEnhancement}>
-                <Table className={classes.table}>
-                    <TableBody className={classes.accordionTableBody}>
-                        <TableRow className={classes.dataRow}>
-                            <TableCell component="th" className={classes.accordionFirstCell}>
-                                Max HP Fous
-                            </TableCell>
-                            {statKeys.map(key => (
-                                <TableCell key={key} align="center" width={columnWidth}>
-                                    {maxHpFouCount[key]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                        <TableRow className={classes.dataRow}>
-                            <TableCell component="th" className={classes.accordionFirstCell}>
-                                Max Attack Fous
-                            </TableCell>
-                            {statKeys.map(key => (
-                                <TableCell key={key} align="center" width={columnWidth}>
-                                    {maxAtkFouCount[key]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                        <TableRow className={classes.dataRow}>
-                            <TableCell component="th" className={classes.accordionFirstCell}>
-                                Max Gold HP Fous
-                            </TableCell>
-                            {statKeys.map(key => (
-                                <TableCell key={key} align="center" width={columnWidth}>
-                                    {maxGoldHpFouCount[key]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                        <TableRow className={classes.dataRow}>
-                            <TableCell component="th" className={classes.accordionFirstCell}>
-                                Max Gold Attack Fous
-                            </TableCell>
-                            {statKeys.map(key => (
-                                <TableCell key={key} align="center" width={columnWidth}>
-                                    {maxGoldAtkFouCount[key]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                        <TableRow className={classes.dataRow}>
-                            <TableCell component="th" className={classes.accordionFirstCell}>
-                                1000/1000 Servants
-                            </TableCell>
-                            {statKeys.map(key => (
-                                <TableCell key={key} align="center" width={columnWidth}>
-                                    {doubleMaxFouCount[key]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                        <TableRow className={classes.dataRow}>
-                            <TableCell component="th" className={classes.accordionFirstCell}>
-                                2000/2000 Servants
-                            </TableCell>
-                            {statKeys.map(key => (
-                                <TableCell key={key} align="center" width={columnWidth}>
-                                    {doubleMaxGoldFouCount[key]}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </MasterServantStatsExpandablePanel>
-
-        </TableContainer>
+        <LayoutPanelScrollable
+            className="pr-4 py-4 full-height scrollbar-track-border"
+            headerContents={
+                <MasterServantStatsExpandablePanel
+                    key="headerData"
+                    data={headerData}
+                    dataColumnWidth={dataColumnWidth}
+                    borderBottom
+                />
+            }
+            children={expandablePanelNodes}
+        />
     );
+
 });

@@ -1,12 +1,13 @@
-import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/styles';
+import { IconButton, Tooltip } from '@material-ui/core';
+import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@material-ui/icons';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { MasterAccount, Nullable } from '../../../../types';
-import { StyleUtils } from '../../../../utils/style.utils';
 import { MasterServantStatsFilter, MasterServantStatsFilterResult } from './master-servant-stats-filter.component';
 import { MasterServantStatsTable } from './master-servant-stats-table.component';
 import { MasterServantStatsGroupedByClass, MasterServantStatsGroupedByRarity, MasterServantStatsUtils } from './master-servant-stats.utils';
@@ -35,65 +36,8 @@ const renderClassHeaderLabel = (value: string | number): ReactNode => {
     );
 };
 
-const style = (theme: Theme) => ({
-    tableContainer: {
-        borderBottom: `1px solid ${theme.palette.divider}`,
-    },
-    table: {
-        tableLayout: 'fixed',
-        minWidth: 960
-    },
-    cell: {
-        borderBottom: 'none',
-    },
-    dataRow: {
-        borderTop: `1px solid ${theme.palette.divider}`,
-        '& .MuiTableCell-root': {
-            borderBottom: 'none'
-        },
-        '&:hover': {
-            background: fade(theme.palette.text.primary, 0.07)
-        }
-    },
-    expandable: {
-        cursor: 'pointer',
-    },
-    accordion: {
-        margin: '0 !important',
-        boxShadow: StyleUtils.insetBoxShadow(theme.shadows[1]),
-        backgroundColor: theme.palette.background.default,
-        '&:before': {
-            display: 'none',
-        },
-    },
-    accordionSummary: {
-        display: 'none'
-    },
-    accordionDetails: {
-        zIndex: -1,
-        padding: theme.spacing(0),
-    },
-    accordionTableBody: {
-        '& >:first-child': {
-            borderTop: 'none'
-        }
-    },
-    accordionFirstCell: {
-        paddingLeft: theme.spacing(10)
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantStats'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
-/**
- * TODO Merge this into the `master-servant-stats.route.tsx` file.
- */
 export const MasterServantStatsRoute = React.memo(() => {
-    const classes = useStyles();
+
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [filter, setFilter] = useState<MasterServantStatsFilterResult>();
     const [stats, setStats] = useState<MasterServantStatsGroupedByRarity | MasterServantStatsGroupedByClass>();
@@ -131,6 +75,29 @@ export const MasterServantStatsRoute = React.memo(() => {
         setStats(stats);
     }, [gameServantMap, masterAccount, filter]);
 
+    /**
+     * NavigationRail children
+     */
+    const navigationRailChildNodes: ReactNode = useMemo(() => {
+        return [
+            <Tooltip key="servants" title="Back to servant list" placement="right">
+                <div>
+                    <IconButton
+                        component={Link}
+                        to="../servants"
+                        children={<FormatListBulletedIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="export" title="Download servant stats" placement="right">
+                <div>
+                    {/* TODO Implement this */}
+                    <IconButton children={<GetAppIcon />} disabled />
+                </div>
+            </Tooltip>
+        ];
+    }, []);
+
     /*
      * Render the stats table.
      */
@@ -149,21 +116,25 @@ export const MasterServantStatsRoute = React.memo(() => {
         }
         return (
             <MasterServantStatsTable
-                classes={classes}
                 stats={stats}
                 dataColumnWidth={dataColumnWidth}
                 headerLabelRenderer={headerLabelRenderer}
             />
         );
-    }, [classes, filter, stats]);
+    }, [filter, stats]);
 
     return (
-        <div>
+        <div className="flex column full-height">
             <PageTitle>Servant Stats</PageTitle>
-            <div className="px-4">
-                <MasterServantStatsFilter onFilterChange={setFilter}></MasterServantStatsFilter>
+            <div className="flex overflow-hidden">
+                <NavigationRail>
+                    {navigationRailChildNodes}
+                </NavigationRail>
+                <div className="flex column flex-fill">
+                    <MasterServantStatsFilter onFilterChange={setFilter}></MasterServantStatsFilter>
+                    {statsTableNode}
+                </div>
             </div>
-            {statsTableNode}
         </div>
     );
 

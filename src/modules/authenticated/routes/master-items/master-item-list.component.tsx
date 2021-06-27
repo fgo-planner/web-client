@@ -28,10 +28,6 @@ const ItemCategories: ReadonlyArray<ItemCategory> = [
         itemIds: GameItemConstants.SkillGems
     },
     {
-        label: 'Ascension Statues',
-        itemIds: GameItemConstants.AscensionStatues
-    },
-    {
         label: 'Bronze Materials',
         itemIds: GameItemConstants.BronzeEnhancementMaterials
     },
@@ -42,6 +38,10 @@ const ItemCategories: ReadonlyArray<ItemCategory> = [
     {
         label: 'Gold Materials',
         itemIds: GameItemConstants.GoldEnhancementMaterials
+    },
+    {
+        label: 'Ascension Statues',
+        itemIds: GameItemConstants.AscensionStatues
     },
     {
         label: 'Other Materials',

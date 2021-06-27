@@ -43,10 +43,10 @@ const DifferenceColumnTooltip = 'Additional amount that needs to be acquired in 
 
 const ItemIds = [
     ...GameItemConstants.SkillGems,
-    ...GameItemConstants.AscensionStatues,
     ...GameItemConstants.BronzeEnhancementMaterials,
     ...GameItemConstants.SilverEnhancementMaterials,
     ...GameItemConstants.GoldEnhancementMaterials,
+    ...GameItemConstants.AscensionStatues,
     ...GameItemConstants.OtherEnhancementMaterials,
     5
 ];

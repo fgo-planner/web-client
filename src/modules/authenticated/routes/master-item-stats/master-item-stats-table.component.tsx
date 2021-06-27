@@ -199,7 +199,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
 
     return (
         <LayoutPanelScrollable
-            className="p-4 full-height scrollbar-track-border"
+            className="pr-4 py-4 full-height scrollbar-track-border"
             headerContents={
                 <div className={classes.header}>
                     <Tooltip title={costColumnTooltip} placement="top">

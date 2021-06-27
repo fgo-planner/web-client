@@ -1,6 +1,5 @@
 import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
-import React, { ChangeEvent, useCallback, useState } from 'react';
-import { useEffect } from 'react';
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { MasterItemStatsFilterOptions } from './master-item-stats.utils';
 
 type Props = {
@@ -11,7 +10,7 @@ export const MasterItemStatsFilter = React.memo(({ onFilterChange }: Props) => {
 
     const [includeUnownedServants, setIncludeUnownedServants] = useState<boolean>(false);
     const [includeCostumes, setIncludeCostumes] = useState<boolean>(true);
-    const [includeSoundtracks, setIncludeSoundtracks] = useState<boolean>(false);
+    const [includeSoundtracks, setIncludeSoundtracks] = useState<boolean>(true);
 
     useEffect(() => {
         onFilterChange({
@@ -34,7 +33,7 @@ export const MasterItemStatsFilter = React.memo(({ onFilterChange }: Props) => {
     }, []);
 
     return (
-        <div className="px-6 pt-8 pb-2">
+        <div className="px-4 pt-4">
             <FormGroup row>
                 <FormControlLabel
                     control={

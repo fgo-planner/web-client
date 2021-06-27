@@ -1,4 +1,8 @@
+import { IconButton, Tooltip } from '@material-ui/core';
+import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@material-ui/icons';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
@@ -45,6 +49,29 @@ export const MasterItemStatsRoute = React.memo(() => {
         };
     }, []);
 
+    /**
+     * NavigationRail children
+     */
+    const navigationRailChildNodes: ReactNode = useMemo(() => {
+        return [
+            <Tooltip key="items" title="Back to item list" placement="right">
+                <div>
+                    <IconButton
+                        component={Link}
+                        to="../items"
+                        children={<FormatListBulletedIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="export" title="Download item stats" placement="right">
+                <div>
+                    {/* TODO Implement this */}
+                    <IconButton children={<GetAppIcon />} disabled />
+                </div>
+            </Tooltip>
+        ];
+    }, []);
+
     const statsTableNode: ReactNode = useMemo(() => {
         if (!stats || !gameItemMap || !filter) {
             return null;
@@ -61,8 +88,15 @@ export const MasterItemStatsRoute = React.memo(() => {
     return (
         <div className="flex column full-height">
             <PageTitle>Item Stats</PageTitle>
-            <MasterItemStatsFilter onFilterChange={setFilter} />
-            {statsTableNode}
+            <div className="flex overflow-hidden">
+                <NavigationRail>
+                    {navigationRailChildNodes}
+                </NavigationRail>
+                <div className="flex column flex-fill">
+                    <MasterItemStatsFilter onFilterChange={setFilter} />
+                    {statsTableNode}
+                </div>
+            </div>
         </div>
     );
 });

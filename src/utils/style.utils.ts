@@ -2,6 +2,9 @@ import { Nullable } from '../types';
 
 export class StyleUtils {
 
+    /**
+     * @deprecated Use the `clsx` library instead.
+     */
     static appendClassNames(...classNames: Nullable<string | false>[]) {
         if (!classNames.length) {
             return '';

@@ -2,11 +2,11 @@
 import { fade, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { FileCopy as FileCopyIcon, SvgIconComponent } from '@material-ui/icons';
+import clsx from 'clsx';
 import React, { ChangeEvent, PropsWithChildren, PureComponent, ReactNode } from 'react';
 import Dropzone, { DropzoneRef, DropzoneState } from 'react-dropzone';
 import { ThemeConstants } from '../../styles/theme-constants';
 import { ComponentStyleProps, WithStylesProps } from '../../types';
-import { StyleUtils } from '../../utils/style.utils';
 
 type Props = PropsWithChildren<{
     dropzoneRef?: React.RefObject<DropzoneRef>;
@@ -111,7 +111,7 @@ export const FileInputWithTextarea  = withStyles(style, styleOptions)(class exte
             isDragActive 
         } = state;
         
-        const classNames = StyleUtils.appendClassNames(classes.root, className);
+        const classNames = clsx(classes.root, className);
 
         return (
             <div className={classNames} {...getRootProps()}>

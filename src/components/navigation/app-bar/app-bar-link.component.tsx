@@ -1,10 +1,10 @@
 import { fade, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import clsx from 'clsx';
 import { MouseEventHandler, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { WithStylesProps } from '../../../types';
-import { StyleUtils } from '../../../utils/style.utils';
 
 type Props = {
     active?: boolean;
@@ -56,7 +56,7 @@ export const AppBarLink = withStyles(style, styleOptions)(class extends PureComp
             onMouseOut 
         } = this.props;
 
-        const className = StyleUtils.appendClassNames(classes.root, active && classes.active);
+        const className = clsx(classes.root, active && classes.active);
 
         // If route path was defined, then render it as a Link.
         if (route) {

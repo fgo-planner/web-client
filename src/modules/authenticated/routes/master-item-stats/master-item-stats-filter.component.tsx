@@ -10,7 +10,7 @@ export const MasterItemStatsFilter = React.memo(({ onFilterChange }: Props) => {
 
     const [includeUnownedServants, setIncludeUnownedServants] = useState<boolean>(false);
     const [includeCostumes, setIncludeCostumes] = useState<boolean>(true);
-    const [includeSoundtracks, setIncludeSoundtracks] = useState<boolean>(true);
+    const [includeSoundtracks, setIncludeSoundtracks] = useState<boolean>(false);
 
     useEffect(() => {
         onFilterChange({

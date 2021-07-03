@@ -1,6 +1,7 @@
 import { Fab, Tooltip } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
@@ -10,10 +11,10 @@ import { SoundtrackPlayerService } from '../../../../services/audio/soundtrack-p
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { GameSoundtrack, MasterAccount, Nullable } from '../../../../types';
-import { MasterSoundtrackListHeader } from './master-soundtracks-list-header.component';
+import { MasterSoundtracksListHeader } from './master-soundtracks-list-header.component';
 import { MasterSoundtracksList } from './master-soundtracks-list.component';
 
-const getSoundtrackSetFromMasterAccount = (account: Nullable<MasterAccount>): Set<number> => {
+const getUnlockedSoundtracksSetFromMasterAccount = (account: Nullable<MasterAccount>): Set<number> => {
     if (!account) {
         return new Set();
     }
@@ -25,7 +26,7 @@ export const MasterSoundtracksRoute = React.memo(() => {
     const forceUpdate = useForceUpdate();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-    const [masterSoundtrackSet, setMasterSoundtrackSet] = useState<Set<number>>(new Set());
+    const [unlockedSoundtracksSet, setUnlockedSoundtracksSet] = useState<Set<number>>(new Set());
     const [playingId, setPlayingId] = useState<number>();
     const [editMode, setEditMode] = useState<boolean>(false);
 
@@ -46,9 +47,9 @@ export const MasterSoundtracksRoute = React.memo(() => {
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
             .subscribe(account => {
-                const masterSoundtrackSet = getSoundtrackSetFromMasterAccount(account);
+                const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(account);
                 setMasterAccount(account);
-                setMasterSoundtrackSet(masterSoundtrackSet);
+                setUnlockedSoundtracksSet(unlockedSoundtracksSet);
                 setEditMode(false);
             });
 
@@ -64,10 +65,10 @@ export const MasterSoundtracksRoute = React.memo(() => {
                 if (account == null) {
                     return;
                 }
-                const masterSoundtrackSet = getSoundtrackSetFromMasterAccount(account);
+                const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(account);
                 resetLoadingIndicator();
                 setMasterAccount(account);
-                setMasterSoundtrackSet(masterSoundtrackSet);
+                setUnlockedSoundtracksSet(unlockedSoundtracksSet);
                 setEditMode(false);
             });
 
@@ -93,9 +94,9 @@ export const MasterSoundtracksRoute = React.memo(() => {
     const handleUpdateError = useCallback((error: any): void => {
         // TODO Display error message to user.
         console.error(error);
-        const masterSoundtrackSet = getSoundtrackSetFromMasterAccount(masterAccount);
+        const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(masterAccount);
         resetLoadingIndicator();
-        setMasterSoundtrackSet(masterSoundtrackSet);
+        setUnlockedSoundtracksSet(unlockedSoundtracksSet);
         setEditMode(false);
     }, [masterAccount, resetLoadingIndicator]);
 
@@ -111,7 +112,7 @@ export const MasterSoundtracksRoute = React.memo(() => {
 
         const update = {
             _id: masterAccountId,
-            soundtracks: [...masterSoundtrackSet]
+            soundtracks: [...unlockedSoundtracksSet]
         };
         MasterAccountService.updateAccount(update)
             .catch(handleUpdateError.bind(this));
@@ -122,12 +123,12 @@ export const MasterSoundtracksRoute = React.memo(() => {
         }
         loadingIndicatorIdRef.current = loadingIndicatorId;
 
-    }, [masterSoundtrackSet, masterAccount?._id, handleUpdateError]);
+    }, [unlockedSoundtracksSet, masterAccount?._id, handleUpdateError]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account
-        const masterSoundtrackSet = getSoundtrackSetFromMasterAccount(masterAccount);
-        setMasterSoundtrackSet(masterSoundtrackSet);
+        const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(masterAccount);
+        setUnlockedSoundtracksSet(unlockedSoundtracksSet);
         setEditMode(false);
     }, [masterAccount]);
 
@@ -156,22 +157,22 @@ export const MasterSoundtracksRoute = React.memo(() => {
     /**
      * FabContainer children
      */
-    let fabContainerChildNodes: ReactNode;
-    if (!editMode) {
-        fabContainerChildNodes = (
-            <Tooltip key="edit" title="Edit">
-                <div>
-                    <Fab
-                        color="primary"
-                        onClick={handleEditButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
-                        children={<EditIcon />}
-                    />
-                </div>
-            </Tooltip>
-        );
-    } else {
-        fabContainerChildNodes = [
+    const fabContainerChildNodes: ReactNode = useMemo(() => {
+        if (!editMode) {
+            return (
+                <Tooltip key="edit" title="Edit">
+                    <div>
+                        <Fab
+                            color="primary"
+                            onClick={handleEditButtonClick}
+                            disabled={!!loadingIndicatorIdRef.current}
+                            children={<EditIcon />}
+                        />
+                    </div>
+                </Tooltip>
+            );
+        }
+        return [
             <Tooltip key="cancel" title="Cancel">
                 <div>
                     <Fab
@@ -193,26 +194,31 @@ export const MasterSoundtracksRoute = React.memo(() => {
                 </div>
             </Tooltip>
         ];
-    }
+    }, [editMode, handleCancelButtonClick, handleEditButtonClick, handleSaveButtonClick]);
 
     return (
         <div className="flex column full-height">
             <PageTitle>
                 {editMode ?
-                    'Edit Unlocked Soundtrack' :
-                    'Unlocked Soundtrack'
+                    'Edit Unlocked Soundtracks' :
+                    'Unlocked Soundtracks'
                 }
             </PageTitle>
             <div className="flex overflow-hidden">
-                <LayoutPanelScrollable className="p-4 full-height flex-fill scrollbar-track-border">
-                    <MasterSoundtrackListHeader />
-                    <MasterSoundtracksList
-                        masterSoundtrackSet={masterSoundtrackSet}
-                        playingId={playingId}
-                        editMode={editMode}
-                        onPlayButtonClick={handlePlayButtonClick}
-                    />
-                </LayoutPanelScrollable>
+                <LayoutPanelScrollable
+                    className="p-4 full-height flex-fill scrollbar-track-border"
+                    headerContents={
+                        <MasterSoundtracksListHeader />
+                    }
+                    children={
+                        <MasterSoundtracksList
+                            unlockedSoundtracksSet={unlockedSoundtracksSet}
+                            playingId={playingId}
+                            editMode={editMode}
+                            onPlayButtonClick={handlePlayButtonClick}
+                        />
+                    }
+                />
             </div>
             <FabContainer children={fabContainerChildNodes} />
         </div>

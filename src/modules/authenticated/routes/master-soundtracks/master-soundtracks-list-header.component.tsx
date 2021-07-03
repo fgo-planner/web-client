@@ -9,9 +9,13 @@ const style = (theme: Theme) => ({
         display: 'flex',
         height: 52,
         alignItems: 'center',
+        paddingRight: theme.spacing(ThemeConstants.ScrollbarWidthScale),
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
-        fontSize: '0.875rem'
+        fontSize: '0.875rem',
+        borderBottomWidth: 1,
+        borderBottomStyle: 'solid',
+        borderBottomColor: theme.palette.divider,
     },
     unlockedStatus: {
         width: 42,
@@ -25,21 +29,20 @@ const style = (theme: Theme) => ({
         flex: 1
     },
     unlockMaterial: {
-        textAlign: 'right',
-        width: 28 + theme.spacing(3) + 42
+        textAlign: 'right'
     },
     preview: {
-        width: 48 + 2 * theme.spacing(1)
+        width: 48 + theme.spacing(24 + 4)
     }
 } as StyleRules);
 
 const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterSoundtrackListHeader'
+    classNamePrefix: 'MasterSoundtracksListHeader'
 };
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterSoundtrackListHeader = React.memo(() => {
+export const MasterSoundtracksListHeader = React.memo(() => {
     const classes = useStyles();
     return (
         <div className={classes.root}>
@@ -51,7 +54,7 @@ export const MasterSoundtrackListHeader = React.memo(() => {
                 Track Title
             </div>
             <div className={classes.unlockMaterial}>
-                Cost
+                Unlock Material
             </div>
             <div className={classes.preview} />
         </div>

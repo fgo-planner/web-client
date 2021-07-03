@@ -1,7 +1,6 @@
-import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
+import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { ReactNode, useCallback } from 'react';
-import { useMemo } from 'react';
+import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
@@ -9,13 +8,11 @@ import { GameSoundtrack } from '../../../../types';
 import { MasterSoundtracksListRow } from './master-soundtracks-list-row.component';
 
 type Props = {
-    masterSoundtrackSet: Set<number>;
+    unlockedSoundtracksSet: Set<number>;
     playingId?: number;
     editMode?: boolean;
     onPlayButtonClick?: (soundtrack: GameSoundtrack, action: 'play' | 'pause') => void;
 };
-
-const SoundtrackThumbnailSize = 42;
 
 /**
  * Sort function for sorting soundtrack list by `priority` values in ascending
@@ -38,29 +35,6 @@ const sortByPriority = (gameSoundtrackList: GameSoundtrackList | undefined): Gam
 const style = (theme: Theme) => ({
     root: {
         paddingBottom: theme.spacing(20)
-    },
-    row: {
-        height: 52,
-        display: 'flex',
-        alignItems: 'center',
-        padding: theme.spacing(0, 4),
-        fontSize: '0.875rem'
-    },
-    soundtrackId: {
-        textAlign: 'center',
-        width: theme.spacing(8)
-    },
-    soundtrackThumbnailContainer: {
-        width: 96,
-        height: SoundtrackThumbnailSize,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: fade('#ffffff', 0.69),
-        margin: theme.spacing(0, 6)
-    },
-    soundtrackTitle: {
-
     }
 } as StyleRules);
 
@@ -75,7 +49,7 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
     const forceUpdate = useForceUpdate();
 
     const {
-        masterSoundtrackSet,
+        unlockedSoundtracksSet,
         playingId,
         editMode,
         onPlayButtonClick
@@ -91,17 +65,17 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
 
     const handleUnlockToggle = useCallback((id: number, value: boolean) => {
         if (value) {
-            if (!masterSoundtrackSet.has(id)) {
-                masterSoundtrackSet.add(id);
+            if (!unlockedSoundtracksSet.has(id)) {
+                unlockedSoundtracksSet.add(id);
                 forceUpdate();
             }
         } else {
-            if (masterSoundtrackSet.has(id)) {
-                masterSoundtrackSet.delete(id);
+            if (unlockedSoundtracksSet.has(id)) {
+                unlockedSoundtracksSet.delete(id);
                 forceUpdate();
             }
         }
-    }, [masterSoundtrackSet, forceUpdate]);
+    }, [unlockedSoundtracksSet, forceUpdate]);
 
     if (!gameSoundtrackSortedList.length) {
         return null;
@@ -109,7 +83,7 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
 
     const renderSoundtrackRow = (soundtrack: GameSoundtrack): ReactNode => {
         const soundtrackId = soundtrack._id;
-        const unlocked = masterSoundtrackSet.has(soundtrackId) || !soundtrack.material;
+        const unlocked = unlockedSoundtracksSet.has(soundtrackId) || !soundtrack.material;
         return (
             <MasterSoundtracksListRow
                 key={soundtrackId}

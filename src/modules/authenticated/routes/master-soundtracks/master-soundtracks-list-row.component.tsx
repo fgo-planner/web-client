@@ -2,8 +2,8 @@ import { Checkbox, fade, IconButton, makeStyles, StyleRules, Theme } from '@mate
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Done, Pause, PlayArrow } from '@material-ui/icons';
 import clsx from 'clsx';
-import React, { ChangeEvent, Fragment, ReactNode, useCallback, useMemo } from 'react';
-import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
+import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
+import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.compnent';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { GameSoundtrack } from '../../../../types';
@@ -46,17 +46,12 @@ const style = (theme: Theme) => ({
     title: {
         flex: '1 1'
     },
-    materialQuantity: {
-        width: 28,
-        marginRight: theme.spacing(3),
-        textAlign: 'right'
-    },
     unlockedIcon: {
         color: 'limegreen'
     },
     playButton: {
         width: 48,
-        paddingRight: theme.spacing(1)
+        padding: theme.spacing(0, 24, 0, 4)
     }
 } as StyleRules);
 
@@ -121,12 +116,9 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
             return null;
         }
         return (
-            <Fragment>
-                <div className={classes.materialQuantity}>{quantity}</div>
-                <GameItemThumbnail item={unlockMaterial} showBackground />
-            </Fragment>
+            <GameItemQuantity item={unlockMaterial} quantity={quantity} />
         );
-    }, [classes, soundtrack, gameItemMap]);
+    }, [soundtrack, gameItemMap]);
 
     const playButtonNode: ReactNode = useMemo(() => {
         return (
@@ -142,7 +134,7 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
     }, [classes, playing, handlePlayButtonClick]);
 
     return (
-        <StaticListRowContainer key={soundtrack._id} borderTop>
+        <StaticListRowContainer key={soundtrack._id} borderBottom>
             <div className={classes.root}>
                 {unlockedStatusNode}
                 <div className={classes.thumbnailContainer}>

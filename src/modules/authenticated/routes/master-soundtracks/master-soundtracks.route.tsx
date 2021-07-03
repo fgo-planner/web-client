@@ -38,7 +38,7 @@ export const MasterSoundtracksRoute = React.memo(() => {
             loadingIndicatorIdRef.current = undefined;
             forceUpdate();
         }
-    }, [loadingIndicatorIdRef, forceUpdate]);
+    }, [forceUpdate]);
 
     /**
      * onCurrentMasterAccountChange subscriptions

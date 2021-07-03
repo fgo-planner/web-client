@@ -51,7 +51,7 @@ export const MasterItemsRoute = React.memo(() => {
             loadingIndicatorIdRef.current = undefined;
             forceUpdate();
         }
-    }, [loadingIndicatorIdRef, forceUpdate]);
+    }, [forceUpdate]);
 
     /**
      * onCurrentMasterAccountChange subscriptions

@@ -146,7 +146,7 @@ export const MasterServantsRoute = React.memo(() => {
             loadingIndicatorIdRef.current = undefined;
             forceUpdate();
         }
-    }, [loadingIndicatorIdRef, forceUpdate]);
+    }, [forceUpdate]);
     
     /**
      * If the `masterServants` reference changes (due to data being reloaded, etc.)
@@ -256,7 +256,7 @@ export const MasterServantsRoute = React.memo(() => {
         setEditServantDialogOpen(false);
         setDeleteServant(undefined);
         setDeleteServantDialogOpen(false);
-    }, [loadingIndicatorIdRef, masterAccount?._id, handleUpdateError]);
+    }, [masterAccount?._id, handleUpdateError]);
 
     const handleFormChange = useCallback((): void => {
         const activeServant = activeServantRef.current;

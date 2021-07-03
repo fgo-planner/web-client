@@ -127,9 +127,7 @@ export const MasterServantStatsRoute = React.memo(() => {
         <div className="flex column full-height">
             <PageTitle>Servant Stats</PageTitle>
             <div className="flex overflow-hidden">
-                <NavigationRail>
-                    {navigationRailChildNodes}
-                </NavigationRail>
+                <NavigationRail children={navigationRailChildNodes} />
                 <div className="flex column flex-fill">
                     <MasterServantStatsFilter onFilterChange={setFilter}></MasterServantStatsFilter>
                     {statsTableNode}

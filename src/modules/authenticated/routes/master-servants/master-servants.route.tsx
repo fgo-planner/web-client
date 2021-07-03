@@ -1,5 +1,5 @@
 import { Fab, IconButton, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
-import { Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
+import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
 import { WithStylesOptions } from '@material-ui/styles';
 import lodash from 'lodash';
 import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -147,7 +147,7 @@ export const MasterServantsRoute = React.memo(() => {
             forceUpdate();
         }
     }, [forceUpdate]);
-    
+
     /**
      * If the `masterServants` reference changes (due to data being reloaded, etc.)
      * and there is an `activeServant`, then update the `activeServant` reference
@@ -273,7 +273,7 @@ export const MasterServantsRoute = React.memo(() => {
     const handleSaveButtonClick = useCallback((): void => {
         updateMasterAccount(masterServants, bondLevels, unlockedCostumes);
     }, [masterServants, bondLevels, unlockedCostumes, updateMasterAccount]);
-    
+
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account
         const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(masterAccount);
@@ -308,7 +308,7 @@ export const MasterServantsRoute = React.memo(() => {
         reason: any,
         data?: { masterServant: Omit<MasterServant, 'instanceId'>, bond: MasterServantBondLevel | undefined, costumes: Array<number> }
     ): void => {
-        
+
         /*
          * Close the dialog without taking any further action if the component is not
          * in edit mode, or if the changes were cancelled (if `data` is undefined, then
@@ -359,7 +359,7 @@ export const MasterServantsRoute = React.memo(() => {
                 ..._masterServants,
                 masterServant
             ];
-            
+
         } else {
             /*
              * Merge changes into existing servant object.
@@ -375,7 +375,7 @@ export const MasterServantsRoute = React.memo(() => {
                 return servant === editServant ? { ...editServant } : servant;
             });
         }
-        
+
         updateActiveServantRef(_masterServants);
         setMasterServants(_masterServants);
         setBondLevels(bondLevels); // This should not be needed
@@ -434,68 +434,75 @@ export const MasterServantsRoute = React.memo(() => {
         forceUpdate();
     }, [activeServantRef, forceUpdate]);
 
-    if (!gameServantMap) {
-        return null;
-    }
-
     /**
      * NavigationRail children
      */
-    const navigationRailChildNodes: ReactNode = [
-        <Tooltip key="add" title="Add servant" placement="right">
-            <div>
-                <IconButton
-                    onClick={handleAddServantButtonClick}
-                    children={<AddIcon />}
-                    disabled={!editMode}
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key="stats" title="Servant stats" placement="right">
-            <div>
-                <IconButton
-                    component={Link}
-                    to="servants/stats"
-                    children={<EqualizerIcon />}
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key="import" title="Upload servant data" placement="right">
-            <div>
-                <IconButton
-                    component={Link}
-                    to="./data/import/servants"
-                    children={<PublishIcon />}
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key="export" title="Download servant data" placement="right">
-            <div>
-                {/* TODO Implement this */}
-                <IconButton children={<GetApp />} disabled />
-            </div>
-        </Tooltip>
-    ];
+    const navigationRailChildNodes: ReactNode = useMemo(() => {
+        return [
+            <Tooltip key="add" title="Add servant" placement="right">
+                <div>
+                    <IconButton
+                        onClick={handleAddServantButtonClick}
+                        children={<AddIcon />}
+                        disabled={!editMode}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="costumes" title="Costumes" placement="right">
+                <div>
+                    <IconButton
+                        component={Link}
+                        to="servants/costumes"
+                        children={<AccessibilityNewIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="stats" title="Servant stats" placement="right">
+                <div>
+                    <IconButton
+                        component={Link}
+                        to="servants/stats"
+                        children={<EqualizerIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="import" title="Upload servant data" placement="right">
+                <div>
+                    <IconButton
+                        component={Link}
+                        to="./data/import/servants"
+                        children={<PublishIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key="export" title="Download servant data" placement="right">
+                <div>
+                    {/* TODO Implement this */}
+                    <IconButton children={<GetApp />} disabled />
+                </div>
+            </Tooltip>
+        ];
+    }, [editMode, handleAddServantButtonClick]);
 
     /**
      * FabContainer children
      */
-    let fabContainerChildNodes: ReactNode;
-    if (!editMode) {
-        fabContainerChildNodes = (
-            <Tooltip key="edit" title="Batch edit mode">
-                <div>
-                    <Fab
-                        color="primary"
-                        onClick={handleEditButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
-                        children={<EditIcon />}
-                    />
-                </div>
-            </Tooltip>
-        );
-    } else {
-        fabContainerChildNodes = [
+    const fabContainerChildNodes: ReactNode = useMemo(() => {
+        if (!editMode) {
+            return (
+                <Tooltip key="edit" title="Batch edit mode">
+                    <div>
+                        <Fab
+                            color="primary"
+                            onClick={handleEditButtonClick}
+                            disabled={!!loadingIndicatorIdRef.current}
+                            children={<EditIcon />}
+                        />
+                    </div>
+                </Tooltip>
+            );
+        }
+        return [
             <Tooltip key="cancel" title="Cancel">
                 <div>
                     <Fab
@@ -517,6 +524,10 @@ export const MasterServantsRoute = React.memo(() => {
                 </div>
             </Tooltip>
         ];
+    }, [editMode, handleCancelButtonClick, handleEditButtonClick, handleSaveButtonClick]);
+    
+    if (!gameServantMap) {
+        return null;
     }
 
     return (
@@ -533,7 +544,7 @@ export const MasterServantsRoute = React.memo(() => {
                     <LayoutPanelScrollable
                         className="py-4 pr-4 full-height flex-fill scrollbar-track-border"
                         headerContents={
-                            <MasterServantListHeader 
+                            <MasterServantListHeader
                                 editMode={editMode}
                                 visibleColumns={visibleColumns}
                             />
@@ -556,7 +567,7 @@ export const MasterServantsRoute = React.memo(() => {
                     />
                     {md && <div className={classes.infoPanelContainer}>
                         <LayoutPanelContainer className="flex column full-height" autoHeight>
-                            <MasterServantInfoPanel 
+                            <MasterServantInfoPanel
                                 activeServant={activeServantRef.current}
                                 bondLevels={bondLevels}
                                 unlockedCostumes={unlockedCostumes}

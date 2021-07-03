@@ -1,5 +1,6 @@
 import { Avatar, AvatarProps } from '@material-ui/core';
 import React, { PropsWithChildren } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';
 import { GameServant } from '../../../types';
@@ -7,6 +8,7 @@ import { GameServant } from '../../../types';
 type Props = PropsWithChildren<{
     servant: Readonly<GameServant>;
     stage?: 1 | 2 | 3 | 4;
+    costumeId?: number;
     size?: string | number;
     variant?: AvatarProps['variant'];
     enableLink?: boolean;
@@ -27,6 +29,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
         children,
         servant,
         stage,
+        costumeId,
         variant,
         enableLink,
         openLinkInNewTab
@@ -35,8 +38,14 @@ export const GameServantThumbnail = React.memo((props: Props) => {
     let {size} = props;
 
     const servantId = servant._id;
-    const imageVariant = (stage ?? DefaultStage) - 1;
-    const imageUrl = `${ThumbnailBaseUrl}/f_${servantId}${imageVariant}.png`;
+
+    const imageUrl = useMemo(() => {
+        if (costumeId) {
+            return `${ThumbnailBaseUrl}/f_${costumeId}0.png`;
+        }
+        const imageVariant = (stage ?? DefaultStage) - 1;
+        return `${ThumbnailBaseUrl}/f_${servantId}${imageVariant}.png`;
+    }, [costumeId, servantId, stage]);
 
     size = size || DefaultSize;
 

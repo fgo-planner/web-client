@@ -6,6 +6,7 @@ import { MasterAccountsRoute } from './routes/master-accounts/master-accounts.ro
 import { MasterItemStatsRoute } from './routes/master-item-stats/master-item-stats.route';
 import { MasterItemsRoute } from './routes/master-items/master-items.route';
 import { MasterPlansRoute } from './routes/master-plans/master-plans.route';
+import { MasterServantCostumesRoute } from './routes/master-servant-costumes/master-servant-costumes.route';
 import { MasterServantStatsRoute } from './routes/master-servant-stats/master-servant-stats.route';
 import { MasterServantsRoute } from './routes/master-servants/master-servants.route';
 import { MasterSoundtracksRoute } from './routes/master-soundtracks/master-soundtracks.route';
@@ -40,6 +41,11 @@ export default class AuthenticatedModule extends ModuleComponent {
             component: MasterServantsRoute
         },
         {
+            path: '/master/servants/costumes',
+            exact: true,
+            component: MasterServantCostumesRoute
+        },
+        {
             path: '/master/servants/stats',
             exact: true,
             component: MasterServantStatsRoute
@@ -67,7 +73,7 @@ export default class AuthenticatedModule extends ModuleComponent {
         {
             path: '/master/data/import/servants',
             exact: true,
-            lazyComponent: React.lazy(() => import('./routes/master-servant-import.route')),
+            lazyComponent: React.lazy(() => import('./routes/master-servant-import/master-servant-import.route')),
         },
     ];
 

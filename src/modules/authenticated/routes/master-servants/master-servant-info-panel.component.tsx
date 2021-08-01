@@ -11,7 +11,8 @@ import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.h
 import { GameItemMap } from '../../../../services/data/game/game-item.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { GameServant, MasterServant, MasterServantBondLevel } from '../../../../types';
-import { MasterServantMaterialDebtStats, MasterServantUtils } from '../../../../utils/master/master-servant.utils';
+import { MasterPlanComputationUtils, ResultType1 } from '../../../../utils/master/master-plan-computation.utils';
+import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
 type Props = {
@@ -92,7 +93,7 @@ const renderBondLevel = (classes: ClassNameMap, bond?: MasterServantBondLevel): 
 const renderServantMaterialStatList = (
     classes: ClassNameMap,
     gameItemMap: GameItemMap,
-    servantMaterialStatEntries: Array<[string, MasterServantMaterialDebtStats]>
+    servantMaterialStatEntries: Array<[string, ResultType1]>
 ): ReactNode => {
     return servantMaterialStatEntries.map(([key, stats]): ReactNode => {
         const labelWidth = '80%'; // TODO Make this a constant
@@ -139,7 +140,7 @@ const renderServantMaterialStatList = (
 const renderServantMaterialStats = (
     classes: ClassNameMap,
     gameItemMap: GameItemMap | undefined,
-    servantMaterialStats: Record<number, MasterServantMaterialDebtStats> | undefined
+    servantMaterialStats: Record<number, ResultType1> | undefined
 ): ReactNode => {
 
     if (!servantMaterialStats || !gameItemMap) {
@@ -309,7 +310,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
     const gameServantMap = useGameServantMap();
 
     const [servant, setServant] = useState<Readonly<GameServant>>();
-    const [servantMaterialStats, setServantMaterialStats] = useState<Record<number, MasterServantMaterialDebtStats>>();
+    const [servantMaterialStats, setServantMaterialStats] = useState<Record<number, ResultType1>>();
 
     useEffect(() => {
         if (!gameServantMap || !activeServant) {
@@ -317,7 +318,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
             setServantMaterialStats(undefined);
         } else {
             const servant = gameServantMap[activeServant.gameId];
-            const servantMaterialStats = MasterServantUtils.computeMaterialDebtStats(servant, activeServant, unlockedCostumes);
+            const servantMaterialStats = MasterPlanComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
             setServant(servant);
             setServantMaterialStats(servantMaterialStats);
         }
@@ -338,7 +339,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
          * Re-compute servant material stats
          */
         const servant = gameServantMap[activeServant.gameId];
-        const servantMaterialStats = MasterServantUtils.computeMaterialDebtStats(servant, activeServant, unlockedCostumes);
+        const servantMaterialStats = MasterPlanComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
         setServantMaterialStats(servantMaterialStats);
 
         onStatsChange && onStatsChange(data);

@@ -144,7 +144,6 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
                 <div className={clsx(classes.name, 'truncate')}>
                     {name}
                 </div>
-                {/* <div className="flex-fill" /> */}
                 <div className={classes.unlockMaterials}>
                     {unlockMaterialNodes}
                 </div>

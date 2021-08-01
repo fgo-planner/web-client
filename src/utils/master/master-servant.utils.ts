@@ -1,13 +1,5 @@
 import { GameServantConstants } from '../../constants';
-import { GameServant, GameServantEnhancement, MasterServant, MasterServantAscensionLevel } from '../../types';
-import { MapUtils } from '../map.utils';
-
-export type MasterServantMaterialDebtStats = {
-    ascensions: number;
-    skills: number;
-    costumes: number;
-    total: number;
-};
+import { GameServant, MasterServant, MasterServantAscensionLevel } from '../../types';
 
 export class MasterServantUtils {
 
@@ -148,92 +140,6 @@ export class MasterServantUtils {
             return -1;
         }
         return  Math.max(...masterServants.map(servant => servant.instanceId));
-    }
-
-    //#endregion
-
-
-    //#region Enhancement computation methods
-    
-    static computeMaterialDebtStats(
-        servant: Readonly<GameServant>,
-        masterServant: Readonly<MasterServant>,
-        unlockedCostumes: Array<number>
-    ): Record<number, MasterServantMaterialDebtStats> {
-
-        const unlockedCostumeSet = new Set(unlockedCostumes);
-
-        const stats: Record<number, MasterServantMaterialDebtStats> = {};
-
-        const skill1 = masterServant.skills[1];
-        const skill2 = masterServant.skills[2] ?? 0;
-        const skill3 = masterServant.skills[3] ?? 0;
-
-        for (const [key, skill] of Object.entries(servant.skillMaterials)) {
-            const skillLevel = Number(key);
-            const skillUpgradesNeeded =
-                (skill1 > skillLevel ? 0 : 1) +
-                (skill2 > skillLevel ? 0 : 1) +
-                (skill3 > skillLevel ? 0 : 1);
-            /*
-             * Skip if all three skills are already upgraded to this level.
-             */
-            if (skillUpgradesNeeded === 0) {
-                continue;
-            }
-            this._updateForEnhancement(stats, skill, 'skills', skillUpgradesNeeded);
-        }
-
-        if (servant.ascensionMaterials) {
-            for (const [key, ascension] of Object.entries(servant.ascensionMaterials)) {
-                const ascensionLevel = Number(key);
-                /*
-                 * Skip if servant is already ascended to this level.
-                 */
-                if (masterServant.ascension >= ascensionLevel) {
-                    continue;
-                }
-                this._updateForEnhancement(stats, ascension, 'ascensions');
-            }
-        }
-
-        for (const [key, costume] of Object.entries(servant.costumes)) {
-            const costumeId = Number(key);
-            /*
-             * Skip if servant is already ascended to this level.
-             */
-            if (unlockedCostumeSet.has(costumeId)) {
-                continue;
-            }
-            this._updateForEnhancement(stats, costume.materials, 'costumes');
-        }
-
-        return stats;
-    }
-
-    private static _updateForEnhancement(
-        stats: Record<number, MasterServantMaterialDebtStats>,
-        enhancement: GameServantEnhancement,
-        key: keyof MasterServantMaterialDebtStats,
-        count = 1
-    ): void {
-
-        for (const { itemId, quantity } of enhancement.materials) {
-            // TODO Exclude lores
-            const stat = MapUtils.getOrDefault(stats, itemId, this._instantiateMaterialDebtStat);
-            const total = quantity * count;
-            stat[key] += total;
-            stat.total += total;
-        }
-    }
-
-    private static _instantiateMaterialDebtStat(): MasterServantMaterialDebtStats {
-        return {
-            ascensions: 0,
-            skills: 0,
-            costumes: 0,
-            total: 0
-        };
     }
 
     //#endregion

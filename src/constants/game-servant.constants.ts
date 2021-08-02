@@ -5,7 +5,7 @@ export class GameServantConstants {
 
     static readonly MinLevel = 1;
 
-    static readonly MaxLevel = 100;
+    static readonly MaxLevel = 120;
 
     static readonly MinFou = 0;
 

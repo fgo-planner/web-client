@@ -16,7 +16,7 @@ type Props = {
     editMode: boolean;
 };
 
-const MaxItemQuantity = 999999999; // TOOD Move this to constants file.
+const MaxItemQuantity = 2000000000; // TOOD Move this to constants file.
 
 const QuantityInputProps: InputBaseComponentProps = {
     step: 1,

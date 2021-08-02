@@ -1,3 +1,4 @@
+// TODO Add column for append skills
 
 type MasterServantListColumns<T> = {
     label: T;

@@ -31,6 +31,16 @@ export type MasterServant = {
 
     };
 
+    appendSkills: {
+
+        1?: MasterServantSkillLevel;
+
+        2?: MasterServantSkillLevel;
+
+        3?: MasterServantSkillLevel;
+
+    };
+
     acquired?: Date;
 
 };

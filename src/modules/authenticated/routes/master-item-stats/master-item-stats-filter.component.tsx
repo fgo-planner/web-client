@@ -9,19 +9,31 @@ type Props = {
 export const MasterItemStatsFilter = React.memo(({ onFilterChange }: Props) => {
 
     const [includeUnownedServants, setIncludeUnownedServants] = useState<boolean>(false);
+    const [includeAppendSkills, setIncludeAppendSkills] = useState<boolean>(false);
     const [includeCostumes, setIncludeCostumes] = useState<boolean>(true);
     const [includeSoundtracks, setIncludeSoundtracks] = useState<boolean>(false);
 
     useEffect(() => {
         onFilterChange({
             includeUnownedServants,
+            includeAppendSkills,
             includeCostumes,
             includeSoundtracks
         });
-    }, [includeCostumes, includeSoundtracks, includeUnownedServants, onFilterChange]);
+    }, [
+        includeCostumes,
+        includeAppendSkills,
+        includeSoundtracks,
+        includeUnownedServants,
+        onFilterChange
+    ]);
 
     const handleIncludeUnownedServantsChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         setIncludeUnownedServants(event.target.checked);
+    }, []);
+
+    const handleIncludeAppendSkillsChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        setIncludeAppendSkills(event.target.checked);
     }, []);
 
     const handleIncludeCostumesChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +56,16 @@ export const MasterItemStatsFilter = React.memo(({ onFilterChange }: Props) => {
                         />
                     }
                     label="Un-summoned servants"
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            name="includeAppendSkills"
+                            checked={includeAppendSkills}
+                            onChange={handleIncludeAppendSkillsChange}
+                        />
+                    }
+                    label="Append skills"
                 />
                 <FormControlLabel
                     control={

@@ -39,6 +39,7 @@ export type FormData = {
     skill1: string | number;
     skill2: string | number;
     skill3: string | number;
+    // TODO Add append skills
     bond: string | number;
     unlockedCostumes: Record<number, boolean>;
 };
@@ -98,6 +99,7 @@ const convertToFormData = (
         skill1: skills[1] || 1,
         skill2: skills[2] || '',
         skill3: skills[3] || '',
+        // TODO Add append skills
         unlockedCostumes: unlockedCostumesMap
     };
 };
@@ -126,7 +128,8 @@ const convertToMasterServant = (formData: FormData): Omit<MasterServant, 'instan
             1: Number(skill1) as MasterServantSkillLevel || 1,
             2: Number(skill2) as MasterServantSkillLevel || undefined,
             3: Number(skill3) as MasterServantSkillLevel || undefined
-        }
+        },
+        appendSkills: {} // TODO Implement append skills
     };
 };
 

@@ -139,7 +139,8 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
                 1: skill1 as MasterServantSkillLevel,
                 2: skill2 as MasterServantSkillLevel,
                 3: skill3 as MasterServantSkillLevel
-            }
+            },
+            appendSkills: {}
         };
     }
 

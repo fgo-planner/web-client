@@ -18,6 +18,7 @@ export class MasterServantUtils {
             skills: {
                 1: 1
             },
+            appendSkills: {}
         };
     }
 

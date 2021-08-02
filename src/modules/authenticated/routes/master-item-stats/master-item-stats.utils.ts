@@ -1,6 +1,6 @@
 import { GameServantMap } from '../../../../services/data/game/game-servant.service';
 import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
-import { GameServant, GameServantEnhancement, MasterAccount, MasterServant } from '../../../../types';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '../../../../types';
 import { MapUtils } from '../../../../utils/map.utils';
 
 export type MasterItemStat = {
@@ -12,6 +12,7 @@ export type MasterItemStat = {
 
 export type MasterItemStatsFilterOptions = {
     includeUnownedServants: boolean;
+    includeAppendSkills: boolean;
     includeCostumes: boolean;
     includeSoundtracks: boolean;
 };
@@ -34,6 +35,7 @@ export class MasterItemStatsUtils {
 
         const {
             includeUnownedServants,
+            includeAppendSkills,
             includeCostumes,
             includeSoundtracks
         } = filter;
@@ -56,7 +58,15 @@ export class MasterItemStatsUtils {
             if (!isDuplicate) {
                 ownedServants.add(servantId);
             }
-            this._updateForOwnedServant(stats, servant, masterServant, unlockedCostumes, includeCostumes, !isDuplicate);
+            this._updateForOwnedServant(
+                stats,
+                servant,
+                masterServant,
+                includeAppendSkills,
+                unlockedCostumes,
+                includeCostumes,
+                !isDuplicate
+            );
         }
 
         if (includeUnownedServants) {
@@ -65,17 +75,26 @@ export class MasterItemStatsUtils {
                 if (ownedServants.has(servantId)) {
                     continue;
                 }
-                this._updateForUnownedServant(stats, servant, includeCostumes);
+                this._updateForUnownedServant(
+                    stats,
+                    servant,
+                    includeAppendSkills,
+                    includeCostumes
+                );
             }
         }
 
         if (includeSoundtracks) {
             const unlockedSoundtracks = new Set<number>(masterAccount.soundtracks);
-            this._updateForSoundtracks(stats, gameSoundtrackList, unlockedSoundtracks);
+            this._updateForSoundtracks(
+                stats,
+                gameSoundtrackList,
+                unlockedSoundtracks
+            );
         }
 
         const end = window.performance.now();
-        console.log(`Stats by class took ${(end - start).toFixed(2)}ms to compute.`);
+        console.log(`Stats took ${(end - start).toFixed(2)}ms to compute.`);
 
         return stats;
     }
@@ -95,22 +114,16 @@ export class MasterItemStatsUtils {
         stats: Record<number, MasterItemStat>,
         servant: GameServant,
         masterServant: MasterServant,
+        includeAppendSkills: boolean,
         unlockedCostumes: Set<number>,
         includeCostumes: boolean,
         isUnique: boolean
     ): void {
 
-        const skill1 = masterServant.skills[1];
-        const skill2 = masterServant.skills[2] ?? 0;
-        const skill3 = masterServant.skills[3] ?? 0;
+        this._updateForOwnedServantSkills(stats, servant.skillMaterials, masterServant.skills);
 
-        for (const [key, skill] of Object.entries(servant.skillMaterials)) {
-            const skillLevel = Number(key);
-            const skillUpgradeCount =
-                (skill1 > skillLevel ? 1 : 0) +
-                (skill2 > skillLevel ? 1 : 0) +
-                (skill3 > skillLevel ? 1 : 0);
-            this._updateForServantEnhancement(stats, skill, true, 3, skillUpgradeCount);
+        if (includeAppendSkills) {
+            this._updateForOwnedServantSkills(stats, servant.appendSkillMaterials, masterServant.appendSkills);
         }
 
         if (servant.ascensionMaterials) {
@@ -130,14 +143,38 @@ export class MasterItemStatsUtils {
         }
     }
 
+    private static _updateForOwnedServantSkills(
+        stats: Record<number, MasterItemStat>,
+        skillMaterials: GameServantSkillMaterials,
+        skillLevels: MasterServant['appendSkills']
+    ): void {
+        const appendSkill1 = skillLevels[1] ?? 0;
+        const appendSkill2 = skillLevels[2] ?? 0;
+        const appendSkill3 = skillLevels[3] ?? 0;
+        for (const [key, skill] of Object.entries(skillMaterials)) {
+            const skillLevel = Number(key);
+            const skillUpgradeCount =
+                (appendSkill1 > skillLevel ? 1 : 0) +
+                (appendSkill2 > skillLevel ? 1 : 0) +
+                (appendSkill3 > skillLevel ? 1 : 0);
+            this._updateForServantEnhancement(stats, skill, true, 3, skillUpgradeCount);
+        }
+    }
+
     private static _updateForUnownedServant(
         stats: Record<number, MasterItemStat>,
         servant: GameServant,
+        includeAppendSkills: boolean,
         includeCostumes: boolean
     ): void {
 
         for (const skill of Object.values(servant.skillMaterials)) {
             this._updateForServantEnhancement(stats, skill, false, 3);
+        }
+        if (includeAppendSkills) {
+            for (const skill of Object.values(servant.appendSkillMaterials)) {
+                this._updateForServantEnhancement(stats, skill, false, 3);
+            }
         }
         if (servant.ascensionMaterials) {
             for (const ascension of Object.values(servant.ascensionMaterials)) {

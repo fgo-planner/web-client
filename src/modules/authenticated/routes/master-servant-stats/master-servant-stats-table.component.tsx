@@ -24,6 +24,8 @@ const AverageAscensionLevelLabel = 'Average Ascension Level';
 
 const AverageSkillLevelLabel = 'Average Skill Level';
 
+const AverageAppendSkillLevelLabel = 'Average Append Skill Level';
+
 const TripleNinesLabel = '9/9/9+ Servants';
 
 const TripleTensLabel = '10/10/10 Servants';
@@ -79,8 +81,12 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
         averageAscensionLevel,
         skillLevels,
         averageSkillLevel,
-        tripleNinesCount,
-        tripleTensCount,
+        tripleNineSkillsCount,
+        tripleTenSkillsCount,
+        appendSkillLevels,
+        tripleNineAppendSkillsCount,
+        tripleTenAppendSkillsCount,
+        averageAppendSkillLevel,
         maxHpFouCount,
         maxAtkFouCount,
         maxGoldHpFouCount,
@@ -167,14 +173,37 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
         }
         rows.push({
             label: TripleNinesLabel,
-            values: Object.values(tripleNinesCount)
+            values: Object.values(tripleNineSkillsCount)
         });
         rows.push({
             label: TripleTensLabel,
-            values: Object.values(tripleTensCount)
+            values: Object.values(tripleTenSkillsCount)
         });
         return { header, rows };
-    }, [averageSkillLevel, skillLevels, tripleNinesCount, tripleTensCount]);
+    }, [averageSkillLevel, skillLevels, tripleNineSkillsCount, tripleTenSkillsCount]);
+
+    const appendSkillLevelData: MasterServantStatPanelData = useMemo(() => {
+        const header: MasterServantStatPanelRow = {
+            label: AverageAppendSkillLevelLabel,
+            values: Object.values(averageAppendSkillLevel).map(applyFormatThreeDecimals)
+        };
+        const rows: MasterServantStatPanelRow[] = [];
+        for (const [key, value] of Object.entries(appendSkillLevels)) {
+            rows.push({
+                label: `Level ${key} Append Skills`,
+                values: Object.values(value)
+            });
+        }
+        rows.push({
+            label: TripleNinesLabel,
+            values: Object.values(tripleNineAppendSkillsCount)
+        });
+        rows.push({
+            label: TripleTensLabel,
+            values: Object.values(tripleTenAppendSkillsCount)
+        });
+        return { header, rows };
+    }, [appendSkillLevels, averageAppendSkillLevel, tripleNineAppendSkillsCount, tripleTenAppendSkillsCount]);
 
     const bondLevelData: MasterServantStatPanelData = useMemo(() => {
         const header: MasterServantStatPanelRow = {
@@ -258,6 +287,12 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
         <MasterServantStatsExpandablePanel
             key="skillLevelData"
             data={skillLevelData}
+            dataColumnWidth={dataColumnWidth}
+            borderTop
+        />,
+        <MasterServantStatsExpandablePanel
+            key="appendSkillLevelData"
+            data={appendSkillLevelData}
             dataColumnWidth={dataColumnWidth}
             borderTop
         />,

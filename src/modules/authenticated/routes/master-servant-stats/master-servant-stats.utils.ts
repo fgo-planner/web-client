@@ -20,9 +20,13 @@ export type MasterServantStats<T> = {
     ascensionLevels: Record<MasterServantAscensionLevel, T>;
     averageAscensionLevel: T;
     skillLevels: Record<MasterServantSkillLevel | 0, T>;
-    tripleNinesCount: T;
-    tripleTensCount: T;
+    tripleNineSkillsCount: T;
+    tripleTenSkillsCount: T;
     averageSkillLevel: T;
+    appendSkillLevels: Record<MasterServantSkillLevel | 0, T>;
+    tripleNineAppendSkillsCount: T;
+    tripleTenAppendSkillsCount: T;
+    averageAppendSkillLevel: T;
     maxHpFouCount: T;
     maxAtkFouCount: T;
     maxGoldHpFouCount: T;
@@ -181,14 +185,21 @@ export class MasterServantStatsUtils {
             ascension,
             fouHp,
             fouAtk,
-            skills
+            skills,
+            appendSkills
         } = masterServant;
 
         const {
             totalCount,
             uniqueCount,
             npLevels,
-            ascensionLevels
+            ascensionLevels,
+            skillLevels,
+            tripleNineSkillsCount,
+            tripleTenSkillsCount,
+            appendSkillLevels,
+            tripleNineAppendSkillsCount,
+            tripleTenAppendSkillsCount
         } = stats as MasterServantStats<Record<string, number>>;
 
         const key = statKey as string;
@@ -221,7 +232,12 @@ export class MasterServantStatsUtils {
         /*
          * Skill level stats
          */
-        this._populateSkillStats(stats, key, skills);
+        this._populateSkillStats(skillLevels, tripleNineSkillsCount, tripleTenSkillsCount, key, skills);
+
+        /*
+         * Append skill level stats
+         */
+        this._populateSkillStats(appendSkillLevels, tripleNineAppendSkillsCount, tripleTenAppendSkillsCount, key, appendSkills);
 
         /*
          * Fou enhancements stats
@@ -241,20 +257,16 @@ export class MasterServantStatsUtils {
     }
 
     private static _populateSkillStats<T extends Record<string, number>>(
-        stats: MasterServantStats<T>,
+        skillLevels: MasterServantStats<Record<string, number>>['skillLevels'],
+        tripleNineSkillsCount: Record<string, number>,
+        tripleTenSkillsCount: Record<string, number>,
         statKey: Partial<keyof T>,
-        skills: MasterServant['skills']
+        skills: MasterServant['appendSkills']
     ): void {
-
-        const {
-            skillLevels,
-            tripleNinesCount,
-            tripleTensCount,
-        } = stats as MasterServantStats<Record<string, number>>;
 
         const key = statKey as string;
 
-        const skill1 = skills[1]; // First skill should always be present.
+        const skill1 = skills[1] ?? 0;
         const skill2 = skills[2] ?? 0;
         const skill3 = skills[3] ?? 0;
 
@@ -268,12 +280,12 @@ export class MasterServantStatsUtils {
         skillLevels[skill3].overall += 1;
 
         if (skill1 === 10 && skill2 === 10 && skill3 === 10) {
-            tripleTensCount[key] += 1;
-            tripleTensCount.overall += 1;
+            tripleTenSkillsCount[key] += 1;
+            tripleTenSkillsCount.overall += 1;
         }
         if (skill1 >= 9 && skill2 >= 9 && skill3 >= 9) {
-            tripleNinesCount[key] += 1;
-            tripleNinesCount.overall += 1;
+            tripleNineSkillsCount[key] += 1;
+            tripleNineSkillsCount.overall += 1;
         }
     }
 
@@ -368,6 +380,8 @@ export class MasterServantStatsUtils {
             averageAscensionLevel,
             skillLevels,
             averageSkillLevel,
+            appendSkillLevels,
+            averageAppendSkillLevel,
             fouValuesCount,
             averageFou,
             bondLevels,
@@ -408,6 +422,15 @@ export class MasterServantStatsUtils {
                     totalSkillLevels += skillLevels[level][key] * level;
                 }
                 averageSkillLevel[key] = totalSkillLevels / (count * 3);
+
+                /*
+                * Average skill level stats
+                */
+                let totalAppendSkillLevels = 0;
+                for (const level of GameServantConstants.SkillLevels) {
+                    totalAppendSkillLevels += appendSkillLevels[level][key] * level;
+                }
+                averageAppendSkillLevel[key] = totalAppendSkillLevels / (count * 3);
             }
 
             /*
@@ -464,9 +487,25 @@ export class MasterServantStatsUtils {
                 9: instantiate(),
                 10: instantiate()
             },
-            tripleNinesCount: instantiate(),
-            tripleTensCount: instantiate(),
+            tripleNineSkillsCount: instantiate(),
+            tripleTenSkillsCount: instantiate(),
             averageSkillLevel: instantiate(),
+            appendSkillLevels: {
+                0: instantiate(),
+                1: instantiate(),
+                2: instantiate(),
+                3: instantiate(),
+                4: instantiate(),
+                5: instantiate(),
+                6: instantiate(),
+                7: instantiate(),
+                8: instantiate(),
+                9: instantiate(),
+                10: instantiate()
+            },
+            tripleNineAppendSkillsCount: instantiate(),
+            tripleTenAppendSkillsCount: instantiate(),
+            averageAppendSkillLevel: instantiate(),
             ascensionLevels: {
                 0: instantiate(),
                 1: instantiate(),

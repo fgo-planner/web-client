@@ -1,14 +1,13 @@
 import { Link, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
 import { ClassNameMap, WithStylesOptions } from '@material-ui/styles';
 import clsx from 'clsx';
-import React, { Fragment, ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
 import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
 import { DataPointListItem } from '../../../../components/list/data-point-list-item.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
-import { GameItemMap } from '../../../../services/data/game/game-item.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { GameServant, MasterServant, MasterServantBondLevel } from '../../../../types';
 import { MasterPlanComputationUtils, ResultType1 } from '../../../../utils/master/master-plan-computation.utils';
@@ -25,152 +24,6 @@ type Props = {
 
 const FormId = 'master-servant-info-panel-form';
 
-const renderServantName = (classes: ClassNameMap, servant: Readonly<GameServant> | undefined): ReactNode => {
-    if (!servant) {
-        return (
-            <div className={classes.title}>
-                Unknown Servant
-            </div>
-        );
-    }
-    return (
-        <div className={classes.title}>
-            <div className={clsx(classes.servantName, 'truncate')}>
-                {servant.name}
-            </div>
-            <div className={classes.rarityClassIcon}>
-                <div>
-                    {`${servant.rarity} \u2605`}
-                </div>
-                <GameServantClassIcon
-                    servantClass={servant.class}
-                    rarity={servant.rarity}
-                />
-            </div>
-        </div>
-    );
-};
-
-const renderFouLevels = (classes: ClassNameMap, activeServant: Readonly<MasterServant>): JSX.Element => {
-    const { fouAtk, fouHp } = activeServant;
-    return (
-        <div className={classes.skillLevelStat}>
-            {fouHp ?? '\u2014'}
-            <div className={classes.servantStatsDelimiter}>/</div>
-            {fouAtk ?? '\u2014'}
-        </div>
-    );
-};
-
-const renderSkillLevels = (classes: ClassNameMap, activeServant: Readonly<MasterServant>): JSX.Element => {
-    return (
-        <div className={classes.skillLevelStat}>
-            {activeServant.skills[1] ?? '\u2013'}
-            <div className={classes.servantStatsDelimiter}>/</div>
-            {activeServant.skills[2] ?? '\u2013'}
-            <div className={classes.servantStatsDelimiter}>/</div>
-            {activeServant.skills[3] ?? '\u2013'}
-        </div>
-    );
-};
-
-const renderBondLevel = (classes: ClassNameMap, bond?: MasterServantBondLevel): JSX.Element => {
-    if (bond == null) {
-        return (
-            <div className={classes.bondLevelStat}>
-                {'\u2014'}
-            </div>
-        );
-    }
-    return (
-        <div className={classes.bondLevelStat}>
-            <GameServantBondIcon bond={bond} size={24} />
-            <div className="pl-1">{bond}</div>
-        </div>
-    );
-};
-
-const renderServantMaterialStatList = (
-    classes: ClassNameMap,
-    gameItemMap: GameItemMap,
-    servantMaterialStatEntries: Array<[string, ResultType1]>
-): ReactNode => {
-    return servantMaterialStatEntries.map(([key, stats]): ReactNode => {
-        const labelWidth = '80%'; // TODO Make this a constant
-        const itemId = Number(key);
-        const item = gameItemMap[itemId];
-        const { ascensions, skills, costumes, total } = stats;
-        const label = (
-            <div className={classes.materialStatLabel}>
-                <GameItemThumbnail item={item} size={24} />
-                <div className="pl-2 truncate">
-                    {item.name}
-                </div>
-            </div>
-        );
-        const tooltip = (
-            <Fragment>
-                <div>{item.name}</div>
-                {!!ascensions && <div>Ascensions: {ascensions}</div>}
-                {!!skills && <div>Skills: {skills}</div>}
-                {!!costumes && <div>Costumes: {costumes}</div>}
-                <div>Total: {total}</div>
-            </Fragment>
-        );
-        return (
-            <Tooltip
-                key={itemId}
-                title={tooltip}
-                placement="left-start"
-                enterDelay={250}
-            >
-                <div>
-                    <DataPointListItem
-                        className={classes.materialStat}
-                        label={label}
-                        labelWidth={labelWidth}
-                        value={stats.total}
-                    />
-                </div>
-            </Tooltip>
-        );
-    });
-};
-
-const renderServantMaterialStats = (
-    classes: ClassNameMap,
-    gameItemMap: GameItemMap | undefined,
-    servantMaterialStats: Record<number, ResultType1> | undefined
-): ReactNode => {
-
-    if (!servantMaterialStats || !gameItemMap) {
-        return null;
-    }
-
-    const servantMaterialStatEntries = Object.entries(servantMaterialStats);
-    let servantMaterialList: ReactNode;
-    if (servantMaterialStatEntries.length) {
-        servantMaterialList = renderServantMaterialStatList(classes, gameItemMap, servantMaterialStatEntries);
-    } else {
-        servantMaterialList = (
-            <div className={classes.helperText}>
-                Servant is fully upgraded
-            </div>
-        );
-    }
-
-    return (
-        <div className={classes.materialStatsContainer}>
-            <div className={classes.sectionTitle}>
-                Materials Needed
-            </div>
-            <div className={classes.materialStatsList}> 
-                {servantMaterialList}
-            </div>
-        </div>
-    );
-};
-
 const renderServantLinks = (
     classes: ClassNameMap,
     servant: Readonly<GameServant> | undefined
@@ -184,7 +37,7 @@ const renderServantLinks = (
             <div className={classes.sectionTitle}>
                 Links
             </div>
-            {links.map(({label, url}, index) => (
+            {links.map(({ label, url }, index) => (
                 <div className={classes.externalLink}>
                     <Link key={index} color="secondary" href={url} target="_blank">
                         {label}
@@ -352,9 +205,212 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         onStatsChange
     ]);
 
-    if (!gameServantMap) {
-        return null;
-    }
+    const servantNameNode = useMemo(() => {
+        if (!servant) {
+            return (
+                <div className={classes.title}>
+                    Unknown Servant
+                </div>
+            );
+        }
+        return (
+            <div className={classes.title}>
+                <div className={clsx(classes.servantName, 'truncate')}>
+                    {servant.name}
+                </div>
+                <div className={classes.rarityClassIcon}>
+                    <div>
+                        {`${servant.rarity} \u2605`}
+                    </div>
+                    <GameServantClassIcon
+                        servantClass={servant.class}
+                        rarity={servant.rarity}
+                    />
+                </div>
+            </div>
+        );
+    }, [classes, servant]);
+
+    const renderFouLevels = useCallback((activeServant: Readonly<MasterServant>): JSX.Element => {
+        const { fouAtk, fouHp } = activeServant;
+        return (
+            <div className={classes.skillLevelStat}>
+                {fouHp ?? '\u2014'}
+                <div className={classes.servantStatsDelimiter}>/</div>
+                {fouAtk ?? '\u2014'}
+            </div>
+        );
+    }, [classes]);
+
+    const renderSkillLevels = useCallback((activeServant: Readonly<MasterServant>): JSX.Element => {
+        const { skills } = activeServant;
+        return (
+            <div className={classes.skillLevelStat}>
+                {skills[1] ?? '\u2013'}
+                <div className={classes.servantStatsDelimiter}>/</div>
+                {skills[2] ?? '\u2013'}
+                <div className={classes.servantStatsDelimiter}>/</div>
+                {skills[3] ?? '\u2013'}
+            </div>
+        );
+    }, [classes]);
+
+    const renderBondLevel = useCallback((bond?: MasterServantBondLevel): JSX.Element => {
+        if (bond == null) {
+            return (
+                <div className={classes.bondLevelStat}>
+                    {'\u2014'}
+                </div>
+            );
+        }
+        return (
+            <div className={classes.bondLevelStat}>
+                <GameServantBondIcon bond={bond} size={24} />
+                <div className="pl-1">{bond}</div>
+            </div>
+        );
+    }, [classes]);
+
+    const servantStatsNode: ReactNode = useMemo(() => {
+        if (!activeServant) {
+            return null;
+        }
+        if (editMode) {
+            return (
+                <div className={classes.formContainer}>
+                    <MasterServantEditForm
+                        formId={FormId}
+                        masterServant={activeServant}
+                        bondLevels={bondLevels}
+                        unlockedCostumes={unlockedCostumes}
+                        onStatsChange={handleStatsChange}
+                        layout="panel"
+                    />
+                </div>
+            );
+        } else {
+            const labelWidth = '60%'; // TODO Make this a constant
+            return (
+                <div className={classes.servantStatsContainer}>
+                    <DataPointListItem
+                        className={classes.servantStat}
+                        label="Level"
+                        labelWidth={labelWidth}
+                        value={activeServant.level}
+                    />
+                    <DataPointListItem
+                        className={classes.servantStat}
+                        label="Ascension"
+                        labelWidth={labelWidth}
+                        value={activeServant.ascension}
+                    />
+                    <DataPointListItem
+                        className={classes.servantStat}
+                        label="Fou (HP/ATK)"
+                        labelWidth={labelWidth}
+                        value={renderFouLevels(activeServant)}
+                    />
+                    <DataPointListItem
+                        className={classes.servantStat}
+                        label="Skills"
+                        labelWidth={labelWidth}
+                        value={renderSkillLevels(activeServant)}
+                    />
+                    <DataPointListItem
+                        className={classes.servantStat}
+                        label="Noble Phantasm"
+                        labelWidth={labelWidth}
+                        value={activeServant.np}
+                    />
+                    <DataPointListItem
+                        className={classes.servantStat}
+                        label="Bond"
+                        labelWidth={labelWidth}
+                        value={renderBondLevel(bondLevels[activeServant.gameId])}
+                    />
+                </div>
+            );
+        }
+    }, [
+        activeServant,
+        bondLevels,
+        classes,
+        editMode,
+        handleStatsChange,
+        renderBondLevel,
+        renderFouLevels,
+        renderSkillLevels,
+        unlockedCostumes
+    ]);
+
+    const servantMaterialStatsNode: ReactNode = useMemo(() => {
+        if (!servantMaterialStats || !gameItemMap) {
+            return null;
+        }
+
+        const servantMaterialStatEntries = Object.entries(servantMaterialStats);
+        let servantMaterialList: ReactNode;
+        if (servantMaterialStatEntries.length) {
+            const labelWidth = '80%'; // TODO Make this a constant
+            servantMaterialList = servantMaterialStatEntries.map(([key, stats]): ReactNode => {
+                const itemId = Number(key);
+                const item = gameItemMap[itemId];
+                const { ascensions, skills, appendSkills, costumes, total } = stats;
+                const label = (
+                    <div className={classes.materialStatLabel}>
+                        <GameItemThumbnail item={item} size={24} />
+                        <div className="pl-2 truncate">
+                            {item.name}
+                        </div>
+                    </div>
+                );
+                const tooltip = (
+                    <Fragment>
+                        <div>{item.name}</div>
+                        {!!ascensions && <div>Ascensions: {ascensions}</div>}
+                        {!!skills && <div>Skills: {skills}</div>}
+                        {!!appendSkills && <div>Append skills: {appendSkills}</div>}
+                        {!!costumes && <div>Costumes: {costumes}</div>}
+                        <div>Total: {total}</div>
+                    </Fragment>
+                );
+                return (
+                    <Tooltip
+                        key={itemId}
+                        title={tooltip}
+                        placement="left-start"
+                        enterDelay={250}
+                    >
+                        <div>
+                            <DataPointListItem
+                                className={classes.materialStat}
+                                label={label}
+                                labelWidth={labelWidth}
+                                value={stats.total}
+                            />
+                        </div>
+                    </Tooltip>
+                );
+            });
+        } else {
+            servantMaterialList = (
+                <div className={classes.helperText}>
+                    Servant is fully upgraded
+                </div>
+            );
+        }
+
+        return (
+            <div className={classes.materialStatsContainer}>
+                <div className={classes.sectionTitle}>
+                    Materials Needed
+                </div>
+                <div className={classes.materialStatsList}>
+                    {servantMaterialList}
+                </div>
+            </div>
+        );
+    }, [classes, gameItemMap, servantMaterialStats]);
 
     if (!activeServant) {
         return (
@@ -364,71 +420,14 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         );
     }
 
-    let servantStats: ReactNode;
-    if (editMode) {
-        servantStats = (<div className={classes.formContainer}>
-            <MasterServantEditForm
-                formId={FormId}
-                masterServant={activeServant}
-                bondLevels={bondLevels}
-                unlockedCostumes={unlockedCostumes}
-                onStatsChange={handleStatsChange}
-                layout="panel"
-            />
-        </div>
-        );
-    } else {
-        const labelWidth = '60%'; // TODO Make this a constant
-        servantStats = (
-            <div className={classes.servantStatsContainer}>
-                <DataPointListItem
-                    className={classes.servantStat}
-                    label="Level"
-                    labelWidth={labelWidth}
-                    value={activeServant.level}
-                />
-                <DataPointListItem
-                    className={classes.servantStat}
-                    label="Ascension"
-                    labelWidth={labelWidth}
-                    value={activeServant.ascension}
-                />
-                <DataPointListItem
-                    className={classes.servantStat}
-                    label="Fou (HP/ATK)"
-                    labelWidth={labelWidth}
-                    value={renderFouLevels(classes, activeServant)}
-                />
-                <DataPointListItem
-                    className={classes.servantStat}
-                    label="Skills"
-                    labelWidth={labelWidth}
-                    value={renderSkillLevels(classes, activeServant)}
-                />
-                <DataPointListItem
-                    className={classes.servantStat}
-                    label="Noble Phantasm"
-                    labelWidth={labelWidth}
-                    value={activeServant.np}
-                />
-                <DataPointListItem
-                    className={classes.servantStat}
-                    label="Bond"
-                    labelWidth={labelWidth}
-                    value={renderBondLevel(classes, bondLevels[activeServant.gameId])}
-                />
-            </div>
-        );
-    }
-
     return (
         <div className={classes.root}>
-            {renderServantName(classes, servant)}
+            {servantNameNode}
             <div className={classes.scrollContainer}>
-                {servantStats}
+                {servantStatsNode}
                 <div className={classes.divider} />
                 <div className="px-6 pt-4">
-                    {renderServantMaterialStats(classes, gameItemMap, servantMaterialStats)}
+                    {servantMaterialStatsNode}
                     {renderServantLinks(classes, servant)}
                 </div>
             </div>

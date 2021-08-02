@@ -1,21 +1,25 @@
-import { GameServant, GameServantEnhancement, MasterServantAscensionLevel, MasterServantSkillLevel } from '../../types';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterServantAscensionLevel, MasterServantSkillLevel } from '../../types';
 import { MapUtils } from '../map.utils';
 
 // TODO Rename this
 export type ResultType1 = {
     ascensions: number;
     skills: number;
+    appendSkills: number;
     costumes: number;
     total: number;
 };
 
+type SkillEnhancements = Readonly<{
+    1?: MasterServantSkillLevel;
+    2?: MasterServantSkillLevel;
+    3?: MasterServantSkillLevel;
+}>;
+
 type ServantEnhancements = Readonly<{
     ascension: MasterServantAscensionLevel;
-    skills: Readonly<{
-        1?: MasterServantSkillLevel;
-        2?: MasterServantSkillLevel;
-        3?: MasterServantSkillLevel;
-    }>
+    skills: SkillEnhancements;
+    appendSkills: SkillEnhancements;
 }>;
 
 export class MasterPlanComputationUtils {
@@ -23,6 +27,11 @@ export class MasterPlanComputationUtils {
     private static _DefaultTargetEnhancements: ServantEnhancements = {
         ascension: 4,
         skills: {
+            1: 10,
+            2: 10,
+            3: 10
+        },
+        appendSkills: {
             1: 10,
             2: 10,
             3: 10
@@ -55,17 +64,69 @@ export class MasterPlanComputationUtils {
             currentCostumes = new Set(currentCostumes);
         }
 
-        const stats: Record<number, ResultType1> = {};
+        const result: Record<number, ResultType1> = {};
 
-        const currentSkill1 = currentEnhancements.skills[1] || 0;
-        const currentSkill2 = currentEnhancements.skills[2] || 0;
-        const currentSkill3 = currentEnhancements.skills[3] || 0;
+        this._updateResultForSkills(
+            result,
+            servant.skillMaterials,
+            currentEnhancements.skills,
+            targetEnhancements.skills,
+            'skills'
+        );
 
-        const targetSkill1 = targetEnhancements.skills[1] || 0;
-        const targetSkill2 = targetEnhancements.skills[2] || 0;
-        const targetSkill3 = targetEnhancements.skills[3] || 0;
+        this._updateResultForSkills(
+            result,
+            servant.appendSkillMaterials,
+            currentEnhancements.appendSkills,
+            targetEnhancements.appendSkills,
+            'appendSkills'
+        );
 
-        for (const [key, skill] of Object.entries(servant.skillMaterials)) {
+        if (servant.ascensionMaterials) {
+            for (const [key, ascension] of Object.entries(servant.ascensionMaterials)) {
+                const ascensionLevel = Number(key);
+                /*
+                 * Skip this ascension servant is already at least this level, or if this level
+                 * beyond the targeted level.
+                 */
+                if (currentEnhancements.ascension >= ascensionLevel || ascensionLevel > targetEnhancements.ascension) {
+                    continue;
+                }
+                this._updateResultForEnhancement(result, ascension, 'ascensions');
+            }
+        }
+
+        for (const [key, costume] of Object.entries(servant.costumes)) {
+            const costumeId = Number(key);
+            /*
+             * Skip if the costume is already unlocked, or if it is not targeted.
+             */
+            if (currentCostumes.has(costumeId) || (targetCostumes && !targetCostumes.has(costumeId))) {
+                continue;
+            }
+            this._updateResultForEnhancement(result, costume.materials, 'costumes');
+        }
+
+        return result;
+    }
+
+    private static _updateResultForSkills(
+        result: Record<number, ResultType1>,
+        skillMaterials: Readonly<GameServantSkillMaterials>,
+        currentSkills: SkillEnhancements,
+        targetSkills: SkillEnhancements,
+        skillType: 'skills' | 'appendSkills'
+    ): void {
+
+        const currentSkill1 = currentSkills[1] || 0;
+        const currentSkill2 = currentSkills[2] || 0;
+        const currentSkill3 = currentSkills[3] || 0;
+
+        const targetSkill1 = targetSkills[1] || 0;
+        const targetSkill2 = targetSkills[2] || 0;
+        const targetSkill3 = targetSkills[3] || 0;
+
+        for (const [key, skill] of Object.entries(skillMaterials)) {
             const skillLevel = Number(key);
             /*
              * The number of skills that need to be upgraded to this level. A skill does not
@@ -82,45 +143,18 @@ export class MasterPlanComputationUtils {
             if (skillUpgradeCount === 0) {
                 continue;
             }
-            this._updateResultForEnhancement(stats, skill, 'skills', skillUpgradeCount);
+            this._updateResultForEnhancement(result, skill, skillType, skillUpgradeCount);
         }
-
-        if (servant.ascensionMaterials) {
-            for (const [key, ascension] of Object.entries(servant.ascensionMaterials)) {
-                const ascensionLevel = Number(key);
-                /*
-                 * Skip this ascension servant is already at least this level, or if this level
-                 * beyond the targeted level.
-                 */
-                if (currentEnhancements.ascension >= ascensionLevel || ascensionLevel > targetEnhancements.ascension) {
-                    continue;
-                }
-                this._updateResultForEnhancement(stats, ascension, 'ascensions');
-            }
-        }
-
-        for (const [key, costume] of Object.entries(servant.costumes)) {
-            const costumeId = Number(key);
-            /*
-             * Skip if the costume is already unlocked, or if it is not targeted.
-             */
-            if (currentCostumes.has(costumeId) || (targetCostumes && !targetCostumes.has(costumeId))) {
-                continue;
-            }
-            this._updateResultForEnhancement(stats, costume.materials, 'costumes');
-        }
-
-        return stats;
     }
 
     private static _updateResultForEnhancement(
-        stats: Record<number, ResultType1>,
+        result: Record<number, ResultType1>,
         enhancement: GameServantEnhancement,
         key: keyof ResultType1,
         count = 1
     ): void {
         for (const { itemId, quantity } of enhancement.materials) {
-            const stat = MapUtils.getOrDefault(stats, itemId, this._instantiateResultType1);
+            const stat = MapUtils.getOrDefault(result, itemId, this._instantiateResultType1);
             const total = quantity * count;
             stat[key] += total;
             stat.total += total;
@@ -131,6 +165,7 @@ export class MasterPlanComputationUtils {
         return {
             ascensions: 0,
             skills: 0,
+            appendSkills: 0,
             costumes: 0,
             total: 0
         };

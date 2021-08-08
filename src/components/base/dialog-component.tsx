@@ -1,5 +1,5 @@
 import { ButtonProps } from '@material-ui/core';
-import { DialogComponentProps } from '../../types';
+import { DialogComponentProps } from '../../types/internal';
 import { ModalComponent } from './modal-component';
 
 type Props<T> = DialogComponentProps<T>;

@@ -1,5 +1,6 @@
+import { MasterAccount } from '@fgo-planner/types';
 import { BehaviorSubject } from 'rxjs';
-import { MasterAccount, Nullable, ReadonlyPartialArray, UserInfo } from '../../../types';
+import { Nullable, ReadonlyPartialArray, UserInfo } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { AuthenticationService } from '../../authentication/auth.service';
 

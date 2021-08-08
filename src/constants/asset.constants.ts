@@ -1,4 +1,4 @@
-import { GameItemBackground, MasterServantBondLevel } from '../types';
+import { GameItemBackground, MasterServantBondLevel } from '@fgo-planner/types';
 
 export class AssetConstants {
 

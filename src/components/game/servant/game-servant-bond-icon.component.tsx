@@ -1,8 +1,8 @@
+import { MasterServantBondLevel } from '@fgo-planner/types';
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React from 'react';
 import { AssetConstants } from '../../../constants';
-import { MasterServantBondLevel } from '../../../types';
 
 type Props = {
     bond: MasterServantBondLevel;

@@ -1,4 +1,6 @@
-import { CacheArray, GameSoundtrack, Nullable, Page, Pagination } from '../../../types';
+import { GameSoundtrack } from '@fgo-planner/types';
+import { Page, Pagination } from '../../../types/data';
+import { CacheArray, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
 

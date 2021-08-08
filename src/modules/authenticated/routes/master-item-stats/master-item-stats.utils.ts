@@ -1,6 +1,6 @@
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/types';
 import { GameServantMap } from '../../../../services/data/game/game-servant.service';
 import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '../../../../types';
 import { MapUtils } from '../../../../utils/map.utils';
 
 export type MasterItemStat = {

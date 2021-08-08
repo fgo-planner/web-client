@@ -1,4 +1,5 @@
-import { GameServantClass, GameServantClassSimplified } from '../../types';
+import { GameServantClass } from '@fgo-planner/types';
+import { GameServantClassSimplified } from '../../types/internal';
 
 export class GameServantUtils {
 

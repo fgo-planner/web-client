@@ -1,10 +1,11 @@
+import { GameServantRarity } from '@fgo-planner/types';
 import { Checkbox, IconButton, ListItemText, makeStyles, MenuItem, MenuProps, StyleRules, TextField, Theme, Tooltip } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Replay as ReplayIcon } from '@material-ui/icons';
 import React, { ChangeEvent, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../constants';
-import { GameServantClassSimplified, GameServantRarity, TextFieldChangeEvent } from '../../../../types';
+import { GameServantClassSimplified, TextFieldChangeEvent } from '../../../../types/internal';
 import { MasterServantStatsFilterOptions, MasterServantStatsGroupBy } from './master-servant-stats.utils';
 
 export type MasterServantStatsFilterResult = {

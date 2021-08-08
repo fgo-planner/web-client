@@ -5,7 +5,7 @@ import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
-import { ModalOnCloseReason } from '../../../../types';
+import { ModalOnCloseReason } from '../../../../types/internal';
 import { LoginDialog } from '../../../login/login-dialog.component';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';

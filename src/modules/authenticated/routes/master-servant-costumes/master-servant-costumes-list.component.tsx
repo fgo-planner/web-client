@@ -4,7 +4,7 @@ import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { GameServantList } from '../../../../services/data/game/game-servant.service';
-import { CacheArray } from '../../../../types';
+import { CacheArray } from '../../../../types/internal';
 import { MasterServantCostumeRowData, MasterServantCostumesListRow } from './master-servant-costumes-list-row.component';
 
 type Props = {

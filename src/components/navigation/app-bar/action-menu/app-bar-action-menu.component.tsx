@@ -1,7 +1,7 @@
 import { Menu, PopoverOrigin } from '@material-ui/core';
 import React, { PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ComponentStyleProps, ModalOnCloseHandler } from '../../../../types';
+import { ComponentStyleProps, ModalOnCloseHandler } from '../../../../types/internal';
 
 type Props = {
     className?: string;

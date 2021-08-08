@@ -2,7 +2,7 @@ import React, { ReactNode, Suspense } from 'react';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../../services/authentication/auth.service';
-import { Nullable, RouteDefinition, RouteDefinitions, UserInfo } from '../../types';
+import { Nullable, RouteDefinition, RouteDefinitions, UserInfo } from '../../types/internal';
 import { LazyLoadFallback } from '../route-fallback/lazy-load-fallback.component';
 import { NotFound } from '../route-fallback/not-found.component';
 import { RouteComponent } from './route-component';

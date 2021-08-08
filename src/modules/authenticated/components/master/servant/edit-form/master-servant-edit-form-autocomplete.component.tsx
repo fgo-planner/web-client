@@ -1,7 +1,8 @@
+import { GameServant } from '@fgo-planner/types';
 import { TextField } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 import React, { ChangeEvent, ReactNode, useCallback } from 'react';
-import { GameServant, Nullable } from '../../../../../../types';
+import { Nullable } from '../../../../../../types/internal';
 
 type Props = {
     selectedServant: GameServant;

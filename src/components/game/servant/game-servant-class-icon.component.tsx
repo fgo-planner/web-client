@@ -1,7 +1,8 @@
+import { GameServantClass, GameServantRarity } from '@fgo-planner/types';
 import { makeStyles, StyleRules, Tooltip, TooltipProps } from '@material-ui/core';
 import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../../constants';
-import { GameServantClass, GameServantClassDisplayMap, GameServantRarity, ReadonlyRecord } from '../../../types';
+import { ReadonlyRecord } from '../../../types/internal';
 
 type ClassIconName = GameServantClass | 'Extra' | 'All';
 
@@ -16,7 +17,25 @@ type Props = {
 const ClassIconBaseUrl = AssetConstants.ServantClassIconBaseUrl;
 
 const ClassNameMap: ReadonlyRecord<ClassIconName, string> = {
-    ...GameServantClassDisplayMap,
+    [GameServantClass.Saber]: GameServantClass.Saber,
+    [GameServantClass.Archer]: GameServantClass.Archer,
+    [GameServantClass.Lancer]: GameServantClass.Lancer,
+    [GameServantClass.Rider]: GameServantClass.Rider,
+    [GameServantClass.Caster]: GameServantClass.Caster,
+    [GameServantClass.Assassin]: GameServantClass.Assassin,
+    [GameServantClass.Berserker]: GameServantClass.Berserker,
+    [GameServantClass.Shielder]: GameServantClass.Shielder,
+    [GameServantClass.Ruler]: GameServantClass.Ruler,
+    [GameServantClass.AlterEgo]: 'Alter Ego',
+    [GameServantClass.Avenger]: GameServantClass.Avenger,
+    [GameServantClass.MoonCancer]: 'Moon Cancer',
+    [GameServantClass.Foreigner]: GameServantClass.Foreigner,
+    [GameServantClass.BeastI]: 'Beast I',
+    [GameServantClass.BeastII]: 'Beast II',
+    [GameServantClass.BeastIIIR]: 'Beast III/R',
+    [GameServantClass.BeastIIIL]: 'Beast III/L',
+    [GameServantClass.BeastFalse]: 'Beast (False)',
+    [GameServantClass.Unknown]: GameServantClass.Unknown,
     'Extra': 'Extra',
     'All': 'All'
 };

@@ -1,9 +1,10 @@
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { FormEvent, MouseEvent, ReactNode } from 'react';
 import { DialogComponent } from '../../../../../../components/base/dialog-component';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
-import { DialogComponentProps, MasterServant, MasterServantBondLevel, Nullable, WithStylesProps } from '../../../../../../types';
+import { DialogComponentProps, Nullable, WithStylesProps } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantEditForm, SubmitData } from '../edit-form/master-servant-edit-form.component';
 

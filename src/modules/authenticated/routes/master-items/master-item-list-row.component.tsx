@@ -1,10 +1,10 @@
+import { GameItem, GameItemQuantity } from '@fgo-planner/types';
 import { InputBaseComponentProps, makeStyles, StyleRules, TextField, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, ReactNode, useCallback } from 'react';
 import NumberFormat from 'react-number-format';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { GameItem, GameItemQuantity } from '../../../../types';
 import { MathUtils } from '../../../../utils/math.utils';
 import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 

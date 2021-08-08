@@ -1,10 +1,10 @@
+import { GameItem, GameItemQuantity } from '@fgo-planner/types';
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode, useMemo } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { GameItemMap } from '../../../../services/data/game/game-item.service';
-import { GameItem, GameItemQuantity } from '../../../../types';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { MasterItemListRow } from './master-item-list-row.component';
 

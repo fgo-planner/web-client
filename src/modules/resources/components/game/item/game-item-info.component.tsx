@@ -1,3 +1,4 @@
+import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/types';
 import { StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
@@ -5,7 +6,7 @@ import { GameItemThumbnail } from '../../../../../components/game/item/game-item
 import { LoadingIndicator } from '../../../../../components/loading-indicator.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
 import { GameServantService } from '../../../../../services/data/game/game-servant.service';
-import { GameItem, GameServant, GameServantEnhancement, Nullable, WithStylesProps } from '../../../../../types';
+import { Nullable, WithStylesProps } from '../../../../../types/internal';
 import { GameItemNotFound } from './game-item-not-found.component';
 
 type TotalUsage = {

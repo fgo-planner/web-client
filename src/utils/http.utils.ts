@@ -1,4 +1,4 @@
-import { Nullable } from '../types';
+import { Nullable } from '../types/internal';
 import { JwtUtils } from './jwt.utils';
 
 type RequestBody = string | Record<string, unknown>;

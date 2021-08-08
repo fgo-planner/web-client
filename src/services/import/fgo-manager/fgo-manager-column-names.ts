@@ -1,4 +1,4 @@
-import { ReadonlyRecord } from '.././../../types';
+import { ReadonlyRecord } from '../../../types/internal';
 import { FgoManagerColumn } from './fgo-manager-column.enum';
 
 export const FgoManagerColumnNames: ReadonlyRecord<FgoManagerColumn, string> = {

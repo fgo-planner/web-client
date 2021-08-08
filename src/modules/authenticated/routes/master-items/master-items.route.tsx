@@ -1,3 +1,4 @@
+import { GameItemQuantity, MasterAccount } from '@fgo-planner/types';
 import { Fab, IconButton, Tooltip } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
@@ -10,7 +11,7 @@ import { GameItemConstants } from '../../../../constants';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { GameItemQuantity, MasterAccount, Nullable } from '../../../../types';
+import { Nullable } from '../../../../types/internal';
 import { MasterItemList } from './master-item-list.component';
 
 const cloneItemsFromMasterAccount = (account: Nullable<MasterAccount>): Array<GameItemQuantity> => {

@@ -9,7 +9,7 @@ import { HomeRoute } from './routes/home.route';
 import { LoginRoute } from './routes/login.route';
 import { RegistrationRoute } from './routes/registration.route';
 import { BackgroundMusicService } from './services/audio/background-music.service';
-import { RouteDefinitions } from './types';
+import { RouteDefinitions } from './types/internal';
 
 /*
 Planned navigation outline:

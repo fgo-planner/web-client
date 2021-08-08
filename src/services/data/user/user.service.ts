@@ -1,4 +1,4 @@
-import { User } from '../../../types';
+import { User } from '@fgo-planner/types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 
 export type BasicUser = Pick<User, '_id' | 'username' | 'email'>;

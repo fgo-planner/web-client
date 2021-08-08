@@ -1,4 +1,4 @@
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterServantAscensionLevel, MasterServantSkillLevel } from '../../types';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterServantAscensionLevel, MasterServantSkillLevel } from '@fgo-planner/types';
 import { MapUtils } from '../map.utils';
 
 // TODO Rename this

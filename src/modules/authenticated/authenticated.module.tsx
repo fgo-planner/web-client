@@ -1,6 +1,6 @@
 import React from 'react';
 import { ModuleComponent } from '../../components/base/module-component';
-import { RouteDefinitions } from '../../types';
+import { RouteDefinitions } from '../../types/internal';
 import { MasterAccountHomeRoute } from './routes/master-account-home.route';
 import { MasterAccountsRoute } from './routes/master-accounts/master-accounts.route';
 import { MasterItemStatsRoute } from './routes/master-item-stats/master-item-stats.route';

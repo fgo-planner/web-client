@@ -1,3 +1,4 @@
+import { MasterAccount } from '@fgo-planner/types';
 import { Fab, PaperProps, Tooltip } from '@material-ui/core';
 import { Add as AddIcon } from '@material-ui/icons';
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
@@ -9,7 +10,7 @@ import { MasterAccountAddDialog } from '../../../../components/master/account/ma
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { MasterAccountList as MasterAccountListType, MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { MasterAccount, ModalOnCloseReason, ReadonlyPartial } from '../../../../types';
+import { ModalOnCloseReason, ReadonlyPartial } from '../../../../types/internal';
 import { MasterAccountList } from './master-account-list.component';
 
 const AddAccountDialogPaperProps: PaperProps = {

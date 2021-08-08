@@ -1,6 +1,6 @@
 import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, withWidth } from '@material-ui/core';
 import { ReactNode } from 'react';
-import { DialogComponentProps, Nullable } from '../../types';
+import { DialogComponentProps, Nullable } from '../../types/internal';
 import { DialogComponent } from '../base/dialog-component';
 import { DialogCloseButton } from './dialog-close-button.component';
 

@@ -1,9 +1,10 @@
+import { MasterAccount } from '@fgo-planner/types';
 import { MenuItem, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { ChangeEvent, PureComponent, ReactNode } from 'react';
+import { ChangeEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { MasterAccount, Nullable, ReadonlyPartialArray, WithStylesProps } from '../../../../types';
+import { Nullable, ReadonlyPartialArray, WithStylesProps } from '../../../../types/internal';
 
 type Props = {
     masterAccountList: ReadonlyPartialArray<MasterAccount>;

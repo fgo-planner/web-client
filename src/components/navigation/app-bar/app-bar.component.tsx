@@ -8,7 +8,7 @@ import { AuthenticationService } from '../../../services/authentication/auth.ser
 import { BasicUser, UserService } from '../../../services/data/user/user.service';
 import { AppBarService } from '../../../services/user-interface/app-bar.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { Nullable, UserInfo, WithStylesProps } from '../../../types';
+import { Nullable, UserInfo, WithStylesProps } from '../../../types/internal';
 import { ThemeBackground } from '../../theme/theme-background.component';
 import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';
 import { AppBarGuestUser } from './guest/app-bar-guest-user.component';

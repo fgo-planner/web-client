@@ -1,9 +1,10 @@
+import { MasterPlan } from '@fgo-planner/types';
 import { fade, IconButton, Link as MuiLink, makeStyles, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
 import { DeleteForever as DeleteForeverIcon } from '@material-ui/icons';
 import { WithStylesOptions } from '@material-ui/styles';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MasterPlan, ReadonlyPartial, ReadonlyPartialArray } from '../../../../types';
+import { ReadonlyPartial, ReadonlyPartialArray } from '../../../../types/internal';
 
 type Props = {
     masterPlans: ReadonlyPartialArray<MasterPlan>;

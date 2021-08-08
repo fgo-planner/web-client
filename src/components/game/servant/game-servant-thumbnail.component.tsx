@@ -1,9 +1,8 @@
+import { GameServant } from '@fgo-planner/types';
 import { Avatar, AvatarProps } from '@material-ui/core';
-import React, { PropsWithChildren } from 'react';
-import { useMemo } from 'react';
+import React, { PropsWithChildren, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';
-import { GameServant } from '../../../types';
 
 type Props = PropsWithChildren<{
     servant: Readonly<GameServant>;

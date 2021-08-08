@@ -1,7 +1,7 @@
+import { GameSoundtrack, MasterAccount } from '@fgo-planner/types';
 import { Fab, Tooltip } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { useMemo } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
@@ -10,7 +10,7 @@ import { BackgroundMusicService } from '../../../../services/audio/background-mu
 import { SoundtrackPlayerService } from '../../../../services/audio/soundtrack-player.service';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { GameSoundtrack, MasterAccount, Nullable } from '../../../../types';
+import { Nullable } from '../../../../types/internal';
 import { MasterSoundtracksListHeader } from './master-soundtracks-list-header.component';
 import { MasterSoundtracksList } from './master-soundtracks-list.component';
 

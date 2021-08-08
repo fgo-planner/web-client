@@ -1,11 +1,12 @@
-import { fade, IconButton, makeStyles, Link as MuiLink, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
+import { MasterAccount } from '@fgo-planner/types';
+import { fade, IconButton, Link as MuiLink, makeStyles, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
 import { DeleteForever as DeleteForeverIcon } from '@material-ui/icons';
 import { WithStylesOptions } from '@material-ui/styles';
 import React from 'react';
 import NumberFormat from 'react-number-format';
 import { Link } from 'react-router-dom';
 import { MasterAccountList as MasterAccountListType } from '../../../../services/data/master/master-account.service';
-import { MasterAccount, ReadonlyPartial } from '../../../../types';
+import { ReadonlyPartial } from '../../../../types/internal';
 
 type Props = {
     masterAccountList: MasterAccountListType;

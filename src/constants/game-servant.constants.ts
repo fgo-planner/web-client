@@ -1,5 +1,4 @@
-import { GameServantRarity, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel } from '../types';
-import { MasterServantSkillLevel } from '../types/data/master/servant/master-servant-skill-level.type';
+import { GameServantRarity, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/types';
 
 export class GameServantConstants {
 

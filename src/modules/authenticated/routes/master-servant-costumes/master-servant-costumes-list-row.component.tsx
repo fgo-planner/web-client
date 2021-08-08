@@ -1,13 +1,13 @@
+import { GameServant, GameServantCostume } from '@fgo-planner/types';
 import { Checkbox, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Done } from '@material-ui/icons';
 import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
-import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.compnent';
+import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
 import { GameServantThumbnail } from '../../../../components/game/servant/game-servant-thumbnail.component';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { GameServant, GameServantCostume } from '../../../../types';
 
 export type MasterServantCostumeRowData = GameServantCostume & {
     costumeId: number;

@@ -1,8 +1,8 @@
+import { GameItem } from '@fgo-planner/types';
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { Fragment } from 'react';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
-import { GameItem } from '../../../../types';
 
 type Props = {
     item: GameItem;

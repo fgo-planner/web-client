@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { ModuleComponent } from '../../components/base/module-component';
-import { RouteDefinitions } from '../../types';
+import { RouteDefinitions } from '../../types/internal';
 import { GameEventsRoute } from './routes/game-events.route';
 import { GameItemRoute } from './routes/game-item-route';
 import { GameItemsRoute } from './routes/game-items.route';

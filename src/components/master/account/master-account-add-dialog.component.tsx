@@ -3,7 +3,7 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { useAutoResizeDialog } from '../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
-import { DialogComponentProps } from '../../../types';
+import { DialogComponentProps } from '../../../types/internal';
 import { DialogCloseButton } from '../../dialog/dialog-close-button.component';
 import { InputFieldContainer } from '../../input/input-field-container.component';
 

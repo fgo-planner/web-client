@@ -1,4 +1,4 @@
-import { MasterPlan } from '../../../types';
+import { MasterPlan } from '@fgo-planner/types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 
 export class MasterPlanService {

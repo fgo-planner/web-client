@@ -1,3 +1,4 @@
+import { MasterPlan } from '@fgo-planner/types';
 import { Fab, PaperProps, Tooltip } from '@material-ui/core';
 import { Add as AddIcon } from '@material-ui/icons';
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -10,7 +11,7 @@ import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-e
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { MasterPlanService } from '../../../../services/data/master/master-plan.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { MasterPlan, ModalOnCloseReason, ReadonlyPartial, ReadonlyPartialArray } from '../../../../types';
+import { ModalOnCloseReason, ReadonlyPartial, ReadonlyPartialArray } from '../../../../types/internal';
 import { MasterPlanAddDialog } from './master-plan-add-dialog';
 import { MasterPlanList } from './master-plan-list.component';
 

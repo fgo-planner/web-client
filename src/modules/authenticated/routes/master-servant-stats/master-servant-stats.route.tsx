@@ -1,3 +1,4 @@
+import { MasterAccount } from '@fgo-planner/types';
 import { IconButton, Tooltip } from '@material-ui/core';
 import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@material-ui/icons';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
@@ -7,7 +8,7 @@ import { NavigationRail } from '../../../../components/navigation/navigation-rai
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { MasterAccount, Nullable } from '../../../../types';
+import { Nullable } from '../../../../types/internal';
 import { MasterServantStatsFilter, MasterServantStatsFilterResult } from './master-servant-stats-filter.component';
 import { MasterServantStatsTable } from './master-servant-stats-table.component';
 import { MasterServantStatsGroupedByClass, MasterServantStatsGroupedByRarity, MasterServantStatsUtils } from './master-servant-stats.utils';

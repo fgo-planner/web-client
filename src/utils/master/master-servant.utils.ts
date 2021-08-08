@@ -1,5 +1,5 @@
+import { GameServant, MasterServant, MasterServantAscensionLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
-import { GameServant, MasterServant, MasterServantAscensionLevel } from '../../types';
 
 export class MasterServantUtils {
 

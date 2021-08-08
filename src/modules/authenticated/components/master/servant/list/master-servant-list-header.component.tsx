@@ -3,7 +3,7 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import clsx from 'clsx';
 import React from 'react';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { ReadonlyPartial } from '../../../../../../types';
+import { ReadonlyPartial } from '../../../../../../types/internal';
 import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
 
 type Props = {

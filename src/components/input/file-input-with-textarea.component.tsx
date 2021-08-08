@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import React, { ChangeEvent, PropsWithChildren, PureComponent, ReactNode } from 'react';
 import Dropzone, { DropzoneRef, DropzoneState } from 'react-dropzone';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { ComponentStyleProps, WithStylesProps } from '../../types';
+import { ComponentStyleProps, WithStylesProps } from '../../types/internal';
 
 type Props = PropsWithChildren<{
     dropzoneRef?: React.RefObject<DropzoneRef>;

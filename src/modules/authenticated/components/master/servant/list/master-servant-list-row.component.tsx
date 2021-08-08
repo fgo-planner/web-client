@@ -1,10 +1,11 @@
+import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { IconButton, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { ClassNameMap, WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
 import React, { ReactNode, useCallback } from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { AssetConstants } from '../../../../../../constants';
-import { GameServant, MasterServant, MasterServantBondLevel, ReadonlyPartial } from '../../../../../../types';
+import { ReadonlyPartial } from '../../../../../../types/internal';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
 import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRowLabel } from './master-servant-list-row-label.component';

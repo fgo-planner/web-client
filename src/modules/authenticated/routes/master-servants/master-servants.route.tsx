@@ -1,3 +1,4 @@
+import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Fab, IconButton, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
 import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
 import { WithStylesOptions } from '@material-ui/styles';
@@ -15,7 +16,7 @@ import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-activ
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { MasterAccount, MasterServant, MasterServantBondLevel, ModalOnCloseReason, Nullable } from '../../../../types';
+import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';

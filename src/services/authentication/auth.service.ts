@@ -1,5 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
-import { Nullable, UserCredentials, UserInfo } from '../../types';
+import { UserCredentials } from '../../types/data';
+import { Nullable, UserInfo } from '../../types/internal';
 import { JwtUtils } from '../../utils/jwt.utils';
 
 export class AuthenticationService {

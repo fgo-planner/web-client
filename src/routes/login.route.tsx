@@ -5,7 +5,8 @@ import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } fro
 import { LoginForm } from '../components/login/login-form.component';
 import { PageTitle } from '../components/text/page-title.component';
 import { AuthenticationService } from '../services/authentication/auth.service';
-import { UserCredentials, WithStylesProps } from '../types';
+import { UserCredentials } from '../types/data';
+import { WithStylesProps } from '../types/internal';
 
 type Props = ReactRouteComponentProps & WithStylesProps;
 

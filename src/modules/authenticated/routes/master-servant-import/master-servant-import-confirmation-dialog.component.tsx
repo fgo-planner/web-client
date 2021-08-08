@@ -3,7 +3,7 @@ import React, { ChangeEvent, MouseEvent, useCallback } from 'react';
 import { useState } from 'react';
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../../../types';
+import { DialogComponentProps } from '../../../../types/internal';
 
 type RenderedProps = {
     cancelButtonColor?: ButtonProps['color'];

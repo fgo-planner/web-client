@@ -1,10 +1,11 @@
 
 
+import { GameItem } from '@fgo-planner/types';
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import clsx from 'clsx';
 import React from 'react';
-import { ComponentStyleProps, GameItem } from '../../../types';
+import { ComponentStyleProps } from '../../../types/internal';
 import { GameItemThumbnail } from './game-item-thumbnail.component';
 
 type Props = {

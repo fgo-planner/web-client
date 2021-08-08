@@ -1,12 +1,12 @@
+import { GameSoundtrack } from '@fgo-planner/types';
 import { Checkbox, fade, IconButton, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Done, Pause, PlayArrow } from '@material-ui/icons';
 import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
-import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.compnent';
+import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { GameSoundtrack } from '../../../../types';
 
 type Props = {
     soundtrack: Readonly<GameSoundtrack>;

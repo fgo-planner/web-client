@@ -1,5 +1,5 @@
 import { PureComponent } from 'react';
-import { RouteComponentProps } from '../../types';
+import { RouteComponentProps } from '../../types/internal';
 
 /**
  * @deprecated Replaced by function components that take `RouteComponentProps`

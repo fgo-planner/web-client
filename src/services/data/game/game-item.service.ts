@@ -1,4 +1,6 @@
-import { CacheArray, CacheMap, GameItem, Nullable, Page, Pagination } from '../../../types';
+import { GameItem } from '@fgo-planner/types';
+import { Page, Pagination } from '../../../types/data';
+import { CacheArray, CacheMap, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
 

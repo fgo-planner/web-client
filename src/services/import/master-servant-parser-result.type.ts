@@ -1,4 +1,4 @@
-import { MasterServant, MasterServantBondLevel } from '../../types';
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 
 export type MasterServantParserResult = {
     masterServants: MasterServant[];

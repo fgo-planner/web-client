@@ -1,3 +1,4 @@
+import { MasterPlan } from '@fgo-planner/types';
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, makeStyles, StyleRules, TextField, Theme, Typography } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/styles';
 import { Formik, FormikConfig, FormikProps } from 'formik';
@@ -6,7 +7,7 @@ import { DialogCloseButton } from '../../../../components/dialog/dialog-close-bu
 import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
 import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { MasterPlanService } from '../../../../services/data/master/master-plan.service';
-import { DialogComponentProps, MasterPlan } from '../../../../types';
+import { DialogComponentProps } from '../../../../types/internal';
 import { FormUtils } from '../../../../utils/form.utils';
 
 type Props = {

@@ -1,7 +1,7 @@
 import { Menu, MenuProps, PaperProps, PopoverClassKey, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { PureComponent, ReactNode } from 'react';
-import { WithStylesProps } from '../../types';
+import { WithStylesProps } from '../../types/internal';
 
 type Props = {
     closeDelay?: number;

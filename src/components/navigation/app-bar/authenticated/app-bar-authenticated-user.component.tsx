@@ -1,3 +1,4 @@
+import { MasterAccount } from '@fgo-planner/types';
 import { Avatar, StyleRules, Theme, withStyles } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { HomeOutlined as HomeOutlinedIcon } from '@material-ui/icons';
@@ -7,7 +8,7 @@ import { Subscription } from 'rxjs';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { BasicUser } from '../../../../services/data/user/user.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { MasterAccount, ModalOnCloseReason, ReadonlyPartialArray, WithStylesProps } from '../../../../types';
+import { ModalOnCloseReason, ReadonlyPartialArray, WithStylesProps } from '../../../../types/internal';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
 import { AppBarResourcesMenu } from '../app-bar-resources-menu.component';

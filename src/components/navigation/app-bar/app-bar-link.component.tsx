@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { MouseEventHandler, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { WithStylesProps } from '../../../types';
+import { WithStylesProps } from '../../../types/internal';
 
 type Props = {
     active?: boolean;

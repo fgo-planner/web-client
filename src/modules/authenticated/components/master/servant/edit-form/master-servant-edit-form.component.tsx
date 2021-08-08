@@ -1,3 +1,4 @@
+import { GameServant, MasterServant, MasterServantBondLevel, MasterServantSkillLevel } from '@fgo-planner/types';
 import { FormControl, InputLabel, makeStyles, Select, StyleRules, TextField, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/styles';
 import React, { ChangeEvent, FocusEvent, FormEvent, useCallback, useEffect, useState } from 'react';
@@ -6,8 +7,6 @@ import { GameServantConstants } from '../../../../../../constants';
 import { useGameServantList } from '../../../../../../hooks/data/use-game-servant-list.hook';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
-import { GameServant, MasterServant, MasterServantBondLevel } from '../../../../../../types';
-import { MasterServantSkillLevel } from '../../../../../../types/data/master/servant/master-servant-skill-level.type';
 import { ComponentStyleProps } from '../../../../../../types/internal/props/component-style-props.type';
 import { FormUtils } from '../../../../../../utils/form.utils';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';

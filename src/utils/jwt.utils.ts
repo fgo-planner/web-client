@@ -1,4 +1,4 @@
-import { UserInfo } from '../types';
+import { UserInfo } from '../types/internal';
 import jwt from 'jsonwebtoken';
 
 export class JwtUtils {

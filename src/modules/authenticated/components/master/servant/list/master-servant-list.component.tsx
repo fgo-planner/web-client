@@ -1,3 +1,4 @@
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Button, makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { PersonAddOutlined } from '@material-ui/icons';
@@ -7,7 +8,7 @@ import { DraggableListRowContainer } from '../../../../../../components/list/dra
 import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { MasterServant, MasterServantBondLevel, ReadonlyPartial } from '../../../../../../types';
+import { ReadonlyPartial } from '../../../../../../types/internal';
 import { ArrayUtils } from '../../../../../../utils/array.utils';
 import { MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRow } from './master-servant-list-row.component';

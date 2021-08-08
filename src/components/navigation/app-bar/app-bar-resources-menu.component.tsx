@@ -3,7 +3,7 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { MouseEvent, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { WithStylesProps } from '../../../types';
+import { WithStylesProps } from '../../../types/internal';
 import { HoverMenu } from '../../menu/hover-menu.component';
 
 type Props = {

@@ -1,9 +1,10 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthenticationService } from '../../services/authentication/auth.service';
-import { DialogComponentProps, UserCredentials, WithStylesProps } from '../../types';
+import { UserCredentials } from '../../types/data';
+import { DialogComponentProps, WithStylesProps } from '../../types/internal';
 import { DialogComponent } from '../base/dialog-component';
 import { DialogCloseButton } from '../dialog/dialog-close-button.component';
 import { LoginForm } from './login-form.component';

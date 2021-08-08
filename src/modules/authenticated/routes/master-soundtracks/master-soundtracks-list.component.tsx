@@ -1,10 +1,10 @@
+import { GameSoundtrack } from '@fgo-planner/types';
 import { makeStyles, StyleRules, Theme } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
-import { GameSoundtrack } from '../../../../types';
 import { MasterSoundtracksListRow } from './master-soundtracks-list-row.component';
 
 type Props = {

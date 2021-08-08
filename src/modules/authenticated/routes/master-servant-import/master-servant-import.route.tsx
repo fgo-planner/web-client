@@ -1,3 +1,4 @@
+import { MasterAccount, MasterServant } from '@fgo-planner/types';
 import { Button, Fab, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Clear as ClearIcon, Done as DoneIcon, Publish as PublishIcon } from '@material-ui/icons';
@@ -16,12 +17,12 @@ import { MasterAccountService } from '../../../../services/data/master/master-ac
 import { FgoManagerMasterServantParser } from '../../../../services/import/fgo-manager/fgo-manager-master-servant-parser';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { MasterAccount, MasterServant, ModalOnCloseReason, Nullable } from '../../../../types';
+import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
-import { MasterServantImportConfirmationDialog } from './master-servant-import-confrimation-dialog.component';
+import { MasterServantImportConfirmationDialog } from './master-servant-import-confirmation-dialog.component';
 
 const FileInputHelperText = 'To import the servant data from FGO Manager, download the \'Roster\' sheet as a .csv file and upload it here.';
 

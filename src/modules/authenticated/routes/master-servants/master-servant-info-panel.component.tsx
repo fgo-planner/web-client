@@ -1,3 +1,4 @@
+import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Link, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
 import { ClassNameMap, WithStylesOptions } from '@material-ui/styles';
 import clsx from 'clsx';
@@ -9,7 +10,6 @@ import { DataPointListItem } from '../../../../components/list/data-point-list-i
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { GameServant, MasterServant, MasterServantBondLevel } from '../../../../types';
 import { MasterPlanComputationUtils, ResultType1 } from '../../../../utils/master/master-plan-computation.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';

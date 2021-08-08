@@ -1,3 +1,4 @@
+import { MasterAccount } from '@fgo-planner/types';
 import { Fab, IconButton, Tooltip } from '@material-ui/core';
 import { Clear as ClearIcon, Edit as EditIcon, FormatListBulleted as FormatListBulletedIcon, Save as SaveIcon } from '@material-ui/icons';
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -9,7 +10,7 @@ import { PageTitle } from '../../../../components/text/page-title.component';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { MasterAccount, Nullable } from '../../../../types';
+import { Nullable } from '../../../../types/internal';
 import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
 import { MasterServantCostumesList } from './master-servant-costumes-list.component';
 

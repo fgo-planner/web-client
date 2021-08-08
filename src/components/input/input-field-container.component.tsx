@@ -1,5 +1,5 @@
 import React, { CSSProperties, PropsWithChildren, useMemo } from 'react';
-import { ComponentStyleProps } from '../../types';
+import { ComponentStyleProps } from '../../types/internal';
 
 type Props = PropsWithChildren<{
     width?: string | number;

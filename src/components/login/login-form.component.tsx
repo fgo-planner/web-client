@@ -3,7 +3,8 @@ import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import { PureComponent, ReactNode } from 'react';
 import * as Yup from 'yup';
-import { ComponentStyleProps, UserCredentials, WithStylesProps } from '../../types';
+import { UserCredentials } from '../../types/data';
+import { ComponentStyleProps, WithStylesProps } from '../../types/internal';
 import { FormUtils } from '../../utils/form.utils';
 import { InputFieldContainer } from '../input/input-field-container.component';
 

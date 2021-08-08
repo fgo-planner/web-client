@@ -1,7 +1,7 @@
 import { Button } from '@material-ui/core';
 import { PersonAdd as PersonAddIcon } from '@material-ui/icons';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
-import { ModalOnCloseReason } from '../../../../types';
+import { ModalOnCloseReason } from '../../../../types/internal';
 import { MasterAccountAddDialog } from '../../../master/account/master-account-add-dialog.component';
 
 type Props = {

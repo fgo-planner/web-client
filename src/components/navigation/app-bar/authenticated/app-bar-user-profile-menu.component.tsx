@@ -7,7 +7,7 @@ import { BasicUser } from '../../../../services/data/user/user.service';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseHandler, WithStylesProps } from '../../../../types';
+import { ModalOnCloseHandler, WithStylesProps } from '../../../../types/internal';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
 import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 

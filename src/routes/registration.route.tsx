@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import { InputFieldContainer } from '../components/input/input-field-container.component';
 import { PageTitle } from '../components/text/page-title.component';
 import { UserService } from '../services/data/user/user.service';
-import { WithStylesProps } from '../types';
+import { WithStylesProps } from '../types/internal';
 import { FormUtils } from '../utils/form.utils';
 
 type FormData = {

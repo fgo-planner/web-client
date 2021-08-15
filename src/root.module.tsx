@@ -78,6 +78,7 @@ export class RootModule extends ModuleComponent {
     ];
 
     componentDidMount() {
+        super.componentDidMount();
         const autoplayMusic = process.env.REACT_APP_AUTOPLAY_MUSIC;
         if (autoplayMusic && autoplayMusic.toLowerCase() === 'true') {
             // Autoplay background music

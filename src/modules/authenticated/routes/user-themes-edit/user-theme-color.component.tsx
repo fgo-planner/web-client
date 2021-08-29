@@ -40,7 +40,7 @@ const style = (theme: Theme) => ({
     colorSwatchContainer: {
         width: 64,
         height: 64,
-        marginRight: theme.spacing(4)
+        marginRight: theme.spacing(6)
     },
     label: {
         width: 120

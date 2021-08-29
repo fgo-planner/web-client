@@ -17,7 +17,10 @@ const style = (theme: Theme) => ({
     root: {
         width: Size,
         height: Size,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: theme.palette.divider
     },
     colorPickerIcon: {
         display: 'flex',

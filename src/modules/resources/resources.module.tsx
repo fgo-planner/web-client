@@ -50,7 +50,6 @@ export default class ResourcesModule extends ModuleComponent {
     ];
 
     render(): ReactNode {
-        console.log("RESOURCES RENDERED")
         return super.render();
     }
 

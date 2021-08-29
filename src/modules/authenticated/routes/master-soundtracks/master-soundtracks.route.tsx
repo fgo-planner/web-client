@@ -115,7 +115,7 @@ export const MasterSoundtracksRoute = React.memo(() => {
             soundtracks: [...unlockedSoundtracksSet]
         };
         MasterAccountService.updateAccount(update)
-            .catch(handleUpdateError.bind(this));
+            .catch(handleUpdateError);
 
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {

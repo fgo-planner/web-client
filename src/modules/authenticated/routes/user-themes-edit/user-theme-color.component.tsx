@@ -66,8 +66,8 @@ export const UserThemeColor = React.memo((props: Props) => {
 
     const { label, color, allowEditAlpha } = props;
 
-    const [colorInputValue, setColorInputValue] = useState<string>();
-    const [alphaInputValue, setAlphaInputValue] = useState<string>();
+    const [colorInputValue, setColorInputValue] = useState<string>('');
+    const [alphaInputValue, setAlphaInputValue] = useState<string>('');
     /**
      * Copy of the `color` prop. Should always be set to a new object reference 
      * whenever values inside `color` are updated in order to allow the swatch
@@ -157,10 +157,8 @@ export const UserThemeColor = React.memo((props: Props) => {
     const colorInputField = (
         <TextField
             variant="outlined"
-            // size="small"
             fullWidth
             label="Color (Hex or RGBA)"
-            name="color"
             type="string"
             value={colorInputValue}
             onChange={handleColorInputFieldChange}
@@ -171,10 +169,8 @@ export const UserThemeColor = React.memo((props: Props) => {
     const alphaInputField = (
         <TextField
             variant="outlined"
-            // size="small"
             fullWidth
             label="Alpha"
-            name="alpha"
             type="number"
             inputProps={AlphaInputProps}
             value={alphaInputValue}

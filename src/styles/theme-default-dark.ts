@@ -10,8 +10,6 @@ const themeDefaultDark = () => {
         palette: {
             type: 'dark',
             background: {
-                // default: '#23272A',
-                // paper: '#2C2F33'
                 default: fade('#001E3C', 0.91),
                 paper: '#1A344F'
 

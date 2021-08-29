@@ -115,7 +115,7 @@ export const MasterItemsRoute = React.memo(() => {
             qp: qpItem?.quantity || 0
         };
         MasterAccountService.updateAccount(update)
-            .catch(handleUpdateError.bind(this));
+            .catch(handleUpdateError);
 
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {

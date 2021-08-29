@@ -40,11 +40,29 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
         <LayoutPanelContainer className="m-4" title={title} titlePosition="inside">
             <div className="flex">
                 <div style={{ flex: 0.5 }}>
-                    <UserThemeColor color={userTheme.backgroundColor} label="Background" allowEditAlpha />
-                    <UserThemeColor color={userTheme.foregroundColor} label="Foreground" allowEditAlpha />
-                    <UserThemeColor color={userTheme.primaryColor} label="Primary" />
-                    <UserThemeColor color={userTheme.secondaryColor} label="Secondary" />
-                    <UserThemeColor color={userTheme.dividerColor} label="Divider" allowEditAlpha />
+                    <UserThemeColor
+                        color={userTheme.backgroundColor}
+                        label="Background"
+                        allowEditAlpha
+                    />
+                    <UserThemeColor
+                        color={userTheme.foregroundColor}
+                        label="Foreground"
+                        allowEditAlpha
+                    />
+                    <UserThemeColor
+                        color={userTheme.primaryColor}
+                        label="Primary"
+                    />
+                    <UserThemeColor
+                        color={userTheme.secondaryColor}
+                        label="Secondary"
+                    />
+                    <UserThemeColor
+                        color={userTheme.dividerColor}
+                        label="Divider"
+                        allowEditAlpha
+                    />
                 </div>
                 <div style={{ flex: 0.5 }}>
                     <UserThemeBackgroundImage

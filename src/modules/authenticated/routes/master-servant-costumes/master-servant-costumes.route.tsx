@@ -98,7 +98,7 @@ export const MasterServantCostumesRoute = React.memo(() => {
             costumes: [...unlockedCostumesSet]
         };
         MasterAccountService.updateAccount(update)
-            .catch(handleUpdateError.bind(this));
+            .catch(handleUpdateError);
 
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {

@@ -203,7 +203,6 @@ const Registration = withRouter(withStyles(style, styleOptions)(class extends Pu
     private _renderRegistrationStage(): ReactNode {
         const { classes } = this.props;
         const { termsAccepted, awaitingResponse, errorMessage } = this.state;
-        console.log(awaitingResponse, termsAccepted)
         return (
             <Fragment>
                 {errorMessage &&

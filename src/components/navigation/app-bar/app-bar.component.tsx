@@ -111,7 +111,6 @@ export const AppBar = withStyles(style, styleOptions)(class extends PureComponen
     }
 
     private async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
-        console.log(userInfo);
         if (userInfo) {
             // TODO Handle error
             const currentUser = await UserService.getCurrentUser();

@@ -11,6 +11,7 @@ import { MasterServantStatsRoute } from './routes/master-servant-stats/master-se
 import { MasterServantsRoute } from './routes/master-servants/master-servants.route';
 import { MasterSoundtracksRoute } from './routes/master-soundtracks/master-soundtracks.route';
 import { UserSettingsRoute } from './routes/user-settings.route';
+import { UserThemesEditRoute } from './routes/user-themes-edit/user-themes-edit.route';
 
 export default class AuthenticatedModule extends ModuleComponent {
 
@@ -24,6 +25,11 @@ export default class AuthenticatedModule extends ModuleComponent {
             path: '/settings',
             exact: true,
             component: UserSettingsRoute
+        },
+        {
+            path: '/settings/theme',
+            exact: true,
+            component: UserThemesEditRoute
         },
         {
             path: '/master-accounts',

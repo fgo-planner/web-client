@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { ModuleComponent } from './components/base/module-component';
 import { NavigationMain } from './components/navigation/navigation-main.component';
-import { ThemeManager } from './components/theme/theme-manager.component';
+import { ThemeProviderWrapper } from './components/theme/theme-provider-wrapper.component';
 import { ErrorRoute } from './routes/error.route';
 import { ForgotPasswordRoute } from './routes/forgot-password.route';
 import { HomeRoute } from './routes/home.route';
@@ -89,11 +89,11 @@ export class RootModule extends ModuleComponent {
     render(): ReactNode {
         return (
             <BrowserRouter>
-                <ThemeManager>
+                <ThemeProviderWrapper>
                     <NavigationMain>
                         {this._renderModuleRoutes()}
                     </NavigationMain>
-                </ThemeManager>
+                </ThemeProviderWrapper>
             </BrowserRouter>
         );
     }

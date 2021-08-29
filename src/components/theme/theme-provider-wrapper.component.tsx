@@ -8,17 +8,21 @@ import { ThemeScrollbars } from './theme-scrollbars.component';
 type Props = PropsWithChildren<{}>;
 
 /**
- * Utility component for managing and updating the application's theme state.
+ * Utility component for listening for theme changes from the `ThemeService` and
+ * updating the application's theme state accordingly.
  */
-export const ThemeManager = React.memo(({ children }: Props) => {
+export const ThemeProviderWrapper = React.memo(({ children }: Props) => {
+
     const [theme, setTheme] = useState<Theme>(createMuiTheme({})); // Initialize with default Material-UI theme
+    
     const [backgroundImageUrl, setBackgroundImageUrl] = useState<string>();
 
     useEffect(() => {
         const onThemeChangeSubscription = ThemeService.onThemeChange
             .subscribe((themeInfo: ThemeInfo) => {
-                setTheme(themeInfo.theme);
-                setBackgroundImageUrl(themeInfo.backgroundImageUrl);
+                const { themeOptions, backgroundImageUrl } = themeInfo;
+                setTheme(createMuiTheme(themeOptions));
+                setBackgroundImageUrl(backgroundImageUrl);
             });
 
         return () => onThemeChangeSubscription.unsubscribe();

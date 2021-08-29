@@ -31,7 +31,7 @@ export class PageMetadataService {
         }
     }
 
-    static setThemeColor(themeColor: string): void {
+    static setThemeColor(themeColor: string | undefined): void {
         if (themeColor !== this._metadata.themeColor) {
             this._metadata.themeColor = themeColor;
             this._notifyChanges();

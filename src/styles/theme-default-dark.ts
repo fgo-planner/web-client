@@ -5,7 +5,7 @@ import breakpoints from './theme-breakpoints';
 import { ThemeConstants } from './theme-constants';
 
 const themeDefaultDark = () => {
-    const theme: ThemeOptions = {
+    return {
         spacing: ThemeConstants.Spacing,
         palette: {
             type: 'dark',
@@ -26,8 +26,7 @@ const themeDefaultDark = () => {
         },
         breakpoints,
         overrides
-    };
-    return theme;
+    } as ThemeOptions;
 };
 
 export default themeDefaultDark;

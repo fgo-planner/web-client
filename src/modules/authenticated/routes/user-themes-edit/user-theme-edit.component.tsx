@@ -5,6 +5,7 @@ import { UserWebClientTheme } from '../../../../../local_modules/types/lib';
 import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { ThemeMode, ThemeService } from '../../../../services/user-interface/theme.service';
+import { UserThemeBackgroundImage } from './user-theme-background-image.component';
 import { UserThemeColor } from './user-theme-color.component';
 
 type Props = {
@@ -26,6 +27,11 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
         forceUpdate();
     }, [forThemeMode, userTheme, forceUpdate]);
 
+    const handleBackgroundImageUrlChange = useCallback((url: string): void => {
+        userTheme!!.backgroundImageUrl = url;
+        forceUpdate();
+    }, [userTheme, forceUpdate]);
+
     if (!userTheme) {
         return null;
     }
@@ -41,7 +47,10 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
                     <UserThemeColor color={userTheme.dividerColor} label="Divider" allowEditAlpha />
                 </div>
                 <div style={{ flex: 0.5 }}>
-                    Background Image
+                    <UserThemeBackgroundImage
+                        url={userTheme.backgroundImageUrl}
+                        onChange={handleBackgroundImageUrlChange}
+                    />
                 </div>
             </div>
             <div className="p-6">

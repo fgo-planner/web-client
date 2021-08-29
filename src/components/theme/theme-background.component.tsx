@@ -10,7 +10,7 @@ type Props = ComponentStyleProps;
 const generateBackgroundStyle = (imageUrl?: string, blur?: number): CSSProperties => {
     const style: CSSProperties = {};
     if (imageUrl) {
-        style.backgroundImage = `url(${imageUrl})`;
+        style.backgroundImage = `url('${imageUrl}')`;
     };
     if (blur) {
         style.backdropFilter = `blur(${blur}px)`;

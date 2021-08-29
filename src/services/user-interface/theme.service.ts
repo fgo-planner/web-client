@@ -7,7 +7,6 @@ import { AssetConstants } from '../../constants';
 import defaultDarkTheme from '../../styles/theme-default-dark';
 import defaultLightTheme from '../../styles/theme-default-light';
 import { Nullable } from '../../types/internal';
-import { ColorUtils } from '../../utils/color.utils';
 import { UserService } from '../data/user/user.service';
 import { PageMetadataService } from './page-metadata.service';
 
@@ -176,10 +175,10 @@ export class ThemeService {
         }
         const background = palette.background;
         if (backgroundColor) {
-            background.default = ColorUtils.rgbaColorToString(backgroundColor);
+            background.default = colord(backgroundColor).toRgbString();
         }
         if (foregroundColor) {
-            background.paper = ColorUtils.rgbaColorToString(foregroundColor);
+            background.paper = colord(foregroundColor).toRgbString();
         }
 
         /*
@@ -206,7 +205,7 @@ export class ThemeService {
          * Divider color
          */
         if (dividerColor) {
-            palette.divider = ColorUtils.rgbaColorToString(dividerColor);
+            palette.divider = colord(dividerColor).toRgbString();
         }
 
     }

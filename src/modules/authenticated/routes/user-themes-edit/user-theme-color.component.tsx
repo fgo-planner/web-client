@@ -96,7 +96,7 @@ export const UserThemeColor = React.memo((props: Props) => {
         Object.assign(color, newColor);
         setColorInputValue(toHexDisplayValue(color));
         setAlphaInputValue(toAlphaDisplayValue(color));
-        setSwatchDisplayColor(newColor as RgbaColor);
+        setSwatchDisplayColor(newColor);
     }, [color]);
 
     const handleColorPickerClose = useCallback((event: {}, reason: ModalOnCloseReason): void => {
@@ -198,7 +198,6 @@ export const UserThemeColor = React.memo((props: Props) => {
             <div className={classes.alphaInputFieldContainer}>
                 {alphaInputField}
             </div>
-            {/* <RgbaColorPicker color={color} onChange={setColor2} /> */}
             <UserThemeColorPickerMenu
                 color={color}
                 allowEditAlpha={allowEditAlpha}

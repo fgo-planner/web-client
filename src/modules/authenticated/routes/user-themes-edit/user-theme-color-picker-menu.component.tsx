@@ -58,7 +58,7 @@ export const UserThemeColorPickerMenu = React.memo((props: Props) => {
         onClose
     } = props;
 
-    // const [pickerColor, setPickerColor] = useState<RgbaColor>(color);
+    const pickerColor = { ...color }; // Forces color picker to update.
 
     return (
         <Menu
@@ -77,8 +77,8 @@ export const UserThemeColorPickerMenu = React.memo((props: Props) => {
                 </div>
                 <div className={classes.pickerContainer}>
                     {allowEditAlpha ?
-                        <RgbaColorPicker color={color} onChange={onChange} /> :
-                        <RgbColorPicker color={color} onChange={onChange} />
+                        <RgbaColorPicker color={pickerColor} onChange={onChange} /> :
+                        <RgbColorPicker color={pickerColor} onChange={onChange} />
                     }
                 </div>
                 {/* TODO Add real time color info */}

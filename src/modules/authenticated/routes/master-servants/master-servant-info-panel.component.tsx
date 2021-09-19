@@ -10,7 +10,7 @@ import { DataPointListItem } from '../../../../components/list/data-point-list-i
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { MasterPlanComputationUtils, ResultType1 } from '../../../../utils/master/master-plan-computation.utils';
+import { PlannerComputationUtils, ResultType1 } from '../../../../utils/planner/planner-computation.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
@@ -171,7 +171,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
             setServantMaterialStats(undefined);
         } else {
             const servant = gameServantMap[activeServant.gameId];
-            const servantMaterialStats = MasterPlanComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
+            const servantMaterialStats = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
             setServant(servant);
             setServantMaterialStats(servantMaterialStats);
         }
@@ -192,7 +192,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
          * Re-compute servant material stats
          */
         const servant = gameServantMap[activeServant.gameId];
-        const servantMaterialStats = MasterPlanComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
+        const servantMaterialStats = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
         setServantMaterialStats(servantMaterialStats);
 
         onStatsChange && onStatsChange(data);

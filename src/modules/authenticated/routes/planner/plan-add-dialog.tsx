@@ -1,4 +1,4 @@
-import { MasterPlan } from '@fgo-planner/types';
+import { Plan } from '@fgo-planner/types';
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, makeStyles, StyleRules, TextField, Theme, Typography } from '@material-ui/core';
 import { WithStylesOptions } from '@material-ui/styles';
 import { Formik, FormikConfig, FormikProps } from 'formik';
@@ -6,13 +6,13 @@ import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
 import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
 import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { MasterPlanService } from '../../../../services/data/master/master-plan.service';
+import { PlannerService } from '../../../../services/data/planner/planner.service';
 import { DialogComponentProps } from '../../../../types/internal';
 import { FormUtils } from '../../../../utils/form.utils';
 
 type Props = {
     masterAccountId: string | undefined;
-} & DialogComponentProps<MasterPlan>;
+} & DialogComponentProps<Plan>;
 
 type FormData = {
     name: string;
@@ -48,12 +48,12 @@ const style = (theme: Theme) => ({
 } as StyleRules);
 
 const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterPlanAddDialog'
+    classNamePrefix: 'PlanAddDialog'
 };
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterPlanAddDialog = React.memo((props: Props) => {
+export const PlanAddDialog = React.memo((props: Props) => {
 
     const {
         masterAccountId,
@@ -91,7 +91,7 @@ export const MasterPlanAddDialog = React.memo((props: Props) => {
         setIsSubmitting(true);
         setErrorMessage(undefined);
         try {
-            const plan = await MasterPlanService.addPlan({
+            const plan = await PlannerService.addPlan({
                 ...values,
                 accountId: masterAccountId
             });

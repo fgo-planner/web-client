@@ -1,4 +1,4 @@
-import { MasterPlan } from '@fgo-planner/types';
+import { Plan } from '@fgo-planner/types';
 import { fade, IconButton, Link as MuiLink, makeStyles, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
 import { DeleteForever as DeleteForeverIcon } from '@material-ui/icons';
 import { WithStylesOptions } from '@material-ui/styles';
@@ -7,8 +7,8 @@ import { Link } from 'react-router-dom';
 import { ReadonlyPartial, ReadonlyPartialArray } from '../../../../types/internal';
 
 type Props = {
-    masterPlans: ReadonlyPartialArray<MasterPlan>;
-    onDeletePlan: (masterPlan: ReadonlyPartial<MasterPlan>) => void;
+    plans: ReadonlyPartialArray<Plan>;
+    onDeletePlan: (plan: ReadonlyPartial<Plan>) => void;
 };
 
 const style = (theme: Theme) => ({
@@ -27,12 +27,12 @@ const style = (theme: Theme) => ({
 } as StyleRules);
 
 const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterPlanList'
+    classNamePrefix: 'PlanList'
 };
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const MasterPlanList = React.memo(({ masterPlans, onDeletePlan }: Props) => {
+export const PlanList = React.memo(({ plans, onDeletePlan }: Props) => {
     const classes = useStyles();
 
     return (
@@ -47,15 +47,15 @@ export const MasterPlanList = React.memo(({ masterPlans, onDeletePlan }: Props) 
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {masterPlans.map(masterPlan => (
-                        <TableRow key={masterPlan._id} className={classes.dataRow}>
+                    {plans.map(plan => (
+                        <TableRow key={plan._id} className={classes.dataRow}>
                             <TableCell className="truncate">
-                                <MuiLink component={Link} to='./master' underline="none">
-                                    {masterPlan.name || 'No Name'}
+                                <MuiLink component={Link} to='../master' underline="none">
+                                    {plan.name || 'No Name'}
                                 </MuiLink>
                             </TableCell>
                             <TableCell className="truncate">
-                                {masterPlan.description || '\u2013'}
+                                {plan.description || '\u2013'}
                             </TableCell>
                             <TableCell />
                             <TableCell align="center">
@@ -63,7 +63,7 @@ export const MasterPlanList = React.memo(({ masterPlans, onDeletePlan }: Props) 
                                     <IconButton
                                         className={classes.actionButton}
                                         color="secondary"
-                                        onClick={() => onDeletePlan(masterPlan)}
+                                        onClick={() => onDeletePlan(plan)}
                                         children={<DeleteForeverIcon />}
                                     />
                                 </Tooltip>

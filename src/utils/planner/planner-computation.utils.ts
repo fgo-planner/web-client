@@ -22,7 +22,7 @@ type ServantEnhancements = Readonly<{
     appendSkills: SkillEnhancements;
 }>;
 
-export class MasterPlanComputationUtils {
+export class PlannerComputationUtils {
 
     private static _DefaultTargetEnhancements: ServantEnhancements = {
         ascension: 4,

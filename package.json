@@ -45,6 +45,7 @@
     "yup": "^0.32.8"
   },
   "scripts": {
+    "postinstall": "cd node_modules/@fgo-planner/types && npm run build-ts",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

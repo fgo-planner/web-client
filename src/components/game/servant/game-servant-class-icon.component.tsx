@@ -35,6 +35,7 @@ const ClassNameMap: ReadonlyRecord<ClassIconName, string> = {
     [GameServantClass.BeastIIIR]: 'Beast III/R',
     [GameServantClass.BeastIIIL]: 'Beast III/L',
     [GameServantClass.BeastFalse]: 'Beast (False)',
+    [GameServantClass.Pretender]: GameServantClass.Pretender,
     [GameServantClass.Unknown]: GameServantClass.Unknown,
     'Extra': 'Extra',
     'All': 'All'
@@ -59,6 +60,7 @@ const ClassNumberMap: ReadonlyRecord<ClassIconName, number> = {
     [GameServantClass.BeastIIIR]: 24,
     [GameServantClass.BeastIIIL]: 26,
     [GameServantClass.BeastFalse]: 27,
+    [GameServantClass.Pretender]: 28,
     [GameServantClass.Unknown]: 12,
     'Extra': 1002,
     'All': 0 // TODO Find the code for this

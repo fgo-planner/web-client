@@ -1,8 +1,8 @@
 import { GameSoundtrack } from '@fgo-planner/types';
-import { Checkbox, alpha, IconButton, Theme } from '@mui/material';
+import { Done, Pause, PlayArrow } from '@mui/icons-material';
+import { alpha, Checkbox, IconButton, Theme } from '@mui/material';
 import { StyleRules, WithStylesOptions } from '@mui/styles';
 import makeStyles from '@mui/styles/makeStyles';
-import { Done, Pause, PlayArrow } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';

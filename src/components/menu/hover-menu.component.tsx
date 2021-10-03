@@ -1,7 +1,7 @@
-import { Menu, MenuProps, PaperProps, PopoverClassKey, Theme } from '@mui/material';
+import { Menu, MenuProps, PaperProps, Theme } from '@mui/material';
 import { StyleRules, WithStylesOptions } from '@mui/styles';
 import withStyles from '@mui/styles/withStyles';
-import React, { PureComponent, ReactNode } from 'react';
+import { PureComponent, ReactNode } from 'react';
 import { WithStylesProps } from '../../types/internal';
 
 type Props = {
@@ -28,8 +28,6 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 export const HoverMenu = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
 
-    private readonly _popoverClasses: Partial<Record<PopoverClassKey, string>>;
-
     private _closeRequested = false;
 
     private _isMounted = true;
@@ -43,8 +41,6 @@ export const HoverMenu = withStyles(style, styleOptions)(class extends PureCompo
 
         this._handleMouseEnter = this._handleMouseEnter.bind(this);
         this._handleMouseLeave = this._handleMouseLeave.bind(this);
-
-        this._popoverClasses = { root: props.classes.root };
     }
 
     componentDidUpdate(prevProps: Props): void {
@@ -78,9 +74,8 @@ export const HoverMenu = withStyles(style, styleOptions)(class extends PureCompo
         return (
             <Menu 
                 {...menuProps}
-                classes={{ paper: classes.paper }}
+                classes={classes}
                 open={open}
-                PopoverClasses={this._popoverClasses}
                 PaperProps={this._generatePaperProps()}
                 keepMounted
             />

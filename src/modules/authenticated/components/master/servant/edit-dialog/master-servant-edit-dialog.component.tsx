@@ -1,30 +1,13 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Theme,
-    Typography,
-} from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Theme, Typography } from '@mui/material';
 import { StyleRules, WithStylesOptions } from '@mui/styles';
-import withStyles from '@mui/styles/withStyles';
-import { FormEvent, MouseEvent, ReactNode } from 'react';
-import { DialogComponent } from '../../../../../../components/base/dialog-component';
+import makeStyles from '@mui/styles/makeStyles';
+import React, { FormEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
-import { DialogComponentProps, Nullable, WithStylesProps } from '../../../../../../types/internal';
+import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
+import { DialogComponentProps } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantEditForm, SubmitData } from '../edit-form/master-servant-edit-form.component';
-
-// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent: any) => (props: any) => <WrappedComponent {...props} width="xs" />;
-
-type RenderedProps = {
-    disableServantSelect?: boolean;
-    dialogTitle?: string;
-    submitButtonLabel?: string;
-};
 
 type Props = {
     /**
@@ -34,35 +17,16 @@ type Props = {
     masterServant?: MasterServant;
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
     unlockedCostumes: Array<number>;
-} & (
-    RenderedProps &
-    WithStylesProps &
-    Omit<DialogComponentProps<SubmitData>, 'keepMounted' | 'onExited' | 'PaperProps'>
-);
-
-type State = {
-    masterServant: MasterServant;
-};
+    disableServantSelect?: boolean;
+    dialogTitle?: string;
+    submitButtonLabel?: string;
+} & Omit<DialogComponentProps<SubmitData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const FormId = 'master-servant-edit-dialog-form';
 
 const style = (theme: Theme) => ({
     form: {
         paddingTop: theme.spacing(4)
-    },
-    inputFieldGroup: {
-        display: 'flex',
-        flexWrap: 'nowrap',
-        [theme.breakpoints.down('sm')]: {
-            flexWrap: 'wrap'
-        }
-    },
-    inputFieldContainer: {
-        flex: 1,
-        padding: theme.spacing(0, 2),
-        [theme.breakpoints.down('sm')]: {
-            flex: '100% !important'
-        }
     }
 } as StyleRules);
 
@@ -70,130 +34,103 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'MasterServantEditDialog'
 };
 
-export const MasterServantEditDialog = withWidth()(withStyles(style, styleOptions)(class extends DialogComponent<Props, State, SubmitData> {
+const useStyles = makeStyles(style, styleOptions);
 
-    private _propsSnapshot: Nullable<RenderedProps>;
+export const MasterServantEditDialog = React.memo((props: Props) => {
 
-    constructor(props: Props) {
-        super(props);
+    const {
+        bondLevels,
+        unlockedCostumes,
+        disableServantSelect,
+        dialogTitle,
+        submitButtonLabel,
+        onClose,
+        ...dialogProps
+    } = props;
 
-        const { masterServant } = props;
+    const classes = useStyles();
 
-        this.state = {
-            masterServant: masterServant || MasterServantUtils.instantiate() // Instantiate new servant if needed
-        };
+    const [masterServant, setMasterServant] = useState<MasterServant>(props.masterServant || MasterServantUtils.instantiate());
 
-        this._handleOnDialogExited = this._handleOnDialogExited.bind(this);
-        this._submit = this._submit.bind(this);
-        this._cancel = this._cancel.bind(this);
-    }
+    /**
+     * Update the masterMaster state if the one from the props has changed.
+     */
+    useEffect(() => {
+        setMasterServant(props.masterServant || MasterServantUtils.instantiate());
+    }, [props.masterServant]);
 
-    shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>): boolean {
-        if (!nextProps.open && this.props.open) {
-            const {
-                disableServantSelect,
-                dialogTitle,
-                submitButtonLabel
-            } = this.props;
+    /**
+     * Contains cache of the dialog contents.
+     */
+    const dialogContentsRef = useRef<JSX.Element>();
 
-            this._propsSnapshot = {
-                disableServantSelect,
-                dialogTitle,
-                submitButtonLabel
-            };
-        }
-        return super.shouldComponentUpdate(nextProps, nextState);
-    }
+    const {
+        fullScreen,
+        closeIconEnabled,
+        actionButtonVariant
+    } = useAutoResizeDialog(props);
 
-    componentDidUpdate(prevProps: Props): void {
-        const { masterServant, open } = this.props;
-        if (masterServant !== prevProps.masterServant || (open && !prevProps.open)) {
-            this.setState({
-                masterServant: masterServant || MasterServantUtils.instantiate() // Instantiate new servant if needed
-            });
-        }
-    }
+    const submit = useCallback((event: FormEvent<HTMLFormElement>, data: SubmitData): void => {
+        onClose(event, 'submit', data);
+    }, [onClose]);
 
-    render(): ReactNode {
+    const cancel = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
+        onClose(event, 'cancel');
+    }, [onClose]);
 
-        const {
-            classes,
-            masterServant,
-            bondLevels,
-            unlockedCostumes,
-            disableServantSelect,
-            dialogTitle,
-            submitButtonLabel,
-            ...dialogProps
-        } = {
-            ...this.props,
-            ...this._propsSnapshot
-        };
-
-        const {
-            fullScreen,
-            closeIconEnabled,
-            actionButtonVariant
-        } = this._computeFullScreenProps();
-
-        return (
-            <Dialog
-                {...dialogProps}
-                PaperProps={{ style: { width: 600 } }}
-                fullScreen={fullScreen}
-                keepMounted={false}
-                TransitionProps={{
-                    onExited: this._handleOnDialogExited
-                }}>
-                <Typography component={'div'}>
-                    <DialogTitle>
-                        {dialogTitle}
-                        {closeIconEnabled && <DialogCloseButton onClick={this._cancel} />}
-                    </DialogTitle>
-                    <DialogContent>
-                        <MasterServantEditForm
-                            formId={FormId}
-                            masterServant={this.state.masterServant} // Use masterServant from state, not from props.
-                            bondLevels={bondLevels}
-                            unlockedCostumes={unlockedCostumes}
-                            onSubmit={this._submit}
-                            servantSelectDisabled={disableServantSelect}
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button
-                            variant={actionButtonVariant}
-                            color="secondary"
-                            onClick={this._cancel}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            variant={actionButtonVariant}
-                            color="primary"
-                            form={FormId}
-                            type="submit"
-                        >
-                            {submitButtonLabel || 'Submit'}
-                        </Button>
-                    </DialogActions>
-                </Typography>
-            </Dialog>
+    /*
+     * Only re-render the dialog contents if the dialog is open. This allows the
+     * dialog to keep displaying the same contents while it is undergoing its exit
+     * transition, even if the props were changed by the parent component.
+     */
+    if (!dialogContentsRef.current || props.open) {
+        dialogContentsRef.current = (
+            <Typography component={'div'}>
+                <DialogTitle>
+                    {dialogTitle}
+                    {closeIconEnabled && <DialogCloseButton onClick={cancel} />}
+                </DialogTitle>
+                <DialogContent>
+                    <MasterServantEditForm
+                        className={classes.form}
+                        formId={FormId}
+                        masterServant={masterServant}
+                        bondLevels={bondLevels}
+                        unlockedCostumes={unlockedCostumes}
+                        onSubmit={submit}
+                        servantSelectDisabled={disableServantSelect}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        variant={actionButtonVariant}
+                        color="secondary"
+                        onClick={cancel}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant={actionButtonVariant}
+                        color="primary"
+                        form={FormId}
+                        type="submit"
+                    >
+                        {submitButtonLabel || 'Submit'}
+                    </Button>
+                </DialogActions>
+            </Typography>
         );
     }
 
-    private _handleOnDialogExited(): void {
-        this._propsSnapshot = null;
-    }
+    return (
+        <Dialog
+            {...dialogProps}
+            PaperProps={{ style: { width: 600 } }}
+            fullScreen={fullScreen}
+            keepMounted={false}
+        >
+            {dialogContentsRef.current}
+        </Dialog>
+    );
 
-    private _submit(event: FormEvent<HTMLFormElement>, data: SubmitData): void {
-        const { onClose } = this.props;
-        onClose(event, 'submit', data);
-    }
-
-    private _cancel(event: MouseEvent<HTMLButtonElement>): void {
-        const { onClose } = this.props;
-        onClose(event, 'cancel');
-    }
-
-}));
+});

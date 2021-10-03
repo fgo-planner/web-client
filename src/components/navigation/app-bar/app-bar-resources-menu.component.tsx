@@ -81,7 +81,6 @@ export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends
             <HoverMenu
                 open={open}
                 anchorEl={anchorEl}
-                // getContentAnchorEl={null}
                 transitionDuration={100}
                 forceClosed={forceClosed}
                 anchorOrigin={this._menuAnchorOrigin}

@@ -1,7 +1,7 @@
-import { alpha, DeprecatedThemeOptions } from '@mui/material';
+import { alpha, ThemeOptions } from '@mui/material';
 import { lightBlue, pink } from '@mui/material/colors';
-import overrides from './material-ui-overrides';
-import breakpoints from './theme-breakpoints';
+import { BreakpointOverrides } from './material-ui-breakpoints';
+import { ComponentsOverrides } from './material-ui-components';
 import { ThemeConstants } from './theme-constants';
 
 const themeDefaultLight = () => {
@@ -24,9 +24,9 @@ const themeDefaultLight = () => {
              */
             divider: alpha('#000000', 0.12) 
         },
-        breakpoints,
-        overrides
-    } as DeprecatedThemeOptions;
+        breakpoints: BreakpointOverrides,
+        components: ComponentsOverrides
+    } as ThemeOptions;
 };
 
 export default themeDefaultLight;

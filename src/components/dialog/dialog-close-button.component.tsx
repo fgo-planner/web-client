@@ -1,12 +1,12 @@
+import { Close as CloseIcon, SvgIconComponent } from '@mui/icons-material';
 import { IconButton, Theme } from '@mui/material';
 import { StyleRules, WithStylesOptions } from '@mui/styles';
 import makeStyles from '@mui/styles/makeStyles';
-import { Close as CloseIcon, SvgIconComponent } from '@mui/icons-material';
-import React, { MouseEvent } from 'react';
+import React, { MouseEventHandler } from 'react';
 
 type Props = {
     icon?: SvgIconComponent,
-    onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
+    onClick?: MouseEventHandler;
 };
 
 const DefaultIcon = CloseIcon;

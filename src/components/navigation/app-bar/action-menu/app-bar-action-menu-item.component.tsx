@@ -16,8 +16,7 @@ const style = (theme: Theme) => ({
     root: {
         height: theme.spacing(10),
         '& .MuiListItemIcon-root': {
-            // FIXME Add hint color
-            // color: theme.palette.text.hint,
+            color: theme.palette.text.disabled,
             minWidth: 'initial',
             marginRight: theme.spacing(6)
         },

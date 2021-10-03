@@ -266,7 +266,8 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             formData.ascension = value;
             handleStatsChange();
         }
-    }, [formData, servant, handleStatsChange]);
+        forceUpdate();
+    }, [formData, servant, handleStatsChange, forceUpdate]);
 
     const handleLevelInputBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         if (!formData || !servant) {

@@ -1,11 +1,4 @@
-import {
-    createTheme,
-    Theme,
-    ThemeProvider,
-    StyledEngineProvider,
-    Typography,
-    adaptV4Theme,
-} from '@mui/material';
+import { createTheme, StyledEngineProvider, Theme, ThemeProvider, Typography } from '@mui/material';
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { BackgroundImageContext } from '../../contexts/background-image.context';
 import { ThemeInfo, ThemeService } from '../../services/user-interface/theme.service';
@@ -14,8 +7,8 @@ import { ThemeScrollbars } from './theme-scrollbars.component';
 
 
 declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    interface DefaultTheme extends Theme { }
 }
 
 
@@ -27,15 +20,15 @@ type Props = PropsWithChildren<{}>;
  */
 export const ThemeProviderWrapper = React.memo(({ children }: Props) => {
 
-    const [theme, setTheme] = useState<Theme>(createTheme(adaptV4Theme({}))); // Initialize with default Material-UI theme
-    
+    const [theme, setTheme] = useState<Theme>(createTheme({})); // Initialize with default Material UI theme
+
     const [backgroundImageUrl, setBackgroundImageUrl] = useState<string>();
 
     useEffect(() => {
         const onThemeChangeSubscription = ThemeService.onThemeChange
             .subscribe((themeInfo: ThemeInfo) => {
                 const { themeOptions, backgroundImageUrl } = themeInfo;
-                setTheme(createTheme(adaptV4Theme(themeOptions)));
+                setTheme(createTheme(themeOptions));
                 setBackgroundImageUrl(backgroundImageUrl);
             });
 

@@ -1,13 +1,4 @@
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    TextField,
-    Theme,
-    Typography,
-} from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Theme, Typography } from '@mui/material';
 import { StyleRules, WithStylesOptions } from '@mui/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import React, { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
@@ -50,6 +41,8 @@ const useStyles = makeStyles(style, styleOptions);
 
 export const MasterAccountAddDialog = React.memo((props: Props) => {
 
+    const { onClose } = props;
+
     const {
         fullScreen,
         closeIconEnabled,
@@ -64,9 +57,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
     const [isMounted, setIsMounted] = useState<boolean>(true);
 
     useEffect(() => {
-        return () => {
-            setIsMounted(false);
-        };
+        return () => setIsMounted(false);
     }, []);
 
     const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
@@ -91,17 +82,17 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
                 setIsSubmitting(false);
             }
 
-            props.onClose({}, 'submit');
+            onClose({}, 'submit');
         } catch (e: any) {
             setIsSubmitting(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [formValues, isMounted, props]);
+    }, [formValues, isMounted, onClose]);
 
     const cancel = useCallback((): void => {
         setFormValues(defaultFormValues());
-        props.onClose({}, 'cancel');
-    }, [props]);
+        onClose({}, 'cancel');
+    }, [onClose]);
 
     return (
         <Dialog {...props} fullScreen={fullScreen}>

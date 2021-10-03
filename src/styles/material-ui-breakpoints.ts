@@ -1,6 +1,9 @@
 import { BreakpointsOptions } from '@mui/material/styles';
 
-const ThemeBreakpoints: BreakpointsOptions = {
+/**
+ * Breakpoint definitions that are used throughout the app.
+ */
+export const BreakpointOverrides: BreakpointsOptions = {
     values: {
         // These are all default values except for the `xl` breakpoint.
         xs: 0,
@@ -10,5 +13,3 @@ const ThemeBreakpoints: BreakpointsOptions = {
         xl: 1600 // Default value was 1920px
     }
 };
-
-export default ThemeBreakpoints;

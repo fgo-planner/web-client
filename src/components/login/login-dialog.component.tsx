@@ -1,32 +1,16 @@
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Theme,
-    Typography,
-} from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Theme, Typography } from '@mui/material';
 import { StyleRules, WithStylesOptions } from '@mui/styles';
-import withStyles from '@mui/styles/withStyles';
-import { ReactNode } from 'react';
+import makeStyles from '@mui/styles/makeStyles';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { AuthenticationService } from '../../services/authentication/auth.service';
 import { UserCredentials } from '../../types/data';
-import { DialogComponentProps, WithStylesProps } from '../../types/internal';
-import { DialogComponent } from '../base/dialog-component';
+import { DialogComponentProps } from '../../types/internal';
 import { DialogCloseButton } from '../dialog/dialog-close-button.component';
 import { LoginForm } from './login-form.component';
 
-// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent: any) => (props: any) => <WrappedComponent {...props} width="xs" />;
-
-type Props = DialogComponentProps & WithStylesProps;
-
-type State = {
-    isLoggingIn: boolean;
-    errorMessage?: string | null;
-};
+type Props = DialogComponentProps;
 
 const FormId = 'login-dialog-form';
 
@@ -54,111 +38,105 @@ const styleOptions: WithStylesOptions<Theme> = {
     classNamePrefix: 'LoginDialog'
 };
 
-export const LoginDialog = withWidth()(withStyles(style, styleOptions)(class extends DialogComponent<Props, State> {
+const useStyles = makeStyles(style, styleOptions);
 
-    constructor(props: Props) {
-        super(props);
+export const LoginDialog = React.memo((props: Props) => {
 
-        this.state = {
-            isLoggingIn: false
-        };
+    const {
+        showCloseIcon,
+        onClose,
+        ...dialogProps
+    } = props;
 
-        this._login = this._login.bind(this);
-        this._cancel = this._cancel.bind(this);
-    }
+    const classes = useStyles();
 
-    componentDidUpdate(prevProps: Props) {
-        const { open } = this.props;
-        if (open && !prevProps.open) {
-            this.setState({ errorMessage: null });
-        }
-    }
+    const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>();
+    const [isMounted, setIsMounted] = useState<boolean>(false);
 
-    render(): ReactNode {
-        const { classes, showCloseIcon, ...dialogProps } = this.props;
-        const { isLoggingIn, errorMessage } = this.state;
-        const { fullScreen, closeIconEnabled } = this._computeFullScreenProps();
-        return (
-            <Dialog {...dialogProps} fullScreen={fullScreen}>
-                <Typography component={'div'}>
-                    <DialogTitle>
-                        Login
-                        {closeIconEnabled && <DialogCloseButton onClick={this._cancel}/>}
-                    </DialogTitle>
-                    <DialogContent>
-                        {errorMessage && 
-                            <div className={classes.errorMessage}>
-                                {errorMessage}
-                            </div>
-                        }
-                        <LoginForm
-                            classes={{ root: classes.form }} 
-                            formId={FormId}
-                            onSubmit={this._login}
-                        />
-                    </DialogContent>
-                    <DialogActions className={classes.dialogActions}>
-                        <div className={classes.actionLinks}>
-                            <Button
-                                component={Link}
-                                variant="text"
-                                color="secondary"
-                                to="/forgot-password"
-                                onClick={this._cancel}
-                            >
-                                Forgot password
-                            </Button>
-                            <Button
-                                component={Link}
-                                variant="text"
-                                color="secondary"
-                                to="/register"
-                                onClick={this._cancel}
-                            >
-                                Create account
-                            </Button>
-                        </div>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            form={FormId}
-                            type="submit"
-                            disabled={isLoggingIn}
-                        >
-                            Login
-                        </Button>
-                    </DialogActions>
-                </Typography>
-            </Dialog>
-        );
-    }
+    useEffect(() => {
+        return () => setIsMounted(false);
+    }, []);
 
-    private async _login(values: UserCredentials): Promise<void> {
-        this.setState({ 
-            isLoggingIn: true,
-            errorMessage: null
-        });
+    const {
+        fullScreen,
+        closeIconEnabled,
+    } = useAutoResizeDialog(props);
+
+    const login = useCallback(async (values: UserCredentials): Promise<void> => {
+        setIsLoggingIn(true);
+        setErrorMessage(undefined);
         try {
             await AuthenticationService.login(values);
-
-            // Only update the state if the component is still mounted.
-            if (this._isMounted) {
-                this.setState({
-                    isLoggingIn: false
-                });
+            /*
+             * Only update the state if the component is still mounted.
+             */
+            if (isMounted) {
+                setIsLoggingIn(false);
             }
-            
-            this.props.onClose({}, 'submit');
-        } catch (e) {
-            this.setState({
-                isLoggingIn: false,
-                errorMessage: String(e)
-            });
+            onClose({}, 'submit');
+        } catch (e: any) {
+            setIsLoggingIn(false);
+            setErrorMessage(e.message || String(e));
         }
-    }
+    }, [isMounted, onClose]);
 
-    private _cancel(): void {
-        this.props.onClose({}, 'cancel');
-    }
+    const cancel = useCallback((event: any): void => {
+        onClose(event, 'cancel');
+    }, [onClose]);
 
-}));
+    return (
+        <Dialog {...dialogProps} fullScreen={fullScreen}>
+            <Typography component={'div'}>
+                <DialogTitle>
+                    Login
+                    {closeIconEnabled && <DialogCloseButton onClick={cancel} />}
+                </DialogTitle>
+                <DialogContent>
+                    {errorMessage &&
+                        <div className={classes.errorMessage}>
+                            {errorMessage}
+                        </div>
+                    }
+                    <LoginForm
+                        classes={{ root: classes.form }}
+                        formId={FormId}
+                        onSubmit={login}
+                    />
+                </DialogContent>
+                <DialogActions className={classes.dialogActions}>
+                    <div className={classes.actionLinks}>
+                        <Button
+                            component={Link}
+                            variant="text"
+                            color="secondary"
+                            to="/forgot-password"
+                            onClick={cancel}
+                        >
+                            Forgot password
+                        </Button>
+                        <Button
+                            component={Link}
+                            variant="text"
+                            color="secondary"
+                            to="/register"
+                            onClick={cancel}
+                        >
+                            Create account
+                        </Button>
+                    </div>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        form={FormId}
+                        type="submit"
+                        disabled={isLoggingIn}
+                    >
+                        Login
+                    </Button>
+                </DialogActions>
+            </Typography>
+        </Dialog>
+    );
+
+});

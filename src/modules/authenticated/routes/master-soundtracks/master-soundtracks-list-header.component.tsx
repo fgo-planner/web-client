@@ -1,7 +1,7 @@
+import { LockOpen } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 import { StyleRules, WithStylesOptions } from '@mui/styles';
 import makeStyles from '@mui/styles/makeStyles';
-import { LockOpen } from '@mui/icons-material';
 import React from 'react';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 
@@ -24,7 +24,8 @@ const style = (theme: Theme) => ({
         textAlign: 'center'
     },
     thumbnailContainer: {
-        width: 96 + theme.spacing(6)
+        width: 96,
+        marginRight: theme.spacing(6)
     },
     title: {
         flex: 1
@@ -33,7 +34,8 @@ const style = (theme: Theme) => ({
         textAlign: 'right'
     },
     preview: {
-        width: 48 + theme.spacing(24 + 4)
+        width: 48,
+        padding: theme.spacing(0, 24, 0, 4)
     }
 } as StyleRules);
 

@@ -82,7 +82,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
             }
 
             props.onClose({}, 'submit');
-        } catch (e) {
+        } catch (e: any) {
             setIsSubmitting(false);
             setErrorMessage(e.message || String(e));
         }

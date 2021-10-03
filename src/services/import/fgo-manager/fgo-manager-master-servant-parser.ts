@@ -59,7 +59,7 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
                 return results;
             }
             this._parse(results, data, startInstanceId);
-        } catch (e) {
+        } catch (e: any) {
             results.errors.push(typeof e === 'string' ? e : e.message);
         }
         return results;
@@ -75,7 +75,7 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
             try {
                 const masterServant = this._parseRow(row, headerMap, instanceId++, bondLevels);
                 results.masterServants.push(masterServant);
-            } catch (e) {
+            } catch (e: any) {
                 const message: string = typeof e === 'string' ? e : e.message;
                 results.warnings.push(`Row ${r + 1}: ${message}`);
             }

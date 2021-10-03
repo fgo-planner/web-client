@@ -5,11 +5,11 @@ import { MasterAccountHomeRoute } from './routes/master-account-home.route';
 import { MasterAccountsRoute } from './routes/master-accounts/master-accounts.route';
 import { MasterItemStatsRoute } from './routes/master-item-stats/master-item-stats.route';
 import { MasterItemsRoute } from './routes/master-items/master-items.route';
-import { PlannerRoute } from './routes/planner/planner.route';
 import { MasterServantCostumesRoute } from './routes/master-servant-costumes/master-servant-costumes.route';
 import { MasterServantStatsRoute } from './routes/master-servant-stats/master-servant-stats.route';
 import { MasterServantsRoute } from './routes/master-servants/master-servants.route';
 import { MasterSoundtracksRoute } from './routes/master-soundtracks/master-soundtracks.route';
+import { PlansRoute } from './routes/plans/plans.route';
 import { UserSettingsRoute } from './routes/user-settings.route';
 import { UserThemesEditRoute } from './routes/user-themes-edit/user-themes-edit.route';
 
@@ -74,7 +74,7 @@ export default class AuthenticatedModule extends ModuleComponent {
         {
             path: '/master/planner',
             exact: true,
-            component: PlannerRoute
+            component: PlansRoute
         },
         {
             path: '/master/data/import/servants',

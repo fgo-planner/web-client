@@ -401,7 +401,7 @@ const Registration = withRouter(withStyles(style, styleOptions)(class extends Pu
                 success: true,
                 redirectTimeout
             });
-        } catch (e) {
+        } catch (e: any) {
             this.setState({
                 awaitingResponse: false,
                 errorMessage: e.message || String(e)

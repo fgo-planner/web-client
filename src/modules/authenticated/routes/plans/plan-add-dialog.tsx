@@ -97,7 +97,7 @@ export const PlanAddDialog = React.memo((props: Props) => {
             });
             setIsSubmitting(false);
             onClose({}, 'submit', plan);
-        } catch (e) {
+        } catch (e: any) {
             setIsSubmitting(false);
             setErrorMessage(e.message || String(e));
         }

@@ -1,4 +1,4 @@
-import { Plan } from '@fgo-planner/types';
+import { Plan, PlanGroup } from '@fgo-planner/types';
 import { Fab, PaperProps, Tooltip } from '@material-ui/core';
 import { Add as AddIcon } from '@material-ui/icons';
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -9,7 +9,7 @@ import { LayoutPanelContainer } from '../../../../components/layout/layout-panel
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { PlannerService } from '../../../../services/data/planner/planner.service';
+import { AccountPlans, PlannerService } from '../../../../services/data/planner/planner.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { ModalOnCloseReason, ReadonlyPartial, ReadonlyPartialArray } from '../../../../types/internal';
 import { PlanAddDialog } from './plan-add-dialog';
@@ -23,7 +23,7 @@ const AddPlanDialogPaperProps: PaperProps = {
 
 const DeletePlanDialogTitle = 'Delete Plan?';
 
-const generateDeletePlanDialogPrompt = (plan: ReadonlyPartial<Plan>): string => {
+const generateDeletePlanDialogPrompt = (plan: ReadonlyPartial<Plan> | undefined): string => {
     if (!plan) {
         return '';
     }
@@ -36,19 +36,19 @@ const generateDeletePlanDialogPrompt = (plan: ReadonlyPartial<Plan>): string => 
     }
 };
 
-export const PlannerRoute = React.memo(() => {
+export const PlansRoute = React.memo(() => {
 
     const masterAccountIdRef = useRef<string>();
-    const [plans, setPlans] = useState<ReadonlyPartialArray<Plan>>([]);
+    const [accountPlans, setAccountPlans] = useState<AccountPlans>();
     const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
     const [deletePlanDialogOpen, setDeletePlanDialogOpen] = useState<boolean>(false);
     const [deletePlanTarget, setDeletePlanTarget] = useState<ReadonlyPartial<Plan>>();
     const [loadingIndicatorId, setLoadingIndicatorId] = useState<string>();
 
-    const loadPlans = useCallback(async () => {
+    const loadPlansForAccount = useCallback(async () => {
         const masterAccountId = masterAccountIdRef.current;
         if (!masterAccountId) {
-            return setPlans([]);
+            return setAccountPlans(undefined);
         }
         let _loadingIndicatorId = loadingIndicatorId;
         if (!_loadingIndicatorId) {
@@ -58,11 +58,11 @@ export const PlannerRoute = React.memo(() => {
         setDeletePlanDialogOpen(false);
         setDeletePlanTarget(undefined);
         setLoadingIndicatorId(_loadingIndicatorId);
-        
+
         try {
-            const { plans, planGroups } = await PlannerService.getForAccount(masterAccountId);
+            const accountPlans = await PlannerService.getForAccount(masterAccountId);
             LoadingIndicatorOverlayService.waive(_loadingIndicatorId);
-            setPlans(plans);
+            setAccountPlans(accountPlans);
             setLoadingIndicatorId(undefined);
         } catch (e) {
             // TODO Handle error
@@ -80,24 +80,18 @@ export const PlannerRoute = React.memo(() => {
                 const masterAccountId = masterAccount?._id;
                 if (masterAccountId !== masterAccountIdRef.current) {
                     masterAccountIdRef.current = masterAccountId;
-                    loadPlans();
+                    loadPlansForAccount();
                 }
             });
 
         return () => {
             onCurrentMasterAccountChangeSubscription.unsubscribe();
         };
-    }, [loadPlans]);
+    }, [loadPlansForAccount]);
 
     const scrollContainer = useElevateAppBarOnScroll();
 
-    const deletePlanDialogPrompt = useMemo(() => {
-        if (!deletePlanTarget) {
-            return '';
-        }
-        return generateDeletePlanDialogPrompt(deletePlanTarget);
-    }, [deletePlanTarget]);
-
+    const deletePlanDialogPrompt = useMemo(() => generateDeletePlanDialogPrompt(deletePlanTarget), [deletePlanTarget]);
 
     const handleAddPlanButtonClick = useCallback((): void => {
         setAddPlanDialogOpen(true);
@@ -106,9 +100,9 @@ export const PlannerRoute = React.memo(() => {
     const handleAddPlanDialogClose = useCallback((event: any, reason: ModalOnCloseReason, data?: Plan): void => {
         setAddPlanDialogOpen(false);
         if (reason === 'submit') {
-            loadPlans();
+            loadPlansForAccount();
         }
-    }, [loadPlans]);
+    }, [loadPlansForAccount]);
 
     const handleDeletePlan = useCallback((plan: ReadonlyPartial<Plan>): void => {
         setDeletePlanTarget(plan);
@@ -119,14 +113,14 @@ export const PlannerRoute = React.memo(() => {
         if (reason === 'submit') {
             try {
                 await PlannerService.deletePlan(deletePlanTarget?._id!!);
-                loadPlans();
+                loadPlansForAccount();
             } catch (e) {
                 console.error(e);
             }
         }
         setDeletePlanTarget(undefined);
         setDeletePlanDialogOpen(false);
-    }, [deletePlanTarget, loadPlans]);
+    }, [deletePlanTarget, loadPlansForAccount]);
 
     return (
         <Fragment>
@@ -135,14 +129,14 @@ export const PlannerRoute = React.memo(() => {
                     My Plans
                 </PageTitle>
                 <LayoutPanelContainer className="p-4">
-                    {plans.length ?
+                    {!!accountPlans ?
                         <PlanList
-                            plans={plans}
+                            accountPlans={accountPlans}
                             onDeletePlan={handleDeletePlan}
                         /> :
                         <div>
                             No plans found
-                    </div>
+                        </div>
                     }
                 </LayoutPanelContainer>
                 <div className="py-10" />

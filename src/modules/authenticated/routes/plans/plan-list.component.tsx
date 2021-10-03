@@ -1,14 +1,16 @@
-import { Plan } from '@fgo-planner/types';
+import { Plan, PlanGroup } from '@fgo-planner/types';
 import { fade, IconButton, Link as MuiLink, makeStyles, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
 import { DeleteForever as DeleteForeverIcon } from '@material-ui/icons';
 import { WithStylesOptions } from '@material-ui/styles';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ReadonlyPartial, ReadonlyPartialArray } from '../../../../types/internal';
+import { AccountPlans } from '../../../../services/data/planner/planner.service';
+import { ReadonlyPartial } from '../../../../types/internal';
 
 type Props = {
-    plans: ReadonlyPartialArray<Plan>;
-    onDeletePlan: (plan: ReadonlyPartial<Plan>) => void;
+    accountPlans: AccountPlans;
+    onDeletePlan?: (plan: ReadonlyPartial<Plan>) => void;
+    onDeletePlanGroup?: (planGroup: ReadonlyPartial<PlanGroup>) => void;
 };
 
 const style = (theme: Theme) => ({
@@ -32,7 +34,7 @@ const styleOptions: WithStylesOptions<Theme> = {
 
 const useStyles = makeStyles(style, styleOptions);
 
-export const PlanList = React.memo(({ plans, onDeletePlan }: Props) => {
+export const PlanList = React.memo(({ accountPlans, onDeletePlan, onDeletePlanGroup }: Props) => {
     const classes = useStyles();
 
     return (
@@ -47,7 +49,7 @@ export const PlanList = React.memo(({ plans, onDeletePlan }: Props) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {plans.map(plan => (
+                    {accountPlans.plans.map(plan => (
                         <TableRow key={plan._id} className={classes.dataRow}>
                             <TableCell className="truncate">
                                 <MuiLink component={Link} to='../master' underline="none">
@@ -63,7 +65,7 @@ export const PlanList = React.memo(({ plans, onDeletePlan }: Props) => {
                                     <IconButton
                                         className={classes.actionButton}
                                         color="secondary"
-                                        onClick={() => onDeletePlan(plan)}
+                                        onClick={() => onDeletePlan?.(plan)}
                                         children={<DeleteForeverIcon />}
                                     />
                                 </Tooltip>

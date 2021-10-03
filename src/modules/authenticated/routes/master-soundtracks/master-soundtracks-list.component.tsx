@@ -1,6 +1,7 @@
 import { GameSoundtrack } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';

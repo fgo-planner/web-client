@@ -1,8 +1,9 @@
 
 
 import { GameItem } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React from 'react';
 import { ComponentStyleProps } from '../../../types/internal';

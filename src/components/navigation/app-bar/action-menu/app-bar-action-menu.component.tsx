@@ -1,4 +1,4 @@
-import { Menu, PopoverOrigin } from '@material-ui/core';
+import { Menu, PopoverOrigin } from '@mui/material';
 import React, { PureComponent, ReactNode } from 'react';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ComponentStyleProps, ModalOnCloseHandler } from '../../../../types/internal';
@@ -27,7 +27,7 @@ export class AppBarActionMenu extends PureComponent<Props> {
             <Menu
                 PaperProps={{ className }}
                 anchorEl={anchorEl}
-                getContentAnchorEl={null}
+                // getContentAnchorEl={null}
                 anchorOrigin={this.MenuAnchorOrigin}
                 transformOrigin={this.MenuTransformOrigin}
                 open={!!anchorEl}

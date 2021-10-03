@@ -1,6 +1,7 @@
 import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Link, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
-import { ClassNameMap, WithStylesOptions } from '@material-ui/styles';
+import { Link, Theme, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { ClassNameMap, WithStylesOptions, StyleRules } from '@mui/styles';
 import clsx from 'clsx';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';

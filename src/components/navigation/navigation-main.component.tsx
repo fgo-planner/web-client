@@ -1,5 +1,6 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import React, { PropsWithChildren } from 'react';
 import { ThemeConstants } from '../../styles/theme-constants';
@@ -24,7 +25,7 @@ const style = (theme: Theme) => ({
     },
     lowerSection: {
         // display: 'flex',
-        height: `calc(100vh - ${theme.spacing(ThemeConstants.AppBarHeightScale)}px)`
+        height: `calc(100vh - ${theme.spacing(ThemeConstants.AppBarHeightScale)})`
     },
     mainContent: {
         flex: 1,

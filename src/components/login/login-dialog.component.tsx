@@ -1,5 +1,14 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Theme,
+    Typography,
+} from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthenticationService } from '../../services/authentication/auth.service';
@@ -8,6 +17,9 @@ import { DialogComponentProps, WithStylesProps } from '../../types/internal';
 import { DialogComponent } from '../base/dialog-component';
 import { DialogCloseButton } from '../dialog/dialog-close-button.component';
 import { LoginForm } from './login-form.component';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent: any) => (props: any) => <WrappedComponent {...props} width="xs" />;
 
 type Props = DialogComponentProps & WithStylesProps;
 

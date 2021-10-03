@@ -1,7 +1,8 @@
 import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { IconButton, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { ClassNameMap, WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@material-ui/icons';
+import { IconButton, Theme } from '@mui/material';
+import { StyleRules, ClassNameMap, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import React, { ReactNode, useCallback } from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { AssetConstants } from '../../../../../../constants';
@@ -232,10 +233,10 @@ export const MasterServantListRow = React.memo((props: Props) => {
 
     const actionButtons: ReactNode = actions && (
         <div className={classes.actions}>
-            <IconButton color="primary" onClick={handleEditServant}>
+            <IconButton color="primary" onClick={handleEditServant} size="large">
                 <EditIcon />
             </IconButton>
-            <IconButton color="secondary" onClick={handleDeleteServant}>
+            <IconButton color="secondary" onClick={handleDeleteServant} size="large">
                 <DeleteIcon />
             </IconButton>
         </div>

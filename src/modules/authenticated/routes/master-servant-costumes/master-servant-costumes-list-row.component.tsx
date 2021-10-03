@@ -1,7 +1,8 @@
 import { GameServant, GameServantCostume } from '@fgo-planner/types';
-import { Checkbox, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Done } from '@material-ui/icons';
+import { Checkbox, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { Done } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';

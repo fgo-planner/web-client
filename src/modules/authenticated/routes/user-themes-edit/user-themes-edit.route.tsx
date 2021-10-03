@@ -1,5 +1,5 @@
-import { Fab, Tooltip } from '@material-ui/core';
-import { Clear as ClearIcon, Save as SaveIcon } from '@material-ui/icons';
+import { Fab, Tooltip } from '@mui/material';
+import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import _ from 'lodash';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useState } from 'react';

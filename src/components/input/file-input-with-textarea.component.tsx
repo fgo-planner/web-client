@@ -1,7 +1,8 @@
 
-import { fade, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { FileCopy as FileCopyIcon, SvgIconComponent } from '@material-ui/icons';
+import { alpha, TextField, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
+import { FileCopy as FileCopyIcon, SvgIconComponent } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { ChangeEvent, PropsWithChildren, PureComponent, ReactNode } from 'react';
 import Dropzone, { DropzoneRef, DropzoneState } from 'react-dropzone';
@@ -51,7 +52,7 @@ const style = (theme: Theme) => ({
         borderColor: theme.palette.primary.light,
         borderStyle: 'dashed',
         borderRadius: theme.spacing(2),
-        backgroundColor: fade(theme.palette.primary.light, 0.1),
+        backgroundColor: alpha(theme.palette.primary.light, 0.1),
         opacity: 0.69
     },
     dragOverlayIcon: {
@@ -123,7 +124,7 @@ export const FileInputWithTextarea  = withStyles(style, styleOptions)(class exte
                     variant={variant ?? DefaultTextareaVariant}
                     label={label}
                     rows={rows ?? DefaultTextareaRows}
-                    rowsMax={rowsMax}
+                    maxRows={rowsMax}
                     value={value}
                     onChange={this._handleTextAreaChange}
                 />

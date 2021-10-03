@@ -1,6 +1,6 @@
 import { GameItemQuantity, MasterAccount } from '@fgo-planner/types';
-import { Fab, IconButton, Tooltip } from '@material-ui/core';
-import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
+import { Fab, IconButton, Tooltip } from '@mui/material';
+import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
@@ -142,19 +142,19 @@ export const MasterItemsRoute = React.memo(() => {
                     component={Link}
                     to="items/stats"
                     children={<EqualizerIcon />}
-                />
+                    size="large" />
             </div>
         </Tooltip>,
         <Tooltip key="import" title="Upload item data" placement="right">
             <div>
                 {/* TODO Implement this */}
-                <IconButton children={<PublishIcon />} disabled />
+                <IconButton children={<PublishIcon />} disabled size="large" />
             </div>
         </Tooltip>,
         <Tooltip key="export" title="Download item data" placement="right">
             <div>
                 {/* TODO Implement this */}
-                <IconButton children={<GetApp />} disabled />
+                <IconButton children={<GetApp />} disabled size="large" />
             </div>
         </Tooltip>
     ];

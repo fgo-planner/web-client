@@ -1,5 +1,6 @@
-import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/styles';
+import { alpha, Theme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { WithStylesOptions, StyleRules } from '@mui/styles';
 import clsx from 'clsx';
 import React from 'react';
 import { GameItemThumbnail } from '../../../components/game/item/game-item-thumbnail.component';
@@ -21,7 +22,7 @@ const style = (theme: Theme) => ({
         borderBottomStyle: 'solid',
         borderBottomColor: theme.palette.divider,
         '&:hover': {
-            background: fade(theme.palette.text.primary, 0.07)
+            background: alpha(theme.palette.text.primary, 0.07)
         }
     },
     footer: {

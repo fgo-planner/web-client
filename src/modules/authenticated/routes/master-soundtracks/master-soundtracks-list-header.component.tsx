@@ -1,6 +1,7 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { LockOpen } from '@material-ui/icons';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { LockOpen } from '@mui/icons-material';
 import React from 'react';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 

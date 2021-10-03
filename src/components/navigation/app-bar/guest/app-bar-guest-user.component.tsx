@@ -1,6 +1,7 @@
-import { IconButton, makeStyles, PaperProps, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
+import { IconButton, PaperProps, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@mui/icons-material';
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
@@ -116,11 +117,11 @@ export const AppBarGuestUser = React.memo(() => {
                 <IconButton
                     onClick={() => ThemeService.toggleThemeMode()}
                     children={themeInfo?.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
-                />
+                    size="large" />
                 <IconButton
                     onClick={() => isBackgroundMusicPlaying ? BackgroundMusicService.pause() : BackgroundMusicService.play()}
                     children={isBackgroundMusicPlaying ? <VolumeUpIcon /> : <VolumeOffIcon />}
-                />
+                    size="large" />
             </div>
             <LoginDialog
                 PaperProps={LoginDialogPaperProps}

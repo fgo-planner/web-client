@@ -1,5 +1,6 @@
-import { Checkbox, FormControlLabel, FormGroup, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Checkbox, FormControlLabel, FormGroup, TextField, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import { PureComponent, ReactNode } from 'react';
 import * as Yup from 'yup';

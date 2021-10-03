@@ -1,5 +1,5 @@
-import { Button } from '@material-ui/core';
-import { PersonAdd as PersonAddIcon } from '@material-ui/icons';
+import { Button } from '@mui/material';
+import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { ModalOnCloseReason } from '../../../../types/internal';
 import { MasterAccountAddDialog } from '../../../master/account/master-account-add-dialog.component';

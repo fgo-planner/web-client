@@ -1,15 +1,17 @@
-import { fade, StyleRules, Theme } from '@material-ui/core';
+import { alpha, Theme } from '@mui/material';
+
+import { StyleRules } from '@mui/styles';
 
 const style = (theme: Theme) => ({
     row: {
         '&:hover': {
-            backgroundColor: fade(theme.palette.text.primary, 0.07)
+            backgroundColor: alpha(theme.palette.text.primary, 0.07)
         }
     },
     active: {
-        backgroundColor: `${fade(theme.palette.primary.main, 0.07)} !important`,
+        backgroundColor: `${alpha(theme.palette.primary.main, 0.07)} !important`,
         '&:hover': {
-            backgroundColor: `${fade(theme.palette.primary.main, 0.12)} !important`,
+            backgroundColor: `${alpha(theme.palette.primary.main, 0.12)} !important`,
         }
     },
     borderTop: {

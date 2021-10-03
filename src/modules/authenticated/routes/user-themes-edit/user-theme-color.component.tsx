@@ -1,6 +1,7 @@
 import { RgbaColor } from '@fgo-planner/types';
-import { InputBaseComponentProps, makeStyles, StyleRules, TextField, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { InputBaseComponentProps, TextField, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import { colord, RgbColor } from 'colord';
 import React, { ChangeEvent, FocusEvent, MouseEvent, useCallback, useState } from 'react';
 import { useEffect } from 'react';

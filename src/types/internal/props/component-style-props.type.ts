@@ -1,4 +1,4 @@
-import { ClassNameMap } from '@material-ui/styles';
+import { ClassNameMap } from '@mui/styles';
 import { CSSProperties } from 'react';
 
 export type ComponentStyleProps = {

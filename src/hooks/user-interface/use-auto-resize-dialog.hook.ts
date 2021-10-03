@@ -1,4 +1,4 @@
-import { ButtonProps, Theme, useMediaQuery } from '@material-ui/core';
+import { ButtonProps, Theme, useMediaQuery } from '@mui/material';
 import { DialogComponentProps } from '../../types/internal';
 
 const DefaultActionButtonVariant = 'text';

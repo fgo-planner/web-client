@@ -1,6 +1,19 @@
 import { Plan } from '@fgo-planner/types';
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, makeStyles, StyleRules, TextField, Theme, Typography } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/styles';
+import {
+    Button,
+    Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControlLabel,
+    FormGroup,
+    TextField,
+    Theme,
+    Typography,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { WithStylesOptions, StyleRules } from '@mui/styles';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';

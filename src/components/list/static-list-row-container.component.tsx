@@ -1,5 +1,6 @@
-import { makeStyles, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { WithStylesOptions } from '@mui/styles';
 import clsx from 'clsx';
 import React, { PropsWithChildren } from 'react';
 import listRowStyle from './list-row-style';

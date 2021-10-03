@@ -1,5 +1,6 @@
-import { fade, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { alpha, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import clsx from 'clsx';
 import { MouseEventHandler, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
@@ -30,7 +31,7 @@ const style = (theme: Theme) => ({
         borderBottom: '4px solid transparent',
         transition: 'background-color 100ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
         '&:hover': {
-            background: fade(theme.palette.primary.main, 0.04)
+            background: alpha(theme.palette.primary.main, 0.04)
         }
     },
     active: {

@@ -1,5 +1,6 @@
-import { Paper, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Paper, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import clsx from 'clsx';
 import { PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
@@ -46,7 +47,7 @@ const style = (theme: Theme) => ({
         color: theme.palette.text.primary,
         textDecoration: 'none',
         marginRight: theme.spacing(6),
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('lg')]: {
             display: 'none'
         },
     }

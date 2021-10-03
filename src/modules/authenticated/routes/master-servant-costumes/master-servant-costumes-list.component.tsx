@@ -1,5 +1,6 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';

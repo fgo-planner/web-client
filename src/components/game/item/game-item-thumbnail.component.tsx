@@ -1,6 +1,7 @@
 import { GameItem } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';

@@ -1,7 +1,8 @@
 import { GameSoundtrack } from '@fgo-planner/types';
-import { Checkbox, fade, IconButton, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Done, Pause, PlayArrow } from '@material-ui/icons';
+import { Checkbox, alpha, IconButton, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { Done, Pause, PlayArrow } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
@@ -40,7 +41,7 @@ const style = (theme: Theme) => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: fade('#ffffff', 0.69),
+        background: alpha('#ffffff', 0.69),
         marginRight: theme.spacing(6)
     },
     title: {
@@ -123,7 +124,7 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
     const playButtonNode: ReactNode = useMemo(() => {
         return (
             <div className={classes.playButton} onClick={handlePlayButtonClick}>
-                <IconButton color="primary">
+                <IconButton color="primary" size="large">
                     {playing ?
                         <Pause /> :
                         <PlayArrow className="play-icon" />

@@ -1,5 +1,6 @@
-import { CircularProgress, makeStyles, StyleRules, Theme, useMediaQuery } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { CircularProgress, Theme, useMediaQuery } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 
 type Props = {

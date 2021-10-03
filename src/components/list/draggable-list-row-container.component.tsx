@@ -1,6 +1,7 @@
-import { makeStyles, Theme } from '@material-ui/core';
-import { StyleRules, WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { DragIndicator as DragIndicatorIcon, SvgIconComponent } from '@material-ui/icons';
+import { Theme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import { DragIndicator as DragIndicatorIcon, SvgIconComponent } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { PropsWithChildren } from 'react';
 import { Draggable } from 'react-beautiful-dnd';

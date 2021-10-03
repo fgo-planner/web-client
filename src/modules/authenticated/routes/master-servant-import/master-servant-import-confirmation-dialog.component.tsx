@@ -1,4 +1,4 @@
-import { Button, ButtonProps, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel } from '@material-ui/core';
+import { Button, ButtonProps, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel } from '@mui/material';
 import React, { ChangeEvent, MouseEvent, useCallback } from 'react';
 import { useState } from 'react';
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';

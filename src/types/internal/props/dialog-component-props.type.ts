@@ -1,4 +1,4 @@
-import { DialogProps } from '@material-ui/core';
+import { DialogProps } from '@mui/material';
 import { ModalComponentProps } from './modal-component-props.type';
 import { WithWidthProps } from './with-width-props.type';
 

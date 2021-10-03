@@ -1,7 +1,7 @@
 import { GameServant } from '@fgo-planner/types';
-import { TextField } from '@material-ui/core';
-import { Autocomplete } from '@material-ui/lab';
-import React, { ChangeEvent, ReactNode, useCallback } from 'react';
+import { TextField } from '@mui/material';
+import { Autocomplete } from '@mui/material';
+import React, { ChangeEvent, HTMLAttributes, ReactNode, useCallback } from 'react';
 import { Nullable } from '../../../../../../types/internal';
 
 type Props = {
@@ -16,12 +16,16 @@ const getOptionLabel = (option: Readonly<GameServant>): string => {
     return option.name || option.metadata?.displayName || String(option._id);
 };
 
-const isOptionSelected = (option: Readonly < GameServant >, value: Readonly<GameServant>): boolean => {
+const isOptionSelected = (option: Readonly<GameServant>, value: Readonly<GameServant>): boolean => {
     return option._id === value._id;
 };
 
-const renderSelectOption = (servant: Readonly<GameServant>): ReactNode => {
-    return <div>{servant.name}</div>;
+const renderSelectOption = (props: HTMLAttributes<HTMLLIElement>, servant: Readonly<GameServant>): ReactNode => {
+    return (
+        <li {...props}>
+            <div>{servant.name}</div>
+        </li>
+    );
 };
 
 const renderInput = (params: any): ReactNode => {
@@ -68,7 +72,7 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
             options={servantList as Array<Readonly<GameServant>>}
             noOptionsText="No results"
             getOptionLabel={getOptionLabel}
-            getOptionSelected={isOptionSelected}
+            isOptionEqualToValue={isOptionSelected}
             renderOption={renderSelectOption}
             renderInput={renderInput}
             onChange={handleChange}

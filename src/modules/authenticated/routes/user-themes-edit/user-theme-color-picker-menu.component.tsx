@@ -1,6 +1,7 @@
 import { RgbaColor } from '@fgo-planner/types';
-import { makeStyles, Menu, PopoverOrigin, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Menu, PopoverOrigin, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { RgbaColorPicker, RgbColor, RgbColorPicker } from 'react-colorful';
 import { ThemeConstants } from '../../../../styles/theme-constants';
@@ -64,7 +65,7 @@ export const UserThemeColorPickerMenu = React.memo((props: Props) => {
         <Menu
             // PaperProps={{ className }}
             anchorEl={anchorEl}
-            getContentAnchorEl={null}
+            // getContentAnchorEl={null}
             anchorOrigin={MenuAnchorOrigin}
             transformOrigin={MenuTransformOrigin}
             open={!!anchorEl}

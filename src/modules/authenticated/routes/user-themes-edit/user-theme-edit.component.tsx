@@ -1,4 +1,4 @@
-import { Button } from '@material-ui/core';
+import { Button } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useCallback } from 'react';
 import { UserWebClientTheme } from '../../../../../local_modules/types/lib';

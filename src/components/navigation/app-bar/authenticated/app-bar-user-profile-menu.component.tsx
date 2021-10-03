@@ -1,5 +1,7 @@
-import { Avatar, Divider, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, InfoOutlined as InfoOutlinedIcon, NightsStay as NightsStayIcon, Settings as SettingsIcon, SupervisedUserCircleOutlined as SupervisedUserCircleIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@material-ui/icons';
+import { Avatar, Divider, Theme } from '@mui/material';
+import { StyleRules } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
+import { AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, InfoOutlined as InfoOutlinedIcon, NightsStay as NightsStayIcon, Settings as SettingsIcon, SupervisedUserCircleOutlined as SupervisedUserCircleIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@mui/icons-material';
 import { PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { AuthenticationService } from '../../../../services/authentication/auth.service';

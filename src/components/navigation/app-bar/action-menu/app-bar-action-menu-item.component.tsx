@@ -1,6 +1,7 @@
-import { ListItemIcon, ListItemText, makeStyles, MenuItem, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { SvgIconComponent } from '@material-ui/icons';
+import { ListItemIcon, ListItemText, MenuItem, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { SvgIconComponent } from '@mui/icons-material';
 import React, { MouseEventHandler } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -15,7 +16,8 @@ const style = (theme: Theme) => ({
     root: {
         height: theme.spacing(10),
         '& .MuiListItemIcon-root': {
-            color: theme.palette.text.hint,
+            // FIXME Add hint color
+            // color: theme.palette.text.hint,
             minWidth: 'initial',
             marginRight: theme.spacing(6)
         },

@@ -1,7 +1,8 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { CSSProperties, WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { BackgroundImageContext, BackgroundImageContextProps } from '../../contexts/background-image.context';
 import { ComponentStyleProps } from '../../types/internal/props/component-style-props.type';
 

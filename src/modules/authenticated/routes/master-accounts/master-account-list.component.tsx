@@ -1,7 +1,20 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { fade, IconButton, Link as MuiLink, makeStyles, StyleRules, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme, Tooltip } from '@material-ui/core';
-import { DeleteForever as DeleteForeverIcon } from '@material-ui/icons';
-import { WithStylesOptions } from '@material-ui/styles';
+import {
+    alpha,
+    IconButton,
+    Link as MuiLink,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Theme,
+    Tooltip,
+} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { DeleteForever as DeleteForeverIcon } from '@mui/icons-material';
+import { WithStylesOptions, StyleRules } from '@mui/styles';
 import React from 'react';
 import NumberFormat from 'react-number-format';
 import { Link } from 'react-router-dom';
@@ -20,7 +33,7 @@ const style = (theme: Theme) => ({
     },
     dataRow: {
         '&:hover': {
-            background: fade(theme.palette.text.primary, 0.07)
+            background: alpha(theme.palette.text.primary, 0.07)
         }
     },
     actionButton: {
@@ -73,7 +86,7 @@ export const MasterAccountList = React.memo(({ masterAccountList, onDeleteAccoun
                                         color="secondary"
                                         onClick={() => onDeleteAccount(masterAccount)}
                                         children={<DeleteForeverIcon />}
-                                    />
+                                        size="large" />
                                 </Tooltip>
                             </TableCell>
                         </TableRow>

@@ -1,5 +1,6 @@
-import { Button, fade, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Button, alpha, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import React, { PureComponent, ReactNode } from 'react';
 import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
 import { LoginForm } from '../components/login/login-form.component';
@@ -22,7 +23,7 @@ const style = (theme: Theme) => ({
         display: 'flex',
         justifyContent: 'center',
         margin: '20vh 0',
-        [theme.breakpoints.down('xs')]: {
+        [theme.breakpoints.down('sm')]: {
             marginTop: 0
         }
     },
@@ -34,10 +35,10 @@ const style = (theme: Theme) => ({
         boxSizing: 'border-box',
         borderWidth: 1,
         borderStyle: 'solid',
-        borderColor: fade(theme.palette.text.primary, 0.23),
+        borderColor: alpha(theme.palette.text.primary, 0.23),
         borderRadius: 8,
         backgroundColor: theme.palette.background.paper,
-        [theme.breakpoints.down('xs')]: {
+        [theme.breakpoints.down('sm')]: {
             width: '100%',
             border: 'none'
         }

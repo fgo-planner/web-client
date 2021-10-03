@@ -1,5 +1,6 @@
-import { fade, makeStyles, StyleRules, Theme, Typography } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/styles';
+import { alpha, Theme, Typography } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { WithStylesOptions, StyleRules } from '@mui/styles';
 import clsx from 'clsx';
 import React, { PropsWithChildren, ReactNode } from 'react';
 import { ComponentStyleProps } from '../../types/internal/props/component-style-props.type';
@@ -19,7 +20,7 @@ const style = (theme: Theme) => ({
     },
     background: {
         height: '100%',
-        backgroundColor: fade(theme.palette.background.paper, 0.95),
+        backgroundColor: alpha(theme.palette.background.paper, 0.95),
         borderRadius: theme.spacing(4),
         overflow: 'hidden'
     },

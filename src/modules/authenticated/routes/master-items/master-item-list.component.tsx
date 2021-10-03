@@ -1,6 +1,7 @@
 import { GameItem, GameItemQuantity } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { ReactNode, useMemo } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';

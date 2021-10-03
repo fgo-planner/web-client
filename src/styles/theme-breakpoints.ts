@@ -1,4 +1,4 @@
-import { BreakpointsOptions } from '@material-ui/core/styles/createBreakpoints';
+import { BreakpointsOptions } from '@mui/material/styles';
 
 const ThemeBreakpoints: BreakpointsOptions = {
     values: {

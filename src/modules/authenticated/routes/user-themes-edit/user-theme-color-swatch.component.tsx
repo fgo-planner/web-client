@@ -1,7 +1,8 @@
 import { RgbaColor } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Colorize as ColorizeIcon } from '@material-ui/icons';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { Colorize as ColorizeIcon } from '@mui/icons-material';
 import { colord, RgbColor } from 'colord';
 import React, { MouseEventHandler } from 'react';
 

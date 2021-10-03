@@ -1,12 +1,24 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, StyleRules, Theme, Typography, withStyles, withWidth } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Theme,
+    Typography,
+} from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { FormEvent, MouseEvent, ReactNode } from 'react';
 import { DialogComponent } from '../../../../../../components/base/dialog-component';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { DialogComponentProps, Nullable, WithStylesProps } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantEditForm, SubmitData } from '../edit-form/master-servant-edit-form.component';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent: any) => (props: any) => <WrappedComponent {...props} width="xs" />;
 
 type RenderedProps = {
     disableServantSelect?: boolean;
@@ -41,14 +53,14 @@ const style = (theme: Theme) => ({
     inputFieldGroup: {
         display: 'flex',
         flexWrap: 'nowrap',
-        [theme.breakpoints.down('xs')]: {
+        [theme.breakpoints.down('sm')]: {
             flexWrap: 'wrap'
         }
     },
     inputFieldContainer: {
         flex: 1,
         padding: theme.spacing(0, 2),
-        [theme.breakpoints.down('xs')]: {
+        [theme.breakpoints.down('sm')]: {
             flex: '100% !important'
         }
     }
@@ -130,8 +142,9 @@ export const MasterServantEditDialog = withWidth()(withStyles(style, styleOption
                 PaperProps={{ style: { width: 600 } }}
                 fullScreen={fullScreen}
                 keepMounted={false}
-                onExited={this._handleOnDialogExited}
-            >
+                TransitionProps={{
+                    onExited: this._handleOnDialogExited
+                }}>
                 <Typography component={'div'}>
                     <DialogTitle>
                         {dialogTitle}

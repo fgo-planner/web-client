@@ -1,6 +1,7 @@
 import { GameItem, GameItemQuantity } from '@fgo-planner/types';
-import { InputBaseComponentProps, makeStyles, StyleRules, TextField, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { InputBaseComponentProps, TextField, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { ChangeEvent, ReactNode, useCallback } from 'react';
 import NumberFormat from 'react-number-format';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';

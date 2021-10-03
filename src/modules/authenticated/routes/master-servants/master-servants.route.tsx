@@ -1,7 +1,8 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Fab, IconButton, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
-import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
-import { WithStylesOptions } from '@material-ui/styles';
+import { Fab, IconButton, Theme, Tooltip } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
+import { WithStylesOptions, StyleRules } from '@mui/styles';
 import lodash from 'lodash';
 import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -76,7 +77,7 @@ const style = (theme: Theme) => ({
         height: 'calc(100% - 84px)',
         padding: theme.spacing(4, 4, 4, 0),
         boxSizing: 'border-box',
-        [theme.breakpoints.down('lg')]: {
+        [theme.breakpoints.down('xl')]: {
             width: 300
         }
     }
@@ -446,7 +447,7 @@ export const MasterServantsRoute = React.memo(() => {
                         onClick={handleAddServantButtonClick}
                         children={<AddIcon />}
                         disabled={!editMode}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>,
             <Tooltip key="costumes" title="Costumes" placement="right">
@@ -455,7 +456,7 @@ export const MasterServantsRoute = React.memo(() => {
                         component={Link}
                         to="servants/costumes"
                         children={<AccessibilityNewIcon />}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>,
             <Tooltip key="stats" title="Servant stats" placement="right">
@@ -464,7 +465,7 @@ export const MasterServantsRoute = React.memo(() => {
                         component={Link}
                         to="servants/stats"
                         children={<EqualizerIcon />}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>,
             <Tooltip key="import" title="Upload servant data" placement="right">
@@ -473,13 +474,13 @@ export const MasterServantsRoute = React.memo(() => {
                         component={Link}
                         to="./data/import/servants"
                         children={<PublishIcon />}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>,
             <Tooltip key="export" title="Download servant data" placement="right">
                 <div>
                     {/* TODO Implement this */}
-                    <IconButton children={<GetApp />} disabled />
+                    <IconButton children={<GetApp />} disabled size="large" />
                 </div>
             </Tooltip>
         ];

@@ -1,4 +1,4 @@
-import { Checkbox, FormControlLabel, FormGroup } from '@material-ui/core';
+import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { MasterItemStatsFilterOptions } from './master-item-stats.utils';
 

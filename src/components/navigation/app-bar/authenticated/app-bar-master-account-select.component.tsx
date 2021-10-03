@@ -1,6 +1,7 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { MenuItem, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { MenuItem, TextField, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { ChangeEvent, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';

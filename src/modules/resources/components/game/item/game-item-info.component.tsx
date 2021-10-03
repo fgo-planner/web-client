@@ -1,6 +1,7 @@
 import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/types';
-import { StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { LoadingIndicator } from '../../../../../components/loading-indicator.component';

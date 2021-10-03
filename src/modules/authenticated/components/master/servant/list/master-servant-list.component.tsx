@@ -1,7 +1,8 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Button, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { PersonAddOutlined } from '@material-ui/icons';
+import { Button, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { PersonAddOutlined } from '@mui/icons-material';
 import React, { ReactNode, useCallback } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
@@ -30,7 +31,7 @@ type Props = {
 
 const style = (theme: Theme) => ({
     root: {
-        // minWidth: `${theme.breakpoints.width('lg')}px`,
+        // minWidth: `${theme.breakpoints.values.lg}px`,
     },
     addServantRow: {
         borderTopWidth: 1,

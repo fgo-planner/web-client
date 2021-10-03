@@ -1,5 +1,6 @@
-import { fade, MenuItem, PaperProps, PopoverOrigin, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { alpha, MenuItem, PaperProps, PopoverOrigin, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import React, { MouseEvent, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeConstants } from '../../../styles/theme-constants';
@@ -25,7 +26,7 @@ const style = (theme: Theme) => ({
         color: theme.palette.primary.main,
         lineHeight: '32px',
         '&:hover': {
-            background: fade(theme.palette.primary.main, 0.04)
+            background: alpha(theme.palette.primary.main, 0.04)
         }
     }
 } as StyleRules);
@@ -80,7 +81,7 @@ export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends
             <HoverMenu
                 open={open}
                 anchorEl={anchorEl}
-                getContentAnchorEl={null}
+                // getContentAnchorEl={null}
                 transitionDuration={100}
                 forceClosed={forceClosed}
                 anchorOrigin={this._menuAnchorOrigin}

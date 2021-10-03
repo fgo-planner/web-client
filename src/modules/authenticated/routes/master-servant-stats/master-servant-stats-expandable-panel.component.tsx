@@ -1,5 +1,13 @@
-import { Accordion as MuiAccordion, AccordionDetails as MuiAccordionDetails, AccordionSummary as MuiAccordionSummary, fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import withStyles, { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import {
+    Accordion as MuiAccordion,
+    AccordionDetails as MuiAccordionDetails,
+    AccordionSummary as MuiAccordionSummary,
+    alpha,
+    Theme,
+} from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import withStyles from '@mui/styles/withStyles';
 import clsx from 'clsx';
 import React, { CSSProperties, PropsWithChildren, ReactNode, useCallback, useMemo, useState } from 'react';
 import { StyleUtils } from '../../../../utils/style.utils';
@@ -55,7 +63,7 @@ const AccordionSummary = withStyles({
 const AccordionDetails = withStyles((theme) => ({
     root: {
         padding: theme.spacing(0),
-        backgroundColor: fade(theme.palette.background.default, 0.5),
+        backgroundColor: alpha(theme.palette.background.default, 0.5),
         boxShadow: StyleUtils.insetBoxShadow(theme.shadows[1]),
     },
 }))(MuiAccordionDetails);
@@ -69,7 +77,7 @@ const style = (theme: Theme) => ({
         padding: theme.spacing(0, 4),
         fontSize: '0.875rem',
         '&:hover': {
-            backgroundColor: fade(theme.palette.text.primary, 0.07)
+            backgroundColor: alpha(theme.palette.text.primary, 0.07)
         }
     },
     detailRow: {

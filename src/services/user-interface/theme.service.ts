@@ -1,6 +1,6 @@
 import { UserPreferences, UserWebClientTheme } from '@fgo-planner/types';
-import { ThemeOptions } from '@material-ui/core';
-import { SimplePaletteColorOptions } from '@material-ui/core/styles/createPalette';
+import { DeprecatedThemeOptions } from '@mui/material';
+import { SimplePaletteColorOptions } from '@mui/material/styles';
 import { colord } from 'colord';
 import { BehaviorSubject } from 'rxjs';
 import { AssetConstants } from '../../constants';
@@ -13,7 +13,7 @@ import { PageMetadataService } from './page-metadata.service';
 export type ThemeMode = 'light' | 'dark';
 
 export type ThemeInfo = {
-    themeOptions: ThemeOptions;
+    themeOptions: DeprecatedThemeOptions;
     themeMode: ThemeMode;
     backgroundImageUrl?: string;
 };
@@ -92,7 +92,7 @@ export class ThemeService {
     /**
      * Sets the `theme-color` metadata.
      */
-    private static _setThemeColorMeta(themeOptions: ThemeOptions): void {
+    private static _setThemeColorMeta(themeOptions: DeprecatedThemeOptions): void {
         PageMetadataService.setThemeColor(themeOptions?.palette?.background?.default);
     }
 
@@ -120,7 +120,7 @@ export class ThemeService {
      * Converts the user's custom theme settings into a `ThemeOptions` object.
      */
     private static _parseUserThemePreference(userThemePreference: UserWebClientTheme | undefined, themeMode: ThemeMode): ThemeInfo {
-        let themeOptions: ThemeOptions;
+        let themeOptions: DeprecatedThemeOptions;
         /*
          * The theme options starts off with default values as the base. Any values that
          * are not specified by the user in the custom theme will use the default.
@@ -153,7 +153,7 @@ export class ThemeService {
         return { themeOptions, themeMode, backgroundImageUrl };
     }
 
-    private static _mergeThemeOptions(baseThemeOptions: ThemeOptions, userThemePreference: UserWebClientTheme): void {
+    private static _mergeThemeOptions(baseThemeOptions: DeprecatedThemeOptions, userThemePreference: UserWebClientTheme): void {
         const {
             backgroundColor,
             foregroundColor,
@@ -211,7 +211,7 @@ export class ThemeService {
     }
 
     private static _getDefaultThemeForMode(themeMode: ThemeMode): ThemeInfo {
-        let themeOptions: ThemeOptions;
+        let themeOptions: DeprecatedThemeOptions;
         let backgroundImageUrl: string;
         if (themeMode === 'light') {
             themeOptions = defaultLightTheme();

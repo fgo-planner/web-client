@@ -1,5 +1,6 @@
-import { makeStyles, Theme } from '@material-ui/core';
-import { StyleRules, WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
 import React, { PropsWithChildren } from 'react';
 import { ThemeConstants } from '../../../styles/theme-constants';
 

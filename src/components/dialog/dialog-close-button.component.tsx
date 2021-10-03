@@ -1,6 +1,7 @@
-import { IconButton, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Close as CloseIcon, SvgIconComponent } from '@material-ui/icons';
+import { IconButton, Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { Close as CloseIcon, SvgIconComponent } from '@mui/icons-material';
 import React, { MouseEvent } from 'react';
 
 type Props = {
@@ -28,7 +29,7 @@ export const DialogCloseButton = React.memo(({ icon, onClick }: Props) => {
     const classes = useStyles();
     const Icon = icon ?? DefaultIcon;
     return (
-        <IconButton className={classes.root} onClick={onClick}>
+        <IconButton className={classes.root} onClick={onClick} size="large">
             <Icon />
         </IconButton>
     );

@@ -1,5 +1,7 @@
 import { GameServantClass, GameServantRarity } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Tooltip, TooltipProps } from '@material-ui/core';
+import { Tooltip, TooltipProps } from '@mui/material';
+import { StyleRules } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../../constants';
 import { ReadonlyRecord } from '../../../types/internal';

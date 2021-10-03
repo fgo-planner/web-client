@@ -1,7 +1,8 @@
 import { MasterAccount, MasterServant } from '@fgo-planner/types';
-import { Button, Fab, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Clear as ClearIcon, Done as DoneIcon, Publish as PublishIcon } from '@material-ui/icons';
+import { Button, Fab, Theme, Tooltip } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import { Clear as ClearIcon, Done as DoneIcon, Publish as PublishIcon } from '@mui/icons-material';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DropzoneRef } from 'react-dropzone';
 import { useHistory } from 'react-router-dom';
@@ -68,7 +69,7 @@ const style = (theme: Theme) => ({
     },
     importResultsHelperText: {
         color: theme.palette.text.secondary,
-        minWidth: `${theme.breakpoints.width('lg')}px`,
+        minWidth: `${theme.breakpoints.values.lg}px`,
         padding: theme.spacing(6, 4, 4, 4)
     }
 } as StyleRules);

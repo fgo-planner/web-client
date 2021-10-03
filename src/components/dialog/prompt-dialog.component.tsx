@@ -1,8 +1,19 @@
-import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, withWidth } from '@material-ui/core';
+import {
+    Button,
+    ButtonProps,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+} from '@mui/material';
 import { ReactNode } from 'react';
 import { DialogComponentProps, Nullable } from '../../types/internal';
 import { DialogComponent } from '../base/dialog-component';
 import { DialogCloseButton } from './dialog-close-button.component';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent: any) => (props: any) => <WrappedComponent {...props} width="xs" />;
 
 type RenderedProps = {
     title?: string;
@@ -92,8 +103,9 @@ export const PromptDialog = withWidth()(class extends DialogComponent<Props> {
                 {...dialogProps}
                 fullScreen={fullScreen}
                 onClose={onClose}
-                onExited={this._handleOnExited}
-            >
+                TransitionProps={{
+                    onExited: this._handleOnExited
+                }}>
                 {showTitle &&
                     <DialogTitle>
                         {title}

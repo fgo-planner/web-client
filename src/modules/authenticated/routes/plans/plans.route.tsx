@@ -1,6 +1,6 @@
 import { Plan, PlanGroup } from '@fgo-planner/types';
-import { Fab, PaperProps, Tooltip } from '@material-ui/core';
-import { Add as AddIcon } from '@material-ui/icons';
+import { Fab, PaperProps, Tooltip } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';

@@ -1,6 +1,7 @@
 import { GameServant, MasterServant } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
 import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';

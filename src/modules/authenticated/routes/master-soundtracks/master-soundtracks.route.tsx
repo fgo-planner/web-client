@@ -1,6 +1,6 @@
 import { GameSoundtrack, MasterAccount } from '@fgo-planner/types';
-import { Fab, Tooltip } from '@material-ui/core';
-import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@material-ui/icons';
+import { Fab, Tooltip } from '@mui/material';
+import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@mui/icons-material';
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';

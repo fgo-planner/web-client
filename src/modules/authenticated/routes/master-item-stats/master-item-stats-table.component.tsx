@@ -1,5 +1,6 @@
-import { makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme, Tooltip } from '@mui/material';
+import { StyleRules, WithStylesOptions } from '@mui/styles';
+import makeStyles from '@mui/styles/makeStyles';
 import React, { ReactNode } from 'react';
 import { useMemo } from 'react';
 import NumberFormat from 'react-number-format';

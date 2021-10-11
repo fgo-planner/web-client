@@ -54,9 +54,6 @@ const style = (theme: Theme) => ({
     },
     form: {
         padding: theme.spacing(2)
-    },
-    inputFieldContainer: {
-        width: '100%'
     }
 } as StyleRules);
 
@@ -137,7 +134,7 @@ export const PlanAddDialog = React.memo((props: Props) => {
                         onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
                     >
                         <div className={classes.root}>
-                            <InputFieldContainer className={classes.inputFieldContainer}>
+                            <InputFieldContainer width="100%">
                                 <TextField
                                     variant="outlined"
                                     fullWidth
@@ -150,7 +147,7 @@ export const PlanAddDialog = React.memo((props: Props) => {
                                     helperText={touchedErrors.name}
                                 />
                             </InputFieldContainer>
-                            <InputFieldContainer className={classes.inputFieldContainer}>
+                            <InputFieldContainer width="100%">
                                 <TextField
                                     variant="outlined"
                                     fullWidth

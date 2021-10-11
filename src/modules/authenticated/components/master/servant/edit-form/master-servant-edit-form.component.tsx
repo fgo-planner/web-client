@@ -1,7 +1,6 @@
 import { GameServant, MasterServant, MasterServantBondLevel, MasterServantSkillLevel } from '@fgo-planner/types';
-import { FormControl, InputLabel, Select, SelectChangeEvent, TextField, Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
+import { FormControl, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
+import { Box, SxProps, Theme } from '@mui/system';
 import React, { ChangeEvent, FocusEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer } from '../../../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../../../constants';
@@ -145,37 +144,26 @@ const getFouInputStepSize = (value: string | undefined): number => {
     return 20;
 };
 
-const style = (theme: Theme) => ({
-    // root: {
-    //     paddingTop: theme.spacing(4)
-    // },
+const styles = {
     inputFieldGroup: {
         display: 'flex',
-        flexWrap: 'nowrap',
-        [theme.breakpoints.down('sm')]: {
-            flexWrap: 'wrap'
+        flexWrap: {
+            xs: 'wrap',
+            sm: 'nowrap',
         }
-    },
+    } as SxProps<Theme>,
     inputFieldContainer: {
-        flex: 1,
-        padding: theme.spacing(0, 2),
-        [theme.breakpoints.down('sm')]: {
-            flex: '100% !important'
-        }
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantEditForm'
+        flex: {
+            xs: '100% !important',
+            sm: 1,
+        },
+        px: 2
+    } as SxProps<Theme>
 };
-
-const useStyles = makeStyles(style, styleOptions);
 
 export const MasterServantEditForm = React.memo((props: Props) => {
 
     const forceUpdate = useForceUpdate();
-
-    const classes = useStyles();
 
     const {
         formId,
@@ -507,41 +495,41 @@ export const MasterServantEditForm = React.memo((props: Props) => {
                 noValidate
                 onSubmit={handleSubmit}
             >
-                <div className={classes.inputFieldGroup}>
-                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                <Box sx={styles.inputFieldGroup}>
+                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
                         {levelField}
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
                         {ascensionField}
                     </InputFieldContainer>
-                </div>
-                <div className={classes.inputFieldGroup}>
-                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                </Box>
+                <Box sx={styles.inputFieldGroup}>
+                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
                         {fouHpField}
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
                         {fouAtkField}
                     </InputFieldContainer>
-                </div>
-                <div className={classes.inputFieldGroup}>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                </Box>
+                <Box sx={styles.inputFieldGroup}>
+                    <InputFieldContainer sx={styles.inputFieldContainer}>
                         {skill1Field}
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer sx={styles.inputFieldContainer}>
                         {skill2Field}
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
+                    <InputFieldContainer sx={styles.inputFieldContainer}>
                         {skill3Field}
                     </InputFieldContainer>
-                </div>
-                <div className={classes.inputFieldGroup}>
-                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                </Box>
+                <Box sx={styles.inputFieldGroup}>
+                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
                         {npField}
                     </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer} flex="50%">
+                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
                         {bondField}
                     </InputFieldContainer>
-                </div>
+                </Box>
             </form>
         );
     }
@@ -554,8 +542,8 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             noValidate
             onSubmit={handleSubmit}
         >
-            <div className={classes.inputFieldGroup}>
-                <InputFieldContainer className={classes.inputFieldContainer} flex="75%">
+            <Box sx={styles.inputFieldGroup}>
+                <InputFieldContainer sx={styles.inputFieldContainer} flex="75%">
                     <MasterServantEditFormAutocomplete
                         servantList={gameServantList}
                         selectedServant={servant}
@@ -563,38 +551,38 @@ export const MasterServantEditForm = React.memo((props: Props) => {
                         disabled={servantSelectDisabled || readonly}
                     />
                 </InputFieldContainer>
-                <InputFieldContainer className={classes.inputFieldContainer} flex="25%">
+                <InputFieldContainer sx={styles.inputFieldContainer} flex="25%">
                     {npField}
                 </InputFieldContainer>
-            </div>
-            <div className={classes.inputFieldGroup}>
-                <InputFieldContainer className={classes.inputFieldContainer}>
+            </Box>
+            <Box sx={styles.inputFieldGroup}>
+                <InputFieldContainer sx={styles.inputFieldContainer}>
                     {levelField}
                 </InputFieldContainer>
-                <InputFieldContainer className={classes.inputFieldContainer}>
+                <InputFieldContainer sx={styles.inputFieldContainer}>
                     {ascensionField}
                 </InputFieldContainer>
-                <InputFieldContainer className={classes.inputFieldContainer}>
+                <InputFieldContainer sx={styles.inputFieldContainer}>
                     {fouHpField}
                 </InputFieldContainer>
-                <InputFieldContainer className={classes.inputFieldContainer}>
+                <InputFieldContainer sx={styles.inputFieldContainer}>
                     {fouAtkField}
                 </InputFieldContainer>
-            </div>
-            <div className={classes.inputFieldGroup}>
-                <InputFieldContainer className={classes.inputFieldContainer}>
+            </Box>
+            <Box sx={styles.inputFieldGroup}>
+                <InputFieldContainer sx={styles.inputFieldContainer}>
                     {skill1Field}
                 </InputFieldContainer>
-                <InputFieldContainer className={classes.inputFieldContainer}>
+                <InputFieldContainer sx={styles.inputFieldContainer}>
                     {skill2Field}
                 </InputFieldContainer>
-                <InputFieldContainer className={classes.inputFieldContainer}>
+                <InputFieldContainer sx={styles.inputFieldContainer}>
                     {skill3Field}
                 </InputFieldContainer>
-                <InputFieldContainer className={classes.inputFieldContainer}>
+                <InputFieldContainer sx={styles.inputFieldContainer}>
                     {bondField}
                 </InputFieldContainer>
-            </div>
+            </Box>
         </form>
     );
 

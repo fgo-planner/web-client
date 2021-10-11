@@ -1,17 +1,7 @@
 import { GameServantRarity } from '@fgo-planner/types';
-import {
-    Checkbox,
-    IconButton,
-    ListItemText,
-    MenuItem,
-    MenuProps,
-    TextField,
-    Theme,
-    Tooltip,
-} from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
 import { Replay as ReplayIcon } from '@mui/icons-material';
+import { Checkbox, IconButton, ListItemText, MenuItem, MenuProps, TextField, Tooltip } from '@mui/material';
+import { Box, SxProps, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../constants';
@@ -24,6 +14,22 @@ export type MasterServantStatsFilterResult = {
 
 type Props = {
     onFilterChange: (filter: MasterServantStatsFilterResult) => void;
+};
+
+const styles = {
+    root: {
+        display: 'flex',
+        height: 64,
+        mt: 6,
+        mb: -2
+    } as SxProps<Theme>,
+    multiSelectCheckbox: {
+        ml: -2,
+        pr: 3
+    } as SxProps<Theme>,
+    selectContainer: {
+        px: 2
+    } as SxProps<Theme>
 };
 
 /**
@@ -56,26 +62,7 @@ const renderMultiSelectValue = (value: unknown): ReactNode => {
     return selected.join(', ');
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        height: 64,
-        margin: theme.spacing(6, 0, -2, 0)
-    },
-    multiSelectCheckbox: {
-        marginLeft: theme.spacing(-2),
-        paddingRight: theme.spacing(3)
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantStatsFilter'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
 export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) => {
-    const classes = useStyles();
     const [groupBy, setGroupBy] = useState<MasterServantStatsGroupBy>('rarity');
     const [classFilter, setClassFilter] = useState<GameServantClassSimplified[]>([...ClassFilterOptions]);
     const [rarityFilter, setRarityFilter] = useState<GameServantRarity[]>([...GameServantConstants.RarityValues]);
@@ -101,9 +88,9 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
 
     // TODO Move this to a util class?
     const handleMultiSelectChange = useCallback(<T,>(
-        values: string[], 
-        prevValues: T[], 
-        allValues: ReadonlyArray<T>, 
+        values: string[],
+        prevValues: T[],
+        allValues: ReadonlyArray<T>,
         setState: (value: SetStateAction<T[]>) => void
     ): void => {
 
@@ -163,8 +150,6 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
         setRarityFilter([...GameServantConstants.RarityValues]);
     }, []);
 
-    const multiSelectCheckboxClasses = { root: classes.multiSelectCheckbox };
-
     /*
      * Render the 'group by' select.
      */
@@ -210,7 +195,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
             >
                 <MenuItem value={MultiSelectAllOption}>
                     <Checkbox
-                        classes={multiSelectCheckboxClasses}
+                        sx={styles.multiSelectCheckbox}
                         checked={!!classFilter.length}
                         indeterminate={!allSelected && !!classFilter.length}
                     />
@@ -219,7 +204,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 {ClassFilterOptions.map(className => (
                     <MenuItem key={className} value={className}>
                         <Checkbox
-                            classes={multiSelectCheckboxClasses}
+                            sx={styles.multiSelectCheckbox}
                             checked={classFilter.indexOf(className) !== -1}
                         />
                         <ListItemText primary={className} />
@@ -252,8 +237,8 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 onChange={handleRarityFilterChange}
             >
                 <MenuItem value={MultiSelectAllOption}>
-                    <Checkbox 
-                        classes={multiSelectCheckboxClasses}
+                    <Checkbox
+                        sx={styles.multiSelectCheckbox}
                         checked={!!rarityFilter.length}
                         indeterminate={!allSelected && !!rarityFilter.length}
                     />
@@ -262,7 +247,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 {GameServantConstants.RarityValues.map(rarity => (
                     <MenuItem key={rarity} value={rarity}>
                         <Checkbox
-                            classes={multiSelectCheckboxClasses}
+                            sx={styles.multiSelectCheckbox}
                             checked={rarityFilter.indexOf(rarity) !== -1}
                         />
                         <ListItemText primary={`${rarity} \u2605`} />
@@ -273,11 +258,11 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
     }
 
     return (
-        <div className={classes.root}>
-            <InputFieldContainer className="px-2" width={240}>
+        <Box sx={styles.root}>
+            <InputFieldContainer sx={styles.selectContainer} width={240}>
                 {groupBySelect}
             </InputFieldContainer>
-            <InputFieldContainer className="px-2" width={240}>
+            <InputFieldContainer sx={styles.selectContainer} width={240}>
                 {/* Only one of the below can be non-null at any given time. */}
                 {classFilterSelect}
                 {rarityFilterSelect}
@@ -291,6 +276,6 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                         size="large" />
                 </div>
             </Tooltip>
-        </div>
+        </Box>
     );
 });

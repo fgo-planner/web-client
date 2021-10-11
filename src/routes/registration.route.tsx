@@ -1,23 +1,12 @@
-import {
-    Button,
-    Checkbox,
-    alpha,
-    FormControlLabel,
-    FormGroup,
-    TextField,
-    Theme,
-    Tooltip,
-} from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import withStyles from '@mui/styles/withStyles';
+import { alpha, Button, Checkbox, FormControlLabel, FormGroup, TextField, Tooltip } from '@mui/material';
+import { Box, SxProps, Theme } from '@mui/system';
 import { Formik, FormikConfig, FormikHelpers, FormikProps } from 'formik';
-import React, { ChangeEvent, Fragment, PureComponent, ReactNode } from 'react';
-import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
+import React, { ChangeEvent, Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
 import { InputFieldContainer } from '../components/input/input-field-container.component';
 import { PageTitle } from '../components/text/page-title.component';
 import { UserService } from '../services/data/user/user.service';
-import { WithStylesProps } from '../types/internal';
 import { FormUtils } from '../utils/form.utils';
 
 type FormData = {
@@ -28,14 +17,73 @@ type FormData = {
     friendId: string
 };
 
-type Props = ReactRouteComponentProps & WithStylesProps;
-
-type State = {
-    termsAccepted: boolean;
-    awaitingResponse: boolean;
-    errorMessage?: string | null;
-    success?: boolean;
-    redirectTimeout?: NodeJS.Timeout;
+const styles = {
+    root: {
+        display: 'flex',
+        justifyContent: 'center',
+        mt: {
+            xs: 0,
+            sm: '10vh'
+        }
+    } as SxProps<Theme>,
+    title: {
+        pb: 8
+    } as SxProps<Theme>,
+    formContainer: {
+        width: {
+            xs: '100%',
+            sm: 420
+        },
+        boxSizing: 'border-box',
+        borderWidth: {
+            xs: 0,
+            sm: 1
+        },
+        borderStyle: 'solid',
+        borderColor: (theme: Theme) => alpha(theme.palette.text.primary, 0.23),
+        borderRadius: {
+            xs: 0,
+            sm: 2
+        },
+        backgroundColor: (theme: Theme) => theme.palette.background.paper
+    } as SxProps<Theme>,
+    errorMessage: {
+        color: 'red',
+        px: 8,
+        pb: 6
+    } as SxProps<Theme>,
+    form: {
+        px: 8,
+        boxSizing: 'border-box'
+    } as SxProps<Theme>,
+    actionsContainer: {
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        mx: 6,
+        mt: 10,
+        mb: 6
+    } as SxProps<Theme>,
+    actionLinks: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'start',
+        '& >div': {
+            color: (theme: Theme) => theme.palette.text.secondary,
+            px: 2,
+            py: 1
+        }
+    } as SxProps<Theme>,
+    success: {
+        height: 654,
+        boxSizing: 'border-box',
+        px: 4
+    } as SxProps<Theme>,
+    successMessage: {
+        px: 2,
+        pt: 4,
+        pb: 16
+    } as SxProps<Theme>
 };
 
 const FormId = 'registration-form';
@@ -69,306 +117,48 @@ const ValidationSchema = Yup.object().shape({
         .max(999999999)
 });
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        justifyContent: 'center',
-        margin: '10vh 0',
-        [theme.breakpoints.down('sm')]: {
-            marginTop: 0
-        }
-    },
-    title: {
-        paddingBottom: theme.spacing(8)
-    },
-    formContainer: {
-        width: 420,
-        boxSizing: 'border-box',
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: alpha(theme.palette.text.primary, 0.23),
-        borderRadius: 8,
-        backgroundColor: theme.palette.background.paper,
-        [theme.breakpoints.down('sm')]: {
-            width: '100%',
-            border: 'none'
-        }
-    },
-    errorMessage: {
-        color: 'red',
-        padding: theme.spacing(0, 8, 6, 8)
-    },
-    form: {
-        padding: theme.spacing(0, 8),
-        boxSizing: 'border-box'
-    },
-    inputFieldContainer: {
-        width: '100%'
-    },
-    actionsContainer: {
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        margin: theme.spacing(10, 6, 6, 6)
-    },
-    actionLinks: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'start',
-        '& >div': {
-            color: theme.palette.text.secondary,
-            padding: theme.spacing(1, 2)
-        }
-    },
-    success: {
-        height: 654,
-        boxSizing: 'border-box',
-        // display: 'flex',
-        // flexDirection: 'column',
-        // alignItems: 'flex-end',
-        padding: theme.spacing(0, 4)
-    },
-    successMessage: {
-        padding: theme.spacing(4, 2, 16, 2)
-    }
-} as StyleRules);
+export const RegistrationRoute = React.memo(() => {
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'Registration'
-};
+    const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
+    const [isRegistering, setIsRegistering] = useState<boolean>(false);
+    const [success, setSuccess] = useState<boolean>();
+    const [errorMessage, setErrorMessage] = useState<string>();
+    const [redirectTimeout, setRedirectTimeout] = useState<NodeJS.Timeout>();
 
-const Registration = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
+    const history = useHistory();
 
-    private readonly _formikConfig: FormikConfig<FormData> = {
-        initialValues: {
-            username: '',
-            password: '',
-            confirmPassword: '',
-            email: '',
-            friendId: ''
-        },
-        onSubmit: this._register.bind(this),
-        validationSchema: ValidationSchema,
-        validateOnBlur: true
-    };
-
-    constructor(props: Props) {
-        super(props);
-
-        this.state = {
-            termsAccepted: false,
-            awaitingResponse: false
+    useEffect(() => {
+        return () => {
+            if (redirectTimeout !== undefined) {
+                clearTimeout(redirectTimeout);
+            }
         };
+    }, [redirectTimeout]);
 
-        this._renderForm = this._renderForm.bind(this);
-        this._handleTermsCheckboxChange = this._handleTermsCheckboxChange.bind(this);
-    }
+    const register = useCallback(async (formData: FormData): Promise<void> => {
+        setIsRegistering(true);
+        setErrorMessage(undefined);
+        try {
+            const { confirmPassword, ...user } = formData;
+            await UserService.register(user as any);
 
-    componentWillUnmount() {
-        const { redirectTimeout } = this.state;
-        if (redirectTimeout !== undefined) {
-            clearTimeout(redirectTimeout);
+            // Wait 5 seconds before redirecting to login page
+            const redirectTimeout = setTimeout(() => {
+                history.push('/login');
+            }, SuccessRedirectDelay);
+
+            setSuccess(true);
+            setRedirectTimeout(redirectTimeout);
+        } catch (e: any) {
+            setIsRegistering(false);
+            setErrorMessage(e.message || String(e));
         }
-    }
+    }, [history]);
 
-    render(): ReactNode {
-        const { classes } = this.props;
-        const { success } = this.state;
-        return (
-            <div className={classes.root}>
-                <div className={classes.formContainer}>
-                    <PageTitle className="pb-8">
-                        {success ? 'Success!' : 'Create Account'}
-                    </PageTitle>
-                    {success ? 
-                        this._renderSuccessStage() :
-                        this._renderRegistrationStage()
-                    }
-                </div>
-            </div>
-        );
-    }
-
-    private _renderSuccessStage(): ReactNode {
-        const { classes } = this.props;
-        return (
-            <div className={classes.success}>
-                <div className={classes.successMessage}>
-                    <div>{SuccessMessage1}</div>
-                    <br />
-                    <div>{SuccessMessage2}</div>
-                </div>
-                <Button
-                    component={Link}
-                    variant="text"
-                    color="secondary"
-                    to="/login"
-                >
-                    Click here to login
-                </Button>
-            </div>
-        );
-    }
-
-    private _renderRegistrationStage(): ReactNode {
-        const { classes } = this.props;
-        const { termsAccepted, awaitingResponse, errorMessage } = this.state;
-        return (
-            <Fragment>
-                {errorMessage &&
-                    <div className={classes.errorMessage}>
-                        {errorMessage}
-                    </div>
-                }
-                <Formik {...this._formikConfig}>
-                    {this._renderForm}
-                </Formik>
-                <div className={classes.actionsContainer}>
-                    <div className={classes.actionLinks}>
-                        <div>
-                            Already have an account?
-                            </div>
-                        <Button
-                            component={Link}
-                            variant="text"
-                            color="secondary"
-                            to="/login"
-                        >
-                            Login instead
-                        </Button>
-                    </div>
-                    <Tooltip title={termsAccepted ? '' : 'Terms must be accepted'} placement="top">
-                        <div>
-                            <Button
-                                color="primary"
-                                variant="contained"
-                                type="submit"
-                                form={FormId}
-                                disabled={!termsAccepted || awaitingResponse}
-                            >
-                                Register
-                            </Button>
-                        </div>
-                    </Tooltip>
-                </div>
-            </Fragment>
-        );
-    }
-
-    private _renderForm(props: FormikProps<FormData>): ReactNode {
-        const { classes } = this.props;
-        const { termsAccepted } = this.state;
-
-        const {
-            values,
-            errors,
-            touched,
-            setFieldValue,
-            handleBlur,
-            handleChange,
-            handleSubmit
-        } = props;
-
-        const touchedErrors = FormUtils.getErrorsForTouchedFields(errors, touched);
-
-        return (
-            <form
-                id={FormId}
-                noValidate
-                onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
-            >
-                <div className={classes.form}>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
-                        <TextField
-                            variant="outlined"
-                            fullWidth
-                            label="Username"
-                            name="username"
-                            value={values.username}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={!!touchedErrors.username}
-                            helperText={touchedErrors.username}
-                            required
-                        />
-                    </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
-                        <TextField
-                            variant="outlined"
-                            fullWidth
-                            label="Password"
-                            name="password"
-                            type="password"
-                            value={values.password}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={!!touchedErrors.password}
-                            helperText={touchedErrors.password}
-                            required
-                        />
-                    </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
-                        <TextField
-                            variant="outlined"
-                            fullWidth
-                            label="Confirm Password"
-                            name="confirmPassword"
-                            type="password"
-                            value={values.confirmPassword}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={!!touchedErrors.confirmPassword}
-                            helperText={touchedErrors.confirmPassword}
-                        />
-                    </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
-                        <TextField
-                            variant="outlined"
-                            fullWidth
-                            label="Email (for account recovery)"
-                            name="email"
-                            value={values.email}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={!!touchedErrors.email}
-                            helperText={touchedErrors.email}
-                        />
-                    </InputFieldContainer>
-                    <InputFieldContainer className={classes.inputFieldContainer}>
-                        <TextField
-                            variant="outlined"
-                            fullWidth
-                            label="Friend ID"
-                            name="friendId"
-                            value={values.friendId}
-                            onChange={e => this._handleFriendIdChange(e, setFieldValue)}
-                            onBlur={handleBlur}
-                            error={!!touchedErrors.friendId}
-                            helperText={touchedErrors.friendId}
-                        />
-                    </InputFieldContainer>
-                    <FormGroup>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    name="noExpire"
-                                    checked={termsAccepted}
-                                    onChange={this._handleTermsCheckboxChange}
-                                />
-                            }
-                            label="I accept terms and conditions"
-                        />
-                    </FormGroup>
-                </div>
-            </form>
-        );
-
-    }
-
-    private _handleFriendIdChange(
+    const handleFriendIdChange = useCallback((
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
         setFieldValue: FormikHelpers<FormData>['setFieldValue']
-    ): void {
+    ): void => {
 
         const { name, value } = event.target;
 
@@ -384,41 +174,211 @@ const Registration = withRouter(withStyles(style, styleOptions)(class extends Pu
         }
 
         setFieldValue(name, transformedValue, false);
-    }
+    }, []);
 
-    private _handleTermsCheckboxChange(e: ChangeEvent<HTMLInputElement>): void {
-        const { checked } = e.target;
-        this.setState({
-            termsAccepted: checked
-        });
-    }
+    const handleTermsCheckboxChange = useCallback((e: ChangeEvent<HTMLInputElement>): void => {
+        setTermsAccepted(e.target.checked);
+    }, []);
 
-    private async _register(formData: FormData): Promise<void> {
-        this.setState({
-            awaitingResponse: true,
-            errorMessage: null
-        });
-        try {
-            const { confirmPassword, ...user } = formData;
-            await UserService.register(user as any);
+    const formikConfigRef = useRef<FormikConfig<FormData>>({
+        initialValues: {
+            username: '',
+            password: '',
+            confirmPassword: '',
+            email: '',
+            friendId: ''
+        },
+        onSubmit: register,
+        validationSchema: ValidationSchema,
+        validateOnBlur: true
+    });
 
-            // Wait 5 seconds before redirecting to login page
-            const redirectTimeout = setTimeout(() => {
-                this.props.history.push('/login');
-            }, SuccessRedirectDelay);
+    const renderForm = useCallback((formikProps: FormikProps<FormData>): ReactNode => {
 
-            this.setState({
-                success: true,
-                redirectTimeout
-            });
-        } catch (e: any) {
-            this.setState({
-                awaitingResponse: false,
-                errorMessage: e.message || String(e)
-            });
+        const {
+            values,
+            errors,
+            touched,
+            setFieldValue,
+            handleBlur,
+            handleChange,
+            handleSubmit
+        } = formikProps;
+
+        const touchedErrors = FormUtils.getErrorsForTouchedFields(errors, touched);
+
+        return (
+            <form
+                id={FormId}
+                noValidate
+                onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
+            >
+                <Box sx={styles.form}>
+                    <InputFieldContainer width="100%">
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            label="Username"
+                            name="username"
+                            value={values.username}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={!!touchedErrors.username}
+                            helperText={touchedErrors.username}
+                            required
+                        />
+                    </InputFieldContainer>
+                    <InputFieldContainer width="100%">
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            label="Password"
+                            name="password"
+                            type="password"
+                            value={values.password}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={!!touchedErrors.password}
+                            helperText={touchedErrors.password}
+                            required
+                        />
+                    </InputFieldContainer>
+                    <InputFieldContainer width="100%">
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            label="Confirm Password"
+                            name="confirmPassword"
+                            type="password"
+                            value={values.confirmPassword}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={!!touchedErrors.confirmPassword}
+                            helperText={touchedErrors.confirmPassword}
+                        />
+                    </InputFieldContainer>
+                    <InputFieldContainer width="100%">
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            label="Email (for account recovery)"
+                            name="email"
+                            value={values.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            error={!!touchedErrors.email}
+                            helperText={touchedErrors.email}
+                        />
+                    </InputFieldContainer>
+                    <InputFieldContainer width="100%">
+                        <TextField
+                            variant="outlined"
+                            fullWidth
+                            label="Friend ID"
+                            name="friendId"
+                            value={values.friendId}
+                            onChange={e => handleFriendIdChange(e, setFieldValue)}
+                            onBlur={handleBlur}
+                            error={!!touchedErrors.friendId}
+                            helperText={touchedErrors.friendId}
+                        />
+                    </InputFieldContainer>
+                    <FormGroup>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    name="noExpire"
+                                    checked={termsAccepted}
+                                    onChange={handleTermsCheckboxChange}
+                                />
+                            }
+                            label="I accept terms and conditions"
+                        />
+                    </FormGroup>
+                </Box>
+            </form>
+        );
+
+    }, [handleFriendIdChange, handleTermsCheckboxChange, termsAccepted]);
+
+    const stageContentsNode: ReactNode = useMemo(() => {
+        /*
+         * Registration stage
+         */
+        if (!success) {
+            return (
+                <Fragment>
+                    {errorMessage &&
+                        <Box sx={styles.errorMessage}>
+                            {errorMessage}
+                        </Box>
+                    }
+                    <Formik {...formikConfigRef.current}>
+                        {renderForm}
+                    </Formik>
+                    <Box sx={styles.actionsContainer}>
+                        <Box sx={styles.actionLinks}>
+                            <div>
+                                Already have an account?
+                            </div>
+                            <Button
+                                component={Link}
+                                variant="text"
+                                color="secondary"
+                                to="/login"
+                            >
+                                Login instead
+                            </Button>
+                        </Box>
+                        <Tooltip title={termsAccepted ? '' : 'Terms must be accepted'} placement="top">
+                            <div>
+                                <Button
+                                    color="primary"
+                                    variant="contained"
+                                    type="submit"
+                                    form={FormId}
+                                    disabled={!termsAccepted || isRegistering}
+                                >
+                                    Register
+                                </Button>
+                            </div>
+                        </Tooltip>
+                    </Box>
+                </Fragment>
+            );
         }
-    }
 
-}));
+        /*
+         * Success stage
+         */
+        return (
+            <Box sx={styles.success}>
+                <Box sx={styles.successMessage}>
+                    <div>{SuccessMessage1}</div>
+                    <br />
+                    <div>{SuccessMessage2}</div>
+                </Box>
+                <Button
+                    component={Link}
+                    variant="text"
+                    color="secondary"
+                    to="/login"
+                >
+                    Click here to login
+                </Button>
+            </Box>
+        );
+    }, [errorMessage, isRegistering, renderForm, success, termsAccepted]);
 
-export const RegistrationRoute = React.memo(() => <Registration />);
+    return (
+        <Box sx={styles.root}>
+            <Box sx={styles.formContainer}>
+                <PageTitle className="pb-8">
+                    {success ? 'Success!' : 'Create Account'}
+                </PageTitle>
+                {stageContentsNode}
+            </Box>
+        </Box>
+    );
+
+});

@@ -27,9 +27,6 @@ const defaultFormValues = (): Form => {
 const style = (theme: Theme) => ({
     form: {
         padding: theme.spacing(2)
-    },
-    inputFieldContainer: {
-        width: '100%'
     }
 } as StyleRules);
 
@@ -107,7 +104,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
                     </div>
                     <form className={classes.form} id={FormId} onSubmit={submit}>
                         {/* TODO Add form validation */}
-                        <InputFieldContainer className={classes.inputFieldContainer}>
+                        <InputFieldContainer width="100%">
                             <TextField
                                 variant="outlined"
                                 fullWidth
@@ -118,7 +115,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
                                 onChange={handleInputChange}
                             />
                         </InputFieldContainer>
-                        <InputFieldContainer className={classes.inputFieldContainer}>
+                        <InputFieldContainer width="100%">
                             <TextField
                                 variant="outlined"
                                 fullWidth

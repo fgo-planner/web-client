@@ -1,7 +1,6 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Theme, Typography } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
-import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Box, SxProps, Theme } from '@mui/system';
+import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { AuthenticationService } from '../../services/authentication/auth.service';
@@ -12,33 +11,29 @@ import { LoginForm } from './login-form.component';
 
 type Props = DialogComponentProps;
 
-const FormId = 'login-dialog-form';
-
-const style = (theme: Theme) => ({
+const styles = {
+    form: {
+        p: 2
+    } as SxProps<Theme>,
     errorMessage: {
         color: 'red',
-        padding: theme.spacing(0, 2, 4, 2)
-    },
-    form: {
-        padding: theme.spacing(2)
-    },
+        px: 2,
+        pt: 0,
+        pb: 4
+    } as SxProps<Theme>,
     dialogActions: {
         alignItems: 'flex-end',
         justifyContent: 'space-between',
-        padding: theme.spacing(6)
-    },
+        p: 6
+    } as SxProps<Theme>,
     actionLinks: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'start'
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'LoginDialog'
+    } as CSSProperties
 };
 
-const useStyles = makeStyles(style, styleOptions);
+const FormId = 'login-dialog-form';
 
 export const LoginDialog = React.memo((props: Props) => {
 
@@ -47,8 +42,6 @@ export const LoginDialog = React.memo((props: Props) => {
         onClose,
         ...dialogProps
     } = props;
-
-    const classes = useStyles();
 
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
@@ -94,18 +87,18 @@ export const LoginDialog = React.memo((props: Props) => {
                 </DialogTitle>
                 <DialogContent>
                     {errorMessage &&
-                        <div className={classes.errorMessage}>
+                        <Box sx={styles.errorMessage}>
                             {errorMessage}
-                        </div>
+                        </Box>
                     }
                     <LoginForm
-                        classes={{ root: classes.form }}
+                        sx={styles.form}
                         formId={FormId}
                         onSubmit={login}
                     />
                 </DialogContent>
-                <DialogActions className={classes.dialogActions}>
-                    <div className={classes.actionLinks}>
+                <DialogActions sx={styles.dialogActions}>
+                    <div style={styles.actionLinks}>
                         <Button
                             component={Link}
                             variant="text"

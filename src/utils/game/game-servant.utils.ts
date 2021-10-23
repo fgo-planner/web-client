@@ -1,4 +1,6 @@
-import { GameServantClass } from '@fgo-planner/types';
+import { GameServant, GameServantClass, GameServantRarity } from '@fgo-planner/types';
+import { GameServantConstants } from '../../constants';
+import { GameServantList } from '../../services/data/game/game-servant.service';
 import { GameServantClassSimplified } from '../../types/internal';
 
 export class GameServantUtils {
@@ -23,5 +25,93 @@ export class GameServantUtils {
             return GameServantClassSimplified.Extra;
         }
     }
+
+    static parseClass(string: string, ignoreCase = true): GameServantClass | undefined {
+        if (ignoreCase) {
+            string = string.toLowerCase();
+        }
+        for (const servantClass of Object.keys(GameServantClass)) {
+            if ((ignoreCase && servantClass.toLowerCase() !== string) || (!ignoreCase && string !== servantClass)) {
+                continue;
+            }
+            return servantClass as GameServantClass;
+        }
+        return undefined;
+    }
+
+    static filterServants(search: string, servants: GameServantList): GameServantList {
+        const searchTrimmed = search.trim();
+        if (!searchTrimmed) {
+            return servants;
+        }
+    
+        let classes = new Set<GameServantClass>();
+        let rarities = new Set<GameServantRarity>();
+    
+        const searchTerms = searchTrimmed.split(/\s+/).filter(value => {
+            /*
+             * Rarity filters. Only filters by rarity if the input is valid. Otherwise, it
+             * will just act as another search term.
+             */
+            if (value.length === 2 && value.charAt(1) === '*') {
+                const rarity = Number(value.charAt(0));
+                if (!isNaN(rarity) && rarity >= GameServantConstants.MinRarity && rarity <= GameServantConstants.MaxRarity) {
+                    rarities.add(rarity as GameServantRarity);
+                    return false;
+                }
+                return true;
+            }
+            /*
+             * Servant class filters. Only filters by class if the input is a valid class.
+             * Otherwise, it will just act as another search term.
+             */
+            const servantClass = this.parseClass(value);
+            if (!!servantClass) {
+                classes.add(servantClass);
+                return false;
+            }
+            return true;
+        });
+    
+        return servants.filter(servant => this._filterServant(servant, searchTerms, classes, rarities));
+    }
+
+    private static _filterServant(
+        servant: Readonly<GameServant>,
+        searchTerms: Array<string>,
+        classes: Set<GameServantClass>,
+        rarities: Set<GameServantRarity>
+    ): boolean {
+        /*
+         * Rarity and class filters are only applied if at least one value is given.
+         */
+        if (classes.size && !classes.has(servant.class)) {
+            return false;
+        }
+        if (rarities.size && !rarities.has(servant.rarity)) {
+            return false;
+        }
+        /*
+         * If there are no generic search terms, but at least one class or rarity was
+         * given (and matched), then return true.
+         */
+        if (!searchTerms.length &&(classes.size || rarities.size) ) {
+            return true;
+        }
+        /*
+         * Generate a string of keywords for the servant.
+         */
+        const keywords = (servant.name + (servant.metadata?.displayName || '')).toLowerCase();
+        /*
+         * If any of the search terms are present in the keywords string, then it is
+         * considered to be a match.
+         */
+        for (const searchTerm of searchTerms) {
+            if (keywords.includes(searchTerm)) {
+                return true;
+            }
+        }
+        return false;
+    };
 
 }

@@ -2,9 +2,10 @@ import { GameServantClass, GameServantRarity } from '@fgo-planner/types';
 import { Tooltip, TooltipProps } from '@mui/material';
 import { StyleRules } from '@mui/styles';
 import makeStyles from '@mui/styles/makeStyles';
+import { Box } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../../constants';
-import { ReadonlyRecord } from '../../../types/internal';
+import { ComponentStyleProps, ReadonlyRecord } from '../../../types/internal';
 
 type ClassIconName = GameServantClass | 'Extra' | 'All';
 
@@ -14,7 +15,7 @@ type Props = {
     size?: string | number;
     tooltip?: boolean;
     tooltipPlacement?: TooltipProps['placement'];
-};
+} & Pick<ComponentStyleProps, 'sx'>;
 
 const ClassIconBaseUrl = AssetConstants.ServantClassIconBaseUrl;
 
@@ -98,7 +99,8 @@ export const GameServantClassIcon = React.memo((props: Props) => {
         servantClass,
         rarity,
         tooltip,
-        tooltipPlacement
+        tooltipPlacement,
+        sx
     } = props;
 
     const classes = useStyles();
@@ -114,18 +116,28 @@ export const GameServantClassIcon = React.memo((props: Props) => {
     const rarityColor = RarityColorMap[rarity] ?? DefaultRarityColor;
     const imageUrl = `${ClassIconBaseUrl}/class${rarityColor}_${classNumber}.png`;
 
-    const icon = (
-        <div style={elemStyle}>
-            <img className={classes.img} src={imageUrl} alt={servantClass} />
-        </div>
-    );
+    const iconNode = useMemo((): JSX.Element => {
+        if (sx) {
+            return (
+                <Box style={elemStyle} sx={sx}>
+                    <img className={classes.img} src={imageUrl} alt={servantClass} />
+                </Box>
+            );
+        }
+        return (
+            <div style={elemStyle}>
+                <img className={classes.img} src={imageUrl} alt={servantClass} />
+            </div>
+        );
+    }, [classes.img, elemStyle, imageUrl, servantClass, sx]);
 
     if (tooltip) {
         return (
             <Tooltip title={ClassNameMap[servantClass] ?? ''} placement={tooltipPlacement}>
-                {icon}
+                {iconNode}
             </Tooltip>
         );
     }
-    return icon;
+
+    return iconNode;
 });

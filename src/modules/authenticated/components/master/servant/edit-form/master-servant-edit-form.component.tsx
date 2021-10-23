@@ -4,7 +4,6 @@ import { Box, SxProps, Theme } from '@mui/system';
 import React, { ChangeEvent, FocusEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer } from '../../../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../../../constants';
-import { useGameServantList } from '../../../../../../hooks/data/use-game-servant-list.hook';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { ComponentStyleProps } from '../../../../../../types/internal/props/component-style-props.type';
@@ -180,9 +179,6 @@ export const MasterServantEditForm = React.memo((props: Props) => {
 
     const [formData, setFormData] = useState<FormData>();
     const [servant, setServant] = useState<GameServant>();
-
-    // TODO Add default value option in hook.
-    const gameServantList = useGameServantList() || [];
 
     const gameServantMap = useGameServantMap();
 
@@ -545,7 +541,6 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             <Box sx={styles.inputFieldGroup}>
                 <InputFieldContainer sx={styles.inputFieldContainer} flex="75%">
                     <MasterServantEditFormAutocomplete
-                        servantList={gameServantList}
                         selectedServant={servant}
                         onChange={handleSelectedServantChange}
                         disabled={servantSelectDisabled || readonly}

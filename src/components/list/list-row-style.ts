@@ -1,29 +1,28 @@
-import { alpha, Theme } from '@mui/material';
-
-import { StyleRules } from '@mui/styles';
+import { CSSProperties } from '@mui/styled-engine';
+import { alpha, Theme } from '@mui/system';
 
 const style = (theme: Theme) => ({
-    row: {
+    '&.row': {
         '&:hover': {
             backgroundColor: alpha(theme.palette.text.primary, 0.07)
         }
     },
-    active: {
+    '&.active': {
         backgroundColor: `${alpha(theme.palette.primary.main, 0.07)} !important`,
         '&:hover': {
             backgroundColor: `${alpha(theme.palette.primary.main, 0.12)} !important`,
         }
     },
-    borderTop: {
+    '&.border-top': {
         borderTopWidth: 1,
         borderTopStyle: 'solid',
         borderTopColor: theme.palette.divider,
     },
-    borderBottom: {
+    '&.border-bottom': {
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         borderBottomColor: theme.palette.divider,
     }
-} as StyleRules);
+} as CSSProperties);
 
 export default style;

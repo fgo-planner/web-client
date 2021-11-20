@@ -1,5 +1,5 @@
 import { alpha, Button, Checkbox, FormControlLabel, FormGroup, TextField, Tooltip } from '@mui/material';
-import { Box, SxProps, Theme } from '@mui/system';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import { Formik, FormikConfig, FormikHelpers, FormikProps } from 'formik';
 import React, { ChangeEvent, Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
@@ -25,10 +25,10 @@ const styles = {
             xs: 0,
             sm: '10vh'
         }
-    } as SxProps<Theme>,
+    } as SystemStyleObject<Theme>,
     title: {
         pb: 8
-    } as SxProps<Theme>,
+    } as SystemStyleObject<Theme>,
     formContainer: {
         width: {
             xs: '100%',
@@ -46,16 +46,16 @@ const styles = {
             sm: 2
         },
         backgroundColor: (theme: Theme) => theme.palette.background.paper
-    } as SxProps<Theme>,
+    } as SystemStyleObject<Theme>,
     errorMessage: {
         color: 'red',
         px: 8,
         pb: 6
-    } as SxProps<Theme>,
+    } as SystemStyleObject<Theme>,
     form: {
         px: 8,
         boxSizing: 'border-box'
-    } as SxProps<Theme>,
+    } as SystemStyleObject<Theme>,
     actionsContainer: {
         display: 'flex',
         alignItems: 'flex-end',
@@ -63,7 +63,7 @@ const styles = {
         mx: 6,
         mt: 10,
         mb: 6
-    } as SxProps<Theme>,
+    } as SystemStyleObject<Theme>,
     actionLinks: {
         display: 'flex',
         flexDirection: 'column',
@@ -73,17 +73,17 @@ const styles = {
             px: 2,
             py: 1
         }
-    } as SxProps<Theme>,
+    } as SystemStyleObject<Theme>,
     success: {
         height: 654,
         boxSizing: 'border-box',
         px: 4
-    } as SxProps<Theme>,
+    } as SystemStyleObject<Theme>,
     successMessage: {
         px: 2,
         pt: 4,
         pb: 16
-    } as SxProps<Theme>
+    } as SystemStyleObject<Theme>
 };
 
 const FormId = 'registration-form';

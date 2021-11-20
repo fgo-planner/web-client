@@ -1,7 +1,6 @@
 import { RgbaColor } from '@fgo-planner/types';
-import { Menu, PopoverOrigin, Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
+import { Menu, PopoverOrigin } from '@mui/material';
+import { SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { RgbaColorPicker, RgbColor, RgbColorPicker } from 'react-colorful';
 import { ThemeConstants } from '../../../../styles/theme-constants';
@@ -26,11 +25,13 @@ const MenuTransformOrigin: PopoverOrigin = {
     horizontal: 'right'
 };
 
-const style = () => ({
-    title: {
+const StyleClassPrefix = 'UserThemeColorPickerMenu';
+
+const StyleProps = {
+    [`& .${StyleClassPrefix}-title`]: {
         fontFamily: ThemeConstants.FontFamilyGoogleSans
     },
-    pickerContainer: {
+    [`& .${StyleClassPrefix}-picker-container`]: {
         '& .react-colorful__saturation': {
             borderRadius: 0
         },
@@ -38,17 +39,9 @@ const style = () => ({
             borderRadius: 0
         }
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'UserThemeColorPickerMenu'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const UserThemeColorPickerMenu = React.memo((props: Props) => {
-
-    const classes = useStyles();
 
     const {
         color,
@@ -64,6 +57,7 @@ export const UserThemeColorPickerMenu = React.memo((props: Props) => {
     return (
         <Menu
             // PaperProps={{ className }}
+            sx={StyleProps}
             anchorEl={anchorEl}
             // getContentAnchorEl={null}
             anchorOrigin={MenuAnchorOrigin}
@@ -73,10 +67,10 @@ export const UserThemeColorPickerMenu = React.memo((props: Props) => {
             keepMounted
         >
             <div>
-                <div className={classes.title}>
+                <div className={`${StyleClassPrefix}-title`}>
                     {title}
                 </div>
-                <div className={classes.pickerContainer}>
+                <div className={`${StyleClassPrefix}-picker-container`}>
                     {allowEditAlpha ?
                         <RgbaColorPicker color={pickerColor} onChange={onChange} /> :
                         <RgbColorPicker color={pickerColor} onChange={onChange} />

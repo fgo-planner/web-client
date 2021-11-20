@@ -1,13 +1,12 @@
 import { GameItem, GameItemQuantity } from '@fgo-planner/types';
-import { Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { GameItemMap } from '../../../../services/data/game/game-item.service';
 import { MasterItemListHeader } from './master-item-list-header.component';
-import { MasterItemListRow } from './master-item-list-row.component';
+import { StyleClassPrefix as MasterItemListRowLabelStyleClassPrefix } from './master-item-list-row-label.component';
+import { MasterItemListRow, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';
 
 type ItemCategory = { label: string; itemIds: ReadonlyArray<number> };
 
@@ -99,27 +98,29 @@ const generateListViewData = (masterItems: Array<GameItemQuantity>, gameItemMap:
     return listViewData;
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        paddingBottom: theme.spacing(12)
+const StyleClassPrefix = 'MasterItemList';
+
+const StyleProps = {
+    pb: 12,
+    [`& .${StyleClassPrefix}-item-category`]: {
+        pb: 8
     },
-    itemCategory: {
-        paddingBottom: theme.spacing(8),
-        '& .section-subheader': {
-            paddingTop: theme.spacing(2)
+    [`& .${MasterItemListRowStyleClassPrefix}-root`]: {
+        display: 'flex',
+        alignContent: 'center',
+        alignItems: 'center',
+        height: 52,
+        pl: 4,
+        pr: 8,
+        py: 0,
+        fontSize: '0.875rem',
+        [`& .${MasterItemListRowLabelStyleClassPrefix}-item-name`]: {
+            px: 4
         }
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterItemList'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const MasterItemList = React.memo(({ editMode, masterItems }: Props) => {
-
-    const classes = useStyles();
 
     const gameItemMap = useGameItemMap();
 
@@ -138,7 +139,7 @@ export const MasterItemList = React.memo(({ editMode, masterItems }: Props) => {
 
     const renderItemCategory = (category: ListViewDataCategory, key: number): ReactNode => {
         return (
-            <div className={classes.itemCategory} key={key}>
+            <div key={key} className={`${StyleClassPrefix}-item-category`}>
                 <MasterItemListHeader categoryLabel={category.label} showQuantityLabel={key === 0} />
                 {category.items.map(renderItemRow)}
             </div>
@@ -146,9 +147,9 @@ export const MasterItemList = React.memo(({ editMode, masterItems }: Props) => {
     };
 
     return (
-        <div className={classes.root}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             {listViewData.map(renderItemCategory)}
-        </div>
+        </Box>
     );
 
 });

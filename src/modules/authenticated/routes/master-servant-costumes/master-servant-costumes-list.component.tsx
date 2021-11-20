@@ -1,12 +1,11 @@
-import { Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { GameServantList } from '../../../../services/data/game/game-servant.service';
 import { CacheArray } from '../../../../types/internal';
-import { MasterServantCostumeRowData, MasterServantCostumesListRow } from './master-servant-costumes-list-row.component';
+import { MasterServantCostumeRowData, MasterServantCostumesListRow, StyleClassPrefix as MasterServantCostumesListRowStyleClassPrefix } from './master-servant-costumes-list-row.component';
+
 
 type Props = {
     unlockedCostumesSet: Set<number>;
@@ -29,23 +28,45 @@ const transformCostumesList = (gameServants: GameServantList): CacheArray<Master
     return result;
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        paddingBottom: theme.spacing(20)
+const StyleClassPrefix = 'MasterServantCostumesList';
+
+const StyleProps = {
+    pb: 20,
+    [`& .${MasterServantCostumesListRowStyleClassPrefix}-root`]: {
+        height: 52,
+        display: 'flex',
+        alignItems: 'center',
+        fontSize: '0.875rem',
+        '&:not(:hover) .play-icon': {
+            opacity: 0
+        },
+        [`& .${MasterServantCostumesListRowStyleClassPrefix}-unlocked-status`]: {
+            width: 42,
+            px: 2,
+            textAlign: 'center',
+        },
+        [`& .${MasterServantCostumesListRowStyleClassPrefix}-collection-no`]: {
+            width: 64,
+            textAlign: 'center'
+        },
+        [`& .${MasterServantCostumesListRowStyleClassPrefix}-name`]: {
+            flex: '1 1',
+            minWidth: 0
+        },
+        [`& .${MasterServantCostumesListRowStyleClassPrefix}-unlocked-icon`]: {
+            color: 'limegreen'
+        },
+        [`& .${MasterServantCostumesListRowStyleClassPrefix}-unlock-materials`]: {
+            display: 'flex',
+            justifyContent: 'flex-end',
+            pr: 24
+        }
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantCostumesList'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const MasterServantCostumesList = React.memo(({ unlockedCostumesSet, editMode }: Props) => {
 
     const forceUpdate = useForceUpdate();
-
-    const classes = useStyles();
 
     const gameServantList = useGameServantList();
 
@@ -90,9 +111,9 @@ export const MasterServantCostumesList = React.memo(({ unlockedCostumesSet, edit
     };
 
     return (
-        <div className={classes.root}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             {costumesList.map(renderCostumeRow)}
-        </div>
+        </Box>
     );
 
 });

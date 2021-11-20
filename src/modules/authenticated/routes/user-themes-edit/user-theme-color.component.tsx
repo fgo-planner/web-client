@@ -1,10 +1,8 @@
 import { RgbaColor } from '@fgo-planner/types';
-import { InputBaseComponentProps, TextField, Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
+import { InputBaseComponentProps, TextField } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import { colord, RgbColor } from 'colord';
-import React, { ChangeEvent, FocusEvent, MouseEvent, useCallback, useState } from 'react';
-import { useEffect } from 'react';
+import React, { ChangeEvent, FocusEvent, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { MathUtils } from '../../../../utils/math.utils';
 import { UserThemeColorPickerMenu } from './user-theme-color-picker-menu.component';
@@ -32,38 +30,32 @@ const toAlphaDisplayValue = (color: RgbaColor): string => {
     return String(color.a || 1);
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        alignItems: 'center',
-        margin: theme.spacing(2, 0, 6, 6)
-    },
-    colorSwatchContainer: {
+const StyleClassPrefix = 'UserThemeColor';
+
+const StyleProps = {
+    display: 'flex',
+    alignItems: 'center',
+    ml: 6,
+    mt: 2,
+    mb: 6,
+    [`& .${StyleClassPrefix}-color-swatch-container`]: {
         width: 64,
         height: 64,
-        marginRight: theme.spacing(6)
+        mr: 6
     },
-    label: {
+    [`& .${StyleClassPrefix}-label`]: {
         width: 120
     },
-    colorInputFieldContainer: {
+    [`& .${StyleClassPrefix}-color-input-field-container`]: {
         width: 200,
-        marginRight: theme.spacing(4)
+        mr: 4
     },
-    alphaInputFieldContainer: {
+    [`& .${StyleClassPrefix}-alpha-input-field-container`]: {
         width: 120
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'UserThemeColor'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const UserThemeColor = React.memo((props: Props) => {
-
-    const classes = useStyles();
 
     const { label, color, allowEditAlpha } = props;
 
@@ -117,8 +109,8 @@ export const UserThemeColor = React.memo((props: Props) => {
          * Reset alpha to 1 if it is not supposed to be editable.
          */
         if (!allowEditAlpha) {
-            newColor.a = 1; 
-        } 
+            newColor.a = 1;
+        }
         /*
          * Alpha value should not be updated unless the input is in rgba format.
          */
@@ -142,7 +134,7 @@ export const UserThemeColor = React.memo((props: Props) => {
         setAlphaInputValue(value);
 
         color.a = MathUtils.clamp(Number(value), 0, 1);
-        setSwatchDisplayColor({...color});
+        setSwatchDisplayColor({ ...color });
     }, [allowEditAlpha, color]);
 
     const handleAlphaInputFieldBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
@@ -182,21 +174,21 @@ export const UserThemeColor = React.memo((props: Props) => {
     );
 
     return (
-        <div className={classes.root}>
-            <div className={classes.colorSwatchContainer}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <div className={`${StyleClassPrefix}-color-swatch-container`}>
                 <UserThemeColorSwatch
                     color={swatchDisplayColor}
                     onClick={handleColorSwatchClick}
                     allowEditAlpha
                 />
             </div>
-            <div className={classes.label}>
+            <div className={`${StyleClassPrefix}-label`}>
                 {label}
             </div>
-            <div className={classes.colorInputFieldContainer}>
+            <div className={`${StyleClassPrefix}-color-input-field-container`}>
                 {colorInputField}
             </div>
-            <div className={classes.alphaInputFieldContainer}>
+            <div className={`${StyleClassPrefix}-alpha-input-field-container`}>
                 {alphaInputField}
             </div>
             <UserThemeColorPickerMenu
@@ -206,6 +198,7 @@ export const UserThemeColor = React.memo((props: Props) => {
                 onChange={handleColorPickerChange}
                 onClose={handleColorPickerClose}
             />
-        </div>
+        </Box>
     );
+
 });

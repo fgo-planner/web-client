@@ -1,3 +1,4 @@
+import { SxProps, Theme } from '@mui/system';
 import { Nullable } from '../types/internal';
 
 export class StyleUtils {
@@ -37,6 +38,23 @@ export class StyleUtils {
     static insetBoxShadow(boxShadow: string): string {
         boxShadow = boxShadow.replaceAll(/,\s*(\d+px)/gi, ', inset $1');
         return `inset ${boxShadow}`;
+    }
+
+    static mergeSxProps(sxProps1: SxProps<Theme>, sxProps2: SxProps<Theme> | undefined): SxProps<Theme> {
+        if (!sxProps2) {
+            return sxProps1;
+        }
+        if (Array.isArray(sxProps1)) {
+            if (Array.isArray(sxProps2)) {
+                return [...sxProps1, ...sxProps2];
+            } else {
+                return [...sxProps1, sxProps2];
+            }
+        }
+        if (Array.isArray(sxProps2)) {
+            return [sxProps1, ...sxProps2];
+        }
+        return [sxProps1, sxProps2];
     }
 
 }

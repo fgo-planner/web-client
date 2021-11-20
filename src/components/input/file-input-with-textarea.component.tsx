@@ -1,13 +1,11 @@
 
-import { alpha, TextField, Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import withStyles from '@mui/styles/withStyles';
 import { FileCopy as FileCopyIcon, SvgIconComponent } from '@mui/icons-material';
-import clsx from 'clsx';
+import { alpha, TextField } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, PropsWithChildren, PureComponent, ReactNode } from 'react';
 import Dropzone, { DropzoneRef, DropzoneState } from 'react-dropzone';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { ComponentStyleProps, WithStylesProps } from '../../types/internal';
+import { ComponentStyleProps } from '../../types/internal';
 
 type Props = PropsWithChildren<{
     dropzoneRef?: React.RefObject<DropzoneRef>;
@@ -21,7 +19,7 @@ type Props = PropsWithChildren<{
     dragOverlayText?: string;
     value?: string;
     onValueChange?: (value: string) => void;
-}> & ComponentStyleProps & WithStylesProps;
+}> & Pick<ComponentStyleProps, 'className' | 'sx'>;
 
 const DefaultTextareaVariant = 'outlined';
 
@@ -31,14 +29,14 @@ const DefaultDragOverlayIcon = FileCopyIcon;
 
 const DefaultDragOverlayText = 'Drop your file here';
 
-const style = (theme: Theme) => ({
-    root: {
-        position: 'relative',
-        width: '100%',
-        padding: theme.spacing(4),
-        boxSizing: 'border-box'
-    },
-    dragOverlay: {
+export const StyleClassPrefix = 'FileInputWithTextarea';
+
+const StyleProps = (theme: Theme) => ({
+    position: 'relative',
+    width: '100%',
+    p: 4,
+    boxSizing: 'border-box',
+    [`& .${StyleClassPrefix}-drag-overlay`]: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -51,30 +49,27 @@ const style = (theme: Theme) => ({
         borderWidth: '3px',
         borderColor: theme.palette.primary.light,
         borderStyle: 'dashed',
-        borderRadius: theme.spacing(2),
-        backgroundColor: alpha(theme.palette.primary.light, 0.1),
+        borderRadius: 2,
+        backgroundColor: alpha(theme.palette.primary.light, 0.2),
         opacity: 0.69
     },
-    dragOverlayIcon: {
+    [`& .${StyleClassPrefix}-drag-overlay-icon`]: {
         fontSize: '4rem',
-        paddingBottom: theme.spacing(4)
+        pb: 4
     },
-    dragOverlayText: {
+    [`& .${StyleClassPrefix}-drag-overlay-text`]: {
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontSize: '2rem',
         // color: theme.palette.text.secondary
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'FileInputWithTextarea'
-};
+} as SystemStyleObject<Theme>);
 
 /**
  * For inputting plain-text data, via file or input field. Includes a drop area
  * for file drag-and-drop.
  */
-export const FileInputWithTextarea  = withStyles(style, styleOptions)(class extends PureComponent<Props> {
+// TODO Convert this to functional component
+export const FileInputWithTextarea = class extends PureComponent<Props> {
 
     constructor(props: Props) {
         super(props);
@@ -87,7 +82,13 @@ export const FileInputWithTextarea  = withStyles(style, styleOptions)(class exte
     render(): ReactNode {
         const { dropzoneRef } = this.props;
         return (
-            <Dropzone ref={dropzoneRef} noClick noKeyboard multiple={false} onDrop={this._handleFileSelected}>
+            <Dropzone
+                ref={dropzoneRef}
+                onDrop={this._handleFileSelected}
+                multiple={false}
+                noClick
+                noKeyboard
+            >
                 {this._renderDropzoneContents}
             </Dropzone>
         );
@@ -95,10 +96,8 @@ export const FileInputWithTextarea  = withStyles(style, styleOptions)(class exte
 
     private _renderDropzoneContents(state: DropzoneState): JSX.Element {
 
-        const { 
+        const {
             children,
-            classes,
-            className,
             variant,
             rows,
             rowsMax,
@@ -106,16 +105,18 @@ export const FileInputWithTextarea  = withStyles(style, styleOptions)(class exte
             value
         } = this.props;
 
-        const { 
-            getRootProps, 
-            getInputProps, 
-            isDragActive 
+        const {
+            getRootProps,
+            getInputProps,
+            isDragActive
         } = state;
-        
-        const classNames = clsx(classes.root, className);
 
         return (
-            <div className={classNames} {...getRootProps()}>
+            <Box
+                className={`${StyleClassPrefix}-root`}
+                sx={StyleProps}
+                {...getRootProps()}
+            >
                 {isDragActive && this._renderDragOverlay()}
                 <input {...getInputProps()} />
                 <TextField
@@ -129,18 +130,18 @@ export const FileInputWithTextarea  = withStyles(style, styleOptions)(class exte
                     onChange={this._handleTextAreaChange}
                 />
                 {children}
-            </div>
+            </Box>
         );
 
     }
 
     private _renderDragOverlay(): ReactNode {
-        const { classes, dragOverlayText, dragOverlayIcon } = this.props;
+        const { dragOverlayText, dragOverlayIcon } = this.props;
         const DragOverlayIcon = dragOverlayIcon ?? DefaultDragOverlayIcon;
         return (
-            <div className={classes.dragOverlay}>
-                <DragOverlayIcon className={classes.dragOverlayIcon} />
-                <div className={classes.dragOverlayText}>
+            <div className={`${StyleClassPrefix}-drag-overlay`}>
+                <DragOverlayIcon className={`${StyleClassPrefix}-drag-overlay-icon`} />
+                <div className={`${StyleClassPrefix}-drag-overlay-text`}>
                     {dragOverlayText ?? DefaultDragOverlayText}
                 </div>
             </div>
@@ -167,4 +168,4 @@ export const FileInputWithTextarea  = withStyles(style, styleOptions)(class exte
         onValueChange && onValueChange(value);
     }
 
-});
+};

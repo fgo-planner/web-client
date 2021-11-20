@@ -1,25 +1,27 @@
 import { alpha, Button } from '@mui/material';
-import { Box, SxProps, Theme } from '@mui/system';
-import React, { CSSProperties, useCallback, useState } from 'react';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
+import React, { useCallback, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { LoginForm } from '../components/login/login-form.component';
+import { LoginForm, StyleClassPrefix as LoginFormStyleClassPrefix } from '../components/login/login-form.component';
 import { PageTitle } from '../components/text/page-title.component';
 import { AuthenticationService } from '../services/authentication/auth.service';
 import { UserCredentials } from '../types/data';
 
-const styles = {
-    root: {
-        display: 'flex',
-        justifyContent: 'center',
-        mt: {
-            xs: 0,
-            sm: '20vh'
-        }
-    } as SxProps<Theme>,
-    title: {
+const FormId = 'login-form';
+
+const StyleClassPrefix = 'Login';
+
+const StyleProps = {
+    display: 'flex',
+    justifyContent: 'center',
+    mt: {
+        xs: 0,
+        sm: '20vh'
+    },
+    [`& .${StyleClassPrefix}-title`]: {
         pb: 8
-    } as SxProps<Theme>,
-    formContainer: {
+    },
+    [`& .${StyleClassPrefix}-form-container`]: {
         width: {
             xs: '100%',
             sm: 360
@@ -36,32 +38,30 @@ const styles = {
             sm: 2
         },
         backgroundColor: (theme: Theme) => theme.palette.background.paper,
-    } as SxProps<Theme>,
-    form: {
+    },
+    [`& .${LoginFormStyleClassPrefix}-root`]: {
         px: 8,
         py: 0
-    } as SxProps<Theme>,
-    errorMessage: {
+    },
+    [`& .${StyleClassPrefix}-error-message`]: {
         color: 'red',
         px: 8,
         pb: 6
-    } as SxProps<Theme>,
-    actionsContainer: {
+    },
+    [`& .${StyleClassPrefix}-actions-container`]: {
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         mx: 6,
         mt: 10,
         mb: 6
-    } as SxProps<Theme>,
-    actionLinks: {
+    },
+    [`& .${StyleClassPrefix}-action-links`]: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'start'
-    } as CSSProperties
-};
-
-const FormId = 'login-form';
+    }
+} as SystemStyleObject<Theme>;
 
 export const LoginRoute = React.memo(() => {
 
@@ -83,23 +83,22 @@ export const LoginRoute = React.memo(() => {
     }, [history]);
 
     return (
-        <Box sx={styles.root}>
-            <Box sx={styles.formContainer}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <div className={`${StyleClassPrefix}-form-container`}>
                 <PageTitle className="pb-8">
                     Login
                 </PageTitle>
                 {errorMessage &&
-                    <Box sx={styles.errorMessage}>
+                    <div className={`${StyleClassPrefix}-error-message`}>
                         {errorMessage}
-                    </Box>
+                    </div>
                 }
                 <LoginForm
-                    sx={styles.form}
                     formId={FormId}
                     onSubmit={login}
                 />
-                <Box sx={styles.actionsContainer}>
-                    <Box sx={styles.actionLinks}>
+                <div className={`${StyleClassPrefix}-actions-container`}>
+                    <div className={`${StyleClassPrefix}-actions-links`}>
                         <Button
                             component={Link}
                             variant="text"
@@ -116,18 +115,18 @@ export const LoginRoute = React.memo(() => {
                         >
                             Create account
                         </Button>
-                    </Box>
+                    </div>
                     <Button
                         color="primary"
                         variant="contained"
                         type="submit"
                         form={FormId}
+                        >
                         disabled={isLoggingIn}
-                    >
                         Login
                     </Button>
-                </Box>
-            </Box>
+                </div>
+            </div>
         </Box>
     );
 

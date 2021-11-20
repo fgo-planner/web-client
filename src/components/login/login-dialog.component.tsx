@@ -1,39 +1,41 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
-import { Box, SxProps, Theme } from '@mui/system';
-import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
+import { SystemStyleObject, Theme } from '@mui/system';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { AuthenticationService } from '../../services/authentication/auth.service';
 import { UserCredentials } from '../../types/data';
 import { DialogComponentProps } from '../../types/internal';
 import { DialogCloseButton } from '../dialog/dialog-close-button.component';
-import { LoginForm } from './login-form.component';
+import { LoginForm, StyleClassPrefix as LoginFormStyleClassPrefix } from './login-form.component';
 
 type Props = DialogComponentProps;
 
-const styles = {
-    form: {
+const FormId = 'login-dialog-form';
+
+const StyleClassPrefix = 'LoginDialog';
+
+const StyleProps = {
+    [`& .${LoginFormStyleClassPrefix}-root`]: {
         p: 2
-    } as SxProps<Theme>,
-    errorMessage: {
+    },
+    [`& .${StyleClassPrefix}-error-message`]: {
         color: 'red',
         px: 2,
         pt: 0,
         pb: 4
-    } as SxProps<Theme>,
-    dialogActions: {
+    },
+    [`& .${StyleClassPrefix}-dialog-actions`]: {
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         p: 6
-    } as SxProps<Theme>,
-    actionLinks: {
+    },
+    [`& .${StyleClassPrefix}-action-links`]: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'start'
-    } as CSSProperties
-};
-
-const FormId = 'login-dialog-form';
+    }
+} as SystemStyleObject<Theme>;
 
 export const LoginDialog = React.memo((props: Props) => {
 
@@ -79,7 +81,12 @@ export const LoginDialog = React.memo((props: Props) => {
     }, [onClose]);
 
     return (
-        <Dialog {...dialogProps} fullScreen={fullScreen}>
+        <Dialog
+            {...dialogProps}
+            className={`${StyleClassPrefix}-root`}
+            sx={StyleProps}
+            fullScreen={fullScreen}
+        >
             <Typography component={'div'}>
                 <DialogTitle>
                     Login
@@ -87,18 +94,17 @@ export const LoginDialog = React.memo((props: Props) => {
                 </DialogTitle>
                 <DialogContent>
                     {errorMessage &&
-                        <Box sx={styles.errorMessage}>
+                        <div className={`${StyleClassPrefix}-error-message`}>
                             {errorMessage}
-                        </Box>
+                        </div>
                     }
                     <LoginForm
-                        sx={styles.form}
                         formId={FormId}
                         onSubmit={login}
                     />
                 </DialogContent>
-                <DialogActions sx={styles.dialogActions}>
-                    <div style={styles.actionLinks}>
+                <DialogActions className={`${StyleClassPrefix}-dialog-actions`}>
+                    <div className={`${StyleClassPrefix}-action-links`}>
                         <Button
                             component={Link}
                             variant="text"

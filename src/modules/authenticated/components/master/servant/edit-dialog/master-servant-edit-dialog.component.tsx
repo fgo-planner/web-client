@@ -1,7 +1,5 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Theme, Typography } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import React, { FormEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
@@ -24,18 +22,6 @@ type Props = {
 
 const FormId = 'master-servant-edit-dialog-form';
 
-const style = (theme: Theme) => ({
-    form: {
-        paddingTop: theme.spacing(4)
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantEditDialog'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
 export const MasterServantEditDialog = React.memo((props: Props) => {
 
     const {
@@ -47,8 +33,6 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         onClose,
         ...dialogProps
     } = props;
-
-    const classes = useStyles();
 
     const [masterServant, setMasterServant] = useState<MasterServant>(props.masterServant || MasterServantUtils.instantiate());
 
@@ -92,8 +76,8 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
                 </DialogTitle>
                 <DialogContent>
                     <MasterServantEditForm
-                        className={classes.form}
                         formId={FormId}
+                        className="pt-4"
                         masterServant={masterServant}
                         bondLevels={bondLevels}
                         unlockedCostumes={unlockedCostumes}
@@ -125,6 +109,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
     return (
         <Dialog
             {...dialogProps}
+            // FIXME Inline paper props
             PaperProps={{ style: { width: 600 } }}
             fullScreen={fullScreen}
             keepMounted={false}

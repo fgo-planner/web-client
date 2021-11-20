@@ -1,7 +1,6 @@
 import { Close as CloseIcon, SvgIconComponent } from '@mui/icons-material';
 import { IconButton, Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
+import { SystemStyleObject } from '@mui/system';
 import React, { MouseEventHandler } from 'react';
 
 type Props = {
@@ -11,26 +10,27 @@ type Props = {
 
 const DefaultIcon = CloseIcon;
 
-const style = (theme: Theme) => ({
-    root: {
-        position: 'absolute',
-        right: theme.spacing(2),
-        top: theme.spacing(2)
-    }
-} as StyleRules);
+const StyleClassPrefix = 'DialogCloseButton';
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'DialogCloseButton'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+const StyleProps = (theme: Theme) => ({
+    position: 'absolute',
+    right: theme.spacing(2),
+    top: theme.spacing(2)
+} as SystemStyleObject<Theme>);
 
 export const DialogCloseButton = React.memo(({ icon, onClick }: Props) => {
-    const classes = useStyles();
-    const Icon = icon ?? DefaultIcon;
+
+    const Icon = icon || DefaultIcon;
+
     return (
-        <IconButton className={classes.root} onClick={onClick} size="large">
+        <IconButton
+            className={`${StyleClassPrefix}-root`}
+            sx={StyleProps}
+            onClick={onClick}
+            size="large"
+        >
             <Icon />
         </IconButton>
     );
+
 });

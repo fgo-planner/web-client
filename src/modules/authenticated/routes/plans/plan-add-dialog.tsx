@@ -1,19 +1,6 @@
 import { Plan } from '@fgo-planner/types';
-import {
-    Button,
-    Checkbox,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    FormControlLabel,
-    FormGroup,
-    TextField,
-    Theme,
-    Typography,
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { WithStylesOptions, StyleRules } from '@mui/styles';
+import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
+import { SystemStyleObject, Theme } from '@mui/system';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
@@ -47,21 +34,18 @@ const formikConfig: Omit<FormikConfig<FormData>, 'onSubmit'> = {
     validateOnBlur: true
 };
 
-const style = (theme: Theme) => ({
-    errorMessage: {
+const StyleClassPrefix = 'LoginDialog';
+
+const StyleProps = {
+    [`& .${StyleClassPrefix}-error-message`]: {
         color: 'red',
-        padding: theme.spacing(0, 2, 4, 2)
+        px: 2,
+        pb: 4
     },
-    form: {
-        padding: theme.spacing(2)
+    [`& .${StyleClassPrefix}-form`]: {
+        p: 2
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'PlanAddDialog'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const PlanAddDialog = React.memo((props: Props) => {
 
@@ -78,11 +62,9 @@ export const PlanAddDialog = React.memo((props: Props) => {
         actionButtonVariant
     } = useAutoResizeDialog(props);
 
-    const classes = useStyles();
-
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
-    const [isMounted, setIsMounted] = useState<boolean>(true);
+    const [, setIsMounted] = useState<boolean>(true);
 
     useEffect(() => {
         return () => {
@@ -124,67 +106,66 @@ export const PlanAddDialog = React.memo((props: Props) => {
                     handleChange,
                     handleSubmit
                 } = props;
-    
+
                 const touchedErrors = FormUtils.getErrorsForTouchedFields(errors, touched);
-    
+
                 return (
                     <form
                         id={FormId}
+                        className={`${StyleClassPrefix}-form`}
                         noValidate
                         onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
                     >
-                        <div className={classes.root}>
-                            <InputFieldContainer width="100%">
-                                <TextField
-                                    variant="outlined"
-                                    fullWidth
-                                    label="Plan Name"
-                                    name="name"
-                                    value={values.name}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={!!touchedErrors.name}
-                                    helperText={touchedErrors.name}
-                                />
-                            </InputFieldContainer>
-                            <InputFieldContainer width="100%">
-                                <TextField
-                                    variant="outlined"
-                                    fullWidth
-                                    label="Description"
-                                    name="description"
-                                    value={values.description}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={!!touchedErrors.description}
-                                    helperText={touchedErrors.description}
-                                />
-                            </InputFieldContainer>
-                            <FormGroup>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            name="autoUpdate"
-                                            checked={values.autoUpdate}
-                                            onChange={handleChange}
-                                        />
-                                    }
-                                    label="Auto-update"
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            name="shared"
-                                            checked={values.shared}
-                                            onChange={handleChange}
-                                        />
-                                    }
-                                    label="Shared"
-                                />
-                            </FormGroup>
-                        </div>
+                        <InputFieldContainer width="100%">
+                            <TextField
+                                variant="outlined"
+                                fullWidth
+                                label="Plan Name"
+                                name="name"
+                                value={values.name}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                error={!!touchedErrors.name}
+                                helperText={touchedErrors.name}
+                            />
+                        </InputFieldContainer>
+                        <InputFieldContainer width="100%">
+                            <TextField
+                                variant="outlined"
+                                fullWidth
+                                label="Description"
+                                name="description"
+                                value={values.description}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                error={!!touchedErrors.description}
+                                helperText={touchedErrors.description}
+                            />
+                        </InputFieldContainer>
+                        <FormGroup>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name="autoUpdate"
+                                        checked={values.autoUpdate}
+                                        onChange={handleChange}
+                                    />
+                                }
+                                label="Auto-update"
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name="shared"
+                                        checked={values.shared}
+                                        onChange={handleChange}
+                                    />
+                                }
+                                label="Shared"
+                            />
+                        </FormGroup>
                     </form>
                 );
             }}
@@ -192,15 +173,20 @@ export const PlanAddDialog = React.memo((props: Props) => {
     );
 
     return (
-        <Dialog {...dialogProps} fullScreen={fullScreen}>
+        <Dialog
+            {...dialogProps}
+            className={`${StyleClassPrefix}-root`}
+            sx={StyleProps}
+            fullScreen={fullScreen}
+        >
             <Typography component={'div'}>
                 <DialogTitle>
                     Create Plan
                     {closeIconEnabled && <DialogCloseButton onClick={cancel} />}
                 </DialogTitle>
                 <DialogContent>
-                    {errorMessage && 
-                        <div className={classes.errorMessage}>
+                    {errorMessage &&
+                        <div className={`${StyleClassPrefix}-error-message`}>
                             {errorMessage}
                         </div>
                     }

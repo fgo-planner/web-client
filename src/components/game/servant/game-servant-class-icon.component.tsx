@@ -1,7 +1,5 @@
 import { GameServantClass, GameServantRarity } from '@fgo-planner/types';
 import { Tooltip, TooltipProps } from '@mui/material';
-import { StyleRules } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
 import { Box } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../../constants';
@@ -84,32 +82,28 @@ const DefaultRarityColor = 1;
 
 const DefaultSize = 24;
 
-const style = () => ({
+const styles = {
     img: {
         width: '100%',
         height: '100%'
-    }
-} as StyleRules);
-
-const useStyles = makeStyles(style);
+    } as CSSProperties
+};
 
 export const GameServantClassIcon = React.memo((props: Props) => {
 
     const {
         servantClass,
         rarity,
+        size,
         tooltip,
         tooltipPlacement,
         sx
     } = props;
 
-    const classes = useStyles();
-
-    const size = props.size || DefaultSize;
-    const elemStyle = useMemo((): CSSProperties => ({
-        minWidth: size,
-        maxWidth: size,
-        height: size
+    const sizeStyle = useMemo((): CSSProperties => ({
+        minWidth: size || DefaultSize,
+        maxWidth: size || DefaultSize,
+        height: size || DefaultSize
     }), [size]);
 
     const classNumber = ClassNumberMap[servantClass] || DefaultClassNumber;
@@ -119,17 +113,17 @@ export const GameServantClassIcon = React.memo((props: Props) => {
     const iconNode = useMemo((): JSX.Element => {
         if (sx) {
             return (
-                <Box style={elemStyle} sx={sx}>
-                    <img className={classes.img} src={imageUrl} alt={servantClass} />
+                <Box style={sizeStyle} sx={sx}>
+                    <img style={styles.img} src={imageUrl} alt={servantClass} />
                 </Box>
             );
         }
         return (
-            <div style={elemStyle}>
-                <img className={classes.img} src={imageUrl} alt={servantClass} />
+            <div style={sizeStyle}>
+                <img style={styles.img} src={imageUrl} alt={servantClass} />
             </div>
         );
-    }, [classes.img, elemStyle, imageUrl, servantClass, sx]);
+    }, [sizeStyle, imageUrl, servantClass, sx]);
 
     if (tooltip) {
         return (

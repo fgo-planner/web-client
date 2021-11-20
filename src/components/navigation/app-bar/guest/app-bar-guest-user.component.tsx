@@ -1,7 +1,6 @@
-import { IconButton, PaperProps, Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
 import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@mui/icons-material';
+import { IconButton, PaperProps } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
@@ -11,34 +10,28 @@ import { LoginDialog } from '../../../login/login-dialog.component';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
 
-const LoginDialogPaperProps: PaperProps = { 
-    style: { 
-        minWidth: 360 
-    } 
-};
-
-const style = (theme: Theme) => ({
-    root: {
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-        padding: theme.spacing(0, 4)
+const LoginDialogPaperProps: PaperProps = {
+    style: {
+        minWidth: 360
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'AppBarGuestUser'
 };
 
-const useStyles = makeStyles(style, styleOptions);
+// This component does not need StyleClassPrefix.
+
+const StyleProps = {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    px: 4,
+    py: 0
+} as SystemStyleObject<Theme>;
 
 /**
  * Renders the app bar contents for a guest (not logged in) user.
  */
 export const AppBarGuestUser = React.memo(() => {
-    const classes = useStyles();
     const location = useLocation();
     const history = useHistory();
 
@@ -91,7 +84,7 @@ export const AppBarGuestUser = React.memo(() => {
 
     return (
         <Fragment>
-            <div className={classes.root}>
+            <Box sx={StyleProps}>
                 <AppBarLinks>
                     <AppBarLink
                         label="Servants"
@@ -122,7 +115,7 @@ export const AppBarGuestUser = React.memo(() => {
                     onClick={() => isBackgroundMusicPlaying ? BackgroundMusicService.pause() : BackgroundMusicService.play()}
                     children={isBackgroundMusicPlaying ? <VolumeUpIcon /> : <VolumeOffIcon />}
                     size="large" />
-            </div>
+            </Box>
             <LoginDialog
                 PaperProps={LoginDialogPaperProps}
                 open={loginModalOpen}

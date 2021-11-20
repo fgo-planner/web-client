@@ -1,16 +1,15 @@
-import { createTheme, StyledEngineProvider, Theme, ThemeProvider, Typography } from '@mui/material';
+import { createTheme, Typography, ThemeProvider } from '@mui/material';
+import { StyledEngineProvider, Theme } from '@mui/system';
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { BackgroundImageContext } from '../../contexts/background-image.context';
 import { ThemeInfo, ThemeService } from '../../services/user-interface/theme.service';
 import { ThemeBackground } from './theme-background.component';
 import { ThemeScrollbars } from './theme-scrollbars.component';
 
-
 declare module '@mui/styles/defaultTheme' {
     // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface DefaultTheme extends Theme { }
 }
-
 
 type Props = PropsWithChildren<{}>;
 

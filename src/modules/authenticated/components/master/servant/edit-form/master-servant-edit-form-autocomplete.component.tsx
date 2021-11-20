@@ -1,6 +1,6 @@
 import { GameServant } from '@fgo-planner/types';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
-import { SxProps, Theme } from '@mui/system';
+import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
@@ -32,7 +32,7 @@ const optionStyles = {
     } as CSSProperties,
     classIcon: {
         px: 1
-    } as SxProps<Theme>
+    } as SystemStyleObject<Theme>
 };
 
 const generateServantOption = (servant: Readonly<GameServant>): ServantOption => {

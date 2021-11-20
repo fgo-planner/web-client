@@ -1,21 +1,24 @@
-import { Theme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { WithStylesOptions } from '@mui/styles';
+import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { PropsWithChildren } from 'react';
+import { ComponentStyleProps } from '../../types/internal';
 import listRowStyle from './list-row-style';
 
 type Props = PropsWithChildren<{
     active?: boolean;
     borderTop?: boolean;
     borderBottom?: boolean;
-}>;
+}> & ComponentStyleProps;
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'StaticListRowContainer'
-};
+export const StyleClassPrefix = 'StaticListRowContainer';
 
-const useStyles = makeStyles(listRowStyle, styleOptions);
+const StyleOptions = {
+    name: StyleClassPrefix
+} as MuiStyledOptions;
+
+const RootComponent = styled('div', StyleOptions)(({ theme }) => {
+    return listRowStyle(theme) as any; // TODO Find out which type this is supposed to be.
+});
 
 export const StaticListRowContainer = React.memo((props: Props) => {
 
@@ -23,22 +26,28 @@ export const StaticListRowContainer = React.memo((props: Props) => {
         children,
         active,
         borderTop,
-        borderBottom
+        borderBottom,
+        className,
+        style,
+        sx
     } = props;
 
-    const classes = useStyles();
-
-    const className = clsx(
-        classes.row,
-        active && classes.active,
-        borderTop && classes.borderTop,
-        borderBottom && classes.borderBottom
+    const classNames = clsx(
+        className,
+        'row',
+        active && 'active',
+        borderTop && 'border-top',
+        borderBottom && 'border-bottom'
     );
 
     return (
-        <div className={className}>
+        <RootComponent
+            className={classNames}
+            style={style}
+            sx={sx}
+        >
             {children}
-        </div>
+        </RootComponent >
     );
-    
+
 });

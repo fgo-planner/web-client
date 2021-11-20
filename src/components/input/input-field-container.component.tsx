@@ -1,4 +1,5 @@
 import { Box } from '@mui/system';
+import clsx from 'clsx';
 import React, { CSSProperties, PropsWithChildren, useMemo } from 'react';
 import { ComponentStyleProps } from '../../types/internal';
 
@@ -6,11 +7,13 @@ type Props = PropsWithChildren<{
     width?: string | number;
     flex?: string | number;
     size?: 'medium' | 'small';
-}> & Pick<ComponentStyleProps, 'style' | 'sx' | 'className'>;
+}> & Pick<ComponentStyleProps, 'className' | 'sx'>;
 
 const HeightSmall = 72;
 
 const HeightMedium = 96;
+
+export const StyleClassPrefix = 'InputFieldContainer';
 
 export const InputFieldContainer = React.memo((props: Props) => {
 
@@ -19,6 +22,7 @@ export const InputFieldContainer = React.memo((props: Props) => {
         width,
         flex,
         size,
+        className,
         sx
     } = props;
 
@@ -27,21 +31,12 @@ export const InputFieldContainer = React.memo((props: Props) => {
         flex,
         height: size === 'small' ? HeightSmall : HeightMedium,
         boxSizing: 'border-box',
-        ...props.style
-    }), [flex, props.style, size, width]);
-
-    if (sx) {
-        return (
-            <Box style={style} sx={sx}>
-                {children}
-            </Box>
-        );
-    }
+    }), [flex, size, width]);
 
     return (
-        <div style={style}>
+        <Box className={clsx(`${StyleClassPrefix}-root`, className)} style={style} sx={sx}>
             {children}
-        </div>
+        </Box>
     );
 
 });

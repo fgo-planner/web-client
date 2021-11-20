@@ -1,8 +1,9 @@
 import { GameServant, MasterServant, MasterServantBondLevel, MasterServantSkillLevel } from '@fgo-planner/types';
 import { FormControl, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
-import { Box, SxProps, Theme } from '@mui/system';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
+import clsx from 'clsx';
 import React, { ChangeEvent, FocusEvent, FormEvent, useCallback, useEffect, useState } from 'react';
-import { InputFieldContainer } from '../../../../../../components/input/input-field-container.component';
+import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../../../constants';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
@@ -143,22 +144,24 @@ const getFouInputStepSize = (value: string | undefined): number => {
     return 20;
 };
 
-const styles = {
-    inputFieldGroup: {
+export const StyleClassPrefix = 'MasterServantEditForm';
+
+const StyleProps = (theme: Theme) => ({
+    [`& .${StyleClassPrefix}-input-field-group`]: {
         display: 'flex',
-        flexWrap: {
-            xs: 'wrap',
-            sm: 'nowrap',
-        }
-    } as SxProps<Theme>,
-    inputFieldContainer: {
-        flex: {
-            xs: '100% !important',
-            sm: 1,
+        flexWrap: 'nowrap',
+        [theme.breakpoints.down('sm')]: {
+            flexWrap: 'wrap'
         },
-        px: 2
-    } as SxProps<Theme>
-};
+        [`& .${InputFieldContainerStyleClassPrefix}-root`]: {
+            flex: 1,
+            px: 2,
+            [theme.breakpoints.down('sm')]: {
+                flex: '100% !important'
+            }
+        }
+    }
+} as SystemStyleObject<Theme>);
 
 export const MasterServantEditForm = React.memo((props: Props) => {
 
@@ -486,45 +489,47 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         // Panel layout
         return (
             <form
-                className={className}
+                className={clsx(`${StyleClassPrefix}-root`, className)}
                 id={formId}
                 noValidate
                 onSubmit={handleSubmit}
             >
-                <Box sx={styles.inputFieldGroup}>
-                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
-                        {levelField}
-                    </InputFieldContainer>
-                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
-                        {ascensionField}
-                    </InputFieldContainer>
-                </Box>
-                <Box sx={styles.inputFieldGroup}>
-                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
-                        {fouHpField}
-                    </InputFieldContainer>
-                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
-                        {fouAtkField}
-                    </InputFieldContainer>
-                </Box>
-                <Box sx={styles.inputFieldGroup}>
-                    <InputFieldContainer sx={styles.inputFieldContainer}>
-                        {skill1Field}
-                    </InputFieldContainer>
-                    <InputFieldContainer sx={styles.inputFieldContainer}>
-                        {skill2Field}
-                    </InputFieldContainer>
-                    <InputFieldContainer sx={styles.inputFieldContainer}>
-                        {skill3Field}
-                    </InputFieldContainer>
-                </Box>
-                <Box sx={styles.inputFieldGroup}>
-                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
-                        {npField}
-                    </InputFieldContainer>
-                    <InputFieldContainer sx={styles.inputFieldContainer} flex="50%">
-                        {bondField}
-                    </InputFieldContainer>
+                <Box sx={StyleProps}>
+                    <div className={`${StyleClassPrefix}-input-field-group`}>
+                        <InputFieldContainer flex="50%">
+                            {levelField}
+                        </InputFieldContainer>
+                        <InputFieldContainer flex="50%">
+                            {ascensionField}
+                        </InputFieldContainer>
+                    </div>
+                    <div className={`${StyleClassPrefix}-input-field-group`}>
+                        <InputFieldContainer flex="50%">
+                            {fouHpField}
+                        </InputFieldContainer>
+                        <InputFieldContainer flex="50%">
+                            {fouAtkField}
+                        </InputFieldContainer>
+                    </div>
+                    <div className={`${StyleClassPrefix}-input-field-group`}>
+                        <InputFieldContainer>
+                            {skill1Field}
+                        </InputFieldContainer>
+                        <InputFieldContainer>
+                            {skill2Field}
+                        </InputFieldContainer>
+                        <InputFieldContainer>
+                            {skill3Field}
+                        </InputFieldContainer>
+                    </div>
+                    <div className={`${StyleClassPrefix}-input-field-group`}>
+                        <InputFieldContainer flex="50%">
+                            {npField}
+                        </InputFieldContainer>
+                        <InputFieldContainer flex="50%">
+                            {bondField}
+                        </InputFieldContainer>
+                    </div>
                 </Box>
             </form>
         );
@@ -533,50 +538,52 @@ export const MasterServantEditForm = React.memo((props: Props) => {
     // Dialog layout
     return (
         <form
-            className={className}
+            className={clsx(`${StyleClassPrefix}-root`, className)}
             id={formId}
             noValidate
             onSubmit={handleSubmit}
         >
-            <Box sx={styles.inputFieldGroup}>
-                <InputFieldContainer sx={styles.inputFieldContainer} flex="75%">
-                    <MasterServantEditFormAutocomplete
-                        selectedServant={servant}
-                        onChange={handleSelectedServantChange}
-                        disabled={servantSelectDisabled || readonly}
-                    />
-                </InputFieldContainer>
-                <InputFieldContainer sx={styles.inputFieldContainer} flex="25%">
-                    {npField}
-                </InputFieldContainer>
-            </Box>
-            <Box sx={styles.inputFieldGroup}>
-                <InputFieldContainer sx={styles.inputFieldContainer}>
-                    {levelField}
-                </InputFieldContainer>
-                <InputFieldContainer sx={styles.inputFieldContainer}>
-                    {ascensionField}
-                </InputFieldContainer>
-                <InputFieldContainer sx={styles.inputFieldContainer}>
-                    {fouHpField}
-                </InputFieldContainer>
-                <InputFieldContainer sx={styles.inputFieldContainer}>
-                    {fouAtkField}
-                </InputFieldContainer>
-            </Box>
-            <Box sx={styles.inputFieldGroup}>
-                <InputFieldContainer sx={styles.inputFieldContainer}>
-                    {skill1Field}
-                </InputFieldContainer>
-                <InputFieldContainer sx={styles.inputFieldContainer}>
-                    {skill2Field}
-                </InputFieldContainer>
-                <InputFieldContainer sx={styles.inputFieldContainer}>
-                    {skill3Field}
-                </InputFieldContainer>
-                <InputFieldContainer sx={styles.inputFieldContainer}>
-                    {bondField}
-                </InputFieldContainer>
+            <Box sx={StyleProps}>
+                <div className={`${StyleClassPrefix}-input-field-group`}>
+                    <InputFieldContainer flex="75%">
+                        <MasterServantEditFormAutocomplete
+                            selectedServant={servant}
+                            onChange={handleSelectedServantChange}
+                            disabled={servantSelectDisabled || readonly}
+                        />
+                    </InputFieldContainer>
+                    <InputFieldContainer flex="25%">
+                        {npField}
+                    </InputFieldContainer>
+                </div>
+                <div className={`${StyleClassPrefix}-input-field-group`}>
+                    <InputFieldContainer>
+                        {levelField}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {ascensionField}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {fouHpField}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {fouAtkField}
+                    </InputFieldContainer>
+                </div>
+                <div className={`${StyleClassPrefix}-input-field-group`}>
+                    <InputFieldContainer>
+                        {skill1Field}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {skill2Field}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {skill3Field}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {bondField}
+                    </InputFieldContainer>
+                </div>
             </Box>
         </form>
     );

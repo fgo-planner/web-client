@@ -1,69 +1,57 @@
-import { Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
 import { LockOpen } from '@mui/icons-material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        height: 52,
-        alignItems: 'center',
-        paddingRight: theme.spacing(ThemeConstants.ScrollbarWidthScale),
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontWeight: 500,
-        fontSize: '0.875rem',
-        borderBottomWidth: 1,
-        borderBottomStyle: 'solid',
-        borderBottomColor: theme.palette.divider,
-    },
-    unlockedStatus: {
+export const StyleClassPrefix = 'MasterServantCostumesListHeader';
+
+const StyleProps = {
+    display: 'flex',
+    height: 52,
+    alignItems: 'center',
+    pr: ThemeConstants.ScrollbarWidthScale,
+    fontFamily: ThemeConstants.FontFamilyGoogleSans,
+    fontWeight: 500,
+    fontSize: '0.875rem',
+    borderBottomWidth: 1,
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'divider',
+    [`& .${StyleClassPrefix}-unlocked-status`]: {
         width: 42,
-        padding: theme.spacing(0, 2),
+        px: 2,
         textAlign: 'center'
     },
-    thumbnail: {
+    [`& .${StyleClassPrefix}-thumbnail`]: {
         width: 48
     },
-    collectionNo: {
+    [`& .${StyleClassPrefix}-collection-no`]: {
         width: 64,
         textAlign: 'center'
     },
-    name: {
+    [`& .${StyleClassPrefix}-name`]: {
         flex: 1
     },
-    unlockMaterials: {
-        width: 295,
-        paddingRight: theme.spacing(24),
+    [`& .${StyleClassPrefix}-unlock-materials`]: {
+        width: 256,
+        pr: 24,
         textAlign: 'center'
     }
-} as StyleRules);
+} as SystemStyleObject<Theme>;
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantCostumesListHeader'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
-export const MasterServantCostumesListHeader = React.memo(() => {
-    const classes = useStyles();
-    return (
-        <div className={classes.root}>
-            <div className={classes.unlockedStatus}>
-                <LockOpen fontSize="small" />
-            </div>
-            <div className={classes.thumbnail} />
-            <div className={classes.collectionNo}>
-                No.
-            </div>
-            <div className={classes.name}>
-                Costume Name
-            </div>
-            <div className={classes.unlockMaterials}>
-                Unlock Materials
-            </div>
-            <div className={classes.preview} />
+export const MasterServantCostumesListHeader = React.memo(() => (
+    <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+        <div className={`${StyleClassPrefix}-unlocked-status`}>
+            <LockOpen fontSize="small" />
         </div>
-    );
-});
+        <div className={`${StyleClassPrefix}-thumbnail`} />
+        <div className={`${StyleClassPrefix}-collection-no`}>
+            No.
+        </div>
+        <div className={`${StyleClassPrefix}-name`}>
+            Costume Name
+        </div>
+        <div className={`${StyleClassPrefix}-unlock-materials`}>
+            Unlock Materials
+        </div>
+    </Box>
+));

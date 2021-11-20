@@ -1,26 +1,25 @@
-import { alpha, MenuItem, PaperProps, PopoverOrigin, Theme } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import withStyles from '@mui/styles/withStyles';
+import { alpha, MenuItem, PaperProps, PopoverOrigin } from '@mui/material';
+import { Theme } from '@mui/system';
 import React, { MouseEvent, PureComponent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { WithStylesProps } from '../../../types/internal';
 import { HoverMenu } from '../../menu/hover-menu.component';
 
 type Props = {
     open: boolean;
     anchorEl?: Element | null;
-} & WithStylesProps;
+};
 
 type State = {
     forceClosed: boolean;
 };
 
-const style = (theme: Theme) => ({
+// FIXME Convert styles to SystemStyleObject
+const styles = {
     paper: {
-        width: '120px'
+        width: 120
     },
-    link: {
+    link: (theme: Theme) => ({
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
         color: theme.palette.primary.main,
@@ -28,14 +27,10 @@ const style = (theme: Theme) => ({
         '&:hover': {
             background: alpha(theme.palette.primary.main, 0.04)
         }
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'AppBarResourcesMenu'
+    })
 };
 
-export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
+export const AppBarResourcesMenu = class extends PureComponent<Props, State> {
 
     private readonly _menuAnchorOrigin: PopoverOrigin = {
         vertical: 'bottom',
@@ -61,7 +56,7 @@ export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends
         this._menuPaperProps = {
             elevation: 2,
             square: true,
-            className: props.classes.paper
+            style: styles.paper,
         };
     }
 
@@ -75,7 +70,7 @@ export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends
     }
 
     render(): ReactNode {
-        const { classes, open, anchorEl } = this.props;
+        const { open, anchorEl } = this.props;
         const { forceClosed } = this.state;
         return (
             <HoverMenu
@@ -88,7 +83,7 @@ export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends
                 PaperProps={this._menuPaperProps}
             >
                 <MenuItem
-                    className={classes.link}
+                    sx={styles.link}
                     component={Link}
                     to="/resources/servants"
                     onClick={this._handleLinkClick}
@@ -96,7 +91,7 @@ export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends
                     Servants
                 </MenuItem>
                 <MenuItem
-                    className={classes.link}
+                    sx={styles.link}
                     component={Link}
                     to="/resources/items"
                     onClick={this._handleLinkClick}
@@ -104,7 +99,7 @@ export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends
                     Items
                 </MenuItem>
                 <MenuItem
-                    className={classes.link}
+                    sx={styles.link}
                     component={Link}
                     to="/resources/events"
                     onClick={this._handleLinkClick}
@@ -121,4 +116,4 @@ export const AppBarResourcesMenu = withStyles(style, styleOptions)(class extends
         });
     }
 
-});
+};

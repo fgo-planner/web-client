@@ -1,6 +1,5 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Theme, Typography } from '@mui/material';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
-import makeStyles from '@mui/styles/makeStyles';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import React, { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { useAutoResizeDialog } from '../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
@@ -24,18 +23,6 @@ const defaultFormValues = (): Form => {
     };
 };
 
-const style = (theme: Theme) => ({
-    form: {
-        padding: theme.spacing(2)
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterAccountAddDialog'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
 export const MasterAccountAddDialog = React.memo((props: Props) => {
 
     const { onClose } = props;
@@ -45,8 +32,6 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
         closeIconEnabled,
         actionButtonVariant
     } = useAutoResizeDialog(props);
-
-    const classes = useStyles();
 
     const [formValues, setFormValues] = useState<Form>(defaultFormValues());
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -64,7 +49,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
             [name]: value
         });
     }, [formValues]);
-    
+
     const submit = useCallback(async (event: FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         setIsSubmitting(true);
@@ -96,37 +81,40 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
             <Typography component={'div'}>
                 <DialogTitle>
                     Add Master Account
-                    {closeIconEnabled && <DialogCloseButton onClick={cancel}/>}
+                    {closeIconEnabled && <DialogCloseButton onClick={cancel} />}
                 </DialogTitle>
                 <DialogContent>
                     <div>
                         {errorMessage}
                     </div>
-                    <form className={classes.form} id={FormId} onSubmit={submit}>
-                        {/* TODO Add form validation */}
-                        <InputFieldContainer width="100%">
-                            <TextField
-                                variant="outlined"
-                                fullWidth
-                                label="Nickname (Optional)"
-                                id="name"
-                                name="name"
-                                value={formValues.name}
-                                onChange={handleInputChange}
-                            />
-                        </InputFieldContainer>
-                        <InputFieldContainer width="100%">
-                            <TextField
-                                variant="outlined"
-                                fullWidth
-                                label="Friend ID (Optional)"
-                                id="friendId"
-                                name="friendId"
-                                value={formValues.friendId}
-                                onChange={handleInputChange}
-                            />
-                        </InputFieldContainer>
-                    </form>
+                    {/* FIXME Inline sx prop */}
+                    <Box sx={{ p: 2 }}>
+                        <form id={FormId} onSubmit={submit}>
+                            {/* TODO Add form validation */}
+                            <InputFieldContainer width="100%">
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    label="Nickname (Optional)"
+                                    id="name"
+                                    name="name"
+                                    value={formValues.name}
+                                    onChange={handleInputChange}
+                                />
+                            </InputFieldContainer>
+                            <InputFieldContainer width="100%">
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    label="Friend ID (Optional)"
+                                    id="friendId"
+                                    name="friendId"
+                                    value={formValues.friendId}
+                                    onChange={handleInputChange}
+                                />
+                            </InputFieldContainer>
+                        </form>
+                    </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button

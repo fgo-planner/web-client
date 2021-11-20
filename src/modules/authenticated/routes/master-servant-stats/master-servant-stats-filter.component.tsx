@@ -1,9 +1,9 @@
 import { GameServantRarity } from '@fgo-planner/types';
 import { Replay as ReplayIcon } from '@mui/icons-material';
 import { Checkbox, IconButton, ListItemText, MenuItem, MenuProps, TextField, Tooltip } from '@mui/material';
-import { Box, SxProps, Theme } from '@mui/system';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
-import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
+import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../constants';
 import { GameServantClassSimplified, TextFieldChangeEvent } from '../../../../types/internal';
 import { MasterServantStatsFilterOptions, MasterServantStatsGroupBy } from './master-servant-stats.utils';
@@ -16,21 +16,21 @@ type Props = {
     onFilterChange: (filter: MasterServantStatsFilterResult) => void;
 };
 
-const styles = {
-    root: {
-        display: 'flex',
-        height: 64,
-        mt: 6,
-        mb: -2
-    } as SxProps<Theme>,
-    multiSelectCheckbox: {
+const StyleClassPrefix = 'MasterServantStatsFilter';
+
+const StyleProps = {
+    display: 'flex',
+    height: 64,
+    mt: 6,
+    mb: -2,
+    [`& .${StyleClassPrefix}-multiSelectCheckbox`]: {
         ml: -2,
         pr: 3
-    } as SxProps<Theme>,
-    selectContainer: {
+    },
+    [`& .${InputFieldContainerStyleClassPrefix}-root`]: {
         px: 2
-    } as SxProps<Theme>
-};
+    }
+} as SystemStyleObject<Theme>;
 
 /**
  * Value of the 'all' option in multi-select dropdowns.
@@ -195,7 +195,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
             >
                 <MenuItem value={MultiSelectAllOption}>
                     <Checkbox
-                        sx={styles.multiSelectCheckbox}
+                        className={`${StyleClassPrefix}-multiSelectCheckbox`}
                         checked={!!classFilter.length}
                         indeterminate={!allSelected && !!classFilter.length}
                     />
@@ -204,7 +204,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 {ClassFilterOptions.map(className => (
                     <MenuItem key={className} value={className}>
                         <Checkbox
-                            sx={styles.multiSelectCheckbox}
+                            className={`${StyleClassPrefix}-multiSelectCheckbox`}
                             checked={classFilter.indexOf(className) !== -1}
                         />
                         <ListItemText primary={className} />
@@ -238,7 +238,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
             >
                 <MenuItem value={MultiSelectAllOption}>
                     <Checkbox
-                        sx={styles.multiSelectCheckbox}
+                        className={`${StyleClassPrefix}-multiSelectCheckbox`}
                         checked={!!rarityFilter.length}
                         indeterminate={!allSelected && !!rarityFilter.length}
                     />
@@ -247,7 +247,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 {GameServantConstants.RarityValues.map(rarity => (
                     <MenuItem key={rarity} value={rarity}>
                         <Checkbox
-                            sx={styles.multiSelectCheckbox}
+                            className={`${StyleClassPrefix}-multiSelectCheckbox`}
                             checked={rarityFilter.indexOf(rarity) !== -1}
                         />
                         <ListItemText primary={`${rarity} \u2605`} />
@@ -258,11 +258,11 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
     }
 
     return (
-        <Box sx={styles.root}>
-            <InputFieldContainer sx={styles.selectContainer} width={240}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <InputFieldContainer width={240}>
                 {groupBySelect}
             </InputFieldContainer>
-            <InputFieldContainer sx={styles.selectContainer} width={240}>
+            <InputFieldContainer width={240}>
                 {/* Only one of the below can be non-null at any given time. */}
                 {classFilterSelect}
                 {rarityFilterSelect}

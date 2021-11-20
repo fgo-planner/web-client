@@ -1,175 +1,157 @@
-import { Avatar, Divider, Theme } from '@mui/material';
-import { StyleRules } from '@mui/styles';
-import withStyles from '@mui/styles/withStyles';
 import { AccountCircle as AccountCircleIcon, ExitToApp as ExitToAppIcon, InfoOutlined as InfoOutlinedIcon, NightsStay as NightsStayIcon, Settings as SettingsIcon, SupervisedUserCircleOutlined as SupervisedUserCircleIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@mui/icons-material';
-import { PureComponent, ReactNode } from 'react';
-import { Subscription } from 'rxjs';
+import { Avatar, Divider } from '@mui/material';
+import { SystemStyleObject, Theme } from '@mui/system';
+import clsx from 'clsx';
+import React, { useCallback, useEffect, useState } from 'react';
+import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { AuthenticationService } from '../../../../services/authentication/auth.service';
 import { BasicUser } from '../../../../services/data/user/user.service';
-import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseHandler, WithStylesProps } from '../../../../types/internal';
+import { ModalOnCloseHandler } from '../../../../types/internal';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
 import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 
 type Props = {
+    currentUser: BasicUser;
     anchorEl?: Element | null;
     onClose?: ModalOnCloseHandler;
-    currentUser: BasicUser;
-} & WithStylesProps;
-
-type State = {
-    themeInfo?: ThemeInfo;
-    isBackgroundMusicPlaying: boolean;
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        width: '280px' // TODO Un-hardcode this
-    },
-    menuHeader: {
+const MenuWidth = 280;
+
+const AvatarSize = 56;
+
+const StyleClassPrefix = 'AppBarUserProfileMenu';
+
+const StyleProps = {
+    width: MenuWidth,
+    [`& .${StyleClassPrefix}-menu-header`]: {
         display: 'flex',
-        padding: theme.spacing(2, 4, 3, 4),
+        px: 4,
+        pt: 2,
+        pb: 3,
         outline: 'none'
     },
-    avatar: {
-        width: theme.spacing(14),
-        height: theme.spacing(14),
-        marginRight: theme.spacing(3)
+    [`& .${StyleClassPrefix}-avatar`]: {
+        width: AvatarSize,
+        height: AvatarSize,
+        mr: 3
     },
-    userInfo: {
-        maxWidth: '180px' // TODO Un-hardcode this
+    [`& .${StyleClassPrefix}-user-info`]: {
+        maxWidth: 180 // TODO Un-hardcode this
     },
-    username: {
+    [`& .${StyleClassPrefix}-username`]: {
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontSize: '1rem',
         fontWeight: 500,
-        color: theme.palette.text.primary
+        color: 'text.primary',
+        mb: 1
     },
-    email: {
-        fontFamily: theme.typography.fontFamily,
+    [`& .${StyleClassPrefix}-email`]: {
+        fontFamily: ThemeConstants.FontFamilyRoboto,
         fontSize: '0.875rem',
-        color: theme.palette.text.secondary
+        color: 'text.secondary',
     }
-} as StyleRules);
+} as SystemStyleObject<Theme>;
 
-export const AppBarUserProfileMenu = withStyles(style)(class extends PureComponent<Props, State> {
+export const AppBarUserProfileMenu = React.memo((props: Props) => {
 
-    private _onThemeChangeSubscription!: Subscription;
+    const { currentUser, anchorEl, onClose } = props;
 
-    private _onPlayStatusChangeSubscription!: Subscription;
+    const [themeInfo, setThemeInfo] = useState<ThemeInfo>();
+    const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState<boolean>(false);
 
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            isBackgroundMusicPlaying: false
+    useEffect(() => {
+        const onThemeChangeSubscription = ThemeService.onThemeChange
+            .subscribe(setThemeInfo);
+        const onPlayStatusChangeSubscription = BackgroundMusicService.onPlayStatusChange
+            .subscribe(setIsBackgroundMusicPlaying);
+
+        return () => {
+            onThemeChangeSubscription.unsubscribe();
+            onPlayStatusChangeSubscription.unsubscribe();
         };
-        this._logout = this._logout.bind(this);
-        this._toggleThemeMode = this._toggleThemeMode.bind(this);
-        this._handleBackgroundMusicButtonClick = this._handleBackgroundMusicButtonClick.bind(this);
-    }
+    }, []);
 
-    componentDidMount(): void {
-        this._onThemeChangeSubscription = ThemeService.onThemeChange
-            .subscribe(this._handleThemeChange.bind(this));
-        this._onPlayStatusChangeSubscription = BackgroundMusicService.onPlayStatusChange
-            .subscribe(this._handleBackgroundMusicPlayStatusChange.bind(this));
-    }
-
-    componentWillUnmount(): void {
-        this._onThemeChangeSubscription.unsubscribe();
-    }
-
-    render(): ReactNode {
-        const { themeInfo, isBackgroundMusicPlaying } = this.state;
-        const isLightMode = themeInfo?.themeMode === 'light';
-        return (
-            <AppBarActionMenu
-                className={this.props.classes.root}
-                anchorEl={this.props.anchorEl}
-                onClose={this.props.onClose}
-            >
-                {this._renderMenuHeader()}
-                <Divider />
-                <AppBarActionMenuItem
-                    label="Profile"
-                    icon={AccountCircleIcon}
-                    to="/user/profile"
-                />
-                <AppBarActionMenuItem
-                    label="Settings"
-                    icon={SettingsIcon}
-                    to="/user/settings"
-                />
-                <AppBarActionMenuItem
-                    label="Master Accounts"
-                    icon={SupervisedUserCircleIcon}
-                    to="/user/master-accounts"
-                />
-                <AppBarActionMenuItem
-                    label="Log Out"
-                    icon={ExitToAppIcon}
-                    onClick={this._logout}
-                />
-                <Divider />
-                <AppBarActionMenuItem
-                    label={`Appearance: ${isLightMode ? 'Light' : 'Dark'}`}
-                    icon={isLightMode ? WbSunnyIcon : NightsStayIcon}
-                    onClick={this._toggleThemeMode}
-                />
-                <AppBarActionMenuItem
-                    label={`Music: ${isBackgroundMusicPlaying ? 'On' : 'Off'}`}
-                    icon={isBackgroundMusicPlaying ? VolumeUpIcon : VolumeOffIcon}
-                    onClick={this._handleBackgroundMusicButtonClick}
-                />
-                <AppBarActionMenuItem
-                    label="About"
-                    icon={InfoOutlinedIcon}
-                />
-            </AppBarActionMenu>
-        );
-    }
-
-    private _renderMenuHeader(): ReactNode {
-        const styleClasses = this.props.classes;
-        return (
-            <div className={styleClasses.menuHeader}>
-                <Avatar className={styleClasses.avatar} src="https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png" />
-                <div className={styleClasses.userInfo}>
-                    <div className={`${styleClasses.username} truncate`}>
-                        {this.props.currentUser.username}
-                    </div>
-                    <div className={`${styleClasses.email} truncate`}>
-                        {this.props.currentUser.email}
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    private _logout(): void {
+    const handleLogout = useCallback((): void => {
         AuthenticationService.logout();
-    }
+    }, []);
 
-    private _toggleThemeMode(): void {
+    const handleThemeModeToggle = useCallback((): void => {
         ThemeService.toggleThemeMode();
-    }
+    }, []);
 
-    private _handleBackgroundMusicButtonClick(): void {
-        if (this.state.isBackgroundMusicPlaying) {
+    const handleBackgroundMusicButtonClick = useCallback((): void => {
+        if (isBackgroundMusicPlaying) {
             BackgroundMusicService.pause();
         } else {
             BackgroundMusicService.play();
         }
-    }
+    }, [isBackgroundMusicPlaying]);
 
-    private _handleThemeChange(themeInfo: ThemeInfo): void {
-        this.setState({ themeInfo });
-    }
 
-    private _handleBackgroundMusicPlayStatusChange(isPlaying: boolean): void {
-        this.setState({ isBackgroundMusicPlaying: isPlaying });
-    }
+    const menuHeaderNode = (
+        <div className={`${StyleClassPrefix}-menu-header`}>
+            <Avatar className={`${StyleClassPrefix}-avatar`} src="https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png" />
+            <div className={`${StyleClassPrefix}-user-info`}>
+                <div className={clsx(`${StyleClassPrefix}-username`, 'truncate')}>
+                    {currentUser.username}
+                </div>
+                <div className={clsx(`${StyleClassPrefix}-email`, 'truncate')}>
+                    {currentUser.email}
+                </div>
+            </div>
+        </div>
+    );
+
+    const isLightMode = themeInfo?.themeMode === 'light';
+
+    return (
+        <AppBarActionMenu
+            className={`${StyleClassPrefix}-root`}
+            sx={StyleProps}
+            anchorEl={anchorEl}
+            onClose={onClose}
+        >
+            {menuHeaderNode}
+            <Divider />
+            <AppBarActionMenuItem
+                label="Profile"
+                icon={AccountCircleIcon}
+                to="/user/profile"
+            />
+            <AppBarActionMenuItem
+                label="Settings"
+                icon={SettingsIcon}
+                to="/user/settings"
+            />
+            <AppBarActionMenuItem
+                label="Master Accounts"
+                icon={SupervisedUserCircleIcon}
+                to="/user/master-accounts"
+            />
+            <AppBarActionMenuItem
+                label="Log Out"
+                icon={ExitToAppIcon}
+                onClick={handleLogout}
+            />
+            <Divider />
+            <AppBarActionMenuItem
+                label={`Appearance: ${isLightMode ? 'Light' : 'Dark'}`}
+                icon={isLightMode ? WbSunnyIcon : NightsStayIcon}
+                onClick={handleThemeModeToggle}
+            />
+            <AppBarActionMenuItem
+                label={`Music: ${isBackgroundMusicPlaying ? 'On' : 'Off'}`}
+                icon={isBackgroundMusicPlaying ? VolumeUpIcon : VolumeOffIcon}
+                onClick={handleBackgroundMusicButtonClick}
+            />
+            <AppBarActionMenuItem
+                label="About"
+                icon={InfoOutlinedIcon}
+            />
+        </AppBarActionMenu>
+    );
 
 });

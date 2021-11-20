@@ -11,6 +11,7 @@ type State = {
     show: boolean;
 };
 
+// TODO Convert this to functional component
 export class LoadingIndicatorOverlay extends PureComponent<Props, State> {
 
     private _onDisplayStatusChangeSubscription!: Subscription;

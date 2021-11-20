@@ -1,7 +1,5 @@
-import { Theme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { StyleRules, WithStylesOptions } from '@mui/styles';
 import { DragIndicator as DragIndicatorIcon, SvgIconComponent } from '@mui/icons-material';
+import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { PropsWithChildren } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
@@ -20,26 +18,26 @@ type Props = PropsWithChildren<{
 
 const DefaultDragHandleIcon = DragIndicatorIcon;
 
-const style = (theme: Theme) => ({
+export const StyleClassPrefix = 'DraggableListRowContainer';
+
+const StyleOptions = {
+    name: StyleClassPrefix
+} as MuiStyledOptions;
+
+const RootComponent = styled('div', StyleOptions)(({ theme }) => ({
     ...listRowStyle(theme),
-    draggable: {
+    '&.draggable': {
         display: 'flex',
         alignItems: 'center'
     },
-    dragging: {
+    '&.dragging': {
         borderBottom: `1px solid ${theme.palette.divider}`,
     },
-    dragHandle: {
+    [`& .${StyleClassPrefix}-drag-handle`]: {
         margin: theme.spacing(0, -2, 0, 1),
         opacity: 0.5
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'DraggableListRowContainer'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+}));
 
 export const DraggableListRowContainer = React.memo((props: Props) => {
 
@@ -50,31 +48,33 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
         dragHandleIcon,
         active,
         borderTop,
-        borderBottom
+        borderBottom,
     } = props;
-
-    const classes = useStyles(props);
 
     const DragHandleIcon = dragHandleIcon ?? DefaultDragHandleIcon;
 
     return (
-        <Draggable draggableId={draggableId} index={index}>
+        <Draggable draggableId={draggableId} key={draggableId} index={index}>
             {(provided, snapshot) => {
-                const className = clsx(
-                    classes.row,
-                    classes.draggable,
-                    snapshot.isDragging && classes.dragging,
-                    active && classes.active,
-                    borderTop && classes.borderTop,
-                    borderBottom && classes.borderBottom
+                const classNames = clsx(
+                    'row',
+                    'draggable',
+                    snapshot.isDragging && 'dragging',
+                    active && 'active',
+                    borderTop && 'border-top',
+                    borderBottom && 'border-bottom'
                 );
                 return (
-                    <div ref={provided.innerRef} {...provided.draggableProps} className={className}>
-                        <div {...provided.dragHandleProps} className={classes.dragHandle}>
+                    <RootComponent
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className={classNames}
+                    >
+                        <div {...provided.dragHandleProps} className={`${StyleClassPrefix}-drag-handle`}>
                             <DragHandleIcon />
                         </div>
                         {children}
-                    </div>
+                    </RootComponent>
                 );
             }}
         </Draggable>

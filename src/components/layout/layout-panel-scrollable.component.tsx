@@ -1,9 +1,8 @@
-import { Theme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { WithStylesOptions, StyleRules } from '@mui/styles';
+import { SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
-import React, { PropsWithChildren, ReactNode } from 'react';
+import React, { PropsWithChildren, ReactNode, useMemo } from 'react';
 import { ComponentStyleProps } from '../../types/internal/props/component-style-props.type';
+import { StyleUtils } from '../../utils/style.utils';
 import { LayoutPanelContainer } from './layout-panel-container.component';
 
 type Props = PropsWithChildren<{
@@ -13,65 +12,67 @@ type Props = PropsWithChildren<{
     footerBorder?: boolean;
 }> & ComponentStyleProps;
 
-const style = (theme: Theme) => ({
-    container: {
+export const StyleClassPrefix = 'LayoutPanelScrollable';
+
+const StyleProps = {
+    [`& .${StyleClassPrefix}-container`]: {
         display: 'flex',
         flexDirection: 'column',
         height: '100%'
     },
-    headerBorder: {
+    [`& .${StyleClassPrefix}-header.border`]: {
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
-        borderBottomColor: theme.palette.divider
+        borderBottomColor: 'divider'
     },
-    childrenContainer: {
+    [`& .${StyleClassPrefix}-children-container`]: {
         overflow: 'auto',
         height: '100%'
     },
-    footerBorder: {
+    [`& .${StyleClassPrefix}-footer.border`]: {
         borderTopWidth: 1,
         borderTopStyle: 'solid',
-        borderTopColor: theme.palette.divider
+        borderTopColor: 'divider'
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'LayoutPanelScrollable'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const LayoutPanelScrollable = React.memo((props: Props) => {
 
     const {
-        headerContents,
         children,
+        headerContents,
         footerContents,
         headerBorder,
         footerBorder,
         className,
         style,
+        sx
     } = props;
 
-    const classes = useStyles();
+    const sxProps = useMemo(() => StyleUtils.mergeSxProps(StyleProps, sx), [sx]);
 
     return (
-        <LayoutPanelContainer className={className} style={style}>
-            <div className={classes.container + ' test'}>
+        <LayoutPanelContainer
+            className={clsx(`${StyleClassPrefix}-root`, className)}
+            style={style}
+            sx={sxProps}
+        >
+            <div className={`${StyleClassPrefix}-container`}>
                 {headerContents &&
-                    <div className={clsx(headerBorder && classes.headerBorder)}>
+                    <div className={clsx(`${StyleClassPrefix}-header`, headerBorder && 'border')}>
                         {headerContents}
                     </div>
                 }
-                <div className={classes.childrenContainer}>
+                <div className={`${StyleClassPrefix}-children-container`}>
                     {children}
                 </div>
                 {footerContents &&
-                    <div className={clsx(footerBorder && classes.footerBorder)}>
+                    <div className={clsx(`${StyleClassPrefix}-footer`, footerBorder && 'border')}>
                         {footerContents}
                     </div>
                 }
             </div>
         </LayoutPanelContainer>
     );
+    
 });

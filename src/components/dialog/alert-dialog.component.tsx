@@ -1,94 +1,59 @@
-import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, withWidth } from '@material-ui/core';
-import { ReactNode } from 'react';
-import { DialogComponentProps, Nullable } from '../../types/internal';
-import { DialogComponent } from '../base/dialog-component';
+import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import React, { Fragment, MouseEvent, useCallback, useRef } from 'react';
+import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
+import { DialogComponentProps } from '../../types/internal';
 import { DialogCloseButton } from './dialog-close-button.component';
 
-type RenderedProps = {
+type Props = {
     title?: string;
     message?: string;
     confirmButtonLabel?: string;
     confirmButtonColor?: ButtonProps['color'];
-};
-
-type Props = RenderedProps & Omit<DialogComponentProps, 'onExited'>;
+} & Omit<DialogComponentProps, 'onExited'>;
 
 /**
- * Generic dialog for displaying a simple alert with an action button and a
- * cancel button.
+ * Generic dialog for displaying a simple alert with an confirmation button.
  */
-export const AlertDialog = withWidth()(class extends DialogComponent<Props> {
+export const AlertDialog = React.memo((props: Props) => {
+
+    const {
+        title,
+        message,
+        confirmButtonLabel,
+        confirmButtonColor,
+        onClose,
+        ...dialogProps
+    } = props;
 
     /**
-     * Snapshot of the styling and text props. This allows the dialog to keep
-     * displaying the same contents while it is undergoing its exit transition,
-     * even if the props were cleared by the parent component.
+     * Contains cache of the dialog contents.
      */
-    private _propsSnapshot: Nullable<RenderedProps>;
+    const dialogContentsRef = useRef<JSX.Element>();
 
-    constructor(props: Props) {
-        super(props);
+    const {
+        fullScreen,
+        closeIconEnabled,
+        actionButtonVariant
+    } = useAutoResizeDialog(props);
 
-        this._handleOnExited = this._handleOnExited.bind(this);
-    }
+    const showTitle = title || closeIconEnabled;
 
-    shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<{}>): boolean {
-        /*
-         * If the dialog is about to close, then take snapshot of the current props.
-         * The snapshot will be cleared after the dialog has existed.
-         */
-        if (!nextProps.open && this.props.open) {
-            const {
-                title,
-                message,
-                confirmButtonLabel,
-                confirmButtonColor
-            } = this.props;
+    const cancel = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
+        onClose(event, 'cancel');
+    }, [onClose]);
 
-            this._propsSnapshot = {
-                title,
-                message,
-                confirmButtonLabel,
-                confirmButtonColor
-            };
-        }
-
-        return super.shouldComponentUpdate(nextProps, nextState);
-    }
-
-    render(): ReactNode {
-
-        const {
-            title,
-            message,
-            confirmButtonLabel,
-            confirmButtonColor,
-            onClose,
-            ...dialogProps
-        } = {
-            ...this.props,
-            ...this._propsSnapshot
-        };
-
-        const {
-            fullScreen,
-            closeIconEnabled,
-            actionButtonVariant
-        } = this._computeFullScreenProps();
-
-        const showTitle = title || closeIconEnabled;
-
-        return (
-            <Dialog
-                {...dialogProps}
-                fullScreen={fullScreen}
-                onClose={onClose}
-                onExited={this._handleOnExited}
-            >
+    /*
+     * Only re-render the dialog contents if the dialog is open. This allows the
+     * dialog to keep displaying the same contents while it is undergoing its exit
+     * transition, even if the props were changed by the parent component.
+     */
+    if (!dialogContentsRef.current || props.open) {
+        dialogContentsRef.current = (
+            <Fragment>
                 {showTitle &&
                     <DialogTitle>
                         {title}
-                        {closeIconEnabled && <DialogCloseButton onClick={e => onClose(e, 'cancel')} />}
+                        {closeIconEnabled && <DialogCloseButton onClick={cancel} />}
                     </DialogTitle>
                 }
                 <DialogContent>
@@ -103,12 +68,18 @@ export const AlertDialog = withWidth()(class extends DialogComponent<Props> {
                         {confirmButtonLabel || 'Confirm'}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Fragment>
         );
     }
- 
-    private _handleOnExited(): void {
-        this._propsSnapshot = null;
-    }
+
+    return (
+        <Dialog
+            {...dialogProps}
+            fullScreen={fullScreen}
+            onClose={onClose}
+        >
+            {dialogContentsRef.current}
+        </Dialog>
+    );
 
 });

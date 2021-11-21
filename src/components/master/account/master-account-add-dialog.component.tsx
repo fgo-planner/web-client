@@ -1,5 +1,5 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, makeStyles, StyleRules, TextField, Theme, Typography } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import React, { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { useAutoResizeDialog } from '../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
@@ -23,22 +23,9 @@ const defaultFormValues = (): Form => {
     };
 };
 
-const style = (theme: Theme) => ({
-    form: {
-        padding: theme.spacing(2)
-    },
-    inputFieldContainer: {
-        width: '100%'
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterAccountAddDialog'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
 export const MasterAccountAddDialog = React.memo((props: Props) => {
+
+    const { onClose } = props;
 
     const {
         fullScreen,
@@ -46,17 +33,13 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
         actionButtonVariant
     } = useAutoResizeDialog(props);
 
-    const classes = useStyles();
-
     const [formValues, setFormValues] = useState<Form>(defaultFormValues());
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [isMounted, setIsMounted] = useState<boolean>(true);
 
     useEffect(() => {
-        return () => {
-            setIsMounted(false);
-        };
+        return () => setIsMounted(false);
     }, []);
 
     const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
@@ -66,7 +49,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
             [name]: value
         });
     }, [formValues]);
-    
+
     const submit = useCallback(async (event: FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         setIsSubmitting(true);
@@ -81,54 +64,57 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
                 setIsSubmitting(false);
             }
 
-            props.onClose({}, 'submit');
+            onClose({}, 'submit');
         } catch (e: any) {
             setIsSubmitting(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [formValues, isMounted, props]);
+    }, [formValues, isMounted, onClose]);
 
     const cancel = useCallback((): void => {
         setFormValues(defaultFormValues());
-        props.onClose({}, 'cancel');
-    }, [props]);
+        onClose({}, 'cancel');
+    }, [onClose]);
 
     return (
         <Dialog {...props} fullScreen={fullScreen}>
             <Typography component={'div'}>
                 <DialogTitle>
                     Add Master Account
-                    {closeIconEnabled && <DialogCloseButton onClick={cancel}/>}
+                    {closeIconEnabled && <DialogCloseButton onClick={cancel} />}
                 </DialogTitle>
                 <DialogContent>
                     <div>
                         {errorMessage}
                     </div>
-                    <form className={classes.form} id={FormId} onSubmit={submit}>
-                        {/* TODO Add form validation */}
-                        <InputFieldContainer className={classes.inputFieldContainer}>
-                            <TextField
-                                variant="outlined"
-                                fullWidth
-                                label="Nickname (Optional)"
-                                id="name"
-                                name="name"
-                                value={formValues.name}
-                                onChange={handleInputChange}
-                            />
-                        </InputFieldContainer>
-                        <InputFieldContainer className={classes.inputFieldContainer}>
-                            <TextField
-                                variant="outlined"
-                                fullWidth
-                                label="Friend ID (Optional)"
-                                id="friendId"
-                                name="friendId"
-                                value={formValues.friendId}
-                                onChange={handleInputChange}
-                            />
-                        </InputFieldContainer>
-                    </form>
+                    {/* FIXME Inline sx prop */}
+                    <Box sx={{ p: 2 }}>
+                        <form id={FormId} onSubmit={submit}>
+                            {/* TODO Add form validation */}
+                            <InputFieldContainer width="100%">
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    label="Nickname (Optional)"
+                                    id="name"
+                                    name="name"
+                                    value={formValues.name}
+                                    onChange={handleInputChange}
+                                />
+                            </InputFieldContainer>
+                            <InputFieldContainer width="100%">
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    label="Friend ID (Optional)"
+                                    id="friendId"
+                                    name="friendId"
+                                    value={formValues.friendId}
+                                    onChange={handleInputChange}
+                                />
+                            </InputFieldContainer>
+                        </form>
+                    </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button

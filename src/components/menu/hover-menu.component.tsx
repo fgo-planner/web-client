@@ -1,33 +1,26 @@
-import { Menu, MenuProps, PaperProps, PopoverClassKey, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { PureComponent, ReactNode } from 'react';
-import { WithStylesProps } from '../../types/internal';
+import { Menu, MenuProps, PaperProps } from '@mui/material';
+import { CSSProperties, PureComponent, ReactNode } from 'react';
 
 type Props = {
     closeDelay?: number;
     forceClosed?: boolean;
-} & MenuProps & WithStylesProps;
+} & MenuProps;
 
 type State = {
     open: boolean;
 };
 
-const style = () => ({
+const styles = {
     root: {
         pointerEvents: 'none'
-    },
+    } as CSSProperties,
     paper: {
         pointerEvents: 'initial'
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'HoverMenu'
+    } as CSSProperties
 };
 
-export const HoverMenu = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
-
-    private readonly _popoverClasses: Partial<Record<PopoverClassKey, string>>;
+// TODO Convert this to functional component
+export const HoverMenu = class extends PureComponent<Props, State> {
 
     private _closeRequested = false;
 
@@ -42,8 +35,6 @@ export const HoverMenu = withStyles(style, styleOptions)(class extends PureCompo
 
         this._handleMouseEnter = this._handleMouseEnter.bind(this);
         this._handleMouseLeave = this._handleMouseLeave.bind(this);
-
-        this._popoverClasses = { root: props.classes.root };
     }
 
     componentDidUpdate(prevProps: Props): void {
@@ -72,14 +63,13 @@ export const HoverMenu = withStyles(style, styleOptions)(class extends PureCompo
     }
 
     render(): ReactNode {
-        const { classes, closeDelay, forceClosed, ...menuProps } = this.props;
+        const { closeDelay, forceClosed, ...menuProps } = this.props;
         const { open } = this.state;
         return (
             <Menu 
                 {...menuProps}
-                classes={{ paper: classes.paper }}
+                style={styles.root}
                 open={open}
-                PopoverClasses={this._popoverClasses}
                 PaperProps={this._generatePaperProps()}
                 keepMounted
             />
@@ -90,6 +80,7 @@ export const HoverMenu = withStyles(style, styleOptions)(class extends PureCompo
         const { PaperProps } = this.props;
         return {
             ...PaperProps,
+            style: styles.paper,
             onMouseEnter: this._handleMouseEnter,
             onMouseLeave: this._handleMouseLeave
         };
@@ -122,4 +113,4 @@ export const HoverMenu = withStyles(style, styleOptions)(class extends PureCompo
         }, closeDelay || 0);
     }
 
-});
+};

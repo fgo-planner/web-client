@@ -1,12 +1,12 @@
 import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/types';
-import { StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Theme } from '@mui/material';
+import { StyleRules } from '@mui/styles';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { LoadingIndicator } from '../../../../../components/loading-indicator.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
 import { GameServantService } from '../../../../../services/data/game/game-servant.service';
-import { Nullable, WithStylesProps } from '../../../../../types/internal';
+import { Nullable } from '../../../../../types/internal';
 import { GameItemNotFound } from './game-item-not-found.component';
 
 type TotalUsage = {
@@ -26,7 +26,7 @@ type GameItemUsage = {
 
 type Props = {
     itemId: number;
-} & WithStylesProps;
+};
 
 type State = {
     itemLoading: boolean;
@@ -40,11 +40,7 @@ const style = (theme: Theme) => ({
     }
 } as StyleRules);
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'GameItemInfo'
-};
-
-export const GameItemInfo = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
+export const GameItemInfo = class extends PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
@@ -182,4 +178,4 @@ export const GameItemInfo = withStyles(style, styleOptions)(class extends PureCo
         return sum;
     }
 
-});
+};

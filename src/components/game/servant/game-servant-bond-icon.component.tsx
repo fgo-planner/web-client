@@ -1,7 +1,5 @@
 import { MasterServantBondLevel } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React from 'react';
+import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../../constants';
 
 type Props = {
@@ -11,26 +9,25 @@ type Props = {
 
 const DefaultSize = 50;
 
-const style = () => ({
-    img: {
-        width: '100%',
-        height: '100%'
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'GameServantBondIcon'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+// TODO Define StyleClassPrefix? 
 
 export const GameServantBondIcon = React.memo(({ bond, size }: Props) => {
-    const classes = useStyles();
+
     const imageUrl = AssetConstants.ServantBondIconMap[bond];
-    size = size || DefaultSize;
+
+    const sizeStyle = useMemo((): CSSProperties => ({
+        width: size || DefaultSize,
+        height: size || DefaultSize
+    }), [size]);
+
     return (
-        <div style={{width: size, height: size}}>
-            <img className={classes.img} src={imageUrl} alt={`Bond ${bond}`} />
+        <div style={sizeStyle}>
+            <img
+                className="full-width full-height"
+                src={imageUrl}
+                alt={`Bond ${bond}`}
+            />
         </div>
     );
+
 });

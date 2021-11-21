@@ -1,5 +1,5 @@
-import { Accordion as MuiAccordion, AccordionDetails as MuiAccordionDetails, AccordionSummary as MuiAccordionSummary, fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import withStyles, { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Accordion, AccordionDetails, AccordionSummary, alpha } from '@mui/material';
+import { SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { CSSProperties, PropsWithChildren, ReactNode, useCallback, useMemo, useState } from 'react';
 import { StyleUtils } from '../../../../utils/style.utils';
@@ -21,90 +21,77 @@ export type MasterServantStatPanelRow = {
     values: Array<number | string | ReactNode>;
 };
 
+const RowHeight = 52;
+
 const DefaultDataColumnWidth = '6.9%';
 
-const Accordion = withStyles({
-    root: {
-        '&:before': {
-            display: 'none',
-        },
-        '&$expanded': {
-            margin: 'auto',
-        },
-    },
-    expanded: {} // Do not delete this
-})(MuiAccordion);
+const StyleClassPrefix = 'MasterServantStatsExpandablePanel';
 
-const AccordionSummary = withStyles({
-    root: {
-        padding: 0,
-        minHeight: 52,
-        '&$expanded': {
-            minHeight: 52
+const StyleProps = (theme: Theme) => ({
+    '&.MuiAccordion-root': {
+        '&:before': {
+            display: 'none'
+        },
+        '&.Mui-expanded': {
+            margin: 'auto',
         }
     },
-    content: {
+    '& .MuiAccordionSummary-root': {
+        padding: 0,
+        minHeight: RowHeight,
+        '&.Mui-expanded': {
+            minHeight: RowHeight
+        }
+    },
+    '& .MuiAccordionSummary-content': {
         margin: 0,
-        '&$expanded': {
+        '&.Mui-expanded': {
             margin: 0
-        },
+        }
     },
-    expanded: {} // Do not delete this
-})(MuiAccordionSummary);
-
-const AccordionDetails = withStyles((theme) => ({
-    root: {
-        padding: theme.spacing(0),
-        backgroundColor: fade(theme.palette.background.default, 0.5),
-        boxShadow: StyleUtils.insetBoxShadow(theme.shadows[1]),
+    '& .MuiAccordionDetails-root': {
+        padding: 0,
+        backgroundColor: alpha(theme.palette.background.default, 0.5),
+        boxShadow: StyleUtils.insetBoxShadow((theme.shadows as any)[1])
     },
-}))(MuiAccordionDetails);
-
-const style = (theme: Theme) => ({
-    row: {
+    [`& .${StyleClassPrefix}-row`]: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        height: 52,
-        padding: theme.spacing(0, 4),
+        height: RowHeight,
+        px: 4,
         fontSize: '0.875rem',
         '&:hover': {
-            backgroundColor: fade(theme.palette.text.primary, 0.07)
+            backgroundColor: alpha(theme.palette.text.primary, 0.07)
+        },
+        '&.border-top': {
+            borderTopWidth: 1,
+            borderTopStyle: 'solid',
+            borderTopColor: 'divider',
+        },
+        '&.border-bottom': {
+            borderBottomWidth: 1,
+            borderBottomStyle: 'solid',
+            borderBottomColor: 'divider',
+        },
+        '&.not-expandable': {
+            cursor: 'default'
         }
     },
-    detailRow: {
+    [`& .${StyleClassPrefix}-detail-row`]: {
         '&:not(:last-child)': {
             borderBottomWidth: 1,
             borderBottomStyle: 'solid',
-            borderBottomColor: theme.palette.divider
+            borderBottomColor: 'divider'
+        },
+        [`& .${StyleClassPrefix}-row-label`]: {
+            ml: 4
         }
     },
-    borderTop: {
-        borderTopWidth: 1,
-        borderTopStyle: 'solid',
-        borderTopColor: theme.palette.divider,
-    },
-    borderBottom: {
-        borderBottomWidth: 1,
-        borderBottomStyle: 'solid',
-        borderBottomColor: theme.palette.divider,
-    },
-    notExpandable: {
-        cursor: 'default'
-    },
-    rowLabel: {
-        flex: 1,
-    },
-    rowValue: {
-
+    [`& .${StyleClassPrefix}-row-label`]: {
+        flex: 1
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantStatsExpandablePanel'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>);
 
 export const MasterServantStatsExpandablePanel = React.memo((props: Props) => {
 
@@ -116,8 +103,6 @@ export const MasterServantStatsExpandablePanel = React.memo((props: Props) => {
     } = props;
 
     const { header, rows } = data;
-
-    const classes = useStyles();
 
     const [expanded, setExpanded] = useState<boolean>(false);
 
@@ -135,8 +120,8 @@ export const MasterServantStatsExpandablePanel = React.memo((props: Props) => {
 
     const renderDetailRow = (rowData: MasterServantStatPanelRow): ReactNode => {
         return (
-            <div className={clsx(classes.row, classes.detailRow)}>
-                <div className={clsx(classes.rowLabel, 'truncate', 'ml-4')}>
+            <div className={clsx(`${StyleClassPrefix}-row`, `${StyleClassPrefix}-detail-row`)}>
+                <div className={clsx(`${StyleClassPrefix}-row-label`, 'truncate')}>
                     {rowData.label}
                 </div>
                 {rowData.values.map(value => (
@@ -149,18 +134,24 @@ export const MasterServantStatsExpandablePanel = React.memo((props: Props) => {
     };
 
     const headerRowClassName = clsx(
-        classes.row,
-        !rows && classes.notExpandable,
-        borderTop && classes.borderTop,
-        borderBottom && classes.borderBottom,
+        `${StyleClassPrefix}-row`,
+        !rows && 'not-expandable',
+        borderTop && 'border-top',
+        borderBottom && 'border-bottom',
     );
 
     return (
-        <Accordion square expanded={expanded} onChange={handleHeaderClick}>
+        <Accordion
+            className={`${StyleClassPrefix}-root`}
+            sx={StyleProps}
+            expanded={expanded}
+            onChange={handleHeaderClick}
+            square
+        >
             <AccordionSummary>
                 <div className="full-width">
                     <div className={headerRowClassName}>
-                        <div className={clsx(classes.rowLabel, 'truncate')}>
+                        <div className={clsx(`${StyleClassPrefix}-row-label`, 'truncate')}>
                             {header.label}
                         </div>
                         {header.values.map(value => (
@@ -178,4 +169,5 @@ export const MasterServantStatsExpandablePanel = React.memo((props: Props) => {
             </AccordionDetails>
         </Accordion>
     );
+
 });

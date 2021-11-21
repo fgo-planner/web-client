@@ -1,34 +1,20 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { PropsWithChildren } from 'react';
+import { MuiStyledOptions, styled } from '@mui/system';
 
-type Props = PropsWithChildren<{}>;
+const StyleClassPrefix = 'FabContainer';
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        alignItems: 'flex-end',
-        position: 'fixed',
-        bottom: theme.spacing(6),
-        right: theme.spacing(8),
-        '& >*': {
-            marginLeft: theme.spacing(4)
-        },
-        zIndex: 2
-    }
-} as StyleRules);
+const StyleOptions = {
+    name: StyleClassPrefix,
+    slot: 'root'
+} as MuiStyledOptions;
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'FabContainer'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
-export const FabContainer = React.memo(({ children }: Props) => {
-    const classes = useStyles();
-    return (
-        <div className={classes.root}>
-            {children}
-        </div>
-    );
-});
+export const FabContainer = styled('div', StyleOptions)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'flex-end',
+    position: 'fixed',
+    bottom: theme.spacing(6),
+    right: theme.spacing(8),
+    '& >*': {
+        marginLeft: theme.spacing(4)
+    },
+    zIndex: 2
+}));

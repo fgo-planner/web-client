@@ -1,50 +1,45 @@
 
 
 import { GameItem } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import clsx from 'clsx';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
-import { ComponentStyleProps } from '../../../types/internal';
 import { GameItemThumbnail } from './game-item-thumbnail.component';
 
 type Props = {
     item: Readonly<GameItem>;
     quantity: number;
     size?: string | number;
-} & ComponentStyleProps;
+};
 
 const DefaultThumbnailSize = 42;
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        alignItems: 'center'
-    },
-    quantity: {
-        width: 24,
-        marginRight: theme.spacing(2),
-        textAlign: 'right'
-    }
-} as StyleRules);
+export const StyleClassPrefix = 'GameItemQuantity';
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'GameItemQuantity'
+const StyleProps = {
+    display: 'flex',
+    alignItems: 'center',
+    [`& .${StyleClassPrefix}-quantity`]: {
+        width: 24,
+        mr: 2,
+        textAlign: 'right'
+    } as SystemStyleObject<Theme>
 };
 
-const useStyles = makeStyles(style, styleOptions);
-
-export const GameItemQuantity = React.memo(({ className, item, quantity, size }: Props) => {
-
-    const classes = useStyles();
+export const GameItemQuantity = React.memo(({ item, quantity, size }: Props) => {
 
     const thumbnailSize = size || DefaultThumbnailSize;
 
     return (
-        <div className={clsx(classes.root, className)}>
-            <div className={classes.quantity}>{quantity}</div>
-            <GameItemThumbnail item={item} size={thumbnailSize} showBackground />
-        </div>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <div className={`${StyleClassPrefix}-quantity`}>
+                {quantity}
+            </div>
+            <GameItemThumbnail
+                item={item}
+                size={thumbnailSize}
+                showBackground
+            />
+        </Box>
     );
 
 });

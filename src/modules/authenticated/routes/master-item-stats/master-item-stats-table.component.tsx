@@ -1,7 +1,7 @@
-import { makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { ReactNode } from 'react';
-import { useMemo } from 'react';
+import { Tooltip } from '@mui/material';
+import { SystemStyleObject, Theme } from '@mui/system';
+import clsx from 'clsx';
+import React, { ReactNode, useMemo } from 'react';
 import NumberFormat from 'react-number-format';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
@@ -51,52 +51,48 @@ const ItemIds = [
     5
 ];
 
-const style = (theme: Theme) => ({
-    header: {
+const StyleClassPrefix = 'MasterItemStatsTable';
+
+const StyleProps = {
+    height: '100%',
+    pr: 4,
+    py: 4,
+    [`& .${StyleClassPrefix}-header`]: {
         display: 'flex',
-        padding: theme.spacing(4, 2, 4, 4),
+        pr: 2,
+        pl: 4,
+        py: 4,
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
         fontWeight: 500,
         fontSize: '0.875rem',
         justifyContent: 'flex-end',
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
-        borderBottomColor: theme.palette.divider
+        borderBottomColor: 'divider'
     },
-    dataRow: {
+    [`& .${StyleClassPrefix}-data-row`]: {
         display: 'flex',
         alignContent: 'center',
         alignItems: 'center',
         height: 52,
-        padding: theme.spacing(0, 0, 0, 4),
+        pl: 4,
         fontSize: '0.875rem'
     },
-    labelCell: {
+    [`& .${StyleClassPrefix}-label-cell`]: {
         display: 'flex',
         alignContent: 'center',
         alignItems: 'center',
         width: '25%'
     },
-    dataCell: {
+    [`& .${StyleClassPrefix}-data-cell`]: {
         textAlign: 'center',
         width: '15%'
-    },
-    thumbnailContainer: {
-        margin: theme.spacing(-3, 0)
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantStats'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: Props) => {
 
     const { includeUnownedServants, includeSoundtracks } = filter;
-
-    const classes = useStyles();
 
     const costColumnTooltip = useMemo(() => {
         if (!includeUnownedServants && !includeSoundtracks) {
@@ -141,51 +137,49 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
         const { inventory, used, cost, debt } = stat;
 
         return (
-            <StaticListRowContainer key={itemId} borderBottom={index !== ItemIds.length -1}>
-                <div className={classes.dataRow}>
-                    <div className={classes.labelCell}>
-                        <div className={classes.thumbnailContainer}>
-                            <GameItemThumbnail
-                                item={item}
-                                size={42}
-                                showBackground
-                                enableLink
-                            />
-                        </div>
+            <StaticListRowContainer key={itemId} borderBottom={index !== ItemIds.length - 1}>
+                <div className={`${StyleClassPrefix}-data-row`}>
+                    <div className={`${StyleClassPrefix}-label-cell`}>
+                        <GameItemThumbnail
+                            item={item}
+                            size={42}
+                            showBackground
+                            enableLink
+                        />
                         <div className="pl-4">
                             {/* TODO Make this a link */}
                             {item.name}
                         </div>
                     </div>
-                    <div className={classes.dataCell}>
+                    <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
                             displayType="text"
                             value={cost}
                         />
                     </div>
-                    <div className={classes.dataCell}>
+                    <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
                             displayType="text"
                             value={used}
                         />
                     </div>
-                    <div className={classes.dataCell}>
+                    <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
                             displayType="text"
                             value={inventory}
                         />
                     </div>
-                    <div className={classes.dataCell}>
+                    <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
                             displayType="text"
                             value={debt}
                         />
                     </div>
-                    <div className={classes.dataCell}>
+                    <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
                             displayType="text"
@@ -199,23 +193,24 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
 
     return (
         <LayoutPanelScrollable
-            className="pr-4 py-4 full-height scrollbar-track-border"
+            className={clsx(`${StyleClassPrefix}-root`, 'scrollbar-track-border')}
+            sx={StyleProps}
             headerContents={
-                <div className={classes.header}>
+                <div className={`${StyleClassPrefix}-header`}>
                     <Tooltip title={costColumnTooltip} placement="top">
-                        <div className={classes.dataCell}>Total Needed</div>
+                        <div className={`${StyleClassPrefix}-data-cell`}>Total Needed</div>
                     </Tooltip>
                     <Tooltip title={usedColumnTooltip} placement="top">
-                        <div className={classes.dataCell}>Total Consumed</div>
+                        <div className={`${StyleClassPrefix}-data-cell`}>Total Consumed</div>
                     </Tooltip>
                     <Tooltip title={InventoryColumnTooltip} placement="top">
-                        <div className={classes.dataCell}>Current Inventory</div>
+                        <div className={`${StyleClassPrefix}-data-cell`}>Current Inventory</div>
                     </Tooltip>
                     <Tooltip title={debtColumnTooltip} placement="top" >
-                        <div className={classes.dataCell}>Remaining Needed</div>
+                        <div className={`${StyleClassPrefix}-data-cell`}>Remaining Needed</div>
                     </Tooltip>
                     <Tooltip title={DifferenceColumnTooltip} placement="top">
-                        <div className={classes.dataCell}>Deficit</div>
+                        <div className={`${StyleClassPrefix}-data-cell`}>Deficit</div>
                     </Tooltip>
                 </div>
             }

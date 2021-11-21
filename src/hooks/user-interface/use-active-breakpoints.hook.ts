@@ -1,7 +1,7 @@
-import { useMediaQuery, useTheme } from '@material-ui/core';
-import { BreakpointValues } from '@material-ui/core/styles/createBreakpoints';
+import { useMediaQuery, useTheme } from '@mui/material';
+import { Breakpoint } from '@mui/material/styles';
 
-export type ActiveBreakpoints = Record<keyof BreakpointValues, boolean>;
+export type ActiveBreakpoints = Record<Breakpoint, boolean>;
 
 /**
  * Returns a map containing active status of breakpoints.

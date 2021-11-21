@@ -1,7 +1,7 @@
 import { MasterAccount, MasterServant } from '@fgo-planner/types';
-import { Button, Fab, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Clear as ClearIcon, Done as DoneIcon, Publish as PublishIcon } from '@material-ui/icons';
+import { Clear as ClearIcon, Done as DoneIcon, Publish as PublishIcon } from '@mui/icons-material';
+import { Button, Fab, Tooltip } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DropzoneRef } from 'react-dropzone';
 import { useHistory } from 'react-router-dom';
@@ -48,42 +48,41 @@ const ServantListVisibleColumns: MasterServantListVisibleColumns = {
     actions: false
 };
 
-const style = (theme: Theme) => ({
-    fileInputHelperText: {
-        color: theme.palette.text.secondary,
-        padding: theme.spacing(6, 8, 0, 8)
+const StyleClassPrefix = 'MasterServantImportRoute';
+
+const StyleProps = (theme: Theme) => ({
+    [`& .${StyleClassPrefix}-file-input-helper-text`]: {
+        color: 'text.secondary',
+        px: 8,
+        pt: 6
     },
-    fileInputContainer: {
-        padding: theme.spacing(4)
+    [`& .${StyleClassPrefix}-file-input-container`]: {
+        p: 4
     },
-    fileInputActions: {
+    [`& .${StyleClassPrefix}-file-input-actions`]: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        paddingTop: theme.spacing(4)
+        pt: 4
     },
-    fileInputActionsHelperText: {
-        color: theme.palette.text.secondary,
-        paddingRight: theme.spacing(4)
+    [`& .${StyleClassPrefix}-file-input-actions-helper-text`]: {
+        color: 'text.secondary',
+        pr: 4
     },
-    importResultsHelperText: {
-        color: theme.palette.text.secondary,
-        minWidth: `${theme.breakpoints.width('lg')}px`,
-        padding: theme.spacing(6, 4, 4, 4)
+    [`& .${StyleClassPrefix}-import-results-helper-text`]: {
+        color: 'text.secondary',
+        minWidth: theme.breakpoints.values.lg,
+        px: 4,
+        pt: 6,
+        pb: 4
     }
-} as StyleRules);
+}  as SystemStyleObject<Theme>);
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantImport'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
+// TODO Split into smaller components
 const MasterServantImportRoute = React.memo(() => {
 
     const forceUpdate = useForceUpdate();
 
-    const classes = useStyles();
     const history = useHistory();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
@@ -298,19 +297,19 @@ const MasterServantImportRoute = React.memo(() => {
          */
         if (!parsedData) {
             return (
-                <Fragment>
-                    <div className={classes.fileInputHelperText}>
+                <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+                    <div className={`${StyleClassPrefix}-file-input-helper-text`}>
                         {FileInputHelperText}
                     </div>
-                    <div className={classes.fileInputContainer}>
+                    <div className={`${StyleClassPrefix}-file-input-container`}>
                         <FileInputWithTextarea
                             dropzoneRef={dropzoneRef}
                             rows={15}
                             value={importData}
                             onValueChange={setImportData}
                         >
-                            <div className={classes.fileInputActions}>
-                                <div className={classes.fileInputActionsHelperText}>
+                            <div className={`${StyleClassPrefix}-file-input-actions`}>
+                                <div className={`${StyleClassPrefix}-file-input-actions-helper-text`}>
                                     {FileInputActionsHelperText}
                                 </div>
                                 <Button variant="contained" color="secondary" onClick={openFileUploadDialog}>
@@ -319,7 +318,7 @@ const MasterServantImportRoute = React.memo(() => {
                             </div>
                         </FileInputWithTextarea>
                     </div>
-                </Fragment>
+                </Box>
             );
         }
         /*
@@ -339,8 +338,8 @@ const MasterServantImportRoute = React.memo(() => {
             );
         }
         return (
-            <Fragment>
-                <div className={classes.importResultsHelperText}>
+            <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+                <div className={`${StyleClassPrefix}-import-results-helper-text`}>
                     {ParseResultHelperText}
                 </div>
                 <LayoutPanelContainer className="p-4">
@@ -355,9 +354,9 @@ const MasterServantImportRoute = React.memo(() => {
                     />
                 </LayoutPanelContainer>
                 <div className="py-10" />
-            </Fragment>
+            </Box>
         );
-    }, [cancelImport, classes, importData, openFileUploadDialog, parsedData]);
+    }, [cancelImport, importData, openFileUploadDialog, parsedData]);
 
     return (
         <Fragment>

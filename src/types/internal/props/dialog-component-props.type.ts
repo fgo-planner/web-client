@@ -1,8 +1,8 @@
-import { DialogProps } from '@material-ui/core';
-import { ModalComponentProps } from './modal-component-props.type';
-import { WithWidthProps } from './with-width-props.type';
+import { DialogProps } from '@mui/material';
+import { ModalOnCloseHandler } from '../modal-on-close-handler.type';
 
 export type DialogComponentProps<T = {}> = {
+
     /**
      * Whether to show the close icon button at the top right corner of the dialog.
      * The exact behavior depends on the dialog implementation, but the general
@@ -12,4 +12,7 @@ export type DialogComponentProps<T = {}> = {
      * - `never`: Never show the close button.
      */
     showCloseIcon?: 'auto' | 'always' | 'never';
-} & Omit<DialogProps, 'children' | 'onClose'> & ModalComponentProps<T> & Partial<WithWidthProps>;
+
+    onClose: ModalOnCloseHandler<T>;
+
+} & Omit<DialogProps, 'children' | 'onClose'>;

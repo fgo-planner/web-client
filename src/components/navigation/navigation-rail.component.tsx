@@ -1,47 +1,34 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import clsx from 'clsx';
-import React, { PropsWithChildren } from 'react';
-import { ComponentStyleProps } from '../../types/internal/props/component-style-props.type';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
+import React, { CSSProperties, PropsWithChildren, useMemo } from 'react';
 
 type Props = PropsWithChildren<{
     width?: number | string;
-}> & ComponentStyleProps;
+}>;
 
 const DefaultWidth = 56;
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        height: '100%',
-        paddingTop: theme.spacing(2),
-        '& >*': {
-            // https://material.io/components/navigation-rail#specs
-            paddingTop: theme.spacing(1),
-            paddingBottom: theme.spacing(1)
-        }
+const StyleProps = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    height: '100%',
+    pt: 2,
+    '& >*': {
+        // https://material.io/components/navigation-rail#specs
+        py: 1
     }
-} as StyleRules);
+} as SystemStyleObject<Theme>;
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'NavigationRail'
-};
+export const NavigationRail = React.memo(({ children, width }: Props) => {
 
-const useStyles = makeStyles(style, styleOptions);
-
-export const NavigationRail = React.memo((props: Props) => {
-    const { children, className, style } = props;
-
-    const classes = useStyles();
-
-    const width = props.width || DefaultWidth;
+    const widthStyle = useMemo((): CSSProperties => ({
+        width: width || DefaultWidth
+    }), [width]);
 
     return (
-        <div className={clsx(classes.root, className)} style={{ ...style, width }}>
+        <Box sx={StyleProps} style={widthStyle}>
             {children}
-        </div>
+        </Box>
     );
 
 });

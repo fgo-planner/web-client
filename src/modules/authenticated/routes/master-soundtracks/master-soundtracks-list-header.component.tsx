@@ -1,62 +1,56 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { LockOpen } from '@material-ui/icons';
+import { LockOpen } from '@mui/icons-material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        height: 52,
-        alignItems: 'center',
-        paddingRight: theme.spacing(ThemeConstants.ScrollbarWidthScale),
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontWeight: 500,
-        fontSize: '0.875rem',
-        borderBottomWidth: 1,
-        borderBottomStyle: 'solid',
-        borderBottomColor: theme.palette.divider,
-    },
-    unlockedStatus: {
+export const StyleClassPrefix = 'MasterSoundtracksListHeader';
+
+const StyleProps = {
+    display: 'flex',
+    height: 52,
+    alignItems: 'center',
+    pr: ThemeConstants.ScrollbarWidthScale,
+    fontFamily: ThemeConstants.FontFamilyGoogleSans,
+    fontWeight: 500,
+    fontSize: '0.875rem',
+    borderBottomWidth: 1,
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'divider',
+    [`& .${StyleClassPrefix}-unlocked-status`]: {
         width: 42,
-        padding: theme.spacing(0, 2),
+        px: 2,
         textAlign: 'center'
     },
-    thumbnailContainer: {
-        width: 96 + theme.spacing(6)
+    [`& .${StyleClassPrefix}-thumbnail`]: {
+        width: 96,
+        mr: 6,
     },
-    title: {
+    [`& .${StyleClassPrefix}-title`]: {
         flex: 1
     },
-    unlockMaterial: {
+    [`& .${StyleClassPrefix}-unlock-material`]: {
         textAlign: 'right'
     },
-    preview: {
-        width: 48 + theme.spacing(24 + 4)
+    [`& .${StyleClassPrefix}-preview`]: {
+        width: 48,
+        pr: 24,
+        pl: 4
     }
-} as StyleRules);
+}  as SystemStyleObject<Theme>;
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterSoundtracksListHeader'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
-export const MasterSoundtracksListHeader = React.memo(() => {
-    const classes = useStyles();
-    return (
-        <div className={classes.root}>
-            <div className={classes.unlockedStatus}>
-                <LockOpen fontSize="small" />
-            </div>
-            <div className={classes.thumbnailContainer} />
-            <div className={classes.title}>
-                Track Title
-            </div>
-            <div className={classes.unlockMaterial}>
-                Unlock Material
-            </div>
-            <div className={classes.preview} />
+export const MasterSoundtracksListHeader = React.memo(() => (
+    <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+        <div className={`${StyleClassPrefix}-unlocked-status`}>
+            <LockOpen fontSize="small" />
         </div>
-    );
-});
+        <div className={`${StyleClassPrefix}-thumbnail`} />
+        <div className={`${StyleClassPrefix}-title`}>
+            Track Title
+        </div>
+        <div className={`${StyleClassPrefix}-unlock-material`}>
+            Unlock Material
+        </div>
+        <div className={`${StyleClassPrefix}-preview`} />
+    </Box>
+)
+);

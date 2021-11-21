@@ -1,7 +1,6 @@
 import { RgbaColor } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Colorize as ColorizeIcon } from '@material-ui/icons';
+import { Colorize as ColorizeIcon } from '@mui/icons-material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import { colord, RgbColor } from 'colord';
 import React, { MouseEventHandler } from 'react';
 
@@ -13,16 +12,16 @@ type Props = {
 
 const Size = 64;
 
-const style = (theme: Theme) => ({
-    root: {
-        width: Size,
-        height: Size,
-        cursor: 'pointer',
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: theme.palette.divider
-    },
-    colorPickerIcon: {
+const StyleClassPrefix = 'UserThemeColorSwatch';
+
+const StyleProps = {
+    width: Size,
+    height: Size,
+    cursor: 'pointer',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: 'divider',
+    [`& .${StyleClassPrefix}-color-picker-icon`]: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -39,28 +38,17 @@ const style = (theme: Theme) => ({
             opacity: 0.69
         }
     }
-} as StyleRules);
+} as SystemStyleObject<Theme>;
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'UserThemeColorSwatch'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
-export const UserThemeColorSwatch = React.memo(({ color, allowEditAlpha, onClick }: Props) => {
-
-    const classes = useStyles();
-
-    return (
-        <div
-            className={classes.root}
-            style={{ background: colord(color).toRgbString() }}
-            onClick={onClick}
-        >
-            <div className={classes.colorPickerIcon}>
-                <ColorizeIcon fontSize="large" />
-            </div>
+export const UserThemeColorSwatch = React.memo(({ color, allowEditAlpha, onClick }: Props) => (
+    <Box
+        className={`${StyleClassPrefix}-root`}
+        style={{ background: colord(color).toRgbString() }}
+        sx={StyleProps}
+        onClick={onClick}
+    >
+        <div className={`${StyleClassPrefix}-color-picker-icon`}>
+            <ColorizeIcon fontSize="large" />
         </div>
-    );
-
-});
+    </Box>
+));

@@ -1,5 +1,4 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React from 'react';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
@@ -12,55 +11,50 @@ type Props = {
     viewLayout?: any; // TODO Make use of this
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        padding: theme.spacing(4, 0, 4, 4),
-        borderBottomWidth: 1,
-        borderBottomStyle: 'solid',
-        borderBottomColor: theme.palette.divider,
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontWeight: 500,
-        textAlign: 'center',
-        fontSize: '0.875rem'
+export const StyleClassPrefix = 'MasterServantCostumesListHeader';
+
+const StyleProps = {
+    display: 'flex',
+    pl: 4,
+    py: 4,
+    borderBottomWidth: 1,
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'divider',
+    fontFamily: ThemeConstants.FontFamilyGoogleSans,
+    fontWeight: 500,
+    textAlign: 'center',
+    fontSize: '0.875rem',
+    '&.edit-mode': {
+        pl: 4 + 5
     },
-    editMode: {
-        paddingLeft: theme.spacing(4 + 5)
-    },
-    label: {
+    [`& .${StyleClassPrefix}-label`]: {
         flex: ColumnWidths.label
     },
-    npLevel: {
+    [`& .${StyleClassPrefix}-np-level`]: {
         flex: ColumnWidths.npLevel
     },
-    level: {
+    [`& .${StyleClassPrefix}-level`]: {
         flex: ColumnWidths.level
     },
-    fouHp: {
+    [`& .${StyleClassPrefix}-fou-hp`]: {
         flex: ColumnWidths.fouHp
     },
-    fouAtk: {
+    [`& .${StyleClassPrefix}-fou-atk`]: {
         flex: ColumnWidths.fouAtk
     },
-    skillLevels: {
+    [`& .${StyleClassPrefix}-skill-levels`]: {
         flex: ColumnWidths.skillLevels
     },
-    bondLevel: {
+    [`& .${StyleClassPrefix}-bond-level`]: {
         flex: ColumnWidths.bondLevel
     },
-    actions: {
+    [`& .${StyleClassPrefix}-actions`]: {
         width: ColumnWidths.actions
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantListHeader'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const MasterServantListHeader = React.memo(({ editMode, visibleColumns }: Props) => {
-    
+
     const {
         npLevel,
         level,
@@ -71,49 +65,46 @@ export const MasterServantListHeader = React.memo(({ editMode, visibleColumns }:
         actions
     } = visibleColumns || {};
 
-    const classes = useStyles();
-
-    const rootClassName = clsx(classes.root, editMode && classes.editMode);
-
     return (
-        <div className={rootClassName}>
-            <div className={classes.label}>
+        <Box className={clsx(`${StyleClassPrefix}-root`, editMode && 'edit-mode')} sx={StyleProps}>
+            <div className={`${StyleClassPrefix}-label`}>
                 Servant
             </div>
             {npLevel &&
-                <div className={classes.npLevel}>
+                <div className={`${StyleClassPrefix}-np-level`}>
                     NP
                 </div>
             }
             {level &&
-                <div className={classes.level}>
+                <div className={`${StyleClassPrefix}-level`}>
                     Level
                 </div>
             }
             {fouHp &&
-                <div className={classes.fouHp}>
+                <div className={`${StyleClassPrefix}-fou-hp`}>
                     Fou (HP)
                 </div>
             }
             {fouAtk &&
-                <div className={classes.fouAtk}>
+                <div className={`${StyleClassPrefix}-fou-atk`}>
                     Fou (ATK)
                 </div>
             }
             {skillLevels &&
-                <div className={classes.skillLevels}>
+                <div className={`${StyleClassPrefix}-skill-levels`}>
                     Skills
                 </div>
             }
             {bondLevel &&
-                <div className={classes.bondLevel}>
+                <div className={`${StyleClassPrefix}-bond-level`}>
                     Bond
                 </div>
             }
             {actions &&
-                <div className={classes.actions}>
+                <div className={`${StyleClassPrefix}-actions`}>
                     Actions
-            </div>}
-        </div>
+                </div>}
+        </Box>
     );
+    
 });

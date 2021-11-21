@@ -1,7 +1,7 @@
-import { fade, ThemeOptions } from '@material-ui/core';
-import { lightBlue, pink } from '@material-ui/core/colors';
-import overrides from './material-ui-overrides';
-import breakpoints from './theme-breakpoints';
+import { alpha, ThemeOptions } from '@mui/material';
+import { lightBlue, pink } from '@mui/material/colors';
+import { BreakpointOverrides } from './material-ui-breakpoints';
+import { ComponentsOverrides } from './material-ui-components';
 import { ThemeConstants } from './theme-constants';
 
 const themeDefaultLight = () => {
@@ -9,7 +9,7 @@ const themeDefaultLight = () => {
         spacing: ThemeConstants.Spacing,
         palette: {
             background: {
-                default: fade('#FFFFFF', 0.69),
+                default: alpha('#FFFFFF', 0.69),
                 paper: '#FFFFFF'
             },
             primary: {
@@ -22,10 +22,10 @@ const themeDefaultLight = () => {
              * This is already the default value but we include it anyways so that it can be
              * picked up by the `ThemeService`.
              */
-            divider: fade('#000000', 0.12) 
+            divider: alpha('#000000', 0.12) 
         },
-        breakpoints,
-        overrides
+        breakpoints: BreakpointOverrides,
+        components: ComponentsOverrides
     } as ThemeOptions;
 };
 

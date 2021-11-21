@@ -1,9 +1,15 @@
-import { createMuiTheme, Theme, ThemeProvider, Typography } from '@material-ui/core';
+import { createTheme, Typography, ThemeProvider } from '@mui/material';
+import { StyledEngineProvider, Theme } from '@mui/system';
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { BackgroundImageContext } from '../../contexts/background-image.context';
 import { ThemeInfo, ThemeService } from '../../services/user-interface/theme.service';
 import { ThemeBackground } from './theme-background.component';
 import { ThemeScrollbars } from './theme-scrollbars.component';
+
+declare module '@mui/styles/defaultTheme' {
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    interface DefaultTheme extends Theme { }
+}
 
 type Props = PropsWithChildren<{}>;
 
@@ -13,15 +19,15 @@ type Props = PropsWithChildren<{}>;
  */
 export const ThemeProviderWrapper = React.memo(({ children }: Props) => {
 
-    const [theme, setTheme] = useState<Theme>(createMuiTheme({})); // Initialize with default Material-UI theme
-    
+    const [theme, setTheme] = useState<Theme>(createTheme({})); // Initialize with default Material UI theme
+
     const [backgroundImageUrl, setBackgroundImageUrl] = useState<string>();
 
     useEffect(() => {
         const onThemeChangeSubscription = ThemeService.onThemeChange
             .subscribe((themeInfo: ThemeInfo) => {
                 const { themeOptions, backgroundImageUrl } = themeInfo;
-                setTheme(createMuiTheme(themeOptions));
+                setTheme(createTheme(themeOptions));
                 setBackgroundImageUrl(backgroundImageUrl);
             });
 
@@ -36,13 +42,15 @@ export const ThemeProviderWrapper = React.memo(({ children }: Props) => {
     return (
         <BackgroundImageContext.Provider value={backgroundImageContextValue}>
             <ThemeBackground />
-            <ThemeProvider theme={theme}>
-                <Typography component={'div'}>
-                    <ThemeScrollbars>
-                        {children}
-                    </ThemeScrollbars>
-                </Typography>
-            </ThemeProvider>
+            <StyledEngineProvider injectFirst>
+                <ThemeProvider theme={theme}>
+                    <Typography component={'div'}>
+                        <ThemeScrollbars>
+                            {children}
+                        </ThemeScrollbars>
+                    </Typography>
+                </ThemeProvider>
+            </StyledEngineProvider>
         </BackgroundImageContext.Provider>
     );
 

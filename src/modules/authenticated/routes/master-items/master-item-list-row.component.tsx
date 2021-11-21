@@ -1,6 +1,5 @@
 import { GameItem, GameItemQuantity } from '@fgo-planner/types';
-import { InputBaseComponentProps, makeStyles, StyleRules, TextField, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback } from 'react';
 import NumberFormat from 'react-number-format';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
@@ -24,28 +23,11 @@ const QuantityInputProps: InputBaseComponentProps = {
     max: MaxItemQuantity
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        alignContent: 'center',
-        alignItems: 'center',
-        height: 52,
-        padding: theme.spacing(0, 8, 0, 4),
-        fontSize: '0.875rem'
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterItemListRow'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+export const StyleClassPrefix = 'MasterItemListRow';
 
 export const MasterItemListRow = React.memo(({ key, item, editMode }: Props) => {
 
     const forceUpdate = useForceUpdate();
-
-    const classes = useStyles();
 
     const handleItemQuantityChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         const value = event.target.value;
@@ -80,13 +62,15 @@ export const MasterItemListRow = React.memo(({ key, item, editMode }: Props) => 
     }
 
     return (
-        <StaticListRowContainer borderTop>
-            <div className={classes.root} key={key}>
-                <MasterItemListRowLabel item={item.item} editMode={editMode} />
-                <div className="flex-fill" />
-                <div>
-                    {itemQuantityNode}
-                </div>
+        <StaticListRowContainer
+            key={key}
+            className={`${StyleClassPrefix}-root`}
+            borderTop
+        >
+            <MasterItemListRowLabel item={item.item} editMode={editMode} />
+            <div className="flex-fill" />
+            <div>
+                {itemQuantityNode}
             </div>
         </StaticListRowContainer>
     );

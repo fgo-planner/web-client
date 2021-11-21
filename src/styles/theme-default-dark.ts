@@ -1,16 +1,16 @@
-import { fade, ThemeOptions } from '@material-ui/core';
-import { pink } from '@material-ui/core/colors';
-import overrides from './material-ui-overrides';
-import breakpoints from './theme-breakpoints';
+import { alpha, ThemeOptions } from '@mui/material';
+import { pink } from '@mui/material/colors';
+import { BreakpointOverrides } from './material-ui-breakpoints';
+import { ComponentsOverrides } from './material-ui-components';
 import { ThemeConstants } from './theme-constants';
 
 const themeDefaultDark = () => {
     return {
         spacing: ThemeConstants.Spacing,
         palette: {
-            type: 'dark',
+            mode: 'dark',
             background: {
-                default: fade('#001E3C', 0.91),
+                default: alpha('#001E3C', 0.91),
                 paper: '#1A344F'
 
             },
@@ -22,8 +22,8 @@ const themeDefaultDark = () => {
             },
             divider: '#001E3C'
         },
-        breakpoints,
-        overrides
+        breakpoints: BreakpointOverrides,
+        components: ComponentsOverrides
     } as ThemeOptions;
 };
 

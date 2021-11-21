@@ -1,9 +1,9 @@
 import { GameServantRarity } from '@fgo-planner/types';
-import { Checkbox, IconButton, ListItemText, makeStyles, MenuItem, MenuProps, StyleRules, TextField, Theme, Tooltip } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Replay as ReplayIcon } from '@material-ui/icons';
+import { Replay as ReplayIcon } from '@mui/icons-material';
+import { Checkbox, IconButton, ListItemText, MenuItem, MenuProps, TextField, Tooltip } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
-import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
+import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../constants';
 import { GameServantClassSimplified, TextFieldChangeEvent } from '../../../../types/internal';
 import { MasterServantStatsFilterOptions, MasterServantStatsGroupBy } from './master-servant-stats.utils';
@@ -15,6 +15,22 @@ export type MasterServantStatsFilterResult = {
 type Props = {
     onFilterChange: (filter: MasterServantStatsFilterResult) => void;
 };
+
+const StyleClassPrefix = 'MasterServantStatsFilter';
+
+const StyleProps = {
+    display: 'flex',
+    height: 64,
+    mt: 6,
+    mb: -2,
+    [`& .${StyleClassPrefix}-multiSelectCheckbox`]: {
+        ml: -2,
+        pr: 3
+    },
+    [`& .${InputFieldContainerStyleClassPrefix}-root`]: {
+        px: 2
+    }
+} as SystemStyleObject<Theme>;
 
 /**
  * Value of the 'all' option in multi-select dropdowns.
@@ -30,8 +46,7 @@ const SelectMenuProps: Partial<MenuProps> = {
     transformOrigin: {
         vertical: 'top',
         horizontal: 'center'
-    },
-    getContentAnchorEl: null
+    }
 };
 
 const ClassFilterOptions = Object.values(GameServantClassSimplified);
@@ -47,26 +62,7 @@ const renderMultiSelectValue = (value: unknown): ReactNode => {
     return selected.join(', ');
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        height: 64,
-        margin: theme.spacing(6, 0, -2, 0)
-    },
-    multiSelectCheckbox: {
-        marginLeft: theme.spacing(-2),
-        paddingRight: theme.spacing(3)
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantStatsFilter'
-};
-
-const useStyles = makeStyles(style, styleOptions);
-
 export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) => {
-    const classes = useStyles();
     const [groupBy, setGroupBy] = useState<MasterServantStatsGroupBy>('rarity');
     const [classFilter, setClassFilter] = useState<GameServantClassSimplified[]>([...ClassFilterOptions]);
     const [rarityFilter, setRarityFilter] = useState<GameServantRarity[]>([...GameServantConstants.RarityValues]);
@@ -92,9 +88,9 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
 
     // TODO Move this to a util class?
     const handleMultiSelectChange = useCallback(<T,>(
-        values: string[], 
-        prevValues: T[], 
-        allValues: ReadonlyArray<T>, 
+        values: string[],
+        prevValues: T[],
+        allValues: ReadonlyArray<T>,
         setState: (value: SetStateAction<T[]>) => void
     ): void => {
 
@@ -154,8 +150,6 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
         setRarityFilter([...GameServantConstants.RarityValues]);
     }, []);
 
-    const multiSelectCheckboxClasses = { root: classes.multiSelectCheckbox };
-
     /*
      * Render the 'group by' select.
      */
@@ -201,7 +195,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
             >
                 <MenuItem value={MultiSelectAllOption}>
                     <Checkbox
-                        classes={multiSelectCheckboxClasses}
+                        className={`${StyleClassPrefix}-multiSelectCheckbox`}
                         checked={!!classFilter.length}
                         indeterminate={!allSelected && !!classFilter.length}
                     />
@@ -210,7 +204,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 {ClassFilterOptions.map(className => (
                     <MenuItem key={className} value={className}>
                         <Checkbox
-                            classes={multiSelectCheckboxClasses}
+                            className={`${StyleClassPrefix}-multiSelectCheckbox`}
                             checked={classFilter.indexOf(className) !== -1}
                         />
                         <ListItemText primary={className} />
@@ -243,8 +237,8 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 onChange={handleRarityFilterChange}
             >
                 <MenuItem value={MultiSelectAllOption}>
-                    <Checkbox 
-                        classes={multiSelectCheckboxClasses}
+                    <Checkbox
+                        className={`${StyleClassPrefix}-multiSelectCheckbox`}
                         checked={!!rarityFilter.length}
                         indeterminate={!allSelected && !!rarityFilter.length}
                     />
@@ -253,7 +247,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 {GameServantConstants.RarityValues.map(rarity => (
                     <MenuItem key={rarity} value={rarity}>
                         <Checkbox
-                            classes={multiSelectCheckboxClasses}
+                            className={`${StyleClassPrefix}-multiSelectCheckbox`}
                             checked={rarityFilter.indexOf(rarity) !== -1}
                         />
                         <ListItemText primary={`${rarity} \u2605`} />
@@ -264,11 +258,11 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
     }
 
     return (
-        <div className={classes.root}>
-            <InputFieldContainer className="px-2" width={240}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <InputFieldContainer width={240}>
                 {groupBySelect}
             </InputFieldContainer>
-            <InputFieldContainer className="px-2" width={240}>
+            <InputFieldContainer width={240}>
                 {/* Only one of the below can be non-null at any given time. */}
                 {classFilterSelect}
                 {rarityFilterSelect}
@@ -279,9 +273,9 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                         color="secondary"
                         children={<ReplayIcon />}
                         onClick={handleResetFilterClick}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>
-        </div>
+        </Box>
     );
 });

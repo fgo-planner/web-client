@@ -1,5 +1,4 @@
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 
@@ -9,33 +8,24 @@ type Props = {
     viewLayout?: any; // TODO Make use of this
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: theme.spacing(4, 8, 4, 6),
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontWeight: 500,
-        fontSize: '0.875rem'
-    }
-} as StyleRules);
+const StyleClassPrefix = 'MasterItemListHeader';
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterItemListHeader'
-};
+const StyleProps = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    px: 6,
+    pr: 8,
+    py: 4,
+    fontFamily: ThemeConstants.FontFamilyGoogleSans,
+    fontWeight: 500,
+    fontSize: '0.875rem'
+} as SystemStyleObject<Theme>;
 
-const useStyles = makeStyles(style, styleOptions);
-
-export const MasterItemListHeader = React.memo(({ categoryLabel, showQuantityLabel }: Props) => {
-    const classes = useStyles();
-    return (
-        <div className={classes.root}>
-            <div>
-                {categoryLabel}
-            </div>
-            {showQuantityLabel && <div>
-                Quantity
-            </div>}
+export const MasterItemListHeader = React.memo(({ categoryLabel, showQuantityLabel }: Props) => (
+    <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+        <div>
+            {categoryLabel}
         </div>
-    );
-});
+        {showQuantityLabel && <div>Quantity</div>}
+    </Box>
+));

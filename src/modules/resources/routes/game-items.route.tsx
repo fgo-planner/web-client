@@ -1,5 +1,5 @@
-import { fade, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/styles';
+import { alpha } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React from 'react';
 import { GameItemThumbnail } from '../../../components/game/item/game-item-thumbnail.component';
@@ -7,51 +7,51 @@ import { LayoutPanelScrollable } from '../../../components/layout/layout-panel-s
 import { PageTitle } from '../../../components/text/page-title.component';
 import { useGameItemList } from '../../../hooks/data/use-game-item-list.hook';
 
-const style = (theme: Theme) => ({
-    header: {
+const StyleClassPrefix = 'GameItems';
+
+const StyleProps = (theme: Theme) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    [`& .${StyleClassPrefix}-header`]: {
         height: 64,
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
-        borderBottomColor: theme.palette.divider,
+        borderBottomColor: 'divider',
     },
-    row: {
+    [`& .${StyleClassPrefix}-row`]: {
         height: 52,
-        padding: theme.spacing(0, 4),
+        px: 4,
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
-        borderBottomColor: theme.palette.divider,
+        borderBottomColor: 'divider',
         '&:hover': {
-            background: fade(theme.palette.text.primary, 0.07)
+            background: alpha(theme.palette.text.primary, 0.07)
         }
     },
-    footer: {
+    [`& .${StyleClassPrefix}-footer`]: {
         height: 64,
         borderTopWidth: 1,
         borderTopStyle: 'solid',
-        borderTopColor: theme.palette.divider,
+        borderTopColor: 'divider',
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'GameItemsRoute'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>);
 
 export const GameItemsRoute = React.memo(() => {
-    const classes = useStyles();
+
     const gameItems = useGameItemList();
+
     return (
-        <div className="flex column full-height">
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <PageTitle>Item List</PageTitle>
             <LayoutPanelScrollable
                 className="m-4 scrollbar-track-border"
                 headerContents={
-                    <div className={classes.header}>HEADER TEST</div>
+                    <div className={`${StyleClassPrefix}-header`}>HEADER TEST</div>
                 }
             >
                 {gameItems?.map((item, key) => (
-                    <div key={key} className={clsx(classes.row, 'flex align-center')}>
+                    <div key={key} className={clsx(`${StyleClassPrefix}-row`, 'flex align-center')}>
                         <GameItemThumbnail
                             item={item}
                             size={42}
@@ -64,6 +64,7 @@ export const GameItemsRoute = React.memo(() => {
                     </div>
                 ))}
             </LayoutPanelScrollable>
-        </div>
+        </Box>
     );
+
 });

@@ -1,6 +1,6 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { IconButton, Tooltip } from '@material-ui/core';
-import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@material-ui/icons';
+import { IconButton, Tooltip } from '@mui/material';
+import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
@@ -87,13 +87,13 @@ export const MasterServantStatsRoute = React.memo(() => {
                         component={Link}
                         to="../servants"
                         children={<FormatListBulletedIcon />}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>,
             <Tooltip key="export" title="Download servant stats" placement="right">
                 <div>
                     {/* TODO Implement this */}
-                    <IconButton children={<GetAppIcon />} disabled />
+                    <IconButton children={<GetAppIcon />} disabled size="large" />
                 </div>
             </Tooltip>
         ];

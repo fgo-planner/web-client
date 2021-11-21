@@ -1,6 +1,6 @@
 import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Link, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
-import { ClassNameMap, WithStylesOptions } from '@material-ui/styles';
+import { Link, Tooltip } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
@@ -10,8 +10,8 @@ import { DataPointListItem } from '../../../../components/list/data-point-list-i
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { PlannerComputationUtils, ResultType1 } from '../../../../utils/planner/planner-computation.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
+import { PlannerComputationUtils, ResultType1 } from '../../../../utils/planner/planner-computation.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
 type Props = {
@@ -24,21 +24,60 @@ type Props = {
 
 const FormId = 'master-servant-info-panel-form';
 
-const renderServantLinks = (
-    classes: ClassNameMap,
-    servant: Readonly<GameServant> | undefined
-): ReactNode => {
+const StyleClassPrefix = 'MasterServantInfoPanel';
+
+const renderFouLevels = (activeServant: Readonly<MasterServant>): JSX.Element => {
+    const { fouAtk, fouHp } = activeServant;
+    return (
+        <div className={`${StyleClassPrefix}-skill-level-stat`}>
+            {fouHp ?? '\u2014'}
+            <div className={`${StyleClassPrefix}-servant-stats-delimiter`}>/</div>
+            {fouAtk ?? '\u2014'}
+        </div>
+    );
+};
+
+const renderSkillLevels = (activeServant: Readonly<MasterServant>): JSX.Element => {
+    const { skills } = activeServant;
+    return (
+        <div className={`${StyleClassPrefix}-skill-level-stat`}>
+            {skills[1] ?? '\u2013'}
+            <div className={`${StyleClassPrefix}-servant-stats-delimiter`}>/</div>
+            {skills[2] ?? '\u2013'}
+            <div className={`${StyleClassPrefix}-servant-stats-delimiter`}>/</div>
+            {skills[3] ?? '\u2013'}
+        </div>
+    );
+};
+
+const renderBondLevel = (bond?: MasterServantBondLevel): JSX.Element => {
+    if (bond == null) {
+        return (
+            <div className={`${StyleClassPrefix}-bond-level-stat`}>
+                {'\u2014'}
+            </div>
+        );
+    }
+    return (
+        <div className={`${StyleClassPrefix}-bond-level-stat`}>
+            <GameServantBondIcon bond={bond} size={24} />
+            <div className="pl-1">{bond}</div>
+        </div>
+    );
+};
+
+const renderServantLinks = (servant: Readonly<GameServant> | undefined): ReactNode => {
     const links = servant?.metadata.links;
     if (!links?.length) {
         return null;
     }
     return (
-        <div className={classes.externalLinksContainer}>
-            <div className={classes.sectionTitle}>
+        <div className={`${StyleClassPrefix}-external-links-container`}>
+            <div className={`${StyleClassPrefix}-section-title`}>
                 Links
             </div>
             {links.map(({ label, url }, index) => (
-                <div className={classes.externalLink}>
+                <div className={`${StyleClassPrefix}-external-link`}>
                     <Link key={index} color="secondary" href={url} target="_blank">
                         {label}
                     </Link>
@@ -48,104 +87,96 @@ const renderServantLinks = (
     );
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%'
-    },
-    title: {
+const StyleProps = {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    [`& .${StyleClassPrefix}-title`]: {
         display: 'flex',
         flexWrap: 'nowrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: theme.spacing(4, 6)
+        px: 6,
+        py: 4
     },
-    sectionTitle: {
+    [`& .${StyleClassPrefix}-section-title`]: {
         fontSize: '0.875rem',
         fontWeight: 500,
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        padding: theme.spacing(1, 0)
+        py: 1
     },
-    helperText: {
+    [`& .${StyleClassPrefix}-helper-text`]: {
         fontSize: '0.875rem',
-        color: theme.palette.text.secondary,
+        color: 'text.secondary',
         fontStyle: 'italic',
         lineHeight: '32px'
     },
-    servantName: {
+    [`& .${StyleClassPrefix}-servant-name`]: {
         fontSize: '1.125rem',
         fontWeight: 500,
         fontFamily: ThemeConstants.FontFamilyGoogleSans
     },
-    rarityClassIcon: {
+    [`& .${StyleClassPrefix}-rarity-class-icon`]: {
         minWidth: 56,
-        paddingLeft: theme.spacing(2),
+        pl: 2,
         display: 'flex',
         flexWrap: 'nowrap',
         justifyContent: 'space-between'
     },
-    scrollContainer: {
+    [`& .${StyleClassPrefix}-scroll-container`]: {
         overflowY: 'auto',
         height: '100%'
     },
-    formContainer: {
-        padding: theme.spacing(4)
+    [`& .${StyleClassPrefix}-servant-stats-container`]: {
+        px: 6,
+        pt: 2,
+        pb: 4
     },
-    servantStatsContainer: {
-        padding: theme.spacing(2, 6, 4, 6)
-    },
-    servantStat: {
+    [`& .${StyleClassPrefix}-servant-stat`]: {
         justifyContent: 'space-between',
     },
-    servantStatsDelimiter: {
+    [`& .${StyleClassPrefix}-servant-stats-delimiter`]: {
         width: '1rem'
     },
-    skillLevelStat: {
+    [`& .${StyleClassPrefix}-skill-level-stat`]: {
         display: 'flex',
         textAlign: 'center',
         alignItems: 'center',
     },
-    bondLevelStat: {
+    [`& .${StyleClassPrefix}-bond-level-stat`]: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
     },
-    divider: {
+    [`& .${StyleClassPrefix}-divider`]: {
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
-        borderBottomColor: theme.palette.divider,
+        borderBottomColor: 'divider',
     },
-    materialStatsContainer: {
-        paddingBottom: theme.spacing(4)
+    [`& .${StyleClassPrefix}-material-stats-container`]: {
+        pb: 4
     },
-    materialStatsList: {
-        paddingTop: theme.spacing(2)
+    [`& .${StyleClassPrefix}-material-stats-list`]: {
+        pt: 2
     },
-    materialStat: {
+    [`& .${StyleClassPrefix}-material-stat`]: {
         cursor: 'default',
         justifyContent: 'space-between',
-        marginLeft: theme.spacing(-1)
+        ml: -1
     },
-    materialStatLabel: {
+    [`& .${StyleClassPrefix}-material-stat-label`]: {
         display: 'flex',
         alignItems: 'center'
     },
-    externalLinksContainer: {
-        paddingTop: theme.spacing(2),
-        paddingBottom: theme.spacing(6)
+    [`& .${StyleClassPrefix}-external-links-container`]: {
+        pt: 2,
+        pb: 6
     },
-    externalLink: {
+    [`& .${StyleClassPrefix}-external-link`]: {
         fontSize: '0.875rem',
-        paddingTop: theme.spacing(2)
+        pt: 2
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantInfoPanel'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const MasterServantInfoPanel = React.memo((props: Props) => {
 
@@ -156,8 +187,6 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         editMode,
         onStatsChange
     } = props;
-
-    const classes = useStyles();
 
     const gameItemMap = useGameItemMap();
     const gameServantMap = useGameServantMap();
@@ -208,17 +237,17 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
     const servantNameNode = useMemo(() => {
         if (!servant) {
             return (
-                <div className={classes.title}>
+                <div className={`${StyleClassPrefix}-title`}>
                     Unknown Servant
                 </div>
             );
         }
         return (
-            <div className={classes.title}>
-                <div className={clsx(classes.servantName, 'truncate')}>
+            <div className={`${StyleClassPrefix}-title`}>
+                <div className={clsx(`${StyleClassPrefix}-servant-name`, 'truncate')}>
                     {servant.name}
                 </div>
-                <div className={classes.rarityClassIcon}>
+                <div className={`${StyleClassPrefix}-rarity-class-icon`}>
                     <div>
                         {`${servant.rarity} \u2605`}
                     </div>
@@ -229,47 +258,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 </div>
             </div>
         );
-    }, [classes, servant]);
-
-    const renderFouLevels = useCallback((activeServant: Readonly<MasterServant>): JSX.Element => {
-        const { fouAtk, fouHp } = activeServant;
-        return (
-            <div className={classes.skillLevelStat}>
-                {fouHp ?? '\u2014'}
-                <div className={classes.servantStatsDelimiter}>/</div>
-                {fouAtk ?? '\u2014'}
-            </div>
-        );
-    }, [classes]);
-
-    const renderSkillLevels = useCallback((activeServant: Readonly<MasterServant>): JSX.Element => {
-        const { skills } = activeServant;
-        return (
-            <div className={classes.skillLevelStat}>
-                {skills[1] ?? '\u2013'}
-                <div className={classes.servantStatsDelimiter}>/</div>
-                {skills[2] ?? '\u2013'}
-                <div className={classes.servantStatsDelimiter}>/</div>
-                {skills[3] ?? '\u2013'}
-            </div>
-        );
-    }, [classes]);
-
-    const renderBondLevel = useCallback((bond?: MasterServantBondLevel): JSX.Element => {
-        if (bond == null) {
-            return (
-                <div className={classes.bondLevelStat}>
-                    {'\u2014'}
-                </div>
-            );
-        }
-        return (
-            <div className={classes.bondLevelStat}>
-                <GameServantBondIcon bond={bond} size={24} />
-                <div className="pl-1">{bond}</div>
-            </div>
-        );
-    }, [classes]);
+    }, [servant]);
 
     const servantStatsNode: ReactNode = useMemo(() => {
         if (!activeServant) {
@@ -277,53 +266,52 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         }
         if (editMode) {
             return (
-                <div className={classes.formContainer}>
-                    <MasterServantEditForm
-                        formId={FormId}
-                        masterServant={activeServant}
-                        bondLevels={bondLevels}
-                        unlockedCostumes={unlockedCostumes}
-                        onStatsChange={handleStatsChange}
-                        layout="panel"
-                    />
-                </div>
+                <MasterServantEditForm
+                    formId={FormId}
+                    className="p-4"
+                    masterServant={activeServant}
+                    bondLevels={bondLevels}
+                    unlockedCostumes={unlockedCostumes}
+                    onStatsChange={handleStatsChange}
+                    layout="panel"
+                />
             );
         } else {
             const labelWidth = '60%'; // TODO Make this a constant
             return (
-                <div className={classes.servantStatsContainer}>
+                <div className={`${StyleClassPrefix}-servant-stats-container`}>
                     <DataPointListItem
-                        className={classes.servantStat}
+                        className={`${StyleClassPrefix}-servant-stat`}
                         label="Level"
                         labelWidth={labelWidth}
                         value={activeServant.level}
                     />
                     <DataPointListItem
-                        className={classes.servantStat}
+                        className={`${StyleClassPrefix}-servant-stat`}
                         label="Ascension"
                         labelWidth={labelWidth}
                         value={activeServant.ascension}
                     />
                     <DataPointListItem
-                        className={classes.servantStat}
+                        className={`${StyleClassPrefix}-servant-stat`}
                         label="Fou (HP/ATK)"
                         labelWidth={labelWidth}
                         value={renderFouLevels(activeServant)}
                     />
                     <DataPointListItem
-                        className={classes.servantStat}
+                        className={`${StyleClassPrefix}-servant-stat`}
                         label="Skills"
                         labelWidth={labelWidth}
                         value={renderSkillLevels(activeServant)}
                     />
                     <DataPointListItem
-                        className={classes.servantStat}
+                        className={`${StyleClassPrefix}-servant-stat`}
                         label="Noble Phantasm"
                         labelWidth={labelWidth}
                         value={activeServant.np}
                     />
                     <DataPointListItem
-                        className={classes.servantStat}
+                        className={`${StyleClassPrefix}-servant-stat`}
                         label="Bond"
                         labelWidth={labelWidth}
                         value={renderBondLevel(bondLevels[activeServant.gameId])}
@@ -334,12 +322,8 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
     }, [
         activeServant,
         bondLevels,
-        classes,
         editMode,
         handleStatsChange,
-        renderBondLevel,
-        renderFouLevels,
-        renderSkillLevels,
         unlockedCostumes
     ]);
 
@@ -357,7 +341,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 const item = gameItemMap[itemId];
                 const { ascensions, skills, appendSkills, costumes, total } = stats;
                 const label = (
-                    <div className={classes.materialStatLabel}>
+                    <div className={`${StyleClassPrefix}-material-stat-label`}>
                         <GameItemThumbnail item={item} size={24} />
                         <div className="pl-2 truncate">
                             {item.name}
@@ -383,7 +367,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                     >
                         <div>
                             <DataPointListItem
-                                className={classes.materialStat}
+                                className={`${StyleClassPrefix}-material-stat`}
                                 label={label}
                                 labelWidth={labelWidth}
                                 value={stats.total}
@@ -394,43 +378,45 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
             });
         } else {
             servantMaterialList = (
-                <div className={classes.helperText}>
+                <div className={`${StyleClassPrefix}-helper-text`}>
                     Servant is fully upgraded
                 </div>
             );
         }
 
         return (
-            <div className={classes.materialStatsContainer}>
-                <div className={classes.sectionTitle}>
+            <div className={`${StyleClassPrefix}-material-stats-container`}>
+                <div className={`${StyleClassPrefix}-section-title`}>
                     Materials Needed
                 </div>
-                <div className={classes.materialStatsList}>
+                <div className={`${StyleClassPrefix}-material-stats-list`}>
                     {servantMaterialList}
                 </div>
             </div>
         );
-    }, [classes, gameItemMap, servantMaterialStats]);
+    }, [gameItemMap, servantMaterialStats]);
 
     if (!activeServant) {
         return (
-            <div className={clsx(classes.helperText, 'px-6 py-4')}>
+            // FIXME Inline sx prop
+            <Box className={`${StyleClassPrefix}-helper-text`} sx={{ px: 6, py: 4 }}>
                 No servant selected
-            </div>
+            </Box>
         );
     }
 
     return (
-        <div className={classes.root}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             {servantNameNode}
-            <div className={classes.scrollContainer}>
+            <div className={`${StyleClassPrefix}-scroll-container`}>
                 {servantStatsNode}
-                <div className={classes.divider} />
-                <div className="px-6 pt-4">
+                <div className={`${StyleClassPrefix}-divider`} />
+                {/* FIXME Inline sx prop */}
+                <Box sx={{ px: 6, pt: 4 }}>
                     {servantMaterialStatsNode}
-                    {renderServantLinks(classes, servant)}
-                </div>
+                    {renderServantLinks(servant)}
+                </Box>
             </div>
-        </div>
+        </Box>
     );
 });

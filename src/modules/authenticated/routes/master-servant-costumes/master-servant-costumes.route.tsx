@@ -1,6 +1,6 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { Fab, IconButton, Tooltip } from '@material-ui/core';
-import { Clear as ClearIcon, Edit as EditIcon, FormatListBulleted as FormatListBulletedIcon, Save as SaveIcon } from '@material-ui/icons';
+import { Fab, IconButton, Tooltip } from '@mui/material';
+import { Clear as ClearIcon, Edit as EditIcon, FormatListBulleted as FormatListBulletedIcon, Save as SaveIcon } from '@mui/icons-material';
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
@@ -126,7 +126,7 @@ export const MasterServantCostumesRoute = React.memo(() => {
                         component={Link}
                         to="../servants"
                         children={<FormatListBulletedIcon />}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>
         );

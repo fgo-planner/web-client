@@ -1,34 +1,31 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { MenuItem, StyleRules, TextField, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { ChangeEvent, PureComponent, ReactNode } from 'react';
+import { MenuItem, TextField } from '@mui/material';
+import { SystemStyleObject, Theme } from '@mui/system';
+import { ChangeEvent, CSSProperties, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { Nullable, ReadonlyPartialArray, WithStylesProps } from '../../../../types/internal';
+import { Nullable, ReadonlyPartialArray } from '../../../../types/internal';
 
 type Props = {
     masterAccountList: ReadonlyPartialArray<MasterAccount>;
-} & WithStylesProps;
+};
 
 type State = {
     currentMasterAccountId: string;
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        width: theme.spacing(56),
-        background: theme.palette.background.default,
-    },
-    selectOption: {
-        height: theme.spacing(10)
-    }
-} as StyleRules);
+const StyleClassPrefix = 'master-account-select';
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'AppBarMasterAccountSelect'
-};
+const styles = {
+    width: 224,
+    bgcolor: 'background.default'
+} as SystemStyleObject<Theme>;
 
-export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
+const selectOptionStyles = {
+    height: 40
+} as CSSProperties;
+
+export const AppBarMasterAccountSelect = class extends PureComponent<Props, State> {
 
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
@@ -52,14 +49,15 @@ export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class e
     }
 
     render(): ReactNode {
-        const { classes, masterAccountList } = this.props;
+        const { masterAccountList } = this.props;
         const { currentMasterAccountId } = this.state;
         return (
             <TextField
                 select
                 variant="outlined"
                 size="small"
-                className={classes.root}
+                className={StyleClassPrefix}
+                sx={styles}
                 value={currentMasterAccountId}
                 onChange={this._handleInputChange}
             >
@@ -69,14 +67,13 @@ export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class e
     }
 
     private _renderSelectOption(account: Partial<MasterAccount>, index: number): ReactNode {
-        const { classes } = this.props;
         let itemLabel = account.name || `Account ${index + 1}`;
         if (account.friendId) {
             itemLabel += ` (${account.friendId})`;
         }
         return (
             <MenuItem
-                className={classes.selectOption}
+                style={selectOptionStyles}
                 value={account._id}
                 key={index}
             >
@@ -103,4 +100,4 @@ export const AppBarMasterAccountSelect = withStyles(style, styleOptions)(class e
         });
     }
 
-});
+};

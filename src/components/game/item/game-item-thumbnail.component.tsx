@@ -1,9 +1,8 @@
 import { GameItem } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React from 'react';
+import React, { CSSProperties, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 
 type Props = {
     item: Readonly<GameItem>;
@@ -17,11 +16,13 @@ const ImageBaseUrl = AssetConstants.ItemImageBaseUrl;
 
 const DefaultSize = 42;
 
-const style = (theme: Theme) => ({
-    thumbnailContainer: {
+export const StyleClassPrefix = 'GameItemThumbnail';
+
+const StyleProps = {
+    [`& .${StyleClassPrefix}-composite-container`]: {
         position: 'relative'
     },
-    foreground: {
+    [`& .${StyleClassPrefix}-foreground`]: {
         position: 'absolute',
         width: '100%',
         height: '100%',
@@ -29,57 +30,47 @@ const style = (theme: Theme) => ({
         boxSizing: 'border-box',
         zIndex: 1
     },
-    background: {
+    [`& .${StyleClassPrefix}-background`]: {
         position: 'absolute',
         top: 0,
         left: 0,
         width: '100%',
         height: '100%'
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'GameItemThumbnail'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const GameItemThumbnail = React.memo((props: Props) => {
 
     const {
         item,
         showBackground,
+        size,
         enableLink,
         openLinkInNewTab
     } = props;
-
-    let { size } = props;
-
-    const classes = useStyles();
 
     const itemId = item._id;
     const { name, background } = item;
 
     const imageUrl = `${ImageBaseUrl}/${itemId}.png`;
 
-    size = size || DefaultSize;
-    const sizeStyle = {
-        width: size,
-        height: size
-    } as React.CSSProperties;
+    const sizeStyle = useMemo(() => ({
+        width: size || DefaultSize,
+        height: size || DefaultSize
+    } as CSSProperties), [size]);
 
     let thumbnail: JSX.Element | null;
     if (showBackground) {
         const backgroundUrl = AssetConstants.ItemBackgroundMap[background];
         thumbnail = (
-            <div className={classes.thumbnailContainer} style={sizeStyle} >
+            <div className={`${StyleClassPrefix}-composite-container`} style={sizeStyle}>
                 <img
-                    className={classes.foreground}
+                    className={`${StyleClassPrefix}-foreground`}
                     src={imageUrl}
                     alt={name}
                 />
                 <img
-                    className={classes.background}
+                    className={`${StyleClassPrefix}-background`}
                     src={backgroundUrl}
                     alt={background}
                 />
@@ -89,16 +80,27 @@ export const GameItemThumbnail = React.memo((props: Props) => {
         thumbnail = <img src={imageUrl} style={sizeStyle} alt={name} />;
     }
 
-    if (!enableLink) {
-        return thumbnail;
+    /**
+     * If link is enabled, then wrap the thumbnail in a link component.
+     */
+    if (enableLink) {
+        const href = `/resources/items/${itemId}`;
+        const target = openLinkInNewTab ? '_blank' : undefined;
+        thumbnail = (
+            <Link
+                // style={sizeStyle}
+                to={href}
+                target={target}
+            >
+                {thumbnail}
+            </Link>
+        );
     }
 
-    const href = `/resources/items/${itemId}`;
-    const target = openLinkInNewTab ? '_blank' : undefined;
     return (
-        <Link to={href} target={target} style={sizeStyle}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             {thumbnail}
-        </Link>
+        </Box>
     );
 
 });

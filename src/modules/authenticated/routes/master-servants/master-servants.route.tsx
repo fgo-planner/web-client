@@ -1,7 +1,7 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Fab, IconButton, makeStyles, StyleRules, Theme, Tooltip } from '@material-ui/core';
-import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@material-ui/icons';
-import { WithStylesOptions } from '@material-ui/styles';
+import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
+import { Fab, IconButton, Tooltip } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import lodash from 'lodash';
 import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -70,29 +70,27 @@ const findByGameIdAndInstanceId = (
     }
 };
 
-const style = (theme: Theme) => ({
-    infoPanelContainer: {
+const StyleClassPrefix = 'MasterServants';
+
+const StyleProps = (theme: Theme) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    [`& .${StyleClassPrefix}-info-panel-container`]: {
         width: 320,
         height: 'calc(100% - 84px)',
-        padding: theme.spacing(4, 4, 4, 0),
+        pr: 4,
+        py: 4,
         boxSizing: 'border-box',
-        [theme.breakpoints.down('lg')]: {
+        [theme.breakpoints.down('xl')]: {
             width: 300
         }
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServants'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>);
 
 export const MasterServantsRoute = React.memo(() => {
 
     const forceUpdate = useForceUpdate();
-
-    const classes = useStyles();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     /**
@@ -446,7 +444,7 @@ export const MasterServantsRoute = React.memo(() => {
                         onClick={handleAddServantButtonClick}
                         children={<AddIcon />}
                         disabled={!editMode}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>,
             <Tooltip key="costumes" title="Costumes" placement="right">
@@ -455,7 +453,7 @@ export const MasterServantsRoute = React.memo(() => {
                         component={Link}
                         to="servants/costumes"
                         children={<AccessibilityNewIcon />}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>,
             <Tooltip key="stats" title="Servant stats" placement="right">
@@ -464,7 +462,7 @@ export const MasterServantsRoute = React.memo(() => {
                         component={Link}
                         to="servants/stats"
                         children={<EqualizerIcon />}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>,
             <Tooltip key="import" title="Upload servant data" placement="right">
@@ -473,13 +471,13 @@ export const MasterServantsRoute = React.memo(() => {
                         component={Link}
                         to="./data/import/servants"
                         children={<PublishIcon />}
-                    />
+                        size="large" />
                 </div>
             </Tooltip>,
             <Tooltip key="export" title="Download servant data" placement="right">
                 <div>
                     {/* TODO Implement this */}
-                    <IconButton children={<GetApp />} disabled />
+                    <IconButton children={<GetApp />} disabled size="large" />
                 </div>
             </Tooltip>
         ];
@@ -532,7 +530,7 @@ export const MasterServantsRoute = React.memo(() => {
     }
 
     return (
-        <div className="flex column full-height">
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <PageTitle>
                 {editMode ?
                     'Edit Servant Roster' :
@@ -566,7 +564,7 @@ export const MasterServantsRoute = React.memo(() => {
                             />
                         }
                     />
-                    {md && <div className={classes.infoPanelContainer}>
+                    {md && <div className={`${StyleClassPrefix}-info-panel-container`}>
                         <LayoutPanelContainer className="flex column full-height" autoHeight>
                             <MasterServantInfoPanel
                                 activeServant={activeServantRef.current}
@@ -599,6 +597,6 @@ export const MasterServantsRoute = React.memo(() => {
                 confirmButtonLabel="Delete"
                 onClose={handleDeleteServantDialogClose}
             />
-        </div>
+        </Box>
     );
 });

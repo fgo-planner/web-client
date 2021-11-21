@@ -1,11 +1,10 @@
 import { GameSoundtrack } from '@fgo-planner/types';
-import { makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
+import { alpha, Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
-import { MasterSoundtracksListRow } from './master-soundtracks-list-row.component';
+import { MasterSoundtracksListRow, StyleClassPrefix as MasterSoundtracksListRowStyleClassPrefix } from './master-soundtracks-list-row.component';
 
 type Props = {
     unlockedSoundtracksSet: Set<number>;
@@ -32,17 +31,44 @@ const sortByPriority = (gameSoundtrackList: GameSoundtrackList | undefined): Gam
     return [...gameSoundtrackList].sort(prioritySort);
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        paddingBottom: theme.spacing(20)
+const StyleClassPrefix = 'MasterSoundtracksList';
+
+const StyleProps = {
+    pb: 20,
+    [`& .${MasterSoundtracksListRowStyleClassPrefix}-root`]: {
+        height: 52,
+        display: 'flex',
+        alignItems: 'center',
+        fontSize: '0.875rem',
+        '&:not(:hover) .play-icon': {
+            opacity: 0
+        },
+        [`& .${MasterSoundtracksListRowStyleClassPrefix}-unlocked-status`]: {
+            width: 42,
+            px: 2,
+            textAlign: 'center',
+        },
+        [`& .${MasterSoundtracksListRowStyleClassPrefix}-thumbnail`]: {
+            width: 96,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: alpha('#ffffff', 0.69),
+            mr: 6
+        },
+        [`& .${MasterSoundtracksListRowStyleClassPrefix}-title`]: {
+            flex: '1 1'
+        },
+        [`& .${MasterSoundtracksListRowStyleClassPrefix}-unlocked-icon`]: {
+            color: 'limegreen'
+        },
+        [`& .${MasterSoundtracksListRowStyleClassPrefix}-play-button`]: {
+            width: 48,
+            pr: 24,
+            pl: 4
+        }
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterSoundtracksList'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const MasterSoundtracksList = React.memo((props: Props) => {
 
@@ -54,8 +80,6 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
         editMode,
         onPlayButtonClick
     } = props;
-
-    const classes = useStyles();
 
     const gameSoundtrackList = useGameSoundtrackList();
 
@@ -98,9 +122,9 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
     };
 
     return (
-        <div className={classes.root}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             {gameSoundtrackSortedList.map(renderSoundtrackRow)}
-        </div>
+        </Box>
     );
 
 });

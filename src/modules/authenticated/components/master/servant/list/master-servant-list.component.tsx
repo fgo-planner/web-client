@@ -1,7 +1,7 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Button, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { PersonAddOutlined } from '@material-ui/icons';
+import { PersonAddOutlined } from '@mui/icons-material';
+import { Button } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useCallback } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
@@ -10,8 +10,9 @@ import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { ReadonlyPartial } from '../../../../../../types/internal';
 import { ArrayUtils } from '../../../../../../utils/array.utils';
-import { MasterServantListVisibleColumns } from './master-servant-list-columns';
-import { MasterServantListRow } from './master-servant-list-row.component';
+import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
+import { StyleClassPrefix as MasterServantListRowLabelStyleClassPrefix } from './master-servant-list-row-label.component';
+import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './master-servant-list-row.component';
 
 type Props = {
     masterServants: MasterServant[];
@@ -28,36 +29,117 @@ type Props = {
     onDeleteServant?: (servant: MasterServant) => void;
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        // minWidth: `${theme.breakpoints.width('lg')}px`,
-    },
-    addServantRow: {
+const StyleClassPrefix = 'MasterServantList';
+
+const StyleProps = {
+    [`& .${StyleClassPrefix}-add-servant-row`]: {
         borderTopWidth: 1,
         borderTopStyle: 'solid',
-        borderTopColor: theme.palette.divider
+        borderTopColor: 'divider'
     },
-    addServantRowButton: {
+    [`& .${StyleClassPrefix}-add-servant-row-button`]: {
         width: '100%',
         height: 54
     },
-    addServantRowLabel: {
+    [`& .${StyleClassPrefix}-add-servant-row-label`]: {
         display: 'flex',
         alignItems: 'center',
         fontFamily: ThemeConstants.FontFamilyRoboto,
         textTransform: 'uppercase',
         fontSize: '0.875rem',
         '& >div': {
-            paddingLeft: theme.spacing(3)
+            pl: 3
+        }
+    },
+    [`& .${MasterServantListRowStyleClassPrefix}-root`]: {
+        flex: 1,
+        display: 'flex',
+        alignContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        height: 52,
+        pl: 4,
+        fontSize: '0.875rem',
+        [`& .${MasterServantListRowStyleClassPrefix}-np-level`]: {
+            flex: ColumnWidths.npLevel,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '& img': {
+                pr: 1,
+                width: '18px',
+                height: '18px'
+            }
+        },
+        [`& .${MasterServantListRowStyleClassPrefix}-level`]: {
+            flex: ColumnWidths.level,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '&>.value': {
+                width: '28px',
+                textAlign: 'right',
+                pr: 3
+            },
+            '&>img': {
+                width: '16px',
+                height: '16px'
+            },
+            '&>.ascension': {
+                width: '16px'
+            }
+        },
+        [`& .${MasterServantListRowStyleClassPrefix}-fou-hp`]: {
+            flex: ColumnWidths.fouHp
+        },
+        [`& .${MasterServantListRowStyleClassPrefix}-fou-atk`]: {
+            flex: ColumnWidths.fouAtk
+        },
+        [`& .${MasterServantListRowStyleClassPrefix}-skill-levels`]: {
+            flex: ColumnWidths.skillLevels,
+            display: 'flex',
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '&>.value': {
+                width: '1.25rem'
+            },
+        },
+        [`& .${MasterServantListRowStyleClassPrefix}-bond-level`]: {
+            flex: ColumnWidths.bondLevel,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '&>.value': {
+                pl: 1.5,
+                width: '1.25rem',
+                textAlign: 'left'
+            }
+        },
+        [`& .${MasterServantListRowStyleClassPrefix}-actions`]: {
+            width: ColumnWidths.actions,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        [`& .${MasterServantListRowLabelStyleClassPrefix}-root`]: {
+            display: 'flex',
+            alignItems: 'center',
+            flex: ColumnWidths.label,
+            /**
+             * This fixes text truncation issues inside flex box.
+             * @see https://css-tricks.com/flexbox-truncated-text/
+             */
+            minWidth: 0,
+            '& > :not(:first-child)': {
+                pl: 4
+            },
+            [`& .${MasterServantListRowLabelStyleClassPrefix}-rarity`]: {
+                minWidth: 24
+            }
         }
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterServantList'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const MasterServantList = React.memo((props: Props) => {
     
@@ -74,8 +156,6 @@ export const MasterServantList = React.memo((props: Props) => {
         onEditServant,
         onDeleteServant
     } = props;
-
-    const classes = useStyles();
 
     const handleDragEnd = useCallback((result: DropResult): void => {
         if (!result.destination) {
@@ -144,13 +224,13 @@ export const MasterServantList = React.memo((props: Props) => {
 
     const renderAddServantRow = (): ReactNode => {
         return (
-            <div className={classes.addServantRow}>
+            <div className={`${StyleClassPrefix}-add-servant-row`}>
                 <Button
-                    className={classes.addServantRowButton}
+                    className={`${StyleClassPrefix}-add-servant-row-button`}
                     color="secondary"
                     onClick={onAddServant}
                 >
-                    <div className={classes.addServantRowLabel}>
+                    <div className={`${StyleClassPrefix}-add-servant-row-label`}>
                         <PersonAddOutlined />
                         <div>Add servant</div>
                     </div>
@@ -161,10 +241,10 @@ export const MasterServantList = React.memo((props: Props) => {
 
     if (!editMode) {
         return (
-            <div className={classes.root}>
+            <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
                 {masterServants.map(renderMasterServantRow)}
                 {showAddServantRow && renderAddServantRow()}
-            </div>
+            </Box>
         );
     }
 
@@ -188,7 +268,7 @@ export const MasterServantList = React.memo((props: Props) => {
     };
 
     return (
-        <div className={classes.root}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId="droppable-servant-list">
                     {(provided: DroppableProvided) => (
@@ -200,7 +280,7 @@ export const MasterServantList = React.memo((props: Props) => {
                 </Droppable>
             </DragDropContext>
             {showAddServantRow && renderAddServantRow()}
-        </div>
+        </Box>
     );
 
 });

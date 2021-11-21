@@ -1,5 +1,5 @@
 import { GameServant } from '@fgo-planner/types';
-import { Avatar, AvatarProps } from '@material-ui/core';
+import { Avatar, AvatarProps } from '@mui/material';
 import React, { PropsWithChildren, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';

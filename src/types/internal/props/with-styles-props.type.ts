@@ -1,5 +1,8 @@
-import { ClassNameMap } from '@material-ui/core/styles/withStyles';
+import { ClassNameMap } from '@mui/styles';
 
+/**
+ * @deprecated
+ */
 export type WithStylesProps = {
     classes: ClassNameMap;
 };

@@ -1,152 +1,133 @@
-import { Button, fade, StyleRules, Theme, withStyles } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { PureComponent, ReactNode } from 'react';
-import { Link, RouteComponentProps as ReactRouteComponentProps, withRouter } from 'react-router-dom';
-import { LoginForm } from '../components/login/login-form.component';
+import { alpha, Button } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
+import React, { useCallback, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { LoginForm, StyleClassPrefix as LoginFormStyleClassPrefix } from '../components/login/login-form.component';
 import { PageTitle } from '../components/text/page-title.component';
 import { AuthenticationService } from '../services/authentication/auth.service';
 import { UserCredentials } from '../types/data';
-import { WithStylesProps } from '../types/internal';
-
-type Props = ReactRouteComponentProps & WithStylesProps;
-
-type State = {
-    awaitingResponse: boolean;
-    errorMessage?: string | null;
-};
 
 const FormId = 'login-form';
 
-const style = (theme: Theme) => ({
-    root: {
-        display: 'flex',
-        justifyContent: 'center',
-        margin: '20vh 0',
-        [theme.breakpoints.down('xs')]: {
-            marginTop: 0
-        }
+const StyleClassPrefix = 'Login';
+
+const StyleProps = {
+    display: 'flex',
+    justifyContent: 'center',
+    mt: {
+        xs: 0,
+        sm: '20vh'
     },
-    title: {
-        paddingBottom: theme.spacing(8)
+    [`& .${StyleClassPrefix}-title`]: {
+        pb: 8
     },
-    formContainer: {
-        width: 360,
+    [`& .${StyleClassPrefix}-form-container`]: {
+        width: {
+            xs: '100%',
+            sm: 360
+        },
         boxSizing: 'border-box',
-        borderWidth: 1,
+        borderWidth: {
+            xs: 0,
+            sm: 1
+        },
         borderStyle: 'solid',
-        borderColor: fade(theme.palette.text.primary, 0.23),
-        borderRadius: 8,
-        backgroundColor: theme.palette.background.paper,
-        [theme.breakpoints.down('xs')]: {
-            width: '100%',
-            border: 'none'
-        }
+        borderColor: (theme: Theme) => alpha(theme.palette.text.primary, 0.23),
+        borderRadius: {
+            xs: 0,
+            sm: 2
+        },
+        backgroundColor: (theme: Theme) => theme.palette.background.paper,
     },
-    errorMessage: {
+    [`& .${LoginFormStyleClassPrefix}-root`]: {
+        px: 8,
+        py: 0
+    },
+    [`& .${StyleClassPrefix}-error-message`]: {
         color: 'red',
-        padding: theme.spacing(0, 8, 6, 8)
+        px: 8,
+        pb: 6
     },
-    form: {
-        padding: theme.spacing(0, 8)
-    },
-    actionsContainer: {
+    [`& .${StyleClassPrefix}-actions-container`]: {
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
-        margin: theme.spacing(10, 6, 6, 6),
+        mx: 6,
+        mt: 10,
+        mb: 6
     },
-    actionLinks: {
+    [`& .${StyleClassPrefix}-action-links`]: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'start'
     }
-} as StyleRules);
+} as SystemStyleObject<Theme>;
 
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'Login'
-};
+export const LoginRoute = React.memo(() => {
 
-const Login = withRouter(withStyles(style, styleOptions)(class extends PureComponent<Props, State> {
+    const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>();
 
-    constructor(props: Props) {
-        super(props);
+    const history = useHistory();
 
-        this.state = {
-            awaitingResponse: false
-        };
-
-        this._login = this._login.bind(this);
-    }
-
-    render(): ReactNode {
-        const { classes } = this.props;
-        const { awaitingResponse, errorMessage } = this.state;
-        return (
-            <div className={classes.root}>
-                <div className={classes.formContainer}>
-                    <PageTitle className="pb-8">
-                        Login
-                    </PageTitle>
-                    {errorMessage && 
-                        <div className={classes.errorMessage}>
-                            {errorMessage}
-                        </div>
-                    }
-                    <LoginForm
-                        classes={{ root: classes.form }}
-                        formId={FormId}
-                        onSubmit={this._login}
-                    />
-                    <div className={classes.actionsContainer}>
-                        <div className={classes.actionLinks}>
-                            <Button
-                                component={Link}
-                                variant="text"
-                                color="secondary"
-                                to="/forgot-password"
-                            >
-                                Forgot password
-                            </Button>
-                            <Button
-                                component={Link}
-                                variant="text"
-                                color="secondary"
-                                to="/register"
-                            >
-                                Create account
-                            </Button>
-                        </div>
-                        <Button
-                            color="primary"
-                            variant="contained"
-                            type="submit"
-                            form={FormId}
-                            disabled={awaitingResponse}
-                        >
-                            Login
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    private async _login(values: UserCredentials): Promise<void> {
-        this.setState({
-            awaitingResponse: true,
-            errorMessage: null
-        });
+    const login = useCallback(async (values: UserCredentials): Promise<void> => {
+        setIsLoggingIn(true);
+        setErrorMessage(undefined);
         try {
             await AuthenticationService.login(values);
-            this.props.history.push('/user');
-        } catch (e) {
-            this.setState({
-                awaitingResponse: false,
-                errorMessage: String(e)
-            });
+            history.push('/user');
+        } catch (e: any) {
+            setIsLoggingIn(false);
+            setErrorMessage(e.message || String(e));
         }
-    }
+    }, [history]);
 
-}));
+    return (
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <div className={`${StyleClassPrefix}-form-container`}>
+                <PageTitle className="pb-8">
+                    Login
+                </PageTitle>
+                {errorMessage &&
+                    <div className={`${StyleClassPrefix}-error-message`}>
+                        {errorMessage}
+                    </div>
+                }
+                <LoginForm
+                    formId={FormId}
+                    onSubmit={login}
+                />
+                <div className={`${StyleClassPrefix}-actions-container`}>
+                    <div className={`${StyleClassPrefix}-actions-links`}>
+                        <Button
+                            component={Link}
+                            variant="text"
+                            color="secondary"
+                            to="/forgot-password"
+                        >
+                            Forgot password
+                        </Button>
+                        <Button
+                            component={Link}
+                            variant="text"
+                            color="secondary"
+                            to="/register"
+                        >
+                            Create account
+                        </Button>
+                    </div>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        type="submit"
+                        form={FormId}
+                        >
+                        disabled={isLoggingIn}
+                        Login
+                    </Button>
+                </div>
+            </div>
+        </Box>
+    );
 
-export const LoginRoute = React.memo(() => <Login />);
+});

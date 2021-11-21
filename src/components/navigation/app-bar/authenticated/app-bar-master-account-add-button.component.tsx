@@ -1,11 +1,11 @@
-import { Button } from '@material-ui/core';
-import { PersonAdd as PersonAddIcon } from '@material-ui/icons';
+import { Button } from '@mui/material';
+import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { ModalOnCloseReason } from '../../../../types/internal';
 import { MasterAccountAddDialog } from '../../../master/account/master-account-add-dialog.component';
 
 type Props = {
-    
+
 };
 
 type State = {
@@ -25,7 +25,7 @@ export const AppBarMasterAccountAddButton = class extends PureComponent<Props, S
         this._handleDialogClose = this._handleDialogClose.bind(this);
     }
 
-    render (): ReactNode {
+    render(): ReactNode {
         const { dialogOpen } = this.state;
         return (
             <Fragment>
@@ -36,10 +36,11 @@ export const AppBarMasterAccountAddButton = class extends PureComponent<Props, S
                 >
                     <PersonAddIcon />
                     <div className="pl-2">
-                        Add Account 
+                        Add Account
                     </div>
                 </Button>
                 <MasterAccountAddDialog
+                    // FIXME Inline paper props
                     PaperProps={{ style: { minWidth: 360 } }}
                     showCloseIcon="never"
                     open={dialogOpen}

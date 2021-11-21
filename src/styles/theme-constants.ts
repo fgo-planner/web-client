@@ -13,12 +13,6 @@ export class ThemeConstants {
     static AppBarHeightScale = 16;
 
     /**
-     * The size of the app bar avatar image as a factor of the spacing
-     * transformation value.
-     */
-    static AppBarAvatarSize = 11;
-
-    /**
      * The width of the custom scrollbars as a factor of the spacing transformation
      * value.
      */

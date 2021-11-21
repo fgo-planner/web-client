@@ -1,41 +1,33 @@
-import { makeStyles, StyleRules, TextField, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useMemo, useState } from 'react';
-import { useEffect } from 'react';
+import { TextField } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
+import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 type Props = {
     url?: string;
     onChange?: (url: string) => void;
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        margin: theme.spacing(3, 6, 0, 0)
-    },
-    imagePreviewContainer: {
+const StyleClassPrefix = 'UserThemeBackgroundImage';
+
+const StyleProps = {
+    mt: 3,
+    mr: 6,
+    [`& .${StyleClassPrefix}-imagePreviewContainer`]: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         height: 420,
-        paddingTop: theme.spacing(4),
+        pt: 4,
         marginBottom: -40,
         boxSizing: 'border-box'
     },
-    imagePreview: {
+    [`& .${StyleClassPrefix}-imagePreview`]: {
         maxWidth: '100%',
         maxHeight: '100%'
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'UserThemeBackgroundImage'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>;
 
 export const UserThemeBackgroundImage = React.memo(({ url, onChange }: Props) => {
-
-    const classes = useStyles();
 
     const [urlInputValue, setUrlInputValue] = useState('');
 
@@ -77,18 +69,18 @@ export const UserThemeBackgroundImage = React.memo(({ url, onChange }: Props) =>
             return null;
         }
         return (
-            <div className={classes.imagePreviewContainer}>
-                <img className={classes.imagePreview} src={url} alt="Not found" />
+            <div className={`${StyleClassPrefix}-imagePreviewContainer`}>
+                <img className={`${StyleClassPrefix}-imagePreview`} src={url} alt="Not found" />
                 {/* TODO Add fallback when image is not found. */}
             </div>
         );
-    }, [classes, url]);
+    }, [url]);
 
     return (
-        <div className={classes.root}>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             {urlInputField}
             {imagePreviewNode}
-        </div>
+        </Box>
     );
 
 });

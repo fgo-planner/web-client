@@ -1,8 +1,9 @@
-import { fade, makeStyles, StyleRules, Theme, Typography } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/styles';
+import { alpha, Typography } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
-import React, { PropsWithChildren, ReactNode } from 'react';
+import React, { PropsWithChildren, ReactNode, useMemo } from 'react';
 import { ComponentStyleProps } from '../../types/internal/props/component-style-props.type';
+import { StyleUtils } from '../../utils/style.utils';
 
 type Props = PropsWithChildren<{
     title?: string;
@@ -12,33 +13,27 @@ type Props = PropsWithChildren<{
 
 const DefaultTitlePosition = 'outside';
 
-const style = (theme: Theme) => ({
-    root: {
-        overflow: 'hidden', 
-        boxSizing: 'border-box'
-    },
-    background: {
-        height: '100%',
-        backgroundColor: fade(theme.palette.background.paper, 0.95),
-        borderRadius: theme.spacing(4),
-        overflow: 'hidden'
-    },
-    autoHeight: {
-        height: 'initial',
-        maxHeight: '100%'
-    },
-    title: {
+const StyleClassPrefix = 'LayoutPanelContainer';
+
+const StyleProps = (theme: Theme) => ({
+    overflow: 'hidden',
+    boxSizing: 'border-box',
+    [`& .${StyleClassPrefix}-title`]: {
         fontSize: '1.125rem',
         fontWeight: 'normal',
         padding: theme.spacing(4, 6)
+    },
+    [`& .${StyleClassPrefix}-contents`]: {
+        height: '100%',
+        backgroundColor: alpha(theme.palette.background.paper, 0.95),
+        borderRadius: theme.spacing(4),
+        overflow: 'hidden',
+        '&.auto-height': {
+            height: 'initial',
+            maxHeight: '100%'
+        }
     }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'LayoutPanelContainer'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+} as SystemStyleObject<Theme>);
 
 export const LayoutPanelContainer = React.memo((props: Props) => {
 
@@ -47,26 +42,32 @@ export const LayoutPanelContainer = React.memo((props: Props) => {
         title,
         autoHeight,
         className,
-        style
+        style,
+        sx
     } = props;
+
+    const sxProps = useMemo(() => StyleUtils.mergeSxProps(StyleProps, sx), [sx]);
 
     const titlePosition = props.titlePosition || DefaultTitlePosition;
 
-    const classes = useStyles(props);
-
-    const renderTitle = (): ReactNode => (
-        <Typography variant="h6" className={clsx(classes.title, titlePosition)}>
+    const titleNode: ReactNode = title && (
+        <Typography variant="h6" className={clsx(`${StyleClassPrefix}-title`, titlePosition)}>
             {title}
         </Typography>
     );
 
     return (
-        <div className={clsx(classes.root, className)} style={style}>
-            {title && titlePosition === 'outside' && renderTitle()}
-            <div className={clsx(classes.background, autoHeight && classes.autoHeight)}>
-                {title && titlePosition === 'inside' && renderTitle()}
+        <Box
+            className={clsx(`${StyleClassPrefix}-root`, className)}
+            style={style}
+            sx={sxProps}
+        >
+            {titlePosition === 'outside' && titleNode}
+            <div className={clsx(`${StyleClassPrefix}-contents`, autoHeight && 'auto-height')}>
+                {titlePosition === 'inside' && titleNode}
                 {children}
             </div>
-        </div>
+        </Box>
     );
+
 });

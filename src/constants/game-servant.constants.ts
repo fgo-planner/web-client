@@ -34,6 +34,10 @@ export class GameServantConstants {
 
     static readonly BondLevels = Array.from(Array(16).keys()) as ReadonlyArray<MasterServantBondLevel>;
 
+    static readonly MinRarity = 0;
+
+    static readonly MaxRarity = 5;
+
     static readonly RarityValues = Array.from(Array(6).keys()) as ReadonlyArray<GameServantRarity>;
 
 }

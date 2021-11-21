@@ -1,7 +1,6 @@
 import { GameSoundtrack } from '@fgo-planner/types';
-import { Checkbox, fade, IconButton, makeStyles, StyleRules, Theme } from '@material-ui/core';
-import { WithStylesOptions } from '@material-ui/core/styles/withStyles';
-import { Done, Pause, PlayArrow } from '@material-ui/icons';
+import { Done as DoneIcon, Pause as PauseIcon, PlayArrow as PlayArrowIcon } from '@mui/icons-material';
+import { Checkbox, IconButton } from '@mui/material';
 import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
@@ -19,47 +18,7 @@ type Props = {
 
 const SoundtrackThumbnailSize = 42;
 
-const style = (theme: Theme) => ({
-    root: {
-        height: 52,
-        display: 'flex',
-        alignItems: 'center',
-        fontSize: '0.875rem',
-        '&:not(:hover) .play-icon': {
-            opacity: 0
-        }
-    },
-    unlockedStatus: {
-        width: 42,
-        padding: theme.spacing(0, 2),
-        textAlign: 'center',
-    },
-    thumbnailContainer: {
-        width: 96,
-        height: SoundtrackThumbnailSize,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: fade('#ffffff', 0.69),
-        marginRight: theme.spacing(6)
-    },
-    title: {
-        flex: '1 1'
-    },
-    unlockedIcon: {
-        color: 'limegreen'
-    },
-    playButton: {
-        width: 48,
-        padding: theme.spacing(0, 24, 0, 4)
-    }
-} as StyleRules);
-
-const styleOptions: WithStylesOptions<Theme> = {
-    classNamePrefix: 'MasterSoundtracksListRow'
-};
-
-const useStyles = makeStyles(style, styleOptions);
+export const StyleClassPrefix = 'MasterSoundtracksListRow';
 
 export const MasterSoundtracksListRow = React.memo((props: Props) => {
 
@@ -71,8 +30,6 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
         onUnlockToggle,
         onPlayButtonClick
     } = props;
-
-    const classes = useStyles();
 
     const gameItemMap = useGameItemMap();
 
@@ -91,20 +48,20 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
     const unlockedStatusNode: ReactNode = useMemo(() => {
         if (!editMode) {
             return (
-                <div className={classes.unlockedStatus}>
-                    {unlocked && <Done className={classes.unlockedIcon} />}
+                <div className={`${StyleClassPrefix}-unlocked-status`}>
+                    {unlocked && <DoneIcon className={`${StyleClassPrefix}-unlocked-icon`} />}
                 </div>
             );
         }
         return (
-            <div className={classes.unlockedStatus}>
+            <div className={`${StyleClassPrefix}-unlocked-status`}>
                 {soundtrack.material && <Checkbox
                     checked={unlocked}
                     onChange={handleUnlockCheckboxChange}
                 />}
             </div>
         );
-    }, [classes, soundtrack, editMode, unlocked, handleUnlockCheckboxChange]);
+    }, [soundtrack, editMode, unlocked, handleUnlockCheckboxChange]);
 
     const unlockMaterialNode: ReactNode = useMemo(() => {
         if (!gameItemMap || !soundtrack.material) {
@@ -122,34 +79,36 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
 
     const playButtonNode: ReactNode = useMemo(() => {
         return (
-            <div className={classes.playButton} onClick={handlePlayButtonClick}>
-                <IconButton color="primary">
+            <div className={`${StyleClassPrefix}-play-button`} onClick={handlePlayButtonClick}>
+                <IconButton color="primary" size="large">
                     {playing ?
-                        <Pause /> :
-                        <PlayArrow className="play-icon" />
+                        <PauseIcon /> :
+                        <PlayArrowIcon />
                     }
                 </IconButton>
             </div>
         );
-    }, [classes, playing, handlePlayButtonClick]);
+    }, [playing, handlePlayButtonClick]);
 
     return (
-        <StaticListRowContainer key={soundtrack._id} borderBottom>
-            <div className={classes.root}>
-                {unlockedStatusNode}
-                <div className={classes.thumbnailContainer}>
-                    <img
-                        src={soundtrack.thumbnailUrl}
-                        alt={soundtrack.name}
-                        height={SoundtrackThumbnailSize}
-                    />
-                </div>
-                <div className={clsx(classes.title, 'truncate')}>
-                    {soundtrack.name}
-                </div>
-                {unlockMaterialNode}
-                {playButtonNode}
+        <StaticListRowContainer
+            key={soundtrack._id}
+            className={`${StyleClassPrefix}-root`}
+            borderBottom
+        >
+            {unlockedStatusNode}
+            <div className={`${StyleClassPrefix}-thumbnail`}>
+                <img
+                    src={soundtrack.thumbnailUrl}
+                    alt={soundtrack.name}
+                    height={SoundtrackThumbnailSize}
+                />
             </div>
+            <div className={clsx(`${StyleClassPrefix}-title`, 'truncate')}>
+                {soundtrack.name}
+            </div>
+            {unlockMaterialNode}
+            {playButtonNode}
         </StaticListRowContainer>
     );
 

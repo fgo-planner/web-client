@@ -1,9 +1,9 @@
 import React from 'react';
-import { useRouteMatch } from 'react-router-dom';
+import { useMatch } from 'react-router-dom';
 
 const GameServant = React.memo(() => {
-    const match = useRouteMatch<{ id: string }>();
-    const { id } = match.params;
+    const match = useMatch<'id'>('/resources/servants/:id');
+    const id = match?.params.id;
     const servantId = Number(id);
     return (
         <div>

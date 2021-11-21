@@ -451,7 +451,7 @@ export const MasterServantsRoute = React.memo(() => {
                 <div>
                     <IconButton
                         component={Link}
-                        to="servants/costumes"
+                        to="costumes"
                         children={<AccessibilityNewIcon />}
                         size="large" />
                 </div>
@@ -460,7 +460,7 @@ export const MasterServantsRoute = React.memo(() => {
                 <div>
                     <IconButton
                         component={Link}
-                        to="servants/stats"
+                        to="stats"
                         children={<EqualizerIcon />}
                         size="large" />
                 </div>
@@ -469,7 +469,7 @@ export const MasterServantsRoute = React.memo(() => {
                 <div>
                     <IconButton
                         component={Link}
-                        to="./data/import/servants"
+                        to="../master/data/import/servants"
                         children={<PublishIcon />}
                         size="large" />
                 </div>

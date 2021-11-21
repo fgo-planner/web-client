@@ -1,15 +1,15 @@
-import React, { ReactNode } from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { ModuleComponent } from './components/base/module-component';
+import React, { Suspense, useEffect } from 'react';
+import { RouteObject, useRoutes } from 'react-router-dom';
 import { NavigationMain } from './components/navigation/navigation-main.component';
+import { LazyLoadFallback } from './components/route-fallback/lazy-load-fallback.component';
 import { ThemeProviderWrapper } from './components/theme/theme-provider-wrapper.component';
+import { RequireAuthentication } from './components/utils/require-authentication.component';
 import { ErrorRoute } from './routes/error.route';
 import { ForgotPasswordRoute } from './routes/forgot-password.route';
 import { HomeRoute } from './routes/home.route';
 import { LoginRoute } from './routes/login.route';
 import { RegistrationRoute } from './routes/registration.route';
 import { BackgroundMusicService } from './services/audio/background-music.service';
-import { RouteDefinitions } from './types/internal';
 
 /*
 Planned navigation outline:
@@ -40,62 +40,68 @@ Planned navigation outline:
         ↳ Planner
 */
 
-export class RootModule extends ModuleComponent {
+const ResourcesModule = React.lazy(() => import('./modules/resources/resources.module'));
 
-    protected readonly ModuleRoutes: RouteDefinitions = [
-        {
-            path: '/',
-            exact: true,
-            component: HomeRoute
-        },
-        {
-            path: '/login',
-            exact: true,
-            component: LoginRoute
-        },
-        {
-            path: '/register',
-            exact: true,
-            component: RegistrationRoute
-        },
-        {
-            path: '/forgot-password',
-            exact: true,
-            component: ForgotPasswordRoute
-        },
-        {
-            path: '/resources',
-            lazyComponent: React.lazy(() => import('./modules/resources/resources.module'))
-        },
-        {
-            path: '/user',
-            lazyComponent: React.lazy(() => import('./modules/authenticated/authenticated.module')),
-            authenticationRequired: true
-        },
-        {
-            component: ErrorRoute
-        }
-    ];
+const AuthenticatedModule = React.lazy(() => import('./modules/authenticated/authenticated.module'));
 
-    componentDidMount() {
-        super.componentDidMount();
+const ModuleRoutes = [
+    {
+        path: '/',
+        element: <HomeRoute />
+    },
+    {
+        path: '/login',
+        element: <LoginRoute />
+    },
+    {
+        path: '/register',
+        element: <RegistrationRoute />
+    },
+    {
+        path: '/forgot-password',
+        element: <ForgotPasswordRoute />
+    },
+    {
+        path: '/resources/*',
+        element: (
+            <Suspense fallback={<LazyLoadFallback />}>
+                <ResourcesModule />
+            </Suspense>
+        )
+    },
+    {
+        path: '/user/*',
+        element: (
+            <RequireAuthentication>
+                <Suspense fallback={<LazyLoadFallback />}>
+                    <AuthenticatedModule />
+                </Suspense>
+            </RequireAuthentication>
+        )
+    },
+    {
+        element: <ErrorRoute />
+    }
+] as Array<RouteObject>;
+
+export const RootModule = React.memo(() => {
+
+    useEffect(() => {
         const autoplayMusic = process.env.REACT_APP_AUTOPLAY_MUSIC;
         if (autoplayMusic && autoplayMusic.toLowerCase() === 'true') {
             // Autoplay background music
             BackgroundMusicService.play();
         }
-    }
+    }, []);
 
-    render(): ReactNode {
-        return (
-            <BrowserRouter>
-                <ThemeProviderWrapper>
-                    <NavigationMain>
-                        {this._renderModuleRoutes()}
-                    </NavigationMain>
-                </ThemeProviderWrapper>
-            </BrowserRouter>
-        );
-    }
+    const activeRouteElement = useRoutes(ModuleRoutes);
 
-}
+    return (
+        <ThemeProviderWrapper>
+            <NavigationMain>
+                {activeRouteElement}
+            </NavigationMain>
+        </ThemeProviderWrapper>
+    );
+
+});

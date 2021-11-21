@@ -1,15 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { PageMetadata } from './components/utils/page-metadata.component';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import { RootModule as Root } from './root.module';
+import { RootModule as AppRoot } from './root.module';
 import './styles/styles.scss';
 
 const element = (
     <React.StrictMode>
         <PageMetadata />
-        <Root parentPath="/" />
+        <BrowserRouter>
+        <AppRoot />
+        </BrowserRouter>
     </React.StrictMode>
 );
 

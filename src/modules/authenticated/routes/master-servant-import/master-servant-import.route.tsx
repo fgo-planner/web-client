@@ -4,7 +4,7 @@ import { Button, Fab, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DropzoneRef } from 'react-dropzone';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AlertDialog } from '../../../../components/dialog/alert-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { FileInputWithTextarea } from '../../../../components/input/file-input-with-textarea.component';
@@ -83,7 +83,7 @@ const MasterServantImportRoute = React.memo(() => {
 
     const forceUpdate = useForceUpdate();
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [importData, setImportData] = useState<string>();
@@ -247,11 +247,11 @@ const MasterServantImportRoute = React.memo(() => {
 
     const handleImportStatusDialogAction = useCallback((): void => {
         if (importStatus === 'success') {
-            return history.push('/user/master/servants');
+            return navigate('/user/master/servants');
         } else if (importStatus === 'fail') {
             setImportStatus('none');
         }
-    }, [history, importStatus]);
+    }, [navigate, importStatus]);
 
     const fabContainerChildNodes: ReactNode = useMemo(() => {
         if (!parsedData) {

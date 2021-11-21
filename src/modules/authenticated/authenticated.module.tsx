@@ -1,6 +1,6 @@
-import React from 'react';
-import { ModuleComponent } from '../../components/base/module-component';
-import { RouteDefinitions } from '../../types/internal';
+import React, { Suspense } from 'react';
+import { Navigate, useRoutes } from 'react-router';
+import { LazyLoadFallback } from '../../components/route-fallback/lazy-load-fallback.component';
 import { MasterAccountHomeRoute } from './routes/master-account-home.route';
 import { MasterAccountsRoute } from './routes/master-accounts/master-accounts.route';
 import { MasterItemStatsRoute } from './routes/master-item-stats/master-item-stats.route';
@@ -13,74 +13,69 @@ import { PlansRoute } from './routes/plans/plans.route';
 import { UserSettingsRoute } from './routes/user-settings.route';
 import { UserThemesEditRoute } from './routes/user-themes-edit/user-themes-edit.route';
 
-export default class AuthenticatedModule extends ModuleComponent {
+const MasterServantImportRoute = React.lazy(() => import('./routes/master-servant-import/master-servant-import.route'));
 
-    protected readonly ModuleRoutes: RouteDefinitions = [
-        {
-            path: '/',
-            exact: true,
-            redirectTo: '/master'
-        },
-        {
-            path: '/settings',
-            exact: true,
-            component: UserSettingsRoute
-        },
-        {
-            path: '/settings/theme',
-            exact: true,
-            component: UserThemesEditRoute
-        },
-        {
-            path: '/master-accounts',
-            exact: true,
-            component: MasterAccountsRoute
-        },
-        {
-            path: '/master',
-            exact: true,
-            component: MasterAccountHomeRoute
-        },
-        {
-            path: '/master/servants',
-            exact: true,
-            component: MasterServantsRoute
-        },
-        {
-            path: '/master/servants/costumes',
-            exact: true,
-            component: MasterServantCostumesRoute
-        },
-        {
-            path: '/master/servants/stats',
-            exact: true,
-            component: MasterServantStatsRoute
-        },
-        {
-            path: '/master/items',
-            exact: true,
-            component: MasterItemsRoute
-        },
-        {
-            path: '/master/items/stats',
-            exact: true,
-            component: MasterItemStatsRoute
-        },
-        {
-            path: '/master/soundtracks',
-            exact: true,
-            component: MasterSoundtracksRoute
-        },
-        {
-            path: '/master/planner',
-            exact: true,
-            component: PlansRoute
-        },
-        {
-            path: '/master/data/import/servants',
-            exact: true,
-            lazyComponent: React.lazy(() => import('./routes/master-servant-import/master-servant-import.route')),
-        },
-    ];
+const ModuleRoutes = [
+    {
+        path: '/',
+        element: <Navigate to='./master' />
+    },
+    {
+        path: '/settings',
+        element: <UserSettingsRoute />
+    },
+    {
+        path: '/settings/theme',
+        element: <UserThemesEditRoute />
+    },
+    {
+        path: '/master-accounts',
+        element: <MasterAccountsRoute />
+    },
+    {
+        path: '/master',
+        element: <MasterAccountHomeRoute />
+    },
+    {
+        path: '/master/servants',
+        element: <MasterServantsRoute />
+    },
+    {
+        path: '/master/servants/costumes',
+        element: <MasterServantCostumesRoute />
+    },
+    {
+        path: '/master/servants/stats',
+        element: <MasterServantStatsRoute />
+    },
+    {
+        path: '/master/items',
+        element: <MasterItemsRoute />
+    },
+    {
+        path: '/master/items/stats',
+        element: <MasterItemStatsRoute />
+    },
+    {
+        path: '/master/soundtracks',
+        element: <MasterSoundtracksRoute />
+    },
+    {
+        path: '/master/planner',
+        element: <PlansRoute />
+    },
+    {
+        path: '/master/data/import/servants',
+        element: (
+            <Suspense fallback={<LazyLoadFallback />}>
+                <MasterServantImportRoute />
+            </Suspense>
+        )
+    },
+];
 
-}
+const AuthenticatedModule = React.memo(() => {
+    return useRoutes(ModuleRoutes);
+});
+
+export default AuthenticatedModule;

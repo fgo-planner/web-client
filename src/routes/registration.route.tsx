@@ -2,7 +2,7 @@ import { alpha, Button, Checkbox, FormControlLabel, FormGroup, TextField, Toolti
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import { Formik, FormikConfig, FormikHelpers, FormikProps } from 'formik';
 import React, { ChangeEvent, Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { InputFieldContainer } from '../components/input/input-field-container.component';
 import { PageTitle } from '../components/text/page-title.component';
@@ -125,7 +125,7 @@ export const RegistrationRoute = React.memo(() => {
     const [errorMessage, setErrorMessage] = useState<string>();
     const [redirectTimeout, setRedirectTimeout] = useState<NodeJS.Timeout>();
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     useEffect(() => {
         return () => {
@@ -144,7 +144,7 @@ export const RegistrationRoute = React.memo(() => {
 
             // Wait 5 seconds before redirecting to login page
             const redirectTimeout = setTimeout(() => {
-                history.push('/login');
+                navigate('/login');
             }, SuccessRedirectDelay);
 
             setSuccess(true);
@@ -153,7 +153,7 @@ export const RegistrationRoute = React.memo(() => {
             setIsRegistering(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [history]);
+    }, [navigate]);
 
     const handleFriendIdChange = useCallback((
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

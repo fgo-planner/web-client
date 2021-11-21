@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export const UserSettingsRoute = React.memo(() => {
     return (
         <div className="p-4">
-            <Button component={Link} to="settings/theme">
+            <Button component={Link} to="theme">
                 Edit Theme
             </Button>
         </div>

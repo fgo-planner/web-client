@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 
 type Props = {
-    itemId: number | string;
+    itemId: number | string | undefined;
 };
 
 export const GameItemNotFound = React.memo((props: Props) => (

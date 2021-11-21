@@ -45,7 +45,7 @@ export const MasterAccountList = React.memo(({ masterAccountList, onDeleteAccoun
                 {masterAccountList.map((masterAccount, i) => (
                     <TableRow key={masterAccount._id} className={`${StyleClassPrefix}-data-row`}>
                         <TableCell>
-                            <MuiLink component={Link} to='./master' underline="none">
+                            <MuiLink component={Link} to='../master' underline="none">
                                 {masterAccount.name || `Account ${i + 1}`}
                             </MuiLink>
                         </TableCell>

@@ -1,7 +1,7 @@
 import { alpha, Button } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LoginForm, StyleClassPrefix as LoginFormStyleClassPrefix } from '../components/login/login-form.component';
 import { PageTitle } from '../components/text/page-title.component';
 import { AuthenticationService } from '../services/authentication/auth.service';
@@ -68,19 +68,19 @@ export const LoginRoute = React.memo(() => {
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const login = useCallback(async (values: UserCredentials): Promise<void> => {
         setIsLoggingIn(true);
         setErrorMessage(undefined);
         try {
             await AuthenticationService.login(values);
-            history.push('/user');
+            navigate('/user');
         } catch (e: any) {
             setIsLoggingIn(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [history]);
+    }, [navigate]);
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>

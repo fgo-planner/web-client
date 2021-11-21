@@ -140,7 +140,7 @@ export const MasterItemsRoute = React.memo(() => {
             <div>
                 <IconButton
                     component={Link}
-                    to="items/stats"
+                    to="stats"
                     children={<EqualizerIcon />}
                     size="large" />
             </div>

@@ -2,7 +2,7 @@ import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as V
 import { IconButton, PaperProps } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
 import { ModalOnCloseReason } from '../../../../types/internal';
@@ -33,7 +33,7 @@ const StyleProps = {
  */
 export const AppBarGuestUser = React.memo(() => {
     const location = useLocation();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
     const [themeInfo, setThemeInfo] = useState<ThemeInfo>();
@@ -63,9 +63,9 @@ export const AppBarGuestUser = React.memo(() => {
         if (pathname?.includes('resources')) {
             setLoginModalOpen(true);
         } else {
-            history.push('/login');
+            navigate('/login');
         }
-    }, [location.pathname, history]);
+    }, [location.pathname, navigate]);
 
     const handleLoginDialogClose = useCallback((event: any, reason: ModalOnCloseReason): void => {
         setLoginModalOpen(false);

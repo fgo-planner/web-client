@@ -1,9 +1,8 @@
-import { Fab, Tooltip } from '@mui/material';
 import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
+import { Fab, Tooltip } from '@mui/material';
 import _ from 'lodash';
-import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserPreferences, UserWebClientTheme } from '../../../../../local_modules/types/lib';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
@@ -27,7 +26,7 @@ const getUserThemeOrDefault = (userPreferences: Nullable<UserPreferences>, theme
 
 export const UserThemesEditRoute = React.memo(() => {
     const forceUpdate = useForceUpdate();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     /**
      * Clone of the user's light theme preferences.
@@ -88,18 +87,18 @@ export const UserThemesEditRoute = React.memo(() => {
         try {
             await UserService.updateUserPreferences(update);
             resetLoadingIndicator();
-            history.push('/user/settings');
+            navigate('/user/settings');
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);
             resetLoadingIndicator();
         }
 
-    }, [darkTheme, history, lightTheme, resetLoadingIndicator]);
+    }, [darkTheme, lightTheme, navigate, resetLoadingIndicator]);
 
     const handleCancelButtonClick = useCallback((): void => {
-        history.push('/user/settings');
-    }, [history]);
+        navigate('/user/settings');
+    }, [navigate]);
 
     /**
      * FabContainer children

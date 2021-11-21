@@ -5,7 +5,7 @@ export const MasterAccountHomeRoute = React.memo(() => {
     return (
         <Fragment>
             Account HOME!
-            <Link to="master/soundtracks">Soundtracks</Link>
+            <Link to="soundtracks">Soundtracks</Link>
         </Fragment>
     );
 });

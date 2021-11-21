@@ -1,6 +1,6 @@
 import React, { DetailedHTMLProps, MetaHTMLAttributes, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { PageMetadata as PageMetadataType, PageMetadataService } from '../services/user-interface/page-metadata.service';
+import { PageMetadata as PageMetadataType, PageMetadataService } from '../../services/user-interface/page-metadata.service';
 
 type HelmetMetaProp = DetailedHTMLProps<MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>[];
 

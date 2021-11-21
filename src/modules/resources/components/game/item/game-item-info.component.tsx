@@ -3,7 +3,7 @@ import { Theme } from '@mui/material';
 import { StyleRules } from '@mui/styles';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
-import { LoadingIndicator } from '../../../../../components/loading-indicator.component';
+import { LoadingIndicator } from '../../../../../components/utils/loading-indicator.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
 import { GameServantService } from '../../../../../services/data/game/game-servant.service';
 import { Nullable } from '../../../../../types/internal';

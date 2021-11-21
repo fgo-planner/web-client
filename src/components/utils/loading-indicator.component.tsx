@@ -2,7 +2,7 @@ import { CircularProgress, Theme, useMediaQuery } from '@mui/material';
 import React, { CSSProperties, useMemo } from 'react';
 
 type Props = {
-    show?: boolean;
+    visible?: boolean;
     zIndex?: number;
 };
 
@@ -22,7 +22,7 @@ const styles = {
     } as CSSProperties
 };
 
-export const LoadingIndicator = React.memo(({ show, zIndex }: Props) => {
+export const LoadingIndicator = React.memo(({ visible, zIndex }: Props) => {
 
     // TODO Change this to use useActiveBreakpoints hook instead.
     const breakpointSm = useMediaQuery((theme: Theme) => theme.breakpoints.only('sm'));
@@ -34,7 +34,7 @@ export const LoadingIndicator = React.memo(({ show, zIndex }: Props) => {
         zIndex: zIndex ?? 1
     }), [zIndex]);
     
-    if (show !== undefined && !show) {
+    if (visible === false) {
         return null;
     }
 

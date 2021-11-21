@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { PageMetadata } from './components/page-metadata.component';
+import { PageMetadata } from './components/utils/page-metadata.component';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { RootModule as Root } from './root.module';

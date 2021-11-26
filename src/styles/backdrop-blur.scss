@@ -1,9 +1,16 @@
 $backdrop-blur-amount: 2px;
 
 /**
+ * Default background color for the backdrop. There is a bug when using
+ * 'transparent' background color that causes the blur to not display, so we
+ * use a value that is close instead (tested in Chrome 96.0.4664.45).
+ */
+$default-background-color: rgba(0, 0, 0, 0.01);
+
+/**
  * Blurred backdrop effect
  */
-@mixin backdrop-blur($background-color: transparent) {
+@mixin backdrop-blur($background-color: $default-background-color) {
     @supports ((-webkit-backdrop-filter: blur($backdrop-blur-amount)) or (backdrop-filter: blur($backdrop-blur-amount))) {
         background: $background-color;
         -webkit-backdrop-filter: blur($backdrop-blur-amount);

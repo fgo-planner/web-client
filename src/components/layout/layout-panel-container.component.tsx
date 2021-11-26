@@ -13,7 +13,7 @@ type Props = PropsWithChildren<{
 
 const DefaultTitlePosition = 'outside';
 
-const StyleClassPrefix = 'LayoutPanelContainer';
+export const StyleClassPrefix = 'LayoutPanelContainer';
 
 const StyleProps = (theme: Theme) => ({
     overflow: 'hidden',

@@ -1,15 +1,8 @@
-import { MasterAccount, MasterServant } from '@fgo-planner/types';
-import { Clear as ClearIcon, Done as DoneIcon, Publish as PublishIcon } from '@mui/icons-material';
-import { Button, Fab, Tooltip } from '@mui/material';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { MasterAccount } from '@fgo-planner/types';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DropzoneRef } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog } from '../../../../components/dialog/alert-dialog.component';
-import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { FileInputWithTextarea } from '../../../../components/input/file-input-with-textarea.component';
 import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
-import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { GameServantService } from '../../../../services/data/game/game-servant.service';
@@ -17,66 +10,33 @@ import { MasterAccountService } from '../../../../services/data/master/master-ac
 import { FgoManagerMasterServantParser } from '../../../../services/import/fgo-manager/fgo-manager-master-servant-parser';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
+import { Nullable, ReadonlyRecord } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
-import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
-import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
-import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
-import { MasterServantImportConfirmationDialog } from './master-servant-import-confirmation-dialog.component';
+import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
+import { MasterServantImportFileInput } from './master-servant-import-file-input';
+import { MasterServantImportList } from './master-servant-import-list.component';
 
-const FileInputHelperText = 'To import the servant data from FGO Manager, download the \'Roster\' sheet as a .csv file and upload it here.';
-
-const FileInputActionsHelperText = 'Select or drag and drop the .csv file here, or paste the file contents above';
+type ImportStatus =
+    'none' |
+    'parseFail' |
+    'importFail' |
+    'parseSuccess' |
+    'importSuccess';
 
 const ParseFailMessage = 'No servants could be parsed from the given data! Please review the data and try again.';
 
-const ParseResultHelperText = `The following servants were parsed from the given data. They have NOT been imported yet. Please review the
-    list and click on the confirm button to finalize the import.`;
-
-const ImportSuccessMessage = 'Servants imported successfully!';
+const ParseSuccessMessage = 'Servants parsed successfully! Please review the list and click the confirm button to finalize the import.';
 
 const ImportFailMessage = 'An error was encountered while attempting to import servants.';
 
-// TODO Make this responsive.
-const ServantListVisibleColumns: MasterServantListVisibleColumns = {
-    npLevel: true,
-    level: true,
-    bondLevel: true,
-    fouHp: true,
-    fouAtk: true,
-    skillLevels: true,
-    actions: false
-};
+const ImportSuccessMessage = 'Servants imported successfully!';
 
-const StyleClassPrefix = 'MasterServantImportRoute';
-
-const StyleProps = (theme: Theme) => ({
-    [`& .${StyleClassPrefix}-file-input-helper-text`]: {
-        color: 'text.secondary',
-        px: 8,
-        pt: 6
-    },
-    [`& .${StyleClassPrefix}-file-input-container`]: {
-        p: 4
-    },
-    [`& .${StyleClassPrefix}-file-input-actions`]: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        pt: 4
-    },
-    [`& .${StyleClassPrefix}-file-input-actions-helper-text`]: {
-        color: 'text.secondary',
-        pr: 4
-    },
-    [`& .${StyleClassPrefix}-import-results-helper-text`]: {
-        color: 'text.secondary',
-        minWidth: theme.breakpoints.values.lg,
-        px: 4,
-        pt: 6,
-        pb: 4
-    }
-}  as SystemStyleObject<Theme>);
+const ImportStatusMessages = {
+    'parseFail': ParseFailMessage,
+    'parseSuccess': ParseSuccessMessage,
+    'importFail': ImportFailMessage,
+    'importSuccess': ImportSuccessMessage
+} as ReadonlyRecord<ImportStatus, string>;
 
 // TODO Split into smaller components
 const MasterServantImportRoute = React.memo(() => {
@@ -86,13 +46,11 @@ const MasterServantImportRoute = React.memo(() => {
     const navigate = useNavigate();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-    const [importData, setImportData] = useState<string>();
     const [parsedData, setParsedData] = useState<MasterServantParserResult>();
-    const [showConfirmationDialog, setShowConfirmationDialog] = useState<boolean>(false);
-    const [importStatus, setImportStatus] = useState<'none' | 'fail' | 'success'>('none');
+    const [importStatus, setImportStatus] = useState<ImportStatus>('none');
+    const [importStatusDialogOpen, setImportStatusDialogOpen] = useState<boolean>(false);
 
     const loadingIndicatorIdRef = useRef<string>();
-    const dropzoneRef = useRef<DropzoneRef | null>(null);
     const scrollContainerRef = useElevateAppBarOnScroll();
 
     const resetLoadingIndicator = useCallback((): void => {
@@ -104,7 +62,7 @@ const MasterServantImportRoute = React.memo(() => {
         }
     }, [forceUpdate]);
 
-    /**
+    /*
      * onCurrentMasterAccountChange subscriptions
      */
     useEffect(() => {
@@ -114,7 +72,7 @@ const MasterServantImportRoute = React.memo(() => {
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, []);
 
-    /**
+    /*
      * onCurrentMasterAccountUpdated subscriptions
      */
     useEffect(() => {
@@ -129,7 +87,7 @@ const MasterServantImportRoute = React.memo(() => {
         return () => onCurrentMasterAccountUpdatedSubscription.unsubscribe();
     }, [resetLoadingIndicator]);
 
-    /**
+    /*
      * Turns off the loading indicator if the parsed data has changed.
      */
     useEffect(() => {
@@ -141,43 +99,49 @@ const MasterServantImportRoute = React.memo(() => {
         }, 500);
     }, [parsedData, resetLoadingIndicator]);
 
-    const openFileUploadDialog = useCallback((): void => {
-        // Note that the ref is set async, so it might be null at some point.
-        dropzoneRef.current?.open();
-    }, []);
-
-    const hasImportData = !!importData?.trim().length;
-
-    const parseImportData = useCallback((): void => {
-        if (!hasImportData) {
-            console.error('No data');
+    /*
+     * Automatically opens the dialog when the status changes to anything other
+     * than `none`.
+     */
+    useEffect(() => {
+        if (importStatus === 'none') {
             return;
+        }
+        setImportStatusDialogOpen(true);
+    }, [importStatus]);
+
+    const parseData = useCallback((data: string): void => {
+        data = data.trim();
+        if (!data) {
+            return setImportStatus('parseFail');
         }
 
         // Activate the loading indicator before parsing.
         loadingIndicatorIdRef.current = LoadingIndicatorOverlayService.invoke();
         forceUpdate();
 
-        let lastInstanceId = -1;
-        if (masterAccount) {
-            lastInstanceId = MasterServantUtils.getLastInstanceId(masterAccount.servants);
-        }
-
         // Set timeout to allow the loading indicator to be rendered first.
         setTimeout(async () => {
             const gameServants = await GameServantService.getServants();
-            const parser = new FgoManagerMasterServantParser(importData!!, gameServants);
-            const parsedData = parser.parse(lastInstanceId + 1);
-            setImportData('');
-            setParsedData(parsedData);
+            const parser = new FgoManagerMasterServantParser(data, gameServants);
+            const parsedData = parser.parse();
+            if (!parsedData.masterServants.length) {
+                setImportStatus('parseFail');
+            } else {
+                setImportStatus('parseSuccess');
+                setParsedData(parsedData);
+            }
+            resetLoadingIndicator();
         });
-    }, [forceUpdate, hasImportData, importData, masterAccount]);
+
+    }, [forceUpdate, resetLoadingIndicator]);
 
     const cancelImport = useCallback((): void => {
         setParsedData(undefined);
+        setImportStatus('none');
     }, []);
 
-    const finalizeImport = useCallback(async (overwrite = false): Promise<void> => {
+    const finalizeImport = useCallback(async (existingAction = ExistingAction.Overwrite): Promise<void> => {
         if (!masterAccount || !parsedData) {
             return;
         }
@@ -185,197 +149,123 @@ const MasterServantImportRoute = React.memo(() => {
         loadingIndicatorIdRef.current = LoadingIndicatorOverlayService.invoke();
         forceUpdate();
 
-        let servants: MasterServant[];
-        if (overwrite) {
-            // Overwrite
-            servants = parsedData.masterServants;
-        } else {
-            // Append
-            servants = [
-                ...masterAccount.servants,
-                ...parsedData.masterServants
-            ];
-        }
-
-        /*
-         * Combine existing and imported bond level data. The imported data
-         * will always overwrite the existing data.
+        /**
+         * The update payload.
          */
-        const bondLevels = {
-            ...masterAccount.bondLevels,
-            ...parsedData.bondLevels
+        const update: Partial<MasterAccount> = {
+            _id: masterAccount._id,
+            /*
+             * Existing bond levels are always merged with imported data, regardless of the
+             * selected action.
+             */
+            bondLevels: {
+                ...masterAccount.bondLevels,
+                ...parsedData.bondLevels
+            }
         };
 
+        /*
+         * Generate the servant update data depending on the selected action.
+         */
+        if (existingAction === ExistingAction.Update) {
+            /*
+             * Clone the existing servants, just in case the update fails.
+             */
+            const servants = masterAccount.servants.map(servant => MasterServantUtils.clone(servant));
+            
+            /*
+             * Merge the parsed servants into the existing servants.
+             */
+            MasterServantUtils.merge(servants, parsedData.masterServants);
+
+            update.servants = servants;
+        } else {
+            /*
+             * Update `instanceId` to continue off from the old list. This needs to be done
+             * for both the `Append` and `Overwrite` actions.
+             */
+            const lastInstanceId = MasterServantUtils.getLastInstanceId(masterAccount.servants);
+            MasterServantUtils.reassignInstanceIds(parsedData.masterServants, lastInstanceId + 1);
+
+            if (existingAction === ExistingAction.Append) {
+                update.servants = [
+                    ...masterAccount.servants,
+                    ...parsedData.masterServants
+                ];
+            } else {
+                update.servants = parsedData.masterServants;
+            }
+        }
+
         try {
-            await MasterAccountService.updateAccount({
-                _id: masterAccount._id,
-                servants,
-                bondLevels
-            });
-            setImportStatus('success');
+            await MasterAccountService.updateAccount(update);
+            setImportStatus('importSuccess');
         } catch (error) {
             console.error(error);
-            setImportStatus('fail');
+            setImportStatus('importFail');
         }
 
         resetLoadingIndicator();
     }, [forceUpdate, masterAccount, parsedData, resetLoadingIndicator]);
 
-    const handleFinalizeImportClick = useCallback((): void => {
-        if (!masterAccount) {
-            return;
-        }
-        /*
-         * If there are already servants in the account, then prompt the user for an
-         * action.
-         */
-        if (masterAccount.servants.length) {
-            return setShowConfirmationDialog(true);
-        }
-        /*
-         * Otherwise, just import the servants.
-         */
-        finalizeImport();
-    }, [finalizeImport, masterAccount]);
-
-    const handleConfirmationDialogAction = useCallback((event: any, reason: ModalOnCloseReason, overwrite?: boolean): void => {
-        setShowConfirmationDialog(false);
-        if (reason === 'submit') {
-            finalizeImport(overwrite);
-        }
-    }, [finalizeImport]);
-
     const handleImportStatusDialogAction = useCallback((): void => {
-        if (importStatus === 'success') {
+        switch (importStatus) {
+        case 'importSuccess':
             return navigate('/user/master/servants');
-        } else if (importStatus === 'fail') {
+        case 'parseFail':
+        case 'importFail':
             setImportStatus('none');
+            break;
+        default:
+            // Do nothing
         }
+        setImportStatusDialogOpen(false);
     }, [navigate, importStatus]);
 
-    const fabContainerChildNodes: ReactNode = useMemo(() => {
-        if (!parsedData) {
-            const disabled = !hasImportData || !!loadingIndicatorIdRef.current;
-            return (
-                <Tooltip title="Import data">
-                    <div>
-                        <Fab
-                            color="primary"
-                            onClick={parseImportData}
-                            disabled={disabled}
-                            children={<PublishIcon />}
-                        />
-                    </div>
-                </Tooltip>
-            );
-        }
-        return [
-            <Tooltip key="cancel" title="Cancel">
-                <div>
-                    <Fab
-                        color="default"
-                        onClick={cancelImport}
-                        children={<ClearIcon />}
-                    />
-                </div>
-            </Tooltip>,
-            <Tooltip key="submit" title="Confirm">
-                <div>
-                    <Fab
-                        color="primary"
-                        onClick={handleFinalizeImportClick}
-                        children={<DoneIcon />}
-                    />
-                </div>
-            </Tooltip>
-        ];
-    }, [cancelImport, handleFinalizeImportClick, hasImportData, parseImportData, parsedData]);
-
-    const mainContentNode: ReactNode = useMemo(() => {
+    const mainContentNode = useMemo((): ReactNode => {
         /*
-         * If there is no parsed data, display the data input screen.
+         * If data has been successfully parsed, then show the parsed servant list.
          */
-        if (!parsedData) {
+        if (parsedData && parsedData.masterServants.length) {
             return (
-                <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-                    <div className={`${StyleClassPrefix}-file-input-helper-text`}>
-                        {FileInputHelperText}
-                    </div>
-                    <div className={`${StyleClassPrefix}-file-input-container`}>
-                        <FileInputWithTextarea
-                            dropzoneRef={dropzoneRef}
-                            rows={15}
-                            value={importData}
-                            onValueChange={setImportData}
-                        >
-                            <div className={`${StyleClassPrefix}-file-input-actions`}>
-                                <div className={`${StyleClassPrefix}-file-input-actions-helper-text`}>
-                                    {FileInputActionsHelperText}
-                                </div>
-                                <Button variant="contained" color="secondary" onClick={openFileUploadDialog}>
-                                    Select File
-                                </Button>
-                            </div>
-                        </FileInputWithTextarea>
-                    </div>
-                </Box>
-            );
-        }
-        /*
-         * Else, display the parsed servant results.
-         */
-        const { masterServants, bondLevels } = parsedData;
-        // TODO Display errors and warning
-        if (!masterServants.length) {
-            return (
-                <AlertDialog
-                    open
-                    message={ParseFailMessage}
-                    confirmButtonColor="primary"
-                    confirmButtonLabel="OK"
-                    onClose={cancelImport}
+                <MasterServantImportList
+                    parsedData={parsedData}
+                    hasExistingServants={!!masterAccount?.servants.length}
+                    onSubmit={finalizeImport}
+                    onCancel={cancelImport}
                 />
             );
         }
+        /*
+         * Otherwise, keep showing the file input.
+         */
         return (
-            <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-                <div className={`${StyleClassPrefix}-import-results-helper-text`}>
-                    {ParseResultHelperText}
-                </div>
-                <LayoutPanelContainer className="p-4">
-                    <MasterServantListHeader
-                        visibleColumns={ServantListVisibleColumns}
-                    />
-                    <MasterServantList
-                        openLinksInNewTab
-                        masterServants={masterServants}
-                        bondLevels={bondLevels}
-                        visibleColumns={ServantListVisibleColumns}
-                    />
-                </LayoutPanelContainer>
-                <div className="py-10" />
-            </Box>
+            <MasterServantImportFileInput
+                onSubmit={parseData}
+                disableSubmit={!!loadingIndicatorIdRef.current}
+            />
         );
-    }, [cancelImport, importData, openFileUploadDialog, parsedData]);
+    }, [cancelImport, finalizeImport, masterAccount?.servants.length, parseData, parsedData]);
+
+    const importStatusDialog = useMemo((): ReactNode => {
+        const message = ImportStatusMessages[importStatus];
+        return (
+            <AlertDialog
+                open={importStatusDialogOpen}
+                message={message}
+                confirmButtonColor="primary"
+                confirmButtonLabel="OK"
+                onClose={handleImportStatusDialogAction}
+            />
+        );
+    }, [handleImportStatusDialogAction, importStatus, importStatusDialogOpen]);
 
     return (
         <Fragment>
             <LayoutPageScrollable scrollContainerRef={scrollContainerRef}>
                 {mainContentNode}
             </LayoutPageScrollable>
-            <FabContainer children={fabContainerChildNodes} />
-            <MasterServantImportConfirmationDialog
-                open={showConfirmationDialog}
-                confirmButtonColor="primary"
-                onClose={handleConfirmationDialogAction}
-            />
-            <AlertDialog
-                open={importStatus !== 'none'}
-                message={importStatus === 'success' ? ImportSuccessMessage : ImportFailMessage}
-                confirmButtonColor="primary"
-                confirmButtonLabel="OK"
-                onClose={handleImportStatusDialogAction}
-            />
+            {importStatusDialog}
         </Fragment>
     );
 

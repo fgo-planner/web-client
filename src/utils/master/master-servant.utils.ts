@@ -3,8 +3,6 @@ import { GameServantConstants } from '../../constants';
 
 export class MasterServantUtils {
 
-    //#region Data manipulation methods
-
     /**
      * Instantiates a default `MasterServant` object.
      */
@@ -37,13 +35,115 @@ export class MasterServantUtils {
     /**
      * Merges a `MasterServant` object into another.
      */
-    static merge(target: MasterServant, source: Partial<MasterServant>): void {
+    static merge(target: MasterServant, source: Partial<MasterServant>): void;
+
+    /**
+     * Merges an array of `MasterServant` objects into another. Servants that exist
+     * in both arrays (matched by `gameId`) will be merged together. In case of
+     * duplicates in one or both lists, they will be matched by their order of
+     * appearance (index).
+     */
+    static merge(target: Array<MasterServant>, source: Array<MasterServant>): void;
+
+    /**
+     * Method implementation
+     */
+    static merge(target: MasterServant | Array<MasterServant>, source: Partial<MasterServant> | Array<MasterServant>): void {
+        if (!Array.isArray(target) && !Array.isArray(source)) {
+            this._merge(target, source);
+        } else if (Array.isArray(target) && Array.isArray(source)) {
+            this._mergeArrays(target, source);
+        }
+    }
+
+    private static _merge(target: MasterServant, source: Partial<MasterServant>): void {
         Object.assign(target, source);
         if (source.skills) {
             target.skills = {
                 ...source.skills
             };
         }
+    }
+
+    private static _mergeArrays(target: Array<MasterServant>, source: Array<MasterServant>): void {
+        /*
+         * Nothing to do, return.
+         */
+        if (!source.length) {
+            return;
+        }
+        
+        /*
+         * No need to do any individual merges, just copy the entire list.
+         */
+        if (!target.length) {
+            target.push(...source);
+            return;
+        }
+
+        /**
+         * The last `instanceId` of the target list.
+         */
+        let lastInstanceId = this.getLastInstanceId(target);
+
+        /**
+         * A map of the target list where the key is the servant `gameId` and the
+         * values are buckets containing the servants with the `gameId`.
+         */
+        const targetMapByGameId = new Map<number, Array<MasterServant>>();
+        for (const targetServant of target) {
+            const { gameId } = targetServant;
+            let bucket = targetMapByGameId.get(gameId);
+            if (!bucket) {
+                targetMapByGameId.set(gameId, bucket = []);
+            }
+            bucket.push(targetServant);
+        }
+
+        /**
+         * Keeps track of the number of servants by `gameId` have that have been merged
+         * into the target list.
+         */
+        const mergeCountByGameId: Record<number, number> = {};
+
+        /*
+         * Iterate through the source list.
+         */
+        for (const sourceServant of source) {
+            const { gameId } = sourceServant;
+            const mergeCount = mergeCountByGameId[gameId] || 0;
+            const bucket = targetMapByGameId.get(gameId);
+
+            /**
+             * The target servant to merge into.
+             */
+            const mergeTarget = bucket?.[mergeCount];
+
+            /*
+             * If a suitable merge target could not be found, then just add the servant to
+             * the target list. Otherwise, merge the source servant into the target and
+             * update the merge count.
+             */
+            if (!mergeTarget) {
+                sourceServant.instanceId = ++lastInstanceId;
+                target.push(sourceServant);
+            } else {
+                this._merge(mergeTarget, sourceServant);
+                mergeCountByGameId[gameId] = mergeCount + 1;
+            }
+
+        }
+    }
+
+    static getLastInstanceId(masterServants: Array<MasterServant>): number {
+        if (!masterServants.length) {
+            return 0;
+        }
+        return Math.max(...masterServants.map(servant => servant.instanceId));
+    }
+
+    static reassignInstanceIds(masterServants: Array<MasterServant>, startId = 1) {
+        masterServants.forEach((servant, index) => servant.instanceId = startId + index);
     }
 
     /**
@@ -135,14 +235,5 @@ export class MasterServantUtils {
         }
         return GameServantConstants.MinLevel;
     }
-
-    static getLastInstanceId(masterServants: MasterServant[]): number {
-        if (!masterServants.length) {
-            return -1;
-        }
-        return  Math.max(...masterServants.map(servant => servant.instanceId));
-    }
-
-    //#endregion
 
 }

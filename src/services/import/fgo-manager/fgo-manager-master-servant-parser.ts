@@ -38,7 +38,7 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         this._servantNameMap = servantNameToGameIdMap;
     }
 
-    parse(startInstanceId: number): MasterServantParserResult {
+    parse(startInstanceId = 1): MasterServantParserResult {
         const results: MasterServantParserResult = {
             masterServants: [],
             bondLevels: {},

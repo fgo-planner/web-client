@@ -131,7 +131,7 @@ const StyleProps = {
              * @see https://css-tricks.com/flexbox-truncated-text/
              */
             minWidth: 0,
-            '& > :not(:first-child)': {
+            '& >div': {
                 pl: 4
             },
             [`& .${MasterServantListRowLabelStyleClassPrefix}-rarity`]: {

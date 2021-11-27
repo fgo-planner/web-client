@@ -1,5 +1,5 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
 import React, { FormEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
@@ -12,7 +12,7 @@ type Props = {
      * The master servant to edit. If not provided, the dialog will instantiate a
      * new servant.
      */
-    masterServant?: MasterServant;
+    masterServant?: Readonly<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
     unlockedCostumes: Array<number>;
     disableServantSelect?: boolean;
@@ -22,9 +22,18 @@ type Props = {
 
 const FormId = 'master-servant-edit-dialog-form';
 
+const DialogWidth = 600;
+
+const DialogPaperProps = {
+    style: {
+        width: DialogWidth
+    }
+} as PaperProps;
+
 export const MasterServantEditDialog = React.memo((props: Props) => {
 
     const {
+        masterServant,
         bondLevels,
         unlockedCostumes,
         disableServantSelect,
@@ -34,14 +43,15 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         ...dialogProps
     } = props;
 
-    const [masterServant, setMasterServant] = useState<MasterServant>(props.masterServant || MasterServantUtils.instantiate());
+    // TODO Find a better name for this variable.
+    const [_masterServant, setMasterServant] = useState<Readonly<MasterServant>>(masterServant || MasterServantUtils.instantiate());
 
     /**
-     * Update the masterMaster state if the one from the props has changed.
+     * Update the masterServant state if the one from the props has changed.
      */
     useEffect(() => {
-        setMasterServant(props.masterServant || MasterServantUtils.instantiate());
-    }, [props.masterServant]);
+        setMasterServant(masterServant || MasterServantUtils.instantiate());
+    }, [masterServant]);
 
     /**
      * Contains cache of the dialog contents.
@@ -78,7 +88,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
                     <MasterServantEditForm
                         formId={FormId}
                         className="pt-4"
-                        masterServant={masterServant}
+                        masterServant={_masterServant}
                         bondLevels={bondLevels}
                         unlockedCostumes={unlockedCostumes}
                         onSubmit={submit}
@@ -109,8 +119,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
     return (
         <Dialog
             {...dialogProps}
-            // FIXME Inline paper props
-            PaperProps={{ style: { width: 600 } }}
+            PaperProps={DialogPaperProps}
             fullScreen={fullScreen}
             keepMounted={false}
         >

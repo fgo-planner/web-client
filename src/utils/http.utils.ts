@@ -26,8 +26,9 @@ export class HttpUtils {
         const headers = this._appendAuthorizationHeader();
         const init = {
             method: 'GET',
+            credentials: 'include',
             headers
-        };
+        } as RequestInit;
         const response = await fetch(url, init);
         return this._parseResponseBody(response, options) as any;
     }
@@ -45,9 +46,10 @@ export class HttpUtils {
         }
         const init = {
             method: 'POST',
+            credentials: 'include',
             body,
             headers
-        };
+        } as RequestInit;
         const response = await fetch(url, init);
         return this._parseResponseBody(response, options) as any;
     }
@@ -65,9 +67,10 @@ export class HttpUtils {
         }
         const init = {
             method: 'PUT',
+            credentials: 'include',
             body,
             headers
-        };
+        } as RequestInit;
         const response = await fetch(url, init);
         return this._parseResponseBody(response, options) as any;
     }
@@ -79,12 +82,13 @@ export class HttpUtils {
         const headers = this._appendAuthorizationHeader();
         const init = {
             method: 'DELETE',
+            credentials: 'include',
             headers
-        };
+        } as RequestInit;
         const response = await fetch(url, init);
         return this._parseResponseBody(response, options) as any;
     }
-    
+
     private static _inferContentType(body: RequestBody): string {
         if (typeof body === 'object') {
             return 'application/json';

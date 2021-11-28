@@ -35,14 +35,15 @@ export class AuthenticationService {
     }
 
     static async login(credentials: UserCredentials): Promise<void> {
-        const options = {
+        const init = {
             method: 'POST',
+            credentials: 'include',
             body: JSON.stringify(credentials),
             headers: {
                 'Content-Type': 'application/json'
             }
-        };
-        const response = await fetch(this._LoginUrl, options);
+        } as RequestInit;
+        const response = await fetch(this._LoginUrl, init);
         if (response.status === 200) {
             const token = await response.text();
             JwtUtils.writeTokenToStorage(token);

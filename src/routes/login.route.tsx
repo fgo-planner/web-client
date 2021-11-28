@@ -121,8 +121,8 @@ export const LoginRoute = React.memo(() => {
                         variant="contained"
                         type="submit"
                         form={FormId}
-                        >
                         disabled={isLoggingIn}
+                    >
                         Login
                     </Button>
                 </div>

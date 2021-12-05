@@ -82,9 +82,22 @@ export class AuthenticationService {
     }
 
     static logout() {
+        /*
+         * Remove the access token from local storage and set current user to null.
+         */
         JwtUtils.removeTokenFromStorage();
         this._currentUser = null;
         this.onCurrentUserChange.next(null);
+
+        /*
+         * Currently the status of this request doesn't matter...it is only used to
+         * clear the cookie access token. As long as the local storage token is removed,
+         * the app will recognize that the user is no longer logged in.
+         */
+        fetch(`${this._BaseAuthenticationUrl}/logout`, {
+            method: 'POST',
+            credentials: 'include'
+        });
     }
 
     /**

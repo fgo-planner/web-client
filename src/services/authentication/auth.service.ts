@@ -5,7 +5,7 @@ import { JwtUtils } from '../../utils/jwt.utils';
 
 export class AuthenticationService {
 
-    private static readonly _LoginUrl = `${process.env.REACT_APP_REST_ENDPOINT}/login`;
+    private static readonly _BaseAuthenticationUrl = `${process.env.REACT_APP_REST_ENDPOINT}/auth`;
 
     private static _onCurrentUserChange?: BehaviorSubject<Nullable<UserInfo>>;
     static get onCurrentUserChange() {
@@ -69,7 +69,7 @@ export class AuthenticationService {
             }
         } as RequestInit;
 
-        const response = await fetch(this._LoginUrl, init);
+        const response = await fetch(`${this._BaseAuthenticationUrl}/login`, init);
 
         if (response.status === 200) {
             const token = await response.text();

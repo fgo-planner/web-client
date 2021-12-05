@@ -16,10 +16,26 @@ export class AuthenticationService {
         return this._onCurrentUserChange;
     }
 
+    private static __useCookieToken: boolean;
     /**
-     * Cached copy of user info parsed from JWT.
+     * Whether to use additional cookie token access token. Parsed from the
+     * `REACT_APP_USE_COOKIE_ACCESS_TOKEN` property in the `.env` file. If running
+     * the app in a development environment (or any other environment that is using
+     * HTTP instead of HTTPS to communicate with the back-end), it is recommended to
+     * set this property to `false`. Defaults to `true` if not defined.
      */
+    private static get _useCookieToken() {
+        if (this.__useCookieToken == null) {
+            this.__useCookieToken = process.env.REACT_APP_USE_COOKIE_ACCESS_TOKEN?.toLowerCase() !== 'false';
+        }
+        return this.__useCookieToken;
+    }
+
     private static _currentUser: Nullable<UserInfo>;
+    /**
+     * The currently logged in user's info, parsed from JWT. Is `null` if the user
+     * is not currently logged in.
+     */
     static get currentUser() {
         if (!this._currentUser) {
             this._loadTokenFromStorage();
@@ -35,15 +51,26 @@ export class AuthenticationService {
     }
 
     static async login(credentials: UserCredentials): Promise<void> {
+
+        const useCookieToken = this._useCookieToken;
+        if (!useCookieToken) {
+            console.warn('Logging in without requesting redundant cookie access token');
+        }
+
         const init = {
             method: 'POST',
             credentials: 'include',
-            body: JSON.stringify(credentials),
+            body: JSON.stringify({
+                ...credentials,
+                useCookieToken
+            }),
             headers: {
                 'Content-Type': 'application/json'
             }
         } as RequestInit;
+
         const response = await fetch(this._LoginUrl, init);
+
         if (response.status === 200) {
             const token = await response.text();
             JwtUtils.writeTokenToStorage(token);

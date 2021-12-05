@@ -1,3 +1,6 @@
+export * from './dependency-injection/injectable-definition.type';
+export * from './dependency-injection/injectable-token.type';
+export * from './dependency-injection/injected-field.type';
 export * from './game/servant/game-servant-class-simplified.type';
 export * from './generics/cache-array.type';
 export * from './generics/cache-map.type';
@@ -6,6 +9,7 @@ export * from './generics/optional.type';
 export * from './generics/readonly-partial-array.type';
 export * from './generics/readonly-partial.type';
 export * from './generics/readonly-record.type';
+export * from './generics/type.type';
 export * from './modal-on-close-handler.type';
 export * from './modal-on-close-reason.type';
 export * from './props/component-style-props.type';

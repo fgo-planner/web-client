@@ -124,7 +124,7 @@ export const MasterServantCostumesRoute = React.memo(() => {
                 <div>
                     <IconButton
                         component={Link}
-                        to="../servants"
+                        to="../master/servants"
                         children={<FormatListBulletedIcon />}
                         size="large" />
                 </div>

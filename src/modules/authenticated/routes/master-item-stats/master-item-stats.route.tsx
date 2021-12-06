@@ -59,7 +59,7 @@ export const MasterItemStatsRoute = React.memo(() => {
                 <div>
                     <IconButton
                         component={Link}
-                        to="../items"
+                        to="../master/items"
                         children={<FormatListBulletedIcon />}
                         size="large" />
                 </div>

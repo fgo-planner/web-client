@@ -1,8 +1,9 @@
 import { MasterAccount } from '@fgo-planner/types';
 import { BehaviorSubject } from 'rxjs';
 import { Nullable, ReadonlyPartialArray, UserInfo } from '../../../types/internal';
+import { InjectablesContainer } from '../../../utils/dependency-injection/injectables-container';
 import { HttpUtils as Http } from '../../../utils/http.utils';
-import { AuthenticationService } from '../../authentication/auth.service';
+import { AuthenticationService } from '../../authentication/authentication.service';
 
 export type MasterAccountList = ReadonlyPartialArray<MasterAccount>;
 
@@ -35,10 +36,15 @@ export class MasterAccountService {
      * Initialization method, simulates a static constructor.
      */
     private static _initialize(): void {
-        /*
-         * Static subscription the the subject, unsubscribe should not be needed.
-         */
-        AuthenticationService.onCurrentUserChange.subscribe(this._handleCurrentUserChange.bind(this));
+        
+        // TODO Move subjects to a centralized container.
+        setTimeout(() => {
+            /*
+             * Static subscription the the subject, unsubscribe should not be needed.
+             */
+            const authenticationService = InjectablesContainer.get(AuthenticationService)!;
+            authenticationService.onCurrentUserChange.subscribe(this._handleCurrentUserChange.bind(this));
+        });
     }
 
     static async addAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {

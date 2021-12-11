@@ -1,66 +1,27 @@
 import { User, UserPreferences } from '@fgo-planner/types';
 import { BehaviorSubject } from 'rxjs';
-import { Nullable, UserInfo } from '../../../types/internal';
-import { HttpUtils as Http } from '../../../utils/http.utils';
-import { AuthenticationService } from '../../authentication/auth.service';
+import { Nullable } from '../../../types/internal';
 
 export type BasicUser = Pick<User, '_id' | 'username' | 'email'>;
 
-export class UserService {
+export abstract class UserService {
 
-    private static readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user`;
+    protected _currentUserPreferences: Nullable<UserPreferences>;
 
-    private static _currentUserPreferences: Nullable<UserPreferences>;
-
-    static readonly onCurrentUserPreferencesChange = new BehaviorSubject<Nullable<UserPreferences>>(null);
-
-    /**
-     * Initialization method, simulates a static constructor.
-     */
-    private static _initialize(): void {
-        /*
-         * Static subscription the the subject, unsubscribe should not be needed.
-         */
-        AuthenticationService.onCurrentUserChange.subscribe(this._handleCurrentUserChange.bind(this));
+    // TODO Move subjects to a centralized container.
+    private static readonly _onCurrentUserPreferencesChange = new BehaviorSubject<Nullable<UserPreferences>>(null);
+    get onCurrentUserPreferencesChange() {
+        return UserService._onCurrentUserPreferencesChange;
     }
 
-    static async register(data: { username: string, password: string, email?: string, friendId?: string }): Promise<User> {
-        const url = `${this._BaseUrl}/register`;
-        return Http.post<User>(url, data, { responseType: 'text' });
-    }
+    abstract register(data: { username: string, password: string, email?: string, friendId?: string }): Promise<User>;
 
-    static async requestPasswordReset(): Promise<User> {
-        const url = `${this._BaseUrl}/request-password-reset`;
-        return Http.post<User>(url, {}, { responseType: 'text' });
-    }
+    abstract requestPasswordReset(): Promise<User>;
 
-    static async getUserPreferences(): Promise<UserPreferences> {
-        const url = `${this._BaseUrl}/user-preferences`;
-        return Http.get<UserPreferences>(url);
-    }
+    abstract getUserPreferences(): Promise<UserPreferences>;
 
-    static async updateUserPreferences(userPreferences: Partial<UserPreferences>): Promise<UserPreferences> {
-        const url = `${this._BaseUrl}/user-preferences`;
-        const updated = await Http.post<UserPreferences>(url, userPreferences);
-        this.onCurrentUserPreferencesChange.next(this._currentUserPreferences = updated);
-        return updated;
-    }
+    abstract updateUserPreferences(userPreferences: Partial<UserPreferences>): Promise<UserPreferences>;
 
-    static async getCurrentUser(): Promise<BasicUser> {
-        const url = `${this._BaseUrl}/current-user`;
-        return Http.get<BasicUser>(url);
-    }
-
-    private static async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
-        if (!userInfo) {
-            this.onCurrentUserPreferencesChange.next(this._currentUserPreferences = null);
-            return;
-        }
-        this._currentUserPreferences = await this.getUserPreferences();
-        this.onCurrentUserPreferencesChange.next(this._currentUserPreferences);
-    }
+    abstract getCurrentUser(): Promise<BasicUser>;
 
 }
-
-// Call the static initialization method.
-(UserService as any)._initialize();

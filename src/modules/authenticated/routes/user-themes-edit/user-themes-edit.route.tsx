@@ -7,6 +7,7 @@ import { UserPreferences, UserWebClientTheme } from '../../../../../local_module
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { UserService } from '../../../../services/data/user/user.service';
@@ -25,8 +26,11 @@ const getUserThemeOrDefault = (userPreferences: Nullable<UserPreferences>, theme
 };
 
 export const UserThemesEditRoute = React.memo(() => {
+
     const forceUpdate = useForceUpdate();
     const navigate = useNavigate();
+
+    const userService = useInjectable(UserService);
 
     /**
      * Clone of the user's light theme preferences.
@@ -51,7 +55,7 @@ export const UserThemesEditRoute = React.memo(() => {
     }, [forceUpdate]);
 
     useEffect(() => {
-        const onCurrentUserPreferencesChangeSubscription = UserService.onCurrentUserPreferencesChange
+        const onCurrentUserPreferencesChangeSubscription = userService.onCurrentUserPreferencesChange
             .subscribe(userPreferences => {
                 userPreferencesRef.current = userPreferences;
                 setLightTheme(getUserThemeOrDefault(userPreferences, 'light'));
@@ -85,7 +89,7 @@ export const UserThemesEditRoute = React.memo(() => {
         };
 
         try {
-            await UserService.updateUserPreferences(update);
+            await userService.updateUserPreferences(update);
             resetLoadingIndicator();
             navigate('/user/settings');
         } catch (error: any) {
@@ -94,7 +98,7 @@ export const UserThemesEditRoute = React.memo(() => {
             resetLoadingIndicator();
         }
 
-    }, [darkTheme, lightTheme, navigate, resetLoadingIndicator]);
+    }, [darkTheme, lightTheme, navigate, resetLoadingIndicator, userService]);
 
     const handleCancelButtonClick = useCallback((): void => {
         navigate('/user/settings');

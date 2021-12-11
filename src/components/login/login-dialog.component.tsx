@@ -2,8 +2,9 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography }
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
 import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { AuthenticationService } from '../../services/authentication/auth.service';
+import { AuthenticationService } from '../../services/authentication/authentication.service';
 import { UserCredentials } from '../../types/data';
 import { DialogComponentProps } from '../../types/internal';
 import { DialogCloseButton } from '../dialog/dialog-close-button.component';
@@ -45,6 +46,8 @@ export const LoginDialog = React.memo((props: Props) => {
         ...dialogProps
     } = props;
 
+    const authenticationService = useInjectable(AuthenticationService);
+
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -62,7 +65,7 @@ export const LoginDialog = React.memo((props: Props) => {
         setIsLoggingIn(true);
         setErrorMessage(undefined);
         try {
-            await AuthenticationService.login(values);
+            await authenticationService.login(values);
             /*
              * Only update the state if the component is still mounted.
              */
@@ -74,7 +77,7 @@ export const LoginDialog = React.memo((props: Props) => {
             setIsLoggingIn(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [isMounted, onClose]);
+    }, [authenticationService, isMounted, onClose]);
 
     const cancel = useCallback((event: any): void => {
         onClose(event, 'cancel');

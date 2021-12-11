@@ -3,8 +3,9 @@ import { Avatar, Divider } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
-import { AuthenticationService } from '../../../../services/authentication/auth.service';
+import { AuthenticationService } from '../../../../services/authentication/authentication.service';
 import { BasicUser } from '../../../../services/data/user/user.service';
 import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
@@ -59,6 +60,8 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
 
     const { currentUser, anchorEl, onClose } = props;
 
+    const authenticationService = useInjectable(AuthenticationService);
+
     const [themeInfo, setThemeInfo] = useState<ThemeInfo>();
     const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState<boolean>(false);
 
@@ -75,8 +78,8 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
     }, []);
 
     const handleLogout = useCallback((): void => {
-        AuthenticationService.logout();
-    }, []);
+        authenticationService.logout();
+    }, [authenticationService]);
 
     const handleThemeModeToggle = useCallback((): void => {
         ThemeService.toggleThemeMode();

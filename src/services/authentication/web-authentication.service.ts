@@ -1,22 +1,14 @@
-import { BehaviorSubject } from 'rxjs';
+import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import { UserCredentials } from '../../types/data';
-import { Nullable, UserInfo } from '../../types/internal';
 import { JwtUtils } from '../../utils/jwt.utils';
+import { AuthenticationService } from './authentication.service';
 
-export class AuthenticationService {
+@Injectable
+export class WebAuthenticationService extends AuthenticationService {
 
-    private static readonly _BaseAuthenticationUrl = `${process.env.REACT_APP_REST_ENDPOINT}/auth`;
+    private readonly _BaseAuthenticationUrl = `${process.env.REACT_APP_REST_ENDPOINT}/auth`;
 
-    private static _onCurrentUserChange?: BehaviorSubject<Nullable<UserInfo>>;
-    static get onCurrentUserChange() {
-        if (!this._onCurrentUserChange) {
-            this._loadTokenFromStorage();
-            this._onCurrentUserChange = new BehaviorSubject<Nullable<UserInfo>>(this._currentUser);
-        }
-        return this._onCurrentUserChange;
-    }
-
-    private static __useCookieToken: boolean;
+    private __useCookieToken?: boolean;
     /**
      * Whether to use additional cookie token access token. Parsed from the
      * `REACT_APP_USE_COOKIE_ACCESS_TOKEN` property in the `.env` file. If running
@@ -24,34 +16,19 @@ export class AuthenticationService {
      * HTTP instead of HTTPS to communicate with the back-end), it is recommended to
      * set this property to `false`. Defaults to `true` if not defined.
      */
-    private static get _useCookieToken() {
-        if (this.__useCookieToken == null) {
+    private get _useCookieToken() {
+        if (this.__useCookieToken === undefined) {
             this.__useCookieToken = process.env.REACT_APP_USE_COOKIE_ACCESS_TOKEN?.toLowerCase() !== 'false';
         }
         return this.__useCookieToken;
     }
 
-    private static _currentUser: Nullable<UserInfo>;
-    /**
-     * The currently logged in user's info, parsed from JWT. Is `null` if the user
-     * is not currently logged in.
-     */
-    static get currentUser() {
-        if (!this._currentUser) {
-            this._loadTokenFromStorage();
-        }
-        return this._currentUser;
+    constructor() {
+        super();
+        this._loadTokenFromStorage();
     }
 
-    /**
-     * Whether the user is logged in.
-     */
-    static get isLoggedIn() {
-        return !!this.currentUser;
-    }
-
-    static async login(credentials: UserCredentials): Promise<void> {
-
+    async login(credentials: UserCredentials): Promise<void> {
         const useCookieToken = this._useCookieToken;
         if (!useCookieToken) {
             console.warn('Logging in without requesting redundant cookie access token');
@@ -81,7 +58,7 @@ export class AuthenticationService {
         }
     }
 
-    static logout() {
+    async logout(): Promise<void> {
         /*
          * Remove the access token from local storage and set current user to null.
          */
@@ -103,11 +80,11 @@ export class AuthenticationService {
     /**
      * Loads user info from JWT in local storage.
      */
-    private static _loadTokenFromStorage(): void {
+    private _loadTokenFromStorage(): void {
         const token = JwtUtils.readTokenFromStorage();
         if (token) {
             this._currentUser = JwtUtils.parseToken(token);
-            this._onCurrentUserChange?.next(this._currentUser);
+            this.onCurrentUserChange.next(this._currentUser);
         }
     }
 

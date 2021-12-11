@@ -3,7 +3,8 @@ import { SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AuthenticationService } from '../../../services/authentication/auth.service';
+import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
+import { AuthenticationService } from '../../../services/authentication/authentication.service';
 import { BasicUser, UserService } from '../../../services/data/user/user.service';
 import { AppBarService } from '../../../services/user-interface/app-bar.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
@@ -48,6 +49,9 @@ const StyleProps = (theme: Theme) => ({
  */
 export const AppBar = React.memo(() => {
 
+    const authenticationService = useInjectable(AuthenticationService);
+    const userService = useInjectable(UserService);
+
     const [currentUser, setCurrentUser] = useState<BasicUser>();
     const [elevated, setElevated] = useState<boolean>(false);
 
@@ -55,11 +59,11 @@ export const AppBar = React.memo(() => {
      * onCurrentUserChangeSubscription subscriptions
      */
     useEffect(() => {
-        const onCurrentUserChangeSubscription = AuthenticationService.onCurrentUserChange
+        const onCurrentUserChangeSubscription = authenticationService.onCurrentUserChange
             .subscribe(async (userInfo) => {
                 if (userInfo) {
                     // TODO Handle error
-                    const currentUser = await UserService.getCurrentUser();
+                    const currentUser = await userService.getCurrentUser();
                     setCurrentUser(currentUser);
                 } else {
                     setCurrentUser(undefined);
@@ -67,7 +71,7 @@ export const AppBar = React.memo(() => {
             });
 
         return () => onCurrentUserChangeSubscription.unsubscribe();
-    }, []);
+    }, [authenticationService.onCurrentUserChange, userService]);
 
     /**
      * onElevatedChangeSubscription subscriptions

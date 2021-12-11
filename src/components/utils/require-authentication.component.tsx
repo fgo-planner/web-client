@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { Navigate } from 'react-router';
-import { AuthenticationService } from '../../services/authentication/auth.service';
+import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
+import { AuthenticationService } from '../../services/authentication/authentication.service';
 
 /**
  * A wrapper utility component that prevents children components from being
@@ -9,14 +10,16 @@ import { AuthenticationService } from '../../services/authentication/auth.servic
  */
 export const RequireAuthentication = React.memo(({ children }) => {
 
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(AuthenticationService.isLoggedIn);
+    const authenticationService = useInjectable(AuthenticationService);
+
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(authenticationService.isLoggedIn);
 
     useEffect(() => {
-        const onCurrentUserChangeSubscription = AuthenticationService.onCurrentUserChange
-            .subscribe(() => setIsLoggedIn(AuthenticationService.isLoggedIn));
+        const onCurrentUserChangeSubscription = authenticationService.onCurrentUserChange
+            .subscribe(() => setIsLoggedIn(authenticationService.isLoggedIn));
 
         return () => onCurrentUserChangeSubscription.unsubscribe();
-    }, []);
+    }, [authenticationService]);
 
     if (!isLoggedIn) {
         return <Navigate to="/" />;

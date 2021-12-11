@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { InputFieldContainer } from '../components/input/input-field-container.component';
 import { PageTitle } from '../components/text/page-title.component';
+import { useInjectable } from '../hooks/dependency-injection/use-injectable.hook';
 import { UserService } from '../services/data/user/user.service';
 import { FormUtils } from '../utils/form.utils';
 
@@ -119,13 +120,15 @@ const ValidationSchema = Yup.object().shape({
 
 export const RegistrationRoute = React.memo(() => {
 
+    const navigate = useNavigate();
+
+    const userService = useInjectable(UserService);
+
     const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
     const [isRegistering, setIsRegistering] = useState<boolean>(false);
     const [success, setSuccess] = useState<boolean>();
     const [errorMessage, setErrorMessage] = useState<string>();
     const [redirectTimeout, setRedirectTimeout] = useState<NodeJS.Timeout>();
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         return () => {
@@ -140,7 +143,7 @@ export const RegistrationRoute = React.memo(() => {
         setErrorMessage(undefined);
         try {
             const { confirmPassword, ...user } = formData;
-            await UserService.register(user as any);
+            await userService.register(user as any);
 
             // Wait 5 seconds before redirecting to login page
             const redirectTimeout = setTimeout(() => {
@@ -153,7 +156,7 @@ export const RegistrationRoute = React.memo(() => {
             setIsRegistering(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [navigate]);
+    }, [navigate, userService]);
 
     const handleFriendIdChange = useCallback((
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

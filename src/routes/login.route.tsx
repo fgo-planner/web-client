@@ -4,7 +4,8 @@ import React, { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LoginForm, StyleClassPrefix as LoginFormStyleClassPrefix } from '../components/login/login-form.component';
 import { PageTitle } from '../components/text/page-title.component';
-import { AuthenticationService } from '../services/authentication/auth.service';
+import { useInjectable } from '../hooks/dependency-injection/use-injectable.hook';
+import { AuthenticationService } from '../services/authentication/authentication.service';
 import { UserCredentials } from '../types/data';
 
 const FormId = 'login-form';
@@ -65,6 +66,8 @@ const StyleProps = {
 
 export const LoginRoute = React.memo(() => {
 
+    const authenticationService = useInjectable(AuthenticationService);
+
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
 
@@ -74,13 +77,13 @@ export const LoginRoute = React.memo(() => {
         setIsLoggingIn(true);
         setErrorMessage(undefined);
         try {
-            await AuthenticationService.login(values);
+            await authenticationService.login(values);
             navigate('/user');
         } catch (e: any) {
             setIsLoggingIn(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [navigate]);
+    }, [authenticationService, navigate]);
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>

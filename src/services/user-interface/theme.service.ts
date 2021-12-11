@@ -7,6 +7,7 @@ import { AssetConstants } from '../../constants';
 import defaultDarkTheme from '../../styles/theme-default-dark';
 import defaultLightTheme from '../../styles/theme-default-light';
 import { Nullable } from '../../types/internal';
+import { InjectablesContainer } from '../../utils/dependency-injection/injectables-container';
 import { UserService } from '../data/user/user.service';
 import { PageMetadataService } from './page-metadata.service';
 
@@ -51,10 +52,14 @@ export class ThemeService {
         this._setThemeColorMeta(themeInfo.themeOptions);
         this._onThemeChange = new BehaviorSubject<ThemeInfo>(themeInfo);
 
-        /*
-         * Static subscription the the subject, unsubscribe should not be needed.
-         */
-        UserService.onCurrentUserPreferencesChange.subscribe(this._handleCurrentUserPreferencesChange.bind(this));
+        // TODO Move subjects to a centralized container.
+        setTimeout(() => {
+            /*
+             * Static subscription the the subject, unsubscribe should not be needed.
+             */
+            const userService = InjectablesContainer.get(UserService)!;
+            userService.onCurrentUserPreferencesChange.subscribe(this._handleCurrentUserPreferencesChange.bind(this));
+        });
     }
 
     static toggleThemeMode(): void {

@@ -10,7 +10,6 @@ import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 type ListViewDataItem = { item: GameItem; masterData: GameItemQuantity };
 
 type Props = {
-    key: number;
     item: ListViewDataItem;
     editMode: boolean;
 };
@@ -25,7 +24,7 @@ const QuantityInputProps: InputBaseComponentProps = {
 
 export const StyleClassPrefix = 'MasterItemListRow';
 
-export const MasterItemListRow = React.memo(({ key, item, editMode }: Props) => {
+export const MasterItemListRow = React.memo(({ item, editMode }: Props) => {
 
     const forceUpdate = useForceUpdate();
 
@@ -62,11 +61,7 @@ export const MasterItemListRow = React.memo(({ key, item, editMode }: Props) => 
     }
 
     return (
-        <StaticListRowContainer
-            key={key}
-            className={`${StyleClassPrefix}-root`}
-            borderTop
-        >
+        <StaticListRowContainer className={`${StyleClassPrefix}-root`} borderTop>
             <MasterItemListRowLabel item={item.item} editMode={editMode} />
             <div className="flex-fill" />
             <div>

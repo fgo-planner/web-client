@@ -1,67 +1,62 @@
 import { UserPreferences, UserWebClientTheme } from '@fgo-planner/types';
-import { DeprecatedThemeOptions } from '@mui/material';
-import { SimplePaletteColorOptions } from '@mui/material/styles';
+import { SimplePaletteColorOptions, ThemeOptions } from '@mui/material/styles';
 import { colord } from 'colord';
-import { BehaviorSubject } from 'rxjs';
 import { AssetConstants } from '../../constants';
+import { Inject } from '../../decorators/dependency-injection/inject.decorator';
+import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import defaultDarkTheme from '../../styles/theme-default-dark';
 import defaultLightTheme from '../../styles/theme-default-light';
-import { Nullable } from '../../types/internal';
+import { Nullable, ThemeInfo, ThemeMode } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
+import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
 import { PageMetadataService } from './page-metadata.service';
-
-export type ThemeMode = 'light' | 'dark';
-
-export type ThemeInfo = {
-    themeOptions: DeprecatedThemeOptions;
-    themeMode: ThemeMode;
-    backgroundImageUrl?: string;
-};
 
 type UserThemes = {
     light: ThemeInfo;
     dark: ThemeInfo;
 };
 
+@Injectable
 export class ThemeService {
     /**
      * Key used for storing and retrieving the last used theme mode from local
      * storage.
      */
-    private static readonly _ThemeModeKey = 'theme_mode';
+    private readonly _ThemeModeKey = 'theme_mode';
 
-    private static _onThemeChange: BehaviorSubject<ThemeInfo>;
-    static get onThemeChange() {
-        return this._onThemeChange;
+    @Inject(PageMetadataService)
+    private readonly _pageMetadataService!: PageMetadataService;
+
+    private get _onThemeChange() {
+        return SubscribablesContainer.get(SubscriptionTopic.UserInterface_ThemeChange);
     }
 
-    private static _themeMode: ThemeMode;
+    private _themeMode: ThemeMode;
 
-    private static _backgroundImage: string | undefined;
+    private _currentUserThemes!: UserThemes;
 
-    private static _currentUserThemes: UserThemes;
+    constructor() {
+        this._themeMode = this._loadThemeModeFromStorage();
 
-    /**
-     * Initialization method, simulates a static constructor.
-     */
-    private static _initialize(): void {
-        const themeMode = this._themeMode = this._loadThemeModeFromStorage();
-
-        const themeInfo = this._getDefaultThemeForMode(themeMode);
-        this._setThemeColorMeta(themeInfo.themeOptions);
-        this._onThemeChange = new BehaviorSubject<ThemeInfo>(themeInfo);
+        const themeInfo = this._getDefaultThemeForMode(this._themeMode);
+        this._onThemeChange.next(themeInfo);
 
         /*
-         * This class is meant to last the lifetime of the application; no need to
-         * unsubscribe from subscriptions.
+         * Set timeout here to allow the PageMetadataService to be injected first
+         * before accessing it in the subscription handler.
          */
-        SubscribablesContainer
-            .get(SubscriptionTopics.UserCurrentUserPreferencesChange)
-            .subscribe(this._handleCurrentUserPreferencesChange.bind(this));
+        setTimeout(() => {
+            /*
+             * This class is meant to last the lifetime of the application; no need to
+             * unsubscribe from subscriptions.
+             */
+            SubscribablesContainer
+                .get(SubscriptionTopic.User_CurrentUserPreferencesChange)
+                .subscribe(this._handleCurrentUserPreferencesChange.bind(this));
+        });
     }
 
-    static toggleThemeMode(): void {
+    toggleThemeMode(): void {
         if (this._themeMode === 'light') {
             this._setThemeMode('dark');
         } else {
@@ -72,7 +67,7 @@ export class ThemeService {
         this._onThemeChange.next(themeInfo);
     }
 
-    private static _loadThemeModeFromStorage(): ThemeMode {
+    private _loadThemeModeFromStorage(): ThemeMode {
         let themeMode = localStorage.getItem(this._ThemeModeKey);
         if (themeMode !== 'dark') {
             /*
@@ -88,25 +83,26 @@ export class ThemeService {
      * Helper method for setting the value of the `_themeMode` member variable.
      * Also writes the value to local storage.
      */
-    private static _setThemeMode(themeMode: ThemeMode): void {
+    private _setThemeMode(themeMode: ThemeMode): void {
         this._themeMode = themeMode;
         localStorage.setItem(this._ThemeModeKey, themeMode);
+    }
+
+    private async _handleCurrentUserPreferencesChange(userPreferences: Nullable<UserPreferences>): Promise<void> {
+        this._currentUserThemes = this._loadThemesForCurrentUser(userPreferences);
+        const themeInfo = this._currentUserThemes[this._themeMode];
+        this._setThemeColorMeta(themeInfo.themeOptions);
+        this._onThemeChange.next(themeInfo);
     }
 
     /**
      * Sets the `theme-color` metadata.
      */
-    private static _setThemeColorMeta(themeOptions: DeprecatedThemeOptions): void {
-        PageMetadataService.setThemeColor(themeOptions?.palette?.background?.default);
+    private _setThemeColorMeta(themeOptions: ThemeOptions): void {
+        this._pageMetadataService.setThemeColor(themeOptions.palette?.background?.default);
     }
 
-    private static async _handleCurrentUserPreferencesChange(userPreferences: Nullable<UserPreferences>): Promise<void> {
-        this._currentUserThemes = this._loadThemesForCurrentUser(userPreferences);
-        const themeInfo = this._currentUserThemes[this._themeMode];
-        this._onThemeChange.next(themeInfo);
-    }
-
-    private static _loadThemesForCurrentUser(userPreferences: Nullable<UserPreferences>): UserThemes {
+    private _loadThemesForCurrentUser(userPreferences: Nullable<UserPreferences>): UserThemes {
         let light: ThemeInfo;
         let dark: ThemeInfo;
         const userThemePreferences = userPreferences?.webClient?.themes;
@@ -123,8 +119,8 @@ export class ThemeService {
     /**
      * Converts the user's custom theme settings into a `ThemeOptions` object.
      */
-    private static _parseUserThemePreference(userThemePreference: UserWebClientTheme | undefined, themeMode: ThemeMode): ThemeInfo {
-        let themeOptions: DeprecatedThemeOptions;
+    private _parseUserThemePreference(userThemePreference: UserWebClientTheme | undefined, themeMode: ThemeMode): ThemeInfo {
+        let themeOptions: ThemeOptions;
         /*
          * The theme options starts off with default values as the base. Any values that
          * are not specified by the user in the custom theme will use the default.
@@ -157,7 +153,7 @@ export class ThemeService {
         return { themeOptions, themeMode, backgroundImageUrl };
     }
 
-    private static _mergeThemeOptions(baseThemeOptions: DeprecatedThemeOptions, userThemePreference: UserWebClientTheme): void {
+    private _mergeThemeOptions(baseThemeOptions: ThemeOptions, userThemePreference: UserWebClientTheme): void {
         const {
             backgroundColor,
             foregroundColor,
@@ -214,8 +210,8 @@ export class ThemeService {
 
     }
 
-    private static _getDefaultThemeForMode(themeMode: ThemeMode): ThemeInfo {
-        let themeOptions: DeprecatedThemeOptions;
+    private _getDefaultThemeForMode(themeMode: ThemeMode): ThemeInfo {
+        let themeOptions: ThemeOptions;
         let backgroundImageUrl: string;
         if (themeMode === 'light') {
             themeOptions = defaultLightTheme();
@@ -233,7 +229,7 @@ export class ThemeService {
      * can be modified without any side effects. Useful when creating new accounts
      * and to backfill older accounts that don't have theme data.
      */
-    static getDefaultUserWebClientTheme(themeMode: ThemeMode): UserWebClientTheme {
+    getDefaultUserWebClientTheme(themeMode: ThemeMode): UserWebClientTheme {
         const { themeOptions, backgroundImageUrl } = this._getDefaultThemeForMode(themeMode);
         const { palette } = themeOptions;
         const backgroundColor = colord(palette?.background?.default || '').toRgb();
@@ -252,6 +248,3 @@ export class ThemeService {
     }
 
 }
-
-// Call the static initialization method.
-(ThemeService as any)._initialize();

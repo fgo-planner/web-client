@@ -13,6 +13,9 @@ import { LoadingIndicatorOverlayService } from '../../../../services/user-interf
 import { Nullable } from '../../../../types/internal';
 import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
 import { MasterServantCostumesList } from './master-servant-costumes-list.component';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 
 const getUnlockedCostumeSetFromMasterAccount = (account: Nullable<MasterAccount>): Set<number> => {
     if (!account) {
@@ -25,6 +28,9 @@ export const MasterServantCostumesRoute = React.memo(() => {
 
     const forceUpdate = useForceUpdate();
 
+    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const masterAccountService = useInjectable(MasterAccountService);
+
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [unlockedCostumesSet, setUnlockedCostumesSet] = useState<Set<number>>(new Set());
     const [editMode, setEditMode] = useState<boolean>(false);
@@ -34,17 +40,18 @@ export const MasterServantCostumesRoute = React.memo(() => {
     const resetLoadingIndicator = useCallback((): void => {
         const loadingIndicatorId = loadingIndicatorIdRef.current;
         if (loadingIndicatorId) {
-            LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+            loadingIndicatorOverlayService.waive(loadingIndicatorId);
             loadingIndicatorIdRef.current = undefined;
             forceUpdate();
         }
-    }, [forceUpdate]);
+    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     /**
      * onCurrentMasterAccountChange subscriptions
      */
     useEffect(() => {
-        const onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
+        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(account => {
                 const unlockedCostumesSet = getUnlockedCostumeSetFromMasterAccount(account);
                 setMasterAccount(account);
@@ -56,10 +63,11 @@ export const MasterServantCostumesRoute = React.memo(() => {
     }, []);
 
     /**
-     * onCurrentMasterAccountUpdated subscriptions
+     * onCurrentMasterAccountUpdate subscriptions
      */
     useEffect(() => {
-        const onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
+        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
             .subscribe(account => {
                 if (account == null) {
                     return;
@@ -71,7 +79,7 @@ export const MasterServantCostumesRoute = React.memo(() => {
                 setEditMode(false);
             });
 
-        return () => onCurrentMasterAccountUpdatedSubscription.unsubscribe();
+        return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
     }, [resetLoadingIndicator]);
 
     const handleUpdateError = useCallback((error: any): void => {
@@ -97,16 +105,16 @@ export const MasterServantCostumesRoute = React.memo(() => {
             _id: masterAccountId,
             costumes: [...unlockedCostumesSet]
         };
-        MasterAccountService.updateAccount(update)
+        masterAccountService.updateAccount(update)
             .catch(handleUpdateError);
 
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
-            loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
+            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
         }
         loadingIndicatorIdRef.current = loadingIndicatorId;
 
-    }, [unlockedCostumesSet, masterAccount?._id, handleUpdateError]);
+    }, [handleUpdateError, loadingIndicatorOverlayService, masterAccount?._id, masterAccountService, unlockedCostumesSet]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account

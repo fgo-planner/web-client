@@ -1,6 +1,6 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { IconButton, Tooltip } from '@mui/material';
 import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
+import { IconButton, Tooltip } from '@mui/material';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
@@ -8,8 +8,9 @@ import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
-import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { Nullable } from '../../../../types/internal';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { MasterItemStatsFilter } from './master-item-stats-filter.component';
 import { MasterItemStatsTable } from './master-item-stats-table.component';
 import { MasterItemStats, MasterItemStatsFilterOptions, MasterItemStatsUtils } from './master-item-stats.utils';
@@ -33,10 +34,12 @@ export const MasterItemStatsRoute = React.memo(() => {
      * Master account subscriptions
      */
     useEffect(() => {
-        const onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
+        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(setMasterAccount);
 
-        const onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
+        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
             .subscribe(account => {
                 if (account == null) {
                     return;
@@ -46,7 +49,7 @@ export const MasterItemStatsRoute = React.memo(() => {
 
         return () => {
             onCurrentMasterAccountChangeSubscription.unsubscribe();
-            onCurrentMasterAccountUpdatedSubscription.unsubscribe();
+            onCurrentMasterAccountUpdateSubscription.unsubscribe();
         };
     }, []);
 

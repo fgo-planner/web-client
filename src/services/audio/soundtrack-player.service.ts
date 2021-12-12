@@ -1,14 +1,19 @@
-import { BehaviorSubject } from 'rxjs';
+import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
+import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
 
+@Injectable
 export class SoundtrackPlayerService {
 
-    private static readonly _DefaultVolume = 0.5;
+    private readonly _DefaultVolume = 0.5;
 
-    private static _audioEl: HTMLAudioElement;
+    private _audioEl?: HTMLAudioElement;
 
-    static readonly onPlayStatusChange = new BehaviorSubject<boolean>(false);
+    private get _onPlayStatusChange() {
+        return SubscribablesContainer.get(SubscriptionTopic.Audio_BackgroundPlayStatusChange);
+    }
 
-    static async play(src: string): Promise<void> {
+    async play(src: string): Promise<void> {
         let audioEl = this._audioEl;
         if (!audioEl) {
             audioEl = this._audioEl = new Audio();
@@ -18,19 +23,19 @@ export class SoundtrackPlayerService {
         audioEl.src = src;
         try {
             await audioEl.play();
-            this.onPlayStatusChange.next(true);
+            this._onPlayStatusChange.next(true);
         } catch (e) {
             console.error(e);
             return;
         }
     }
 
-    static pause(): void {
+    pause(): void {
         if (!this._audioEl) {
             return;
         }
         this._audioEl.pause();
-        this.onPlayStatusChange.next(false);
+        this._onPlayStatusChange.next(false);
     }
 
 }

@@ -5,10 +5,9 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { BasicUser, UserService } from '../../../services/data/user/user.service';
-import { AppBarService } from '../../../services/user-interface/app-bar.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
+import { SubscriptionTopic } from '../../../utils/subscription/subscription-topic';
 import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';
 import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
 
@@ -60,7 +59,7 @@ export const AppBar = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentUserChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopics.UserCurrentUserChange)
+            .get(SubscriptionTopic.User_CurrentUserChange)
             .subscribe(async (userInfo) => {
                 if (userInfo) {
                     // TODO Handle error
@@ -78,7 +77,8 @@ export const AppBar = React.memo(() => {
      * onElevatedChangeSubscription subscriptions
      */
     useEffect(() => {
-        const onElevatedChangeSubscription = AppBarService.onElevatedChange
+        const onElevatedChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.UserInterface_AppBarElevatedChange)
             .subscribe(setElevated);
 
         return () => onElevatedChangeSubscription.unsubscribe();

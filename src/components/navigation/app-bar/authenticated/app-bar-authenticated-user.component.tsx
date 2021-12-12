@@ -3,9 +3,11 @@ import { Avatar } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
-import { MasterAccountList as MasterAccountListType, MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { MasterAccountList as MasterAccountListType } from '../../../../services/data/master/master-account.service';
 import { BasicUser } from '../../../../services/data/user/user.service';
-import { ModalOnCloseReason } from '../../../../types/internal';
+import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
 import { AppBarResourcesMenu } from '../app-bar-resources-menu.component';
@@ -43,7 +45,7 @@ const StyleProps = {
 export const AppBarAuthenticatedUser = React.memo(({ currentUser }: Props) => {
     const location = useLocation();
 
-    const [masterAccountList, setMasterAccountList] = useState<MasterAccountListType>();
+    const [masterAccountList, setMasterAccountList] = useState<Nullable<MasterAccountListType>>();
     const [resourcesMenuOpen, setResourcesMenuOpen] = useState<boolean>(false);
     const [resourcesMenuAnchorEl, setResourcesMenuAnchorEl] = useState<Element | null>(null);
     const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState<Element | null>(null);
@@ -52,11 +54,12 @@ export const AppBarAuthenticatedUser = React.memo(({ currentUser }: Props) => {
      * Master account subscriptions
      */
     useEffect(() => {
-        const onMasterAccountListUpdatedSubscription = MasterAccountService.onMasterAccountListUpdated
+        const onMasterAccountListUpdateSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_MasterAccountListUpdate)
             .subscribe(setMasterAccountList);
 
         return () => {
-            onMasterAccountListUpdatedSubscription.unsubscribe();
+            onMasterAccountListUpdateSubscription.unsubscribe();
         };
     }, []);
 

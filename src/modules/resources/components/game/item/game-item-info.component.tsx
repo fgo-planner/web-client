@@ -1,12 +1,11 @@
 import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/types';
-import { Theme } from '@mui/material';
-import { StyleRules } from '@mui/styles';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { LoadingIndicator } from '../../../../../components/utils/loading-indicator.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
 import { GameServantService } from '../../../../../services/data/game/game-servant.service';
 import { Nullable } from '../../../../../types/internal';
+import { InjectablesContainer } from '../../../../../utils/dependency-injection/injectables-container';
 import { GameItemNotFound } from './game-item-not-found.component';
 
 type TotalUsage = {
@@ -34,13 +33,18 @@ type State = {
     itemUsage?: GameItemUsage | null;
 };
 
-const style = (theme: Theme) => ({
-    root: {
-        // TODO Implement this
-    }
-} as StyleRules);
-
+// TODO Convert this to functional component
 export const GameItemInfo = class extends PureComponent<Props, State> {
+
+    // TODO Use the useInjectable hook after converting into functional component.
+    private get _gameItemService() {
+        return InjectablesContainer.get(GameItemService)!;
+    }
+
+    // TODO Use the useInjectable hook after converting into functional component.
+    private get _gameServantService() {
+        return InjectablesContainer.get(GameServantService)!;
+    }
 
     constructor(props: Props) {
         super(props);
@@ -108,7 +112,7 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
         this.setState({ 
             itemLoading: true
         });
-        GameItemService.getItem(itemId).then(async item => {
+        this._gameItemService.getItem(itemId).then(async item => {
             const itemUsage = await this._computeItemUsage(item);
             this.setState({
                 itemLoading: false,
@@ -130,7 +134,8 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
             skills: 0,
             costumes: 0
         };
-        const servants = await GameServantService.getServants();
+        // TODO Use useServantList hook instead after converting to functional component.
+        const servants = await this._gameServantService.getServants();
         for (const servant of servants) {
             const { skillMaterials, ascensionMaterials } = servant;
             const costumeMaterials = Object.values(servant.costumes).map(c => c.materials);

@@ -1,17 +1,22 @@
-import { BehaviorSubject } from 'rxjs';
+import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
+import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
 
+@Injectable
 export class AppBarService {
 
-    static readonly onElevatedChange = new BehaviorSubject<boolean>(false);
+    private get _onElevatedChange() {
+        return SubscribablesContainer.get(SubscriptionTopic.UserInterface_AppBarElevatedChange);
+    }
 
-    private static elevated = false;
+    private _elevated = false;
 
-    static setElevated(elevated: boolean): void {
-        if (this.elevated === elevated) {
+    setElevated(elevated: boolean): void {
+        if (this._elevated === elevated) {
             return;
         }
-        this.elevated = elevated;
-        this.onElevatedChange.next(elevated);
+        this._elevated = elevated;
+        this._onElevatedChange.next(elevated);
     }
 
 }

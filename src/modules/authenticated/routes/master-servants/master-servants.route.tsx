@@ -12,12 +12,15 @@ import { LayoutPanelScrollable } from '../../../../components/layout/layout-pane
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
@@ -92,6 +95,9 @@ export const MasterServantsRoute = React.memo(() => {
 
     const forceUpdate = useForceUpdate();
 
+    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const masterAccountService = useInjectable(MasterAccountService);
+
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     /**
      * Clone of the `servants` array from the `MasterAccount` object.
@@ -141,11 +147,11 @@ export const MasterServantsRoute = React.memo(() => {
     const resetLoadingIndicator = useCallback((): void => {
         const loadingIndicatorId = loadingIndicatorIdRef.current;
         if (loadingIndicatorId) {
-            LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+            loadingIndicatorOverlayService.waive(loadingIndicatorId);
             loadingIndicatorIdRef.current = undefined;
             forceUpdate();
         }
-    }, [forceUpdate]);
+    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     /**
      * If the `masterServants` reference changes (due to data being reloaded, etc.)
@@ -170,7 +176,8 @@ export const MasterServantsRoute = React.memo(() => {
      * onCurrentMasterAccountChange subscriptions
      */
     useEffect(() => {
-        const onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
+        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(account => {
                 const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(account);
                 const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
@@ -187,10 +194,11 @@ export const MasterServantsRoute = React.memo(() => {
     }, [updateActiveServantRef]);
 
     /**
-     * onCurrentMasterAccountUpdated subscriptions
+     * onCurrentMasterAccountUpdate subscriptions
      */
     useEffect(() => {
-        const onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
+        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
             .subscribe(account => {
                 if (account == null) {
                     return;
@@ -207,7 +215,7 @@ export const MasterServantsRoute = React.memo(() => {
                 setEditMode(false);
             });
 
-        return () => onCurrentMasterAccountUpdatedSubscription.unsubscribe();
+        return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
     }, [resetLoadingIndicator, updateActiveServantRef]);
 
     const handleUpdateError = useCallback((error: any): void => {
@@ -242,12 +250,12 @@ export const MasterServantsRoute = React.memo(() => {
             bondLevels: bondLevels as Record<number, MasterServantBondLevel>,
             costumes: unlockedCostumes
         };
-        MasterAccountService.updateAccount(update)
+        masterAccountService.updateAccount(update)
             .catch(handleUpdateError);
 
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
-            loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
+            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
         }
         loadingIndicatorIdRef.current = loadingIndicatorId;
 
@@ -255,7 +263,7 @@ export const MasterServantsRoute = React.memo(() => {
         setEditServantDialogOpen(false);
         setDeleteServant(undefined);
         setDeleteServantDialogOpen(false);
-    }, [masterAccount?._id, handleUpdateError]);
+    }, [handleUpdateError, loadingIndicatorOverlayService, masterAccount?._id, masterAccountService]);
 
     const handleFormChange = useCallback((): void => {
         const activeServant = activeServantRef.current;

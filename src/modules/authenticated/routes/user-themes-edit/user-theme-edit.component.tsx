@@ -3,8 +3,10 @@ import React, { useMemo } from 'react';
 import { useCallback } from 'react';
 import { UserWebClientTheme } from '../../../../../local_modules/types/lib';
 import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { ThemeMode, ThemeService } from '../../../../services/user-interface/theme.service';
+import { ThemeService } from '../../../../services/user-interface/theme.service';
+import { ThemeMode } from '../../../../types/internal';
 import { UserThemeBackgroundImage } from './user-theme-background-image.component';
 import { UserThemeColor } from './user-theme-color.component';
 
@@ -17,15 +19,17 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
 
     const forceUpdate = useForceUpdate();
 
+    const themeService = useInjectable(ThemeService);
+
     const title = useMemo(() => {
-        return forThemeMode.charAt(0).toUpperCase() + forThemeMode.substr(1) + ' Theme';
+        return forThemeMode.charAt(0).toUpperCase() + forThemeMode.substring(1) + ' Theme';
     }, [forThemeMode]);
 
     const handleResetDefaultClick = useCallback((): void => {
-        const defaultTheme = ThemeService.getDefaultUserWebClientTheme(forThemeMode);
+        const defaultTheme = themeService.getDefaultUserWebClientTheme(forThemeMode);
         Object.assign(userTheme, defaultTheme);
         forceUpdate();
-    }, [forThemeMode, userTheme, forceUpdate]);
+    }, [forThemeMode, forceUpdate, themeService, userTheme]);
 
     const handleBackgroundImageUrlChange = useCallback((url: string): void => {
         userTheme!!.backgroundImageUrl = url;

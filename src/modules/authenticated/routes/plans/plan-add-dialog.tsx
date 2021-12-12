@@ -5,6 +5,7 @@ import { Formik, FormikConfig, FormikProps } from 'formik';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
 import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { PlannerService } from '../../../../services/data/planner/planner.service';
 import { DialogComponentProps } from '../../../../types/internal';
@@ -62,6 +63,8 @@ export const PlanAddDialog = React.memo((props: Props) => {
         actionButtonVariant
     } = useAutoResizeDialog(props);
 
+    const plannerService = useInjectable(PlannerService);
+
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [, setIsMounted] = useState<boolean>(true);
@@ -83,7 +86,7 @@ export const PlanAddDialog = React.memo((props: Props) => {
         setIsSubmitting(true);
         setErrorMessage(undefined);
         try {
-            const plan = await PlannerService.addPlan({
+            const plan = await plannerService.addPlan({
                 ...values,
                 accountId: masterAccountId
             });
@@ -93,7 +96,7 @@ export const PlanAddDialog = React.memo((props: Props) => {
             setIsSubmitting(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [masterAccountId, onClose]);
+    }, [masterAccountId, onClose, plannerService]);
 
     const renderForm = (): ReactNode => (
         <Formik {...formikConfig} onSubmit={submit}>

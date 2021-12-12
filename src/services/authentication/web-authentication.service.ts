@@ -2,7 +2,7 @@ import { Injectable } from '../../decorators/dependency-injection/injectable.dec
 import { UserCredentials } from '../../types/data';
 import { JwtUtils } from '../../utils/jwt.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
+import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
 import { AuthenticationService } from './authentication.service';
 
 @Injectable
@@ -26,7 +26,7 @@ export class WebAuthenticationService extends AuthenticationService {
     }
 
     private get _onCurrentUserChange() {
-        return SubscribablesContainer.get(SubscriptionTopics.UserCurrentUserChange);
+        return SubscribablesContainer.get(SubscriptionTopic.User_CurrentUserChange);
     }
 
     constructor() {

@@ -1,6 +1,6 @@
 import { GameItemQuantity, MasterAccount } from '@fgo-planner/types';
-import { Fab, IconButton, Tooltip } from '@mui/material';
 import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
+import { Fab, IconButton, Tooltip } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
@@ -8,10 +8,13 @@ import { LayoutPanelScrollable } from '../../../../components/layout/layout-pane
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { GameItemConstants } from '../../../../constants';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { Nullable } from '../../../../types/internal';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { MasterItemList } from './master-item-list.component';
 
 const cloneItemsFromMasterAccount = (account: Nullable<MasterAccount>): Array<GameItemQuantity> => {
@@ -34,7 +37,11 @@ const cloneItemsFromMasterAccount = (account: Nullable<MasterAccount>): Array<Ga
 };
 
 export const MasterItemsRoute = React.memo(() => {
+
     const forceUpdate = useForceUpdate();
+
+    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const masterAccountService = useInjectable(MasterAccountService);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     /**
@@ -48,17 +55,18 @@ export const MasterItemsRoute = React.memo(() => {
     const resetLoadingIndicator = useCallback((): void => {
         const loadingIndicatorId = loadingIndicatorIdRef.current;
         if (loadingIndicatorId) {
-            LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+            loadingIndicatorOverlayService.waive(loadingIndicatorId);
             loadingIndicatorIdRef.current = undefined;
             forceUpdate();
         }
-    }, [forceUpdate]);
+    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     /**
      * onCurrentMasterAccountChange subscriptions
      */
     useEffect(() => {
-        const onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
+        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(account => {
                 const masterItems = cloneItemsFromMasterAccount(account);
                 setMasterAccount(account);
@@ -70,10 +78,11 @@ export const MasterItemsRoute = React.memo(() => {
     }, []);
 
     /**
-     * onCurrentMasterAccountUpdated subscriptions
+     * onCurrentMasterAccountUpdate subscriptions
      */
     useEffect(() => {
-        const onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
+        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
             .subscribe(account => {
                 if (account == null) {
                     return;
@@ -85,7 +94,7 @@ export const MasterItemsRoute = React.memo(() => {
                 setEditMode(false);
             });
 
-        return () => onCurrentMasterAccountUpdatedSubscription.unsubscribe();
+        return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
     }, [resetLoadingIndicator]);
 
     const handleUpdateError = useCallback((error: any): void => {
@@ -114,16 +123,16 @@ export const MasterItemsRoute = React.memo(() => {
             items,
             qp: qpItem?.quantity || 0
         };
-        MasterAccountService.updateAccount(update)
+        masterAccountService.updateAccount(update)
             .catch(handleUpdateError);
 
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
-            loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
+            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
         }
         loadingIndicatorIdRef.current = loadingIndicatorId;
 
-    }, [masterItems, masterAccount?._id, handleUpdateError]);
+    }, [handleUpdateError, loadingIndicatorOverlayService, masterAccount?._id, masterAccountService, masterItems]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account

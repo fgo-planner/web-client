@@ -6,6 +6,8 @@ import { GameItemsRoute } from './routes/game-items.route';
 import { GameServantRoute } from './routes/game-servant.route';
 import { GameServantsRoute } from './routes/game-servants.route';
 
+console.log('ResourcesModule loaded');
+
 const ModuleRoutes = [
     {
         path: '/',

@@ -3,18 +3,23 @@ import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, us
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog } from '../../../../components/dialog/alert-dialog.component';
 import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
+import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { GameServantService } from '../../../../services/data/game/game-servant.service';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { FgoManagerMasterServantParser } from '../../../../services/import/fgo-manager/fgo-manager-master-servant-parser';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { Nullable, ReadonlyRecord } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
 import { MasterServantImportFileInput } from './master-servant-import-file-input';
 import { MasterServantImportList } from './master-servant-import-list.component';
+
+console.log('MasterServantImportRoute loaded');
 
 type ImportStatus =
     'none' |
@@ -42,13 +47,17 @@ const ImportStatusMessages = {
 const MasterServantImportRoute = React.memo(() => {
 
     const forceUpdate = useForceUpdate();
-
     const navigate = useNavigate();
+
+    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const masterAccountService = useInjectable(MasterAccountService);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [parsedData, setParsedData] = useState<MasterServantParserResult>();
     const [importStatus, setImportStatus] = useState<ImportStatus>('none');
     const [importStatusDialogOpen, setImportStatusDialogOpen] = useState<boolean>(false);
+
+    const gameServantList = useGameServantList();
 
     const loadingIndicatorIdRef = useRef<string>();
     const scrollContainerRef = useElevateAppBarOnScroll();
@@ -56,27 +65,29 @@ const MasterServantImportRoute = React.memo(() => {
     const resetLoadingIndicator = useCallback((): void => {
         const loadingIndicatorId = loadingIndicatorIdRef.current;
         if (loadingIndicatorId) {
-            LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+            loadingIndicatorOverlayService.waive(loadingIndicatorId);
             loadingIndicatorIdRef.current = undefined;
             forceUpdate();
         }
-    }, [forceUpdate]);
+    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     /*
      * onCurrentMasterAccountChange subscriptions
      */
     useEffect(() => {
-        const onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
+        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(setMasterAccount);
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, []);
 
     /*
-     * onCurrentMasterAccountUpdated subscriptions
+     * onCurrentMasterAccountUpdate subscriptions
      */
     useEffect(() => {
-        const onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
+        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
             .subscribe(account => {
                 if (account == null) {
                     return;
@@ -84,7 +95,7 @@ const MasterServantImportRoute = React.memo(() => {
                 setMasterAccount(account);
             });
 
-        return () => onCurrentMasterAccountUpdatedSubscription.unsubscribe();
+        return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
     }, [resetLoadingIndicator]);
 
     /*
@@ -117,13 +128,12 @@ const MasterServantImportRoute = React.memo(() => {
         }
 
         // Activate the loading indicator before parsing.
-        loadingIndicatorIdRef.current = LoadingIndicatorOverlayService.invoke();
+        loadingIndicatorIdRef.current = loadingIndicatorOverlayService.invoke();
         forceUpdate();
 
         // Set timeout to allow the loading indicator to be rendered first.
         setTimeout(async () => {
-            const gameServants = await GameServantService.getServants();
-            const parser = new FgoManagerMasterServantParser(data, gameServants);
+            const parser = new FgoManagerMasterServantParser(data, gameServantList || []);
             const parsedData = parser.parse();
             if (!parsedData.masterServants.length) {
                 setImportStatus('parseFail');
@@ -134,7 +144,7 @@ const MasterServantImportRoute = React.memo(() => {
             resetLoadingIndicator();
         });
 
-    }, [forceUpdate, resetLoadingIndicator]);
+    }, [forceUpdate, gameServantList, loadingIndicatorOverlayService, resetLoadingIndicator]);
 
     const cancelImport = useCallback((): void => {
         setParsedData(undefined);
@@ -146,7 +156,7 @@ const MasterServantImportRoute = React.memo(() => {
             return;
         }
 
-        loadingIndicatorIdRef.current = LoadingIndicatorOverlayService.invoke();
+        loadingIndicatorIdRef.current = loadingIndicatorOverlayService.invoke();
         forceUpdate();
 
         /**
@@ -172,7 +182,7 @@ const MasterServantImportRoute = React.memo(() => {
              * Clone the existing servants, just in case the update fails.
              */
             const servants = masterAccount.servants.map(servant => MasterServantUtils.clone(servant));
-            
+
             /*
              * Merge the parsed servants into the existing servants.
              */
@@ -198,7 +208,7 @@ const MasterServantImportRoute = React.memo(() => {
         }
 
         try {
-            await MasterAccountService.updateAccount(update);
+            await masterAccountService.updateAccount(update);
             setImportStatus('importSuccess');
         } catch (error) {
             console.error(error);
@@ -206,7 +216,7 @@ const MasterServantImportRoute = React.memo(() => {
         }
 
         resetLoadingIndicator();
-    }, [forceUpdate, masterAccount, parsedData, resetLoadingIndicator]);
+    }, [forceUpdate, loadingIndicatorOverlayService, masterAccount, masterAccountService, parsedData, resetLoadingIndicator]);
 
     const handleImportStatusDialogAction = useCallback((): void => {
         switch (importStatus) {
@@ -217,7 +227,7 @@ const MasterServantImportRoute = React.memo(() => {
             setImportStatus('none');
             break;
         default:
-            // Do nothing
+        // Do nothing
         }
         setImportStatusDialogOpen(false);
     }, [navigate, importStatus]);

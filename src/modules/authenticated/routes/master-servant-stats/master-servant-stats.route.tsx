@@ -1,14 +1,15 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { IconButton, Tooltip } from '@mui/material';
 import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
+import { IconButton, Tooltip } from '@mui/material';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
-import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { Nullable } from '../../../../types/internal';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { MasterServantStatsFilter, MasterServantStatsFilterResult } from './master-servant-stats-filter.component';
 import { MasterServantStatsTable } from './master-servant-stats-table.component';
 import { MasterServantStatsGroupedByClass, MasterServantStatsGroupedByRarity, MasterServantStatsUtils } from './master-servant-stats.utils';
@@ -44,12 +45,17 @@ export const MasterServantStatsRoute = React.memo(() => {
     const [stats, setStats] = useState<MasterServantStatsGroupedByRarity | MasterServantStatsGroupedByClass>();
 
     const gameServantMap = useGameServantMap();
-
+    
+    /*
+     * Master account subscriptions
+     */
     useEffect(() => {
-        const onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
+        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(setMasterAccount);
 
-        const onCurrentMasterAccountUpdatedSubscription = MasterAccountService.onCurrentMasterAccountUpdated
+        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
             .subscribe(account => {
                 if (account == null) {
                     return;
@@ -59,7 +65,7 @@ export const MasterServantStatsRoute = React.memo(() => {
 
         return () => {
             onCurrentMasterAccountChangeSubscription.unsubscribe();
-            onCurrentMasterAccountUpdatedSubscription.unsubscribe();
+            onCurrentMasterAccountUpdateSubscription.unsubscribe();
         };
     }, []);
 

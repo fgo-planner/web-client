@@ -1,4 +1,6 @@
 import { GameServant } from '@fgo-planner/types';
+import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
+import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { Page, Pagination } from '../../../types/data';
 import { CacheArray, CacheMap, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
@@ -12,21 +14,25 @@ export type GameServantList = ServantsCache;
 
 export type GameServantMap = ServantsCacheMap;
 
+@Injectable
 export class GameServantService {
 
-    private static readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-servant`;
+    private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-servant`;
 
-    private static _servantsCache: Nullable<ServantsCache>;
+    @Inject(LoadingIndicatorOverlayService)
+    private readonly _loadingIndicatorOverlayService!: LoadingIndicatorOverlayService;
 
-    private static _servantsCacheMap: Nullable<ServantsCacheMap>;
+    private _servantsCache: Nullable<ServantsCache>;
 
-    private static _servantsCachePromise: Nullable<Promise<ServantsCache>>;
+    private _servantsCacheMap: Nullable<ServantsCacheMap>;
 
-    static async getServant(id: number): Promise<Nullable<GameServant>> {
+    private _servantsCachePromise: Nullable<Promise<ServantsCache>>;
+
+    async getServant(id: number): Promise<Nullable<GameServant>> {
         return Http.get<Nullable<GameServant>>(`${this._BaseUrl}/${id}`);
     }
 
-    static async getServants(): Promise<ServantsCache> {
+    async getServants(): Promise<ServantsCache> {
         if (this._servantsCache) {
             /*
              * Currently, the same instance of the cache array is returned every time this
@@ -36,7 +42,7 @@ export class GameServantService {
             return this._servantsCache;
         }
         if (!this._servantsCachePromise) {
-            const loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
+            const loadingIndicatorId = this._loadingIndicatorOverlayService.invoke();
             /*
              * TODO Currently, every servant is retrieved and cached with this call. This
              * may need to modify the caching system for servants so that servants are 
@@ -45,16 +51,16 @@ export class GameServantService {
             this._servantsCachePromise = Http.get<GameServant[]>(`${this._BaseUrl}`);
             this._servantsCachePromise.then(cache => {
                 this._onServantsCacheLoaded(cache);
-                LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
             }).catch(error => {
                 this._onServantsCacheLoadError(error);
-                LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
             });
         }
         return this._servantsCachePromise;
     }
 
-    static async getServantsMap(): Promise<ServantsCacheMap> {
+    async getServantsMap(): Promise<ServantsCacheMap> {
         if (!this._servantsCacheMap) {
             await this.getServants();
         }
@@ -62,7 +68,7 @@ export class GameServantService {
         return this._servantsCacheMap!!;
     }
 
-    static async getServantsPage(pagination: Pagination): Promise<Page<GameServant>> {
+    async getServantsPage(pagination: Pagination): Promise<Page<GameServant>> {
         const params = {
             page: pagination.page,
             limit: pagination.size,
@@ -72,25 +78,24 @@ export class GameServantService {
         return Http.get<Page<GameServant>>(`${this._BaseUrl}/page`, { params });
     }
 
-    private static _onServantsCacheLoaded(data: ReadonlyArray<GameServant>): void {
+    private _onServantsCacheLoaded(data: ReadonlyArray<GameServant>): void {
         this._generateCacheMap(this._servantsCache = data);
         this._servantsCachePromise = null;
     }
 
-    private static _onServantsCacheLoadError(error: any): void {
+    private _onServantsCacheLoadError(error: any): void {
         this._invalidateCache();
     }
 
-    private static _invalidateCache(): void {
+    private _invalidateCache(): void {
         this._servantsCache = null;
         this._servantsCacheMap = null;
     }
 
-    private static _generateCacheMap(servants: ReadonlyArray<GameServant>): void {
+    private _generateCacheMap(servants: ReadonlyArray<GameServant>): void {
         const cacheMap: Record<number, Readonly<GameServant>> = {};
         for (const servant of servants) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            cacheMap[servant._id!!] = servant;
+            cacheMap[servant._id] = servant;
         }
         this._servantsCacheMap = cacheMap;
     }

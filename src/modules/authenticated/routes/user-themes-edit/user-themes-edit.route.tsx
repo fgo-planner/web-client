@@ -12,26 +12,19 @@ import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-e
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { UserService } from '../../../../services/data/user/user.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { ThemeMode, ThemeService } from '../../../../services/user-interface/theme.service';
-import { Nullable } from '../../../../types/internal';
+import { ThemeService } from '../../../../services/user-interface/theme.service';
+import { Nullable, ThemeMode } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { UserThemeEdit } from './user-theme-edit.component';
-
-const getUserThemeOrDefault = (userPreferences: Nullable<UserPreferences>, themeMode: ThemeMode): UserWebClientTheme => {
-    const userTheme = userPreferences?.webClient.themes[themeMode];
-    if (!userTheme) {
-        return ThemeService.getDefaultUserWebClientTheme(themeMode);
-    } else {
-        return _.cloneDeep(userTheme); // Return a clone for editing
-    }
-};
 
 export const UserThemesEditRoute = React.memo(() => {
 
     const forceUpdate = useForceUpdate();
     const navigate = useNavigate();
-
+    
+    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const themeService = useInjectable(ThemeService);
     const userService = useInjectable(UserService);
 
     /**
@@ -50,15 +43,24 @@ export const UserThemesEditRoute = React.memo(() => {
     const resetLoadingIndicator = useCallback((): void => {
         const loadingIndicatorId = loadingIndicatorIdRef.current;
         if (loadingIndicatorId) {
-            LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+            loadingIndicatorOverlayService.waive(loadingIndicatorId);
             loadingIndicatorIdRef.current = undefined;
             forceUpdate();
         }
-    }, [forceUpdate]);
+    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     useEffect(() => {
+        const getUserThemeOrDefault = (userPreferences: Nullable<UserPreferences>, themeMode: ThemeMode): UserWebClientTheme => {
+            const userTheme = userPreferences?.webClient.themes[themeMode];
+            if (!userTheme) {
+                return themeService.getDefaultUserWebClientTheme(themeMode);
+            } else {
+                return _.cloneDeep(userTheme); // Return a clone for editing
+            }
+        };
+
         const onCurrentUserPreferencesChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopics.UserCurrentUserPreferencesChange)
+            .get(SubscriptionTopic.User_CurrentUserPreferencesChange)
             .subscribe(userPreferences => {
                 userPreferencesRef.current = userPreferences;
                 setLightTheme(getUserThemeOrDefault(userPreferences, 'light'));
@@ -66,7 +68,7 @@ export const UserThemesEditRoute = React.memo(() => {
             });
 
         return () => onCurrentUserPreferencesChangeSubscription.unsubscribe();
-    }, []);
+    }, [themeService]);
 
     const handleSaveButtonClick = useCallback(async (): Promise<void> => {
         const userPreferences = userPreferencesRef.current;
@@ -77,7 +79,7 @@ export const UserThemesEditRoute = React.memo(() => {
 
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
-            loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
+            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
         }
         loadingIndicatorIdRef.current = loadingIndicatorId;
 
@@ -101,7 +103,7 @@ export const UserThemesEditRoute = React.memo(() => {
             resetLoadingIndicator();
         }
 
-    }, [darkTheme, lightTheme, navigate, resetLoadingIndicator, userService]);
+    }, [darkTheme, lightTheme, loadingIndicatorOverlayService, navigate, resetLoadingIndicator, userService]);
 
     const handleCancelButtonClick = useCallback((): void => {
         navigate('/user/settings');

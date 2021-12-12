@@ -1,24 +1,29 @@
-import { BehaviorSubject } from 'rxjs';
+import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
+import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
 
+@Injectable
 export class LoadingIndicatorOverlayService {
 
-    private static readonly _InvocationIdSet = new Set<string>();
+    private readonly _InvocationIdSet = new Set<string>();
 
-    static readonly onDisplayStatusChange = new BehaviorSubject<boolean>(false);
+    private get _onDisplayStatusChange() {
+        return SubscribablesContainer.get(SubscriptionTopic.UserInterface_LoadingIndicatorDisplayChange);
+    }
 
-    static invoke(): string {
+    invoke(): string {
         const id = String(new Date().getTime());
         this._InvocationIdSet.add(id);
-        if (!this.onDisplayStatusChange.value) {
-            this.onDisplayStatusChange.next(true);
+        if (!this._onDisplayStatusChange.value) {
+            this._onDisplayStatusChange.next(true);
         }
         return id;
     }
 
-    static waive(id: string): void {
+    waive(id: string): void {
         this._InvocationIdSet.delete(id);
         if (!this._InvocationIdSet.size) {
-            this.onDisplayStatusChange.next(false);
+            this._onDisplayStatusChange.next(false);
         }
     }
 

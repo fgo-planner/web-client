@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { BehaviorSubject } from 'rxjs';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic.class';
+import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
 
 export function useSubscribable<T = any>(topicName: string): BehaviorSubject<T>;
 export function useSubscribable<T>(topic: SubscriptionTopic<T>): BehaviorSubject<T>;

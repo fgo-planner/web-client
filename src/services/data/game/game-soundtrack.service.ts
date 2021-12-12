@@ -1,4 +1,6 @@
 import { GameSoundtrack } from '@fgo-planner/types';
+import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
+import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { Page, Pagination } from '../../../types/data';
 import { CacheArray, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
@@ -8,19 +10,23 @@ type SoundtracksCache = CacheArray<GameSoundtrack>;
 
 export type GameSoundtrackList = SoundtracksCache;
 
+@Injectable
 export class GameSoundtrackService {
 
-    private static readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-soundtrack`;
+    private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-soundtrack`;
 
-    private static _soundtracksCache: Nullable<SoundtracksCache>;
+    @Inject(LoadingIndicatorOverlayService)
+    private readonly _loadingIndicatorOverlayService!: LoadingIndicatorOverlayService;
 
-    private static _soundtracksCachePromise: Nullable<Promise<SoundtracksCache>>;
+    private _soundtracksCache: Nullable<SoundtracksCache>;
 
-    static async getSoundtrack(id: number): Promise<Nullable<GameSoundtrack>> {
+    private _soundtracksCachePromise: Nullable<Promise<SoundtracksCache>>;
+
+    async getSoundtrack(id: number): Promise<Nullable<GameSoundtrack>> {
         return Http.get<Nullable<GameSoundtrack>>(`${this._BaseUrl}/${id}`);
     }
 
-    static async getSoundtracks(): Promise<SoundtracksCache> {
+    async getSoundtracks(): Promise<SoundtracksCache> {
         if (this._soundtracksCache) {
             /*
              * Currently, the same instance of the cache array is returned every time this
@@ -30,20 +36,20 @@ export class GameSoundtrackService {
             return this._soundtracksCache;
         }
         if (!this._soundtracksCachePromise) {
-            const loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
+            const loadingIndicatorId = this._loadingIndicatorOverlayService.invoke();
             this._soundtracksCachePromise = Http.get<GameSoundtrack[]>(`${this._BaseUrl}`);
             this._soundtracksCachePromise.then(cache => {
                 this._onSoundtracksCacheLoaded(cache);
-                LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
             }).catch(error => {
                 this._onSoundtracksCacheLoadError(error);
-                LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
             });
         }
         return this._soundtracksCachePromise;
     }
 
-    static async getSoundtracksPage(pagination: Pagination): Promise<Page<GameSoundtrack>> {
+    async getSoundtracksPage(pagination: Pagination): Promise<Page<GameSoundtrack>> {
         const params = {
             page: pagination.page,
             limit: pagination.size,
@@ -53,16 +59,16 @@ export class GameSoundtrackService {
         return Http.get<Page<GameSoundtrack>>(`${this._BaseUrl}/page`, { params });
     }
 
-    private static _onSoundtracksCacheLoaded(data: ReadonlyArray<GameSoundtrack>): void {
+    private _onSoundtracksCacheLoaded(data: ReadonlyArray<GameSoundtrack>): void {
         this._soundtracksCache = data;
         this._soundtracksCachePromise = null;
     }
 
-    private static _onSoundtracksCacheLoadError(error: any): void {
+    private _onSoundtracksCacheLoadError(error: any): void {
         this._invalidateCache();
     }
 
-    private static _invalidateCache(): void {
+    private _invalidateCache(): void {
         this._soundtracksCache = null;
     }
 

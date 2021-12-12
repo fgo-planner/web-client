@@ -7,9 +7,11 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { AuthenticationService } from '../../../../services/authentication/authentication.service';
 import { BasicUser } from '../../../../services/data/user/user.service';
-import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
+import { ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseHandler } from '../../../../types/internal';
+import { ModalOnCloseHandler, Nullable, ThemeInfo } from '../../../../types/internal';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
 import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 
@@ -61,14 +63,18 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
     const { currentUser, anchorEl, onClose } = props;
 
     const authenticationService = useInjectable(AuthenticationService);
+    const backgroundMusicService = useInjectable(BackgroundMusicService);
+    const themeService = useInjectable(ThemeService);
 
-    const [themeInfo, setThemeInfo] = useState<ThemeInfo>();
+    const [themeInfo, setThemeInfo] = useState<Nullable<ThemeInfo>>();
     const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState<boolean>(false);
 
     useEffect(() => {
-        const onThemeChangeSubscription = ThemeService.onThemeChange
+        const onThemeChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.UserInterface_ThemeChange)
             .subscribe(setThemeInfo);
-        const onPlayStatusChangeSubscription = BackgroundMusicService.onPlayStatusChange
+        const onPlayStatusChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.Audio_BackgroundPlayStatusChange)
             .subscribe(setIsBackgroundMusicPlaying);
 
         return () => {
@@ -82,16 +88,16 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
     }, [authenticationService]);
 
     const handleThemeModeToggle = useCallback((): void => {
-        ThemeService.toggleThemeMode();
-    }, []);
+        themeService.toggleThemeMode();
+    }, [themeService]);
 
     const handleBackgroundMusicButtonClick = useCallback((): void => {
         if (isBackgroundMusicPlaying) {
-            BackgroundMusicService.pause();
+            backgroundMusicService.pause();
         } else {
-            BackgroundMusicService.play();
+            backgroundMusicService.play();
         }
-    }, [isBackgroundMusicPlaying]);
+    }, [backgroundMusicService, isBackgroundMusicPlaying]);
 
 
     const menuHeaderNode = (

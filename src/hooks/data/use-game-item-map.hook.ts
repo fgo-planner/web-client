@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { GameItemMap, GameItemService } from '../../services/data/game/game-item.service';
+import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 /**
  * Returns a map of the loaded game item data from the `GameItemService` where
@@ -8,14 +9,16 @@ import { GameItemMap, GameItemService } from '../../services/data/game/game-item
  */
 export const useGameItemMap = (): GameItemMap | undefined => {
 
+    const gameItemService = useInjectable(GameItemService);
+
     const [gameItemMap, setGameItemMap] = useState<GameItemMap>();
 
     /*
      * Retrieve game item map.
      */
     useEffect(() => {
-        GameItemService.getItemsMap().then(setGameItemMap);
-    }, []);
+        gameItemService.getItemsMap().then(setGameItemMap);
+    }, [gameItemService]);
 
     return gameItemMap;
 

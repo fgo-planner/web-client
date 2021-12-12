@@ -3,7 +3,7 @@ import { Navigate } from 'react-router';
 import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
+import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
 
 /**
  * A wrapper utility component that prevents children components from being
@@ -18,7 +18,7 @@ export const RequireAuthentication = React.memo(({ children }) => {
 
     useEffect(() => {
         const onCurrentUserChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopics.UserCurrentUserChange)
+            .get(SubscriptionTopic.User_CurrentUserChange)
             .subscribe(() => setIsLoggedIn(authenticationService.isLoggedIn));
 
         return () => onCurrentUserChangeSubscription.unsubscribe();

@@ -13,6 +13,8 @@ import { PlansRoute } from './routes/plans/plans.route';
 import { UserSettingsRoute } from './routes/user-settings.route';
 import { UserThemesEditRoute } from './routes/user-themes-edit/user-themes-edit.route';
 
+console.log('AuthenticatedModule loaded');
+
 const MasterServantImportRoute = React.lazy(() => import('./routes/master-servant-import/master-servant-import.route'));
 
 const ModuleRoutes = [

@@ -1,12 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { AppBarService } from '../../services/user-interface/app-bar.service';
 import { ThemeConstants } from '../../styles/theme-constants';
-
-const handleScroll = (event: Event): void => {
-    const scrollAmount = (event.target as Element)?.scrollTop;
-    const appBarElevated = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
-    AppBarService.setElevated(appBarElevated);
-};
+import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 /**
  * Automatically sets the app bar elevation state based on the reference `div`
@@ -17,9 +12,11 @@ const handleScroll = (event: Event): void => {
  */
 export const useElevateAppBarOnScroll = () => {
 
+    const appBarService = useInjectable(AppBarService);
+
     useEffect(() => {
-        return () => AppBarService.setElevated(false);
-    }, []);
+        return () => appBarService.setElevated(false);
+    }, [appBarService]);
 
     const scrollContainer = useRef<HTMLDivElement>(null);
 
@@ -28,8 +25,12 @@ export const useElevateAppBarOnScroll = () => {
         if (!element) {
             return;
         }
-        element.onscroll = handleScroll;
-    }, []);
+        element.onscroll = (event: Event): void => {
+            const scrollAmount = (event.target as Element)?.scrollTop;
+            const appBarElevated = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
+            appBarService.setElevated(appBarElevated);
+        };
+    }, [appBarService]);
 
     return scrollContainer;
 

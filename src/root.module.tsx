@@ -4,12 +4,15 @@ import { NavigationMain } from './components/navigation/navigation-main.componen
 import { LazyLoadFallback } from './components/route-fallback/lazy-load-fallback.component';
 import { ThemeProviderWrapper } from './components/theme/theme-provider-wrapper.component';
 import { RequireAuthentication } from './components/utils/require-authentication.component';
+import { useInjectable } from './hooks/dependency-injection/use-injectable.hook';
 import { ErrorRoute } from './routes/error.route';
 import { ForgotPasswordRoute } from './routes/forgot-password.route';
 import { HomeRoute } from './routes/home.route';
 import { LoginRoute } from './routes/login.route';
 import { RegistrationRoute } from './routes/registration.route';
 import { BackgroundMusicService } from './services/audio/background-music.service';
+
+console.log('RootModule loaded');
 
 /*
 Planned navigation outline:
@@ -86,13 +89,15 @@ const ModuleRoutes = [
 
 export const RootModule = React.memo(() => {
 
+    const backgroundMusicService = useInjectable(BackgroundMusicService);
+
     useEffect(() => {
         const autoplayMusic = process.env.REACT_APP_AUTOPLAY_MUSIC;
         if (autoplayMusic && autoplayMusic.toLowerCase() === 'true') {
             // Autoplay background music
-            BackgroundMusicService.play();
+            backgroundMusicService.play();
         }
-    }, []);
+    }, [backgroundMusicService]);
 
     const activeRouteElement = useRoutes(ModuleRoutes);
 

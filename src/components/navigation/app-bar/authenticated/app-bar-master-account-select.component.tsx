@@ -5,6 +5,9 @@ import { ChangeEvent, CSSProperties, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { Nullable, ReadonlyPartialArray } from '../../../../types/internal';
+import { InjectablesContainer } from '../../../../utils/dependency-injection/injectables-container';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 
 type Props = {
     masterAccountList: ReadonlyPartialArray<MasterAccount>;
@@ -25,7 +28,13 @@ const selectOptionStyles = {
     height: 40
 } as CSSProperties;
 
+// TODO Convert this to functional component
 export const AppBarMasterAccountSelect = class extends PureComponent<Props, State> {
+
+    // TODO Use the useInjectable hook after converting into functional component.
+    private get _masterAccountService() {
+        return InjectablesContainer.get(MasterAccountService)!;
+    }
 
     private _onCurrentMasterAccountChangeSubscription!: Subscription;
 
@@ -40,7 +49,8 @@ export const AppBarMasterAccountSelect = class extends PureComponent<Props, Stat
     }
 
     componentDidMount(): void {
-        this._onCurrentMasterAccountChangeSubscription = MasterAccountService.onCurrentMasterAccountChange
+        this._onCurrentMasterAccountChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
     }
 
@@ -90,7 +100,7 @@ export const AppBarMasterAccountSelect = class extends PureComponent<Props, Stat
         this.setState({
             currentMasterAccountId: accountId
         });
-        MasterAccountService.selectAccount(accountId);
+        this._masterAccountService.selectAccount(accountId);
     }
 
     private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {

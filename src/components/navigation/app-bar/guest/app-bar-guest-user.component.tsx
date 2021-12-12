@@ -3,9 +3,12 @@ import { IconButton, PaperProps } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
-import { ThemeInfo, ThemeService } from '../../../../services/user-interface/theme.service';
-import { ModalOnCloseReason } from '../../../../types/internal';
+import { ThemeService } from '../../../../services/user-interface/theme.service';
+import { ModalOnCloseReason, Nullable, ThemeInfo } from '../../../../types/internal';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { LoginDialog } from '../../../login/login-dialog.component';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
@@ -32,24 +35,43 @@ const StyleProps = {
  * Renders the app bar contents for a guest (not logged in) user.
  */
 export const AppBarGuestUser = React.memo(() => {
+
     const location = useLocation();
     const navigate = useNavigate();
 
+    const backgroundMusicService = useInjectable(BackgroundMusicService);
+    const themeService = useInjectable(ThemeService);
+
     const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
-    const [themeInfo, setThemeInfo] = useState<ThemeInfo>();
-    const [isBackgroundMusicPlaying, setBackgroundMusicPlaying] = useState<boolean>();
+    const [themeInfo, setThemeInfo] = useState<Nullable<ThemeInfo>>();
+    const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState<boolean>();
 
     useEffect(() => {
-        const onThemeChangeSubscription = ThemeService.onThemeChange
+        const onThemeChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.UserInterface_ThemeChange)
             .subscribe(setThemeInfo);
-        const onPlayStatusChangeSubscription = BackgroundMusicService.onPlayStatusChange
-            .subscribe(setBackgroundMusicPlaying);
+        const onPlayStatusChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.Audio_BackgroundPlayStatusChange)
+            .subscribe(setIsBackgroundMusicPlaying);
+
 
         return () => {
             onThemeChangeSubscription.unsubscribe();
             onPlayStatusChangeSubscription.unsubscribe();
         };
     }, []);
+
+    const handleThemeModeToggle = useCallback((): void => {
+        themeService.toggleThemeMode();
+    }, [themeService]);
+
+    const handleBackgroundMusicButtonClick = useCallback((): void => {
+        if (isBackgroundMusicPlaying) {
+            backgroundMusicService.pause();
+        } else {
+            backgroundMusicService.play();
+        }
+    }, [backgroundMusicService, isBackgroundMusicPlaying]);
 
     const openLoginDialog = useCallback((): void => {
         const pathname = location.pathname;
@@ -108,11 +130,11 @@ export const AppBarGuestUser = React.memo(() => {
                     />
                 </AppBarLinks>
                 <IconButton
-                    onClick={() => ThemeService.toggleThemeMode()}
+                    onClick={handleThemeModeToggle}
                     children={themeInfo?.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
                     size="large" />
                 <IconButton
-                    onClick={() => isBackgroundMusicPlaying ? BackgroundMusicService.pause() : BackgroundMusicService.play()}
+                    onClick={handleBackgroundMusicButtonClick}
                     children={isBackgroundMusicPlaying ? <VolumeUpIcon /> : <VolumeOffIcon />}
                     size="large" />
             </Box>

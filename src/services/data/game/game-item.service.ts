@@ -1,4 +1,6 @@
 import { GameItem } from '@fgo-planner/types';
+import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
+import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { Page, Pagination } from '../../../types/data';
 import { CacheArray, CacheMap, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
@@ -12,21 +14,25 @@ export type GameItemList = ItemsCache;
 
 export type GameItemMap = ItemsCacheMap;
 
+@Injectable
 export class GameItemService {
 
-    private static readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-item`;
+    private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-item`;
 
-    private static _itemsCache: Nullable<ItemsCache>;
+    @Inject(LoadingIndicatorOverlayService)
+    private readonly _loadingIndicatorOverlayService!: LoadingIndicatorOverlayService;
 
-    private static _itemsCacheMap: Nullable<ItemsCacheMap>;
+    private _itemsCache: Nullable<ItemsCache>;
 
-    private static _itemsCachePromise: Nullable<Promise<ItemsCache>>;
+    private _itemsCacheMap: Nullable<ItemsCacheMap>;
 
-    static async getItem(id: number): Promise<Nullable<GameItem>> {
+    private _itemsCachePromise: Nullable<Promise<ItemsCache>>;
+
+    async getItem(id: number): Promise<Nullable<GameItem>> {
         return Http.get<Nullable<GameItem>>(`${this._BaseUrl}/${id}`);
     }
 
-    static async getItems(): Promise<ItemsCache> {
+    async getItems(): Promise<ItemsCache> {
         if (this._itemsCache) {
             /*
              * Currently, the same instance of the cache array is returned every time this
@@ -36,20 +42,20 @@ export class GameItemService {
             return this._itemsCache;
         }
         if (!this._itemsCachePromise) {
-            const loadingIndicatorId = LoadingIndicatorOverlayService.invoke();
+            const loadingIndicatorId = this._loadingIndicatorOverlayService.invoke();
             this._itemsCachePromise = Http.get<GameItem[]>(`${this._BaseUrl}`);
             this._itemsCachePromise.then(cache => {
                 this._onItemsCacheLoaded(cache);
-                LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
             }).catch(error => {
                 this._onItemsCacheLoadError(error);
-                LoadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
             });
         }
         return this._itemsCachePromise;
     }
 
-    static async getItemsMap(): Promise<ItemsCacheMap> {
+    async getItemsMap(): Promise<ItemsCacheMap> {
         if (!this._itemsCacheMap) {
             await this.getItems();
         }
@@ -57,7 +63,7 @@ export class GameItemService {
         return this._itemsCacheMap!!;
     }
 
-    static async getItemsPage(pagination: Pagination): Promise<Page<GameItem>> {
+    async getItemsPage(pagination: Pagination): Promise<Page<GameItem>> {
         const params = {
             page: pagination.page,
             limit: pagination.size,
@@ -67,24 +73,23 @@ export class GameItemService {
         return Http.get<Page<GameItem>>(`${this._BaseUrl}/page`, { params });
     }
 
-    private static _onItemsCacheLoaded(data: ReadonlyArray<GameItem>): void {
+    private _onItemsCacheLoaded(data: ReadonlyArray<GameItem>): void {
         this._generateCacheMap(this._itemsCache = data);
         this._itemsCachePromise = null;
     }
 
-    private static _onItemsCacheLoadError(error: any): void {
+    private _onItemsCacheLoadError(error: any): void {
         this._invalidateCache();
     }
 
-    private static _invalidateCache(): void {
+    private _invalidateCache(): void {
         this._itemsCache = null;
         this._itemsCacheMap = null;
     }
 
-    private static _generateCacheMap(items: ReadonlyArray<GameItem>): void {
+    private _generateCacheMap(items: ReadonlyArray<GameItem>): void {
         const cacheMap: Record<number, Readonly<GameItem>> = {};
         for (const item of items) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             cacheMap[item._id!!] = item;
         }
         this._itemsCacheMap = cacheMap;

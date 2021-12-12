@@ -1,6 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
+import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useAutoResizeDialog } from '../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { DialogComponentProps } from '../../../types/internal';
@@ -33,6 +34,8 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
         actionButtonVariant
     } = useAutoResizeDialog(props);
 
+    const masterAccountService = useInjectable(MasterAccountService);
+
     const [formValues, setFormValues] = useState<Form>(defaultFormValues());
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
@@ -56,7 +59,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
         setErrorMessage(undefined);
         try {
             const { name, friendId } = formValues;
-            await MasterAccountService.addAccount({ name, friendId });
+            await masterAccountService.addAccount({ name, friendId });
 
             // Only update the state if the component is still mounted.
             if (isMounted) {
@@ -69,7 +72,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
             setIsSubmitting(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [formValues, isMounted, onClose]);
+    }, [formValues, isMounted, masterAccountService, onClose]);
 
     const cancel = useCallback((): void => {
         setFormValues(defaultFormValues());

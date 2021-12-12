@@ -14,6 +14,8 @@ import { UserService } from '../../../../services/data/user/user.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { ThemeMode, ThemeService } from '../../../../services/user-interface/theme.service';
 import { Nullable } from '../../../../types/internal';
+import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { UserThemeEdit } from './user-theme-edit.component';
 
 const getUserThemeOrDefault = (userPreferences: Nullable<UserPreferences>, themeMode: ThemeMode): UserWebClientTheme => {
@@ -55,7 +57,8 @@ export const UserThemesEditRoute = React.memo(() => {
     }, [forceUpdate]);
 
     useEffect(() => {
-        const onCurrentUserPreferencesChangeSubscription = userService.onCurrentUserPreferencesChange
+        const onCurrentUserPreferencesChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopics.UserCurrentUserPreferencesChange)
             .subscribe(userPreferences => {
                 userPreferencesRef.current = userPreferences;
                 setLightTheme(getUserThemeOrDefault(userPreferences, 'light'));

@@ -2,6 +2,8 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Navigate } from 'react-router';
 import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
+import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 
 /**
  * A wrapper utility component that prevents children components from being
@@ -15,7 +17,8 @@ export const RequireAuthentication = React.memo(({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(authenticationService.isLoggedIn);
 
     useEffect(() => {
-        const onCurrentUserChangeSubscription = authenticationService.onCurrentUserChange
+        const onCurrentUserChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopics.UserCurrentUserChange)
             .subscribe(() => setIsLoggedIn(authenticationService.isLoggedIn));
 
         return () => onCurrentUserChangeSubscription.unsubscribe();

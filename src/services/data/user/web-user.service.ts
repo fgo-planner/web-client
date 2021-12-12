@@ -1,9 +1,9 @@
 import { User, UserPreferences } from '@fgo-planner/types';
-import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { Nullable, UserInfo } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
-import { AuthenticationService } from '../../authentication/authentication.service';
+import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
+import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 import { BasicUser, UserService } from './user.service';
 
 @Injectable
@@ -11,21 +11,20 @@ export class WebUserService extends UserService {
 
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user`;
 
-    @Inject(AuthenticationService)
-    private readonly _authenticationService!: AuthenticationService;
-
+    private get _onCurrentUserPreferencesChange() {
+        return SubscribablesContainer.get(SubscriptionTopics.UserCurrentUserPreferencesChange);
+    }
+    
     constructor() {
         super();
-
-        // TODO Move subjects to a centralized container.
-        setTimeout(() => {
-            /*
-             * Static subscription the the subject, unsubscribe should not be needed.
-             */
-            console.log(this._authenticationService);
-            this._authenticationService.onCurrentUserChange.subscribe(this._handleCurrentUserChange.bind(this));
-        });
         
+        /*
+         * This class is meant to last the lifetime of the application; no need to
+         * unsubscribe from subscriptions.
+         */
+        SubscribablesContainer
+            .get(SubscriptionTopics.UserCurrentUserChange)
+            .subscribe(this._handleCurrentUserChange.bind(this));
     }
 
     async register(data: { username: string, password: string, email?: string, friendId?: string }): Promise<User> {
@@ -46,7 +45,7 @@ export class WebUserService extends UserService {
     async updateUserPreferences(userPreferences: Partial<UserPreferences>): Promise<UserPreferences> {
         const url = `${this._BaseUrl}/user-preferences`;
         const updated = await Http.post<UserPreferences>(url, userPreferences);
-        this.onCurrentUserPreferencesChange.next(this._currentUserPreferences = updated);
+        this._onCurrentUserPreferencesChange.next(this._currentUserPreferences = updated);
         return updated;
     }
 
@@ -54,14 +53,14 @@ export class WebUserService extends UserService {
         const url = `${this._BaseUrl}/current-user`;
         return Http.get<BasicUser>(url);
     }
-    
+
     private async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
         if (!userInfo) {
-            this.onCurrentUserPreferencesChange.next(this._currentUserPreferences = null);
+            this._onCurrentUserPreferencesChange.next(this._currentUserPreferences = null);
             return;
         }
         this._currentUserPreferences = await this.getUserPreferences();
-        this.onCurrentUserPreferencesChange.next(this._currentUserPreferences);
+        this._onCurrentUserPreferencesChange.next(this._currentUserPreferences);
     }
 
 }

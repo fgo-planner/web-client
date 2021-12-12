@@ -1,13 +1,7 @@
-import { BehaviorSubject } from 'rxjs';
 import { UserCredentials } from '../../types/data';
 import { Nullable, UserInfo } from '../../types/internal';
 
 export abstract class AuthenticationService {
-
-    private static readonly _onCurrentUserChange = new BehaviorSubject<Nullable<UserInfo>>(null);
-    get onCurrentUserChange() {
-        return AuthenticationService._onCurrentUserChange;
-    }
 
     protected _currentUser: Nullable<UserInfo>;
     /**

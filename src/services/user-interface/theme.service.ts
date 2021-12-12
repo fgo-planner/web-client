@@ -7,8 +7,8 @@ import { AssetConstants } from '../../constants';
 import defaultDarkTheme from '../../styles/theme-default-dark';
 import defaultLightTheme from '../../styles/theme-default-light';
 import { Nullable } from '../../types/internal';
-import { InjectablesContainer } from '../../utils/dependency-injection/injectables-container';
-import { UserService } from '../data/user/user.service';
+import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { PageMetadataService } from './page-metadata.service';
 
 export type ThemeMode = 'light' | 'dark';
@@ -52,14 +52,13 @@ export class ThemeService {
         this._setThemeColorMeta(themeInfo.themeOptions);
         this._onThemeChange = new BehaviorSubject<ThemeInfo>(themeInfo);
 
-        // TODO Move subjects to a centralized container.
-        setTimeout(() => {
-            /*
-             * Static subscription the the subject, unsubscribe should not be needed.
-             */
-            const userService = InjectablesContainer.get(UserService)!;
-            userService.onCurrentUserPreferencesChange.subscribe(this._handleCurrentUserPreferencesChange.bind(this));
-        });
+        /*
+         * This class is meant to last the lifetime of the application; no need to
+         * unsubscribe from subscriptions.
+         */
+        SubscribablesContainer
+            .get(SubscriptionTopics.UserCurrentUserPreferencesChange)
+            .subscribe(this._handleCurrentUserPreferencesChange.bind(this));
     }
 
     static toggleThemeMode(): void {

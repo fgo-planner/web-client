@@ -9,7 +9,6 @@ import { ThemeBackground } from './theme-background.component';
 import { ThemeScrollbars } from './theme-scrollbars.component';
 
 declare module '@mui/styles/defaultTheme' {
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
     interface DefaultTheme extends Theme { }
 }
 

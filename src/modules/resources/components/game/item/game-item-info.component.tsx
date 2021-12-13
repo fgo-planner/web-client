@@ -126,7 +126,6 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
         if (!item) {
             return null;
         }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const itemId = item._id!!;
         const servantUsage: ServantUsage[] = [];
         const totalUsage: TotalUsage = {

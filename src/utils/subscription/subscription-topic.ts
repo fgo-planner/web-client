@@ -3,7 +3,6 @@ import { Nullable, PageMetadata, ReadonlyPartialArray, ThemeInfo, UserInfo } fro
 
 type MasterAccountList = Nullable<ReadonlyPartialArray<MasterAccount>>;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class SubscriptionTopic<T = any> {
     
     static readonly Audio_BackgroundPlayStatusChange = new SubscriptionTopic<boolean>(() => false);

@@ -64,7 +64,6 @@ export class GameServantService {
         if (!this._servantsCacheMap) {
             await this.getServants();
         }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return this._servantsCacheMap!!;
     }
 

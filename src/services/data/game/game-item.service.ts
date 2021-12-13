@@ -59,7 +59,6 @@ export class GameItemService {
         if (!this._itemsCacheMap) {
             await this.getItems();
         }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         return this._itemsCacheMap!!;
     }
 

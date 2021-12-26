@@ -7,11 +7,12 @@ import { GameItemThumbnail } from '../../../../components/game/item/game-item-th
 import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
 import { DataPointListItem } from '../../../../components/list/data-point-list-item.component';
+import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
-import { PlannerComputationUtils, ResultType1 } from '../../../../utils/planner/planner-computation.utils';
+import { MaterialDebtMap, PlannerComputationUtils } from '../../../../utils/planner/planner-computation.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
 type Props = {
@@ -192,17 +193,18 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
     const gameServantMap = useGameServantMap();
 
     const [servant, setServant] = useState<Readonly<GameServant>>();
-    const [servantMaterialStats, setServantMaterialStats] = useState<Record<number, ResultType1>>();
+    const [servantMaterialDebt, setServantMaterialDebt] = useState<MaterialDebtMap>();
 
     useEffect(() => {
         if (!gameServantMap || !activeServant) {
             setServant(undefined);
-            setServantMaterialStats(undefined);
+            setServantMaterialDebt(undefined);
         } else {
             const servant = gameServantMap[activeServant.gameId];
-            const servantMaterialStats = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
+            // TODO Add way to toggle append skills and lores
+            const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
             setServant(servant);
-            setServantMaterialStats(servantMaterialStats);
+            setServantMaterialDebt(servantMaterialDebt);
         }
     }, [gameServantMap, activeServant, unlockedCostumes]);
 
@@ -221,8 +223,8 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
          * Re-compute servant material stats
          */
         const servant = gameServantMap[activeServant.gameId];
-        const servantMaterialStats = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
-        setServantMaterialStats(servantMaterialStats);
+        const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
+        setServantMaterialDebt(servantMaterialDebt);
 
         onStatsChange && onStatsChange(data);
     }, [
@@ -327,19 +329,28 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         unlockedCostumes
     ]);
 
-    const servantMaterialStatsNode: ReactNode = useMemo(() => {
-        if (!servantMaterialStats || !gameItemMap) {
+    const servantMaterialDebtNode: ReactNode = useMemo(() => {
+        if (!servantMaterialDebt || !gameItemMap) {
             return null;
         }
 
-        const servantMaterialStatEntries = Object.entries(servantMaterialStats);
+        const servantMaterialStatEntries = Object.entries(servantMaterialDebt);
         let servantMaterialList: ReactNode;
         if (servantMaterialStatEntries.length) {
             const labelWidth = '80%'; // TODO Make this a constant
             servantMaterialList = servantMaterialStatEntries.map(([key, stats]): ReactNode => {
                 const itemId = Number(key);
+
+                /*
+                 * Do not display QP in the panel...
+                 */
+                if (itemId === GameItemConstants.QpItemId) {
+                    return null;
+                }
+
                 const item = gameItemMap[itemId];
                 const { ascensions, skills, appendSkills, costumes, total } = stats;
+
                 const label = (
                     <div className={`${StyleClassPrefix}-material-stat-label`}>
                         <GameItemThumbnail item={item} size={24} />
@@ -348,6 +359,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                         </div>
                     </div>
                 );
+
                 const tooltip = (
                     <Fragment>
                         <div>{item.name}</div>
@@ -358,6 +370,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                         <div>Total: {total}</div>
                     </Fragment>
                 );
+
                 return (
                     <Tooltip
                         key={itemId}
@@ -379,7 +392,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         } else {
             servantMaterialList = (
                 <div className={`${StyleClassPrefix}-helper-text`}>
-                    Servant is fully upgraded
+                    Servant is fully enhanced
                 </div>
             );
         }
@@ -394,7 +407,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 </div>
             </div>
         );
-    }, [gameItemMap, servantMaterialStats]);
+    }, [gameItemMap, servantMaterialDebt]);
 
     if (!activeServant) {
         return (
@@ -413,7 +426,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 <div className={`${StyleClassPrefix}-divider`} />
                 {/* FIXME Inline sx prop */}
                 <Box sx={{ px: 6, pt: 4 }}>
-                    {servantMaterialStatsNode}
+                    {servantMaterialDebtNode}
                     {renderServantLinks(servant)}
                 </Box>
             </div>

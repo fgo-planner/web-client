@@ -1,14 +1,25 @@
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterServantAscensionLevel, MasterServantSkillLevel } from '@fgo-planner/types';
+import { GameItemConstants } from '../../constants';
 import { MapUtils } from '../map.utils';
 
-// TODO Rename this
-export type ResultType1 = {
+/**
+ * Breakdown of the quantities required for each enhancement category for a
+ * single item.
+ */
+export type MaterialDebt = {
     ascensions: number;
     skills: number;
     appendSkills: number;
     costumes: number;
     total: number;
 };
+
+/**
+ * Map of items required to enhance a servant to the specified targets. The key
+ * is the item's ID, and the value is a breakdown of the quantities required for
+ * each enhancement category.
+ */
+export type MaterialDebtMap = Record<number, MaterialDebt>;
 
 type SkillEnhancements = Readonly<{
     1?: MasterServantSkillLevel;
@@ -42,7 +53,7 @@ export class PlannerComputationUtils {
         servant: Readonly<GameServant>,
         currentEnhancements: ServantEnhancements,
         currentCostumes: Array<number>
-    ): Record<number, ResultType1>;
+    ): MaterialDebtMap;
 
     static computeMaterialDebtForServant(
         servant: Readonly<GameServant>,
@@ -50,7 +61,7 @@ export class PlannerComputationUtils {
         currentCostumes: Set<number>,
         targetEnhancements: ServantEnhancements,
         targetCostumes: Set<number>
-    ): Record<number, ResultType1>;
+    ): MaterialDebtMap;
 
     static computeMaterialDebtForServant(
         servant: Readonly<GameServant>,
@@ -58,13 +69,18 @@ export class PlannerComputationUtils {
         currentCostumes: Array<number> | Set<number>,
         targetEnhancements = this._DefaultTargetEnhancements,
         targetCostumes?: Set<number>
-    ): Record<number, ResultType1> {
+    ): MaterialDebtMap {
 
         if (!(currentCostumes instanceof Set)) {
             currentCostumes = new Set(currentCostumes);
         }
 
-        const result: Record<number, ResultType1> = {};
+        /**
+         * The result map for the servant, instantiated with an entry for QP.
+         */
+        const result: MaterialDebtMap = {
+            [GameItemConstants.QpItemId]: this._instantiateMaterialDebt()
+        };
 
         this._updateResultForSkills(
             result,
@@ -111,7 +127,7 @@ export class PlannerComputationUtils {
     }
 
     private static _updateResultForSkills(
-        result: Record<number, ResultType1>,
+        result: MaterialDebtMap,
         skillMaterials: Readonly<GameServantSkillMaterials>,
         currentSkills: SkillEnhancements,
         targetSkills: SkillEnhancements,
@@ -148,20 +164,31 @@ export class PlannerComputationUtils {
     }
 
     private static _updateResultForEnhancement(
-        result: Record<number, ResultType1>,
+        result: MaterialDebtMap,
         enhancement: GameServantEnhancement,
-        key: keyof ResultType1,
-        count = 1
+        key: keyof MaterialDebt,
+        enhancementCount = 1
     ): void {
+        /*
+         * Update material count.
+         */
         for (const { itemId, quantity } of enhancement.materials) {
-            const stat = MapUtils.getOrDefault(result, itemId, this._instantiateResultType1);
-            const total = quantity * count;
-            stat[key] += total;
-            stat.total += total;
+            const itemCount = MapUtils.getOrDefault(result, itemId, this._instantiateMaterialDebt);
+            const total = quantity * enhancementCount;
+            itemCount[key] += total;
+            itemCount.total += total;
         }
+        /*
+         * Also update QP count. Assumes that the QP entry is always present in the
+         * result map.
+         */
+        const qpCount = result[GameItemConstants.QpItemId];
+        const total = enhancement.qp * enhancementCount;
+        qpCount[key] += total;
+        qpCount.total += total;
     }
 
-    private static _instantiateResultType1(): ResultType1 {
+    private static _instantiateMaterialDebt(): MaterialDebt {
         return {
             ascensions: 0,
             skills: 0,

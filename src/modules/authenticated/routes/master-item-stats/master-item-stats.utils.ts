@@ -1,4 +1,5 @@
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/types';
+import { GameItemConstants } from '../../../../constants';
 import { GameServantMap } from '../../../../services/data/game/game-servant.service';
 import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
 import { MapUtils } from '../../../../utils/map.utils';
@@ -20,9 +21,6 @@ export type MasterItemStatsFilterOptions = {
 export type MasterItemStats = Record<number, MasterItemStat>;
 
 export class MasterItemStatsUtils {
-
-    // TODO Move this to constants file
-    private static readonly _QPItemId = 5;
 
     static generateStats(
         gameServantMap: GameServantMap,
@@ -107,7 +105,7 @@ export class MasterItemStatsUtils {
         }
         const stat = this._instantiateItemStat();
         stat.inventory = masterAccount.qp;
-        stats[this._QPItemId] = stat;
+        stats[GameItemConstants.QpItemId] = stat;
     }
 
     private static _updateForOwnedServant(
@@ -198,29 +196,29 @@ export class MasterItemStatsUtils {
      * @param stats The stats object to be updated.
      * @param enhancement The skill, ascension, or costume enhancement.
      * @param owned Whether the servant is owned by the master.
-     * @param maxUpgrades This should be `3` for skills, and `1` for ascension and
-     * costumes.
-     * @param upgradeCount How many times this was upgraded. For ascensions and
-     * costumes, this should be `1` if the upgrade has been performed, and `0` if
-     * it has not been performed. For skills, this is the number of skills out of
-     * the 3 that has been upgraded.
+     * @param maxEnhancementCount This should be `3` for skills, and `1` for
+     * ascension and costumes.
+     * @param enhancementCount How many times this enhancement has been performed.
+     * For ascensions and costumes, this should be `1` if the upgrade has been
+     * performed, and `0` if it has not been performed. For skills, this is the
+     * number of skills out of the 3 that has been upgraded.
      */
     private static _updateForServantEnhancement(
         stats: Record<number, MasterItemStat>,
         enhancement: GameServantEnhancement,
         owned = false,
-        maxUpgrades = 1,
-        upgradeCount = 0
+        maxEnhancementCount = 1,
+        enhancementCount = 0
     ): void {
 
         for (const { itemId, quantity } of enhancement.materials) {
             const stat = MapUtils.getOrDefault(stats, itemId, this._instantiateItemStat);
-            const cost = quantity * maxUpgrades;
+            const cost = quantity * maxEnhancementCount;
             stat.cost += cost;
             if (!owned) {
                 stat.debt += cost;
             } else {
-                const used = upgradeCount * quantity;
+                const used = enhancementCount * quantity;
                 const debt = cost - used;
                 stat.used += used;
                 stat.debt += debt;
@@ -229,13 +227,13 @@ export class MasterItemStatsUtils {
 
         // QP Stats
         const quantity = enhancement.qp;
-        const stat = stats[this._QPItemId];
-        const cost = quantity * maxUpgrades;
+        const stat = stats[GameItemConstants.QpItemId];
+        const cost = quantity * maxEnhancementCount;
         stat.cost += cost;
         if (!owned) {
             stat.debt += cost;
         } else {
-            const used = upgradeCount * quantity;
+            const used = enhancementCount * quantity;
             const debt = cost - used;
             stat.used += used;
             stat.debt += debt;

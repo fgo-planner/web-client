@@ -59,8 +59,12 @@ export class WebUserService extends UserService {
             this._onCurrentUserPreferencesChange.next(this._currentUserPreferences = null);
             return;
         }
-        this._currentUserPreferences = await this.getUserPreferences();
-        this._onCurrentUserPreferencesChange.next(this._currentUserPreferences);
+        try {
+            this._currentUserPreferences = await this.getUserPreferences();
+            this._onCurrentUserPreferencesChange.next(this._currentUserPreferences);
+        } catch (e: any) {
+            console.error(e);
+        }
     }
 
 }

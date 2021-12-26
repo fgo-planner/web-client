@@ -1,5 +1,6 @@
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import { UserCredentials } from '../../types/data';
+import { HttpResponseError, Nullable } from '../../types/internal';
 import { JwtUtils } from '../../utils/jwt.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
@@ -9,6 +10,8 @@ import { AuthenticationService } from './authentication.service';
 export class WebAuthenticationService extends AuthenticationService {
 
     private readonly _BaseAuthenticationUrl = `${process.env.REACT_APP_REST_ENDPOINT}/auth`;
+
+    private readonly _InvalidateCredentialsWaitDuration = 1000;
 
     private __useCookieToken?: boolean;
     /**
@@ -29,9 +32,19 @@ export class WebAuthenticationService extends AuthenticationService {
         return SubscribablesContainer.get(SubscriptionTopic.User_CurrentUserChange);
     }
 
+    private _invalidatingCredentials = false;
+
     constructor() {
         super();
         this._loadTokenFromStorage();
+
+        /*
+         * This class is meant to last the lifetime of the application; no need to
+         * unsubscribe from subscriptions.
+         */
+        SubscribablesContainer
+            .get(SubscriptionTopic.User_Unauthorized)
+            .subscribe(this._handleUnauthorizedResponse.bind(this));
     }
 
     async login(credentials: UserCredentials): Promise<void> {
@@ -65,6 +78,26 @@ export class WebAuthenticationService extends AuthenticationService {
     }
 
     async logout(): Promise<void> {
+        this._invalidateCredentials();
+    }
+
+    /**
+     * Loads user info from JWT in local storage.
+     */
+    private _loadTokenFromStorage(): void {
+        const token = JwtUtils.readTokenFromStorage();
+        if (token) {
+            this._currentUser = JwtUtils.parseToken(token);
+            this._onCurrentUserChange.next(this._currentUser);
+        }
+    }
+
+    private _invalidateCredentials(): void {
+        /*
+         * Set the _invalidatingCredentials flag to true.
+         */
+        this._invalidatingCredentials = true;
+        
         /*
          * Remove the access token from local storage and set current user to null.
          */
@@ -81,17 +114,22 @@ export class WebAuthenticationService extends AuthenticationService {
             method: 'POST',
             credentials: 'include'
         });
+
+        /*
+         * Reset the _invalidatingCredentials flag after the duration specified by the
+         * _InvalidateCredentialsWaitDuration constant.
+         */
+        setTimeout(() => {
+            this._invalidatingCredentials = false;
+        }, this._InvalidateCredentialsWaitDuration);
     }
 
-    /**
-     * Loads user info from JWT in local storage.
-     */
-    private _loadTokenFromStorage(): void {
-        const token = JwtUtils.readTokenFromStorage();
-        if (token) {
-            this._currentUser = JwtUtils.parseToken(token);
-            this._onCurrentUserChange.next(this._currentUser);
+    private _handleUnauthorizedResponse(error: Nullable<HttpResponseError>): void {
+        if (!error || this._invalidatingCredentials) {
+            return;
         }
+        console.log('Invalidating credentials due to unauthorized response...', error);
+        this._invalidateCredentials();
     }
 
 }

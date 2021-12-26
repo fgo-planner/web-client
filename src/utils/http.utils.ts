@@ -1,23 +1,19 @@
-import { Nullable } from '../types/internal';
+import { HttpOptions, HttpResponseError, HttpResponseType, Nullable } from '../types/internal';
 import { JwtUtils } from './jwt.utils';
+import { SubscribablesContainer } from './subscription/subscribables-container';
+import { SubscriptionTopic } from './subscription/subscription-topic';
 
 type RequestBody = string | Record<string, unknown>;
-
-// TODO Export this if needed
-type HttpOptions = {
-    params?: Record<string, Nullable<string | number | boolean>>;
-    responseType?: HttpResponseType;
-};
-
-// TODO Export this if needed
-// TODO add more types
-type HttpResponseType = 'json' | 'text';
 
 export class HttpUtils {
 
     private static readonly _AuthorizationHeader = 'Authorization';
 
     private static readonly _ContentTypeHeader = 'Content-Type';
+
+    private static get _onUnauthorized() {
+        return SubscribablesContainer.get(SubscriptionTopic.User_Unauthorized);
+    }
 
     static async get<T = any>(url: string, options?: HttpOptions): Promise<T> {
         if (options?.params) {
@@ -29,7 +25,7 @@ export class HttpUtils {
             credentials: 'include',
             headers
         } as RequestInit;
-        const response = await fetch(url, init);
+        const response = await this._fetch(url, init);
         return this._parseResponseBody(response, options) as any;
     }
 
@@ -50,7 +46,7 @@ export class HttpUtils {
             body,
             headers
         } as RequestInit;
-        const response = await fetch(url, init);
+        const response = await this._fetch(url, init);
         return this._parseResponseBody(response, options) as any;
     }
 
@@ -71,7 +67,7 @@ export class HttpUtils {
             body,
             headers
         } as RequestInit;
-        const response = await fetch(url, init);
+        const response = await this._fetch(url, init);
         return this._parseResponseBody(response, options) as any;
     }
 
@@ -85,7 +81,7 @@ export class HttpUtils {
             credentials: 'include',
             headers
         } as RequestInit;
-        const response = await fetch(url, init);
+        const response = await this._fetch(url, init);
         return this._parseResponseBody(response, options) as any;
     }
 
@@ -119,19 +115,32 @@ export class HttpUtils {
         return urlParams.toString();
     }
 
-    private static async _parseResponseBody(response: Response, options?: HttpOptions): Promise<string | Record<string, any>> {
+    private static async _fetch(url: string, init: RequestInit): Promise<Response> {
+        try {
+            return await fetch(url, init);
+        } catch (e: any) {
+            // TODO Handle fetch error here.
+            throw e;
+        }
+    }
+
+    private static async _parseResponseBody(response: Response, options: HttpOptions = {}): Promise<string | Record<string, any>> {
         const contentType = response.headers.get(this._ContentTypeHeader);
+        const { responseType, ignoreUnauthorized } = options;
         let inferredResponseType: HttpResponseType;
-        if (response.ok && options?.responseType) {
-            inferredResponseType = options.responseType;
+        if (response.ok && responseType) {
+            inferredResponseType = responseType;
         } else if (contentType?.includes('json')) {
             inferredResponseType = 'json';
         } else {
             inferredResponseType = 'text';
         }
         if (!response.ok) {
-            const error = await this._getResponseBody(response, inferredResponseType);
-            throw Error(typeof error === 'string' ? error : error['message']);
+            const error = await this._parseResponseError(response, inferredResponseType);
+            if (this._isUnauthorizedError(error) && !ignoreUnauthorized) {
+                this._notifyUnauthorizedError(error);
+            }
+            throw error;
         }
         return this._getResponseBody(response, inferredResponseType);
     }
@@ -142,6 +151,25 @@ export class HttpUtils {
         }
         // TODO Fallback to text if json fails.
         return response.json();
+    }
+
+    private static async _parseResponseError(response: Response, responseType: HttpResponseType): Promise<HttpResponseError> {
+        const body = await this._getResponseBody(response, responseType);
+        const message = typeof body === 'string' ? body : body['message'];
+
+        return {
+            status: response.status,
+            statusText: response.statusText,
+            message,
+        };
+    }
+
+    private static _isUnauthorizedError({ status }: HttpResponseError): boolean {
+        return status === 401 || status === 403;
+    }
+
+    private static _notifyUnauthorizedError(error: HttpResponseError): void {
+        this._onUnauthorized.next(error);
     }
 
 }

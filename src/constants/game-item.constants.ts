@@ -122,6 +122,8 @@ export class GameItemConstants {
         7999, // Grail
     ];
 
+    static readonly MaxItemQuantity = 2000000000;
+
     static readonly QpItemId = 5;
 
 }

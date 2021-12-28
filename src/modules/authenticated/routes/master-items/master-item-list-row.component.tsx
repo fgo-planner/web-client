@@ -3,6 +3,7 @@ import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import NumberFormat from 'react-number-format';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
+import { GameItemConstants } from '../../../../constants';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MathUtils } from '../../../../utils/math.utils';
 import { MasterItemListRowLabel } from './master-item-list-row-label.component';
@@ -14,12 +15,10 @@ type Props = {
     editMode: boolean;
 };
 
-const MaxItemQuantity = 2000000000; // TOOD Move this to constants file.
-
 const QuantityInputProps: InputBaseComponentProps = {
     step: 1,
     min: 0,
-    max: MaxItemQuantity
+    max: GameItemConstants.MaxItemQuantity
 };
 
 export const StyleClassPrefix = 'MasterItemListRow';
@@ -41,7 +40,7 @@ export const MasterItemListRow = React.memo(({ item, editMode }: Props) => {
 
     const handleItemQuantityChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         const value = event.target.value;
-        const quantity = MathUtils.clamp(~~Number(value), 0, MaxItemQuantity);
+        const quantity = MathUtils.clamp(~~Number(value), 0, GameItemConstants.MaxItemQuantity);
 
         // TODO Is it bad practice to modify an object in props?
         item.masterData.quantity = quantity;

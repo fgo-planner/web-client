@@ -1,13 +1,15 @@
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
-import React, { PropsWithChildren } from 'react';
+import React, { MouseEventHandler, PropsWithChildren } from 'react';
 import { ComponentStyleProps } from '../../types/internal';
 import listRowStyle from './list-row-style';
 
+// TODO Add prop for cursor style.
 type Props = PropsWithChildren<{
     active?: boolean;
     borderTop?: boolean;
     borderBottom?: boolean;
+    onClick?: MouseEventHandler<HTMLDivElement>;
 }> & ComponentStyleProps;
 
 export const StyleClassPrefix = 'StaticListRowContainer';
@@ -27,6 +29,7 @@ export const StaticListRowContainer = React.memo((props: Props) => {
         active,
         borderTop,
         borderBottom,
+        onClick,
         className,
         style,
         sx
@@ -45,6 +48,7 @@ export const StaticListRowContainer = React.memo((props: Props) => {
             className={classNames}
             style={style}
             sx={sx}
+            onClick={onClick}
         >
             {children}
         </RootComponent >

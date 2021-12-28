@@ -5,6 +5,7 @@ import React, { PropsWithChildren } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import listRowStyle from './list-row-style';
 
+// TODO Add prop for cursor style.
 type Props = PropsWithChildren<{
     classes?: any;
     active?: boolean;

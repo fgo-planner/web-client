@@ -1,6 +1,7 @@
 import { CSSProperties } from '@mui/styled-engine';
 import { alpha, Theme } from '@mui/system';
 
+// TODO Add class for pointer cursor.
 const style = (theme: Theme) => ({
     '&.row': {
         '&:hover': {

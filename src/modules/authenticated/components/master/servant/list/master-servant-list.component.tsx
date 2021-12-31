@@ -2,10 +2,8 @@ import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { PersonAddOutlined } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { ReactNode, useCallback } from 'react';
+import React, { MouseEvent, ReactNode, useCallback, useRef } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
-import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
-import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { ReadonlyPartial } from '../../../../../../types/internal';
@@ -15,18 +13,21 @@ import { StyleClassPrefix as MasterServantListRowLabelStyleClassPrefix } from '.
 import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './master-servant-list-row.component';
 
 type Props = {
-    masterServants: MasterServant[];
+    masterServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
-    activeServant?: MasterServant;
+    /**
+     * Instance IDs of selected servants.
+     */
+    selectedServants?: ReadonlySet<number>;
     editMode?: boolean;
     showAddServantRow?: boolean;
     openLinksInNewTab?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
-    onActivateServant?: (servant: MasterServant) => void;
     onAddServant?: () => void;
     onEditServant?: (servant: MasterServant) => void;
     onDeleteServant?: (servant: MasterServant) => void;
+    onServantSelectionChange?: (instanceIds: Array<number>) => void;
 };
 
 const StyleClassPrefix = 'MasterServantList';
@@ -146,18 +147,108 @@ export const MasterServantList = React.memo((props: Props) => {
     const {
         masterServants,
         bondLevels,
-        activeServant,
+        selectedServants,
         editMode,
         showAddServantRow,
         openLinksInNewTab,
         visibleColumns,
-        onActivateServant,
         onAddServant,
         onEditServant,
-        onDeleteServant
+        onDeleteServant,
+        onServantSelectionChange
     } = props;
 
-    const handleDragEnd = useCallback((result: DropResult): void => {
+    const lastClickIndexRef = useRef<number>();
+
+    const handleServantClick = useCallback((e: MouseEvent<HTMLDivElement>, index: number): void => {
+        if (!onServantSelectionChange) {
+            return;
+        }
+        
+        /**
+         * The instance ID of the servant that was clicked.
+         */
+        const clickedInstanceId = masterServants[index].instanceId;
+        
+        /**
+         * Array containing the instance IDs of the updated selection.
+         */
+        const updatedSelection: number[] = [];
+
+        if (e.shiftKey) {
+            /*
+             * If the shift modifier key was pressed, then do one of the following:
+             * 
+             * - If a previous click index was recorded, then all all the servants between
+             *   that index and the newly clicked index (inclusive) regardless of whether
+             *   they were already selected or not.
+             * 
+             * - If a previous click was not recorded, then change the selection to just the
+             *   servant that was clicked (same behavior as no modifier keys).
+             *
+             * Note that if both the shift and ctrl keys were pressed, then the shift key
+             * has precedence.
+             */
+            const lastClickIndex = lastClickIndexRef.current;
+            if (lastClickIndex === undefined) {
+                updatedSelection.push(clickedInstanceId);
+            } else {
+                if (selectedServants) {
+                    updatedSelection.push(...selectedServants);
+                }
+                if (lastClickIndex === index) {
+                    updatedSelection.push(clickedInstanceId);
+                } else {
+                    const start = Math.min(lastClickIndex, index);
+                    const end = Math.max(lastClickIndex, index);
+                    for (let i = start; i <= end; i++) {
+                        const { instanceId } = masterServants[i];
+                        updatedSelection.push(instanceId);
+                    }
+                }
+            }
+        } else if (e.ctrlKey) {
+            /*
+             * If the ctrl modifier key was pressed, then do one of the following:
+             *
+             * - If the clicked servant was already selected, then deselect it.
+             *
+             * - If the clicked servant was not selected, then add it to the selection.
+             */
+            let alreadySelected = false;
+            if (selectedServants) {
+                for (const instanceId of selectedServants) {
+                    if (instanceId === clickedInstanceId) {
+                        alreadySelected = true;
+                    } else {
+                        updatedSelection.push(instanceId);
+                    }
+                }
+            }
+            if (!alreadySelected) {
+                updatedSelection.push(clickedInstanceId);
+            }
+        } else {
+            /*
+             * If no modifier keys were pressed, then change the selection to just the
+             * servant that was clicked.
+             */
+            updatedSelection.push(clickedInstanceId);
+        }
+
+        /*
+         * Notify parent component of the selection change.
+         */
+        onServantSelectionChange(updatedSelection);
+
+        /*
+         * Update the last clicked row/servant index.
+         */
+        lastClickIndexRef.current = index;
+
+    }, [masterServants, onServantSelectionChange, selectedServants]);
+
+    const handleServantDragEnd = useCallback((result: DropResult): void => {
         if (!result.destination) {
             return;
         }
@@ -179,46 +270,24 @@ export const MasterServantList = React.memo((props: Props) => {
         const { gameId, instanceId } = masterServant;
         const servant = gameServantMap[gameId];
         const bondLevel = bondLevels[gameId];
-        const active = activeServant?.instanceId === instanceId;
+        const active = selectedServants?.has(instanceId);
         
-        if (editMode) {
-            return (
-                <MasterServantListRow
-                    key={instanceId}
-                    servant={servant}
-                    bond={bondLevel}
-                    masterServant={masterServant}
-                    onEditServant={onEditServant}
-                    onDeleteServant={onDeleteServant}
-                    openLinksInNewTab={openLinksInNewTab}
-                    visibleColumns={visibleColumns}
-                    onActivateServant={onActivateServant}
-                    active={active}
-                    editMode
-                />
-            );
-        }
-
-        const lastRow = index === masterServants.length - 1;
-
         return (
-            <StaticListRowContainer
+            <MasterServantListRow
                 key={instanceId}
-                borderBottom={!lastRow}
+                index={index}
+                servant={servant}
+                bond={bondLevel}
+                masterServant={masterServant}
+                onEditServant={onEditServant}
+                onDeleteServant={onDeleteServant}
+                openLinksInNewTab={openLinksInNewTab}
+                visibleColumns={visibleColumns}
                 active={active}
-            >
-                <MasterServantListRow
-                    servant={servant}
-                    bond={bondLevel}
-                    masterServant={masterServant}
-                    onActivateServant={onActivateServant}
-                    onEditServant={onEditServant}
-                    onDeleteServant={onDeleteServant}
-                    openLinksInNewTab={openLinksInNewTab}
-                    visibleColumns={visibleColumns}
-                    active={active}
-                />
-            </StaticListRowContainer>
+                editMode={editMode}
+                onClick={handleServantClick}
+                // TODO Add right click (context) handler
+            />
         );
     };
 
@@ -248,32 +317,13 @@ export const MasterServantList = React.memo((props: Props) => {
         );
     }
 
-    const renderDraggable = (masterServant: MasterServant, index: number): ReactNode => {
-        const { instanceId } = masterServant;
-        
-        const active = activeServant?.instanceId === instanceId;
-        const lastRow = index === masterServants.length - 1;
-
-        return (
-            <DraggableListRowContainer
-                key={instanceId}
-                draggableId={`draggable-servant-${instanceId}`}
-                index={index}
-                borderBottom={!lastRow}
-                active={active}
-            >
-                {renderMasterServantRow(masterServant, index)}
-            </DraggableListRowContainer>
-        );
-    };
-
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <DragDropContext onDragEnd={handleDragEnd}>
+            <DragDropContext onDragEnd={handleServantDragEnd}>
                 <Droppable droppableId="droppable-servant-list">
                     {(provided: DroppableProvided) => (
                         <div ref={provided.innerRef} {...provided.droppableProps}>
-                            {masterServants.map(renderDraggable)}
+                            {masterServants.map(renderMasterServantRow)}
                             {provided.placeholder}
                         </div>
                     )}

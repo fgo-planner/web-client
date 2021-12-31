@@ -1,8 +1,10 @@
 import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
-import React, { ReactNode, useCallback } from 'react';
+import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
+import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
+import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { AssetConstants } from '../../../../../../constants';
 import { ReadonlyPartial } from '../../../../../../types/internal';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
@@ -13,14 +15,18 @@ type Props = {
     servant: Readonly<GameServant> | undefined; // Not optional, but possible to be undefined.
     masterServant: MasterServant;
     bond: MasterServantBondLevel | undefined;
+    index: number;
+    lastRow?: boolean;
     active?: boolean;
     editMode?: boolean;
     openLinksInNewTab?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
-    onActivateServant?: (servant: MasterServant) => void;
     onEditServant?: (servant: MasterServant) => void;
     onDeleteServant?: (servant: MasterServant) => void;
-};
+    onClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
+    onDoubleClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
+    onContextMenu?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
+} & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onDoubleClick' | 'onContextMenu'>;
 
 const shouldSkipUpdate = (prevProps: Readonly<Props>, nextProps: Readonly<Props>): boolean => {
     if (!ObjectUtils.isShallowEquals(prevProps, nextProps)) {
@@ -110,17 +116,23 @@ export const MasterServantListRow = React.memo((props: Props) => {
         servant,
         masterServant,
         bond,
+        index,
+        lastRow,
+        active,
         editMode,
         openLinksInNewTab,
         visibleColumns,
-        onActivateServant,
         onEditServant,
-        onDeleteServant
+        onDeleteServant,
+        onClick,
+        onDoubleClick,
+        onContextMenu,
+        ...domAttributes
     } = props;
 
-    const handleActivateServant = useCallback((): void => {
-        onActivateServant && onActivateServant(masterServant);
-    }, [masterServant, onActivateServant]);
+    const handleClick = useCallback((e: MouseEvent<HTMLDivElement>): void => {
+        onClick?.(e, index);
+    }, [index, onClick]);
 
     const handleEditServant = useCallback((): void => {
         onEditServant && onEditServant(masterServant);
@@ -159,26 +171,49 @@ export const MasterServantListRow = React.memo((props: Props) => {
         </div>
     );
 
-    return (
-        <div 
-            className={`${StyleClassPrefix}-root`} 
-            onClick={handleActivateServant}
-            onDoubleClick={handleEditServant} // TODO Double-click action is temporary.
-        > 
-            <MasterServantListRowLabel 
+    const rowContents: ReactNode = (
+        <div className={`${StyleClassPrefix}-root`}>
+            <MasterServantListRowLabel
                 servant={servant}
-                masterServant={masterServant} 
+                masterServant={masterServant}
                 editMode={editMode}
                 openLinksInNewTab={openLinksInNewTab}
             />
-                {npLevel && renderNpLevel(masterServant)}
-                {level && renderLevel(masterServant)}
-                {fouHp && renderFouLevel(masterServant, 'fouHp')}
-                {fouAtk && renderFouLevel(masterServant, 'fouAtk')}
-                {skillLevels && renderSkillLevels(masterServant)}
-                {bondLevel && renderBondLevel(bond)}
-                {actionButtonsNode}
+            {npLevel && renderNpLevel(masterServant)}
+            {level && renderLevel(masterServant)}
+            {fouHp && renderFouLevel(masterServant, 'fouHp')}
+            {fouAtk && renderFouLevel(masterServant, 'fouAtk')}
+            {skillLevels && renderSkillLevels(masterServant)}
+            {bondLevel && renderBondLevel(bond)}
+            {actionButtonsNode}
         </div>
+    );
+
+    if (editMode) {
+        return (
+            <DraggableListRowContainer
+                draggableId={`draggable-servant-${masterServant.instanceId}`}
+                index={index}
+                borderBottom={!lastRow}
+                active={active}
+                onClick={handleClick}
+                onDoubleClick={handleEditServant}
+                {...domAttributes}
+            >
+                {rowContents}
+            </DraggableListRowContainer>
+        );
+    }
+
+    return (
+        <StaticListRowContainer
+            borderBottom={!lastRow}
+            active={active}
+            onClick={handleClick}
+            {...domAttributes}
+        >
+            {rowContents}
+        </StaticListRowContainer>
     );
 
 }, shouldSkipUpdate);

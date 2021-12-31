@@ -1,4 +1,4 @@
-import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Link, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
@@ -16,7 +16,7 @@ import { MaterialDebtMap, PlannerComputationUtils } from '../../../../utils/plan
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
 type Props = {
-    activeServant: MasterServant | undefined; // Not optional, but can be undefined.
+    activeServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
     unlockedCostumes: Array<number>;
     editMode?: boolean;
@@ -63,27 +63,6 @@ const renderBondLevel = (bond?: MasterServantBondLevel): JSX.Element => {
         <div className={`${StyleClassPrefix}-bond-level-stat`}>
             <GameServantBondIcon bond={bond} size={24} />
             <div className="pl-1">{bond}</div>
-        </div>
-    );
-};
-
-const renderServantLinks = (servant: Readonly<GameServant> | undefined): ReactNode => {
-    const links = servant?.metadata.links;
-    if (!links?.length) {
-        return null;
-    }
-    return (
-        <div className={`${StyleClassPrefix}-external-links-container`}>
-            <div className={`${StyleClassPrefix}-section-title`}>
-                Links
-            </div>
-            {links.map(({ label, url }, index) => (
-                <div className={`${StyleClassPrefix}-external-link`}>
-                    <Link key={index} color="secondary" href={url} target="_blank">
-                        {label}
-                    </Link>
-                </div>
-            ))}
         </div>
     );
 };
@@ -182,7 +161,7 @@ const StyleProps = {
 export const MasterServantInfoPanel = React.memo((props: Props) => {
 
     const {
-        activeServant,
+        activeServants,
         bondLevels,
         unlockedCostumes,
         editMode,
@@ -192,26 +171,31 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
     const gameItemMap = useGameItemMap();
     const gameServantMap = useGameServantMap();
 
-    const [servant, setServant] = useState<Readonly<GameServant>>();
-    const [servantMaterialDebt, setServantMaterialDebt] = useState<MaterialDebtMap>();
+    const [selectedServantsMaterialDebt, setSelectedServantsMaterialDebt] = useState<MaterialDebtMap>();
 
     useEffect(() => {
-        if (!gameServantMap || !activeServant) {
-            setServant(undefined);
-            setServantMaterialDebt(undefined);
+        if (!gameServantMap || !activeServants.length) {
+            setSelectedServantsMaterialDebt(undefined);
         } else {
-            const servant = gameServantMap[activeServant.gameId];
+            const selectedServantsMaterialDebt: MaterialDebtMap = {};
+            for (const activeServant of activeServants) {
+                const servant = gameServantMap[activeServant.gameId];
+                if (!servant) {
+                    continue;
+                }
+                const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
+                PlannerComputationUtils.addMaterialDebtMap(servantMaterialDebt, selectedServantsMaterialDebt);
+            }
             // TODO Add way to toggle append skills and lores
-            const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
-            setServant(servant);
-            setServantMaterialDebt(servantMaterialDebt);
+            setSelectedServantsMaterialDebt(selectedServantsMaterialDebt);
         }
-    }, [gameServantMap, activeServant, unlockedCostumes]);
+    }, [activeServants, gameServantMap, unlockedCostumes]);
 
     const handleStatsChange = useCallback((data: SubmitData): void => {
-        if (!editMode || !gameServantMap || !activeServant) {
+        if (!editMode || !gameServantMap || activeServants.length !== 1) {
             return;
         }
+        const activeServant = activeServants[0];
         /*
          * Update data from the form
          */
@@ -220,23 +204,33 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         // TODO Update unlocked costumes
 
         /*
-         * Re-compute servant material stats
+         * Re-compute servant material stats. Only one servant should be active at this
+         * point.
          */
         const servant = gameServantMap[activeServant.gameId];
-        const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
-        setServantMaterialDebt(servantMaterialDebt);
+        if (servant) {
+            const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
+            setSelectedServantsMaterialDebt(servantMaterialDebt);
+        }
 
         onStatsChange && onStatsChange(data);
-    }, [
-        gameServantMap,
-        activeServant,
-        bondLevels,
-        unlockedCostumes,
-        editMode,
-        onStatsChange
-    ]);
+    }, [activeServants, bondLevels, editMode, gameServantMap, onStatsChange, unlockedCostumes]);
 
-    const servantNameNode = useMemo(() => {
+    const servantNameNode: ReactNode = useMemo(() => {
+        if (!activeServants.length) {
+            return null;
+        }
+        if (activeServants.length > 1) {
+            return (
+                <div className={`${StyleClassPrefix}-title`}>
+                    <div className={clsx(`${StyleClassPrefix}-servant-name`, 'truncate')}>
+                        Multiple Selected
+                    </div>
+                </div>
+            );
+        }
+        const activeServant = activeServants[0];
+        const servant = gameServantMap?.[activeServant.gameId];
         if (!servant) {
             return (
                 <div className={`${StyleClassPrefix}-title`}>
@@ -260,12 +254,13 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 </div>
             </div>
         );
-    }, [servant]);
+    }, [activeServants, gameServantMap]);
 
     const servantStatsNode: ReactNode = useMemo(() => {
-        if (!activeServant) {
+        if (activeServants.length !== 1) {
             return null;
         }
+        const activeServant = activeServants[0];
         if (editMode) {
             return (
                 <MasterServantEditForm
@@ -321,20 +316,14 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 </div>
             );
         }
-    }, [
-        activeServant,
-        bondLevels,
-        editMode,
-        handleStatsChange,
-        unlockedCostumes
-    ]);
+    }, [activeServants, bondLevels, editMode, handleStatsChange, unlockedCostumes]);
 
     const servantMaterialDebtNode: ReactNode = useMemo(() => {
-        if (!servantMaterialDebt || !gameItemMap) {
+        if (!selectedServantsMaterialDebt || !gameItemMap) {
             return null;
         }
 
-        const servantMaterialStatEntries = Object.entries(servantMaterialDebt);
+        const servantMaterialStatEntries = Object.entries(selectedServantsMaterialDebt);
         let servantMaterialList: ReactNode;
         if (servantMaterialStatEntries.length) {
             const labelWidth = '80%'; // TODO Make this a constant
@@ -407,9 +396,35 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 </div>
             </div>
         );
-    }, [gameItemMap, servantMaterialDebt]);
+    }, [gameItemMap, selectedServantsMaterialDebt]);
 
-    if (!activeServant) {
+    const servantLinksNode: ReactNode = useMemo(() => {
+        if (activeServants.length !== 1) {
+            return null;
+        }
+        const activeServant = activeServants[0];
+        const servant = gameServantMap?.[activeServant.gameId];
+        const links = servant?.metadata.links;
+        if (!links?.length) {
+            return null;
+        }
+        return (
+            <div className={`${StyleClassPrefix}-external-links-container`}>
+                <div className={`${StyleClassPrefix}-section-title`}>
+                    Links
+                </div>
+                {links.map(({ label, url }, index) => (
+                    <div className={`${StyleClassPrefix}-external-link`}>
+                        <Link key={index} color="secondary" href={url} target="_blank">
+                            {label}
+                        </Link>
+                    </div>
+                ))}
+            </div>
+        );
+    }, [activeServants, gameServantMap]);
+
+    if (!activeServants.length) {
         return (
             // FIXME Inline sx prop
             <Box className={`${StyleClassPrefix}-helper-text`} sx={{ px: 6, py: 4 }}>
@@ -427,7 +442,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 {/* FIXME Inline sx prop */}
                 <Box sx={{ px: 6, pt: 4 }}>
                     {servantMaterialDebtNode}
-                    {renderServantLinks(servant)}
+                    {servantLinksNode}
                 </Box>
             </div>
         </Box>

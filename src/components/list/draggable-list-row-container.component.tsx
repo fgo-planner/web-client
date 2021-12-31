@@ -1,21 +1,26 @@
 import { DragIndicator as DragIndicatorIcon, SvgIconComponent } from '@mui/icons-material';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
-import React, { PropsWithChildren } from 'react';
+import React, { DOMAttributes, MouseEvent, PropsWithChildren } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import listRowStyle from './list-row-style';
 
 // TODO Add prop for cursor style.
 type Props = PropsWithChildren<{
     classes?: any;
+    index: number;
+    draggableId: string;
+    dragHandleIcon?: SvgIconComponent;
     active?: boolean;
     borderTop?: boolean;
     borderBottom?: boolean;
-    draggableId: string;
-    index: number;
-    dragHandleIcon?: SvgIconComponent;
     // TODO Add option(s) to hide/disable drag handle.
-}>;
+}> & DOMAttributes<HTMLDivElement>;
+
+// TODO Move this to a utilities file.
+const handleDragHandleClick = (e: MouseEvent<HTMLDivElement>): void => {
+    e.stopPropagation();
+};
 
 const DefaultDragHandleIcon = DragIndicatorIcon;
 
@@ -44,12 +49,13 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
 
     const {
         children,
-        draggableId,
         index,
+        draggableId,
         dragHandleIcon,
         active,
         borderTop,
         borderBottom,
+        ...domAttributes
     } = props;
 
     const DragHandleIcon = dragHandleIcon ?? DefaultDragHandleIcon;
@@ -68,10 +74,15 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
                 return (
                     <RootComponent
                         ref={provided.innerRef}
+                        {...domAttributes}
                         {...provided.draggableProps}
                         className={classNames}
                     >
-                        <div {...provided.dragHandleProps} className={`${StyleClassPrefix}-drag-handle`}>
+                        <div
+                            onClick={handleDragHandleClick}
+                            {...provided.dragHandleProps}
+                            className={`${StyleClassPrefix}-drag-handle`}
+                        >
                             <DragHandleIcon />
                         </div>
                         {children}

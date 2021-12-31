@@ -49,6 +49,25 @@ export class PlannerComputationUtils {
         }
     };
 
+    static addMaterialDebtMap(source: MaterialDebtMap, target: MaterialDebtMap): void {
+        for (const [id, debt] of Object.entries(source)) {
+            const itemId = Number(id);
+            if (!target[itemId]) {
+                target[itemId] = { ...debt };
+            } else {
+                this._addMaterialDebt(debt, target[itemId]);
+            }
+        }
+    }
+
+    static sumMaterialDebtMaps(maps: Array<MaterialDebtMap>): MaterialDebtMap {
+        const result: Record<number, MaterialDebt> = {};
+        for (const map of maps) {
+            this.addMaterialDebtMap(map, result);
+        }
+        return result;
+    }
+
     static computeMaterialDebtForServant(
         servant: Readonly<GameServant>,
         currentEnhancements: ServantEnhancements,
@@ -196,6 +215,14 @@ export class PlannerComputationUtils {
             costumes: 0,
             total: 0
         };
+    }
+
+    private static _addMaterialDebt(source: MaterialDebt, target: MaterialDebt): void {
+        target.ascensions += source.ascensions;
+        target.skills += source.skills;
+        target.appendSkills += source.appendSkills;
+        target.costumes += source.costumes;
+        target.total += source.total;
     }
 
 }

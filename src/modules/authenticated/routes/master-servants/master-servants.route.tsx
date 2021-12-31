@@ -19,6 +19,7 @@ import { MasterAccountService } from '../../../../services/data/master/master-ac
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
+import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
@@ -27,27 +28,25 @@ import { MasterServantListHeader } from '../../components/master/servant/list/ma
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantInfoPanel } from './master-servant-info-panel.component';
 
-type MasterAccountClonedData = {
-    /**
-     * Clone of the `servants` array from the MasterAccount object.
-     */
-    masterServants: MasterServant[];
-    /**
-     * Clone of the `bondLevels` map from the MasterAccount object.
-     */
+type MasterAccountData = {
+    masterServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
-    /**
-     * Clone of the `costumes` map from the MasterAccount object.
-     */
     unlockedCostumes: Array<number>;
 };
 
-const cloneFromMasterAccount = (account: Nullable<MasterAccount>): MasterAccountClonedData => {
+const getMasterAccountData = (account: Nullable<MasterAccount>, clone = false): MasterAccountData => {
     if (!account) {
         return {
             masterServants: [],
             bondLevels: {},
             unlockedCostumes: []
+        };
+    }
+    if (!clone) {
+        return {
+            masterServants: account.servants,
+            bondLevels: account.bondLevels,
+            unlockedCostumes: account.costumes
         };
     }
     return {
@@ -57,28 +56,17 @@ const cloneFromMasterAccount = (account: Nullable<MasterAccount>): MasterAccount
     };
 };
 
-const findByGameIdAndInstanceId = (
-    masterServants: Array<MasterServant>,
-    gameId: number,
-    instanceId: number
-): MasterServant | undefined => {
-
-    for (const masterServant of masterServants) {
-        if (masterServant.instanceId === instanceId) {
-            if (masterServant.gameId === gameId) {
-                return masterServant;
-            }
-            break;
-        }
-    }
-};
-
 const StyleClassPrefix = 'MasterServants';
 
 const StyleProps = (theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
+    [`& .${StyleClassPrefix}-main-content`]: {
+        display: 'flex',
+        flex: '1',
+        width: 'calc(100% - 48px)'
+    },
     [`& .${StyleClassPrefix}-info-panel-container`]: {
         width: 320,
         height: 'calc(100% - 84px)',
@@ -99,27 +87,39 @@ export const MasterServantsRoute = React.memo(() => {
     const masterAccountService = useInjectable(MasterAccountService);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
+
     /**
-     * Clone of the `servants` array from the `MasterAccount` object.
+     * The `servants` array from the `MasterAccount` object. In edit mode, the array
+     * is cloned to prevent the original array from being modified.
      */
     const [masterServants, setMasterServants] = useState<Array<MasterServant>>([]);
+
     /**
-     * Clone of the `bondLevels` map from the `MasterAccount` object.
+     * The `bondLevels` map from the `MasterAccount` object. In edit mode, the map
+     * is cloned to prevent the original object from being modified.
      */
     const [bondLevels, setBondLevels] = useState<Record<number, MasterServantBondLevel | undefined>>({});
+
     /**
-     * Clone of the `costumes` map from the `MasterAccount` object.
+     * The `costumes` map from the `MasterAccount` object. In edit mode, the map is
+     * cloned to prevent the original object from being modified.
      */
     const [unlockedCostumes, setUnlockedCostumes] = useState<Array<number>>([]);
-    // TODO Do we really need to clone the structures above?
-    const [lastInstanceId, setLastInstanceId] = useState<number>(-1);
+
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editServant, setEditServant] = useState<MasterServant>();
     const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
     const [deleteServant, setDeleteServant] = useState<MasterServant>();
     const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
 
-    const activeServantRef = useRef<MasterServant>();
+    /**
+     * The selected servants.
+     */
+    const selectedServantsRef = useRef<{ instanceIds: Set<number>, servants: Array<MasterServant> }>({
+        instanceIds: new Set(),
+        servants: []
+    });
+
     const loadingIndicatorIdRef = useRef<string>();
 
     const gameServantMap = useGameServantMap();
@@ -155,22 +155,24 @@ export const MasterServantsRoute = React.memo(() => {
 
     /**
      * If the `masterServants` reference changes (due to data being reloaded, etc.)
-     * and there is an `activeServant`, then update the `activeServant` reference
-     * with the copy from the new `masterServants` reference.
+     * the some of the currently selected instance IDs may no longer be present. In
+     * addition, the servant object references themselves could have changed.
+     *
+     * This function validates and updates the `selectedServantsRef` data against
+     * the updated `masterServants` data.
      */
-    const updateActiveServantRef = useCallback((masterServants: Array<MasterServant>) => {
-        const activeServant = activeServantRef.current;
-        if (!activeServant) {
+    const updateSelectedServants = useCallback((updatedMasterServants: Array<MasterServant>): void => {
+        const currentSelectionIds = selectedServantsRef.current.instanceIds;
+        if (!currentSelectionIds.size) {
             return;
         }
-        const { gameId, instanceId } = activeServant;
-        const masterServant = findByGameIdAndInstanceId(masterServants, gameId, instanceId);
-        // If it is the same reference, then no need to update.
-        if (masterServant === activeServant) {
-            return;
-        }
-        activeServantRef.current = masterServant;
-    }, [activeServantRef]);
+        const updatedSelection = updatedMasterServants.filter(servant => currentSelectionIds.has(servant.instanceId));
+        const updatedSelectionIds = new Set(updatedSelection.map(servant => servant.instanceId));
+        selectedServantsRef.current = {
+            instanceIds: updatedSelectionIds,
+            servants: updatedSelection
+        };
+    }, []);
 
     /**
      * onCurrentMasterAccountChange subscriptions
@@ -179,19 +181,20 @@ export const MasterServantsRoute = React.memo(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(account => {
-                const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(account);
-                const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
-                updateActiveServantRef(masterServants);
+                const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(account);
+                selectedServantsRef.current = {
+                    instanceIds: new Set(),
+                    servants: []
+                };
                 setMasterAccount(account);
                 setMasterServants(masterServants);
                 setBondLevels(bondLevels);
                 setUnlockedCostumes(unlockedCostumes);
-                setLastInstanceId(lastInstanceId);
                 setEditMode(false);
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [updateActiveServantRef]);
+    }, [updateSelectedServants]);
 
     /**
      * onCurrentMasterAccountUpdate subscriptions
@@ -203,38 +206,34 @@ export const MasterServantsRoute = React.memo(() => {
                 if (account == null) {
                     return;
                 }
-                const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(account);
-                const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
-                updateActiveServantRef(masterServants);
+                const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(account);
+                updateSelectedServants(masterServants);
                 resetLoadingIndicator();
                 setMasterAccount(account);
                 setMasterServants(masterServants);
                 setBondLevels(bondLevels);
                 setUnlockedCostumes(unlockedCostumes);
-                setLastInstanceId(lastInstanceId);
                 setEditMode(false);
             });
 
         return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
-    }, [resetLoadingIndicator, updateActiveServantRef]);
+    }, [resetLoadingIndicator, updateSelectedServants]);
 
     const handleUpdateError = useCallback((error: any): void => {
         // TODO Display error message to user.
         console.error(error);
-        const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(masterAccount);
-        const lastInstanceId = MasterServantUtils.getLastInstanceId(masterServants);
+        const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(masterAccount);
         resetLoadingIndicator();
-        updateActiveServantRef(masterServants);
+        updateSelectedServants(masterServants);
         setMasterServants(masterServants);
         setBondLevels(bondLevels);
         setUnlockedCostumes(unlockedCostumes);
-        setLastInstanceId(lastInstanceId);
         setEditMode(false);
         setEditServant(undefined);
         setEditServantDialogOpen(false);
         setDeleteServant(undefined);
         setDeleteServantDialogOpen(false);
-    }, [masterAccount, resetLoadingIndicator, updateActiveServantRef]);
+    }, [masterAccount, resetLoadingIndicator, updateSelectedServants]);
 
     /**
      * Sends master servant update request to the back-end.
@@ -266,16 +265,21 @@ export const MasterServantsRoute = React.memo(() => {
     }, [handleUpdateError, loadingIndicatorOverlayService, masterAccount?._id, masterAccountService]);
 
     const handleFormChange = useCallback((): void => {
-        const activeServant = activeServantRef.current;
-        if (!activeServant) {
-            return;
-        }
-        setMasterServants([...masterServants]); // Hacky way to force list to re-render
-    }, [activeServantRef, masterServants]);
+        // FIXME Update implementation.
+        // const activeServant = activeServantRef.current;
+        // if (!activeServant) {
+        //     return;
+        // }
+        setMasterServants([...masterServants]); // Forces child list to re-render
+    }, [masterServants]);
 
     const handleEditButtonClick = useCallback((): void => {
+        const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(masterAccount, true);
+        setMasterServants(masterServants);
+        setBondLevels(bondLevels);
+        setUnlockedCostumes(unlockedCostumes);
         setEditMode(true);
-    }, []);
+    }, [masterAccount]);
 
     const handleSaveButtonClick = useCallback((): void => {
         updateMasterAccount(masterServants, bondLevels, unlockedCostumes);
@@ -283,13 +287,13 @@ export const MasterServantsRoute = React.memo(() => {
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account
-        const { masterServants, bondLevels, unlockedCostumes } = cloneFromMasterAccount(masterAccount);
-        updateActiveServantRef(masterServants);
+        const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(masterAccount);
+        updateSelectedServants(masterServants);
         setMasterServants(masterServants);
         setBondLevels(bondLevels);
         setUnlockedCostumes(unlockedCostumes);
         setEditMode(false);
-    }, [masterAccount, updateActiveServantRef]);
+    }, [masterAccount, updateSelectedServants]);
 
     const openEditServantDialog = useCallback((masterServant?: MasterServant): void => {
         if (!editMode) {
@@ -325,9 +329,6 @@ export const MasterServantsRoute = React.memo(() => {
             return closeEditServantDialog();
         }
 
-        let _lastInstanceId = lastInstanceId;
-        let _masterServants = masterServants;
-
         const servantId = data.masterServant.gameId;
 
         /*
@@ -351,21 +352,22 @@ export const MasterServantsRoute = React.memo(() => {
          * should be defined.
          */
         if (!editServant) {
-            /*
-             * Build new servant object.
+            /**
+             * Computed instance ID for the new servant.
+             */
+            const instanceId = MasterServantUtils.getLastInstanceId(masterServants) + 1;
+            /**
+             * New servant object.
              */
             const masterServant: MasterServant = {
                 ...data.masterServant,
-                instanceId: ++_lastInstanceId
+                instanceId
             };
             /*
              * The master servant array will need to be rebuilt to trigger a re-render
              * after updating the component state.
              */
-            _masterServants = [
-                ..._masterServants,
-                masterServant
-            ];
+            masterServants.push(masterServant);
 
         } else {
             /*
@@ -373,32 +375,17 @@ export const MasterServantsRoute = React.memo(() => {
              */
             lodash.assign(editServant, data.masterServant);
             /*
-             * Just like the previous case, in edit mode, the master servant will need to
-             * be rebuilt to trigger a re-render after updating the component state. The
-             * updated servant will also have to be rebuilt to trigger re-render of some
-             * children components.
+             * Re-build the servant object to force its row to re-render.
              */
-            _masterServants = masterServants.map(servant => {
-                return servant === editServant ? { ...editServant } : servant;
-            });
+            const index = masterServants.indexOf(editServant);
+            if (index !== -1) {
+                masterServants[index] = { ...editServant };
+            }
         }
 
-        updateActiveServantRef(_masterServants);
-        setMasterServants(_masterServants);
-        setBondLevels(bondLevels); // This should not be needed
-        setLastInstanceId(_lastInstanceId);
+        setMasterServants([...masterServants]); // Forces child list to re-render
         closeEditServantDialog();
-    }, [
-        gameServantMap,
-        masterServants,
-        bondLevels,
-        unlockedCostumes,
-        editMode,
-        editServant,
-        lastInstanceId,
-        updateActiveServantRef,
-        closeEditServantDialog
-    ]);
+    }, [gameServantMap, masterServants, bondLevels, unlockedCostumes, editMode, editServant, closeEditServantDialog]);
 
     const openDeleteServantDialog = useCallback((masterServant: MasterServant): void => {
         if (!editMode) {
@@ -424,7 +411,7 @@ export const MasterServantsRoute = React.memo(() => {
         if (!editMode) {
             return updateMasterAccount(masterServants, bondLevels, unlockedCostumes);
         }
-        setMasterServants([...masterServants]); // FIXME Hacky way to force child to re-render
+        setMasterServants([...masterServants]); // Forces child list to re-render
         closeDeleteServantDialog();
     }, [
         masterServants,
@@ -436,10 +423,17 @@ export const MasterServantsRoute = React.memo(() => {
         updateMasterAccount
     ]);
 
-    const handleActiveServantChange = useCallback((activeServant: MasterServant): void => {
-        activeServantRef.current = activeServant;
+    const handleServantSelectionChange = useCallback((instanceIds: Array<number>): void => {
+        const updatedSelectionIds = new Set(instanceIds);
+        if (SetUtils.isEqual(updatedSelectionIds, selectedServantsRef.current.instanceIds)) {
+            return;
+        }
+        selectedServantsRef.current = {
+            instanceIds: updatedSelectionIds,
+            servants: masterServants.filter(servant => updatedSelectionIds.has(servant.instanceId))
+        };
         forceUpdate();
-    }, [activeServantRef, forceUpdate]);
+    }, [forceUpdate, masterServants]);
 
     /**
      * NavigationRail children
@@ -532,7 +526,7 @@ export const MasterServantsRoute = React.memo(() => {
             </Tooltip>
         ];
     }, [editMode, handleCancelButtonClick, handleEditButtonClick, handleSaveButtonClick]);
-    
+
     if (!gameServantMap) {
         return null;
     }
@@ -545,9 +539,9 @@ export const MasterServantsRoute = React.memo(() => {
                     'Servant Roster'
                 }
             </PageTitle>
-            <div className="flex overflow-hidden">
+            <div className="flex overflow-hidden full-height">
                 <NavigationRail children={navigationRailChildNodes} />
-                <div className="flex flex-fill">
+                <div className={`${StyleClassPrefix}-main-content`}>
                     <LayoutPanelScrollable
                         className="py-4 pr-4 full-height flex-fill scrollbar-track-border"
                         headerContents={
@@ -560,12 +554,13 @@ export const MasterServantsRoute = React.memo(() => {
                             <MasterServantList
                                 masterServants={masterServants}
                                 bondLevels={bondLevels}
-                                activeServant={activeServantRef.current}
+                                selectedServants={selectedServantsRef.current.instanceIds}
                                 editMode={editMode}
                                 showAddServantRow={editMode}
                                 visibleColumns={visibleColumns}
                                 openLinksInNewTab={editMode}
-                                onActivateServant={handleActiveServantChange}
+                                // onActivateServant={handleActiveServantChange}
+                                onServantSelectionChange={handleServantSelectionChange}
                                 onAddServant={handleAddServantButtonClick}
                                 onEditServant={openEditServantDialog}
                                 onDeleteServant={openDeleteServantDialog}
@@ -575,7 +570,7 @@ export const MasterServantsRoute = React.memo(() => {
                     {md && <div className={`${StyleClassPrefix}-info-panel-container`}>
                         <LayoutPanelContainer className="flex column full-height" autoHeight>
                             <MasterServantInfoPanel
-                                activeServant={activeServantRef.current}
+                                activeServants={selectedServantsRef.current.servants}
                                 bondLevels={bondLevels}
                                 unlockedCostumes={unlockedCostumes}
                                 editMode={editMode}

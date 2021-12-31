@@ -1,6 +1,6 @@
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEventHandler, PropsWithChildren } from 'react';
+import React, { DOMAttributes, PropsWithChildren } from 'react';
 import { ComponentStyleProps } from '../../types/internal';
 import listRowStyle from './list-row-style';
 
@@ -9,8 +9,7 @@ type Props = PropsWithChildren<{
     active?: boolean;
     borderTop?: boolean;
     borderBottom?: boolean;
-    onClick?: MouseEventHandler<HTMLDivElement>;
-}> & ComponentStyleProps;
+}> & ComponentStyleProps & DOMAttributes<HTMLDivElement>;
 
 export const StyleClassPrefix = 'StaticListRowContainer';
 
@@ -29,10 +28,11 @@ export const StaticListRowContainer = React.memo((props: Props) => {
         active,
         borderTop,
         borderBottom,
-        onClick,
+        classes,
         className,
         style,
-        sx
+        sx,
+        ...domAttributes
     } = props;
 
     const classNames = clsx(
@@ -48,7 +48,7 @@ export const StaticListRowContainer = React.memo((props: Props) => {
             className={classNames}
             style={style}
             sx={sx}
-            onClick={onClick}
+            {...domAttributes}
         >
             {children}
         </RootComponent >

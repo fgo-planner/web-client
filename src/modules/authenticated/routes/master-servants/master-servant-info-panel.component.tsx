@@ -105,7 +105,11 @@ const StyleProps = {
     },
     [`& .${StyleClassPrefix}-scroll-container`]: {
         overflowY: 'auto',
-        height: '100%'
+        height: '100%',
+        '>:last-child': {
+            px: 6,
+            pt: 4
+        }
     },
     [`& .${StyleClassPrefix}-servant-stats-container`]: {
         px: 6,
@@ -217,15 +221,10 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
     }, [activeServants, bondLevels, editMode, gameServantMap, onStatsChange, unlockedCostumes]);
 
     const servantNameNode: ReactNode = useMemo(() => {
-        if (!activeServants.length) {
-            return null;
-        }
-        if (activeServants.length > 1) {
+        if (activeServants.length !== 1) {
             return (
                 <div className={`${StyleClassPrefix}-title`}>
-                    <div className={clsx(`${StyleClassPrefix}-servant-name`, 'truncate')}>
-                        Multiple Selected
-                    </div>
+                    {!activeServants.length ? 'No servant selected' : 'Multiple servants selected'}
                 </div>
             );
         }
@@ -424,27 +423,26 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         );
     }, [activeServants, gameServantMap]);
 
-    if (!activeServants.length) {
+    const scrollContainerNode: ReactNode = useMemo(() => {
+        if (!servantMaterialDebtNode) {
+            return null;
+        }
         return (
-            // FIXME Inline sx prop
-            <Box className={`${StyleClassPrefix}-helper-text`} sx={{ px: 6, py: 4 }}>
-                No servant selected
-            </Box>
+            <div className={`${StyleClassPrefix}-scroll-container`}>
+                {servantStatsNode}
+                <div className={`${StyleClassPrefix}-divider`} />
+                <div>
+                    {servantMaterialDebtNode}
+                    {servantLinksNode}
+                </div>
+            </div>
         );
-    }
+    }, [servantLinksNode, servantMaterialDebtNode, servantStatsNode]);
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             {servantNameNode}
-            <div className={`${StyleClassPrefix}-scroll-container`}>
-                {servantStatsNode}
-                <div className={`${StyleClassPrefix}-divider`} />
-                {/* FIXME Inline sx prop */}
-                <Box sx={{ px: 6, pt: 4 }}>
-                    {servantMaterialDebtNode}
-                    {servantLinksNode}
-                </Box>
-            </div>
+            {scrollContainerNode}
         </Box>
     );
 });

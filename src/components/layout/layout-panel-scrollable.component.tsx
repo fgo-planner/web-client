@@ -10,11 +10,14 @@ type Props = PropsWithChildren<{
     footerContents?: ReactNode;
     headerBorder?: boolean;
     footerBorder?: boolean;
+    autoHeight?: boolean;
 }> & ComponentStyleProps;
 
 export const StyleClassPrefix = 'LayoutPanelScrollable';
 
 const StyleProps = {
+    display: 'flex',
+    flexDirection: 'column',
     [`& .${StyleClassPrefix}-container`]: {
         display: 'flex',
         flexDirection: 'column',
@@ -44,6 +47,7 @@ export const LayoutPanelScrollable = React.memo((props: Props) => {
         footerContents,
         headerBorder,
         footerBorder,
+        autoHeight,
         className,
         style,
         sx
@@ -56,6 +60,7 @@ export const LayoutPanelScrollable = React.memo((props: Props) => {
             className={clsx(`${StyleClassPrefix}-root`, className)}
             style={style}
             sx={sxProps}
+            autoHeight={autoHeight}
         >
             <div className={`${StyleClassPrefix}-container`}>
                 {headerContents &&

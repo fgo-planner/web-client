@@ -544,6 +544,7 @@ export const MasterServantsRoute = React.memo(() => {
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <LayoutPanelScrollable
                         className="py-4 pr-4 full-height flex-fill scrollbar-track-border"
+                        autoHeight
                         headerContents={
                             <MasterServantListHeader
                                 editMode={editMode}

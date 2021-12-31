@@ -13,7 +13,11 @@ import { ThemeConstants } from '../../styles/theme-constants';
  */
 export const ThemeScrollbars = styled('div')(({ theme }) => ({
     '& *::-webkit-scrollbar': {
-        width: theme.spacing(ThemeConstants.ScrollbarWidthScale)
+        width: theme.spacing(ThemeConstants.ScrollbarWidthScale),
+        height: theme.spacing(ThemeConstants.ScrollbarWidthScale)
+    },
+    '& *::-webkit-scrollbar-corner': {
+        backgroundColor: theme.palette.background.paper,
     },
     '& *::-webkit-scrollbar-thumb': {
         backgroundColor: theme.palette.primary.main,

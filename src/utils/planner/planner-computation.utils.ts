@@ -1,5 +1,5 @@
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterServantAscensionLevel, MasterServantSkillLevel } from '@fgo-planner/types';
-import { GameItemConstants } from '../../constants';
+import { GameItemConstants, GameServantConstants } from '../../constants';
 import { MapUtils } from '../map.utils';
 
 /**
@@ -35,20 +35,6 @@ type ServantEnhancements = Readonly<{
 
 export class PlannerComputationUtils {
 
-    private static _DefaultTargetEnhancements: ServantEnhancements = {
-        ascension: 4,
-        skills: {
-            1: 10,
-            2: 10,
-            3: 10
-        },
-        appendSkills: {
-            1: 10,
-            2: 10,
-            3: 10
-        }
-    };
-
     static addMaterialDebtMap(source: MaterialDebtMap, target: MaterialDebtMap): void {
         for (const [id, debt] of Object.entries(source)) {
             const itemId = Number(id);
@@ -71,13 +57,15 @@ export class PlannerComputationUtils {
     static computeMaterialDebtForServant(
         servant: Readonly<GameServant>,
         currentEnhancements: ServantEnhancements,
-        currentCostumes: Array<number>
+        currentCostumes: Array<number> | Set<number>,
+        appendSkills: boolean,
+        lores: boolean
     ): MaterialDebtMap;
 
     static computeMaterialDebtForServant(
         servant: Readonly<GameServant>,
         currentEnhancements: ServantEnhancements,
-        currentCostumes: Set<number>,
+        currentCostumes: Array<number> | Set<number>,
         targetEnhancements: ServantEnhancements,
         targetCostumes: Set<number>
     ): MaterialDebtMap;
@@ -86,7 +74,47 @@ export class PlannerComputationUtils {
         servant: Readonly<GameServant>,
         currentEnhancements: ServantEnhancements,
         currentCostumes: Array<number> | Set<number>,
-        targetEnhancements = this._DefaultTargetEnhancements,
+        param4: ServantEnhancements | boolean,
+        param5: Set<number> | boolean
+    ): MaterialDebtMap {
+        let targetEnhancements: ServantEnhancements;
+        let targetCostumes = undefined;
+        if (typeof param4 === 'boolean') {
+            const appendSkills = param4;
+            const lores = param5 as boolean;
+            const targetSkillLevel = GameServantConstants.MaxSkillLevel - (lores ? 0 : 1) as MasterServantSkillLevel;
+            const targetAppendSkillLevel = appendSkills ? targetSkillLevel : 0 as MasterServantSkillLevel;
+            targetEnhancements = {
+                ascension: 4,
+                skills: {
+                    1: targetSkillLevel,
+                    2: targetSkillLevel,
+                    3: targetSkillLevel
+                },
+                appendSkills: {
+                    1: targetAppendSkillLevel,
+                    2: targetAppendSkillLevel,
+                    3: targetAppendSkillLevel,
+                }
+            };
+        } else {
+            targetEnhancements = param4;
+            targetCostumes = param5 as Set<number>;
+        }
+        return this._computeMaterialDebtForServant(
+            servant,
+            currentEnhancements,
+            currentCostumes,
+            targetEnhancements,
+            targetCostumes
+        );
+    }
+
+    private static _computeMaterialDebtForServant(
+        servant: Readonly<GameServant>,
+        currentEnhancements: ServantEnhancements,
+        currentCostumes: Array<number> | Set<number>,
+        targetEnhancements: ServantEnhancements,
         targetCostumes?: Set<number>
     ): MaterialDebtMap {
 

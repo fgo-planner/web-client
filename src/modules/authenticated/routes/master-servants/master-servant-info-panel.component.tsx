@@ -26,7 +26,9 @@ type Props = {
 
 const FormId = 'master-servant-info-panel-form';
 
-const StyleClassPrefix = 'MasterServantInfoPanel';
+const hasDebt = (materialDebtMap: MaterialDebtMap): boolean => {
+    return materialDebtMap[GameItemConstants.QpItemId].total !== 0;
+};
 
 const renderFouLevels = (activeServant: Readonly<MasterServant>): JSX.Element => {
     const { fouAtk, fouHp } = activeServant;
@@ -67,6 +69,12 @@ const renderBondLevel = (bond?: MasterServantBondLevel): JSX.Element => {
         </div>
     );
 };
+
+const ServantStatLabelWidth = '60%';
+
+const MaterialLabelWidth = '80%';
+
+const StyleClassPrefix = 'MasterServantInfoPanel';
 
 const StyleProps = {
     display: 'flex',
@@ -189,13 +197,19 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 if (!servant) {
                     continue;
                 }
-                const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
+                const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(
+                    servant,
+                    activeServant,
+                    unlockedCostumes,
+                    !!showAppendSkills,
+                    false // TODO Add prop to toggle lores.
+                );
                 PlannerComputationUtils.addMaterialDebtMap(servantMaterialDebt, selectedServantsMaterialDebt);
             }
             // TODO Add way to toggle append skills and lores
             setSelectedServantsMaterialDebt(selectedServantsMaterialDebt);
         }
-    }, [activeServants, gameServantMap, unlockedCostumes]);
+    }, [activeServants, gameServantMap, showAppendSkills, unlockedCostumes]);
 
     const handleStatsChange = useCallback((data: SubmitData): void => {
         if (!editMode || !gameServantMap || activeServants.length !== 1) {
@@ -215,12 +229,18 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
          */
         const servant = gameServantMap[activeServant.gameId];
         if (servant) {
-            const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(servant, activeServant, unlockedCostumes);
+            const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(
+                servant,
+                activeServant,
+                unlockedCostumes,
+                !!showAppendSkills,
+                false // TODO Add prop to toggle lores.
+            );
             setSelectedServantsMaterialDebt(servantMaterialDebt);
         }
 
         onStatsChange && onStatsChange(data);
-    }, [activeServants, bondLevels, editMode, gameServantMap, onStatsChange, unlockedCostumes]);
+    }, [activeServants, bondLevels, editMode, gameServantMap, onStatsChange, showAppendSkills, unlockedCostumes]);
 
     const servantNameNode: ReactNode = useMemo(() => {
         if (activeServants.length !== 1) {
@@ -276,43 +296,42 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 />
             );
         } else {
-            const labelWidth = '60%'; // TODO Make this a constant
             return (
                 <div className={`${StyleClassPrefix}-servant-stats-container`}>
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
                         label="Level"
-                        labelWidth={labelWidth}
+                        labelWidth={ServantStatLabelWidth}
                         value={activeServant.level}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
                         label="Ascension"
-                        labelWidth={labelWidth}
+                        labelWidth={ServantStatLabelWidth}
                         value={activeServant.ascension}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
                         label="Fou (HP/ATK)"
-                        labelWidth={labelWidth}
+                        labelWidth={ServantStatLabelWidth}
                         value={renderFouLevels(activeServant)}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
                         label="Skills"
-                        labelWidth={labelWidth}
+                        labelWidth={ServantStatLabelWidth}
                         value={renderSkillLevels(activeServant)}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
                         label="Noble Phantasm"
-                        labelWidth={labelWidth}
+                        labelWidth={ServantStatLabelWidth}
                         value={activeServant.np}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
                         label="Bond"
-                        labelWidth={labelWidth}
+                        labelWidth={ServantStatLabelWidth}
                         value={renderBondLevel(bondLevels[activeServant.gameId])}
                     />
                 </div>
@@ -325,13 +344,12 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
             return null;
         }
 
-        const servantMaterialStatEntries = Object.entries(selectedServantsMaterialDebt);
         let servantMaterialList: ReactNode;
-        if (servantMaterialStatEntries.length) {
-            const labelWidth = '80%'; // TODO Make this a constant
+        if (hasDebt(selectedServantsMaterialDebt)) {
+
+            const servantMaterialStatEntries = Object.entries(selectedServantsMaterialDebt);
             servantMaterialList = servantMaterialStatEntries.map(([key, stats]): ReactNode => {
                 const itemId = Number(key);
-
                 /*
                  * Do not display QP in the panel...
                  */
@@ -373,7 +391,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                             <DataPointListItem
                                 className={`${StyleClassPrefix}-material-stat`}
                                 label={label}
-                                labelWidth={labelWidth}
+                                labelWidth={MaterialLabelWidth}
                                 value={stats.total}
                             />
                         </div>

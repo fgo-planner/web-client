@@ -32,6 +32,7 @@ const shouldSkipUpdate = (prevProps: Readonly<Props>, nextProps: Readonly<Props>
     if (!ObjectUtils.isShallowEquals(prevProps, nextProps)) {
         return false;
     }
+    // Always re-render active servant rows.
     return !nextProps.active;
 };
 

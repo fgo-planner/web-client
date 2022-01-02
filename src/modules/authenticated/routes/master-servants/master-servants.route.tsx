@@ -87,30 +87,21 @@ export const MasterServantsRoute = React.memo(() => {
     const masterAccountService = useInjectable(MasterAccountService);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-
-    /**
-     * The `servants` array from the `MasterAccount` object. In edit mode, the array
-     * is cloned to prevent the original array from being modified.
-     */
-    const [masterServants, setMasterServants] = useState<Array<MasterServant>>([]);
-
-    /**
-     * The `bondLevels` map from the `MasterAccount` object. In edit mode, the map
-     * is cloned to prevent the original object from being modified.
-     */
-    const [bondLevels, setBondLevels] = useState<Record<number, MasterServantBondLevel | undefined>>({});
-
-    /**
-     * The `costumes` map from the `MasterAccount` object. In edit mode, the map is
-     * cloned to prevent the original object from being modified.
-     */
-    const [unlockedCostumes, setUnlockedCostumes] = useState<Array<number>>([]);
-
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editServant, setEditServant] = useState<MasterServant>();
     const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
     const [deleteServant, setDeleteServant] = useState<MasterServant>();
     const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
+
+    /**
+     * Contains the `servants`, `bondLevels`, and `unlockedCostumes` data from the
+     * `MasterAccount` object. In edit mode, the data is cloned to prevent the
+     * original objects from being modified.
+     *
+     * These are stored as a ref to prevent unwanted triggering of `useCallback`
+     * hooks.
+     */
+    const masterAccountDataRef = useRef<MasterAccountData>(getMasterAccountData(masterAccount));
 
     /**
      * The selected servants.
@@ -161,11 +152,12 @@ export const MasterServantsRoute = React.memo(() => {
      * This function validates and updates the `selectedServantsRef` data against
      * the updated `masterServants` data.
      */
-    const updateSelectedServants = useCallback((updatedMasterServants: Array<MasterServant>): void => {
+    const updateSelectedServants = useCallback((): void => {
         const currentSelectionIds = selectedServantsRef.current.instanceIds;
         if (!currentSelectionIds.size) {
             return;
         }
+        const updatedMasterServants = masterAccountDataRef.current.masterServants;
         const updatedSelection = updatedMasterServants.filter(servant => currentSelectionIds.has(servant.instanceId));
         const updatedSelectionIds = new Set(updatedSelection.map(servant => servant.instanceId));
         selectedServantsRef.current = {
@@ -181,20 +173,17 @@ export const MasterServantsRoute = React.memo(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(account => {
-                const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(account);
+                masterAccountDataRef.current = getMasterAccountData(account);
                 selectedServantsRef.current = {
                     instanceIds: new Set(),
                     servants: []
                 };
                 setMasterAccount(account);
-                setMasterServants(masterServants);
-                setBondLevels(bondLevels);
-                setUnlockedCostumes(unlockedCostumes);
                 setEditMode(false);
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [updateSelectedServants]);
+    }, []);
 
     /**
      * onCurrentMasterAccountUpdate subscriptions
@@ -203,16 +192,13 @@ export const MasterServantsRoute = React.memo(() => {
         const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
             .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
             .subscribe(account => {
+                resetLoadingIndicator();
                 if (account == null) {
                     return;
                 }
-                const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(account);
-                updateSelectedServants(masterServants);
-                resetLoadingIndicator();
+                masterAccountDataRef.current = getMasterAccountData(account);
+                updateSelectedServants();
                 setMasterAccount(account);
-                setMasterServants(masterServants);
-                setBondLevels(bondLevels);
-                setUnlockedCostumes(unlockedCostumes);
                 setEditMode(false);
             });
 
@@ -220,14 +206,11 @@ export const MasterServantsRoute = React.memo(() => {
     }, [resetLoadingIndicator, updateSelectedServants]);
 
     const handleUpdateError = useCallback((error: any): void => {
+        resetLoadingIndicator();
         // TODO Display error message to user.
         console.error(error);
-        const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(masterAccount);
-        resetLoadingIndicator();
-        updateSelectedServants(masterServants);
-        setMasterServants(masterServants);
-        setBondLevels(bondLevels);
-        setUnlockedCostumes(unlockedCostumes);
+        masterAccountDataRef.current = getMasterAccountData(masterAccount);
+        updateSelectedServants();
         setEditMode(false);
         setEditServant(undefined);
         setEditServantDialogOpen(false);
@@ -238,16 +221,10 @@ export const MasterServantsRoute = React.memo(() => {
     /**
      * Sends master servant update request to the back-end.
      */
-    const updateMasterAccount = useCallback((
-        masterServants: MasterServant[],
-        bondLevels: Record<number, MasterServantBondLevel | undefined>,
-        unlockedCostumes: number[]
-    ): void => {
+    const updateMasterAccount = useCallback((): void => {
         const update: Partial<MasterAccount> = {
             _id: masterAccount?._id,
-            servants: masterServants,
-            bondLevels: bondLevels as Record<number, MasterServantBondLevel>,
-            costumes: unlockedCostumes
+            ...masterAccountDataRef.current as any
         };
         masterAccountService.updateAccount(update)
             .catch(handleUpdateError);
@@ -265,33 +242,20 @@ export const MasterServantsRoute = React.memo(() => {
     }, [handleUpdateError, loadingIndicatorOverlayService, masterAccount?._id, masterAccountService]);
 
     const handleFormChange = useCallback((): void => {
-        // FIXME Update implementation.
-        // const activeServant = activeServantRef.current;
-        // if (!activeServant) {
-        //     return;
-        // }
-        setMasterServants([...masterServants]); // Forces child list to re-render
-    }, [masterServants]);
+        const masterAccountData = masterAccountDataRef.current;
+        masterAccountData.masterServants = [...masterAccountData.masterServants]; // Forces child list to re-render
+        forceUpdate();
+    }, [forceUpdate]);
 
     const handleEditButtonClick = useCallback((): void => {
-        const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(masterAccount, true);
-        setMasterServants(masterServants);
-        setBondLevels(bondLevels);
-        setUnlockedCostumes(unlockedCostumes);
+        masterAccountDataRef.current = getMasterAccountData(masterAccount, true);
         setEditMode(true);
     }, [masterAccount]);
 
-    const handleSaveButtonClick = useCallback((): void => {
-        updateMasterAccount(masterServants, bondLevels, unlockedCostumes);
-    }, [masterServants, bondLevels, unlockedCostumes, updateMasterAccount]);
-
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account
-        const { masterServants, bondLevels, unlockedCostumes } = getMasterAccountData(masterAccount);
-        updateSelectedServants(masterServants);
-        setMasterServants(masterServants);
-        setBondLevels(bondLevels);
-        setUnlockedCostumes(unlockedCostumes);
+        masterAccountDataRef.current = getMasterAccountData(masterAccount);
+        updateSelectedServants();
         setEditMode(false);
     }, [masterAccount, updateSelectedServants]);
 
@@ -328,6 +292,12 @@ export const MasterServantsRoute = React.memo(() => {
         if (!editMode || !data) {
             return closeEditServantDialog();
         }
+
+        const {
+            masterServants,
+            bondLevels,
+            unlockedCostumes
+        } = masterAccountDataRef.current;
 
         const servantId = data.masterServant.gameId;
 
@@ -383,9 +353,9 @@ export const MasterServantsRoute = React.memo(() => {
             }
         }
 
-        setMasterServants([...masterServants]); // Forces child list to re-render
+        masterAccountDataRef.current.masterServants = [...masterServants]; // Forces child list to re-render
         closeEditServantDialog();
-    }, [gameServantMap, masterServants, bondLevels, unlockedCostumes, editMode, editServant, closeEditServantDialog]);
+    }, [gameServantMap, editMode, editServant, closeEditServantDialog]);
 
     const openDeleteServantDialog = useCallback((masterServant: MasterServant): void => {
         if (!editMode) {
@@ -406,34 +376,28 @@ export const MasterServantsRoute = React.memo(() => {
         if (reason !== 'submit') {
             return closeDeleteServantDialog();
         }
+        const { masterServants } = masterAccountDataRef.current;
         lodash.remove(masterServants, servant => servant.instanceId === deleteServant?.instanceId);
         // TODO Remove bond/costume data if the last instance of the servant is removed.
         if (!editMode) {
-            return updateMasterAccount(masterServants, bondLevels, unlockedCostumes);
+            return updateMasterAccount();
         }
-        setMasterServants([...masterServants]); // Forces child list to re-render
+        masterAccountDataRef.current.masterServants = [...masterServants]; // Forces child list to re-render
         closeDeleteServantDialog();
-    }, [
-        masterServants,
-        bondLevels,
-        unlockedCostumes,
-        editMode,
-        deleteServant?.instanceId,
-        closeDeleteServantDialog,
-        updateMasterAccount
-    ]);
+    }, [editMode, deleteServant?.instanceId, closeDeleteServantDialog, updateMasterAccount]);
 
     const handleServantSelectionChange = useCallback((instanceIds: Array<number>): void => {
         const updatedSelectionIds = new Set(instanceIds);
         if (SetUtils.isEqual(updatedSelectionIds, selectedServantsRef.current.instanceIds)) {
             return;
         }
+        const { masterServants } = masterAccountDataRef.current;
         selectedServantsRef.current = {
             instanceIds: updatedSelectionIds,
             servants: masterServants.filter(servant => updatedSelectionIds.has(servant.instanceId))
         };
         forceUpdate();
-    }, [forceUpdate, masterServants]);
+    }, [forceUpdate]);
 
     /**
      * NavigationRail children
@@ -518,18 +482,24 @@ export const MasterServantsRoute = React.memo(() => {
                 <div>
                     <Fab
                         color="primary"
-                        onClick={handleSaveButtonClick}
+                        onClick={updateMasterAccount}
                         disabled={!!loadingIndicatorIdRef.current}
                         children={<SaveIcon />}
                     />
                 </div>
             </Tooltip>
         ];
-    }, [editMode, handleCancelButtonClick, handleEditButtonClick, handleSaveButtonClick]);
+    }, [editMode, handleCancelButtonClick, handleEditButtonClick, updateMasterAccount]);
 
     if (!gameServantMap) {
         return null;
     }
+
+    const {
+        masterServants,
+        bondLevels,
+        unlockedCostumes
+    } = masterAccountDataRef.current;
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
@@ -560,7 +530,6 @@ export const MasterServantsRoute = React.memo(() => {
                                 showAddServantRow={editMode}
                                 visibleColumns={visibleColumns}
                                 openLinksInNewTab={editMode}
-                                // onActivateServant={handleActiveServantChange}
                                 onServantSelectionChange={handleServantSelectionChange}
                                 onAddServant={handleAddServantButtonClick}
                                 onEditServant={openEditServantDialog}

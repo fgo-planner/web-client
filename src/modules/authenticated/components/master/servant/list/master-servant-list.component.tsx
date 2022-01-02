@@ -2,7 +2,7 @@ import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { PersonAddOutlined } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { MouseEvent, ReactNode, useCallback, useRef } from 'react';
+import React, { MouseEvent, ReactNode, useCallback, useEffect, useRef } from 'react';
 import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
@@ -160,11 +160,34 @@ export const MasterServantList = React.memo((props: Props) => {
 
     const lastClickIndexRef = useRef<number>();
 
+    /**
+     * Stores the `masterServants` set internally to prevent `handleServantClick`
+     * from being redefined when the object reference changes.
+     */
+    const masterServantsRef = useRef<Array<MasterServant>>(masterServants);
+
+    /**
+     * Stores the `selectedServants` set internally to prevent `handleServantClick`
+     * from being redefined when the object reference changes.
+     */
+    const selectedServantsRef = useRef<ReadonlySet<number>>();
+
+    useEffect(() => {
+        masterServantsRef.current = masterServants;
+    }, [masterServants]);
+
+    useEffect(() => {
+        selectedServantsRef.current = selectedServants;
+    }, [selectedServants]);
+
     const handleServantClick = useCallback((e: MouseEvent<HTMLDivElement>, index: number): void => {
         if (!onServantSelectionChange) {
             return;
         }
         
+        const masterServants = masterServantsRef.current;
+        const selectedServants = selectedServantsRef.current;
+
         /**
          * The instance ID of the servant that was clicked.
          */
@@ -246,7 +269,7 @@ export const MasterServantList = React.memo((props: Props) => {
          */
         lastClickIndexRef.current = index;
 
-    }, [masterServants, onServantSelectionChange, selectedServants]);
+    }, [onServantSelectionChange]);
 
     const handleServantDragEnd = useCallback((result: DropResult): void => {
         if (!result.destination) {

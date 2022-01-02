@@ -16,6 +16,7 @@ type Props = {
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
     unlockedCostumes: Array<number>;
     disableServantSelect?: boolean;
+    showAppendSkills?: boolean;
     dialogTitle?: string;
     submitButtonLabel?: string;
 } & Omit<DialogComponentProps<SubmitData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
@@ -37,6 +38,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         bondLevels,
         unlockedCostumes,
         disableServantSelect,
+        showAppendSkills,
         dialogTitle,
         submitButtonLabel,
         onClose,
@@ -93,6 +95,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
                         unlockedCostumes={unlockedCostumes}
                         onSubmit={submit}
                         servantSelectDisabled={disableServantSelect}
+                        showAppendSkills={showAppendSkills}
                     />
                 </DialogContent>
                 <DialogActions>

@@ -19,6 +19,7 @@ type Props = {
     activeServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
     unlockedCostumes: Array<number>;
+    showAppendSkills?: boolean;
     editMode?: boolean;
     onStatsChange?: (data: SubmitData) => void;
 };
@@ -168,6 +169,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         activeServants,
         bondLevels,
         unlockedCostumes,
+        showAppendSkills,
         editMode,
         onStatsChange
     } = props;
@@ -268,6 +270,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                     masterServant={activeServant}
                     bondLevels={bondLevels}
                     unlockedCostumes={unlockedCostumes}
+                    showAppendSkills={showAppendSkills}
                     onStatsChange={handleStatsChange}
                     layout="panel"
                 />
@@ -315,7 +318,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 </div>
             );
         }
-    }, [activeServants, bondLevels, editMode, handleStatsChange, unlockedCostumes]);
+    }, [activeServants, bondLevels, editMode, handleStatsChange, showAppendSkills, unlockedCostumes]);
 
     const servantMaterialDebtNode: ReactNode = useMemo(() => {
         if (!selectedServantsMaterialDebt || !gameItemMap) {

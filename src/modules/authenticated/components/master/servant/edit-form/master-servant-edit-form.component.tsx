@@ -1,15 +1,18 @@
 import { GameServant, MasterServant, MasterServantBondLevel, MasterServantSkillLevel } from '@fgo-planner/types';
-import { FormControl, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { ChangeEvent, FocusEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
-import { GameServantConstants } from '../../../../../../constants';
+import { ServantAscensionInputField } from '../../../../../../components/input/servant/servant-ascension-input-field.component';
+import { ServantBondInputField } from '../../../../../../components/input/servant/servant-bond-input-field.component';
+import { ServantFouInputField } from '../../../../../../components/input/servant/servant-fou-input-field.component';
+import { ServantLevelInputField } from '../../../../../../components/input/servant/servant-level-input-field.component';
+import { ServantNpLevelInputField } from '../../../../../../components/input/servant/servant-np-level-input-field.component';
+import { ServantSkillInputField } from '../../../../../../components/input/servant/servant-skill-input-field.component copy';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { ComponentStyleProps } from '../../../../../../types/internal/props/component-style-props.type';
 import { FormUtils } from '../../../../../../utils/form.utils';
-import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantEditFormAutocomplete } from './master-servant-edit-form-autocomplete.component';
 
 type Props = {
@@ -18,6 +21,7 @@ type Props = {
     bondLevels: Record<number, MasterServantBondLevel | undefined>;
     unlockedCostumes: Array<number>;
     servantSelectDisabled?: boolean;
+    showAppendSkills?: boolean;
     layout?: 'dialog' | 'panel';
     readonly?: boolean;
     /**
@@ -26,7 +30,7 @@ type Props = {
      */
     onStatsChange?: (data: SubmitData) => void;
     onSubmit?: (event: FormEvent<HTMLFormElement>, data: SubmitData) => void;
-} & ComponentStyleProps;
+} & Pick<ComponentStyleProps, 'className'>;
 
 export type FormData = {
     gameId: number;
@@ -38,7 +42,9 @@ export type FormData = {
     skill1: string;
     skill2: string;
     skill3: string;
-    // TODO Add append skills
+    appendSkill1: string;
+    appendSkill2: string;
+    appendSkill3: string;
     bond: string;
     unlockedCostumes: Record<number, boolean>;
 };
@@ -82,7 +88,8 @@ const convertToFormData = (
         ascension,
         fouAtk,
         fouHp,
-        skills
+        skills,
+        appendSkills
     } = masterServant;
 
     const unlockedCostumesMap = generateUnlockedCostumesMap(servant, unlockedCostumes);
@@ -98,7 +105,9 @@ const convertToFormData = (
         skill1: String(skills[1] || 1),
         skill2: String(skills[2] || ''),
         skill3: String(skills[3] || ''),
-        // TODO Add append skills
+        appendSkill1: String(appendSkills[1] || ''),
+        appendSkill2: String(appendSkills[2] || ''),
+        appendSkill3: String(appendSkills[3] || ''),
         unlockedCostumes: unlockedCostumesMap
     };
 };
@@ -132,18 +141,6 @@ const convertToMasterServant = (formData: FormData): Omit<MasterServant, 'instan
     };
 };
 
-/**
- * Calculates the step size for the Fou number input fields based on the
- * current value of the field.
- */
-const getFouInputStepSize = (value: string | undefined): number => {
-    const numberValue = Number(value);
-    if (!numberValue || numberValue < GameServantConstants.MaxFou / 2) {
-        return 10;
-    }
-    return 20;
-};
-
 export const StyleClassPrefix = 'MasterServantEditForm';
 
 const StyleProps = (theme: Theme) => ({
@@ -157,7 +154,10 @@ const StyleProps = (theme: Theme) => ({
             flex: 1,
             px: 2,
             [theme.breakpoints.down('sm')]: {
-                flex: '100% !important'
+                flex: '100% !important',
+                '&.empty': {
+                    display: 'none'
+                }
             }
         }
     }
@@ -173,6 +173,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         bondLevels,
         unlockedCostumes,
         servantSelectDisabled,
+        showAppendSkills,
         readonly,
         layout,
         onStatsChange,
@@ -195,7 +196,11 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         setServant(servant);
     }, [gameServantMap, masterServant, bondLevels, unlockedCostumes]);
 
-    const handleStatsChange = useCallback((): void => {
+    /**
+     * Notifies the parent component of stats change by invoking the `onStatsChange`
+     * callback function.
+     */
+    const pushStatsChange = useCallback((): void => {
         if (!formData || !onStatsChange) {
             return;
         }
@@ -223,62 +228,33 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         }
     }, [formData, gameServantMap, bondLevels, unlockedCostumes]);
 
-    const handleSelectInputChange = useCallback((event: SelectChangeEvent<string>): void => {
+    const handleInputChange = useCallback((name: string, value: string, pushChanges = false): void => {
         if (!formData) {
             return;
         }
-        const { name, value } = event.target;
         FormUtils.assignValue(formData, name!!, value);
-        handleStatsChange();
+        if (pushChanges) {
+            pushStatsChange();
+        }
         forceUpdate();
-    }, [formData, forceUpdate, handleStatsChange]);
+    }, [formData, forceUpdate, pushStatsChange]);
 
-    const handleInputChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
+    const handleInputBlurEvent = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
+        pushStatsChange();
+        forceUpdate();
+    }, [forceUpdate, pushStatsChange]);
+
+    const handleLevelAscensionInputChange = useCallback((level: string, ascension: string, pushChanges = false): void => {
         if (!formData) {
             return;
         }
-        const { name, value } = event.target;
-        FormUtils.assignValue(formData, name!!, value);
-        forceUpdate();
-    }, [formData, forceUpdate]);
-
-    const handleAscensionInputChange = useCallback((event: SelectChangeEvent<string>): void => {
-        if (!formData || !servant) {
-            return;
-        }
-        const { value } = event.target;
-        const level = MasterServantUtils.roundToNearestValidLevel(Number(value), Number(formData.level), servant);
-        formData.level = String(level);
-        if (formData.ascension !== value) {
-            formData.ascension = value;
-            handleStatsChange();
+        formData.level = level;
+        formData.ascension = ascension;
+        if (pushChanges) {
+            pushStatsChange();
         }
         forceUpdate();
-    }, [formData, servant, handleStatsChange, forceUpdate]);
-
-    const handleLevelInputBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        if (!formData || !servant) {
-            return;
-        }
-        const { value } = event.target;
-        const level = FormUtils.transformInputToInteger(value, GameServantConstants.MinLevel, GameServantConstants.MaxLevel) || 1;
-        const ascension = MasterServantUtils.roundToNearestValidAscensionLevel(level, Number(formData.ascension), servant);
-        formData.level = String(level);
-        formData.ascension = String(ascension);
-        handleStatsChange();
-        forceUpdate();
-    }, [formData, servant, forceUpdate, handleStatsChange]);
-
-    const handleFouInputBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        if (!formData) {
-            return;
-        }
-        const { name, value } = event.target;
-        const transformedValue = FormUtils.transformInputToFouValue(value) ?? '';
-        FormUtils.assignValue(formData, name, transformedValue);
-        handleStatsChange();
-        forceUpdate();
-    }, [formData, forceUpdate, handleStatsChange]);
+    }, [formData, forceUpdate, pushStatsChange]);
 
     const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
@@ -300,189 +276,139 @@ export const MasterServantEditForm = React.memo((props: Props) => {
     }
 
     const npField = (
-        <FormControl variant="outlined" fullWidth>
-            <InputLabel htmlFor="np">NP Level</InputLabel>
-            <Select
-                native
-                id={`${formId}-np`}
-                name="np"
-                label="NP Level"
-                value={formData.np}
-                onChange={handleSelectInputChange}
-                disabled={readonly}
-            >
-                {GameServantConstants.NoblePhantasmLevels.map(level => (
-                    <option key={level} value={level}>
-                        {level}
-                    </option>
-                ))}
-            </Select>
-        </FormControl>
+        <ServantNpLevelInputField
+            value={formData.np}
+            formId={formId}
+            name='np'
+            onChange={handleInputChange}
+            disabled={readonly}
+        />
     );
 
     const levelField = (
-        <TextField
-            variant="outlined"
-            fullWidth
-            label="Servant Level"
-            name="level"
-            type="number"
-            inputProps={{
-                step: 1,
-                min: GameServantConstants.MinLevel,
-                max: GameServantConstants.MaxLevel
-            }}
-            value={formData.level}
-            onChange={handleInputChange}
-            onBlur={handleLevelInputBlur}
+        <ServantLevelInputField
+            level={formData.level}
+            ascension={formData.ascension}
+            servant={servant}
+            name='level'
+            onChange={handleLevelAscensionInputChange}
             disabled={readonly}
         />
     );
 
     const ascensionField = (
-        <FormControl variant="outlined" fullWidth>
-            <InputLabel htmlFor="ascension">Ascension</InputLabel>
-            <Select
-                native
-                id={`${formId}-ascension`}
-                name="ascension"
-                label="Ascension"
-                value={formData.ascension}
-                onChange={handleAscensionInputChange}
-                disabled={readonly}
-            >
-                {GameServantConstants.AscensionLevels.map(level => (
-                    <option key={level} value={level}>
-                        {level}
-                    </option>
-                ))}
-            </Select>
-        </FormControl>
+        <ServantAscensionInputField
+            level={formData.level}
+            ascension={formData.ascension}
+            servant={servant}
+            formId={formId}
+            name='ascension'
+            onChange={handleLevelAscensionInputChange}
+            disabled={readonly}
+        />
     );
 
     const fouHpField = (
-        <TextField
-            variant="outlined"
-            fullWidth
-            label="HP Fou"
-            name="fouHp"
-            type="number"
-            inputProps={{
-                step: getFouInputStepSize(formData.fouHp),
-                min: GameServantConstants.MinFou,
-                max: GameServantConstants.MaxFou
-            }}
+        <ServantFouInputField
             value={formData.fouHp}
+            label='HP Fou'
+            name='fouHp'
             onChange={handleInputChange}
-            onBlur={handleFouInputBlur}
+            onBlur={handleInputBlurEvent}
             disabled={readonly}
         />
     );
 
     const fouAtkField = (
-        <TextField
-            variant="outlined"
-            fullWidth
-            label="Atk. Fou"
-            name="fouAtk"
-            type="number"
-            inputProps={{
-                step: getFouInputStepSize(formData.fouAtk),
-                min: GameServantConstants.MinFou,
-                max: GameServantConstants.MaxFou
-            }}
+        <ServantFouInputField
             value={formData.fouAtk}
+            label='Atk. Fou'
+            name='fouAtk'
             onChange={handleInputChange}
-            onBlur={handleFouInputBlur}
+            onBlur={handleInputBlurEvent}
             disabled={readonly}
         />
     );
 
     const skill1Field = (
-        <FormControl variant="outlined" fullWidth>
-            <InputLabel htmlFor="skill1">Skill 1</InputLabel>
-            <Select
-                native
-                id={`${formId}-skill1`}
-                name="skill1"
-                label="Skill 1"
-                value={formData.skill1}
-                onChange={handleSelectInputChange}
-                disabled={readonly}
-            >
-                {GameServantConstants.SkillLevels.map(level => (
-                    <option key={level} value={level}>
-                        {level}
-                    </option>
-                ))}
-            </Select>
-        </FormControl>
+        <ServantSkillInputField
+            value={formData.skill1}
+            formId={formId}
+            label='Skill 1'
+            name='skill1'
+            onChange={handleInputChange}
+            disabled={readonly}
+        />
     );
 
     const skill2Field = (
-        <FormControl variant="outlined" fullWidth>
-            <InputLabel htmlFor="skill2">Skill 2</InputLabel>
-            <Select
-                native
-                id={`${formId}-skill2`}
-                name="skill2"
-                label="Skill 2"
-                value={formData.skill2}
-                onChange={handleSelectInputChange}
-                disabled={readonly}
-            >
-                <option>{'\u2014'}</option> {/* Blank option */}
-                {GameServantConstants.SkillLevels.map(level => (
-                    <option key={level} value={level}>
-                        {level}
-                    </option>
-                ))}
-            </Select>
-        </FormControl>
+        <ServantSkillInputField
+            value={formData.skill2}
+            formId={formId}
+            label='Skill 2'
+            name='skill2'
+            allowBlank
+            onChange={handleInputChange}
+            disabled={readonly}
+        />
     );
 
     const skill3Field = (
-        <FormControl variant="outlined" fullWidth>
-            <InputLabel htmlFor="skill3">Skill 3</InputLabel>
-            <Select
-                native
-                id={`${formId}-skill3`}
-                name="skill3"
-                label="Skill 3"
-                value={formData.skill3}
-                onChange={handleSelectInputChange}
-                disabled={readonly}
-            >
-                <option>{'\u2014'}</option> {/* Blank option */}
-                {GameServantConstants.SkillLevels.map(level => (
-                    <option key={level} value={level}>
-                        {level}
-                    </option>
-                ))}
-            </Select>
-        </FormControl>
+        <ServantSkillInputField
+            value={formData.skill3}
+            formId={formId}
+            label='Skill 3'
+            name='skill3'
+            allowBlank
+            onChange={handleInputChange}
+            disabled={readonly}
+        />
+    );
+
+    const appendSkill1Field = (
+        <ServantSkillInputField
+            value={formData.appendSkill1}
+            formId={formId}
+            label='Append 1'
+            name='appendSkill1'
+            allowBlank
+            onChange={handleInputChange}
+            disabled={readonly}
+        />
+    );
+
+    const appendSkill2Field = (
+        <ServantSkillInputField
+            value={formData.appendSkill2}
+            formId={formId}
+            label='Append 2'
+            name='appendSkill2'
+            allowBlank
+            onChange={handleInputChange}
+            disabled={readonly}
+        />
+    );
+
+    const appendSkill3Field = (
+        <ServantSkillInputField
+            value={formData.appendSkill3}
+            formId={formId}
+            label='Append 3'
+            name='appendSkill3'
+            allowBlank
+            onChange={handleInputChange}
+            disabled={readonly}
+        />
     );
 
     const bondField = (
-        <FormControl variant="outlined" fullWidth>
-            <InputLabel htmlFor="bond">Bond</InputLabel>
-            <Select
-                native
-                id={`${formId}-bond`}
-                name="bond"
-                label="Bond"
-                value={formData.bond}
-                onChange={handleSelectInputChange}
-                disabled={readonly}
-            >
-                <option>{/* Blank option */}</option>
-                {GameServantConstants.BondLevels.map(level => (
-                    <option key={level} value={level}>
-                        {level}
-                    </option>
-                ))}
-            </Select>
-        </FormControl>
+        <ServantBondInputField
+            value={formData.bond}
+            formId={formId}
+            name='bond'
+            onChange={handleInputChange}
+            disabled={readonly}
+        />
     );
 
     if (layout === 'panel') {
@@ -496,18 +422,18 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             >
                 <Box sx={StyleProps}>
                     <div className={`${StyleClassPrefix}-input-field-group`}>
-                        <InputFieldContainer flex="50%">
+                        <InputFieldContainer flex='50%'>
                             {levelField}
                         </InputFieldContainer>
-                        <InputFieldContainer flex="50%">
+                        <InputFieldContainer flex='50%'>
                             {ascensionField}
                         </InputFieldContainer>
                     </div>
                     <div className={`${StyleClassPrefix}-input-field-group`}>
-                        <InputFieldContainer flex="50%">
+                        <InputFieldContainer flex='50%'>
                             {fouHpField}
                         </InputFieldContainer>
-                        <InputFieldContainer flex="50%">
+                        <InputFieldContainer flex='50%'>
                             {fouAtkField}
                         </InputFieldContainer>
                     </div>
@@ -522,11 +448,24 @@ export const MasterServantEditForm = React.memo((props: Props) => {
                             {skill3Field}
                         </InputFieldContainer>
                     </div>
+                    {showAppendSkills && (
+                        <div className={`${StyleClassPrefix}-input-field-group`}>
+                            <InputFieldContainer>
+                                {appendSkill1Field}
+                            </InputFieldContainer>
+                            <InputFieldContainer>
+                                {appendSkill2Field}
+                            </InputFieldContainer>
+                            <InputFieldContainer>
+                                {appendSkill3Field}
+                            </InputFieldContainer>
+                        </div>)
+                    }
                     <div className={`${StyleClassPrefix}-input-field-group`}>
-                        <InputFieldContainer flex="50%">
+                        <InputFieldContainer flex='50%'>
                             {npField}
                         </InputFieldContainer>
-                        <InputFieldContainer flex="50%">
+                        <InputFieldContainer flex='50%'>
                             {bondField}
                         </InputFieldContainer>
                     </div>
@@ -545,14 +484,14 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         >
             <Box sx={StyleProps}>
                 <div className={`${StyleClassPrefix}-input-field-group`}>
-                    <InputFieldContainer flex="75%">
+                    <InputFieldContainer flex='75%'>
                         <MasterServantEditFormAutocomplete
                             selectedServant={servant}
                             onChange={handleSelectedServantChange}
                             disabled={servantSelectDisabled || readonly}
                         />
                     </InputFieldContainer>
-                    <InputFieldContainer flex="25%">
+                    <InputFieldContainer flex='25%'>
                         {npField}
                     </InputFieldContainer>
                 </div>
@@ -572,6 +511,9 @@ export const MasterServantEditForm = React.memo((props: Props) => {
                 </div>
                 <div className={`${StyleClassPrefix}-input-field-group`}>
                     <InputFieldContainer>
+                        {bondField}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
                         {skill1Field}
                     </InputFieldContainer>
                     <InputFieldContainer>
@@ -580,10 +522,23 @@ export const MasterServantEditForm = React.memo((props: Props) => {
                     <InputFieldContainer>
                         {skill3Field}
                     </InputFieldContainer>
-                    <InputFieldContainer>
-                        {bondField}
-                    </InputFieldContainer>
                 </div>
+                {showAppendSkills && (
+                    <div className={`${StyleClassPrefix}-input-field-group`}>
+                        <InputFieldContainer className='empty'>
+                            {/* Empty container for spacing purposes */}
+                        </InputFieldContainer>
+                        <InputFieldContainer>
+                            {appendSkill1Field}
+                        </InputFieldContainer>
+                        <InputFieldContainer>
+                            {appendSkill2Field}
+                        </InputFieldContainer>
+                        <InputFieldContainer>
+                            {appendSkill3Field}
+                        </InputFieldContainer>
+                    </div>
+                )}
             </Box>
         </form>
     );

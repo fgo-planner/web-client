@@ -18,7 +18,7 @@ import { MasterServantEditFormAutocomplete } from './master-servant-edit-form-au
 type Props = {
     formId: string;
     masterServant: Readonly<MasterServant>;
-    bondLevels: Record<number, MasterServantBondLevel | undefined>;
+    bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
     servantSelectDisabled?: boolean;
     showAppendSkills?: boolean;
@@ -77,7 +77,7 @@ const generateUnlockedCostumesMap = (
 const convertToFormData = (
     servant: GameServant | undefined,
     masterServant: MasterServant,
-    bondLevels: Record<number, MasterServantBondLevel | undefined>,
+    bondLevels: Record<number, MasterServantBondLevel>,
     unlockedCostumes: Array<number>
 ): FormData => {
 

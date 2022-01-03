@@ -17,7 +17,7 @@ import { MasterServantEditForm, SubmitData } from '../../components/master/serva
 
 type Props = {
     activeServants: Array<MasterServant>;
-    bondLevels: Record<number, MasterServantBondLevel | undefined>;
+    bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
     showAppendSkills?: boolean;
     editMode?: boolean;
@@ -216,18 +216,23 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
             return;
         }
         const activeServant = activeServants[0];
+        const { gameId } = activeServant;
         /*
          * Update data from the form
          */
         MasterServantUtils.merge(activeServant, data.masterServant);
-        bondLevels[activeServant.gameId] = data.bond;
+        if (data.bond === undefined) {
+            delete bondLevels[gameId];
+        } else {
+            bondLevels[gameId] = data.bond;
+        }
         // TODO Update unlocked costumes
 
         /*
          * Re-compute servant material stats. Only one servant should be active at this
          * point.
          */
-        const servant = gameServantMap[activeServant.gameId];
+        const servant = gameServantMap[gameId];
         if (servant) {
             const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(
                 servant,

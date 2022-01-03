@@ -14,7 +14,7 @@ import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClas
 
 type Props = {
     masterServants: Array<MasterServant>;
-    bondLevels: Record<number, MasterServantBondLevel | undefined>;
+    bondLevels: Record<number, MasterServantBondLevel>;
     /**
      * Instance IDs of selected servants.
      */

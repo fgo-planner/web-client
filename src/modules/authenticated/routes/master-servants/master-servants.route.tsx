@@ -30,7 +30,7 @@ import { MasterServantInfoPanel } from './master-servant-info-panel.component';
 
 type MasterAccountData = {
     masterServants: Array<MasterServant>;
-    bondLevels: Record<number, MasterServantBondLevel | undefined>;
+    bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
 };
 
@@ -219,9 +219,17 @@ export const MasterServantsRoute = React.memo(() => {
         setDeleteServant(undefined);
         setDeleteServantDialogOpen(false);
 
+        const {
+            masterServants,
+            bondLevels,
+            unlockedCostumes
+        } = masterAccountDataRef.current;
+
         const update: Partial<MasterAccount> = {
             _id: masterAccount?._id,
-            ...masterAccountDataRef.current as any
+            servants: masterServants,
+            bondLevels,
+            costumes: unlockedCostumes
         };
         try {
             masterAccountService.updateAccount(update);
@@ -300,7 +308,11 @@ export const MasterServantsRoute = React.memo(() => {
          * Update the bond level map.
          * TODO Move this to a separate method/function.
          */
-        bondLevels[servantId] = data.bond;
+        if (data.bond === undefined) {
+            delete bondLevels[servantId];
+        } else {
+            bondLevels[servantId] = data.bond;
+        }
 
         /*
          * Update the unlocked costumes list.

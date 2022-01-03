@@ -13,7 +13,7 @@ type Props = {
      * new servant.
      */
     masterServant?: Readonly<MasterServant>;
-    bondLevels: Record<number, MasterServantBondLevel | undefined>;
+    bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
     disableServantSelect?: boolean;
     showAppendSkills?: boolean;

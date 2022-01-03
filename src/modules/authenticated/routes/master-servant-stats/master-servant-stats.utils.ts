@@ -176,7 +176,7 @@ export class MasterServantStatsUtils {
         stats: MasterServantStats<T>,
         statKey: Partial<keyof T>,
         masterServant: MasterServant,
-        bondLevelMap: Record<number, MasterServantBondLevel | undefined>,
+        bondLevelMap: Record<number, MasterServantBondLevel>,
         isUnique: boolean
     ): void {
 

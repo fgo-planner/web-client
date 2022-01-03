@@ -192,7 +192,6 @@ export const MasterServantsRoute = React.memo(() => {
         const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
             .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
             .subscribe(account => {
-                resetLoadingIndicator();
                 if (account == null) {
                     return;
                 }
@@ -203,32 +202,12 @@ export const MasterServantsRoute = React.memo(() => {
             });
 
         return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
-    }, [resetLoadingIndicator, updateSelectedServants]);
-
-    const handleUpdateError = useCallback((error: any): void => {
-        resetLoadingIndicator();
-        // TODO Display error message to user.
-        console.error(error);
-        masterAccountDataRef.current = getMasterAccountData(masterAccount);
-        updateSelectedServants();
-        setEditMode(false);
-        setEditServant(undefined);
-        setEditServantDialogOpen(false);
-        setDeleteServant(undefined);
-        setDeleteServantDialogOpen(false);
-    }, [masterAccount, resetLoadingIndicator, updateSelectedServants]);
+    }, [updateSelectedServants]);
 
     /**
      * Sends master servant update request to the back-end.
      */
-    const updateMasterAccount = useCallback((): void => {
-        const update: Partial<MasterAccount> = {
-            _id: masterAccount?._id,
-            ...masterAccountDataRef.current as any
-        };
-        masterAccountService.updateAccount(update)
-            .catch(handleUpdateError);
-
+    const updateMasterAccount = useCallback(async (): Promise<void> => {
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
             loadingIndicatorId = loadingIndicatorOverlayService.invoke();
@@ -239,7 +218,23 @@ export const MasterServantsRoute = React.memo(() => {
         setEditServantDialogOpen(false);
         setDeleteServant(undefined);
         setDeleteServantDialogOpen(false);
-    }, [handleUpdateError, loadingIndicatorOverlayService, masterAccount?._id, masterAccountService]);
+
+        const update: Partial<MasterAccount> = {
+            _id: masterAccount?._id,
+            ...masterAccountDataRef.current as any
+        };
+        try {
+            masterAccountService.updateAccount(update);
+        } catch (error: any) {
+            // TODO Display error message to user.
+            console.error(error);
+            masterAccountDataRef.current = getMasterAccountData(masterAccount);
+            updateSelectedServants();
+            setEditMode(false);
+        }
+        resetLoadingIndicator();
+
+    }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, resetLoadingIndicator, updateSelectedServants]);
 
     const handleFormChange = useCallback((): void => {
         const masterAccountData = masterAccountDataRef.current;
@@ -372,7 +367,7 @@ export const MasterServantsRoute = React.memo(() => {
         setDeleteServantDialogOpen(false);
     }, []);
 
-    const handleDeleteServantDialogClose = useCallback((event: MouseEvent, reason: ModalOnCloseReason): void => {
+    const handleDeleteServantDialogClose = useCallback((event: MouseEvent, reason: ModalOnCloseReason): any => {
         if (reason !== 'submit') {
             return closeDeleteServantDialog();
         }

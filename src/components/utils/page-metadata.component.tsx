@@ -25,7 +25,7 @@ const generateMeta = (metadata: PageMetadataType): HelmetMetaProp => {
  */
 export const PageMetadata = React.memo(() => {
 
-    const [ metadata, setMetadata ] = useState<PageMetadataType>();
+    const [ metadata, setMetadata ] = useState<PageMetadataType>({});
 
     useEffect(() => {
         const onMetadataChangeSubscription = SubscribablesContainer
@@ -34,10 +34,6 @@ export const PageMetadata = React.memo(() => {
             
         return () => onMetadataChangeSubscription.unsubscribe();
     }, []);
-
-    if (!metadata) {
-        return null;
-    }
 
     return (
         <Helmet 

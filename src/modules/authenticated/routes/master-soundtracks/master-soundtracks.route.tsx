@@ -103,31 +103,15 @@ export const MasterSoundtracksRoute = React.memo(() => {
         };
     }, [soundtrackPlayerService]);
 
-    const handleUpdateError = useCallback((error: any): void => {
-        // TODO Display error message to user.
-        console.error(error);
-        const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(masterAccount);
-        resetLoadingIndicator();
-        setUnlockedSoundtracksSet(unlockedSoundtracksSet);
-        setEditMode(false);
-    }, [masterAccount, resetLoadingIndicator]);
-
     const handleEditButtonClick = useCallback((): void => {
         setEditMode(true);
     }, []);
 
-    const handleSaveButtonClick = useCallback((): void => {
+    const handleSaveButtonClick = useCallback(async (): Promise<void> => {
         const masterAccountId = masterAccount?._id;
         if (!masterAccountId) {
             return;
         }
-
-        const update = {
-            _id: masterAccountId,
-            soundtracks: [...unlockedSoundtracksSet]
-        };
-        masterAccountService.updateAccount(update)
-            .catch(handleUpdateError);
 
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
@@ -135,7 +119,22 @@ export const MasterSoundtracksRoute = React.memo(() => {
         }
         loadingIndicatorIdRef.current = loadingIndicatorId;
 
-    }, [handleUpdateError, loadingIndicatorOverlayService, masterAccount?._id, masterAccountService, unlockedSoundtracksSet]);
+        const update = {
+            _id: masterAccountId,
+            soundtracks: [...unlockedSoundtracksSet]
+        };
+        try {
+            await masterAccountService.updateAccount(update);
+        } catch (error: any) {
+            // TODO Display error message to user.
+            console.error(error);
+            const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(masterAccount);
+            setUnlockedSoundtracksSet(unlockedSoundtracksSet);
+            setEditMode(false);
+        }
+        resetLoadingIndicator();
+
+    }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, resetLoadingIndicator, unlockedSoundtracksSet]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account

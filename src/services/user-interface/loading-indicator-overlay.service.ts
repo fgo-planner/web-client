@@ -7,6 +7,8 @@ export class LoadingIndicatorOverlayService {
 
     private readonly _InvocationIdSet = new Set<string>();
 
+    private _display = false;
+
     private get _onDisplayStatusChange() {
         return SubscribablesContainer.get(SubscriptionTopic.UserInterface_LoadingIndicatorDisplayChange);
     }
@@ -14,8 +16,8 @@ export class LoadingIndicatorOverlayService {
     invoke(): string {
         const id = String(new Date().getTime());
         this._InvocationIdSet.add(id);
-        if (!this._onDisplayStatusChange.value) {
-            this._onDisplayStatusChange.next(true);
+        if (!this._display) {
+            this._onDisplayStatusChange.next(this._display = true);
         }
         return id;
     }
@@ -23,7 +25,7 @@ export class LoadingIndicatorOverlayService {
     waive(id: string): void {
         this._InvocationIdSet.delete(id);
         if (!this._InvocationIdSet.size) {
-            this._onDisplayStatusChange.next(false);
+            this._onDisplayStatusChange.next(this._display = false);
         }
     }
 

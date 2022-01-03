@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
-import { ModalOnCloseReason, Nullable, ThemeInfo } from '../../../../types/internal';
+import { ModalOnCloseReason, ThemeInfo } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { LoginDialog } from '../../../login/login-dialog.component';
@@ -43,8 +43,8 @@ export const AppBarGuestUser = React.memo(() => {
     const themeService = useInjectable(ThemeService);
 
     const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
-    const [themeInfo, setThemeInfo] = useState<Nullable<ThemeInfo>>();
-    const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState<boolean>();
+    const [themeInfo, setThemeInfo] = useState<ThemeInfo>();
+    const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState<boolean>(false);
 
     useEffect(() => {
         const onThemeChangeSubscription = SubscribablesContainer

@@ -9,7 +9,7 @@ import { AuthenticationService } from '../../../../services/authentication/authe
 import { BasicUser } from '../../../../services/data/user/user.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseHandler, Nullable, ThemeInfo } from '../../../../types/internal';
+import { ModalOnCloseHandler, ThemeInfo } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
@@ -66,7 +66,7 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
     const backgroundMusicService = useInjectable(BackgroundMusicService);
     const themeService = useInjectable(ThemeService);
 
-    const [themeInfo, setThemeInfo] = useState<Nullable<ThemeInfo>>();
+    const [themeInfo, setThemeInfo] = useState<ThemeInfo>();
     const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState<boolean>(false);
 
     useEffect(() => {

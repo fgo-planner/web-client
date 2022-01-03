@@ -12,8 +12,18 @@ export class BackgroundMusicService {
 
     private _audioEl?: HTMLAudioElement;
 
-    private get _onPlayStatusChange() {
+    private get _onBackgroundPlayStatusChange() {
         return SubscribablesContainer.get(SubscriptionTopic.Audio_BackgroundPlayStatusChange);
+    }
+
+    constructor() {
+        /*
+         * This class is meant to last the lifetime of the application; no need to
+         * unsubscribe from subscriptions.
+         */
+        SubscribablesContainer
+            .get(SubscriptionTopic.Audio_SoundtrackPlayStatusChange)
+            .subscribe(this._handleSoundtrackPlayStatusChange.bind(this));
     }
 
     async play(): Promise<void> {
@@ -24,7 +34,7 @@ export class BackgroundMusicService {
         audioEl.volume = this._DefaultVolume;
         try {
             await audioEl.play();
-            this._onPlayStatusChange.next(true);
+            this._onBackgroundPlayStatusChange.next(true);
         } catch (e) {
             console.error(e);
             return;
@@ -36,7 +46,13 @@ export class BackgroundMusicService {
             return;
         }
         this._audioEl.pause();
-        this._onPlayStatusChange.next(false);
+        this._onBackgroundPlayStatusChange.next(false);
+    }
+
+    private _handleSoundtrackPlayStatusChange(playing: boolean): void {
+        if (playing) {
+            this.pause();
+        }
     }
 
 }

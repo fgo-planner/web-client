@@ -9,8 +9,18 @@ export class SoundtrackPlayerService {
 
     private _audioEl?: HTMLAudioElement;
 
-    private get _onPlayStatusChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.Audio_BackgroundPlayStatusChange);
+    private get _onSoundtrackPlayStatusChange() {
+        return SubscribablesContainer.get(SubscriptionTopic.Audio_SoundtrackPlayStatusChange);
+    }
+
+    constructor() {
+        /*
+         * This class is meant to last the lifetime of the application; no need to
+         * unsubscribe from subscriptions.
+         */
+        SubscribablesContainer
+            .get(SubscriptionTopic.Audio_BackgroundPlayStatusChange)
+            .subscribe(this._handleBackgroundPlayStatusChange.bind(this));
     }
 
     async play(src: string): Promise<void> {
@@ -23,7 +33,7 @@ export class SoundtrackPlayerService {
         audioEl.src = src;
         try {
             await audioEl.play();
-            this._onPlayStatusChange.next(true);
+            this._onSoundtrackPlayStatusChange.next(true);
         } catch (e) {
             console.error(e);
             return;
@@ -35,7 +45,13 @@ export class SoundtrackPlayerService {
             return;
         }
         this._audioEl.pause();
-        this._onPlayStatusChange.next(false);
+        this._onSoundtrackPlayStatusChange.next(false);
+    }
+
+    private _handleBackgroundPlayStatusChange(playing: boolean): void {
+        if (playing) {
+            this.pause();
+        }
     }
 
 }

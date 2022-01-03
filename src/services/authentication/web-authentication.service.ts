@@ -1,6 +1,6 @@
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import { UserCredentials } from '../../types/data';
-import { HttpResponseError, Nullable } from '../../types/internal';
+import { HttpResponseError } from '../../types/internal';
 import { JwtUtils } from '../../utils/jwt.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
@@ -124,8 +124,8 @@ export class WebAuthenticationService extends AuthenticationService {
         }, this._InvalidateCredentialsWaitDuration);
     }
 
-    private _handleUnauthorizedResponse(error: Nullable<HttpResponseError>): void {
-        if (!error || this._invalidatingCredentials) {
+    private _handleUnauthorizedResponse(error: HttpResponseError): void {
+        if (this._invalidatingCredentials) {
             return;
         }
         console.log('Invalidating credentials due to unauthorized response...', error);

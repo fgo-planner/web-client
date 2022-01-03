@@ -2,7 +2,7 @@ import { createTheme, ThemeProvider, Typography } from '@mui/material';
 import { StyledEngineProvider, Theme } from '@mui/system';
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { BackgroundImageContext } from '../../contexts/background-image.context';
-import { Nullable, ThemeInfo } from '../../types/internal';
+import { ThemeInfo } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
 import { ThemeBackground } from './theme-background.component';
@@ -27,11 +27,7 @@ export const ThemeProviderWrapper = React.memo(({ children }: Props) => {
     useEffect(() => {
         const onThemeChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopic.UserInterface_ThemeChange)
-            .subscribe((themeInfo: Nullable<ThemeInfo>) => {
-                if (!themeInfo) {
-                    // Is this case possible?
-                    return;
-                }
+            .subscribe((themeInfo: ThemeInfo) => {
                 const { themeOptions, backgroundImageUrl } = themeInfo;
                 setTheme(createTheme(themeOptions));
                 setBackgroundImageUrl(backgroundImageUrl);

@@ -35,8 +35,8 @@ export class MasterAccountService {
         return SubscribablesContainer.get(SubscriptionTopic.User_CurrentMasterAccountUpdate);
     }
 
-    private get _onMasterAccountListUpdate() {
-        return SubscribablesContainer.get(SubscriptionTopic.User_MasterAccountListUpdate);
+    private get _onMasterAccountListChange() {
+        return SubscribablesContainer.get(SubscriptionTopic.User_MasterAccountListChange);
     }
 
     constructor() {
@@ -165,13 +165,13 @@ export class MasterAccountService {
      */
     private async _updateMasterAccountList(): Promise<void> {
         this._masterAccountList = await Http.get<Partial<MasterAccount>[]>(`${this._BaseUrl}/current-user`);
-        this._onMasterAccountListUpdate.next(this._masterAccountList);
+        this._onMasterAccountListChange.next(this._masterAccountList);
     }
 
     private async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
         if (!userInfo) {
             this._onCurrentMasterAccountChange.next(this._currentMasterAccount = null);
-            this._onMasterAccountListUpdate.next(this._masterAccountList = null);
+            this._onMasterAccountListChange.next(this._masterAccountList = null);
             return;
         }
         await this._updateMasterAccountList();

@@ -53,13 +53,11 @@ export const MasterAccountsRoute = React.memo(() => {
      * Master account subscriptions
      */
     useEffect(() => {
-        const onMasterAccountListUpdateSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_MasterAccountListUpdate)
+        const onMasterAccountListChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopic.User_MasterAccountListChange)
             .subscribe(setMasterAccountList);
 
-        return () => {
-            onMasterAccountListUpdateSubscription.unsubscribe();
-        };
+        return () => onMasterAccountListChangeSubscription.unsubscribe();
     }, []);
 
     const scrollContainer = useElevateAppBarOnScroll();

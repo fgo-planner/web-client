@@ -73,48 +73,46 @@ export const MasterServantCostumesRoute = React.memo(() => {
                     return;
                 }
                 const unlockedCostumesSet = getUnlockedCostumeSetFromMasterAccount(account);
-                resetLoadingIndicator();
                 setMasterAccount(account);
                 setUnlockedCostumesSet(unlockedCostumesSet);
                 setEditMode(false);
             });
 
         return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
-    }, [resetLoadingIndicator]);
-
-    const handleUpdateError = useCallback((error: any): void => {
-        // TODO Display error message to user.
-        console.error(error);
-        const unlockedCostumesSet = getUnlockedCostumeSetFromMasterAccount(masterAccount);
-        resetLoadingIndicator();
-        setUnlockedCostumesSet(unlockedCostumesSet);
-        setEditMode(false);
-    }, [masterAccount, resetLoadingIndicator]);
+    }, []);
 
     const handleEditButtonClick = useCallback((): void => {
         setEditMode(true);
     }, []);
 
-    const handleSaveButtonClick = useCallback((): void => {
+    const handleSaveButtonClick = useCallback(async (): Promise<void> => {
         const masterAccountId = masterAccount?._id;
         if (!masterAccountId) {
             return;
         }
-
-        const update = {
-            _id: masterAccountId,
-            costumes: [...unlockedCostumesSet]
-        };
-        masterAccountService.updateAccount(update)
-            .catch(handleUpdateError);
 
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
             loadingIndicatorId = loadingIndicatorOverlayService.invoke();
         }
         loadingIndicatorIdRef.current = loadingIndicatorId;
+        
+        const update = {
+            _id: masterAccountId,
+            costumes: [...unlockedCostumesSet]
+        };
+        try {
+            await masterAccountService.updateAccount(update);
+        } catch (error: any) {
+            // TODO Display error message to user.
+            console.error(error);
+            const unlockedCostumesSet = getUnlockedCostumeSetFromMasterAccount(masterAccount);
+            setUnlockedCostumesSet(unlockedCostumesSet);
+            setEditMode(false);
+        }
+        resetLoadingIndicator();
 
-    }, [handleUpdateError, loadingIndicatorOverlayService, masterAccount?._id, masterAccountService, unlockedCostumesSet]);
+    }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, resetLoadingIndicator, unlockedCostumesSet]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account

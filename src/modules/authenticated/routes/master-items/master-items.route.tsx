@@ -88,29 +88,25 @@ export const MasterItemsRoute = React.memo(() => {
                     return;
                 }
                 const masterItems = cloneItemsFromMasterAccount(account);
-                resetLoadingIndicator();
                 setMasterAccount(account);
                 setMasterItems(masterItems);
                 setEditMode(false);
             });
 
         return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
-    }, [resetLoadingIndicator]);
-
-    const handleUpdateError = useCallback((error: any): void => {
-        // TODO Display error message to user.
-        console.error(error);
-        const masterItems = cloneItemsFromMasterAccount(masterAccount);
-        resetLoadingIndicator();
-        setMasterItems(masterItems);
-        setEditMode(false);
-    }, [masterAccount, resetLoadingIndicator]);
+    }, []);
 
     const handleEditButtonClick = useCallback((): void => {
         setEditMode(true);
     }, []);
 
-    const handleSaveButtonClick = useCallback((): void => {
+    const handleSaveButtonClick = useCallback(async (): Promise<void> => {
+        let loadingIndicatorId = loadingIndicatorIdRef.current;
+        if (!loadingIndicatorId) {
+            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
+        }
+        loadingIndicatorIdRef.current = loadingIndicatorId;
+
         /*
          * QP is stored as a standalone property in the `MasterAccount` object, so it
          * needs to be separated out of the items list.
@@ -123,16 +119,18 @@ export const MasterItemsRoute = React.memo(() => {
             items,
             qp: qpItem?.quantity || 0
         };
-        masterAccountService.updateAccount(update)
-            .catch(handleUpdateError);
-
-        let loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (!loadingIndicatorId) {
-            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
+        try {
+            await masterAccountService.updateAccount(update);
+        } catch (error: any) {
+            // TODO Display error message to user.
+            console.error(error);
+            const masterItems = cloneItemsFromMasterAccount(masterAccount);
+            setMasterItems(masterItems);
+            setEditMode(false);
         }
-        loadingIndicatorIdRef.current = loadingIndicatorId;
+        resetLoadingIndicator();
 
-    }, [handleUpdateError, loadingIndicatorOverlayService, masterAccount?._id, masterAccountService, masterItems]);
+    }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, masterItems, resetLoadingIndicator]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account

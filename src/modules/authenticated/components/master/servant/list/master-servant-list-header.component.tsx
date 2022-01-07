@@ -16,6 +16,7 @@ export const StyleClassPrefix = 'MasterServantCostumesListHeader';
 const StyleProps = {
     display: 'flex',
     pl: 4,
+    pr: 1,
     py: 4,
     borderBottomWidth: 1,
     borderBottomStyle: 'solid',
@@ -42,8 +43,11 @@ const StyleProps = {
     [`& .${StyleClassPrefix}-fou-atk`]: {
         flex: ColumnWidths.fouAtk
     },
-    [`& .${StyleClassPrefix}-skill-levels`]: {
-        flex: ColumnWidths.skillLevels
+    [`& .${StyleClassPrefix}-skills`]: {
+        flex: ColumnWidths.skills
+    },
+    [`& .${StyleClassPrefix}-append-skills`]: {
+        flex: ColumnWidths.appendSkills
     },
     [`& .${StyleClassPrefix}-bond-level`]: {
         flex: ColumnWidths.bondLevel
@@ -60,7 +64,8 @@ export const MasterServantListHeader = React.memo(({ editMode, visibleColumns }:
         level,
         fouHp,
         fouAtk,
-        skillLevels,
+        skills,
+        appendSkills,
         bondLevel,
         actions
     } = visibleColumns || {};
@@ -90,9 +95,14 @@ export const MasterServantListHeader = React.memo(({ editMode, visibleColumns }:
                     Fou (ATK)
                 </div>
             }
-            {skillLevels &&
-                <div className={`${StyleClassPrefix}-skill-levels`}>
+            {skills &&
+                <div className={`${StyleClassPrefix}-skills`}>
                     Skills
+                </div>
+            }
+            {appendSkills &&
+                <div className={`${StyleClassPrefix}-append-skills`}>
+                    Append
                 </div>
             }
             {bondLevel &&

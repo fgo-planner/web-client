@@ -41,8 +41,8 @@ const renderFouLevels = (activeServant: Readonly<MasterServant>): JSX.Element =>
     );
 };
 
-const renderSkillLevels = (activeServant: Readonly<MasterServant>): JSX.Element => {
-    const { skills } = activeServant;
+const renderSkillLevels = (activeServant: Readonly<MasterServant>, stat: 'skills' | 'appendSkills'): JSX.Element => {
+    const skills = activeServant[stat];
     return (
         <div className={`${StyleClassPrefix}-skill-level-stat`}>
             {skills[1] ?? '\u2013'}
@@ -206,7 +206,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 );
                 PlannerComputationUtils.addMaterialDebtMap(servantMaterialDebt, selectedServantsMaterialDebt);
             }
-            // TODO Add way to toggle append skills and lores
+            // TODO Add way to toggle lores
             setSelectedServantsMaterialDebt(selectedServantsMaterialDebt);
         }
     }, [activeServants, gameServantMap, showAppendSkills, unlockedCostumes]);
@@ -325,8 +325,16 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                         className={`${StyleClassPrefix}-servant-stat`}
                         label="Skills"
                         labelWidth={ServantStatLabelWidth}
-                        value={renderSkillLevels(activeServant)}
+                        value={renderSkillLevels(activeServant, 'skills')}
                     />
+                    {showAppendSkills &&
+                        <DataPointListItem
+                            className={`${StyleClassPrefix}-servant-stat`}
+                            label="Append Skills"
+                            labelWidth={ServantStatLabelWidth}
+                            value={renderSkillLevels(activeServant, 'appendSkills')}
+                        />
+                    }
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
                         label="Noble Phantasm"

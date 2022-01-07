@@ -29,7 +29,12 @@ const ServantListVisibleColumns: MasterServantListVisibleColumns = {
     bondLevel: true,
     fouHp: true,
     fouAtk: true,
-    skillLevels: true,
+    skills: true,
+    /*
+     * TODO FGO Manager does not support append skills...change this if importing
+     * from a source that does.
+     */
+    appendSkills: false,
     actions: false
 };
 

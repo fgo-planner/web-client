@@ -122,7 +122,10 @@ const convertToMasterServant = (formData: FormData): Omit<MasterServant, 'instan
         fouHp,
         skill1,
         skill2,
-        skill3
+        skill3,
+        appendSkill1,
+        appendSkill2,
+        appendSkill3
     } = formData;
 
     return {
@@ -137,7 +140,11 @@ const convertToMasterServant = (formData: FormData): Omit<MasterServant, 'instan
             2: Number(skill2) as MasterServantSkillLevel || undefined,
             3: Number(skill3) as MasterServantSkillLevel || undefined
         },
-        appendSkills: {} // TODO Implement append skills
+        appendSkills: {
+            1: Number(appendSkill1) as MasterServantSkillLevel || undefined,
+            2: Number(appendSkill2) as MasterServantSkillLevel || undefined,
+            3: Number(appendSkill3) as MasterServantSkillLevel || undefined
+        }
     };
 };
 
@@ -369,7 +376,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         <ServantSkillInputField
             value={formData.appendSkill1}
             formId={formId}
-            label='Append 1'
+            label={layout === 'panel' ? 'App. 1' : 'Append 1'}
             name='appendSkill1'
             allowBlank
             onChange={handleInputChange}
@@ -381,7 +388,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         <ServantSkillInputField
             value={formData.appendSkill2}
             formId={formId}
-            label='Append 2'
+            label={layout === 'panel' ? 'App. 2' : 'Append 2'}
             name='appendSkill2'
             allowBlank
             onChange={handleInputChange}
@@ -393,7 +400,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         <ServantSkillInputField
             value={formData.appendSkill3}
             formId={formId}
-            label='Append 3'
+            label={layout === 'panel' ? 'App. 3' : 'Append 3'}
             name='appendSkill3'
             allowBlank
             onChange={handleInputChange}

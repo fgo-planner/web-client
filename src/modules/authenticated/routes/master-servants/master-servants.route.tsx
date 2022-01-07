@@ -1,9 +1,9 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
-import { Fab, IconButton, Tooltip } from '@mui/material';
+import { Fab, FormControlLabel, FormGroup, IconButton, Switch, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import lodash from 'lodash';
-import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
@@ -62,6 +62,10 @@ const StyleProps = (theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
+    [`& .${StyleClassPrefix}-switch-container`]: {
+        px: 4,
+        mb: -6
+    },
     [`& .${StyleClassPrefix}-main-content`]: {
         display: 'flex',
         flex: '1',
@@ -87,6 +91,7 @@ export const MasterServantsRoute = React.memo(() => {
     const masterAccountService = useInjectable(MasterAccountService);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
+    const [showAppendSkills, setShowAppendSkills] = useState<boolean>(false);
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editServant, setEditServant] = useState<MasterServant>();
     const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
@@ -123,9 +128,10 @@ export const MasterServantsRoute = React.memo(() => {
         bondLevel: xl,
         fouHp: lg,
         fouAtk: lg,
-        skillLevels: sm,
+        skills: sm,
+        appendSkills: sm && showAppendSkills,
         actions: false
-    }), [sm, lg, xl]);
+    }), [showAppendSkills, sm, lg, xl]);
 
     const deleteServantDialogPrompt = useMemo((): string | undefined => {
         if (!gameServantMap || !deleteServant) {
@@ -243,6 +249,10 @@ export const MasterServantsRoute = React.memo(() => {
         resetLoadingIndicator();
 
     }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, resetLoadingIndicator, updateSelectedServants]);
+
+    const handleShowAppendSkillsChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
+        setShowAppendSkills(event.target.checked);
+    }, []);
 
     const handleFormChange = useCallback((): void => {
         const masterAccountData = masterAccountDataRef.current;
@@ -411,46 +421,46 @@ export const MasterServantsRoute = React.memo(() => {
      */
     const navigationRailChildNodes: ReactNode = useMemo(() => {
         return [
-            <Tooltip key="add" title="Add servant" placement="right">
+            <Tooltip key='add' title='Add servant' placement='right'>
                 <div>
                     <IconButton
                         onClick={handleAddServantButtonClick}
                         children={<AddIcon />}
                         disabled={!editMode}
-                        size="large" />
+                        size='large' />
                 </div>
             </Tooltip>,
-            <Tooltip key="costumes" title="Costumes" placement="right">
+            <Tooltip key='costumes' title='Costumes' placement='right'>
                 <div>
                     <IconButton
                         component={Link}
-                        to="costumes"
+                        to='costumes'
                         children={<AccessibilityNewIcon />}
-                        size="large" />
+                        size='large' />
                 </div>
             </Tooltip>,
-            <Tooltip key="stats" title="Servant stats" placement="right">
+            <Tooltip key='stats' title='Servant stats' placement='right'>
                 <div>
                     <IconButton
                         component={Link}
-                        to="stats"
+                        to='stats'
                         children={<EqualizerIcon />}
-                        size="large" />
+                        size='large' />
                 </div>
             </Tooltip>,
-            <Tooltip key="import" title="Upload servant data" placement="right">
+            <Tooltip key='import' title='Upload servant data' placement='right'>
                 <div>
                     <IconButton
                         component={Link}
-                        to="../master/data/import/servants"
+                        to='../master/data/import/servants'
                         children={<PublishIcon />}
-                        size="large" />
+                        size='large' />
                 </div>
             </Tooltip>,
-            <Tooltip key="export" title="Download servant data" placement="right">
+            <Tooltip key='export' title='Download servant data' placement='right'>
                 <div>
                     {/* TODO Implement this */}
-                    <IconButton children={<GetApp />} disabled size="large" />
+                    <IconButton children={<GetApp />} disabled size='large' />
                 </div>
             </Tooltip>
         ];
@@ -462,10 +472,10 @@ export const MasterServantsRoute = React.memo(() => {
     const fabContainerChildNodes: ReactNode = useMemo(() => {
         if (!editMode) {
             return (
-                <Tooltip key="edit" title="Batch edit mode">
+                <Tooltip key='edit' title='Batch edit mode'>
                     <div>
                         <Fab
-                            color="primary"
+                            color='primary'
                             onClick={handleEditButtonClick}
                             disabled={!!loadingIndicatorIdRef.current}
                             children={<EditIcon />}
@@ -475,20 +485,20 @@ export const MasterServantsRoute = React.memo(() => {
             );
         }
         return [
-            <Tooltip key="cancel" title="Cancel">
+            <Tooltip key='cancel' title='Cancel'>
                 <div>
                     <Fab
-                        color="default"
+                        color='default'
                         onClick={handleCancelButtonClick}
                         disabled={!!loadingIndicatorIdRef.current}
                         children={<ClearIcon />}
                     />
                 </div>
             </Tooltip>,
-            <Tooltip key="save" title="Save changes">
+            <Tooltip key='save' title='Save changes'>
                 <div>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={updateMasterAccount}
                         disabled={!!loadingIndicatorIdRef.current}
                         children={<SaveIcon />}
@@ -510,17 +520,33 @@ export const MasterServantsRoute = React.memo(() => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <PageTitle>
-                {editMode ?
-                    'Edit Servant Roster' :
-                    'Servant Roster'
-                }
-            </PageTitle>
-            <div className="flex overflow-hidden full-height">
+            <div className='flex justify-space-between align-center'>
+                <PageTitle>
+                    {editMode ?
+                        'Edit Servant Roster' :
+                        'Servant Roster'
+                    }
+                </PageTitle>
+                <div className={`${StyleClassPrefix}-switch-container`}>
+                    <FormGroup row>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    name='showAppendSkills'
+                                    checked={showAppendSkills}
+                                    onChange={handleShowAppendSkillsChange}
+                                />
+                            }
+                            label='Append Skills'
+                        />
+                    </FormGroup>
+                </div>
+            </div>
+            <div className='flex overflow-hidden full-height'>
                 <NavigationRail children={navigationRailChildNodes} />
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <LayoutPanelScrollable
-                        className="py-4 pr-4 full-height flex-fill scrollbar-track-border"
+                        className='py-4 pr-4 full-height flex-fill scrollbar-track-border'
                         autoHeight
                         headerContents={
                             <MasterServantListHeader
@@ -545,11 +571,12 @@ export const MasterServantsRoute = React.memo(() => {
                         }
                     />
                     {md && <div className={`${StyleClassPrefix}-info-panel-container`}>
-                        <LayoutPanelContainer className="flex column full-height" autoHeight>
+                        <LayoutPanelContainer className='flex column full-height' autoHeight>
                             <MasterServantInfoPanel
                                 activeServants={selectedServantsRef.current.servants}
                                 bondLevels={bondLevels}
                                 unlockedCostumes={unlockedCostumes}
+                                showAppendSkills={showAppendSkills}
                                 editMode={editMode}
                                 onStatsChange={handleFormChange}
                             />
@@ -563,6 +590,7 @@ export const MasterServantsRoute = React.memo(() => {
                 dialogTitle={editServant ? 'Edit Servant Info' : 'Add Servant'}
                 submitButtonLabel={editMode ? 'Done' : 'Save'}
                 disableServantSelect={!!editServant}
+                showAppendSkills={showAppendSkills}
                 masterServant={editServant}
                 bondLevels={bondLevels}
                 unlockedCostumes={unlockedCostumes}
@@ -570,11 +598,11 @@ export const MasterServantsRoute = React.memo(() => {
             />
             <PromptDialog
                 open={deleteServantDialogOpen}
-                title="Delete Servant?"
+                title='Delete Servant?'
                 prompt={deleteServantDialogPrompt}
-                cancelButtonColor="secondary"
-                confirmButtonColor="primary"
-                confirmButtonLabel="Delete"
+                cancelButtonColor='secondary'
+                confirmButtonColor='primary'
+                confirmButtonLabel='Delete'
                 onClose={handleDeleteServantDialogClose}
             />
         </Box>

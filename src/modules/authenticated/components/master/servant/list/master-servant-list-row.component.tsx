@@ -75,19 +75,21 @@ const renderFouLevel = (masterServant: MasterServant, stat: 'fouHp' | 'fouAtk'):
     );
 };
 
-const renderSkillLevels = (masterServant: MasterServant): ReactNode => {
+const renderSkillLevels = (masterServant: MasterServant, stat: 'skills' | 'appendSkills'): ReactNode => {
+    const skills = masterServant[stat];
+    const classNameSuffix = stat === 'appendSkills' ? 'append-skills' : 'skills';
     return (
-        <div className={`${StyleClassPrefix}-skill-levels`}>
+        <div className={`${StyleClassPrefix}-${classNameSuffix}`}>
             <div className="value">
-                {masterServant.skills[1] ?? '\u2013'}
+                {skills[1] ?? '\u2013'}
             </div>
             /
             <div className="value">
-                {masterServant.skills[2] ?? '\u2013'}
+                {skills[2] ?? '\u2013'}
             </div>
             /
             <div className="value">
-                {masterServant.skills[3] ?? '\u2013'}
+                {skills[3] ?? '\u2013'}
             </div>
         </div>
     );
@@ -156,7 +158,8 @@ export const MasterServantListRow = React.memo((props: Props) => {
         level,
         fouHp,
         fouAtk,
-        skillLevels,
+        skills,
+        appendSkills,
         bondLevel,
         actions
     } = visibleColumns || {};
@@ -184,7 +187,8 @@ export const MasterServantListRow = React.memo((props: Props) => {
             {level && renderLevel(masterServant)}
             {fouHp && renderFouLevel(masterServant, 'fouHp')}
             {fouAtk && renderFouLevel(masterServant, 'fouAtk')}
-            {skillLevels && renderSkillLevels(masterServant)}
+            {skills && renderSkillLevels(masterServant, 'skills')}
+            {appendSkills && renderSkillLevels(masterServant, 'appendSkills')}
             {bondLevel && renderBondLevel(bond)}
             {actionButtonsNode}
         </div>

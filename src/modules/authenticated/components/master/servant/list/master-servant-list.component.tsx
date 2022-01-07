@@ -96,8 +96,18 @@ const StyleProps = {
         [`& .${MasterServantListRowStyleClassPrefix}-fou-atk`]: {
             flex: ColumnWidths.fouAtk
         },
-        [`& .${MasterServantListRowStyleClassPrefix}-skill-levels`]: {
-            flex: ColumnWidths.skillLevels,
+        [`& .${MasterServantListRowStyleClassPrefix}-skills`]: {
+            flex: ColumnWidths.skills,
+            display: 'flex',
+            textAlign: 'center',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '&>.value': {
+                width: '1.25rem'
+            },
+        },
+        [`& .${MasterServantListRowStyleClassPrefix}-append-skills`]: {
+            flex: ColumnWidths.appendSkills,
             display: 'flex',
             textAlign: 'center',
             alignItems: 'center',

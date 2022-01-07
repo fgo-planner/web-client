@@ -372,7 +372,8 @@ export const MasterServantsRoute = React.memo(() => {
 
         masterAccountDataRef.current.masterServants = [...masterServants]; // Forces child list to re-render
         closeEditServantDialog();
-    }, [gameServantMap, editMode, editServant, closeEditServantDialog]);
+        updateSelectedServants();
+    }, [editMode, gameServantMap, editServant, closeEditServantDialog, updateSelectedServants]);
 
     const openDeleteServantDialog = useCallback((masterServant: MasterServant): void => {
         if (!editMode) {

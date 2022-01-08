@@ -407,75 +407,77 @@ export const MasterServantsRoute = React.memo(() => {
         forceUpdate();
     }, [forceUpdate]);
 
+    if (!gameServantMap) {
+        return null;
+    }
+
     /**
      * NavigationRail children
      */
-    const navigationRailChildNodes: ReactNode = useMemo(() => {
-        return [
-            <Tooltip key='add' title='Add servant' placement='right'>
-                <div>
-                    <IconButton
-                        onClick={handleAddServantButtonClick}
-                        children={<AddIcon />}
-                        disabled={!editMode}
-                        size='large' />
-                </div>
-            </Tooltip>,
-            <Tooltip key='costumes' title='Costumes' placement='right'>
-                <div>
-                    <IconButton
-                        component={Link}
-                        to='costumes'
-                        children={<AccessibilityNewIcon />}
-                        size='large' />
-                </div>
-            </Tooltip>,
-            <Tooltip key='stats' title='Servant stats' placement='right'>
-                <div>
-                    <IconButton
-                        component={Link}
-                        to='stats'
-                        children={<EqualizerIcon />}
-                        size='large' />
-                </div>
-            </Tooltip>,
-            <Tooltip key='import' title='Upload servant data' placement='right'>
-                <div>
-                    <IconButton
-                        component={Link}
-                        to='../master/data/import/servants'
-                        children={<PublishIcon />}
-                        size='large' />
-                </div>
-            </Tooltip>,
-            <Tooltip key='export' title='Download servant data' placement='right'>
-                <div>
-                    {/* TODO Implement this */}
-                    <IconButton children={<GetApp />} disabled size='large' />
-                </div>
-            </Tooltip>
-        ];
-    }, [editMode, handleAddServantButtonClick]);
+    const navigationRailChildNodes: ReactNode = [
+        <Tooltip key='add' title='Add servant' placement='right'>
+            <div>
+                <IconButton
+                    onClick={handleAddServantButtonClick}
+                    children={<AddIcon />}
+                    disabled={!editMode}
+                    size='large' />
+            </div>
+        </Tooltip>,
+        <Tooltip key='costumes' title='Costumes' placement='right'>
+            <div>
+                <IconButton
+                    component={Link}
+                    to='costumes'
+                    children={<AccessibilityNewIcon />}
+                    size='large' />
+            </div>
+        </Tooltip>,
+        <Tooltip key='stats' title='Servant stats' placement='right'>
+            <div>
+                <IconButton
+                    component={Link}
+                    to='stats'
+                    children={<EqualizerIcon />}
+                    size='large' />
+            </div>
+        </Tooltip>,
+        <Tooltip key='import' title='Upload servant data' placement='right'>
+            <div>
+                <IconButton
+                    component={Link}
+                    to='../master/data/import/servants'
+                    children={<PublishIcon />}
+                    size='large' />
+            </div>
+        </Tooltip>,
+        <Tooltip key='export' title='Download servant data' placement='right'>
+            <div>
+                {/* TODO Implement this */}
+                <IconButton children={<GetApp />} disabled size='large' />
+            </div>
+        </Tooltip>
+    ];
 
     /**
      * FabContainer children
      */
-    const fabContainerChildNodes: ReactNode = useMemo(() => {
-        if (!editMode) {
-            return (
-                <Tooltip key='edit' title='Batch edit mode'>
-                    <div>
-                        <Fab
-                            color='primary'
-                            onClick={handleEditButtonClick}
-                            disabled={!!loadingIndicatorIdRef.current}
-                            children={<EditIcon />}
-                        />
-                    </div>
-                </Tooltip>
-            );
-        }
-        return [
+    let fabContainerChildNodes: ReactNode;
+    if (!editMode) {
+        fabContainerChildNodes = (
+            <Tooltip key='edit' title='Edit mode'>
+                <div>
+                    <Fab
+                        color='primary'
+                        onClick={handleEditButtonClick}
+                        disabled={!!loadingIndicatorIdRef.current}
+                        children={<EditIcon />}
+                    />
+                </div>
+            </Tooltip>
+        );
+    } else {
+        fabContainerChildNodes = [
             <Tooltip key='cancel' title='Cancel'>
                 <div>
                     <Fab
@@ -497,10 +499,6 @@ export const MasterServantsRoute = React.memo(() => {
                 </div>
             </Tooltip>
         ];
-    }, [editMode, handleCancelButtonClick, handleEditButtonClick, updateMasterAccount]);
-
-    if (!gameServantMap) {
-        return null;
     }
 
     const {

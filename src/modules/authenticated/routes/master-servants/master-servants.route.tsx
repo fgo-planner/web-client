@@ -227,7 +227,7 @@ export const MasterServantsRoute = React.memo(() => {
             costumes: unlockedCostumes
         };
         try {
-            masterAccountService.updateAccount(update);
+            await masterAccountService.updateAccount(update);
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);

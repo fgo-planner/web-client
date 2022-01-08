@@ -9,6 +9,7 @@ import { LayoutPanelContainer } from '../../../../components/layout/layout-panel
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
+import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { AccountPlans, PlannerService } from '../../../../services/data/planner/planner.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { ModalOnCloseReason, ReadonlyPartial } from '../../../../types/internal';
@@ -40,6 +41,8 @@ const generateDeletePlanDialogPrompt = (plan: ReadonlyPartial<Plan> | undefined)
 
 export const PlansRoute = React.memo(() => {
 
+    const forceUpdate = useForceUpdate();
+
     const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
     const plannerService = useInjectable(PlannerService);
 
@@ -49,36 +52,45 @@ export const PlansRoute = React.memo(() => {
     const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
     const [deletePlanDialogOpen, setDeletePlanDialogOpen] = useState<boolean>(false);
     const [deletePlanTarget, setDeletePlanTarget] = useState<ReadonlyPartial<Plan>>();
-    const [loadingIndicatorId, setLoadingIndicatorId] = useState<string>();
+
+    const loadingIndicatorIdRef = useRef<string>();
+
+    const resetLoadingIndicator = useCallback((): void => {
+        const loadingIndicatorId = loadingIndicatorIdRef.current;
+        if (loadingIndicatorId) {
+            loadingIndicatorOverlayService.waive(loadingIndicatorId);
+            loadingIndicatorIdRef.current = undefined;
+            forceUpdate();
+        }
+    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     const loadPlansForAccount = useCallback(async () => {
         const masterAccountId = masterAccountIdRef.current;
         if (!masterAccountId) {
             return setAccountPlans(undefined);
         }
-        let _loadingIndicatorId = loadingIndicatorId;
-        if (!_loadingIndicatorId) {
-            _loadingIndicatorId = loadingIndicatorOverlayService.invoke();
+        let loadingIndicatorId = loadingIndicatorIdRef.current;
+        if (!loadingIndicatorId) {
+            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
         }
+        loadingIndicatorIdRef.current = loadingIndicatorId;
+
         setAddPlanDialogOpen(false);
         setDeletePlanDialogOpen(false);
         setDeletePlanTarget(undefined);
-        setLoadingIndicatorId(_loadingIndicatorId);
 
         try {
             const accountPlans = await plannerService.getForAccount(masterAccountId);
-            loadingIndicatorOverlayService.waive(_loadingIndicatorId);
             setAccountPlans(accountPlans);
-            setLoadingIndicatorId(undefined);
         } catch (e) {
             // TODO Handle error
         }
-    }, [loadingIndicatorId, loadingIndicatorOverlayService, plannerService]);
+        resetLoadingIndicator();
+
+    }, [loadingIndicatorOverlayService, plannerService, resetLoadingIndicator]);
 
     /*
-     * Master account subscriptions. Unfortunately, due to the way React hooks
-     * work, this will unsubscribe and then re-subscribe to the subject every time
-     * the `loadingIndicatorId` state is changed.
+     * Master account change subscription.
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
@@ -167,7 +179,7 @@ export const PlansRoute = React.memo(() => {
                         <Fab
                             color="primary"
                             onClick={handleAddPlanButtonClick}
-                            disabled={!!loadingIndicatorId}
+                            disabled={!!loadingIndicatorIdRef.current}
                             children={<AddIcon />}
                         />
                     </div>

@@ -50,8 +50,8 @@ export const MasterSoundtracksRoute = React.memo(() => {
         }
     }, [forceUpdate, loadingIndicatorOverlayService]);
 
-    /**
-     * onCurrentMasterAccountChange subscriptions
+    /*
+     * Master account change subscription.
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
@@ -66,28 +66,8 @@ export const MasterSoundtracksRoute = React.memo(() => {
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, []);
 
-    /**
-     * onCurrentMasterAccountUpdate subscriptions
-     */
-    useEffect(() => {
-        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
-            .subscribe(account => {
-                if (account == null) {
-                    return;
-                }
-                const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(account);
-                resetLoadingIndicator();
-                setMasterAccount(account);
-                setUnlockedSoundtracksSet(unlockedSoundtracksSet);
-                setEditMode(false);
-            });
-
-        return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
-    }, [resetLoadingIndicator]);
-
     /*
-     * onPlayStatusChange subscriptions
+     * Play status change subscription.
      */
     useEffect(() => {
         const onPlayStatusChangeSubscription = SubscribablesContainer

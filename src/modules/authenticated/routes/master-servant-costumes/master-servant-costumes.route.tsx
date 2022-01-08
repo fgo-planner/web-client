@@ -46,8 +46,8 @@ export const MasterServantCostumesRoute = React.memo(() => {
         }
     }, [forceUpdate, loadingIndicatorOverlayService]);
 
-    /**
-     * onCurrentMasterAccountChange subscriptions
+    /*
+     * Master account change subscription.
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
@@ -60,25 +60,6 @@ export const MasterServantCostumesRoute = React.memo(() => {
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, []);
-
-    /**
-     * onCurrentMasterAccountUpdate subscriptions
-     */
-    useEffect(() => {
-        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
-            .subscribe(account => {
-                if (account == null) {
-                    return;
-                }
-                const unlockedCostumesSet = getUnlockedCostumeSetFromMasterAccount(account);
-                setMasterAccount(account);
-                setUnlockedCostumesSet(unlockedCostumesSet);
-                setEditMode(false);
-            });
-
-        return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
     }, []);
 
     const handleEditButtonClick = useCallback((): void => {

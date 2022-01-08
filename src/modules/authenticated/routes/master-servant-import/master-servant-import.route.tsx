@@ -72,7 +72,7 @@ const MasterServantImportRoute = React.memo(() => {
     }, [forceUpdate, loadingIndicatorOverlayService]);
 
     /*
-     * onCurrentMasterAccountChange subscriptions
+     * Master account change subscription.
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
@@ -81,22 +81,6 @@ const MasterServantImportRoute = React.memo(() => {
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, []);
-
-    /*
-     * onCurrentMasterAccountUpdate subscriptions
-     */
-    useEffect(() => {
-        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
-            .subscribe(account => {
-                if (account == null) {
-                    return;
-                }
-                setMasterAccount(account);
-            });
-
-        return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
-    }, [resetLoadingIndicator]);
 
     /*
      * Turns off the loading indicator if the parsed data has changed.

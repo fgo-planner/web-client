@@ -50,7 +50,7 @@ export const MasterAccountsRoute = React.memo(() => {
     const [deleteAccountTarget, setDeleteAccountTarget] = useState<ReadonlyPartial<MasterAccount>>();
 
     /*
-     * Master account subscriptions
+     * Master account change subscription.
      */
     useEffect(() => {
         const onMasterAccountListChangeSubscription = SubscribablesContainer

@@ -29,6 +29,7 @@ import { MasterServantList } from '../../components/master/servant/list/master-s
 import { MasterServantInfoPanel } from './master-servant-info-panel.component';
 
 type MasterAccountData = {
+    id?: string;
     masterServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
@@ -44,12 +45,14 @@ const getMasterAccountData = (account: Nullable<MasterAccount>, clone = false): 
     }
     if (!clone) {
         return {
+            id: account._id,
             masterServants: account.servants,
             bondLevels: account.bondLevels,
             unlockedCostumes: account.costumes
         };
     }
     return {
+        id: account._id,
         masterServants: account.servants.map(MasterServantUtils.clone),
         bondLevels: lodash.cloneDeep(account.bondLevels),
         unlockedCostumes: [...account.costumes]
@@ -172,42 +175,28 @@ export const MasterServantsRoute = React.memo(() => {
         };
     }, []);
 
-    /**
-     * onCurrentMasterAccountChange subscriptions
+    /*
+     * Master account change subscription.
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(account => {
+                const isDifferentAccount = masterAccountDataRef.current.id !== account?._id;
                 masterAccountDataRef.current = getMasterAccountData(account);
-                selectedServantsRef.current = {
-                    instanceIds: new Set(),
-                    servants: []
-                };
+                if (isDifferentAccount) {
+                    selectedServantsRef.current = {
+                        instanceIds: new Set(),
+                        servants: []
+                    };
+                } else {
+                    updateSelectedServants();
+                }
                 setMasterAccount(account);
                 setEditMode(false);
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, []);
-
-    /**
-     * onCurrentMasterAccountUpdate subscriptions
-     */
-    useEffect(() => {
-        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
-            .subscribe(account => {
-                if (account == null) {
-                    return;
-                }
-                masterAccountDataRef.current = getMasterAccountData(account);
-                updateSelectedServants();
-                setMasterAccount(account);
-                setEditMode(false);
-            });
-
-        return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
     }, [updateSelectedServants]);
 
     /**

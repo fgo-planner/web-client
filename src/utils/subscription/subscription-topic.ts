@@ -11,8 +11,6 @@ export class SubscriptionTopic<T = any> {
 
     static readonly User_CurrentMasterAccountChange = new SubscriptionTopic<Nullable<MasterAccount>>(() => null);
 
-    static readonly User_CurrentMasterAccountUpdate = new SubscriptionTopic<MasterAccount>();
-
     static readonly User_CurrentUserChange = new SubscriptionTopic<Nullable<UserInfo>>(() => null);
     
     static readonly User_CurrentUserPreferencesChange = new SubscriptionTopic<Nullable<UserPreferences>>(() => null);

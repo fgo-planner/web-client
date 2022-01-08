@@ -61,8 +61,8 @@ export const MasterItemsRoute = React.memo(() => {
         }
     }, [forceUpdate, loadingIndicatorOverlayService]);
 
-    /**
-     * onCurrentMasterAccountChange subscriptions
+    /*
+     * Master account change subscription.
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
@@ -75,25 +75,6 @@ export const MasterItemsRoute = React.memo(() => {
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, []);
-
-    /**
-     * onCurrentMasterAccountUpdate subscriptions
-     */
-    useEffect(() => {
-        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
-            .subscribe(account => {
-                if (account == null) {
-                    return;
-                }
-                const masterItems = cloneItemsFromMasterAccount(account);
-                setMasterAccount(account);
-                setMasterItems(masterItems);
-                setEditMode(false);
-            });
-
-        return () => onCurrentMasterAccountUpdateSubscription.unsubscribe();
     }, []);
 
     const handleEditButtonClick = useCallback((): void => {

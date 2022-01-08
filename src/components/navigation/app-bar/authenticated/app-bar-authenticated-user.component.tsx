@@ -51,7 +51,7 @@ export const AppBarAuthenticatedUser = React.memo(({ currentUser }: Props) => {
     const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState<Element | null>(null);
 
     /*
-     * Master account subscriptions
+     * Master account change subscription.
      */
     useEffect(() => {
         const onMasterAccountListChangeSubscription = SubscribablesContainer

@@ -31,10 +31,6 @@ export class MasterAccountService {
         return SubscribablesContainer.get(SubscriptionTopic.User_CurrentMasterAccountChange);
     }
 
-    private get _onCurrentMasterAccountUpdate() {
-        return SubscribablesContainer.get(SubscriptionTopic.User_CurrentMasterAccountUpdate);
-    }
-
     private get _onMasterAccountListChange() {
         return SubscribablesContainer.get(SubscriptionTopic.User_MasterAccountListChange);
     }
@@ -71,7 +67,7 @@ export class MasterAccountService {
 
     async updateAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
         const updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount);
-        this._onCurrentMasterAccountUpdate.next(this._currentMasterAccount = updated);
+        this._onCurrentMasterAccountChange.next(this._currentMasterAccount = updated);
         return updated;
     }
 

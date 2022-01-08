@@ -91,9 +91,7 @@ export const PlansRoute = React.memo(() => {
                 }
             });
 
-        return () => {
-            onCurrentMasterAccountChangeSubscription.unsubscribe();
-        };
+        return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, [loadPlansForAccount]);
 
     const scrollContainer = useElevateAppBarOnScroll();

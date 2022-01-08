@@ -31,26 +31,14 @@ export const MasterItemStatsRoute = React.memo(() => {
     }, [filter, gameServantMap, gameSoundtrackList, masterAccount]);
 
     /*
-     * Master account subscriptions
+     * Master account change subscription.
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(setMasterAccount);
 
-        const onCurrentMasterAccountUpdateSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountUpdate)
-            .subscribe(account => {
-                if (account == null) {
-                    return;
-                }
-                setMasterAccount(account);
-            });
-
-        return () => {
-            onCurrentMasterAccountChangeSubscription.unsubscribe();
-            onCurrentMasterAccountUpdateSubscription.unsubscribe();
-        };
+        return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, []);
 
     /**

@@ -251,8 +251,9 @@ export const MasterServantsRoute = React.memo(() => {
 
     const handleEditButtonClick = useCallback((): void => {
         masterAccountDataRef.current = getMasterAccountData(masterAccount, true);
+        updateSelectedServants();
         setEditMode(true);
-    }, [masterAccount]);
+    }, [masterAccount, updateSelectedServants]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account

@@ -13,7 +13,7 @@ import { GameItemService } from './services/data/game/game-item.service';
 import { GameServantService } from './services/data/game/game-servant.service';
 import { GameSoundtrackService } from './services/data/game/game-soundtrack.service';
 import { MasterAccountService } from './services/data/master/master-account.service';
-import { PlannerService } from './services/data/planner/planner.service';
+import { PlanService } from './services/data/plan/plan.service';
 import { UserService } from './services/data/user/user.service';
 import { WebUserService } from './services/data/user/web-user.service';
 import { AppBarService } from './services/user-interface/app-bar.service';
@@ -54,7 +54,7 @@ InjectablesContainer.registerInjectables(
     /*
      * planner
      */
-    PlannerService,
+    PlanService,
     /*
      * user-interface
      */

@@ -17,22 +17,38 @@ export class FormUtils {
 
     /**
      * Transforms the string input into an integer. If the input was not a valid
-     * number, then `undefined` is returned. If the input contains decimal values,
-     * then the number is truncated before returning. Optionally clamps the number
-     * between a min and max value.
+     * number, then `undefined` is returned. Optionally clamps the number between a
+     * min and max value.
      */
-    static transformInputToInteger(input: string, min?: number, max?: number): number | undefined {
+    static convertToNumber<T = number>(input: string, min?: number, max?: number): T | undefined {
         if (!input) {
             return undefined;
         }
         let value = Number(input);
+        if (isNaN(value)) {
+            return undefined;
+        }
         if (min && min !== 0 && value < min) {
             value = min;
         }
         if (max && max !== 0 && value > max) {
             value = max;
         }
-        return ~~value;
+        return value as any;
+    }
+
+    /**
+     * Transforms the string input into an integer. If the input was not a valid
+     * number, then `undefined` is returned. If the input contains decimal values,
+     * then the number is truncated before returning. Optionally clamps the number
+     * between a min and max value.
+     */
+    static convertToInteger<T = number>(input: string, min?: number, max?: number): T | undefined {
+        const value = this.convertToNumber(input, min, max);
+        if (value === undefined) {
+            return undefined;
+        }
+        return ~~value as any;
     }
 
     /**
@@ -53,13 +69,6 @@ export class FormUtils {
 
     static assignValue<T>(object: NonNullable<T>, path: string, value: string | number | undefined): T {
         return lodash.set(object as any, path, value);
-    }
-
-    static convertInputValueToNumber(value: string | number | undefined): number | undefined {
-        if (value === undefined || value === '') {
-            return undefined;
-        }
-        return Number(value);
     }
 
 }

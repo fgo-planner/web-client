@@ -40,4 +40,9 @@ export class GameServantConstants {
 
     static readonly RarityValues = Array.from(Array(6).keys()) as ReadonlyArray<GameServantRarity>;
 
+    /**
+     * OG Artoria. For use when instantiating new servant data.
+     */
+    static readonly DefaultServantId = 100100;
+
 }

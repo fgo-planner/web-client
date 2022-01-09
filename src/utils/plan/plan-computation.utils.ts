@@ -33,7 +33,7 @@ type ServantEnhancements = Readonly<{
     appendSkills: SkillEnhancements;
 }>;
 
-export class PlannerComputationUtils {
+export class PlanComputationUtils {
 
     static addMaterialDebtMap(source: MaterialDebtMap, target: MaterialDebtMap): void {
         for (const [id, debt] of Object.entries(source)) {

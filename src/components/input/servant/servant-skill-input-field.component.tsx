@@ -8,7 +8,7 @@ type Props = {
     formId: string;
     label?: string;
     name: string;
-    allowBlank?: boolean;
+    allowEmpty?: boolean;
     disabled?: boolean;
     onChange: (name: string, value: string, pushChanges: boolean) => void;
 };
@@ -26,7 +26,7 @@ export const ServantSkillInputField = React.memo((props: Props) => {
         formId,
         label,
         name,
-        allowBlank,
+        allowEmpty,
         disabled,
         onChange
     } = props;
@@ -38,7 +38,7 @@ export const ServantSkillInputField = React.memo((props: Props) => {
 
     return (
         <FormControl variant={variant} fullWidth>
-            <InputLabel htmlFor={name}>{label || DefaultLabel}</InputLabel>
+            <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
                 id={`${formId}-${name}`}
@@ -48,7 +48,7 @@ export const ServantSkillInputField = React.memo((props: Props) => {
                 onChange={handleChange}
                 disabled={disabled}
             >
-                {allowBlank && <option>{'\u2014'}</option>}
+                {allowEmpty && <option value=''>{'\u2014'}</option>}
                 {GameServantConstants.SkillLevels.map(value => (
                     <option key={value} value={value}>
                         {value}

@@ -9,7 +9,7 @@ export type AccountPlans = {
 };
 
 @Injectable
-export class PlannerService {
+export class PlanService {
 
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user/planner`;
 

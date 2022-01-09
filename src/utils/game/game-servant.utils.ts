@@ -39,15 +39,19 @@ export class GameServantUtils {
         return undefined;
     }
 
-    static filterServants(search: string, servants: GameServantList): GameServantList {
+    static filterServants(search: string, servants: GameServantList): GameServantList;
+
+    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction: (elem: T) => GameServant): Array<T>;
+
+    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction?: (elem: T) => GameServant): Array<T> {
         const searchTrimmed = search.trim();
         if (!searchTrimmed) {
-            return servants;
+            return [...data];
         }
-    
+
         let classes = new Set<GameServantClass>();
         let rarities = new Set<GameServantRarity>();
-    
+
         const searchTerms = searchTrimmed.split(/\s+/).filter(value => {
             /*
              * Rarity filters. Only filters by rarity if the input is valid. Otherwise, it
@@ -72,8 +76,16 @@ export class GameServantUtils {
             }
             return true;
         });
-    
-        return servants.filter(servant => this._filterServant(servant, searchTerms, classes, rarities));
+
+        return data.filter(elem => {
+            let servant: GameServant;
+            if (mappingFunction) {
+                servant = mappingFunction(elem);
+            } else {
+                servant = elem as any;
+            }
+            return this._filterServant(servant, searchTerms, classes, rarities);
+        });
     }
 
     private static _filterServant(
@@ -95,7 +107,7 @@ export class GameServantUtils {
          * If there are no generic search terms, but at least one class or rarity was
          * given (and matched), then return true.
          */
-        if (!searchTerms.length &&(classes.size || rarities.size) ) {
+        if (!searchTerms.length && (classes.size || rarities.size)) {
             return true;
         }
         /*

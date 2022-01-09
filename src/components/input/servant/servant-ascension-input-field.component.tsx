@@ -12,8 +12,9 @@ type Props = {
     formId: string;
     label?: string;
     name: string;
+    allowEmpty?: boolean;
     disabled?: boolean;
-    onChange: (level: string, ascension: string, pushChanges: boolean) => void;
+    onChange: (name: string, level: string, ascension: string, pushChanges: boolean) => void;
 };
 
 const DefaultLabel = 'Ascension';
@@ -31,6 +32,7 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
         formId,
         label,
         name,
+        allowEmpty,
         disabled,
         onChange
     } = props;
@@ -38,12 +40,12 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
         const { value } = event.target;
         const updatedLevel = MasterServantUtils.roundToNearestValidLevel(Number(value), Number(level), servant);
-        onChange(String(updatedLevel), value, true);
-    }, [level, onChange, servant]);
+        onChange(name, String(updatedLevel), value, true);
+    }, [level, name, onChange, servant]);
 
     return (
         <FormControl variant={variant} fullWidth>
-            <InputLabel htmlFor={name}>{label || DefaultLabel}</InputLabel>
+            <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
                 id={`${formId}-${name}`}
@@ -53,6 +55,7 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
                 onChange={handleChange}
                 disabled={disabled}
             >
+                {allowEmpty && <option value=''>{'\u2014'}</option>}
                 {GameServantConstants.AscensionLevels.map(value => (
                     <option key={value} value={value}>
                         {value}

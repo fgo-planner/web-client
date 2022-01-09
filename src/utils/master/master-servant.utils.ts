@@ -35,7 +35,7 @@ export class MasterServantUtils {
     /**
      * Merges a `MasterServant` object into another.
      */
-    static merge(target: MasterServant, source: Partial<MasterServant>): void;
+    static merge(target: MasterServant, source: MasterServant): void;
 
     /**
      * Merges an array of `MasterServant` objects into another. Servants that exist
@@ -48,7 +48,7 @@ export class MasterServantUtils {
     /**
      * Method implementation
      */
-    static merge(target: MasterServant | Array<MasterServant>, source: Partial<MasterServant> | Array<MasterServant>): void {
+    static merge(target: MasterServant | Array<MasterServant>, source: MasterServant | Array<MasterServant>): void {
         if (!Array.isArray(target) && !Array.isArray(source)) {
             this._merge(target, source);
         } else if (Array.isArray(target) && Array.isArray(source)) {
@@ -56,13 +56,12 @@ export class MasterServantUtils {
         }
     }
 
-    private static _merge(target: MasterServant, source: Partial<MasterServant>): void {
-        Object.assign(target, source);
-        if (source.skills) {
-            target.skills = {
-                ...source.skills
-            };
-        }
+    private static _merge(target: MasterServant, source: MasterServant): void {
+        /*
+         * Copy the deep cloned fields over to the target. The deep cloning is for
+         * creating new instances of nested object(s).
+         */
+        Object.assign(target, this.clone(source));
     }
 
     private static _mergeArrays(target: Array<MasterServant>, source: Array<MasterServant>): void {

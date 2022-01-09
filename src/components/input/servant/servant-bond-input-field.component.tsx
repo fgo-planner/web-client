@@ -8,6 +8,7 @@ type Props = {
     formId: string;
     label?: string;
     name: string;
+    allowEmpty?: boolean;
     disabled?: boolean;
     onChange: (name: string, value: string, pushChanges: boolean) => void;
 };
@@ -25,6 +26,7 @@ export const ServantBondInputField = React.memo((props: Props) => {
         formId,
         label,
         name,
+        allowEmpty,
         disabled,
         onChange
     } = props;
@@ -36,7 +38,7 @@ export const ServantBondInputField = React.memo((props: Props) => {
 
     return (
         <FormControl variant={variant} fullWidth>
-            <InputLabel htmlFor={name}>{label || DefaultLabel}</InputLabel>
+            <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
                 id={`${formId}-${name}`}
@@ -46,6 +48,7 @@ export const ServantBondInputField = React.memo((props: Props) => {
                 onChange={handleChange}
                 disabled={disabled}
             >
+                {allowEmpty && <option value=''>{'\u2014'}</option>}
                 {GameServantConstants.BondLevels.map(value => (
                     <option key={value} value={value}>
                         {value}

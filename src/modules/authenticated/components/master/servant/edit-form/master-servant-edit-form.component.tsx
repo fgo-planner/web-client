@@ -1,4 +1,4 @@
-import { GameServant, MasterServant, MasterServantBondLevel, MasterServantSkillLevel } from '@fgo-planner/types';
+import { GameServant, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel } from '@fgo-planner/types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { ChangeEvent, FocusEvent, FormEvent, useCallback, useEffect, useState } from 'react';
@@ -8,9 +8,11 @@ import { ServantBondInputField } from '../../../../../../components/input/servan
 import { ServantFouInputField } from '../../../../../../components/input/servant/servant-fou-input-field.component';
 import { ServantLevelInputField } from '../../../../../../components/input/servant/servant-level-input-field.component';
 import { ServantNpLevelInputField } from '../../../../../../components/input/servant/servant-np-level-input-field.component';
-import { ServantSkillInputField } from '../../../../../../components/input/servant/servant-skill-input-field.component copy';
+import { ServantSkillInputField } from '../../../../../../components/input/servant/servant-skill-input-field.component';
+import { GameServantConstants } from '../../../../../../constants';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
+import { ReadonlyRecord } from '../../../../../../types/internal';
 import { ComponentStyleProps } from '../../../../../../types/internal/props/component-style-props.type';
 import { FormUtils } from '../../../../../../utils/form.utils';
 import { MasterServantEditFormAutocomplete } from './master-servant-edit-form-autocomplete.component';
@@ -18,8 +20,8 @@ import { MasterServantEditFormAutocomplete } from './master-servant-edit-form-au
 type Props = {
     formId: string;
     masterServant: Readonly<MasterServant>;
-    bondLevels: Record<number, MasterServantBondLevel>;
-    unlockedCostumes: Array<number>;
+    bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
+    unlockedCostumes: ReadonlyArray<number>;
     servantSelectDisabled?: boolean;
     showAppendSkills?: boolean;
     layout?: 'dialog' | 'panel';
@@ -57,7 +59,7 @@ export type SubmitData = {
 
 const generateUnlockedCostumesMap = (
     servant: GameServant | undefined,
-    unlockedCostumes: Array<number>
+    unlockedCostumes: ReadonlyArray<number>
 ): Record<number, boolean> => {
 
     if (!servant) {
@@ -77,8 +79,8 @@ const generateUnlockedCostumesMap = (
 const convertToFormData = (
     servant: GameServant | undefined,
     masterServant: MasterServant,
-    bondLevels: Record<number, MasterServantBondLevel>,
-    unlockedCostumes: Array<number>
+    bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
+    unlockedCostumes: ReadonlyArray<number>
 ): FormData => {
 
     const {
@@ -113,6 +115,7 @@ const convertToFormData = (
 };
 
 const convertToMasterServant = (formData: FormData): Omit<MasterServant, 'instanceId'> => {
+
     const {
         gameId,
         np,
@@ -130,22 +133,23 @@ const convertToMasterServant = (formData: FormData): Omit<MasterServant, 'instan
 
     return {
         gameId,
-        np: Number(np) as any,
+        np: Number(np) as MasterServantNoblePhantasmLevel,
         level: Number(level),
-        ascension: Number(ascension) as any,
-        fouAtk: fouAtk === '' ? undefined : Number(fouAtk),
-        fouHp: fouHp === '' ? undefined : Number(fouHp),
+        ascension: Number(ascension) as MasterServantAscensionLevel,
+        fouAtk: FormUtils.convertToInteger(fouAtk),
+        fouHp: FormUtils.convertToInteger(fouHp),
         skills: {
-            1: Number(skill1) as MasterServantSkillLevel || 1,
-            2: Number(skill2) as MasterServantSkillLevel || undefined,
-            3: Number(skill3) as MasterServantSkillLevel || undefined
+            1: FormUtils.convertToInteger(skill1) || GameServantConstants.MinSkillLevel,
+            2: FormUtils.convertToInteger(skill2) || undefined,
+            3: FormUtils.convertToInteger(skill3) || undefined
         },
         appendSkills: {
-            1: Number(appendSkill1) as MasterServantSkillLevel || undefined,
-            2: Number(appendSkill2) as MasterServantSkillLevel || undefined,
-            3: Number(appendSkill3) as MasterServantSkillLevel || undefined
+            1: FormUtils.convertToInteger(appendSkill1) || undefined,
+            2: FormUtils.convertToInteger(appendSkill2) || undefined,
+            3: FormUtils.convertToInteger(appendSkill3) || undefined,
         }
     };
+
 };
 
 export const StyleClassPrefix = 'MasterServantEditForm';
@@ -188,8 +192,8 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         className
     } = props;
 
-    const [formData, setFormData] = useState<FormData>();
     const [servant, setServant] = useState<GameServant>();
+    const [formData, setFormData] = useState<FormData>(() => convertToFormData(servant, masterServant, bondLevels, unlockedCostumes));
 
     const gameServantMap = useGameServantMap();
 
@@ -208,7 +212,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
      * callback function.
      */
     const pushStatsChange = useCallback((): void => {
-        if (!formData || !onStatsChange) {
+        if (!onStatsChange) {
             return;
         }
         const masterServant = convertToMasterServant(formData);
@@ -222,9 +226,6 @@ export const MasterServantEditForm = React.memo((props: Props) => {
     }, [formData, onStatsChange]);
 
     const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: GameServant): void => {
-        if (!formData) {
-            return;
-        }
         const servantId = value._id;
         if (formData.gameId !== servantId) {
             const servant = gameServantMap?.[servantId];
@@ -236,9 +237,6 @@ export const MasterServantEditForm = React.memo((props: Props) => {
     }, [formData, gameServantMap, bondLevels, unlockedCostumes]);
 
     const handleInputChange = useCallback((name: string, value: string, pushChanges = false): void => {
-        if (!formData) {
-            return;
-        }
         FormUtils.assignValue(formData, name!!, value);
         if (pushChanges) {
             pushStatsChange();
@@ -251,10 +249,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         forceUpdate();
     }, [forceUpdate, pushStatsChange]);
 
-    const handleLevelAscensionInputChange = useCallback((level: string, ascension: string, pushChanges = false): void => {
-        if (!formData) {
-            return;
-        }
+    const handleLevelAscensionInputChange = useCallback((name: string, level: string, ascension: string, pushChanges = false): void => {
         formData.level = level;
         formData.ascension = ascension;
         if (pushChanges) {
@@ -265,7 +260,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
 
     const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
-        if (!formData || readonly || !onSubmit) {
+        if (readonly || !onSubmit) {
             return;
         }
         const masterServant = convertToMasterServant(formData);
@@ -278,7 +273,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         onSubmit(event, data);
     }, [formData, readonly, onSubmit]);
 
-    if (!formData || !servant) {
+    if (!servant) {
         return null;
     }
 
@@ -329,7 +324,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
     const fouAtkField = (
         <ServantFouInputField
             value={formData.fouAtk}
-            label='Atk. Fou'
+            label='ATK Fou'
             name='fouAtk'
             onChange={handleInputChange}
             onBlur={handleInputBlurEvent}
@@ -354,7 +349,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             formId={formId}
             label='Skill 2'
             name='skill2'
-            allowBlank
+            allowEmpty
             onChange={handleInputChange}
             disabled={readonly}
         />
@@ -366,7 +361,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             formId={formId}
             label='Skill 3'
             name='skill3'
-            allowBlank
+            allowEmpty
             onChange={handleInputChange}
             disabled={readonly}
         />
@@ -378,7 +373,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             formId={formId}
             label={layout === 'panel' ? 'App. 1' : 'Append 1'}
             name='appendSkill1'
-            allowBlank
+            allowEmpty
             onChange={handleInputChange}
             disabled={readonly}
         />
@@ -390,7 +385,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             formId={formId}
             label={layout === 'panel' ? 'App. 2' : 'Append 2'}
             name='appendSkill2'
-            allowBlank
+            allowEmpty
             onChange={handleInputChange}
             disabled={readonly}
         />
@@ -402,7 +397,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             formId={formId}
             label={layout === 'panel' ? 'App. 3' : 'Append 3'}
             name='appendSkill3'
-            allowBlank
+            allowEmpty
             onChange={handleInputChange}
             disabled={readonly}
         />
@@ -414,6 +409,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             formId={formId}
             name='bond'
             onChange={handleInputChange}
+            allowEmpty
             disabled={readonly}
         />
     );
@@ -481,6 +477,18 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         );
     }
 
+    /**
+     * The servant selection autocomplete field. This is only present in dialog
+     * layout mode.
+     */
+    const autocompleteField = (
+        <MasterServantEditFormAutocomplete
+            selectedServant={servant}
+            onChange={handleSelectedServantChange}
+            disabled={servantSelectDisabled || readonly}
+        />
+    );
+
     // Dialog layout
     return (
         <form
@@ -492,11 +500,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             <Box sx={StyleProps}>
                 <div className={`${StyleClassPrefix}-input-field-group`}>
                     <InputFieldContainer flex='75%'>
-                        <MasterServantEditFormAutocomplete
-                            selectedServant={servant}
-                            onChange={handleSelectedServantChange}
-                            disabled={servantSelectDisabled || readonly}
-                        />
+                        {autocompleteField}
                     </InputFieldContainer>
                     <InputFieldContainer flex='25%'>
                         {npField}

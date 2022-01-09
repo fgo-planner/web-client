@@ -4,7 +4,7 @@ import { alpha, IconButton, Link as MuiLink, Table, TableBody, TableCell, TableC
 import { SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AccountPlans } from '../../../../services/data/planner/planner.service';
+import { AccountPlans } from '../../../../services/data/plan/plan.service';
 import { ReadonlyPartial } from '../../../../types/internal';
 
 type Props = {
@@ -45,7 +45,7 @@ export const PlanList = React.memo(({ accountPlans, onDeletePlan, onDeletePlanGr
                 {accountPlans.plans.map(plan => (
                     <TableRow key={plan._id} className={`${StyleClassPrefix}-data-row`}>
                         <TableCell className="truncate">
-                            <MuiLink component={Link} to='../master' underline="none">
+                            <MuiLink component={Link} to={`../master/planner/${plan._id}`} underline="none">
                                 {plan.name || 'No Name'}
                             </MuiLink>
                         </TableCell>

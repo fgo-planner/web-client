@@ -1,19 +1,36 @@
-import { GameServant } from '@fgo-planner/types';
+import { GameServant, MasterServant, PlanServantType } from '@fgo-planner/types';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
-import { useGameServantList } from '../../../../../../hooks/data/use-game-servant-list.hook';
+import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 
+type ChangeValue = {
+    gameId: number;
+    instanceId?: number;
+};
+
 type Props = {
-    selectedServant: GameServant;
-    size?: 'small' | 'medium';
+    availableServants?: ReadonlyArray<MasterServant>;
     disabled?: boolean;
-    onChange?: (event: ChangeEvent<{}>, value: Readonly<GameServant>) => void;
+    onChange?: (event: ChangeEvent<{}>, value: ChangeValue) => void;
+    /**
+     * The `instanceId` of the currently selected servant, if it is an owned
+     * servant. Must not be undefined if `type` is `Owned`.
+     */
+    selectedInstanceId?: number;
+    /**
+     * The `GameServant` data of the currently selected servant.
+     */
+    selectedServant: Readonly<GameServant>;
+    size?: 'small' | 'medium';
+    type: PlanServantType;
 };
 
 type ServantOption = Readonly<{
+    key: number;
+    instanceId?: number;
     label: string;
     servant: Readonly<GameServant>;
 }>;
@@ -35,9 +52,15 @@ const optionStyles = {
     } as SystemStyleObject<Theme>
 };
 
-const generateServantOption = (servant: Readonly<GameServant>): ServantOption => {
+const generateServantOption = (servant: Readonly<GameServant>, instanceId?: number): ServantOption => {
+    const key = instanceId ?? servant._id;
     const label = servant.metadata?.displayName || servant.name || String(servant._id);
-    return { label, servant };
+    return {
+        key,
+        label,
+        instanceId,
+        servant
+    };
 };
 
 const filterOptions = (options: Array<ServantOption>, state: FilterOptionsState<ServantOption>): Array<ServantOption> => {
@@ -49,13 +72,13 @@ const filterOptions = (options: Array<ServantOption>, state: FilterOptionsState<
 };
 
 const isOptionSelected = (option: Readonly<ServantOption>, value: Readonly<ServantOption>): boolean => {
-    return option.servant._id === value.servant._id;
+    return option.key === value.key;
 };
 
 const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: Readonly<ServantOption>): ReactNode => {
-    const { servant, label } = option;
+    const { key, label, servant } = option;
     return (
-        <li {...props} key={servant._id}>
+        <li {...props} key={key}>
             <div style={optionStyles.root}>
                 <div style={optionStyles.rarity}>
                     {`${servant.rarity} \u2605`}
@@ -65,7 +88,7 @@ const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: Readonly<Ser
                     rarity={servant.rarity}
                     sx={optionStyles.classIcon}
                 />
-                <div className="truncate">
+                <div className='truncate'>
                     {label}
                 </div>
             </div>
@@ -74,50 +97,63 @@ const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: Readonly<Ser
 };
 
 const renderInput = (params: any): ReactNode => {
-    return <TextField {...params} label="Servant" variant="outlined" />;
+    return <TextField {...params} label='Servant' variant='outlined' />;
 };
 
-export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
-
+export const PlanServantEditFormAutocomplete = React.memo((props: Props) => {
+    
     const {
+        availableServants,
+        disabled,
+        onChange,
+        selectedInstanceId,
         selectedServant,
         size,
-        disabled,
-        onChange
+        type
     } = props;
 
-    const gameServantList = useGameServantList();
+    const gameServantMap = useGameServantMap();
 
     const options = useMemo((): ReadonlyArray<ServantOption> => {
-        if (!gameServantList) {
+        if (!gameServantMap) {
             return [];
         }
-        return gameServantList.map(generateServantOption);
-    }, [gameServantList]);
-
-    const selectedOption = useMemo((): ServantOption | undefined => {
-        if (!selectedServant) {
-            return undefined;
+        if (type === PlanServantType.Owned) {
+            if (!availableServants) {
+                return [];
+            }
+            return availableServants.map(({ gameId, instanceId }) => {
+                const servant = gameServantMap[gameId];
+                return generateServantOption(servant, instanceId);
+            });
+        } else {
+            // TODO Add option to hide servants that are already added/owned.
+            return Object.values(gameServantMap).map(servant => generateServantOption(servant));
         }
-        return generateServantOption(selectedServant);
-    }, [selectedServant]);
+    }, [availableServants, gameServantMap, type]);
+
+    const selectedOption = useMemo((): ServantOption => {
+        return generateServantOption(selectedServant, selectedInstanceId);
+    }, [selectedInstanceId, selectedServant]);
 
     const handleChange = useCallback((event: ChangeEvent<{}>, value: ServantOption | null): void => {
         if (value === null) {
             // Is this case even possible?
             return;
         }
-        onChange?.(event, value.servant);
+        const gameId = value.servant._id;
+        const instanceId = value.instanceId;
+        onChange && onChange(event, { gameId, instanceId });
     }, [onChange]);
 
     if (disabled) {
         return (
             <TextField
-                variant="outlined"
+                variant='outlined'
                 size={size}
                 fullWidth
-                label="Servant"
-                value={selectedServant.name}
+                label='Servant'
+                value={selectedOption.servant.name}
                 disabled
             />
         );
@@ -130,7 +166,7 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
             fullWidth
             size={size}
             options={options}
-            noOptionsText="No results"
+            noOptionsText='No results'
             isOptionEqualToValue={isOptionSelected}
             filterOptions={filterOptions}
             renderOption={renderOption}

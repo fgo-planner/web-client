@@ -12,8 +12,9 @@ type Props = {
     variant?: BaseTextFieldProps['variant'];
     label?: string;
     name: string;
+    allowEmpty?: boolean;
     disabled?: boolean;
-    onChange: (level: string, ascension: string, pushChanges?: boolean) => void;
+    onChange: (name: string, level: string, ascension: string, pushChanges?: boolean) => void;
 };
 
 const DefaultLabel = 'Servant Level';
@@ -25,7 +26,8 @@ const InputProps = {
 } as InputBaseComponentProps;
 
 const transformLevelValue = (value: string): number => {
-    return FormUtils.transformInputToInteger(value, GameServantConstants.MinLevel, GameServantConstants.MaxLevel) || 1;
+    const level = FormUtils.convertToInteger(value, GameServantConstants.MinLevel, GameServantConstants.MaxLevel);
+    return level || GameServantConstants.MinLevel;
 };
 
 /**
@@ -40,22 +42,29 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         variant,
         label,
         name,
+        allowEmpty,
         disabled,
         onChange
     } = props;
 
     const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         const { value } = event.target;
+        if (!value && allowEmpty) {
+            return onChange(name, value, ascension);
+        }
         const updatedLevel = transformLevelValue(value);
-        onChange(String(updatedLevel), ascension);
-    }, [ascension, onChange]);
+        onChange(name, String(updatedLevel), ascension);
+    }, [allowEmpty, ascension, name, onChange]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         const { value } = event.target;
+        if (!value && allowEmpty) {
+            return onChange(name, value, ascension, true);
+        }
         const updatedLevel = transformLevelValue(value);
         const updatedAscension = MasterServantUtils.roundToNearestValidAscensionLevel(updatedLevel, Number(ascension), servant);
-        onChange(String(updatedLevel), String(updatedAscension), true);
-    }, [ascension, onChange, servant]);
+        onChange(name, String(updatedLevel), String(updatedAscension), true);
+    }, [allowEmpty, ascension, name, onChange, servant]);
 
     return (
         <TextField

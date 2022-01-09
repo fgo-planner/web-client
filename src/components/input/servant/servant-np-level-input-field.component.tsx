@@ -36,7 +36,7 @@ export const ServantNpLevelInputField = React.memo((props: Props) => {
 
     return (
         <FormControl variant={variant} fullWidth>
-            <InputLabel htmlFor={name}>{label || DefaultLabel}</InputLabel>
+            <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
                 id={`${formId}-${name}`}

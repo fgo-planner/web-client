@@ -12,7 +12,7 @@ import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
-import { MaterialDebtMap, PlannerComputationUtils } from '../../../../utils/planner/planner-computation.utils';
+import { MaterialDebtMap, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
 type Props = {
@@ -197,14 +197,14 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 if (!servant) {
                     continue;
                 }
-                const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(
+                const servantMaterialDebt = PlanComputationUtils.computeMaterialDebtForServant(
                     servant,
                     activeServant,
                     unlockedCostumes,
                     !!showAppendSkills,
                     false // TODO Add prop to toggle lores.
                 );
-                PlannerComputationUtils.addMaterialDebtMap(servantMaterialDebt, selectedServantsMaterialDebt);
+                PlanComputationUtils.addMaterialDebtMap(servantMaterialDebt, selectedServantsMaterialDebt);
             }
             // TODO Add way to toggle lores
             setSelectedServantsMaterialDebt(selectedServantsMaterialDebt);
@@ -218,9 +218,11 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         const activeServant = activeServants[0];
         const { gameId } = activeServant;
         /*
-         * Update data from the form
+         * Update data from the form. Note that `data.masterServant` does not contain an
+         * `instanceId` value, but it should not affect the `merge` method; we just need
+         * to typecast to `any` to bypass the type check error.
          */
-        MasterServantUtils.merge(activeServant, data.masterServant);
+        MasterServantUtils.merge(activeServant, data.masterServant as any);
         if (data.bond === undefined) {
             delete bondLevels[gameId];
         } else {
@@ -234,7 +236,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
          */
         const servant = gameServantMap[gameId];
         if (servant) {
-            const servantMaterialDebt = PlannerComputationUtils.computeMaterialDebtForServant(
+            const servantMaterialDebt = PlanComputationUtils.computeMaterialDebtForServant(
                 servant,
                 activeServant,
                 unlockedCostumes,

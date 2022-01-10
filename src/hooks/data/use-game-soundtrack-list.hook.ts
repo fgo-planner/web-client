@@ -1,16 +1,32 @@
 import { useEffect, useState } from 'react';
 import { GameSoundtrackList, GameSoundtrackService } from '../../services/data/game/game-soundtrack.service';
+import { Nullable } from '../../types/internal';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
-export const useGameSoundtrackList = (): GameSoundtrackList | undefined => {
+/**
+ * Returns cached soundtracks list from the `GameSoundtrackService`.
+ * 
+ * If the data is not yet available, then null/undefined is returned.
+ */
+export const useGameSoundtrackList = (): Nullable<GameSoundtrackList> => {
 
     const gameSoundtrackService = useInjectable(GameSoundtrackService);
-    
-    const [gameSoundtrackList, setGameSoundtrackList] = useState<GameSoundtrackList>();
 
+    /*
+     * Initialize the state with the game soundtracks list. If the data is not yet
+     * available, then it is initialized as null/undefined and then retrieved later.
+     */
+    const [gameSoundtrackList, setGameSoundtrackList] =
+        useState<Nullable<GameSoundtrackList>>(() => gameSoundtrackService.getSoundtracksSync());
+
+    /*
+     * Retrieve game soundtracks list if it wasn't available during initialization.
+     */
     useEffect(() => {
-        gameSoundtrackService.getSoundtracks().then(setGameSoundtrackList);
-    }, [gameSoundtrackService]);
+        if (!gameSoundtrackList) {
+            gameSoundtrackService.getSoundtracks().then(setGameSoundtrackList);
+        }
+    }, [gameSoundtrackList, gameSoundtrackService]);
 
     return gameSoundtrackList;
 

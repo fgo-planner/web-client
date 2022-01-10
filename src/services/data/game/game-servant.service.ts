@@ -32,12 +32,17 @@ export class GameServantService {
         return Http.get<Nullable<GameServant>>(`${this._BaseUrl}/${id}`);
     }
 
+    /**
+     * Asynchronously returns the cached servants list. If the data is not
+     * available, returns a promise that resolves once the data is fetched and
+     * cached.
+     */
     async getServants(): Promise<ServantsCache> {
         if (this._servantsCache) {
             /*
-             * Currently, the same instance of the cache array is returned every time this
-             * method is called. This may need to be changed to pass a deep copy of the
-             * array.
+             * TODO Currently, the same instance of the cache array is returned every time
+             * this method is called. This may need to be changed so that a deep copy of the
+             * array is returned instead.
              */
             return this._servantsCache;
         }
@@ -60,11 +65,37 @@ export class GameServantService {
         return this._servantsCachePromise;
     }
 
+    /**
+     * Synchronously returns the cached servants list. If the data is not available,
+     * then returns null/undefined.
+     */
+    getServantsSync(): Nullable<ServantsCache> {
+        /*
+         * TODO Currently, the same instance of the cache array is returned every time
+         * this method is called. This may need to be changed so that a deep copy of the
+         * array is returned instead.
+         */
+        return this._servantsCache;
+    }
+
+    /**
+     * Asynchronously returns the cached servants map data. If the data is not
+     * available, returns a promise that resolves once the data is fetched and
+     * cached.
+     */
     async getServantsMap(): Promise<ServantsCacheMap> {
         if (!this._servantsCacheMap) {
             await this.getServants();
         }
         return this._servantsCacheMap!!;
+    }
+
+    /**
+     * Synchronously returns the cached servants map data. If the data is not
+     * available, then returns null/undefined.
+     */
+    getServantsMapSync(): Nullable<ServantsCacheMap> {
+        return this._servantsCacheMap;
     }
 
     async getServantsPage(pagination: Pagination): Promise<Page<GameServant>> {
@@ -86,6 +117,9 @@ export class GameServantService {
         this._invalidateCache();
     }
 
+    /**
+     * @deprecated Not needed
+     */
     private _invalidateCache(): void {
         this._servantsCache = null;
         this._servantsCacheMap = null;

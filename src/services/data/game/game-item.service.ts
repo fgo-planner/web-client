@@ -32,12 +32,16 @@ export class GameItemService {
         return Http.get<Nullable<GameItem>>(`${this._BaseUrl}/${id}`);
     }
 
+    /**
+     * Asynchronously returns the cached items list. If the data is not available,
+     * returns a promise that resolves once the data is fetched and cached.
+     */
     async getItems(): Promise<ItemsCache> {
         if (this._itemsCache) {
             /*
-             * Currently, the same instance of the cache array is returned every time this
-             * method is called. This may need to be changed to pass a deep copy of the
-             * array.
+             * TODO Currently, the same instance of the cache array is returned every time
+             * this method is called. This may need to be changed so that a deep copy of the
+             * array is returned instead.
              */
             return this._itemsCache;
         }
@@ -55,11 +59,37 @@ export class GameItemService {
         return this._itemsCachePromise;
     }
 
+    /**
+     * Synchronously returns the cached items list. If the data is not available,
+     * then returns null/undefined.
+     */
+    getItemsSync(): Nullable<ItemsCache> {
+        /*
+         * TODO Currently, the same instance of the cache array is returned every time
+         * this method is called. This may need to be changed so that a deep copy of the
+         * array is returned instead.
+         */
+        return this._itemsCache;
+    }
+
+    /**
+     * Asynchronously returns the cached items map data. If the data is not
+     * available, returns a promise that resolves once the data is fetched and
+     * cached.
+     */
     async getItemsMap(): Promise<ItemsCacheMap> {
         if (!this._itemsCacheMap) {
             await this.getItems();
         }
         return this._itemsCacheMap!!;
+    }
+
+    /**
+     * Synchronously returns the cached items map data. If the data is not
+     * available, then returns null/undefined.
+     */
+    getItemsMapSync(): Nullable<ItemsCacheMap> {
+        return this._itemsCacheMap;
     }
 
     async getItemsPage(pagination: Pagination): Promise<Page<GameItem>> {
@@ -81,6 +111,9 @@ export class GameItemService {
         this._invalidateCache();
     }
 
+    /**
+     * @deprecated Not needed
+     */
     private _invalidateCache(): void {
         this._itemsCache = null;
         this._itemsCacheMap = null;

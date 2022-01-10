@@ -4,6 +4,7 @@ import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
+import { Nullable } from '../../../../types/internal';
 import { MasterSoundtracksListRow, StyleClassPrefix as MasterSoundtracksListRowStyleClassPrefix } from './master-soundtracks-list-row.component';
 
 type Props = {
@@ -24,7 +25,7 @@ const prioritySort = (a: GameSoundtrack, b: GameSoundtrack): number => {
 /**
  * Returns a copy of the given soundtrack list sorted by `priority`.
  */
-const sortByPriority = (gameSoundtrackList: GameSoundtrackList | undefined): GameSoundtrackList => {
+const sortByPriority = (gameSoundtrackList: Nullable<GameSoundtrackList>): GameSoundtrackList => {
     if (!gameSoundtrackList?.length) {
         return [];
     }

@@ -26,12 +26,17 @@ export class GameSoundtrackService {
         return Http.get<Nullable<GameSoundtrack>>(`${this._BaseUrl}/${id}`);
     }
 
+    /**
+     * Asynchronously returns the cached soundtrack list. If the data is not
+     * available, returns a promise that resolves once the data is fetched and
+     * cached.
+     */
     async getSoundtracks(): Promise<SoundtracksCache> {
         if (this._soundtracksCache) {
             /*
-             * Currently, the same instance of the cache array is returned every time this
-             * method is called. This may need to be changed to pass a deep copy of the
-             * array.
+             * TODO Currently, the same instance of the cache array is returned every time
+             * this method is called. This may need to be changed so that a deep copy of the
+             * array is returned instead.
              */
             return this._soundtracksCache;
         }
@@ -47,6 +52,19 @@ export class GameSoundtrackService {
             });
         }
         return this._soundtracksCachePromise;
+    }
+
+    /**
+     * Synchronously returns the cached soundtracks list. If the data is not available,
+     * then returns null/undefined.
+     */
+    getSoundtracksSync(): Nullable<SoundtracksCache> {
+        /*
+         * TODO Currently, the same instance of the cache array is returned every time
+         * this method is called. This may need to be changed so that a deep copy of the
+         * array is returned instead.
+         */
+        return this._soundtracksCache;
     }
 
     async getSoundtracksPage(pagination: Pagination): Promise<Page<GameSoundtrack>> {

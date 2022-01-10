@@ -52,7 +52,8 @@ export const PlansRoute = React.memo(() => {
     const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
     const [deletePlanDialogOpen, setDeletePlanDialogOpen] = useState<boolean>(false);
     const [deletePlanTarget, setDeletePlanTarget] = useState<ReadonlyPartial<Plan>>();
-
+    
+    const scrollContainerRef = useElevateAppBarOnScroll();
     const loadingIndicatorIdRef = useRef<string>();
 
     const resetLoadingIndicator = useCallback((): void => {
@@ -106,8 +107,6 @@ export const PlansRoute = React.memo(() => {
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, [loadPlansForAccount]);
 
-    const scrollContainer = useElevateAppBarOnScroll();
-
     const deletePlanDialogPrompt = useMemo(() => generateDeletePlanDialogPrompt(deletePlanTarget), [deletePlanTarget]);
 
     const handleAddPlanButtonClick = useCallback((): void => {
@@ -141,7 +140,7 @@ export const PlansRoute = React.memo(() => {
 
     return (
         <Fragment>
-            <LayoutPageScrollable scrollContainerRef={scrollContainer}>
+            <LayoutPageScrollable scrollContainerRef={scrollContainerRef}>
                 <PageTitle>
                     My Plans
                 </PageTitle>

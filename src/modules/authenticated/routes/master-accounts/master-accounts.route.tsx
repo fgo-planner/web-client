@@ -60,7 +60,7 @@ export const MasterAccountsRoute = React.memo(() => {
         return () => onMasterAccountListChangeSubscription.unsubscribe();
     }, []);
 
-    const scrollContainer = useElevateAppBarOnScroll();
+    const scrollContainerRef = useElevateAppBarOnScroll();
 
     const deleteAccountDialogPrompt = useMemo(() => {
         if (!deleteAccountTarget) {
@@ -96,7 +96,7 @@ export const MasterAccountsRoute = React.memo(() => {
 
     return (
         <Fragment>
-            <LayoutPageScrollable scrollContainerRef={scrollContainer}>
+            <LayoutPageScrollable scrollContainerRef={scrollContainerRef}>
                 <PageTitle>
                     Master Accounts
                 </PageTitle>

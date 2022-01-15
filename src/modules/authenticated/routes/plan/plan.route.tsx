@@ -3,7 +3,7 @@ import { Add as AddIcon, AddShoppingCart as AddShoppingCartIcon, Clear as ClearI
 import { Button, Fab, Tooltip } from '@mui/material';
 import lodash from 'lodash';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useMatch } from 'react-router-dom';
+import { useMatch, useNavigate } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -44,6 +44,7 @@ export const PlanRoute = React.memo(() => {
     const planId = routeMatch?.params.id;
 
     const forceUpdate = useForceUpdate();
+    const navigate = useNavigate();
 
     const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
     const planService = useInjectable(PlanService);
@@ -112,14 +113,15 @@ export const PlanRoute = React.memo(() => {
             .subscribe(account => {
                 const isSameAccount = masterAccount?._id === account?._id;
                 if (!masterAccount || isSameAccount) {
+                    // TODO Sanitize current plan against master account data.
                     setMasterAccount(account);
                 } else {
-                    // TODO Redirect user back to plan list.
+                    navigate('/user/master/planner');
                 }
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [masterAccount]);
+    }, [masterAccount, navigate]);
     
     /**
      * Sends plan update request to the back-end.

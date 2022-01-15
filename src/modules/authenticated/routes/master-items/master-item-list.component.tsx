@@ -3,7 +3,7 @@ import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { GameItemMap } from '../../../../services/data/game/game-item.service';
+import { GameItemMap } from '../../../../types/internal';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { StyleClassPrefix as MasterItemListRowLabelStyleClassPrefix } from './master-item-list-row-label.component';
 import { MasterItemListRow, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';

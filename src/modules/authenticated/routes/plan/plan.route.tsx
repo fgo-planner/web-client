@@ -281,7 +281,6 @@ export const PlanRoute = React.memo(() => {
      * These can be undefined during the initial render.
      */
     if (!gameServantMap || !masterAccount || !plan) {
-        console.log("HELLO?")
         return null;
     }
 

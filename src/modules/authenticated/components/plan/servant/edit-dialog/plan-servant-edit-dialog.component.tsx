@@ -70,7 +70,7 @@ const instantiate = (
             */
             const masterServant = availableServants[0];
             const planServant = PlanServantUtils.instantiate(masterServant.gameId, masterServant.instanceId);
-            PlanServantUtils.populateCurrentEnhancements(planServant, masterServant);
+            PlanServantUtils.updateCurrentEnhancements(planServant, masterServant);
             // TODO Populate costume data.
             return planServant;
         }

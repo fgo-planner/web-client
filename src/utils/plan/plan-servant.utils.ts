@@ -1,4 +1,4 @@
-import { GameServant, MasterServant, MasterServantAscensionLevel, PlanServant, PlanServantOwned, PlanServantType } from '@fgo-planner/types';
+import { GameServant, MasterServant, MasterServantAscensionLevel, PlanServant, PlanServantEnhancements, PlanServantOwned, PlanServantType } from '@fgo-planner/types';
 import { MasterServantUtils } from '../master/master-servant.utils';
 
 export class PlanServantUtils {
@@ -45,26 +45,24 @@ export class PlanServantUtils {
 
         return {
             ...planServant,
-            current: {
-                ...current,
-                skills: {
-                    ...current.skills
-                },
-                appendSkills: {
-                    ...current.appendSkills
-                },
-                costumes: [...current.costumes]
+            current: this.cloneEnhancements(current),
+            target: this.cloneEnhancements(target)
+        };
+    }
+
+    /**
+     * Returns a deep clone of the given `PlanServantEnhancements` object.
+     */
+    static cloneEnhancements(enhancements: PlanServantEnhancements): PlanServantEnhancements {
+        return {
+            ...enhancements,
+            skills: {
+                ...enhancements.skills
             },
-            target: {
-                ...target,
-                skills: {
-                    ...target.skills
-                },
-                appendSkills: {
-                    ...target.appendSkills
-                },
-                costumes: [...target.costumes]
-            }
+            appendSkills: {
+                ...enhancements.appendSkills
+            },
+            costumes: [...enhancements.costumes]
         };
     }
 
@@ -81,22 +79,39 @@ export class PlanServantUtils {
     }
 
     /**
-     * Populates the current enhancements of a `PlanServant` from a `MasterServant`.
-     * Does not populate the `costumes` field.
+     * Updates the current enhancements of the given `PlanServant` with the data
+     * from the given `MasterServant`. Does not populate the `costumes` field.
      */
-    static populateCurrentEnhancements(planServant: PlanServant, masterServant: MasterServant): void {
-        const { current } = planServant;
-        current.level = masterServant.level;
-        current.ascension = masterServant.ascension;
-        current.fouHp = masterServant.fouHp;
-        current.fouAtk = masterServant.fouAtk;
-        current.skills[1] = masterServant.skills[1];
-        current.skills[2] = masterServant.skills[2];
-        current.skills[3] = masterServant.skills[3];
-        current.appendSkills[1] = masterServant.appendSkills[1];
-        current.appendSkills[2] = masterServant.appendSkills[2];
-        current.appendSkills[3] = masterServant.appendSkills[3];
+    static updateCurrentEnhancements(planServant: PlanServant, masterServant: MasterServant): void {
+        this.updateEnhancements(planServant.current, masterServant);
     }
+
+    /**
+     * Updates the given `PlanServantEnhancements` with the values from the given
+     * `MasterServant`.
+     */
+    static updateEnhancements(enhancements: PlanServantEnhancements, masterServant: MasterServant): void;
+    /**
+     * Updates the target `PlanServantEnhancements` with the values from the source
+     * `PlanServantEnhancements`.
+     */
+    static updateEnhancements(target: PlanServantEnhancements, source: PlanServantEnhancements): void;
+    /**
+     * Method implementation
+     */
+    static updateEnhancements(target: PlanServantEnhancements, source: MasterServant | PlanServantEnhancements): void {
+        target.level = source.level;
+        target.ascension = source.ascension;
+        target.fouHp = source.fouHp;
+        target.fouAtk = source.fouAtk;
+        target.skills[1] = source.skills[1];
+        target.skills[2] = source.skills[2];
+        target.skills[3] = source.skills[3];
+        target.appendSkills[1] = source.appendSkills[1];
+        target.appendSkills[2] = source.appendSkills[2];
+        target.appendSkills[3] = source.appendSkills[3];
+    }
+
 
     /**
      * Returns an array of `MasterServant` that have not been added to the plan.

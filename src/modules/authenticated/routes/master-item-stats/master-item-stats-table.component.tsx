@@ -7,8 +7,8 @@ import { GameItemThumbnail } from '../../../../components/game/item/game-item-th
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { GameItemConstants } from '../../../../constants';
-import { GameItemMap } from '../../../../services/data/game/game-item.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
+import { GameItemMap } from '../../../../types/internal';
 import { MasterItemStats, MasterItemStatsFilterOptions } from './master-item-stats.utils';
 
 type Props = {

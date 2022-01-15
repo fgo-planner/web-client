@@ -2,17 +2,9 @@ import { GameItem } from '@fgo-planner/types';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { Page, Pagination } from '../../../types/data';
-import { CacheArray, CacheMap, Nullable } from '../../../types/internal';
+import { GameItemList, GameItemMap, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
-
-type ItemsCache = CacheArray<GameItem>;
-
-type ItemsCacheMap = CacheMap<number, GameItem>;
-
-export type GameItemList = ItemsCache;
-
-export type GameItemMap = ItemsCacheMap;
 
 @Injectable
 export class GameItemService {
@@ -22,11 +14,11 @@ export class GameItemService {
     @Inject(LoadingIndicatorOverlayService)
     private readonly _loadingIndicatorOverlayService!: LoadingIndicatorOverlayService;
 
-    private _itemsCache: Nullable<ItemsCache>;
+    private _itemsCache: Nullable<GameItemList>;
 
-    private _itemsCacheMap: Nullable<ItemsCacheMap>;
+    private _itemsCacheMap: Nullable<GameItemMap>;
 
-    private _itemsCachePromise: Nullable<Promise<ItemsCache>>;
+    private _itemsCachePromise: Nullable<Promise<GameItemList>>;
 
     async getItem(id: number): Promise<Nullable<GameItem>> {
         return Http.get<Nullable<GameItem>>(`${this._BaseUrl}/${id}`);
@@ -36,7 +28,7 @@ export class GameItemService {
      * Asynchronously returns the cached items list. If the data is not available,
      * returns a promise that resolves once the data is fetched and cached.
      */
-    async getItems(): Promise<ItemsCache> {
+    async getItems(): Promise<GameItemList> {
         if (this._itemsCache) {
             /*
              * TODO Currently, the same instance of the cache array is returned every time
@@ -63,7 +55,7 @@ export class GameItemService {
      * Synchronously returns the cached items list. If the data is not available,
      * then returns null/undefined.
      */
-    getItemsSync(): Nullable<ItemsCache> {
+    getItemsSync(): Nullable<GameItemList> {
         /*
          * TODO Currently, the same instance of the cache array is returned every time
          * this method is called. This may need to be changed so that a deep copy of the
@@ -77,7 +69,7 @@ export class GameItemService {
      * available, returns a promise that resolves once the data is fetched and
      * cached.
      */
-    async getItemsMap(): Promise<ItemsCacheMap> {
+    async getItemsMap(): Promise<GameItemMap> {
         if (!this._itemsCacheMap) {
             await this.getItems();
         }
@@ -88,7 +80,7 @@ export class GameItemService {
      * Synchronously returns the cached items map data. If the data is not
      * available, then returns null/undefined.
      */
-    getItemsMapSync(): Nullable<ItemsCacheMap> {
+    getItemsMapSync(): Nullable<GameItemMap> {
         return this._itemsCacheMap;
     }
 

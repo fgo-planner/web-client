@@ -217,7 +217,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                     unlockedCostumes,
                     computationOptions
                 );
-                PlanComputationUtils.addMaterialDebtMap(servantMaterialDebt, selectedServantsMaterialDebt);
+                PlanComputationUtils.addMaterialDebtMap(selectedServantsMaterialDebt, servantMaterialDebt);
             }
             setSelectedServantsMaterialDebt(selectedServantsMaterialDebt);
         }

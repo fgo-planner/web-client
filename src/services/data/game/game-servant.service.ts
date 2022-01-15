@@ -2,17 +2,9 @@ import { GameServant } from '@fgo-planner/types';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { Page, Pagination } from '../../../types/data';
-import { CacheArray, CacheMap, Nullable } from '../../../types/internal';
+import { GameServantList, GameServantMap, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
-
-type ServantsCache = CacheArray<GameServant>;
-
-type ServantsCacheMap = CacheMap<number, GameServant>;
-
-export type GameServantList = ServantsCache;
-
-export type GameServantMap = ServantsCacheMap;
 
 @Injectable
 export class GameServantService {
@@ -22,11 +14,11 @@ export class GameServantService {
     @Inject(LoadingIndicatorOverlayService)
     private readonly _loadingIndicatorOverlayService!: LoadingIndicatorOverlayService;
 
-    private _servantsCache: Nullable<ServantsCache>;
+    private _servantsCache: Nullable<GameServantList>;
 
-    private _servantsCacheMap: Nullable<ServantsCacheMap>;
+    private _servantsCacheMap: Nullable<GameServantMap>;
 
-    private _servantsCachePromise: Nullable<Promise<ServantsCache>>;
+    private _servantsCachePromise: Nullable<Promise<GameServantList>>;
 
     async getServant(id: number): Promise<Nullable<GameServant>> {
         return Http.get<Nullable<GameServant>>(`${this._BaseUrl}/${id}`);
@@ -37,7 +29,7 @@ export class GameServantService {
      * available, returns a promise that resolves once the data is fetched and
      * cached.
      */
-    async getServants(): Promise<ServantsCache> {
+    async getServants(): Promise<GameServantList> {
         if (this._servantsCache) {
             /*
              * TODO Currently, the same instance of the cache array is returned every time
@@ -69,7 +61,7 @@ export class GameServantService {
      * Synchronously returns the cached servants list. If the data is not available,
      * then returns null/undefined.
      */
-    getServantsSync(): Nullable<ServantsCache> {
+    getServantsSync(): Nullable<GameServantList> {
         /*
          * TODO Currently, the same instance of the cache array is returned every time
          * this method is called. This may need to be changed so that a deep copy of the
@@ -83,7 +75,7 @@ export class GameServantService {
      * available, returns a promise that resolves once the data is fetched and
      * cached.
      */
-    async getServantsMap(): Promise<ServantsCacheMap> {
+    async getServantsMap(): Promise<GameServantMap> {
         if (!this._servantsCacheMap) {
             await this.getServants();
         }
@@ -94,7 +86,7 @@ export class GameServantService {
      * Synchronously returns the cached servants map data. If the data is not
      * available, then returns null/undefined.
      */
-    getServantsMapSync(): Nullable<ServantsCacheMap> {
+    getServantsMapSync(): Nullable<GameServantMap> {
         return this._servantsCacheMap;
     }
 

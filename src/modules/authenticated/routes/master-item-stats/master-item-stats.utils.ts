@@ -1,8 +1,7 @@
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/types';
 import { GameItemConstants } from '../../../../constants';
-import { GameServantMap } from '../../../../services/data/game/game-servant.service';
-import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
-import { MapUtils } from '../../../../utils/map.utils';
+import { GameServantMap, GameSoundtrackList } from '../../../../types/internal';
+import { ObjectUtils } from '../../../../utils/object.utils';
 
 export type MasterItemStat = {
     inventory: number;
@@ -212,7 +211,7 @@ export class MasterItemStatsUtils {
     ): void {
 
         for (const { itemId, quantity } of enhancement.materials) {
-            const stat = MapUtils.getOrDefault(stats, itemId, this._instantiateItemStat);
+            const stat = ObjectUtils.getOrDefault(stats, itemId, this._instantiateItemStat);
             const cost = quantity * maxEnhancementCount;
             stat.cost += cost;
             if (!owned) {

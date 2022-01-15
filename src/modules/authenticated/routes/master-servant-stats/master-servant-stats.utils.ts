@@ -1,7 +1,6 @@
 import { GameServant, GameServantClass, GameServantRarity, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../../../constants';
-import { GameServantMap } from '../../../../services/data/game/game-servant.service';
-import { GameServantClassSimplified } from '../../../../types/internal';
+import { GameServantClassSimplified, GameServantMap } from '../../../../types/internal';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 
 type MasterServantStatGroupedByRarity = {

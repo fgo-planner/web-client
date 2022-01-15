@@ -12,7 +12,7 @@ import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
-import { MaterialDebtMap, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
+import { ComputationOptions, MaterialDebtMap, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
 type Props = {
@@ -25,6 +25,18 @@ type Props = {
 };
 
 const FormId = 'master-servant-info-panel-form';
+
+const generateComputationOptions = (showAppendSkills: boolean, includeLores: boolean): ComputationOptions => ({
+    include: {
+        ascensions: true,
+        skills: true,
+        appendSkills: showAppendSkills,
+        costumes: true
+    },
+    exclude: {
+        lores: !includeLores // TODO Add prop to toggle lores.
+    }
+});
 
 const hasDebt = (materialDebtMap: MaterialDebtMap): boolean => {
     return materialDebtMap[GameItemConstants.QpItemId].total !== 0;
@@ -197,16 +209,16 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 if (!servant) {
                     continue;
                 }
+                // TODO Add way to toggle lores
+                const computationOptions = generateComputationOptions(!!showAppendSkills, false);
                 const servantMaterialDebt = PlanComputationUtils.computeMaterialDebtForServant(
                     servant,
                     activeServant,
                     unlockedCostumes,
-                    !!showAppendSkills,
-                    false // TODO Add prop to toggle lores.
+                    computationOptions
                 );
                 PlanComputationUtils.addMaterialDebtMap(servantMaterialDebt, selectedServantsMaterialDebt);
             }
-            // TODO Add way to toggle lores
             setSelectedServantsMaterialDebt(selectedServantsMaterialDebt);
         }
     }, [activeServants, gameServantMap, showAppendSkills, unlockedCostumes]);
@@ -236,12 +248,13 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
          */
         const servant = gameServantMap[gameId];
         if (servant) {
+            // TODO Add way to toggle lores
+            const computationOptions = generateComputationOptions(!!showAppendSkills, false);
             const servantMaterialDebt = PlanComputationUtils.computeMaterialDebtForServant(
                 servant,
                 activeServant,
                 unlockedCostumes,
-                !!showAppendSkills,
-                false // TODO Add prop to toggle lores.
+                computationOptions
             );
             setSelectedServantsMaterialDebt(servantMaterialDebt);
         }

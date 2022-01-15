@@ -2,6 +2,18 @@ import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterS
 import { GameItemConstants, GameServantConstants } from '../../constants';
 import { MapUtils } from '../map.utils';
 
+export type ComputationOptions = {
+    include: {
+        ascensions?: boolean;
+        skills?: boolean;
+        appendSkills?: boolean;
+        costumes?: boolean;
+    };
+    exclude?: {
+        lores?: boolean;
+    }
+};
+
 /**
  * Breakdown of the quantities required for each enhancement category for a
  * single item.
@@ -35,6 +47,38 @@ type ServantEnhancements = Readonly<{
 
 export class PlanComputationUtils {
 
+    private static get _defaultOptions(): ComputationOptions {
+        return {
+            include: {
+                ascensions: true,
+                skills: true,
+                appendSkills: true,
+                costumes: true
+            }
+        };
+    }
+
+    private static get _defaultTargetEnhancements(): ServantEnhancements {
+        return {
+            ascension: GameServantConstants.MaxAscensionLevel,
+            skills: {
+                1: GameServantConstants.MaxSkillLevel,
+                2: GameServantConstants.MaxSkillLevel,
+                3: GameServantConstants.MaxSkillLevel
+            },
+            appendSkills: {
+                1: GameServantConstants.MaxSkillLevel,
+                2: GameServantConstants.MaxSkillLevel,
+                3: GameServantConstants.MaxSkillLevel,
+            }
+        };
+    }
+
+    /**
+     * Adds the values from a `MaterialDebtMap` to another `MaterialDebtMap`. Only
+     * the the target map will be updated; the values of the source map will not be
+     * changed.
+     */
     static addMaterialDebtMap(source: MaterialDebtMap, target: MaterialDebtMap): void {
         for (const [id, debt] of Object.entries(source)) {
             const itemId = Number(id);
@@ -46,6 +90,10 @@ export class PlanComputationUtils {
         }
     }
 
+    /**
+     * Takes an array of `MaterialDebtMap` and returns a new `MaterialDebtMap`
+     * containing the sum of the values of all the maps.
+     */
     static sumMaterialDebtMaps(maps: Array<MaterialDebtMap>): MaterialDebtMap {
         const result: Record<number, MaterialDebt> = {};
         for (const map of maps) {
@@ -54,12 +102,13 @@ export class PlanComputationUtils {
         return result;
     }
 
+    //#region computeMaterialDebtForServant + helper methods
+
     static computeMaterialDebtForServant(
         servant: Readonly<GameServant>,
         currentEnhancements: ServantEnhancements,
         currentCostumes: Array<number> | Set<number>,
-        appendSkills: boolean,
-        lores: boolean
+        options?: ComputationOptions
     ): MaterialDebtMap;
 
     static computeMaterialDebtForServant(
@@ -67,46 +116,36 @@ export class PlanComputationUtils {
         currentEnhancements: ServantEnhancements,
         currentCostumes: Array<number> | Set<number>,
         targetEnhancements: ServantEnhancements,
-        targetCostumes: Set<number>
+        targetCostumes: Set<number>,
+        options?: ComputationOptions
     ): MaterialDebtMap;
 
     static computeMaterialDebtForServant(
         servant: Readonly<GameServant>,
         currentEnhancements: ServantEnhancements,
         currentCostumes: Array<number> | Set<number>,
-        param4: ServantEnhancements | boolean,
-        param5: Set<number> | boolean
+        param4?: ServantEnhancements | ComputationOptions,
+        param5?: Set<number>,
+        param6?: ComputationOptions
     ): MaterialDebtMap {
         let targetEnhancements: ServantEnhancements;
         let targetCostumes = undefined;
-        if (typeof param4 === 'boolean') {
-            const appendSkills = param4;
-            const lores = param5 as boolean;
-            const targetSkillLevel = GameServantConstants.MaxSkillLevel - (lores ? 0 : 1) as MasterServantSkillLevel;
-            const targetAppendSkillLevel = appendSkills ? targetSkillLevel : 0 as MasterServantSkillLevel;
-            targetEnhancements = {
-                ascension: 4,
-                skills: {
-                    1: targetSkillLevel,
-                    2: targetSkillLevel,
-                    3: targetSkillLevel
-                },
-                appendSkills: {
-                    1: targetAppendSkillLevel,
-                    2: targetAppendSkillLevel,
-                    3: targetAppendSkillLevel,
-                }
-            };
+        let options = undefined;
+        if (param4 === undefined || (param4 as any)['include']) {
+            targetEnhancements = this._defaultTargetEnhancements;
+            options = param4 as ComputationOptions | undefined;
         } else {
-            targetEnhancements = param4;
-            targetCostumes = param5 as Set<number>;
+            targetEnhancements = param4 as ServantEnhancements;
+            targetCostumes = param5 as Set<number> | undefined;
+            options = param6;
         }
         return this._computeMaterialDebtForServant(
             servant,
             currentEnhancements,
             currentCostumes,
             targetEnhancements,
-            targetCostumes
+            targetCostumes,
+            options
         );
     }
 
@@ -115,10 +154,13 @@ export class PlanComputationUtils {
         currentEnhancements: ServantEnhancements,
         currentCostumes: Array<number> | Set<number>,
         targetEnhancements: ServantEnhancements,
-        targetCostumes?: Set<number>
+        targetCostumes?: Set<number>,
+        options = this._defaultOptions
     ): MaterialDebtMap {
 
-        if (!(currentCostumes instanceof Set)) {
+        const { include, exclude } = options;
+
+        if (Array.isArray(currentCostumes)) {
             currentCostumes = new Set(currentCostumes);
         }
 
@@ -129,45 +171,56 @@ export class PlanComputationUtils {
             [GameItemConstants.QpItemId]: this._instantiateMaterialDebt()
         };
 
-        this._updateResultForSkills(
-            result,
-            servant.skillMaterials,
-            currentEnhancements.skills,
-            targetEnhancements.skills,
-            'skills'
-        );
+        if (include.skills) {
+            this._updateResultForSkills(
+                result,
+                servant.skillMaterials,
+                currentEnhancements.skills,
+                targetEnhancements.skills,
+                'skills',
+                exclude?.lores
+            );
+        }
 
-        this._updateResultForSkills(
-            result,
-            servant.appendSkillMaterials,
-            currentEnhancements.appendSkills,
-            targetEnhancements.appendSkills,
-            'appendSkills'
-        );
+        if (include.appendSkills) {
+            this._updateResultForSkills(
+                result,
+                servant.appendSkillMaterials,
+                currentEnhancements.appendSkills,
+                targetEnhancements.appendSkills,
+                'appendSkills',
+                exclude?.lores
+            );
+        }
 
-        if (servant.ascensionMaterials) {
-            for (const [key, ascension] of Object.entries(servant.ascensionMaterials)) {
-                const ascensionLevel = Number(key);
-                /*
-                 * Skip this ascension servant is already at least this level, or if this level
-                 * beyond the targeted level.
-                 */
-                if (currentEnhancements.ascension >= ascensionLevel || ascensionLevel > targetEnhancements.ascension) {
-                    continue;
+        if (include.ascensions) {
+            if (servant.ascensionMaterials) {
+                for (const [key, ascension] of Object.entries(servant.ascensionMaterials)) {
+                    const ascensionLevel = Number(key);
+                    /*
+                     * Skip this ascension servant is already at least this level, or if this level
+                     * beyond the targeted level.
+                     */
+                    if (currentEnhancements.ascension >= ascensionLevel || ascensionLevel > targetEnhancements.ascension) {
+                        continue;
+                    }
+                    this._updateResultForEnhancement(result, ascension, 'ascensions');
                 }
-                this._updateResultForEnhancement(result, ascension, 'ascensions');
             }
         }
 
-        for (const [key, costume] of Object.entries(servant.costumes)) {
-            const costumeId = Number(key);
-            /*
-             * Skip if the costume is already unlocked, or if it is not targeted.
-             */
-            if (currentCostumes.has(costumeId) || (targetCostumes && !targetCostumes.has(costumeId))) {
-                continue;
+        if (include.costumes) {
+            for (const [key, costume] of Object.entries(servant.costumes)) {
+                const costumeId = Number(key);
+                /*
+                 * Skip if the costume is already unlocked, or if it is not targeted. If the
+                 * targetCostumes set is undefined, then all costumes are target by default.
+                 */
+                if (currentCostumes.has(costumeId) || (targetCostumes && !targetCostumes.has(costumeId))) {
+                    continue;
+                }
+                this._updateResultForEnhancement(result, costume.materials, 'costumes');
             }
-            this._updateResultForEnhancement(result, costume.materials, 'costumes');
         }
 
         return result;
@@ -178,7 +231,8 @@ export class PlanComputationUtils {
         skillMaterials: Readonly<GameServantSkillMaterials>,
         currentSkills: SkillEnhancements,
         targetSkills: SkillEnhancements,
-        skillType: 'skills' | 'appendSkills'
+        skillType: 'skills' | 'appendSkills',
+        excludeLores?: boolean
     ): void {
 
         const currentSkill1 = currentSkills[1] || 0;
@@ -191,6 +245,9 @@ export class PlanComputationUtils {
 
         for (const [key, skill] of Object.entries(skillMaterials)) {
             const skillLevel = Number(key);
+            if (excludeLores && skillLevel === (GameServantConstants.MaxSkillLevel - 1)) {
+                continue;
+            }
             /*
              * The number of skills that need to be upgraded to this level. A skill does not
              * need to be upgraded if it is already at least this level, or if this level beyond
@@ -235,6 +292,11 @@ export class PlanComputationUtils {
         qpCount.total += total;
     }
 
+    //#endregion
+
+
+    //#region Other helper methods
+
     private static _instantiateMaterialDebt(): MaterialDebt {
         return {
             ascensions: 0,
@@ -252,5 +314,7 @@ export class PlanComputationUtils {
         target.costumes += source.costumes;
         target.total += source.total;
     }
+
+    //#endregion
 
 }

@@ -1,27 +1,25 @@
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantSkillLevel, Plan, PlanServant, PlanServantEnhancements, PlanServantOwned, PlanServantType } from '@fgo-planner/types';
-import { GameItemConstants, GameServantConstants } from '../../constants';
+import { GameServantConstants } from '../../constants';
 import { GameServantMap, ReadonlyRecord } from '../../types/internal';
 import { ArrayUtils } from '../array.utils';
 import { ObjectUtils } from '../object.utils';
 import { PlanServantUtils } from './plan-servant.utils';
 
+//#region Exported type definitions
+
 export type ComputationOptions = {
-    include: {
-        ascensions?: boolean;
-        skills?: boolean;
-        appendSkills?: boolean;
-        costumes?: boolean;
-    };
-    exclude?: {
-        lores?: boolean;
-    }
+    includeAscensions?: boolean;
+    includeSkills?: boolean;
+    includeAppendSkills?: boolean;
+    includeCostumes?: boolean;
+    excludeLores?: boolean;
 };
 
 /**
  * Breakdown of the quantities required for each enhancement category for a
  * single item.
  */
-export type MaterialDebt = {
+export type ItemRequirements = {
     ascensions: number;
     skills: number;
     appendSkills: number;
@@ -30,13 +28,29 @@ export type MaterialDebt = {
 };
 
 /**
- * Map of items required to enhance a servant to the specified targets. The key
- * is the item's ID, and the value is a breakdown of the quantities required for
+ * Map of items required to reach the targeted enhancement levels. The key is
+ * the item's ID, and the value is a breakdown of the quantities required for
  * each enhancement category.
  */
-export type MaterialDebtMap = Record<number, MaterialDebt>;
+export type ItemRequirementMap = Record<number, ItemRequirements>;
 
-export type PlanServantDebt = {
+/**
+ * Resources required to reach the targeted enhancement levels. Includes embers,
+ * fous (TODO), items, and QP.
+ */
+export type EnhancementRequirements = {
+    embers: { [key in 1 | 2 | 3 | 4 | 5]: number };
+    // TODO Add fous
+    items: ItemRequirementMap;
+    qp: number;
+};
+
+/**
+ * Computed enhancement requirements for a servant in the target plan. Also
+ * includes the effective current and target enhancement level used for the
+ * computation.
+ */
+export type PlanServantRequirements = {
     type: PlanServantType;
     gameId: number;
     instanceId?: number;
@@ -52,43 +66,50 @@ export type PlanServantDebt = {
      * group.
      */
     target: PlanServantEnhancements;
-    materialDebt: MaterialDebtMap;
+    /**
+     * Requirements for enhancing the servant only for the target plan.
+     */
+    planRequirements: EnhancementRequirements;
 };
 
 /**
- * Computed material debt for the target plan. Also includes summarized data for
- * any preceding plans from the same group, if applicable.
+ * Computed enhancements requirements for the plan/plan group.
  */
-export type PlanDebt = {
+export type PlanRequirements = {
     /**
-     * Detailed material debt for the servants in the target plan.
+     * Total enhancement requirements for the plan group. Only the target plan and
+     * preceding plans are included; proceeding plans are excluded.
      */
-    servants: {
-        [PlanServantType.Owned]: Record<number, PlanServantDebt>;
-        [PlanServantType.Unowned]: Record<number, PlanServantDebt>;
-    }
-    /**
-     * Summarized material debt for the target plan.
-     */
-    planTotal: MaterialDebtMap;
-    /**
-     * Summarized material debt for other plans that precede the target plan in
-     * the plan group. Does not include the target plan or any proceeding plans.
-     * 
-     * This is a map where the key is the `_id` field of the plan, and the value
-     * is the material debt total for the plan.
-     */
-    previousPlans: Record<string, MaterialDebtMap>;
-    /**
-     * Summarized material debt for all the preceding plans and the target plan.
-     * Does not any proceeding plans.
-     */
-    groupTotal: MaterialDebtMap;
+    group: EnhancementRequirements;
     /**
      * Map of item quantities needed based on master's current inventory.
      */
     itemDebt: Record<number, number>; // TODO Is this needed here?
+    /**
+     * Enhancement requirements for individual plans that precede target plan within
+     * the plan group. Does not include the target plan or any proceeding plans.
+     *
+     * This is a map where the key is the `_id` field of the plan, and the value is
+     * the material debt total for the plan.
+     */
+    previousPlans: Record<string, EnhancementRequirements>;
+    /**
+     * Enhancement requirements for the servants in the target plan.
+     */
+    servants: {
+        [PlanServantType.Owned]: Record<number, PlanServantRequirements>;
+        [PlanServantType.Unowned]: Record<number, PlanServantRequirements>;
+    }
+    /**
+     * Total enhancement requirements for the target plan.
+     */
+    targetPlan: EnhancementRequirements;
 };
+
+//#endregion
+
+
+//#region Internal type definitions
 
 type SkillEnhancements = Readonly<{
     1?: MasterServantSkillLevel;
@@ -107,8 +128,8 @@ type ServantEnhancements = Readonly<{
  */
 type MasterAccountData = Readonly<{
     /**
-     * Item quantities held by the master account, including QP, mapped by the
-     * items' `itemId` value.
+     * Item quantities held by the master account, mapped by the items' `itemId`
+     * value.
      */
     items: ReadonlyRecord<number, number>;
     /**
@@ -117,18 +138,20 @@ type MasterAccountData = Readonly<{
      */
     servants: ReadonlyRecord<number, Readonly<MasterServant>>;
     costumes: ReadonlySet<number>;
+    qp: number;
 }>;
+
+//#endregion
+
 
 export class PlanComputationUtils {
 
     private static get _defaultOptions(): Readonly<ComputationOptions> {
         return {
-            include: {
-                ascensions: true,
-                skills: true,
-                appendSkills: true,
-                costumes: true
-            }
+            includeAscensions: true,
+            includeSkills: true,
+            includeAppendSkills: true,
+            includeCostumes: true
         };
     };
 
@@ -149,29 +172,36 @@ export class PlanComputationUtils {
     };
 
     /**
-     * Adds the values from a `MaterialDebtMap` to another `MaterialDebtMap`. Only
-     * the the target map will be updated; the values of the source map will not be
-     * changed.
+     * Adds the values from the source `EnhancementRequirements` to the target
+     * `EnhancementRequirements`. Only the the target map will be updated; the
+     * values of the source map will not be changed.
      */
-    static addMaterialDebtMap(target: MaterialDebtMap, source: MaterialDebtMap): void {
-        for (const [id, debt] of Object.entries(source)) {
-            const itemId = Number(id);
-            if (!target[itemId]) {
-                target[itemId] = { ...debt };
+    static addEnhancementRequirements(target: EnhancementRequirements, source: EnhancementRequirements): void {
+        const targetEmbers = target.embers;
+        for (const [key, value] of Object.entries(source.embers)) {
+            const rarity = Number(key) as 1 | 2 | 3 | 4 | 5;
+            targetEmbers[rarity] += value;
+        }
+        const targetItems = target.items;
+        for (const [key, value] of Object.entries(source.items)) {
+            const itemId = Number(key);
+            if (!targetItems[itemId]) {
+                targetItems[itemId] = { ...value };
             } else {
-                this._addMaterialDebt(target[itemId], debt);
+                this._addItemRequirements(targetItems[itemId], value);
             }
         }
+        target.qp += source.qp;
     }
 
     /**
-     * Takes an array of `MaterialDebtMap` and returns a new `MaterialDebtMap`
-     * containing the sum of the values of all the maps.
+     * Takes an array of `EnhancementRequirements` and returns a new
+     * `EnhancementRequirements` containing the sum of all the values.
      */
-    static sumMaterialDebtMaps(maps: Array<MaterialDebtMap>): MaterialDebtMap {
-        const result: Record<number, MaterialDebt> = {};
-        for (const map of maps) {
-            this.addMaterialDebtMap(result, map);
+    static sumEnhancementRequirements(arr: Array<EnhancementRequirements>): EnhancementRequirements {
+        const result = this._instantiateEnhancementRequirements();
+        for (const enhancementRequirements of arr) {
+            this.addEnhancementRequirements(result, enhancementRequirements);
         }
         return result;
     }
@@ -189,7 +219,7 @@ export class PlanComputationUtils {
         }
     }
 
-    //#region computeMaterialDebtForPlans + helper methods
+    //#region computePlanRequirements + helper methods
 
     /**
      * Computes the material debt for the given plan, and optionally the other plans
@@ -198,24 +228,23 @@ export class PlanComputationUtils {
      * @param gameServantMap Game servant map data.
      * @param masterAccount Master account data.
      * @param targetPlan The target plan.
-     * @param previousPlans (optional) Any preceding plans from the plan group,
-     * relative to the target plan. This should exclude the target plan and any
-     * proceeding plans.
+     * @param previousPlans (optional) Plans that precede the target plan. This
+     * should exclude the target plan itself and any proceeding plans.
      */
-    static computeMaterialDebtForPlans(
+    static computePlanRequirements(
         gameServantMap: GameServantMap,
         masterAccount: Readonly<MasterAccount>,
         targetPlan: Readonly<Plan>,
         previousPlans?: ReadonlyArray<Plan>,
         optionsOverride?: ComputationOptions
-    ): PlanDebt {
+    ): PlanRequirements {
 
         const start = window.performance.now();
 
         /**
          * The computation result. This will be updated as each plan is computed.
          */
-        const result = this._instantiatePlanDebt();
+        const result = this._instantiatePlanRequirements();
 
         /**
          * Pre-processed master account data.
@@ -226,13 +255,13 @@ export class PlanComputationUtils {
          * The computation options. If options override was not given, then use options
          * from target plan.
          */
-        const options = optionsOverride || this._parseComputationOptionsFromPlan(targetPlan);
+        const options = optionsOverride || this._parseComputationOptions(targetPlan);
 
         /*
          * Run computations for previous plans in the group first.
          */
         previousPlans?.forEach(plan => {
-            this._computeMaterialDebtForPlan(
+            this._computePlanRequirements(
                 result,
                 gameServantMap,
                 masterAccountData,
@@ -243,7 +272,7 @@ export class PlanComputationUtils {
         /*
          * Finally, run computations for the target plan.
          */
-        this._computeMaterialDebtForPlan(
+        this._computePlanRequirements(
             result,
             gameServantMap,
             masterAccountData,
@@ -258,8 +287,8 @@ export class PlanComputationUtils {
         return result;
     }
 
-    private static _computeMaterialDebtForPlan(
-        result: PlanDebt,
+    private static _computePlanRequirements(
+        result: PlanRequirements,
         gameServantMap: GameServantMap,
         masterAccountData: MasterAccountData,
         plan: Readonly<Plan>,
@@ -284,12 +313,12 @@ export class PlanComputationUtils {
             /*
              * Compute the options based on a merge of the plan and servant options.
              */
-            const servantOptions = this._parseComputationOptionsFromPlanServant(planServant);
+            const servantOptions = this._parseComputationOptions(planServant);
             options = this._mergeComputationOptions(options, servantOptions);
             /*
              * Compute the debt for the servant for the current plan.
              */
-            const servantComputationResult = this._computeMaterialDebtForPlanServant(
+            const servantComputationResult = this._computePlanServantRequirements(
                 result,
                 gameServant,
                 planServant,
@@ -301,31 +330,31 @@ export class PlanComputationUtils {
                 continue;
             }
 
-            const [planServantDebt, materialDebtMap] = servantComputationResult;
+            const [planServantRequirements, enhancementRequirements] = servantComputationResult;
             /*
              * Update the result with the computed data.
              */
-            let planDebtMap: MaterialDebtMap;
+            let planRequirements: EnhancementRequirements;
             if (isTargetPlan) {
-                Object.assign(planServantDebt.materialDebt, materialDebtMap);
-                planDebtMap = result.planTotal;
+                Object.assign(planServantRequirements.planRequirements.items, enhancementRequirements);
+                planRequirements = result.targetPlan;
             } else {
-                planDebtMap = ObjectUtils.getOrDefault(result.previousPlans, plan._id, this._instantiateMaterialDebt);
+                planRequirements = ObjectUtils.getOrDefault(result.previousPlans, plan._id, this._instantiateEnhancementRequirements);
             }
-            this.addMaterialDebtMap(planDebtMap, materialDebtMap);
-            this.addMaterialDebtMap(result.groupTotal, materialDebtMap);
+            this.addEnhancementRequirements(planRequirements, enhancementRequirements);
+            this.addEnhancementRequirements(result.group, enhancementRequirements);
         }
 
         // TODO Compute the grand total in the `result.itemDebt`;
     }
 
-    private static _computeMaterialDebtForPlanServant(
-        result: PlanDebt,
+    private static _computePlanServantRequirements(
+        result: PlanRequirements,
         gameServant: Readonly<GameServant>,
         planServant: Readonly<PlanServant>,
         masterAccountData: MasterAccountData,
         options: ComputationOptions
-    ): [PlanServantDebt, MaterialDebtMap] | undefined {
+    ): [PlanServantRequirements, EnhancementRequirements] | undefined {
 
         /**
          * This is the `instanceId` for owned servants, or `gameId` for unowned
@@ -335,14 +364,14 @@ export class PlanComputationUtils {
 
         const resultServants = result.servants[planServant.type];
 
-        let planServantDebt = resultServants[key];
-        if (!planServantDebt) {
+        let planServantRequirements = resultServants[key];
+        if (!planServantRequirements) {
             /*
              * If the plan servant does not yet exist in the result, then instantiate it and
              * add it to the result.
              */
-            planServantDebt = this._instantiatePlanServantDebt(planServant);
-            resultServants[key] = planServantDebt;
+            planServantRequirements = this._instantiatePlanServantRequirements(planServant);
+            resultServants[key] = planServantRequirements;
             /*
              * If it is an owned servant, make sure that the current enhancement values
              * match those from the master servant.
@@ -353,7 +382,7 @@ export class PlanComputationUtils {
                     // TODO Log warning to console
                     return undefined;
                 }
-                PlanServantUtils.updateEnhancements(planServantDebt.current, masterServant);
+                PlanServantUtils.updateEnhancements(planServantRequirements.current, masterServant);
             }
         } else {
             /*
@@ -362,13 +391,13 @@ export class PlanComputationUtils {
              * enhancements should be the new current, and the target values from the plan
              * should be the new target.
              */
-            PlanServantUtils.updateEnhancements(planServantDebt.current, planServantDebt.target);
-            PlanServantUtils.updateEnhancements(planServantDebt.target, planServant.target);
+            PlanServantUtils.updateEnhancements(planServantRequirements.current, planServantRequirements.target);
+            PlanServantUtils.updateEnhancements(planServantRequirements.target, planServant.target);
         }
 
-        const { current, target } = planServantDebt;
+        const { current, target } = planServantRequirements;
 
-        const materialDebtMap = this._computeMaterialDebtForServant(
+        const enhancementRequirements = this._computeServantRequirements(
             gameServant,
             current,
             current.costumes,
@@ -377,115 +406,86 @@ export class PlanComputationUtils {
             options
         );
 
-        return [planServantDebt, materialDebtMap];
+        return [planServantRequirements, enhancementRequirements];
     }
 
     private static _preProcessMasterAccount(masterAccount: Readonly<MasterAccount>): MasterAccountData {
         const servants = ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
-
         const items = ArrayUtils.mapArrayToObject(masterAccount.items, item => item.itemId, item => item.quantity);
-        items[GameItemConstants.QpItemId] = masterAccount.qp; // Add QP quantity to the map.
-
         const costumes = new Set(masterAccount.costumes);
+        const qp = masterAccount.qp;
 
-        return { servants, items, costumes };
+        return { servants, items, costumes, qp };
     }
 
     //#endregion
 
 
-    //#region computeMaterialDebtForServant + helper methods
+    //#region computeServantRequirements + helper methods
 
-    static computeMaterialDebtForServant(
+    static computeServantRequirements(
         gameServant: Readonly<GameServant>,
         currentEnhancements: ServantEnhancements,
         currentCostumes: ReadonlyArray<number>,
         options?: ComputationOptions
-    ): MaterialDebtMap;
+    ): EnhancementRequirements {
 
-    static computeMaterialDebtForServant(
-        gameServant: Readonly<GameServant>,
-        currentEnhancements: ServantEnhancements,
-        currentCostumes: ReadonlyArray<number>,
-        targetEnhancements: ServantEnhancements,
-        targetCostumes: ReadonlyArray<number>,
-        options?: ComputationOptions
-    ): MaterialDebtMap;
-
-    /**
-     * Method implementation
-     */
-    static computeMaterialDebtForServant(
-        gameServant: Readonly<GameServant>,
-        currentEnhancements: ServantEnhancements,
-        currentCostumes: ReadonlyArray<number>,
-        param4?: ServantEnhancements | ComputationOptions,
-        param5?: ReadonlyArray<number>,
-        param6?: ComputationOptions
-    ): MaterialDebtMap {
-        let targetEnhancements: ServantEnhancements;
-        let targetCostumes = undefined;
-        let options = undefined;
-        if (param4 === undefined || (param4 as any)['include']) {
-            targetEnhancements = this._defaultTargetEnhancements;
-            options = param4 as ComputationOptions | undefined;
-        } else {
-            targetEnhancements = param4 as ServantEnhancements;
-            targetCostumes = param5 as ReadonlyArray<number> | undefined;
-            options = param6;
-        }
-        return this._computeMaterialDebtForServant(
+        return this._computeServantRequirements(
             gameServant,
             currentEnhancements,
             currentCostumes,
-            targetEnhancements,
-            targetCostumes,
+            this._defaultTargetEnhancements,
+            undefined,
             options
         );
     }
 
-    private static _computeMaterialDebtForServant(
+    private static _computeServantRequirements(
         gameServant: Readonly<GameServant>,
         currentEnhancements: Readonly<ServantEnhancements>,
         currentCostumes: ReadonlyArray<number>,
         targetEnhancements: Readonly<ServantEnhancements>,
         targetCostumes?: ReadonlyArray<number>,
         options = this._defaultOptions
-    ): MaterialDebtMap {
+    ): EnhancementRequirements {
 
-        const { include, exclude } = options;
+        const { 
+            includeAscensions,
+            includeSkills,
+            includeAppendSkills,
+            includeCostumes,
+            excludeLores
+        } = options;
 
         /**
-         * The result map for the servant, instantiated with an entry for QP.
+         * The result data for the servant, instantiated with an entry for QP.
          */
-        const result: MaterialDebtMap = {
-            [GameItemConstants.QpItemId]: this._instantiateMaterialDebt()
-        };
+        const result = this._instantiateEnhancementRequirements();
 
-        if (include.skills) {
+        if (includeSkills) {
             this._updateResultForSkills(
                 result,
                 gameServant.skillMaterials,
                 currentEnhancements.skills,
                 targetEnhancements.skills,
                 'skills',
-                exclude?.lores
+                excludeLores
             );
         }
 
-        if (include.appendSkills) {
+        if (includeAppendSkills) {
             this._updateResultForSkills(
                 result,
                 gameServant.appendSkillMaterials,
                 currentEnhancements.appendSkills,
                 targetEnhancements.appendSkills,
                 'appendSkills',
-                exclude?.lores
+                excludeLores
             );
         }
 
         const targetAscension = targetEnhancements.ascension;
-        if (include.ascensions && targetAscension !== undefined) {
+        if (includeAscensions && targetAscension !== undefined) {
             if (gameServant.ascensionMaterials) {
                 for (const [key, ascension] of Object.entries(gameServant.ascensionMaterials)) {
                     const ascensionLevel = Number(key);
@@ -497,12 +497,13 @@ export class PlanComputationUtils {
                     if (currentAscension >= ascensionLevel || ascensionLevel > targetAscension) {
                         continue;
                     }
-                    this._updateResultForEnhancement(result, ascension, 'ascensions');
+                    this._updateEnhancementRequirementResult(result, ascension, 'ascensions');
                 }
             }
+            // TODO Compute ember requirements
         }
 
-        if (include.costumes) {
+        if (includeCostumes) {
             for (const [key, costume] of Object.entries(gameServant.costumes)) {
                 const costumeId = Number(key);
                 /*
@@ -512,7 +513,7 @@ export class PlanComputationUtils {
                 if (currentCostumes.includes(costumeId) || (targetCostumes && !targetCostumes.includes(costumeId))) {
                     continue;
                 }
-                this._updateResultForEnhancement(result, costume.materials, 'costumes');
+                this._updateEnhancementRequirementResult(result, costume.materials, 'costumes');
             }
         }
 
@@ -520,7 +521,7 @@ export class PlanComputationUtils {
     }
 
     private static _updateResultForSkills(
-        result: MaterialDebtMap,
+        result: EnhancementRequirements,
         skillMaterials: Readonly<GameServantSkillMaterials>,
         currentSkills: SkillEnhancements,
         targetSkills: SkillEnhancements,
@@ -556,33 +557,29 @@ export class PlanComputationUtils {
             if (skillUpgradeCount === 0) {
                 continue;
             }
-            this._updateResultForEnhancement(result, skill, skillType, skillUpgradeCount);
+            this._updateEnhancementRequirementResult(result, skill, skillType, skillUpgradeCount);
         }
     }
 
-    private static _updateResultForEnhancement(
-        result: MaterialDebtMap,
+    private static _updateEnhancementRequirementResult(
+        result: EnhancementRequirements,
         enhancement: GameServantEnhancement,
-        key: keyof MaterialDebt,
+        key: keyof ItemRequirements,
         enhancementCount = 1
     ): void {
         /*
          * Update material count.
          */
         for (const { itemId, quantity } of enhancement.materials) {
-            const itemCount = ObjectUtils.getOrDefault(result, itemId, this._instantiateMaterialDebt);
+            const itemCount = ObjectUtils.getOrDefault(result.items, itemId, this._instantiateItemRequirements);
             const total = quantity * enhancementCount;
             itemCount[key] += total;
             itemCount.total += total;
         }
         /*
-         * Also update QP count. Assumes that the QP entry is always present in the
-         * result map.
+         * Also update QP count.
          */
-        const qpCount = result[GameItemConstants.QpItemId];
-        const total = enhancement.qp * enhancementCount;
-        qpCount[key] += total;
-        qpCount.total += total;
+        result.qp += enhancement.qp * enhancementCount;
     }
 
     //#endregion
@@ -590,7 +587,7 @@ export class PlanComputationUtils {
 
     //#region Other helper methods
     
-    private static _addMaterialDebt(target: MaterialDebt, source: MaterialDebt): void {
+    private static _addItemRequirements(target: ItemRequirements, source: ItemRequirements): void {
         target.ascensions += source.ascensions;
         target.skills += source.skills;
         target.appendSkills += source.appendSkills;
@@ -598,34 +595,38 @@ export class PlanComputationUtils {
         target.total += source.total;
     }
 
-    private static _parseComputationOptionsFromPlan(plan: Readonly<Plan>): ComputationOptions {
-        return {
-            include: {
-                ...plan.enabled
-            }
-        };
-    }
+    private static _parseComputationOptions(data: Readonly<Plan> | Readonly<PlanServant>): ComputationOptions {
+        const {
+            ascensions,
+            skills,
+            appendSkills,
+            costumes
+        } = data.enabled;
 
-    private static _parseComputationOptionsFromPlanServant(planServant: Readonly<PlanServant>): ComputationOptions {
-        const { servant, ...include } = planServant.enabled;
         return {
-            include
+            includeAscensions: ascensions,
+            includeSkills: skills,
+            includeAppendSkills: appendSkills,
+            includeCostumes: costumes
         };
     }
 
     private static _mergeComputationOptions(a: ComputationOptions, b: ComputationOptions): ComputationOptions {
         return {
-            include: {
-                ascensions: a.include.ascensions && b.include.ascensions,
-                skills: a.include.skills && b.include.skills,
-                appendSkills: a.include.appendSkills && b.include.appendSkills,
-                costumes: a.include.costumes && b.include.costumes,
-            }
-            // TODO Add exclude
+            includeAscensions: a.includeAscensions && a.includeAscensions,
+            includeSkills: a.includeSkills && b.includeSkills,
+            includeAppendSkills: a.includeAppendSkills && b.includeAppendSkills,
+            includeCostumes: a.includeCostumes && b.includeCostumes,
+            excludeLores: a.excludeLores && b.excludeLores
         };
     }
 
-    private static _instantiateMaterialDebt(): MaterialDebt {
+    //#endregion
+
+
+    //#region Instantiation methods
+
+    private static _instantiateItemRequirements(): ItemRequirements {
         return {
             ascensions: 0,
             skills: 0,
@@ -635,7 +636,21 @@ export class PlanComputationUtils {
         };
     }
 
-    private static _instantiatePlanServantDebt(planServant: PlanServant): PlanServantDebt {
+    private static _instantiateEnhancementRequirements(): EnhancementRequirements {
+        return {
+            embers: {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0
+            },
+            items: {},
+            qp: 0
+        };
+    }
+
+    private static _instantiatePlanServantRequirements(planServant: PlanServant): PlanServantRequirements {
         const {
             type,
             gameId,
@@ -643,12 +658,12 @@ export class PlanComputationUtils {
             target
         } = planServant;
 
-        const result: PlanServantDebt = {
+        const result: PlanServantRequirements = {
             type,
             gameId,
             current: PlanServantUtils.cloneEnhancements(current),
             target: PlanServantUtils.cloneEnhancements(target),
-            materialDebt: {}
+            planRequirements: this._instantiateEnhancementRequirements()
         };
 
         if (type === PlanServantType.Owned) {
@@ -658,15 +673,15 @@ export class PlanComputationUtils {
         return result;
     }
 
-    private static _instantiatePlanDebt(): PlanDebt {
+    private static _instantiatePlanRequirements(): PlanRequirements {
         return {
             servants: {
                 [PlanServantType.Owned]: {},
                 [PlanServantType.Unowned]: {},
             },
-            planTotal: {},
+            targetPlan: this._instantiateEnhancementRequirements(),
             previousPlans: {},
-            groupTotal: {},
+            group: this._instantiateEnhancementRequirements(),
             itemDebt: {}
         };
     }

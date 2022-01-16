@@ -81,7 +81,7 @@ export const PlanRoute = React.memo(() => {
         }
     }, [forceUpdate, loadingIndicatorOverlayService]);
 
-    /**
+    /*
      * Initial load of plan data.
      */
     useEffect(() => {

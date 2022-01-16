@@ -7,12 +7,11 @@ import { GameItemThumbnail } from '../../../../components/game/item/game-item-th
 import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
 import { DataPointListItem } from '../../../../components/list/data-point-list-item.component';
-import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
-import { ComputationOptions, MaterialDebtMap, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
+import { ComputationOptions, EnhancementRequirements, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
 type Props = {
@@ -27,19 +26,15 @@ type Props = {
 const FormId = 'master-servant-info-panel-form';
 
 const generateComputationOptions = (showAppendSkills: boolean, includeLores: boolean): ComputationOptions => ({
-    include: {
-        ascensions: true,
-        skills: true,
-        appendSkills: showAppendSkills,
-        costumes: true
-    },
-    exclude: {
-        lores: !includeLores // TODO Add prop to toggle lores.
-    }
+    includeAscensions: true,
+    includeSkills: true,
+    includeAppendSkills: showAppendSkills,
+    includeCostumes: true,
+    excludeLores: !includeLores // TODO Add prop to toggle lores.
 });
 
-const hasDebt = (materialDebtMap: MaterialDebtMap): boolean => {
-    return materialDebtMap[GameItemConstants.QpItemId].total !== 0;
+const hasDebt = (enhancementRequirements: EnhancementRequirements): boolean => {
+    return enhancementRequirements.qp > 0;
 };
 
 const renderFouLevels = (activeServant: Readonly<MasterServant>): JSX.Element => {
@@ -197,13 +192,13 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
     const gameItemMap = useGameItemMap();
     const gameServantMap = useGameServantMap();
 
-    const [selectedServantsMaterialDebt, setSelectedServantsMaterialDebt] = useState<MaterialDebtMap>();
+    const [selectedServantsEnhancementRequirements, setSelectedServantsEnhancementRequirements] = useState<EnhancementRequirements>();
 
     useEffect(() => {
         if (!gameServantMap || !activeServants.length) {
-            setSelectedServantsMaterialDebt(undefined);
+            setSelectedServantsEnhancementRequirements(undefined);
         } else {
-            const selectedServantsMaterialDebt: MaterialDebtMap = {};
+            const results = [];
             for (const activeServant of activeServants) {
                 const servant = gameServantMap[activeServant.gameId];
                 if (!servant) {
@@ -211,15 +206,15 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 }
                 // TODO Add way to toggle lores
                 const computationOptions = generateComputationOptions(!!showAppendSkills, false);
-                const servantMaterialDebt = PlanComputationUtils.computeMaterialDebtForServant(
+                const result = PlanComputationUtils.computeServantRequirements(
                     servant,
                     activeServant,
                     unlockedCostumes,
                     computationOptions
                 );
-                PlanComputationUtils.addMaterialDebtMap(selectedServantsMaterialDebt, servantMaterialDebt);
+                results.push(result);
             }
-            setSelectedServantsMaterialDebt(selectedServantsMaterialDebt);
+            setSelectedServantsEnhancementRequirements(PlanComputationUtils.sumEnhancementRequirements(results));
         }
     }, [activeServants, gameServantMap, showAppendSkills, unlockedCostumes]);
 
@@ -250,13 +245,13 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         if (servant) {
             // TODO Add way to toggle lores
             const computationOptions = generateComputationOptions(!!showAppendSkills, false);
-            const servantMaterialDebt = PlanComputationUtils.computeMaterialDebtForServant(
+            const result = PlanComputationUtils.computeServantRequirements(
                 servant,
                 activeServant,
                 unlockedCostumes,
                 computationOptions
             );
-            setSelectedServantsMaterialDebt(servantMaterialDebt);
+            setSelectedServantsEnhancementRequirements(result);
         }
 
         onStatsChange && onStatsChange(data);
@@ -368,25 +363,25 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
     }, [activeServants, bondLevels, editMode, handleStatsChange, showAppendSkills, unlockedCostumes]);
 
     const servantMaterialDebtNode: ReactNode = useMemo(() => {
-        if (!selectedServantsMaterialDebt || !gameItemMap) {
+        if (!selectedServantsEnhancementRequirements || !gameItemMap) {
             return null;
         }
 
-        let servantMaterialList: ReactNode;
-        if (hasDebt(selectedServantsMaterialDebt)) {
+        let materialRequirementsList: ReactNode;
+        if (hasDebt(selectedServantsEnhancementRequirements)) {
+            const materialRequirementsEntries = Object.entries(selectedServantsEnhancementRequirements.items);
+            materialRequirementsList = materialRequirementsEntries.map(([key, requirements]): ReactNode => {
 
-            const servantMaterialStatEntries = Object.entries(selectedServantsMaterialDebt);
-            servantMaterialList = servantMaterialStatEntries.map(([key, stats]): ReactNode => {
+                const {
+                    ascensions,
+                    skills,
+                    appendSkills, 
+                    costumes,
+                    total
+                } = requirements;
+
                 const itemId = Number(key);
-                /*
-                 * Do not display QP in the panel...
-                 */
-                if (itemId === GameItemConstants.QpItemId) {
-                    return null;
-                }
-
                 const item = gameItemMap[itemId];
-                const { ascensions, skills, appendSkills, costumes, total } = stats;
 
                 const label = (
                     <div className={`${StyleClassPrefix}-material-stat-label`}>
@@ -420,14 +415,14 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                                 className={`${StyleClassPrefix}-material-stat`}
                                 label={label}
                                 labelWidth={MaterialLabelWidth}
-                                value={stats.total}
+                                value={requirements.total}
                             />
                         </div>
                     </Tooltip>
                 );
             });
         } else {
-            servantMaterialList = (
+            materialRequirementsList = (
                 <div className={`${StyleClassPrefix}-helper-text`}>
                     Servant is fully enhanced
                 </div>
@@ -440,11 +435,11 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                     Materials Needed
                 </div>
                 <div className={`${StyleClassPrefix}-material-stats-list`}>
-                    {servantMaterialList}
+                    {materialRequirementsList}
                 </div>
             </div>
         );
-    }, [gameItemMap, selectedServantsMaterialDebt]);
+    }, [gameItemMap, selectedServantsEnhancementRequirements]);
 
     const servantLinksNode: ReactNode = useMemo(() => {
         if (activeServants.length !== 1) {

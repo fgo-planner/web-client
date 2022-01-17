@@ -5,16 +5,16 @@ import { GameServantConstants } from '../../../constants';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 
 type Props = {
-    level: string;
-    ascension: string;
-    servant: Readonly<GameServant>;
-    variant?: BaseTextFieldProps['variant'];
-    formId: string;
-    label?: string;
-    name: string;
     allowEmpty?: boolean;
+    ascension: string;
     disabled?: boolean;
+    formId: string;
+    gameServant: Readonly<GameServant>;
+    label?: string;
+    level: string;
+    name: string;
     onChange: (name: string, level: string, ascension: string, pushChanges: boolean) => void;
+    variant?: BaseTextFieldProps['variant'];
 };
 
 const DefaultLabel = 'Ascension';
@@ -25,23 +25,23 @@ const DefaultLabel = 'Ascension';
 export const ServantAscensionInputField = React.memo((props: Props) => {
 
     const {
-        level,
-        ascension,
-        servant,
-        variant,
-        formId,
-        label,
-        name,
         allowEmpty,
+        ascension,
         disabled,
-        onChange
+        formId,
+        gameServant,
+        label,
+        level,
+        name,
+        onChange,
+        variant
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
         const { value } = event.target;
-        const updatedLevel = MasterServantUtils.roundToNearestValidLevel(Number(value), Number(level), servant);
+        const updatedLevel = MasterServantUtils.roundToNearestValidLevel(Number(value), Number(level), gameServant);
         onChange(name, String(updatedLevel), value, true);
-    }, [level, name, onChange, servant]);
+    }, [gameServant, level, name, onChange]);
 
     return (
         <FormControl variant={variant} fullWidth>

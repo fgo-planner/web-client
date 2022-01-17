@@ -6,15 +6,15 @@ import { FormUtils } from '../../../utils/form.utils';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 
 type Props = {
-    level: string;
-    ascension: string;
-    servant: Readonly<GameServant>;
-    variant?: BaseTextFieldProps['variant'];
-    label?: string;
-    name: string;
     allowEmpty?: boolean;
+    ascension: string;
     disabled?: boolean;
+    gameServant: Readonly<GameServant>;
+    label?: string;
+    level: string;
+    name: string;
     onChange: (name: string, level: string, ascension: string, pushChanges?: boolean) => void;
+    variant?: BaseTextFieldProps['variant'];
 };
 
 const DefaultLabel = 'Servant Level';
@@ -36,15 +36,15 @@ const transformLevelValue = (value: string): number => {
 export const ServantLevelInputField = React.memo((props: Props) => {
 
     const {
-        level,
-        ascension,
-        servant,
-        variant,
-        label,
-        name,
         allowEmpty,
+        ascension,
         disabled,
-        onChange
+        gameServant,
+        label,
+        level,
+        name,
+        onChange,
+        variant
     } = props;
 
     const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
@@ -62,9 +62,9 @@ export const ServantLevelInputField = React.memo((props: Props) => {
             return onChange(name, value, ascension, true);
         }
         const updatedLevel = transformLevelValue(value);
-        const updatedAscension = MasterServantUtils.roundToNearestValidAscensionLevel(updatedLevel, Number(ascension), servant);
+        const updatedAscension = MasterServantUtils.roundToNearestValidAscensionLevel(updatedLevel, Number(ascension), gameServant);
         onChange(name, String(updatedLevel), String(updatedAscension), true);
-    }, [allowEmpty, ascension, name, onChange, servant]);
+    }, [allowEmpty, ascension, gameServant, name, onChange]);
 
     return (
         <TextField

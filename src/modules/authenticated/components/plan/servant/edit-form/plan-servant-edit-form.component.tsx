@@ -1,4 +1,4 @@
-import { GameServant, MasterServant, PlanServant, PlanServantOwned, PlanServantType } from '@fgo-planner/types';
+import { GameServant, MasterServant, MasterServantAscensionLevel, MasterServantSkillLevel, PlanServant, PlanServantOwned, PlanServantType } from '@fgo-planner/types';
 import { Tab, Tabs } from '@mui/material';
 import { alpha, Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
@@ -6,8 +6,11 @@ import React, { ChangeEvent, FocusEvent, FormEvent, Fragment, ReactNode, Synthet
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { ServantAscensionInputField } from '../../../../../../components/input/servant/servant-ascension-input-field.component';
 import { ServantFouInputField } from '../../../../../../components/input/servant/servant-fou-input-field.component';
+import { ServantFouQuickToggleButtons } from '../../../../../../components/input/servant/servant-fou-quick-toggle-buttons.component';
 import { ServantLevelInputField } from '../../../../../../components/input/servant/servant-level-input-field.component';
+import { ServantLevelQuickToggleButtons } from '../../../../../../components/input/servant/servant-level-quick-toggle-buttons.component';
 import { ServantSkillInputField } from '../../../../../../components/input/servant/servant-skill-input-field.component';
+import { ServantSkillQuickToggleButtons } from '../../../../../../components/input/servant/servant-skill-quick-toggle-buttons.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { ComponentStyleProps } from '../../../../../../types/internal';
@@ -212,7 +215,7 @@ const convertToPlanServant = (formData: FormData): PlanServant => {
 };
 
 /**
- * Populates the "current fields" and 'instanceId` field in the `FormData` using
+ * Populates the 'current fields' and 'instanceId` field in the `FormData` using
  * values from the `MasterServant`.
  */
 const updateFormData = (formData: FormData, masterServant: Readonly<MasterServant>): void => {
@@ -245,6 +248,11 @@ const StyleProps = (theme: Theme) => ({
         borderStyle: 'solid',
         borderColor: alpha(theme.palette.text.primary, 0.23),
         borderRadius: 1
+    },
+    [`& .${StyleClassPrefix}-toggle-button-group`]: {
+        width: 128,
+        height: 56,
+        ml: 2
     },
     [`& .${StyleClassPrefix}-input-field-group`]: {
         display: 'flex',
@@ -282,7 +290,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
         className
     } = props;
 
-    const [servant, setServant] = useState<GameServant>();
+    const [gameServant, setGameServant] = useState<GameServant>();
     const [formData, setFormData] = useState<FormData>(() => convertToFormData(planServant));
     const [activeTab, setActiveTab] = useState<TabName>('target');
 
@@ -297,7 +305,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
         const formData = convertToFormData(planServant);
         const servant = gameServantMap[planServant.gameId];
         setFormData(formData);
-        setServant(servant);
+        setGameServant(servant);
     }, [gameServantMap, planServant]);
 
     const handleActiveTabChange = useCallback((event: SyntheticEvent, value: TabName) => {
@@ -335,7 +343,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
             }
             updateFormData(formData, masterServant);
         }
-        setServant(servant);
+        setGameServant(servant);
     }, [availableServants, formData, gameServantMap]);
 
     const handleInputChange = useCallback((name: string, value: string, pushChanges = false): void => {
@@ -365,6 +373,54 @@ export const PlanServantEditForm = React.memo((props: Props) => {
         forceUpdate();
     }, [formData, forceUpdate, pushStatsChange]);
 
+    const handleLevelQuickToggleClick = useCallback((level: number, ascension: MasterServantAscensionLevel): void => {
+        if (activeTab !== 'current' && activeTab !== 'target') {
+            return;
+        }
+        handleLevelAscensionInputChange(
+            activeTab,
+            String(level),
+            String(ascension),
+            true
+        );
+    }, [activeTab, handleLevelAscensionInputChange]);
+
+    const handleFouQuickToggleClick = useCallback((value: number): void => {
+        if (activeTab !== 'current' && activeTab !== 'target') {
+            return;
+        }
+        formData[`${activeTab}FouHp`] = String(value);
+        formData[`${activeTab}FouAtk`] = String(value);
+        pushStatsChange();
+        forceUpdate();
+    }, [activeTab, forceUpdate, formData, pushStatsChange]);
+
+    const handleSkillQuickToggleClick = useCallback((value: MasterServantSkillLevel | undefined, stat: 'skills' | 'appendSkills'): void => {
+        if (activeTab !== 'current' && activeTab !== 'target') {
+            return;
+        }
+        const skill = String(value || '');
+        const type = stat === 'skills' ? 'Skill' : 'AppendSkill';
+        let hasChanges = false;
+        if (formData[`${activeTab}${type}1`] !== skill) {
+            formData[`${activeTab}${type}1`] = skill;
+            hasChanges = true;
+        }
+        if (formData[`${activeTab}${type}2`] !== skill) {
+            formData[`${activeTab}${type}2`] = skill;
+            hasChanges = true;
+        }
+        if (formData[`${activeTab}${type}3`] !== skill) {
+            formData[`${activeTab}${type}3`]  = skill;
+            hasChanges = true;
+        }
+        if (!hasChanges) {
+            return;
+        }
+        pushStatsChange();
+        forceUpdate();
+    }, [activeTab, forceUpdate, formData, pushStatsChange]);
+
     const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>): void => {
         event.preventDefault();
         if (readonly || !onSubmit) {
@@ -375,7 +431,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
         onSubmit(event, data);
     }, [formData, readonly, onSubmit]);
 
-    if (!servant) {
+    if (!gameServant) {
         return null;
     }
 
@@ -386,19 +442,19 @@ export const PlanServantEditForm = React.memo((props: Props) => {
         // TODO Implement this
         tabsContentNode = null;
     } else {
-        
+
         const currentTabActive = activeTab === 'current';
-        const fieldDisabled = readonly || (formData.type === PlanServantType.Owned && currentTabActive);
+        const disabled = readonly || (formData.type === PlanServantType.Owned && currentTabActive);
 
         const levelField = (
             <ServantLevelInputField
                 level={currentTabActive ? formData.currentLevel : formData.targetLevel}
                 ascension={currentTabActive ? formData.currentAscension : formData.targetAscension}
-                servant={servant}
-                label='Servant Level'
+                gameServant={gameServant}
+                label='Level'
                 name={currentTabActive ? 'currentLevel' : 'targetLevel'}
                 onChange={handleLevelAscensionInputChange}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -406,12 +462,12 @@ export const PlanServantEditForm = React.memo((props: Props) => {
             <ServantAscensionInputField
                 level={currentTabActive ? formData.currentLevel : formData.targetLevel}
                 ascension={currentTabActive ? formData.currentAscension : formData.targetAscension}
-                servant={servant}
+                gameServant={gameServant}
                 formId={formId}
                 label='Ascension'
                 name={currentTabActive ? 'currentAscension' : 'targetAscension'}
                 onChange={handleLevelAscensionInputChange}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -422,7 +478,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                 name={currentTabActive ? 'currentFouHp' : 'targetFouHp'}
                 onChange={handleInputChange}
                 onBlur={handleInputBlurEvent}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -433,7 +489,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                 name={currentTabActive ? 'currentFouAtk' : 'targetFouAtk'}
                 onChange={handleInputChange}
                 onBlur={handleInputBlurEvent}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -445,7 +501,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                 name={currentTabActive ? 'currentSkill1' : 'targetSkill1'}
                 allowEmpty
                 onChange={handleInputChange}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -457,7 +513,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                 name={currentTabActive ? 'currentSkill2' : 'targetSkill2'}
                 allowEmpty
                 onChange={handleInputChange}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -469,7 +525,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                 name={currentTabActive ? 'currentSkill3' : 'targetSkill3'}
                 allowEmpty
                 onChange={handleInputChange}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -481,7 +537,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                 name={currentTabActive ? 'currentAppendSkill1' : 'targetAppendSkill1'}
                 allowEmpty
                 onChange={handleInputChange}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -493,7 +549,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                 name={currentTabActive ? 'currentAppendSkill2' : 'targetAppendSkill2'}
                 allowEmpty
                 onChange={handleInputChange}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -505,7 +561,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                 name={currentTabActive ? 'currentAppendSkill3' : 'targetAppendSkill3'}
                 allowEmpty
                 onChange={handleInputChange}
-                disabled={fieldDisabled}
+                disabled={disabled}
             />
         );
 
@@ -518,9 +574,14 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                     <InputFieldContainer>
                         {ascensionField}
                     </InputFieldContainer>
-                    <InputFieldContainer className='empty'>
-                        {/* Empty container for spacing purposes */}
-                    </InputFieldContainer>
+                    <ServantLevelQuickToggleButtons
+                        className={`${StyleClassPrefix}-toggle-button-group`}
+                        maxLevel={100}
+                        naturalMaxLevel={gameServant.maxLevel}
+                        onClick={handleLevelQuickToggleClick}
+                        ignoreTabNavigation
+                        disabled={disabled}
+                    />
                 </div>
                 <div className={`${StyleClassPrefix}-input-field-group`}>
                     <InputFieldContainer>
@@ -529,9 +590,12 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                     <InputFieldContainer>
                         {fouAtkField}
                     </InputFieldContainer>
-                    <InputFieldContainer className='empty'>
-                        {/* Empty container for spacing purposes */}
-                    </InputFieldContainer>
+                    <ServantFouQuickToggleButtons
+                        className={`${StyleClassPrefix}-toggle-button-group`}
+                        onClick={handleFouQuickToggleClick}
+                        ignoreTabNavigation
+                        disabled={disabled}
+                    />
                 </div>
                 <div className={`${StyleClassPrefix}-input-field-group`}>
                     <InputFieldContainer>
@@ -543,6 +607,13 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                     <InputFieldContainer>
                         {skill3Field}
                     </InputFieldContainer>
+                    <ServantSkillQuickToggleButtons
+                        className={`${StyleClassPrefix}-toggle-button-group`}
+                        stat='skills'
+                        onClick={handleSkillQuickToggleClick}
+                        ignoreTabNavigation
+                        disabled={disabled}
+                    />
                 </div>
                 {!showAppendSkills && (
                     <div className={`${StyleClassPrefix}-input-field-group`}>
@@ -555,6 +626,14 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                         <InputFieldContainer>
                             {appendSkill3Field}
                         </InputFieldContainer>
+                        <ServantSkillQuickToggleButtons
+                            className={`${StyleClassPrefix}-toggle-button-group`}
+                            stat='appendSkills'
+                            onClick={handleSkillQuickToggleClick}
+                            useClearValuesButton
+                            ignoreTabNavigation
+                            disabled={disabled}
+                        />
                     </div>
                 )}
             </Fragment>
@@ -578,7 +657,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
         <PlanServantEditFormAutocomplete
             availableServants={availableServants}
             selectedInstanceId={formData.instanceId}
-            selectedServant={servant}
+            selectedServant={gameServant}
             type={formData.type}
             onChange={handleSelectedServantChange}
             disabled={servantSelectDisabled || readonly}

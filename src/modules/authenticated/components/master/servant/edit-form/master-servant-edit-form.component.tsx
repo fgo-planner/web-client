@@ -192,8 +192,8 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         className
     } = props;
 
-    const [servant, setServant] = useState<GameServant>();
-    const [formData, setFormData] = useState<FormData>(() => convertToFormData(servant, masterServant, bondLevels, unlockedCostumes));
+    const [gameServant, setGameServant] = useState<GameServant>();
+    const [formData, setFormData] = useState<FormData>(() => convertToFormData(gameServant, masterServant, bondLevels, unlockedCostumes));
 
     const gameServantMap = useGameServantMap();
 
@@ -204,7 +204,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         const servant = gameServantMap[masterServant.gameId];
         const formData = convertToFormData(servant, masterServant, bondLevels, unlockedCostumes);
         setFormData(formData);
-        setServant(servant);
+        setGameServant(servant);
     }, [gameServantMap, masterServant, bondLevels, unlockedCostumes]);
 
     /**
@@ -232,7 +232,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
             formData.gameId = servantId;
             formData.bond = String(bondLevels[servantId] ?? '');
             formData.unlockedCostumes = generateUnlockedCostumesMap(servant, unlockedCostumes);
-            setServant(servant);
+            setGameServant(servant);
         }
     }, [formData, gameServantMap, bondLevels, unlockedCostumes]);
 
@@ -273,7 +273,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         onSubmit(event, data);
     }, [formData, readonly, onSubmit]);
 
-    if (!servant) {
+    if (!gameServant) {
         return null;
     }
 
@@ -291,7 +291,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         <ServantLevelInputField
             level={formData.level}
             ascension={formData.ascension}
-            servant={servant}
+            gameServant={gameServant}
             name='level'
             onChange={handleLevelAscensionInputChange}
             disabled={readonly}
@@ -302,7 +302,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         <ServantAscensionInputField
             level={formData.level}
             ascension={formData.ascension}
-            servant={servant}
+            gameServant={gameServant}
             formId={formId}
             name='ascension'
             onChange={handleLevelAscensionInputChange}
@@ -483,7 +483,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
      */
     const autocompleteField = (
         <MasterServantEditFormAutocomplete
-            selectedServant={servant}
+            selectedServant={gameServant}
             onChange={handleSelectedServantChange}
             disabled={servantSelectDisabled || readonly}
         />

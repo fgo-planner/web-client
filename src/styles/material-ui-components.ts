@@ -22,6 +22,16 @@ export const ComponentsOverrides: Components = {
             // }
         }
     },
+    MuiTab: {
+        styleOverrides: {
+            root: {
+                fontFamily: ThemeConstants.FontFamilyGoogleSans,
+                // fontSize: 16,
+                letterSpacing: '0.25px',
+                textTransform: 'none'
+            }
+        }
+    },
     MuiTypography: {
         styleOverrides: {
             h6: {

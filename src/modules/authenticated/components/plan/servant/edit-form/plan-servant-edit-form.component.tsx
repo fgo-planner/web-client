@@ -1,7 +1,8 @@
 import { GameServant, MasterServant, PlanServant, PlanServantOwned, PlanServantType } from '@fgo-planner/types';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Tab, Tabs } from '@mui/material';
+import { alpha, Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
-import React, { ChangeEvent, FocusEvent, FormEvent, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, FocusEvent, FormEvent, Fragment, ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { ServantAscensionInputField } from '../../../../../../components/input/servant/servant-ascension-input-field.component';
 import { ServantFouInputField } from '../../../../../../components/input/servant/servant-fou-input-field.component';
@@ -32,6 +33,8 @@ type Props = {
     servantSelectDisabled?: boolean;
     showAppendSkills?: boolean;
 } & Pick<ComponentStyleProps, 'className'>;
+
+type TabName = 'current' | 'target' | 'costumes'; // TODO Add costumes tab
 
 export type FormData = {
     type: PlanServantType;
@@ -66,6 +69,9 @@ export type FormData = {
     targetCostumes: number[];
 };
 
+/**
+ * Converts the given `PlanServant` into a `FormData` object.
+ */
 const convertToFormData = (planServant: PlanServant): FormData => {
     const {
         type,
@@ -109,11 +115,14 @@ const convertToFormData = (planServant: PlanServant): FormData => {
 
     if (type === PlanServantType.Owned) {
         formData.instanceId = (planServant as PlanServantOwned).instanceId;
-    } 
+    }
 
     return formData;
 };
 
+/**
+ * Converts the given `FormData` into a `PlanServant`.
+ */
 const convertToPlanServant = (formData: FormData): PlanServant => {
 
     const {
@@ -202,9 +211,41 @@ const convertToPlanServant = (formData: FormData): PlanServant => {
     return planServant;
 };
 
+/**
+ * Populates the "current fields" and 'instanceId` field in the `FormData` using
+ * values from the `MasterServant`.
+ */
+const updateFormData = (formData: FormData, masterServant: Readonly<MasterServant>): void => {
+    formData.instanceId = masterServant.instanceId;
+    formData.currentLevel = String(masterServant.level);
+    formData.currentAscension = String(masterServant.ascension);
+    formData.currentFouAtk = String(masterServant.fouAtk ?? '');
+    formData.currentFouHp = String(masterServant.fouHp ?? '');
+    formData.currentSkill1 = String(masterServant.skills[1]);
+    formData.currentSkill2 = String(masterServant.skills[2] || '');
+    formData.currentSkill3 = String(masterServant.skills[3] || '');
+    formData.currentAppendSkill1 = String(masterServant.appendSkills[1] || '');
+    formData.currentAppendSkill2 = String(masterServant.appendSkills[2] || '');
+    formData.currentAppendSkill3 = String(masterServant.appendSkills[3] || '');
+    // FIXME We have to get the costume data from master account somehow.
+};
+
 export const StyleClassPrefix = 'PlanServantEditForm';
 
 const StyleProps = (theme: Theme) => ({
+    [`& .${StyleClassPrefix}-tabs-container`]: {
+        mx: 4,
+        mt: -6
+    },
+    [`& .${StyleClassPrefix}-tabs-content-container`]: {
+        mx: 2,
+        px: 4,
+        pt: 8,
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: alpha(theme.palette.text.primary, 0.23),
+        borderRadius: 1
+    },
     [`& .${StyleClassPrefix}-input-field-group`]: {
         display: 'flex',
         flexWrap: 'nowrap',
@@ -243,12 +284,11 @@ export const PlanServantEditForm = React.memo((props: Props) => {
 
     const [servant, setServant] = useState<GameServant>();
     const [formData, setFormData] = useState<FormData>(() => convertToFormData(planServant));
+    const [activeTab, setActiveTab] = useState<TabName>('target');
 
     const gameServantMap = useGameServantMap();
 
     // TODO Might have to store the availableServants in a ref.
-
-    console.log(planServant)
 
     useEffect(() => {
         if (!gameServantMap) {
@@ -259,6 +299,10 @@ export const PlanServantEditForm = React.memo((props: Props) => {
         setFormData(formData);
         setServant(servant);
     }, [gameServantMap, planServant]);
+
+    const handleActiveTabChange = useCallback((event: SyntheticEvent, value: TabName) => {
+        setActiveTab(value);
+    }, []);
 
     /**
      * Notifies the parent component of stats change by invoking the `onStatsChange`
@@ -284,10 +328,15 @@ export const PlanServantEditForm = React.memo((props: Props) => {
         const servant = gameServantMap[gameId];
         formData.gameId = gameId;
         if (formData.type === PlanServantType.Owned) {
-            formData.instanceId = instanceId!;
+            const masterServant = availableServants?.find(servant => servant.gameId === gameId && servant.instanceId === instanceId);
+            if (!masterServant) {
+                // TODO Is this case possible?
+                return;
+            }
+            updateFormData(formData, masterServant);
         }
         setServant(servant);
-    }, [formData, gameServantMap]);
+    }, [availableServants, formData, gameServantMap]);
 
     const handleInputChange = useCallback((name: string, value: string, pushChanges = false): void => {
         FormUtils.assignValue(formData, name!!, value);
@@ -330,256 +379,194 @@ export const PlanServantEditForm = React.memo((props: Props) => {
         return null;
     }
 
-    //#region Current stat fields
+    //#region Tabs content
 
-    const currentLevelField = (
-        <ServantLevelInputField
-            level={formData.currentLevel}
-            ascension={formData.currentAscension}
-            servant={servant}
-            label='Current Level'
-            name='currentLevel'
-            onChange={handleLevelAscensionInputChange}
-            disabled={readonly}
-        />
-    );
+    let tabsContentNode: ReactNode;
+    if (activeTab === 'costumes') {
+        // TODO Implement this
+        tabsContentNode = null;
+    } else {
+        
+        const currentTabActive = activeTab === 'current';
+        const fieldDisabled = readonly || (formData.type === PlanServantType.Owned && currentTabActive);
 
-    const currentAscensionField = (
-        <ServantAscensionInputField
-            level={formData.currentLevel}
-            ascension={formData.currentAscension}
-            servant={servant}
-            formId={formId}
-            label='Current Ascension'
-            name='currentAscension'
-            onChange={handleLevelAscensionInputChange}
-            disabled={readonly}
-        />
-    );
+        const levelField = (
+            <ServantLevelInputField
+                level={currentTabActive ? formData.currentLevel : formData.targetLevel}
+                ascension={currentTabActive ? formData.currentAscension : formData.targetAscension}
+                servant={servant}
+                label='Servant Level'
+                name={currentTabActive ? 'currentLevel' : 'targetLevel'}
+                onChange={handleLevelAscensionInputChange}
+                disabled={fieldDisabled}
+            />
+        );
 
-    const currentFouHpField = (
-        <ServantFouInputField
-            value={formData.currentFouHp}
-            label='Current HP Fou'
-            name='currentFouHp'
-            onChange={handleInputChange}
-            onBlur={handleInputBlurEvent}
-            disabled={readonly}
-        />
-    );
+        const ascensionField = (
+            <ServantAscensionInputField
+                level={currentTabActive ? formData.currentLevel : formData.targetLevel}
+                ascension={currentTabActive ? formData.currentAscension : formData.targetAscension}
+                servant={servant}
+                formId={formId}
+                label='Ascension'
+                name={currentTabActive ? 'currentAscension' : 'targetAscension'}
+                onChange={handleLevelAscensionInputChange}
+                disabled={fieldDisabled}
+            />
+        );
 
-    const currentFouAtkField = (
-        <ServantFouInputField
-            value={formData.currentFouAtk}
-            label='Current ATK Fou'
-            name='currentFouAtk'
-            onChange={handleInputChange}
-            onBlur={handleInputBlurEvent}
-            disabled={readonly}
-        />
-    );
+        const fouHpField = (
+            <ServantFouInputField
+                value={currentTabActive ? formData.currentFouHp : formData.targetFouHp}
+                label='HP Fou'
+                name={currentTabActive ? 'currentFouHp' : 'targetFouHp'}
+                onChange={handleInputChange}
+                onBlur={handleInputBlurEvent}
+                disabled={fieldDisabled}
+            />
+        );
 
-    const currentSkill1Field = (
-        <ServantSkillInputField
-            value={formData.currentSkill1}
-            formId={formId}
-            label='Current Skill 1'
-            name='currentSkill1'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
+        const fouAtkField = (
+            <ServantFouInputField
+                value={currentTabActive ? formData.currentFouAtk : formData.targetFouAtk}
+                label='ATK Fou'
+                name={currentTabActive ? 'currentFouAtk' : 'targetFouAtk'}
+                onChange={handleInputChange}
+                onBlur={handleInputBlurEvent}
+                disabled={fieldDisabled}
+            />
+        );
 
-    const currentSkill2Field = (
-        <ServantSkillInputField
-            value={formData.currentSkill2}
-            formId={formId}
-            label='Current Skill 2'
-            name='currentSkill2'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
+        const skill1Field = (
+            <ServantSkillInputField
+                value={currentTabActive ? formData.currentSkill1 : formData.targetSkill1}
+                formId={formId}
+                label='Skill 1'
+                name={currentTabActive ? 'currentSkill1' : 'targetSkill1'}
+                allowEmpty
+                onChange={handleInputChange}
+                disabled={fieldDisabled}
+            />
+        );
 
-    const currentSkill3Field = (
-        <ServantSkillInputField
-            value={formData.currentSkill3}
-            formId={formId}
-            label='Current Skill 3'
-            name='currentSkill3'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
+        const skill2Field = (
+            <ServantSkillInputField
+                value={currentTabActive ? formData.currentSkill2 : formData.targetSkill2}
+                formId={formId}
+                label='Skill 2'
+                name={currentTabActive ? 'currentSkill2' : 'targetSkill2'}
+                allowEmpty
+                onChange={handleInputChange}
+                disabled={fieldDisabled}
+            />
+        );
 
-    const currentAppendSkill1Field = (
-        <ServantSkillInputField
-            value={formData.currentAppendSkill1}
-            formId={formId}
-            label='Current Append 1'
-            name='currentAppendSkill1'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
+        const skill3Field = (
+            <ServantSkillInputField
+                value={currentTabActive ? formData.currentSkill3 : formData.targetSkill3}
+                formId={formId}
+                label='Skill 3'
+                name={currentTabActive ? 'currentSkill3' : 'targetSkill3'}
+                allowEmpty
+                onChange={handleInputChange}
+                disabled={fieldDisabled}
+            />
+        );
 
-    const currentAppendSkill2Field = (
-        <ServantSkillInputField
-            value={formData.currentAppendSkill2}
-            formId={formId}
-            label='Current Append 2'
-            name='currentAppendSkill2'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
+        const appendSkill1Field = (
+            <ServantSkillInputField
+                value={currentTabActive ? formData.currentAppendSkill1 : formData.targetAppendSkill1}
+                formId={formId}
+                label='Append 1'
+                name={currentTabActive ? 'currentAppendSkill1' : 'targetAppendSkill1'}
+                allowEmpty
+                onChange={handleInputChange}
+                disabled={fieldDisabled}
+            />
+        );
 
-    const currentAppendSkill3Field = (
-        <ServantSkillInputField
-            value={formData.currentAppendSkill2}
-            formId={formId}
-            label='Current Append 3'
-            name='currentAppendSkill3'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
+        const appendSkill2Field = (
+            <ServantSkillInputField
+                value={currentTabActive ? formData.currentAppendSkill2 : formData.targetAppendSkill2}
+                formId={formId}
+                label='Append 2'
+                name={currentTabActive ? 'currentAppendSkill2' : 'targetAppendSkill2'}
+                allowEmpty
+                onChange={handleInputChange}
+                disabled={fieldDisabled}
+            />
+        );
 
-    //#endregion
+        const appendSkill3Field = (
+            <ServantSkillInputField
+                value={currentTabActive ? formData.currentAppendSkill3 : formData.targetAppendSkill3}
+                formId={formId}
+                label='Append 3'
+                name={currentTabActive ? 'currentAppendSkill3' : 'targetAppendSkill3'}
+                allowEmpty
+                onChange={handleInputChange}
+                disabled={fieldDisabled}
+            />
+        );
 
-
-    //#region Target stat fields
-
-    const targetLevelField = (
-        <ServantLevelInputField
-            level={formData.targetLevel}
-            ascension={formData.targetAscension}
-            servant={servant}
-            label='Target Level'
-            name='targetLevel'
-            onChange={handleLevelAscensionInputChange}
-            disabled={readonly}
-        />
-    );
-
-    const targetAscensionField = (
-        <ServantAscensionInputField
-            level={formData.targetLevel}
-            ascension={formData.targetAscension}
-            servant={servant}
-            formId={formId}
-            label='Target Ascension'
-            name='targetAscension'
-            onChange={handleLevelAscensionInputChange}
-            disabled={readonly}
-        />
-    );
-
-    const targetFouHpField = (
-        <ServantFouInputField
-            value={formData.targetFouHp}
-            label='Target HP Fou'
-            name='targetFouHp'
-            onChange={handleInputChange}
-            onBlur={handleInputBlurEvent}
-            disabled={readonly}
-        />
-    );
-
-    const targetFouAtkField = (
-        <ServantFouInputField
-            value={formData.targetFouAtk}
-            label='Target ATK Fou'
-            name='targetFouAtk'
-            onChange={handleInputChange}
-            onBlur={handleInputBlurEvent}
-            disabled={readonly}
-        />
-    );
-
-    const targetSkill1Field = (
-        <ServantSkillInputField
-            value={formData.targetSkill1}
-            formId={formId}
-            label='Target Skill 1'
-            name='targetSkill1'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
-
-    const targetSkill2Field = (
-        <ServantSkillInputField
-            value={formData.targetSkill2}
-            formId={formId}
-            label='Target Skill 2'
-            name='targetSkill2'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
-
-    const targetSkill3Field = (
-        <ServantSkillInputField
-            value={formData.targetSkill3}
-            formId={formId}
-            label='Target Skill 3'
-            name='targetSkill3'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
-
-    const targetAppendSkill1Field = (
-        <ServantSkillInputField
-            value={formData.targetAppendSkill1}
-            formId={formId}
-            label='Target Append 1'
-            name='targetAppendSkill1'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
-
-    const targetAppendSkill2Field = (
-        <ServantSkillInputField
-            value={formData.targetAppendSkill2}
-            formId={formId}
-            label='Target Append 2'
-            name='targetAppendSkill2'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
-
-    const targetAppendSkill3Field = (
-        <ServantSkillInputField
-            value={formData.targetAppendSkill2}
-            formId={formId}
-            label='Target Append 3'
-            name='targetAppendSkill3'
-            allowEmpty
-            onChange={handleInputChange}
-            disabled={readonly}
-        />
-    );
+        tabsContentNode = (
+            <Fragment>
+                <div className={`${StyleClassPrefix}-input-field-group`}>
+                    <InputFieldContainer>
+                        {levelField}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {ascensionField}
+                    </InputFieldContainer>
+                    <InputFieldContainer className='empty'>
+                        {/* Empty container for spacing purposes */}
+                    </InputFieldContainer>
+                </div>
+                <div className={`${StyleClassPrefix}-input-field-group`}>
+                    <InputFieldContainer>
+                        {fouHpField}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {fouAtkField}
+                    </InputFieldContainer>
+                    <InputFieldContainer className='empty'>
+                        {/* Empty container for spacing purposes */}
+                    </InputFieldContainer>
+                </div>
+                <div className={`${StyleClassPrefix}-input-field-group`}>
+                    <InputFieldContainer>
+                        {skill1Field}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {skill2Field}
+                    </InputFieldContainer>
+                    <InputFieldContainer>
+                        {skill3Field}
+                    </InputFieldContainer>
+                </div>
+                {!showAppendSkills && (
+                    <div className={`${StyleClassPrefix}-input-field-group`}>
+                        <InputFieldContainer>
+                            {appendSkill1Field}
+                        </InputFieldContainer>
+                        <InputFieldContainer>
+                            {appendSkill2Field}
+                        </InputFieldContainer>
+                        <InputFieldContainer>
+                            {appendSkill3Field}
+                        </InputFieldContainer>
+                    </div>
+                )}
+            </Fragment>
+        );
+    }
 
     //#endregion
 
 
     // Panel layout
     if (layout === 'panel') {
+        return null;
         // TODO Add panel layout
     }
 
@@ -611,6 +598,16 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                     <InputFieldContainer>
                         {autocompleteField}
                     </InputFieldContainer>
+                </div>
+                <div className={`${StyleClassPrefix}-tabs-container`}>
+                    <Tabs value={activeTab} onChange={handleActiveTabChange}>
+                        <Tab label='Current' value='current' />
+                        <Tab label='Target' value='target' />
+                        <Tab label='Costumes' value='costumes' disabled />
+                    </Tabs>
+                </div>
+                <div className={`${StyleClassPrefix}-tabs-content-container`}>
+                    {tabsContentNode}
                 </div>
             </Box>
         </form>

@@ -18,11 +18,10 @@ type Props = {
      */
     defaultType?: PlanServantType;
     dialogTitle?: string;
-    disableServantSelect?: boolean;
     masterServants: ReadonlyArray<MasterServant>;
     /**
-     * The plan servant to edit. If not provided, the dialog will instantiate a new
-     * servant of type `defaultType`.
+     * The planned servant to edit. If not provided, the dialog will instantiate a
+     * new servant of type `defaultType`.
      */
     planServant?: Readonly<PlanServant>;
     planServants: ReadonlyArray<PlanServant>;
@@ -90,7 +89,6 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
     const {
         defaultType,
         dialogTitle,
-        disableServantSelect,
         masterServants,
         planServant,
         planServants,
@@ -101,6 +99,10 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
         ...dialogProps
     } = props;
 
+    /**
+     * Whether the planned servant being edit is an existing one from the plan.
+     */
+    const [isExistingServant, setIsExistingServant] = useState<boolean>(!!planServant);
     const [availableServants, setAvailableServants] = useState<Array<MasterServant>>([]);
 
     const planServantRef = useRef<Readonly<PlanServant> | undefined>(planServant);
@@ -115,6 +117,11 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
             return;
         }
         planServantRef.current = planServant || instantiate(planServants, masterServants, defaultType);
+        setIsExistingServant(!!planServant);
+        /*
+         * Force update is needed here because if the value of `isExistingServant` was
+         * not changed, then it does not trigger a re-render.
+         */
         forceUpdate();
     }, [defaultType, forceUpdate, masterServants, planServant, planServants]);
 
@@ -124,6 +131,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
     useEffect(() => {
         const availableServants = PlanServantUtils.findAvailableMasterServants(planServants, masterServants);
         setAvailableServants(availableServants);
+        setIsExistingServant(!!planServant);
     }, [masterServants, planServant, planServants]);
 
     /**
@@ -171,7 +179,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
                         planServant={planServantRef.current}
                         availableServants={availableServants}
                         onSubmit={submit}
-                        servantSelectDisabled={disableServantSelect}
+                        servantSelectDisabled={isExistingServant}
                         showAppendSkills={showAppendSkills}
                     />
                 </DialogContent>

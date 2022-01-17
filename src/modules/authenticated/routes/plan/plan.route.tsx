@@ -11,6 +11,7 @@ import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { Nullable } from '../../../../types/internal';
+import { PlanComputationUtils, PlanRequirements } from '../../../../utils/plan/plan-computation.utils';
 import { PlanServantUtils } from '../../../../utils/plan/plan-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
@@ -43,16 +44,16 @@ export const PlanRoute = React.memo(() => {
     const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
     const planService = useInjectable(PlanService);
 
-    /**
-     * Whether the user has made any unsaved changes.
-     */
-    const [dirty, setDirty] = useState<boolean>(false); // TODO Rename this
+    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     /**
      * The plan data loaded from the backend. This should not be modified or used
      * anywhere in this route, except when reverting changes. Use `planRef` instead.
      */
     const [plan, setPlan] = useState<Plan>();
-    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
+    /**
+     * Whether the user has made any unsaved changes.
+     */
+    const [dirty, setDirty] = useState<boolean>(false); // TODO Rename this
 
     const [showAppendSkills, setShowAppendSkills] = useState<boolean>(false);
 
@@ -74,6 +75,8 @@ export const PlanRoute = React.memo(() => {
      */
     const planRef = useRef<Plan>();
 
+    const planRequirementsRef = useRef<PlanRequirements>();
+
     const gameServantMap = useGameServantMap();
 
     const resetLoadingIndicator = useCallback((): void => {
@@ -84,6 +87,27 @@ export const PlanRoute = React.memo(() => {
             forceUpdate();
         }
     }, [forceUpdate, loadingIndicatorOverlayService]);
+
+    const computePlanRequirements = useCallback(() => {
+        /*
+         * We don't have to actually check if `plan` is undefined here, because if
+         * `planRef.current` is undefined then so is `plan` (and vice versa), so we only
+         * have to check one of the two. However, we need to trigger a this hook when
+         * `plan` is loaded, so we check it here anyways so that we can add it as a hook
+         * dependency without eslint complaining.
+         */
+        if (!gameServantMap || !masterAccount || !plan || !planRef.current) {
+            return;
+        }
+        const planRequirements = PlanComputationUtils.computePlanRequirements(
+            gameServantMap,
+            masterAccount,
+            planRef.current
+            // TODO Add previous plans
+        );
+        planRequirementsRef.current = planRequirements;
+        // TODO Do we need to call forceUpdate here?
+    }, [gameServantMap, masterAccount, plan]);
 
     /*
      * Initial load of plan data.
@@ -119,13 +143,14 @@ export const PlanRoute = React.memo(() => {
                 if (!masterAccount || isSameAccount) {
                     // TODO Sanitize current plan against master account data.
                     setMasterAccount(account);
+                    computePlanRequirements();
                 } else {
                     navigate('/user/master/planner');
                 }
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [masterAccount, navigate]);
+    }, [computePlanRequirements, masterAccount, navigate]);
     
     /**
      * Sends plan update request to the back-end.
@@ -150,6 +175,7 @@ export const PlanRoute = React.memo(() => {
             planRef.current = clonePlan(updatedPlan);
             setPlan(updatedPlan);
             setDirty(false);
+            computePlanRequirements();
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);
@@ -159,7 +185,7 @@ export const PlanRoute = React.memo(() => {
         // updateSelectedServants();
         resetLoadingIndicator();
 
-    }, [loadingIndicatorOverlayService, plan, planService, resetLoadingIndicator]);
+    }, [computePlanRequirements, loadingIndicatorOverlayService, plan, planService, resetLoadingIndicator]);
 
     const handleSaveButtonClick = useCallback((): void => {
         updatePlan();
@@ -170,7 +196,8 @@ export const PlanRoute = React.memo(() => {
         planRef.current = clonePlan(plan!);
         // updateSelectedServants();
         setDirty(false);
-    }, [plan]);
+        computePlanRequirements();
+    }, [computePlanRequirements, plan]);
 
     const openEditServantDialog = useCallback((value: PlanServant | PlanServantType): void => {
         if (typeof value === 'object') {
@@ -238,8 +265,9 @@ export const PlanRoute = React.memo(() => {
 
         setDirty(true);
         closeEditServantDialog();
+        computePlanRequirements();
         // updateSelectedServants();
-    }, [closeEditServantDialog, editServantTarget]);
+    }, [closeEditServantDialog, computePlanRequirements, editServantTarget]);
 
     const editServantDialogTitle = useMemo((): string => {
         let action: string, type: PlanServantType;
@@ -273,9 +301,10 @@ export const PlanRoute = React.memo(() => {
     }, [deleteServantTarget, gameServantMap, masterAccount]);
 
     /*
-     * These can be undefined during the initial render. `plan` can also be
-     * undefined, but it is a redundant check because `planRef.current` would also
-     * be undefined.
+     * These can be undefined during the initial render.
+     *
+     * Note that if `planRef.current` is undefined, then `plan` would also be
+     * undefined (and vice versa), so we only need to check one of the two here.
      */
     if (!gameServantMap || !masterAccount || !planRef.current) {
         return null;

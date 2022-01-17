@@ -69,7 +69,7 @@ export type PlanServantRequirements = {
     /**
      * Requirements for enhancing the servant only for the target plan.
      */
-    planRequirements: EnhancementRequirements;
+    requirements: EnhancementRequirements;
 };
 
 /**
@@ -336,7 +336,7 @@ export class PlanComputationUtils {
              */
             let planRequirements: EnhancementRequirements;
             if (isTargetPlan) {
-                Object.assign(planServantRequirements.planRequirements.items, enhancementRequirements);
+                this.addEnhancementRequirements(planServantRequirements.requirements, enhancementRequirements);
                 planRequirements = result.targetPlan;
             } else {
                 planRequirements = ObjectUtils.getOrDefault(result.previousPlans, plan._id, this._instantiateEnhancementRequirements);
@@ -663,7 +663,7 @@ export class PlanComputationUtils {
             gameId,
             current: PlanServantUtils.cloneEnhancements(current),
             target: PlanServantUtils.cloneEnhancements(target),
-            planRequirements: this._instantiateEnhancementRequirements()
+            requirements: this._instantiateEnhancementRequirements()
         };
 
         if (type === PlanServantType.Owned) {

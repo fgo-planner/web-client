@@ -576,8 +576,7 @@ export const PlanServantEditForm = React.memo((props: Props) => {
                     </InputFieldContainer>
                     <ServantLevelQuickToggleButtons
                         className={`${StyleClassPrefix}-toggle-button-group`}
-                        maxLevel={100}
-                        naturalMaxLevel={gameServant.maxLevel}
+                        servantMaxLevel={gameServant.maxLevel}
                         onClick={handleLevelQuickToggleClick}
                         ignoreTabNavigation
                         disabled={disabled}

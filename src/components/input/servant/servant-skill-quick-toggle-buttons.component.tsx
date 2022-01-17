@@ -1,11 +1,11 @@
 import { MasterServantSkillLevel } from '@fgo-planner/types';
-import { AddBox as AddBoxIcon, IndeterminateCheckBoxOutlined as IndeterminateCheckBoxOutlinedIcon, Looks6Outlined as Looks6OutlinedIcon, LooksOneOutlined } from '@mui/icons-material';
-import { IconButton, Tooltip } from '@mui/material';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { IndeterminateCheckBoxOutlined as IndeterminateCheckBoxOutlinedIcon, LooksOneOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
 import React from 'react';
 import { GameServantConstants } from '../../../constants';
 import { ComponentStyleProps } from '../../../types/internal';
+import { NineOutlinedIcon, TenIcon } from '../../icons';
+import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
 
 type Props = {
     disabled?: boolean;
@@ -19,20 +19,7 @@ type Props = {
     useClearValuesButton?: boolean;
 } & Pick<ComponentStyleProps, 'className'>;
 
-const TooltipEnterDelay = 250;
-
-export const StyleClassPrefix = 'ServantSkillQuickToggleButtons';
-
-const StyleProps = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'nowrap',
-    width: 120,
-    '& .inverted': {
-        transform: 'rotate(180deg)'
-    }
-} as SystemStyleObject<Theme>;
+const StyleClassPrefix = 'ServantSkillQuickToggleButtons';
 
 /**
  * Buttons for quickly toggling a servant's skill levels to all 1's, 9's, or
@@ -49,54 +36,27 @@ export const ServantSkillQuickToggleButtons = React.memo((props: Props) => {
         className
     } = props;
 
-    const tabIndex = ignoreTabNavigation ? -1 : 0;
-
     return (
-        <Box className={clsx(`${StyleClassPrefix}-root`, className)} sx={StyleProps}>
-            {useClearValuesButton ? (
-                <Tooltip title='Clear all' enterDelay={TooltipEnterDelay}>
-                    <IconButton
-                        color='primary'
-                        onClick={() => onClick?.(undefined, stat)}
-                        tabIndex={tabIndex}
-                        disabled={disabled}
-                    >
-                        <IndeterminateCheckBoxOutlinedIcon />
-                    </IconButton>
-                </Tooltip>
-            ) : (
-                <Tooltip title={`Set all to ${GameServantConstants.MinSkillLevel}`} enterDelay={TooltipEnterDelay}>
-                    <IconButton
-                        color='primary'
-                        onClick={() => onClick?.(GameServantConstants.MinSkillLevel, stat)}
-                        tabIndex={tabIndex}
-                        disabled={disabled}
-                    >
-                        <LooksOneOutlined />
-                    </IconButton>
-                </Tooltip>
-            )}
-            <Tooltip title='Set all to 9' enterDelay={TooltipEnterDelay}>
-                <IconButton
-                    color='primary'
-                    onClick={() => onClick?.(9, stat)}
-                    tabIndex={tabIndex}
-                    disabled={disabled}
-                >
-                    <Looks6OutlinedIcon className='inverted' />
-                </IconButton>
-            </Tooltip>
-            <Tooltip title={`Set all to ${GameServantConstants.MaxSkillLevel}`} enterDelay={TooltipEnterDelay}>
-                <IconButton
-                    color='primary'
-                    onClick={() => onClick?.(GameServantConstants.MaxSkillLevel, stat)}
-                    tabIndex={tabIndex}
-                    disabled={disabled}
-                >
-                    <AddBoxIcon />
-                </IconButton>
-            </Tooltip>
-        </Box>
+        <ServantEnhancementQuickToggleButtons
+            className={clsx(`${StyleClassPrefix}-root`, className)}
+            ignoreTabNavigation={ignoreTabNavigation}
+            disabled={disabled}
+
+            // Left button
+            leftButtonIcon={useClearValuesButton ? <IndeterminateCheckBoxOutlinedIcon /> : <LooksOneOutlined />}
+            leftButtonTooltip={useClearValuesButton ? 'Clear all' : `Set all to ${GameServantConstants.MinSkillLevel}`}
+            onLeftButtonClick={() => onClick?.(useClearValuesButton ? undefined : GameServantConstants.MinSkillLevel, stat)}
+
+            // Center button
+            centerButtonIcon={<NineOutlinedIcon />}
+            centerButtonTooltip='Set all to 9'
+            onCenterButtonClick={() => onClick?.(9, stat)}
+
+            // Right button
+            rightButtonIcon={<TenIcon />}
+            rightButtonTooltip={`Set all to ${GameServantConstants.MaxSkillLevel}`}
+            onRightButtonClick={() => onClick?.(GameServantConstants.MaxSkillLevel, stat)}
+        />
     );
 
 });

@@ -1,10 +1,11 @@
-import { IndeterminateCheckBoxOutlined as IndeterminateCheckBoxOutlinedIcon, OneKOutlined as OneKOutlinedIcon, TwoK as TwoKIcon } from '@mui/icons-material';
-import { IconButton, Tooltip } from '@mui/material';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+/* eslint-disable no-unreachable */
+import { OneKOutlined as OneKOutlinedIcon, TwoK as TwoKIcon } from '@mui/icons-material';
 import clsx from 'clsx';
 import React from 'react';
 import { GameServantConstants } from '../../../constants';
 import { ComponentStyleProps } from '../../../types/internal';
+import { ZeroOutlinedIcon } from '../../icons';
+import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
 
 type Props = {
     disabled?: boolean;
@@ -12,17 +13,7 @@ type Props = {
     onClick?: (value: number) => void;
 } & Pick<ComponentStyleProps, 'className'>;
 
-const TooltipEnterDelay = 250;
-
-export const StyleClassPrefix = 'ServantFouQuickToggleButtons';
-
-const StyleProps = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'nowrap',
-    width: 120
-} as SystemStyleObject<Theme>;
+const StyleClassPrefix = 'ServantFouQuickToggleButtons';
 
 /**
  * Buttons for quickly toggling a servant's fou enhancement value to both 0,
@@ -37,41 +28,28 @@ export const ServantFouQuickToggleButtons = React.memo((props: Props) => {
         className
     } = props;
 
-    const tabIndex = ignoreTabNavigation ? -1 : 0;
-
     return (
-        <Box className={clsx(`${StyleClassPrefix}-root`, className)} sx={StyleProps}>
-            <Tooltip title={`Set both to ${GameServantConstants.MinFou}`} enterDelay={TooltipEnterDelay}>
-                <IconButton
-                    color='primary'
-                    onClick={() => onClick?.(GameServantConstants.MinFou)}
-                    tabIndex={tabIndex}
-                    disabled={disabled}
-                >
-                    <IndeterminateCheckBoxOutlinedIcon />
-                </IconButton>
-            </Tooltip>
-            <Tooltip title='Set both to 1000' enterDelay={TooltipEnterDelay}>
-                <IconButton
-                    color='primary'
-                    onClick={() => onClick?.(1000)}
-                    tabIndex={tabIndex}
-                    disabled={disabled}
-                >
-                    <OneKOutlinedIcon />
-                </IconButton>
-            </Tooltip>
-            <Tooltip title={`Set both to ${GameServantConstants.MaxFou}`} enterDelay={TooltipEnterDelay}>
-                <IconButton
-                    color='primary'
-                    onClick={() => onClick?.(GameServantConstants.MaxFou)}
-                    tabIndex={tabIndex}
-                    disabled={disabled}
-                >
-                    <TwoKIcon />
-                </IconButton>
-            </Tooltip>
-        </Box>
+        <ServantEnhancementQuickToggleButtons
+            className={clsx(`${StyleClassPrefix}-root`, className)}
+            ignoreTabNavigation={ignoreTabNavigation}
+            disabled={disabled}
+
+            // Left button
+            leftButtonIcon={<ZeroOutlinedIcon />}
+            leftButtonTooltip={`Set both to ${GameServantConstants.MinFou}`}
+            onLeftButtonClick={() => onClick?.(GameServantConstants.MinFou)}
+
+            // Center button
+            centerButtonIcon={<OneKOutlinedIcon />}
+            centerButtonTooltip='Set both to 1000'
+            onCenterButtonClick={() => onClick?.(1000)}
+
+            // Right button
+            rightButtonIcon={<TwoKIcon />}
+            rightButtonTooltip={`Set both to ${GameServantConstants.MaxFou}`}
+            onRightButtonClick={() => onClick?.(GameServantConstants.MaxFou)}
+
+        />
     );
 
 });

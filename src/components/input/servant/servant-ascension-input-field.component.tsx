@@ -2,14 +2,15 @@ import { GameServant } from '@fgo-planner/types';
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';
+import { Immutable } from '../../../types/internal';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 
 type Props = {
     allowEmpty?: boolean;
     ascension: string;
     disabled?: boolean;
-    formId: string;
-    gameServant: Readonly<GameServant>;
+    formId?: string;
+    gameServant: Immutable<GameServant>;
     label?: string;
     level: string;
     name: string;
@@ -43,12 +44,14 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
         onChange(name, String(updatedLevel), value, true);
     }, [gameServant, level, name, onChange]);
 
+    const fieldId = formId ? `${formId}-${name}` : name;
+
     return (
         <FormControl variant={variant} fullWidth>
             <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
-                id={`${formId}-${name}`}
+                id={fieldId}
                 name={name}
                 label={label || DefaultLabel}
                 value={ascension}

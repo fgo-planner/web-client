@@ -9,6 +9,8 @@ export * from './game/servant/game-servant-map.type';
 export * from './game/soundtrack/game-soundtrack-list.type';
 export * from './generics/cache-array.type';
 export * from './generics/cache-map.type';
+export * from './generics/immutable-array.type';
+export * from './generics/immutable.type';
 export * from './generics/nullable.type';
 export * from './generics/optional.type';
 export * from './generics/readonly-partial-array.type';

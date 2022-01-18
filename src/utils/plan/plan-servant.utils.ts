@@ -1,10 +1,19 @@
-import { GameServant, MasterServant, MasterServantAscensionLevel, PlanServant, PlanServantEnhancements, PlanServantOwned, PlanServantType } from '@fgo-planner/types';
+import { GameServant, MasterServant, MasterServantAscensionLevel, PlanServant, PlanServantEnhancements, PlanServantOwned, PlanServantType, PlanServantUnowned } from '@fgo-planner/types';
+import { Immutable, ImmutableArray } from '../../types/internal';
 import { MasterServantUtils } from '../master/master-servant.utils';
 
 export class PlanServantUtils {
 
     /**
-     * Instantiates a default `PlanServant` object.
+     * Instantiates a default `PlanServantOwned` object.
+     */
+    static instantiate(gameId: number): PlanServantUnowned;
+    /**
+     * Instantiates a default `PlanServantOwned` object.
+     */
+    static instantiate(gameId: number, instanceId: number): PlanServantOwned;
+    /**
+     * Method implementation
      */
     static instantiate(gameId: number, instanceId?: number): PlanServant {
 
@@ -82,7 +91,7 @@ export class PlanServantUtils {
      * Updates the current enhancements of the given `PlanServant` with the data
      * from the given `MasterServant`. Does not populate the `costumes` field.
      */
-    static updateCurrentEnhancements(planServant: PlanServant, masterServant: MasterServant): void {
+    static updateCurrentEnhancements(planServant: PlanServant, masterServant: Immutable<MasterServant>): void {
         this.updateEnhancements(planServant.current, masterServant);
     }
 
@@ -90,7 +99,7 @@ export class PlanServantUtils {
      * Updates the given `PlanServantEnhancements` with the values from the given
      * `MasterServant`.
      */
-    static updateEnhancements(enhancements: PlanServantEnhancements, masterServant: MasterServant): void;
+    static updateEnhancements(enhancements: PlanServantEnhancements, masterServant: Immutable<MasterServant>): void;
     /**
      * Updates the target `PlanServantEnhancements` with the values from the source
      * `PlanServantEnhancements`.
@@ -99,7 +108,7 @@ export class PlanServantUtils {
     /**
      * Method implementation
      */
-    static updateEnhancements(target: PlanServantEnhancements, source: MasterServant | PlanServantEnhancements): void {
+    static updateEnhancements(target: PlanServantEnhancements, source: Immutable<MasterServant> | PlanServantEnhancements): void {
         target.level = source.level;
         target.ascension = source.ascension;
         target.fouHp = source.fouHp;
@@ -112,17 +121,36 @@ export class PlanServantUtils {
         target.appendSkills[3] = source.appendSkills[3];
     }
 
-
     /**
      * Returns an array of `MasterServant` that have not been added to the plan.
      */
-    static findAvailableMasterServants(
-        planServants: ReadonlyArray<PlanServant>,
-        masterServants: ReadonlyArray<MasterServant>
-    ): Array<MasterServant> {
-        const ownedPlanServants = planServants.filter(servant => servant.type === PlanServantType.Owned);
-        const ownedPlanServantIds = new Set(ownedPlanServants.map(servant => (servant as PlanServantOwned).instanceId));
+    static findAvailableOwnedServants(
+        planServants: ImmutableArray<PlanServant>,
+        masterServants: ImmutableArray<MasterServant>
+    ): Array<Immutable<MasterServant>> {
+        const ownedPlanServantIds = new Set<number>();
+        for (const planServant of planServants) {
+            if (planServant.type === PlanServantType.Owned) {
+                ownedPlanServantIds.add((planServant as PlanServantOwned).instanceId);
+            }
+        }
         return masterServants.filter(servant => !ownedPlanServantIds.has(servant.instanceId));
+    }
+
+    /**
+     * Returns an array of `GameServant` that have not been added to the plan.
+     */
+    static findAvailableUnownedServants(
+        planServants: ImmutableArray<PlanServant>,
+        gameServants: ImmutableArray<GameServant>
+    ): Array<Immutable<GameServant>> {
+        const unownedPlanServantIds = new Set<number>();
+        for (const planServant of planServants) {
+            if (planServant.type === PlanServantType.Unowned) {
+                unownedPlanServantIds.add(planServant.gameId);
+            }
+        }
+        return gameServants.filter(servant => !unownedPlanServantIds.has(servant._id));
     }
 
     /**

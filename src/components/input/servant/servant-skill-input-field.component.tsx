@@ -5,7 +5,7 @@ import { GameServantConstants } from '../../../constants';
 type Props = {
     value: string;
     variant?: BaseTextFieldProps['variant'];
-    formId: string;
+    formId?: string;
     label?: string;
     name: string;
     allowEmpty?: boolean;
@@ -36,12 +36,14 @@ export const ServantSkillInputField = React.memo((props: Props) => {
         onChange(name, value, true);
     }, [onChange]);
 
+    const fieldId = formId ? `${formId}-${name}` : name;
+
     return (
         <FormControl variant={variant} fullWidth>
             <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
-                id={`${formId}-${name}`}
+                id={fieldId}
                 name={name}
                 label={label || DefaultLabel}
                 value={value}

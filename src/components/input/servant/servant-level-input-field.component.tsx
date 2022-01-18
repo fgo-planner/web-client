@@ -2,6 +2,7 @@ import { GameServant } from '@fgo-planner/types';
 import { BaseTextFieldProps, InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';
+import { Immutable } from '../../../types/internal';
 import { FormUtils } from '../../../utils/form.utils';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 
@@ -9,7 +10,7 @@ type Props = {
     allowEmpty?: boolean;
     ascension: string;
     disabled?: boolean;
-    gameServant: Readonly<GameServant>;
+    gameServant: Immutable<GameServant>;
     label?: string;
     level: string;
     name: string;

@@ -1,29 +1,35 @@
-import { GameServant, MasterServant, PlanServantType } from '@fgo-planner/types';
+import { GameServant, PlanServantType } from '@fgo-planner/types';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
-import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
-import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
+import { GameServantClassIcon } from '../../../../../components/game/servant/game-servant-class-icon.component';
+import { useGameServantMap } from '../../../../../hooks/data/use-game-servant-map.hook';
+import { ImmutableArray } from '../../../../../types/internal';
+import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
 type ChangeValue = {
     gameId: number;
     instanceId?: number;
 };
 
+type AvailableServant = {
+    gameId: number;
+    instanceId?: number;
+};
+
 type Props = {
-    availableServants?: ReadonlyArray<MasterServant>;
+    availableServants?: ImmutableArray<AvailableServant>;
     disabled?: boolean;
     onChange?: (event: ChangeEvent<{}>, value: ChangeValue) => void;
     /**
-     * The `instanceId` of the currently selected servant, if it is an owned
-     * servant. Must not be undefined if `type` is `Owned`.
+     * The `gameId` of the selected planned servant.
+     */
+    selectedGameId: number;
+    /**
+     * The `instanceId` of the selected planned servant. Must be provided for owned
+     * servants, and `undefined` for unowned servants.
      */
     selectedInstanceId?: number;
-    /**
-     * The `GameServant` data of the currently selected servant.
-     */
-    selectedServant: Readonly<GameServant>;
     size?: 'small' | 'medium';
     type: PlanServantType;
 };
@@ -100,41 +106,36 @@ const renderInput = (params: any): ReactNode => {
     return <TextField {...params} label='Servant' variant='outlined' />;
 };
 
-export const PlanServantEditFormAutocomplete = React.memo((props: Props) => {
+export const PlanServantSelectAutocomplete = React.memo((props: Props) => {
     
     const {
         availableServants,
         disabled,
         onChange,
+        selectedGameId,
         selectedInstanceId,
-        selectedServant,
-        size,
-        type
+        size
     } = props;
 
     const gameServantMap = useGameServantMap();
 
     const options = useMemo((): ReadonlyArray<ServantOption> => {
-        if (!gameServantMap) {
+        if (!gameServantMap || !availableServants?.length) {
             return [];
         }
-        if (type === PlanServantType.Owned) {
-            if (!availableServants) {
-                return [];
-            }
-            return availableServants.map(({ gameId, instanceId }) => {
-                const servant = gameServantMap[gameId];
-                return generateServantOption(servant, instanceId);
-            });
-        } else {
-            // TODO Add option to hide servants that are already added/owned.
-            return Object.values(gameServantMap).map(servant => generateServantOption(servant));
-        }
-    }, [availableServants, gameServantMap, type]);
+        return availableServants.map(({ gameId, instanceId }) => {
+            const servant = gameServantMap[gameId];
+            return generateServantOption(servant, instanceId);
+        });
+    }, [availableServants, gameServantMap]);
 
-    const selectedOption = useMemo((): ServantOption => {
-        return generateServantOption(selectedServant, selectedInstanceId);
-    }, [selectedInstanceId, selectedServant]);
+    const selectedOption = useMemo((): ServantOption | undefined => {
+        if (!gameServantMap) {
+            return undefined;
+        }
+        const gameServant = gameServantMap[selectedGameId];
+        return generateServantOption(gameServant, selectedInstanceId);
+    }, [gameServantMap, selectedGameId, selectedInstanceId]);
 
     const handleChange = useCallback((event: ChangeEvent<{}>, value: ServantOption | null): void => {
         if (value === null) {
@@ -146,7 +147,14 @@ export const PlanServantEditFormAutocomplete = React.memo((props: Props) => {
         onChange && onChange(event, { gameId, instanceId });
     }, [onChange]);
 
-    if (disabled) {
+    /*
+     * This can be undefined during the initial render.
+     */
+    if (!selectedOption) {
+        return null;
+    }  
+
+    if (disabled || !options.length) {
         return (
             <TextField
                 variant='outlined'

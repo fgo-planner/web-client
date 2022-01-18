@@ -1,5 +1,5 @@
 /* eslint-disable no-unreachable */
-import { OneKOutlined as OneKOutlinedIcon, TwoK as TwoKIcon } from '@mui/icons-material';
+import { OneKOutlined as OneKOutlinedIcon, TwoKOutlined as TwoKOutlinedIcon } from '@mui/icons-material';
 import clsx from 'clsx';
 import React from 'react';
 import { GameServantConstants } from '../../../constants';
@@ -45,7 +45,7 @@ export const ServantFouQuickToggleButtons = React.memo((props: Props) => {
             onCenterButtonClick={() => onClick?.(1000)}
 
             // Right button
-            rightButtonIcon={<TwoKIcon />}
+            rightButtonIcon={<TwoKOutlinedIcon />}
             rightButtonTooltip={`Set both to ${GameServantConstants.MaxFou}`}
             onRightButtonClick={() => onClick?.(GameServantConstants.MaxFou)}
 

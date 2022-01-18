@@ -132,7 +132,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
         setAvailableServants(availableServants);
     }, [gameServantMap, masterServants, planServant, planServants]);
 
-    //#region Event callback handlers
+    //#region Input event handlers
 
     const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: { gameId: number, instanceId?: number }): void => {
         if (!gameServantMap || servantSelectDisabled) {

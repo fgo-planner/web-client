@@ -1,6 +1,7 @@
 import { GameServant, MasterServantAscensionLevel, MasterServantSkillLevel, PlanServant, PlanServantEnhancements, PlanServantType } from '@fgo-planner/types';
+import { Checkbox, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { FocusEvent, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, FocusEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { ServantAscensionInputField } from '../../../../../../components/input/servant/servant-ascension-input-field.component';
 import { ServantFouInputField } from '../../../../../../components/input/servant/servant-fou-input-field.component';
@@ -28,6 +29,8 @@ type Props = {
     showAppendSkills?: boolean;
 };
 
+const TooltipEnterDelay = 250;
+
 const StyleClassPrefix = 'PlanServantEditEnhancementsTabContent';
 
 const StyleProps = (theme: Theme) => ({
@@ -41,6 +44,13 @@ const StyleProps = (theme: Theme) => ({
         flexWrap: 'nowrap',
         [theme.breakpoints.down('sm')]: {
             flexWrap: 'wrap'
+        },
+        [`& .${StyleClassPrefix}-checkbox-container`]: {
+            display: 'flex',
+            alignItems: 'center',
+            width: 42,
+            height: 56,
+            ml: -1
         },
         [`& .${InputFieldContainerStyleClassPrefix}-root`]: {
             flex: 1,
@@ -86,6 +96,16 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         // TODO Implement this
         onChange?.(planServant);
     }, [onChange, planServant]);
+
+
+    //#region Input event handlers
+
+    const handleEnableCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
+        const { name, checked } = event.target;
+        (planServant.enabled as any)[name] = checked;
+        pushStatsChange();
+        forceUpdate();
+    }, [forceUpdate, planServant, pushStatsChange]);
 
     const handleLevelAscensionInputChange = useCallback((name: string, level: string, ascension: string, pushChanges = false): void => {
         enhancements.level = Number(level);
@@ -155,7 +175,55 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         forceUpdate();
     }, [enhancements, forceUpdate, pushStatsChange]);
 
-    const disabled = readonly || (planServant.type === PlanServantType.Owned && enhancementSet === 'current');
+    //#endregion
+
+
+    //#region Input fields
+
+    const { enabled, type } = planServant;
+    const disabled = readonly || (type === PlanServantType.Owned && enhancementSet === 'current');
+
+    const enableAscensionsCheckbox = (
+        <Tooltip
+            title={`Ascensions/levels ${enabled.ascensions ? 'enabled' : 'disabled'}`}
+            enterDelay={TooltipEnterDelay}
+        >
+            <Checkbox
+                name='ascensions'
+                checked={enabled.ascensions}
+                onChange={handleEnableCheckboxChange}
+                disabled={disabled}
+            />
+        </Tooltip>
+    );
+
+    const enableSkillsCheckbox = (
+        <Tooltip
+            title={`Ascensions/levels ${enabled.skills ? 'enabled' : 'disabled'}`}
+            enterDelay={TooltipEnterDelay}
+        >
+            <Checkbox
+                name='skills'
+                checked={enabled.skills}
+                onChange={handleEnableCheckboxChange}
+                disabled={disabled}
+            />
+        </Tooltip>
+    );
+
+    const enableAppendSkillsCheckbox = (
+        <Tooltip
+            title={`Ascensions/levels ${enabled.appendSkills ? 'enabled' : 'disabled'}`}
+            enterDelay={TooltipEnterDelay}
+        >
+            <Checkbox
+                name='appendSkills'
+                checked={enabled.appendSkills}
+                onChange={handleEnableCheckboxChange}
+                disabled={disabled}
+            />
+        </Tooltip>
+    );
 
     const levelField = (
         <ServantLevelInputField
@@ -269,9 +337,17 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         />
     );
 
+    //#endregion
+
+
+    //#region Main component rendering
+
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-input-field-group`}>
+                <div className={`${StyleClassPrefix}-checkbox-container`}>
+                    {enableAscensionsCheckbox}
+                </div>
                 <InputFieldContainer>
                     {levelField}
                 </InputFieldContainer>
@@ -287,6 +363,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                 />
             </div>
             <div className={`${StyleClassPrefix}-input-field-group`}>
+                <div className={`${StyleClassPrefix}-checkbox-container`}>
+                    {/* TODO Add a flag to enable/disable fous */}
+                    <Checkbox />
+                </div>
                 <InputFieldContainer>
                     {fouHpField}
                 </InputFieldContainer>
@@ -301,6 +381,9 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                 />
             </div>
             <div className={`${StyleClassPrefix}-input-field-group`}>
+                <div className={`${StyleClassPrefix}-checkbox-container`}>
+                    {enableSkillsCheckbox}
+                </div>
                 <InputFieldContainer>
                     {skill1Field}
                 </InputFieldContainer>
@@ -320,6 +403,9 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             </div>
             {showAppendSkills && (
                 <div className={`${StyleClassPrefix}-input-field-group`}>
+                    <div className={`${StyleClassPrefix}-checkbox-container`}>
+                        {enableAppendSkillsCheckbox}
+                    </div>
                     <InputFieldContainer>
                         {appendSkill1Field}
                     </InputFieldContainer>

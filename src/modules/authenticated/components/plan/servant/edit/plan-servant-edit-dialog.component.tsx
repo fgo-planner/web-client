@@ -26,11 +26,13 @@ type Props = {
     unlockedCostumes: Array<number>;
 } & Omit<DialogComponentProps<DialogData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
 
-const DialogWidth = 600;
+const DialogWidth = 640;
 
 const DialogPaperProps = {
     style: {
-        width: DialogWidth
+        width: DialogWidth,
+        maxWidth: DialogWidth,
+        margin: 0
     }
 } as PaperProps;
 

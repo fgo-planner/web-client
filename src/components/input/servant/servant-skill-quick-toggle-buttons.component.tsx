@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { GameServantConstants } from '../../../constants';
 import { ComponentStyleProps } from '../../../types/internal';
-import { NineOutlinedIcon, TenIcon } from '../../icons';
+import { NineOutlinedIcon, TenOutlinedIcon } from '../../icons';
 import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
 
 type Props = {
@@ -53,7 +53,7 @@ export const ServantSkillQuickToggleButtons = React.memo((props: Props) => {
             onCenterButtonClick={() => onClick?.(9, stat)}
 
             // Right button
-            rightButtonIcon={<TenIcon />}
+            rightButtonIcon={<TenOutlinedIcon />}
             rightButtonTooltip={`Set all to ${GameServantConstants.MaxSkillLevel}`}
             onRightButtonClick={() => onClick?.(GameServantConstants.MaxSkillLevel, stat)}
         />

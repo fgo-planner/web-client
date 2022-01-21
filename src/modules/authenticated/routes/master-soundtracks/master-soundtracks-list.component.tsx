@@ -3,8 +3,7 @@ import { alpha, Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { GameSoundtrackList } from '../../../../services/data/game/game-soundtrack.service';
-import { Nullable } from '../../../../types/internal';
+import { GameSoundtrackList, Nullable } from '../../../../types/internal';
 import { MasterSoundtracksListRow, StyleClassPrefix as MasterSoundtracksListRowStyleClassPrefix } from './master-soundtracks-list-row.component';
 
 type Props = {

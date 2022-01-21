@@ -3,13 +3,8 @@ import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
-import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
+import { useGameServantList } from '../../../../../../hooks/data/use-game-servant-list.hook';
 import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
-
-type ServantOption = Readonly<{
-    label: string,
-    servant: Readonly<GameServant>
-}>;
 
 type Props = {
     selectedServant: GameServant;
@@ -17,6 +12,11 @@ type Props = {
     disabled?: boolean;
     onChange?: (event: ChangeEvent<{}>, value: Readonly<GameServant>) => void;
 };
+
+type ServantOption = Readonly<{
+    label: string;
+    servant: Readonly<GameServant>;
+}>;
 
 const optionStyles = {
     root: {
@@ -45,14 +45,11 @@ const filterOptions = (options: Array<ServantOption>, state: FilterOptionsState<
     if (!inputValue) {
         return options;
     }
-    const servants = options.map(o => o.servant);
-    return GameServantUtils
-        .filterServants(inputValue, servants)
-        .map(generateServantOption);
+    return GameServantUtils.filterServants(inputValue, options, o => o.servant);
 };
 
 const isOptionSelected = (option: Readonly<ServantOption>, value: Readonly<ServantOption>): boolean => {
-    return option.label === value.label;
+    return option.servant._id === value.servant._id;
 };
 
 const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: Readonly<ServantOption>): ReactNode => {
@@ -89,20 +86,14 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
         onChange
     } = props;
 
-    // const gameServantList = useGameServantList();
-
-    const gameServantMap = useGameServantMap();
+    const gameServantList = useGameServantList();
 
     const options = useMemo((): ReadonlyArray<ServantOption> => {
-        const options: Array<ServantOption> = [];
-        if (!gameServantMap) {
-            return options;
+        if (!gameServantList) {
+            return [];
         }
-        for (const servant of Object.values(gameServantMap)) {
-            options.push(generateServantOption(servant));
-        }
-        return options;
-    }, [gameServantMap]);
+        return gameServantList.map(generateServantOption);
+    }, [gameServantList]);
 
     const selectedOption = useMemo((): ServantOption | undefined => {
         if (!selectedServant) {
@@ -116,7 +107,7 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
             // Is this case even possible?
             return;
         }
-        onChange && onChange(event, value.servant);
+        onChange?.(event, value.servant);
     }, [onChange]);
 
     if (disabled) {

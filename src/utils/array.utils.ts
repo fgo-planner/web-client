@@ -1,5 +1,33 @@
 export class ArrayUtils {
 
+    static mapArrayToObject<T, K extends string | number | symbol>(
+        arr: Array<T>, 
+        keyFunc: (elem: T) => K
+    ): Record<K, T>;
+
+    static mapArrayToObject<T, K extends string | number | symbol, V>(
+        arr: Array<T>, 
+        keyFunc: (elem: T) => K,
+        valueFunc: (elem: T) => V
+    ): Record<K, V>;
+
+    static mapArrayToObject<T, K extends string | number | symbol, V>(
+        arr: Array<T>, 
+        keyFunc: (elem: T) => K,
+        valueFunc?: (elem: T) => V
+    ): Record<K, T | V> {
+        const result = {} as Record<K, T | V>;
+        for (const elem of arr) {
+            const key = keyFunc(elem);
+            if (valueFunc) {
+                result[key] = valueFunc(elem);
+            } else {
+                result[key] = elem;
+            }
+        }
+        return result;
+    }
+
     /**
      * Swaps two elements of the given array at the given indexes. The original
      * array is modified in-place.

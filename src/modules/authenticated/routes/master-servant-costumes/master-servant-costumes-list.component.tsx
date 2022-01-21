@@ -2,10 +2,8 @@ import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { GameServantList } from '../../../../services/data/game/game-servant.service';
-import { CacheArray } from '../../../../types/internal';
+import { CacheArray, GameServantList } from '../../../../types/internal';
 import { MasterServantCostumeRowData, MasterServantCostumesListRow, StyleClassPrefix as MasterServantCostumesListRowStyleClassPrefix } from './master-servant-costumes-list-row.component';
-
 
 type Props = {
     unlockedCostumesSet: Set<number>;

@@ -22,14 +22,13 @@ import { MasterServantUtils } from '../../../../utils/master/master-servant.util
 import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
-import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
+import { DialogData as MasterServantEditDialogData, MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantInfoPanel } from './master-servant-info-panel.component';
 
 type MasterAccountData = {
-    id?: string;
     masterServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
@@ -43,19 +42,17 @@ const getMasterAccountData = (account: Nullable<MasterAccount>, clone = false): 
             unlockedCostumes: []
         };
     }
-    if (!clone) {
+    if (clone) {
         return {
-            id: account._id,
-            masterServants: account.servants,
-            bondLevels: account.bondLevels,
-            unlockedCostumes: account.costumes
+            masterServants: account.servants.map(MasterServantUtils.clone),
+            bondLevels: lodash.cloneDeep(account.bondLevels),
+            unlockedCostumes: [...account.costumes]
         };
     }
     return {
-        id: account._id,
-        masterServants: account.servants.map(MasterServantUtils.clone),
-        bondLevels: lodash.cloneDeep(account.bondLevels),
-        unlockedCostumes: [...account.costumes]
+        masterServants: account.servants,
+        bondLevels: account.bondLevels,
+        unlockedCostumes: account.costumes
     };
 };
 
@@ -101,13 +98,18 @@ export const MasterServantsRoute = React.memo(() => {
     const [deleteServant, setDeleteServant] = useState<MasterServant>();
     const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
 
+    const loadingIndicatorIdRef = useRef<string>();
+
     /**
      * Contains the `servants`, `bondLevels`, and `unlockedCostumes` data from the
-     * `MasterAccount` object. In edit mode, the data is cloned to prevent the
-     * original objects from being modified.
+     * `MasterAccount` object. In edit mode, the data is cloned to avoid unwanted
+     * modification of the original data.
      *
-     * These are stored as a ref to prevent unwanted triggering of `useCallback`
-     * hooks.
+     * The data is stored as a ref to prevent unwanted triggering of hooks on
+     * change.
+     *
+     * FIXME This will call getMasterAccountData on masterAccount for every render,
+     * even if the ref already contains a value
      */
     const masterAccountDataRef = useRef<MasterAccountData>(getMasterAccountData(masterAccount));
 
@@ -118,8 +120,6 @@ export const MasterServantsRoute = React.memo(() => {
         instanceIds: new Set(),
         servants: []
     });
-
-    const loadingIndicatorIdRef = useRef<string>();
 
     const gameServantMap = useGameServantMap();
 
@@ -135,14 +135,6 @@ export const MasterServantsRoute = React.memo(() => {
         appendSkills: sm && showAppendSkills,
         actions: false
     }), [showAppendSkills, sm, lg, xl]);
-
-    const deleteServantDialogPrompt = useMemo((): string | undefined => {
-        if (!gameServantMap || !deleteServant) {
-            return undefined;
-        }
-        const servant = gameServantMap[deleteServant.gameId];
-        return `Are you sure you want to remove ${servant?.name} from the servant list?`;
-    }, [gameServantMap, deleteServant]);
 
     const resetLoadingIndicator = useCallback((): void => {
         const loadingIndicatorId = loadingIndicatorIdRef.current;
@@ -182,27 +174,31 @@ export const MasterServantsRoute = React.memo(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(account => {
-                const isDifferentAccount = masterAccountDataRef.current.id !== account?._id;
                 masterAccountDataRef.current = getMasterAccountData(account);
-                if (isDifferentAccount) {
+                const isSameAccount = masterAccount?._id === account?._id;
+                if (isSameAccount) {
+                    updateSelectedServants();
+                } else {
                     selectedServantsRef.current = {
                         instanceIds: new Set(),
                         servants: []
                     };
-                } else {
-                    updateSelectedServants();
                 }
                 setMasterAccount(account);
                 setEditMode(false);
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [updateSelectedServants]);
+    }, [masterAccount?._id, updateSelectedServants]);
 
     /**
      * Sends master servant update request to the back-end.
      */
     const updateMasterAccount = useCallback(async (): Promise<void> => {
+        if (!masterAccount) {
+            return;
+        }
+
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
             loadingIndicatorId = loadingIndicatorOverlayService.invoke();
@@ -221,7 +217,7 @@ export const MasterServantsRoute = React.memo(() => {
         } = masterAccountDataRef.current;
 
         const update: Partial<MasterAccount> = {
-            _id: masterAccount?._id,
+            _id: masterAccount._id,
             servants: masterServants,
             bondLevels,
             costumes: unlockedCostumes
@@ -235,9 +231,23 @@ export const MasterServantsRoute = React.memo(() => {
             updateSelectedServants();
             setEditMode(false);
         }
+
         resetLoadingIndicator();
 
     }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, resetLoadingIndicator, updateSelectedServants]);
+
+    const handleServantSelectionChange = useCallback((instanceIds: Array<number>): void => {
+        const updatedSelectionIds = new Set(instanceIds);
+        if (SetUtils.isEqual(updatedSelectionIds, selectedServantsRef.current.instanceIds)) {
+            return;
+        }
+        const { masterServants } = masterAccountDataRef.current;
+        selectedServantsRef.current = {
+            instanceIds: updatedSelectionIds,
+            servants: masterServants.filter(servant => updatedSelectionIds.has(servant.instanceId))
+        };
+        forceUpdate();
+    }, [forceUpdate]);
 
     const handleShowAppendSkillsChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
         setShowAppendSkills(event.target.checked);
@@ -256,7 +266,7 @@ export const MasterServantsRoute = React.memo(() => {
     }, [masterAccount, updateSelectedServants]);
 
     const handleCancelButtonClick = useCallback((): void => {
-        // Re-clone data from master account
+        // Copy data back from master account
         masterAccountDataRef.current = getMasterAccountData(masterAccount);
         updateSelectedServants();
         setEditMode(false);
@@ -281,12 +291,7 @@ export const MasterServantsRoute = React.memo(() => {
         openEditServantDialog();
     }, [openEditServantDialog]);
 
-    const handleEditServantDialogClose = useCallback((
-        event: any,
-        reason: any,
-        data?: { masterServant: Omit<MasterServant, 'instanceId'>, bond: MasterServantBondLevel | undefined, costumes: Array<number> }
-    ): void => {
-
+    const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: MasterServantEditDialogData): void => {
         /*
          * Close the dialog without taking any further action if the component is not
          * in edit mode, or if the changes were cancelled (if `data` is undefined, then
@@ -393,20 +398,18 @@ export const MasterServantsRoute = React.memo(() => {
         masterAccountDataRef.current.masterServants = [...masterServants]; // Forces child list to re-render
         closeDeleteServantDialog();
     }, [editMode, deleteServant?.instanceId, closeDeleteServantDialog, updateMasterAccount]);
-
-    const handleServantSelectionChange = useCallback((instanceIds: Array<number>): void => {
-        const updatedSelectionIds = new Set(instanceIds);
-        if (SetUtils.isEqual(updatedSelectionIds, selectedServantsRef.current.instanceIds)) {
-            return;
+    
+    const deleteServantDialogPrompt = useMemo((): string | undefined => {
+        if (!gameServantMap || !deleteServant) {
+            return undefined;
         }
-        const { masterServants } = masterAccountDataRef.current;
-        selectedServantsRef.current = {
-            instanceIds: updatedSelectionIds,
-            servants: masterServants.filter(servant => updatedSelectionIds.has(servant.instanceId))
-        };
-        forceUpdate();
-    }, [forceUpdate]);
+        const servant = gameServantMap[deleteServant.gameId];
+        return `Are you sure you want to remove ${servant?.name} from the servant list?`;
+    }, [gameServantMap, deleteServant]);
 
+    /*
+     * This can be undefined during the initial render.
+     */
     if (!gameServantMap) {
         return null;
     }

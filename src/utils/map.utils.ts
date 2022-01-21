@@ -1,7 +1,7 @@
 export class MapUtils {
 
-    static getOrDefault<K extends string | number | symbol, V>(map: Record<K, V>, key: K, defaultValue: V | (() => V)): V {
-        let value = map[key];
+    static getOrDefault<K extends string | number | symbol, V>(map: Map<K, V>, key: K, defaultValue: V | (() => V)): V {
+        let value = map.get(key);
         if (value !== undefined) {
             return value;
         }
@@ -11,7 +11,8 @@ export class MapUtils {
         } else {
             value = defaultValue;
         }
-        return map[key] = value;
+        map.set(key, value);
+        return value;
     }
 
 }

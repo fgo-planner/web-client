@@ -10,7 +10,7 @@ import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { AccountPlans, PlannerService } from '../../../../services/data/planner/planner.service';
+import { AccountPlans, PlanService } from '../../../../services/data/plan/plan.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { ModalOnCloseReason, ReadonlyPartial } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
@@ -44,7 +44,7 @@ export const PlansRoute = React.memo(() => {
     const forceUpdate = useForceUpdate();
 
     const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
-    const plannerService = useInjectable(PlannerService);
+    const planService = useInjectable(PlanService);
 
     const masterAccountIdRef = useRef<string>();
 
@@ -81,14 +81,13 @@ export const PlansRoute = React.memo(() => {
         setDeletePlanTarget(undefined);
 
         try {
-            const accountPlans = await plannerService.getForAccount(masterAccountId);
+            const accountPlans = await planService.getForAccount(masterAccountId);
             setAccountPlans(accountPlans);
         } catch (e) {
             // TODO Handle error
         }
         resetLoadingIndicator();
-
-    }, [loadingIndicatorOverlayService, plannerService, resetLoadingIndicator]);
+    }, [loadingIndicatorOverlayService, planService, resetLoadingIndicator]);
 
     /*
      * Master account change subscription.
@@ -128,7 +127,7 @@ export const PlansRoute = React.memo(() => {
     const handleDeletePlanDialogClose = useCallback(async (event: any, reason: ModalOnCloseReason): Promise<void> => {
         if (reason === 'submit') {
             try {
-                await plannerService.deletePlan(deletePlanTarget?._id!!);
+                await planService.deletePlan(deletePlanTarget?._id!!);
                 loadPlansForAccount();
             } catch (e) {
                 console.error(e);
@@ -136,7 +135,7 @@ export const PlansRoute = React.memo(() => {
         }
         setDeletePlanTarget(undefined);
         setDeletePlanDialogOpen(false);
-    }, [deletePlanTarget?._id, loadPlansForAccount, plannerService]);
+    }, [deletePlanTarget?._id, loadPlansForAccount, planService]);
 
     return (
         <Fragment>

@@ -9,6 +9,7 @@ import { MasterServantCostumesRoute } from './routes/master-servant-costumes/mas
 import { MasterServantStatsRoute } from './routes/master-servant-stats/master-servant-stats.route';
 import { MasterServantsRoute } from './routes/master-servants/master-servants.route';
 import { MasterSoundtracksRoute } from './routes/master-soundtracks/master-soundtracks.route';
+import { PlanRoute } from './routes/plan/plan.route';
 import { PlansRoute } from './routes/plans/plans.route';
 import { UserSettingsRoute } from './routes/user-settings.route';
 import { UserThemesEditRoute } from './routes/user-themes-edit/user-themes-edit.route';
@@ -65,6 +66,10 @@ const ModuleRoutes = [
     {
         path: '/master/planner',
         element: <PlansRoute />
+    },
+    {
+        path: '/master/planner/:id',
+        element: <PlanRoute />
     },
     {
         path: '/master/data/import/servants',

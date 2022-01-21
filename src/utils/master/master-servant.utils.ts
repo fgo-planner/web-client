@@ -1,5 +1,6 @@
 import { GameServant, MasterServant, MasterServantAscensionLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
+import { Immutable } from '../../types/internal';
 
 export class MasterServantUtils {
 
@@ -35,7 +36,7 @@ export class MasterServantUtils {
     /**
      * Merges a `MasterServant` object into another.
      */
-    static merge(target: MasterServant, source: Partial<MasterServant>): void;
+    static merge(target: MasterServant, source: MasterServant): void;
 
     /**
      * Merges an array of `MasterServant` objects into another. Servants that exist
@@ -48,7 +49,7 @@ export class MasterServantUtils {
     /**
      * Method implementation
      */
-    static merge(target: MasterServant | Array<MasterServant>, source: Partial<MasterServant> | Array<MasterServant>): void {
+    static merge(target: MasterServant | Array<MasterServant>, source: MasterServant | Array<MasterServant>): void {
         if (!Array.isArray(target) && !Array.isArray(source)) {
             this._merge(target, source);
         } else if (Array.isArray(target) && Array.isArray(source)) {
@@ -56,13 +57,12 @@ export class MasterServantUtils {
         }
     }
 
-    private static _merge(target: MasterServant, source: Partial<MasterServant>): void {
-        Object.assign(target, source);
-        if (source.skills) {
-            target.skills = {
-                ...source.skills
-            };
-        }
+    private static _merge(target: MasterServant, source: MasterServant): void {
+        /*
+         * Copy the deep cloned fields over to the target. The deep cloning is for
+         * creating new instances of nested object(s).
+         */
+        Object.assign(target, this.clone(source));
     }
 
     private static _mergeArrays(target: Array<MasterServant>, source: Array<MasterServant>): void {
@@ -72,7 +72,7 @@ export class MasterServantUtils {
         if (!source.length) {
             return;
         }
-        
+
         /*
          * No need to do any individual merges, just copy the entire list.
          */
@@ -186,7 +186,12 @@ export class MasterServantUtils {
      * Given a servant and their current level, rounds their ascension level to the
      * closest valid value.
      */
-    static roundToNearestValidAscensionLevel(level: number, ascension: number, servant: GameServant): MasterServantAscensionLevel {
+    static roundToNearestValidAscensionLevel(
+        level: number,
+        ascension: number,
+        servant: Immutable<GameServant>
+    ): MasterServantAscensionLevel {
+
         const { maxLevel } = servant;
         if (level > maxLevel - 10) {
             return 4;
@@ -219,7 +224,12 @@ export class MasterServantUtils {
      * Given a servant and their current ascension level, rounds their level to the
      * closest valid value.
      */
-    static roundToNearestValidLevel(ascension: number, level: number, servant: GameServant): number {
+    static roundToNearestValidLevel(
+        ascension: number,
+        level: number,
+        servant: Immutable<GameServant>
+    ): number {
+
         const { maxLevel } = servant;
         switch (ascension) {
         case 4:

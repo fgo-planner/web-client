@@ -21,8 +21,7 @@ const DefaultLabel = 'Fou';
  *
  * Note that at 1000 Fou, the step size is calculated to be 20. This is correct
  * when increasing the value (to 1020), but is not correct when decrementing the
- * value (is 980, but should be 990). This error will be handled by the
- * `onChange` event handler.
+ * value (is 980, but should be 990).
  */
 const getFouInputStepSize = (value: string | undefined): number => {
     const numberValue = Number(value);
@@ -49,14 +48,19 @@ export const ServantFouInputField = React.memo((props: Props) => {
 
     const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         const { name, value } = event.target;
-        const transformedValue = FormUtils.transformInputToFouValue(value) ?? '';
-        onChange(name, String(transformedValue));
+        /*
+         * Rounding/capping is not done until onBlur is trigger to allow the user to
+         * type without interference.
+         */
+        onChange(name, value);
     }, [onChange]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        handleChange(event);
+        const { name, value } = event.target;
+        const transformedValue = FormUtils.transformInputToFouValue(value) ?? '';
+        onChange(name, String(transformedValue));
         onBlur?.(event);
-    }, [handleChange, onBlur]);
+    }, [onBlur, onChange]);
 
     return (
         <TextField

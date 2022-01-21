@@ -2,13 +2,9 @@ import { GameSoundtrack } from '@fgo-planner/types';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { Page, Pagination } from '../../../types/data';
-import { CacheArray, Nullable } from '../../../types/internal';
+import { GameSoundtrackList, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
-
-type SoundtracksCache = CacheArray<GameSoundtrack>;
-
-export type GameSoundtrackList = SoundtracksCache;
 
 @Injectable
 export class GameSoundtrackService {
@@ -18,9 +14,9 @@ export class GameSoundtrackService {
     @Inject(LoadingIndicatorOverlayService)
     private readonly _loadingIndicatorOverlayService!: LoadingIndicatorOverlayService;
 
-    private _soundtracksCache: Nullable<SoundtracksCache>;
+    private _soundtracksCache: Nullable<GameSoundtrackList>;
 
-    private _soundtracksCachePromise: Nullable<Promise<SoundtracksCache>>;
+    private _soundtracksCachePromise: Nullable<Promise<GameSoundtrackList>>;
 
     async getSoundtrack(id: number): Promise<Nullable<GameSoundtrack>> {
         return Http.get<Nullable<GameSoundtrack>>(`${this._BaseUrl}/${id}`);
@@ -31,7 +27,7 @@ export class GameSoundtrackService {
      * available, returns a promise that resolves once the data is fetched and
      * cached.
      */
-    async getSoundtracks(): Promise<SoundtracksCache> {
+    async getSoundtracks(): Promise<GameSoundtrackList> {
         if (this._soundtracksCache) {
             /*
              * TODO Currently, the same instance of the cache array is returned every time
@@ -58,7 +54,7 @@ export class GameSoundtrackService {
      * Synchronously returns the cached soundtracks list. If the data is not available,
      * then returns null/undefined.
      */
-    getSoundtracksSync(): Nullable<SoundtracksCache> {
+    getSoundtracksSync(): Nullable<GameSoundtrackList> {
         /*
          * TODO Currently, the same instance of the cache array is returned every time
          * this method is called. This may need to be changed so that a deep copy of the

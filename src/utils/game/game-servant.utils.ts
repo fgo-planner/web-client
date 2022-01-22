@@ -1,6 +1,6 @@
 import { GameServant, GameServantClass, GameServantRarity } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
-import { GameServantClassSimplified, GameServantList } from '../../types/internal';
+import { GameServantClassSimplified, GameServantList, Immutable } from '../../types/internal';
 
 export class GameServantUtils {
 
@@ -40,9 +40,9 @@ export class GameServantUtils {
 
     static filterServants(search: string, servants: GameServantList): GameServantList;
 
-    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction: (elem: T) => GameServant): Array<T>;
+    static filterServants<T>(search: string, data: Array<T>, mappingFunction: (elem: T) => Immutable<GameServant>): Array<T>;
 
-    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction?: (elem: T) => GameServant): Array<T> {
+    static filterServants<T>(search: string, data: Array<T>, mappingFunction?: (elem: T) => Immutable<GameServant>): Array<T> {
         const searchTrimmed = search.trim();
         if (!searchTrimmed) {
             return [...data];
@@ -77,7 +77,7 @@ export class GameServantUtils {
         });
 
         return data.filter(elem => {
-            let servant: GameServant;
+            let servant: Immutable<GameServant>;
             if (mappingFunction) {
                 servant = mappingFunction(elem);
             } else {
@@ -88,7 +88,7 @@ export class GameServantUtils {
     }
 
     private static _filterServant(
-        servant: Readonly<GameServant>,
+        servant: Immutable<GameServant>,
         searchTerms: Array<string>,
         classes: Set<GameServantClass>,
         rarities: Set<GameServantRarity>

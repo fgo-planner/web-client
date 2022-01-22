@@ -7,10 +7,11 @@ export class MasterServantUtils {
     /**
      * Instantiates a default `MasterServant` object.
      */
-    static instantiate(): MasterServant {
+    static instantiate(summoned = true): MasterServant {
         return {
             instanceId: 0,
             gameId: 100100, // TODO Un-hardcode this
+            summoned,
             np: 1,
             level: 1,
             ascension: 0,

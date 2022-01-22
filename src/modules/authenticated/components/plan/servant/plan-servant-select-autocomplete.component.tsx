@@ -1,44 +1,28 @@
-import { GameServant, PlanServantType } from '@fgo-planner/types';
+import { GameServant, MasterServant } from '@fgo-planner/types';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
 import { GameServantClassIcon } from '../../../../../components/game/servant/game-servant-class-icon.component';
 import { useGameServantMap } from '../../../../../hooks/data/use-game-servant-map.hook';
-import { ImmutableArray } from '../../../../../types/internal';
+import { Immutable, ImmutableArray } from '../../../../../types/internal';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
-type ChangeValue = {
-    gameId: number;
-    instanceId?: number;
-};
-
-type AvailableServant = {
-    gameId: number;
-    instanceId?: number;
-};
-
 type Props = {
-    availableServants?: ImmutableArray<AvailableServant>;
+    availableServants?: ImmutableArray<MasterServant>;
     disabled?: boolean;
-    onChange?: (event: ChangeEvent<{}>, value: ChangeValue) => void;
+    onChange?: (event: ChangeEvent<{}>, value: Immutable<MasterServant>) => void;
     /**
-     * The `gameId` of the selected planned servant.
+     * The `MasterServant` instance that corresponds to the currently selected
+     * option.
      */
-    selectedGameId: number;
-    /**
-     * The `instanceId` of the selected planned servant. Must be provided for owned
-     * servants, and `undefined` for unowned servants.
-     */
-    selectedInstanceId?: number;
+    selectedServant?: Immutable<MasterServant>;
     size?: 'small' | 'medium';
-    type: PlanServantType;
 };
 
 type ServantOption = Readonly<{
-    key: number;
-    instanceId?: number;
     label: string;
-    servant: Readonly<GameServant>;
+    gameServant: Immutable<GameServant>;
+    masterServant: Immutable<MasterServant>;
 }>;
 
 const optionStyles = {
@@ -58,14 +42,12 @@ const optionStyles = {
     } as SystemStyleObject<Theme>
 };
 
-const generateServantOption = (servant: Readonly<GameServant>, instanceId?: number): ServantOption => {
-    const key = instanceId ?? servant._id;
-    const label = servant.metadata?.displayName || servant.name || String(servant._id);
+const generateServantOption = (gameServant: Immutable<GameServant>, masterServant: Immutable<MasterServant>): ServantOption => {
+    const label = gameServant.metadata?.displayName || gameServant.name || String(gameServant._id);
     return {
-        key,
         label,
-        instanceId,
-        servant
+        gameServant,
+        masterServant
     };
 };
 
@@ -74,24 +56,24 @@ const filterOptions = (options: Array<ServantOption>, state: FilterOptionsState<
     if (!inputValue) {
         return options;
     }
-    return GameServantUtils.filterServants(inputValue, options, o => o.servant);
+    return GameServantUtils.filterServants(inputValue, options, o => o.gameServant);
 };
 
-const isOptionSelected = (option: Readonly<ServantOption>, value: Readonly<ServantOption>): boolean => {
-    return option.key === value.key;
+const isOptionSelected = (option: ServantOption, value: ServantOption): boolean => {
+    return option.masterServant.instanceId === value.masterServant.instanceId;
 };
 
 const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: Readonly<ServantOption>): ReactNode => {
-    const { key, label, servant } = option;
+    const { label, gameServant, masterServant } = option;
     return (
-        <li {...props} key={key}>
+        <li {...props} key={masterServant.instanceId}>
             <div style={optionStyles.root}>
                 <div style={optionStyles.rarity}>
-                    {`${servant.rarity} \u2605`}
+                    {`${gameServant.rarity} \u2605`}
                 </div>
                 <GameServantClassIcon
-                    servantClass={servant.class}
-                    rarity={servant.rarity}
+                    servantClass={gameServant.class}
+                    rarity={gameServant.rarity}
                     sx={optionStyles.classIcon}
                 />
                 <div className='truncate'>
@@ -107,13 +89,12 @@ const renderInput = (params: any): ReactNode => {
 };
 
 export const PlanServantSelectAutocomplete = React.memo((props: Props) => {
-    
+
     const {
         availableServants,
         disabled,
         onChange,
-        selectedGameId,
-        selectedInstanceId,
+        selectedServant,
         size
     } = props;
 
@@ -123,28 +104,26 @@ export const PlanServantSelectAutocomplete = React.memo((props: Props) => {
         if (!gameServantMap || !availableServants?.length) {
             return [];
         }
-        return availableServants.map(({ gameId, instanceId }) => {
-            const servant = gameServantMap[gameId];
-            return generateServantOption(servant, instanceId);
+        return availableServants.map(masterServant => {
+            const gameServant = gameServantMap[masterServant.gameId];
+            return generateServantOption(gameServant, masterServant);
         });
     }, [availableServants, gameServantMap]);
 
     const selectedOption = useMemo((): ServantOption | undefined => {
-        if (!gameServantMap) {
+        if (!gameServantMap || !selectedServant) {
             return undefined;
         }
-        const gameServant = gameServantMap[selectedGameId];
-        return generateServantOption(gameServant, selectedInstanceId);
-    }, [gameServantMap, selectedGameId, selectedInstanceId]);
+        const gameServant = gameServantMap[selectedServant.gameId];
+        return generateServantOption(gameServant, selectedServant);
+    }, [gameServantMap, selectedServant]);
 
     const handleChange = useCallback((event: ChangeEvent<{}>, value: ServantOption | null): void => {
         if (value === null) {
             // Is this case even possible?
             return;
         }
-        const gameId = value.servant._id;
-        const instanceId = value.instanceId;
-        onChange && onChange(event, { gameId, instanceId });
+        onChange?.(event, value.masterServant);
     }, [onChange]);
 
     /*
@@ -152,7 +131,7 @@ export const PlanServantSelectAutocomplete = React.memo((props: Props) => {
      */
     if (!selectedOption) {
         return null;
-    }  
+    }
 
     if (disabled || !options.length) {
         return (
@@ -161,7 +140,7 @@ export const PlanServantSelectAutocomplete = React.memo((props: Props) => {
                 size={size}
                 fullWidth
                 label='Servant'
-                value={selectedOption.servant.name}
+                value={selectedOption.gameServant.name}
                 disabled
             />
         );

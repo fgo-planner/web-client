@@ -1,5 +1,5 @@
-import { MasterAccount, MasterServant, Plan, PlanServant, PlanServantOwned, PlanServantType, PlanServantUnowned } from '@fgo-planner/types';
-import { Add as AddIcon, AddShoppingCart as AddShoppingCartIcon, Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
+import { MasterAccount, MasterServant, Plan, PlanServant } from '@fgo-planner/types';
+import { Add as AddIcon, Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Button, Fab, Tooltip } from '@mui/material';
 import lodash from 'lodash';
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -10,7 +10,7 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { GameServantMap, ImmutableArray, Nullable } from '../../../../types/internal';
+import { ImmutableArray, Nullable } from '../../../../types/internal';
 import { PlanComputationUtils, PlanRequirements } from '../../../../utils/plan/plan-computation.utils';
 import { PlanServantUtils } from '../../../../utils/plan/plan-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
@@ -18,68 +18,34 @@ import { SubscriptionTopic } from '../../../../utils/subscription/subscription-t
 import { DialogData as PlanServantEditDialogData, PlanServantEditDialog } from '../../components/plan/servant/edit/plan-servant-edit-dialog.component';
 
 /**
- * Instantiates a new `PlanServantOwned` based on the available owned servants
- * that have not yet been added to the plan. If there are multiple servants
- * available, then the first available servant is used. If there are no servants
- * available, then an error will be thrown.
+ * Instantiates a new `PlanServant` based on the available servants in the
+ * master account (a servant is available if it has not yet been added to the
+ * plan). If there are multiple servants available, then the first available
+ * servant is used. If there are no servants available, then an error will be
+ * thrown.
  *
  * @param planServants The servants that are already added to the plan.
- * @param masterServants The servants owned by the master account.
+ * @param masterServants The servants in the master account.
  */
-const instantiateOwnedPlanServant = (
+const instantiatePlanServant = (
     planServants: ImmutableArray<PlanServant>,
     masterServants: ImmutableArray<MasterServant>
-): PlanServantOwned => {
+): PlanServant => {
     /**
-     * Owned servants that have not been added to the plan yet.
+     * Servants that have not been added to the plan yet.
      */
-    const availableServants = PlanServantUtils.findAvailableOwnedServants(planServants, masterServants);
-    if (!availableServants.length) {
-        throw new Error('No more owned servants available');
-    }
-    /*
-     * Instantiate using first available servant.
-     */
-    const masterServant = availableServants[0];
-    const planServant = PlanServantUtils.instantiate(masterServant.gameId, masterServant.instanceId);
-    PlanServantUtils.updateCurrentEnhancements(planServant, masterServant);
-    // TODO Populate costume data.
-    return planServant;
-
-    /*
-     * If there were no more owned servants available, or if `type` was specified as
-     * `Unowned`, then instantiate an unowned servant.
-     */
-    // const availableServants = PlanServantUtils.findAvailableUnownedServants(planServants, masterServants);
-    // return PlanServantUtils.instantiate(GameServantConstants.DefaultServantId);
-};
-
-/**
- * Instantiates a new `PlanServantUnowned` based on the available game servants
- * that have not yet been added to the plan. If there are multiple servants
- * available, then the first available servant is used. If there are no servants
- * available, then an error will be thrown.
- *
- * @param planServants The servants that are already added to the plan.
- * @param masterServants The servants owned by the master account.
- */
-const instantiateUnownedPlanServant = (
-    planServants: ImmutableArray<PlanServant>,
-    gameServantMap: GameServantMap
-): PlanServantUnowned => {
-    const gameServants = Object.values(gameServantMap);
-    /**
-     * Owned servants that have not been added to the plan yet.
-     */
-    const availableServants = PlanServantUtils.findAvailableUnownedServants(planServants, gameServants);
+    const availableServants = PlanServantUtils.findAvailableServants(planServants, masterServants);
     if (!availableServants.length) {
         throw new Error('No more servants available');
     }
     /*
      * Instantiate using first available servant.
      */
-    const gameServant = availableServants[0];
-    return PlanServantUtils.instantiate(gameServant._id);
+    const masterServant = availableServants[0];
+    const planServant = PlanServantUtils.instantiate(masterServant.instanceId);
+    PlanServantUtils.updateCurrentEnhancements(planServant, masterServant);
+    // TODO Populate costume data.
+    return planServant;
 };
 
 /**
@@ -272,38 +238,34 @@ export const PlanRoute = React.memo(() => {
         computePlanRequirements();
     }, [computePlanRequirements, plan]);
 
-    const openEditServantDialog = useCallback((value: PlanServant | PlanServantType): void => {
-        if (typeof value === 'object') {
-            const planServant = value as PlanServant;
-            editServantTargetRef.current = planServant;
-            setEditServantTarget(PlanServantUtils.clone(planServant));
-        } else {
-            const type = value as PlanServantType;
+    const openEditServantDialog = useCallback((value?: PlanServant): void => {
+        if (!value) {
+            /*
+             * Adding a planned servant.
+             */
             const plan = planRef.current!;
-            let editServantTarget;
-            if (type === PlanServantType.Owned) {
-                editServantTarget = instantiateOwnedPlanServant(plan.servants, masterAccount!.servants);
-            } else {
-                editServantTarget = instantiateUnownedPlanServant(plan.servants, gameServantMap!);
-            }
+            const editServantTarget = instantiatePlanServant(plan.servants, masterAccount!.servants);
             editServantTargetRef.current = undefined;
             setEditServantTarget(editServantTarget);
+        } else {
+            /*
+             * Editing a planned servant.
+             */
+            const planServant = value;
+            editServantTargetRef.current = planServant;
+            setEditServantTarget(PlanServantUtils.clone(planServant));
         }
         setDeleteServantTarget(undefined);
         setDeleteServantDialogOpen(false);
-    }, [gameServantMap, masterAccount]);
+    }, [masterAccount]);
 
     const closeEditServantDialog = useCallback((): void => {
         editServantTargetRef.current = undefined;
         setEditServantTarget(undefined);
     }, []);
 
-    const handleAddOwnedServantButtonClick = useCallback((): void => {
-        openEditServantDialog(PlanServantType.Owned);
-    }, [openEditServantDialog]);
-
-    const handleAddUnownedServantButtonClick = useCallback((): void => {
-        openEditServantDialog(PlanServantType.Unowned);
+    const handleAddServantButtonClick = useCallback((): void => {
+        openEditServantDialog();
     }, [openEditServantDialog]);
 
     const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: PlanServantEditDialogData): void => {
@@ -348,27 +310,16 @@ export const PlanRoute = React.memo(() => {
         // updateSelectedServants();
     }, [closeEditServantDialog, computePlanRequirements, editServantTarget]);
 
-    const editServantDialogTitle = useMemo((): string => {
-        const action = !editServantTargetRef.current ? 'Add' : 'Edit';
-        const ownership = editServantTarget?.type === PlanServantType.Owned ? 'Summoned' : 'Unsummoned';
-        return `${action} ${ownership} Servant`;
-    }, [editServantTarget]);
-
     const deleteServantDialogPrompt = useMemo((): string | undefined => {
         if (!deleteServantTarget || !gameServantMap || !masterAccount) {
             return undefined;
         }
-        let gameId: number;
-        if (deleteServantTarget.type === PlanServantType.Owned) {
-            const { instanceId } = deleteServantTarget as PlanServantOwned;
-            const masterServant = masterAccount.servants.find(servant => servant.instanceId === instanceId);
-            if (!masterServant) {
-                return undefined;
-            }
-            gameId = masterServant.gameId;
-        } else {
-            gameId = (deleteServantTarget as PlanServantUnowned).gameId;
+        const { instanceId } = deleteServantTarget;
+        const masterServant = masterAccount.servants.find(servant => servant.instanceId === instanceId);
+        if (!masterServant) {
+            return undefined;
         }
+        const { gameId } = masterServant;
         const servant = gameServantMap[gameId];
         return `Are you sure you want to remove ${servant?.name} from the servant list?`;
     }, [deleteServantTarget, gameServantMap, masterAccount]);
@@ -387,13 +338,8 @@ export const PlanRoute = React.memo(() => {
         <Fragment>
             <div>
                 <div>
-                    <Button onClick={handleAddOwnedServantButtonClick}>
-                        <AddIcon /> Add Summoned
-                    </Button>
-                </div>
-                <div>
-                    <Button onClick={handleAddUnownedServantButtonClick}>
-                        <AddShoppingCartIcon /> Add Unsummoned
+                    <Button onClick={handleAddServantButtonClick}>
+                        <AddIcon /> Add Servant
                     </Button>
                 </div>
             </div>
@@ -421,7 +367,7 @@ export const PlanRoute = React.memo(() => {
             </FabContainer>
             <PlanServantEditDialog
                 open={!!editServantTarget}
-                dialogTitle={editServantDialogTitle}
+                dialogTitle={`${!editServantTargetRef.current ? 'Add' : 'Edit'} Servant`}
                 submitButtonLabel='Done'
                 planServant={editServantTarget!}
                 planServants={planRef.current.servants}

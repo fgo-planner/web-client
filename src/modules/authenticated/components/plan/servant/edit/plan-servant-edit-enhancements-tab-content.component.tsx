@@ -1,4 +1,4 @@
-import { GameServant, MasterServantAscensionLevel, MasterServantSkillLevel, PlanServant, PlanServantEnhancements, PlanServantType } from '@fgo-planner/types';
+import { GameServant, MasterServantAscensionLevel, MasterServantSkillLevel, PlanServant, PlanServantEnhancements } from '@fgo-planner/types';
 import { Checkbox, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, FocusEvent, useCallback, useEffect, useState } from 'react';
@@ -180,8 +180,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
 
     //#region Input fields
 
-    const { enabled, type } = planServant;
-    const disabled = readonly || (type === PlanServantType.Owned && enhancementSet === 'current');
+    const { enabled } = planServant;
+    const disabled = readonly || enhancementSet === 'current';
 
     const enableAscensionsCheckbox = (
         <Tooltip

@@ -1,6 +1,6 @@
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantSkillLevel, Plan, PlanServant, PlanServantEnhancements, PlanServantOwned, PlanServantType } from '@fgo-planner/types';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantSkillLevel, Plan, PlanServant, PlanServantEnhancements } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
-import { GameServantMap, ReadonlyRecord } from '../../types/internal';
+import { GameServantMap, Immutable, ReadonlyRecord } from '../../types/internal';
 import { ArrayUtils } from '../array.utils';
 import { ObjectUtils } from '../object.utils';
 import { PlanServantUtils } from './plan-servant.utils';
@@ -51,9 +51,7 @@ export type EnhancementRequirements = {
  * computation.
  */
 export type PlanServantRequirements = {
-    type: PlanServantType;
-    gameId: number;
-    instanceId?: number;
+    instanceId: number;
     /**
      * Effective current skills. This may differ actual current skills set by the
      * user. Computed based on master servant data and/or previous plans in the
@@ -94,12 +92,11 @@ export type PlanRequirements = {
      */
     previousPlans: Record<string, EnhancementRequirements>;
     /**
-     * Enhancement requirements for the servants in the target plan.
+     * Map of enhancement requirements for the servants in the target plan. The key
+     * is a servant's `instanceId`, and the value is the enhancement requirements
+     * for the servant.
      */
-    servants: {
-        [PlanServantType.Owned]: Record<number, PlanServantRequirements>;
-        [PlanServantType.Unowned]: Record<number, PlanServantRequirements>;
-    }
+    servants: Record<number, PlanServantRequirements>;
     /**
      * Total enhancement requirements for the target plan.
      */
@@ -128,15 +125,15 @@ type ServantEnhancements = Readonly<{
  */
 type MasterAccountData = Readonly<{
     /**
-     * Item quantities held by the master account, mapped by the items' `itemId`
-     * value.
+     * Map of item quantities held by the master account, where the key is the
+     * `itemId` and the value is the quantity.
      */
     items: ReadonlyRecord<number, number>;
     /**
-     * Servants owned by the master account, mapped by the servants' `instanceId`
-     * value.
+     * Map of servants in the master account, where the key is the `instanceId` and
+     * the value is the `MasterServant`
      */
-    servants: ReadonlyRecord<number, Readonly<MasterServant>>;
+    servants: ReadonlyRecord<number, Immutable<MasterServant>>;
     costumes: ReadonlySet<number>;
     qp: number;
 }>;
@@ -204,19 +201,6 @@ export class PlanComputationUtils {
             this.addEnhancementRequirements(result, enhancementRequirements);
         }
         return result;
-    }
-
-    /**
-     * Returns the `instanceId` for owned servants, or `gameId` for unowned
-     * servants.
-     */
-    static getKeyForPlanServant(planServant: PlanServant): number {
-        const { type } = planServant;
-        if (type === PlanServantType.Owned) {
-            return (planServant as PlanServantOwned).instanceId;
-        } else {
-            return planServant.gameId;
-        }
     }
 
     //#region computePlanRequirements + helper methods
@@ -304,9 +288,16 @@ export class PlanComputationUtils {
                 continue;
             }
             /*
+             * Retrieve the master servant data from the map.
+             */
+            const masterServant = masterAccountData.servants[planServant.instanceId];
+            if (!masterServant) {
+                continue;
+            }
+            /*
              * Retrieve the game servant data from the map.
              */
-            const gameServant = gameServantMap[planServant.gameId];
+            const gameServant = gameServantMap[masterServant.gameId];
             if (!gameServant) {
                 continue;
             }
@@ -321,8 +312,9 @@ export class PlanComputationUtils {
             const servantComputationResult = this._computePlanServantRequirements(
                 result,
                 gameServant,
+                masterServant,
                 planServant,
-                masterAccountData,
+                // masterAccountData,
                 options
             );
 
@@ -350,40 +342,29 @@ export class PlanComputationUtils {
 
     private static _computePlanServantRequirements(
         result: PlanRequirements,
-        gameServant: Readonly<GameServant>,
-        planServant: Readonly<PlanServant>,
-        masterAccountData: MasterAccountData,
+        gameServant: Immutable<GameServant>,
+        masterServant: Immutable<MasterServant>,
+        planServant: Immutable<PlanServant>,
+        // masterAccountData: MasterAccountData,
         options: ComputationOptions
     ): [PlanServantRequirements, EnhancementRequirements] | undefined {
 
-        /**
-         * This is the `instanceId` for owned servants, or `gameId` for unowned
-         * servants.
-         */
-        const key = this.getKeyForPlanServant(planServant);
+        const { instanceId } = planServant;
+        const resultServants = result.servants;
 
-        const resultServants = result.servants[planServant.type];
-
-        let planServantRequirements = resultServants[key];
+        let planServantRequirements = resultServants[instanceId];
         if (!planServantRequirements) {
             /*
              * If the plan servant does not yet exist in the result, then instantiate it and
              * add it to the result.
              */
             planServantRequirements = this._instantiatePlanServantRequirements(planServant);
-            resultServants[key] = planServantRequirements;
+            resultServants[instanceId] = planServantRequirements;
             /*
-             * If it is an owned servant, make sure that the current enhancement values
-             * match those from the master servant.
+             * Make sure that the current enhancement values match those from the master
+             * servant.
              */
-            if (planServant.type === PlanServantType.Owned) {
-                const masterServant = masterAccountData.servants[key];
-                if (!masterServant) {
-                    // TODO Log warning to console
-                    return undefined;
-                }
-                PlanServantUtils.updateEnhancements(planServantRequirements.current, masterServant);
-            }
+            PlanServantUtils.updateEnhancements(planServantRequirements.current, masterServant);
         } else {
             /*
              * If the plan servant was already in the result, then it was from a previous
@@ -424,7 +405,7 @@ export class PlanComputationUtils {
     //#region computeServantRequirements + helper methods
 
     static computeServantRequirements(
-        gameServant: Readonly<GameServant>,
+        gameServant: Immutable<GameServant>,
         currentEnhancements: ServantEnhancements,
         currentCostumes: ReadonlyArray<number>,
         options?: ComputationOptions
@@ -441,15 +422,15 @@ export class PlanComputationUtils {
     }
 
     private static _computeServantRequirements(
-        gameServant: Readonly<GameServant>,
-        currentEnhancements: Readonly<ServantEnhancements>,
+        gameServant: Immutable<GameServant>,
+        currentEnhancements: Immutable<ServantEnhancements>,
         currentCostumes: ReadonlyArray<number>,
-        targetEnhancements: Readonly<ServantEnhancements>,
+        targetEnhancements: Immutable<ServantEnhancements>,
         targetCostumes?: ReadonlyArray<number>,
         options = this._defaultOptions
     ): EnhancementRequirements {
 
-        const { 
+        const {
             includeAscensions,
             includeSkills,
             includeAppendSkills,
@@ -522,7 +503,7 @@ export class PlanComputationUtils {
 
     private static _updateResultForSkills(
         result: EnhancementRequirements,
-        skillMaterials: Readonly<GameServantSkillMaterials>,
+        skillMaterials: Immutable<GameServantSkillMaterials>,
         currentSkills: SkillEnhancements,
         targetSkills: SkillEnhancements,
         skillType: 'skills' | 'appendSkills',
@@ -563,7 +544,7 @@ export class PlanComputationUtils {
 
     private static _updateEnhancementRequirementResult(
         result: EnhancementRequirements,
-        enhancement: GameServantEnhancement,
+        enhancement: Immutable<GameServantEnhancement>,
         key: keyof ItemRequirements,
         enhancementCount = 1
     ): void {
@@ -586,7 +567,7 @@ export class PlanComputationUtils {
 
 
     //#region Other helper methods
-    
+
     private static _addItemRequirements(target: ItemRequirements, source: ItemRequirements): void {
         target.ascensions += source.ascensions;
         target.skills += source.skills;
@@ -650,35 +631,24 @@ export class PlanComputationUtils {
         };
     }
 
-    private static _instantiatePlanServantRequirements(planServant: PlanServant): PlanServantRequirements {
+    private static _instantiatePlanServantRequirements(planServant: Immutable<PlanServant>): PlanServantRequirements {
         const {
-            type,
-            gameId,
+            instanceId,
             current,
             target
         } = planServant;
 
-        const result: PlanServantRequirements = {
-            type,
-            gameId,
+        return {
+            instanceId,
             current: PlanServantUtils.cloneEnhancements(current),
             target: PlanServantUtils.cloneEnhancements(target),
             requirements: this._instantiateEnhancementRequirements()
         };
-
-        if (type === PlanServantType.Owned) {
-            result.instanceId = (planServant as PlanServantOwned).instanceId;
-        }
-
-        return result;
     }
 
     private static _instantiatePlanRequirements(): PlanRequirements {
         return {
-            servants: {
-                [PlanServantType.Owned]: {},
-                [PlanServantType.Unowned]: {},
-            },
+            servants: {},
             targetPlan: this._instantiateEnhancementRequirements(),
             previousPlans: {},
             group: this._instantiateEnhancementRequirements(),

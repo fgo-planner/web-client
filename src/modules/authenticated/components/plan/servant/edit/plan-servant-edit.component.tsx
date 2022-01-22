@@ -1,11 +1,10 @@
-import { GameServant, MasterServant, PlanServant, PlanServantOwned, PlanServantType } from '@fgo-planner/types';
+import { GameServant, MasterServant, PlanServant } from '@fgo-planner/types';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { ComponentStyleProps, Immutable, ImmutableArray } from '../../../../../../types/internal';
 import { PlanServantUtils } from '../../../../../../utils/plan/plan-servant.utils';
 import { PlanServantSelectAutocomplete } from '../plan-servant-select-autocomplete.component';
@@ -26,11 +25,6 @@ type Props = {
     showAppendSkills?: boolean;
     unlockedCostumes: Array<number>;
 } & Pick<ComponentStyleProps, 'className'>;
-
-type AvailableServant = {
-    gameId: number;
-    instanceId?: number;
-};
 
 type TabId = 'current' | 'target' | 'costumes';
 
@@ -72,8 +66,6 @@ const StyleProps = (theme: Theme) => ({
 
 export const PlanServantEdit = React.memo((props: Props) => {
 
-    const forceUpdate = useForceUpdate();
-
     const gameServantMap = useGameServantMap();
 
     const {
@@ -89,71 +81,61 @@ export const PlanServantEdit = React.memo((props: Props) => {
     /**
      * The servants available for the servant select.
      */
-    const [availableServants, setAvailableServants] = useState<ImmutableArray<AvailableServant>>([]);
+    const [availableServants, setAvailableServants] = useState<ImmutableArray<MasterServant>>([]);
 
     const [gameServant, setGameServant] = useState<Immutable<GameServant>>();
+    const [masterServant, setMasterServant] = useState<Immutable<MasterServant>>();
 
     const [activeTab, setActiveTab] = useState<TabId>('target');
 
     /*
-     * Updates the `planServantRef` if the `planServant` prop has changed. If
-     * `planServant` is `undefined`, then a new instance is created to ensure that
-     * the ref is never `undefined` from this point forward.
+     * Updates the `gameServant` and `masterServant` states when there are changes
+     * to the `planServant` and/or `masterServants` props.
      */
     useEffect(() => {
         if (!gameServantMap) {
             return;
         }
-        const gameId = planServant.gameId;
-        if (gameServant?._id !== gameId) {
-            setGameServant(gameServantMap[gameId]);
+        const instanceId = planServant.instanceId;
+        const masterServant = masterServants.find(servant => servant.instanceId === instanceId);
+        if (!masterServant) {
+            console.error(`masterServant instanceId=[${instanceId}] could not be found`);
+            return;
         }
-    }, [gameServant, gameServantMap, planServant.gameId]);
+        setMasterServant(masterServant);
+        if (gameServant?._id !== masterServant.gameId) {
+            setGameServant(gameServantMap[masterServant.gameId]);
+        }
+    }, [gameServant, gameServantMap, masterServants, planServant.instanceId]);
 
     /*
-     * Updates the list of available servants based on the planned servant's
-     * ownership type. Owned servants can only be replaced by other owned servants,
-     * while unowned servants can only be replaced by other unowned servants.
+     * Updates the `availableServants` state when there are changes to the
+     * `planServants` and/or `masterServants` props.
      */
     useEffect(() => {
         if (!gameServantMap) {
             return;
         }
-        const { type } = planServant;
-        let availableServants;
-        if (type === PlanServantType.Owned) {
-            availableServants = PlanServantUtils
-                .findAvailableOwnedServants(planServants, masterServants);
-        } else {
-            availableServants = PlanServantUtils
-                .findAvailableUnownedServants(planServants, Object.values(gameServantMap))
-                .map(servant => ({ gameId: servant._id }));
-        }
+        const availableServants = PlanServantUtils.findAvailableServants(planServants, masterServants);
         setAvailableServants(availableServants);
-    }, [gameServantMap, masterServants, planServant, planServants]);
+    }, [gameServantMap, masterServants, planServants]);
 
+    
     //#region Input event handlers
 
-    const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: { gameId: number, instanceId?: number }): void => {
+    const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: Immutable<MasterServant>): void => {
         if (!gameServantMap || servantSelectDisabled) {
             return;
         }
         const { gameId, instanceId } = value;
-        if (planServant.type === PlanServantType.Owned) {
-            const masterServant = masterServants.find(servant => servant.gameId === gameId && servant.instanceId === instanceId);
-            if (!masterServant) {
-                // TODO Is this case possible?
-                return;
-            }
-            PlanServantUtils.updateEnhancements(planServant.current, masterServant);
-            (planServant as PlanServantOwned).instanceId = instanceId!;
-        }
-        if (planServant.gameId !== gameId) {
-            planServant.gameId = gameId;
+        PlanServantUtils.updateEnhancements(planServant.current, value);
+        planServant.instanceId = instanceId;
+        setMasterServant(value);
+        if (gameServant?._id !== gameId) {
             setGameServant(gameServantMap[gameId]);
         }
-        forceUpdate();
-    }, [forceUpdate, gameServantMap, masterServants, planServant, servantSelectDisabled]);
+        // TODO Is force update needed?
+    }, [gameServant?._id, gameServantMap, planServant, servantSelectDisabled]);
 
     const handleActiveTabChange = useCallback((event: SyntheticEvent, value: TabId) => {
         setActiveTab(value);
@@ -197,9 +179,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
                 <InputFieldContainer>
                     <PlanServantSelectAutocomplete
                         availableServants={availableServants}
-                        selectedGameId={planServant.gameId}
-                        selectedInstanceId={(planServant as any).instanceId}
-                        type={planServant.type}
+                        selectedServant={masterServant}
                         onChange={handleSelectedServantChange}
                         disabled={readonly || servantSelectDisabled}
                     />

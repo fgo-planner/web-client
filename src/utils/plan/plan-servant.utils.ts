@@ -1,25 +1,15 @@
-import { GameServant, MasterServant, MasterServantAscensionLevel, PlanServant, PlanServantEnhancements, PlanServantOwned, PlanServantType, PlanServantUnowned } from '@fgo-planner/types';
+import { GameServant, MasterServant, MasterServantAscensionLevel, PlanServant, PlanServantEnhancements } from '@fgo-planner/types';
 import { Immutable, ImmutableArray } from '../../types/internal';
 import { MasterServantUtils } from '../master/master-servant.utils';
 
 export class PlanServantUtils {
 
     /**
-     * Instantiates a default `PlanServantOwned` object.
+     * Instantiates a default `PlanServant` object.
      */
-    static instantiate(gameId: number): PlanServantUnowned;
-    /**
-     * Instantiates a default `PlanServantOwned` object.
-     */
-    static instantiate(gameId: number, instanceId: number): PlanServantOwned;
-    /**
-     * Method implementation
-     */
-    static instantiate(gameId: number, instanceId?: number): PlanServant {
-
-        const planServant: PlanServant =  {
-            type: instanceId !== undefined ? PlanServantType.Owned : PlanServantType.Unowned,
-            gameId,
+    static instantiate(instanceId: number): PlanServant {
+        return {
+            instanceId,
             enabled: {
                 servant: true,
                 ascensions: true,
@@ -38,12 +28,6 @@ export class PlanServantUtils {
                 costumes: []
             }
         };
-
-        if (instanceId !== undefined) {
-            (planServant as PlanServantOwned).instanceId = instanceId;
-        }
-
-        return planServant;
     }
 
     /**
@@ -62,7 +46,7 @@ export class PlanServantUtils {
     /**
      * Returns a deep clone of the given `PlanServantEnhancements` object.
      */
-    static cloneEnhancements(enhancements: PlanServantEnhancements): PlanServantEnhancements {
+    static cloneEnhancements(enhancements: Immutable<PlanServantEnhancements>): PlanServantEnhancements {
         return {
             ...enhancements,
             skills: {
@@ -99,16 +83,25 @@ export class PlanServantUtils {
      * Updates the given `PlanServantEnhancements` with the values from the given
      * `MasterServant`.
      */
-    static updateEnhancements(enhancements: PlanServantEnhancements, masterServant: Immutable<MasterServant>): void;
+    static updateEnhancements(
+        enhancements: PlanServantEnhancements,
+        masterServant: Immutable<MasterServant>
+    ): void;
     /**
      * Updates the target `PlanServantEnhancements` with the values from the source
      * `PlanServantEnhancements`.
      */
-    static updateEnhancements(target: PlanServantEnhancements, source: PlanServantEnhancements): void;
+    static updateEnhancements(
+        target: PlanServantEnhancements,
+        source: Immutable<PlanServantEnhancements>
+    ): void;
     /**
      * Method implementation
      */
-    static updateEnhancements(target: PlanServantEnhancements, source: Immutable<MasterServant> | PlanServantEnhancements): void {
+    static updateEnhancements(
+        target: PlanServantEnhancements,
+        source: Immutable<MasterServant> | Immutable<PlanServantEnhancements>
+    ): void {
         target.level = source.level;
         target.ascension = source.ascension;
         target.fouHp = source.fouHp;
@@ -124,33 +117,15 @@ export class PlanServantUtils {
     /**
      * Returns an array of `MasterServant` that have not been added to the plan.
      */
-    static findAvailableOwnedServants(
+    static findAvailableServants(
         planServants: ImmutableArray<PlanServant>,
         masterServants: ImmutableArray<MasterServant>
     ): Array<Immutable<MasterServant>> {
-        const ownedPlanServantIds = new Set<number>();
-        for (const planServant of planServants) {
-            if (planServant.type === PlanServantType.Owned) {
-                ownedPlanServantIds.add((planServant as PlanServantOwned).instanceId);
-            }
+        const planInstanceIds = new Set<number>();
+        for (const { instanceId } of planServants) {
+            planInstanceIds.add(instanceId);
         }
-        return masterServants.filter(servant => !ownedPlanServantIds.has(servant.instanceId));
-    }
-
-    /**
-     * Returns an array of `GameServant` that have not been added to the plan.
-     */
-    static findAvailableUnownedServants(
-        planServants: ImmutableArray<PlanServant>,
-        gameServants: ImmutableArray<GameServant>
-    ): Array<Immutable<GameServant>> {
-        const unownedPlanServantIds = new Set<number>();
-        for (const planServant of planServants) {
-            if (planServant.type === PlanServantType.Unowned) {
-                unownedPlanServantIds.add(planServant.gameId);
-            }
-        }
-        return gameServants.filter(servant => !unownedPlanServantIds.has(servant._id));
+        return masterServants.filter(({ instanceId }) => !planInstanceIds.has(instanceId));
     }
 
     /**

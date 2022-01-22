@@ -122,6 +122,7 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         const skill1 = this._parseSkillLevel(row, headerMap, 1) || 1;
         const skill2 = this._parseSkillLevel(row, headerMap, 2);
         const skill3 = this._parseSkillLevel(row, headerMap, 3);
+        const summonDate = undefined; // TODO Parse acquisition date
 
         if (bond !== undefined) {
             bondLevels[gameId] = bond;
@@ -130,6 +131,8 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         return {
             instanceId,
             gameId,
+            summoned: true,
+            summonDate,
             np,
             level,
             ascension,

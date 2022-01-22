@@ -36,6 +36,8 @@ type Props = {
 
 export type FormData = {
     gameId: number;
+    summoned: boolean,
+    summonDate: Date | undefined,
     np: string;
     level: string;
     ascension: string;
@@ -85,6 +87,8 @@ const convertToFormData = (
 
     const {
         gameId,
+        summoned,
+        summonDate,
         np,
         level,
         ascension,
@@ -98,6 +102,8 @@ const convertToFormData = (
 
     return {
         gameId,
+        summoned,
+        summonDate,
         np: String(np),
         level: String(level),
         ascension: String(ascension),
@@ -118,6 +124,8 @@ const convertToMasterServant = (formData: FormData): Omit<MasterServant, 'instan
 
     const {
         gameId,
+        summoned,
+        summonDate,
         np,
         level,
         ascension,
@@ -133,6 +141,8 @@ const convertToMasterServant = (formData: FormData): Omit<MasterServant, 'instan
 
     return {
         gameId,
+        summoned,
+        summonDate: summonDate ? new Date(summonDate) : undefined,
         np: Number(np) as MasterServantNoblePhantasmLevel,
         level: Number(level),
         ascension: Number(ascension) as MasterServantAscensionLevel,

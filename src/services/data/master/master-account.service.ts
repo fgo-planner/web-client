@@ -1,11 +1,10 @@
 import { MasterAccount } from '@fgo-planner/types';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { Nullable, ReadonlyPartialArray, UserInfo } from '../../../types/internal';
+import { MasterAccountList } from '../../../types/data';
+import { Nullable, UserInfo } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../utils/subscription/subscription-topic';
-
-export type MasterAccountList = ReadonlyPartialArray<MasterAccount>;
 
 @Injectable
 export class MasterAccountService {
@@ -58,7 +57,7 @@ export class MasterAccountService {
             // Is this case possible?
             return [];
         }
-        return this._masterAccountList.map(account => ({ ...account }));
+        return this._masterAccountList;
     }
 
     async getAccount(id: string): Promise<MasterAccount> {

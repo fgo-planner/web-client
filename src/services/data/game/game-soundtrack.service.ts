@@ -1,8 +1,8 @@
 import { GameSoundtrack } from '@fgo-planner/types';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { Page, Pagination } from '../../../types/data';
-import { GameSoundtrackList, Nullable } from '../../../types/internal';
+import { GameSoundtrackList, Page, Pagination } from '../../../types/data';
+import { Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
 
@@ -73,7 +73,7 @@ export class GameSoundtrackService {
         return Http.get<Page<GameSoundtrack>>(`${this._BaseUrl}/page`, { params });
     }
 
-    private _onSoundtracksCacheLoaded(data: ReadonlyArray<GameSoundtrack>): void {
+    private _onSoundtracksCacheLoaded(data: GameSoundtrackList): void {
         this._soundtracksCache = data;
         this._soundtracksCachePromise = null;
     }

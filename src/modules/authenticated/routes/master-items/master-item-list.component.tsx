@@ -1,20 +1,19 @@
-import { GameItem, GameItemQuantity } from '@fgo-planner/types';
+import { GameItemQuantity } from '@fgo-planner/types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { GameItemMap } from '../../../../types/internal';
+import { GameItemMap } from '../../../../types/data';
+import { ImmutableArray } from '../../../../types/internal';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { StyleClassPrefix as MasterItemListRowLabelStyleClassPrefix } from './master-item-list-row-label.component';
-import { MasterItemListRow, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';
+import { MasterItemListRow, MasterItemRowData, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';
 
 type ItemCategory = { label: string; itemIds: ReadonlyArray<number> };
 
-type ListViewDataItem = { item: GameItem; masterData: GameItemQuantity };
+type ListCategoryData = { label: string; rows: Array<MasterItemRowData> };
 
-type ListViewDataCategory = { label: string; items: Array<ListViewDataItem> };
-
-type ListViewData = Array<ListViewDataCategory>;
+type ListData = Array<ListCategoryData>;
 
 type Props = {
     editMode: boolean;
@@ -22,7 +21,7 @@ type Props = {
     masterItems: Array<GameItemQuantity>;
 };
 
-const ItemCategories: ReadonlyArray<ItemCategory> = [
+const ItemCategories: ImmutableArray<ItemCategory> = [
     {
         label: 'Skill Gems',
         itemIds: GameItemConstants.SkillGems
@@ -52,7 +51,7 @@ const ItemCategories: ReadonlyArray<ItemCategory> = [
     },
 ];
 
-const generateListViewData = (masterItems: Array<GameItemQuantity>, gameItemMap: GameItemMap): ListViewData => {
+const generateListData = (masterItems: Array<GameItemQuantity>, gameItemMap: GameItemMap): ListData => {
     /*
      * Convert the user account items into a map for faster lookup.
      */
@@ -64,20 +63,18 @@ const generateListViewData = (masterItems: Array<GameItemQuantity>, gameItemMap:
     /*
      * Generate the view data array.
      */
-    const listViewData: ListViewData = [];
+    const listViewData: ListData = [];
     for (const itemCategory of ItemCategories) {
 
-        const items: ListViewDataItem[] = [];
+        const rows = [];
         for (const itemId of itemCategory.itemIds) {
-
             /*
              * Retrieve item data from items map.
              */
-            const item = gameItemMap[itemId];
-            if (!item) {
+            const gameItem = gameItemMap[itemId];
+            if (!gameItem) {
                 console.warn(`Item ID ${itemId} could not be retrieved from the map.`);
             }
-
             /*
              * Retrieve user data for the item from the user items map. If the item is not
              * present in the user data, then backfill it. The only exception is QP, which
@@ -90,9 +87,9 @@ const generateListViewData = (masterItems: Array<GameItemQuantity>, gameItemMap:
                 masterItems.push(masterItem);
             }
 
-            items.push({ item, masterData: masterItem });
+            rows.push({ gameItem, quantity: masterItem });
         }
-        listViewData.push({ label: itemCategory.label, items });
+        listViewData.push({ label: itemCategory.label, rows });
     }
 
     return listViewData;
@@ -128,20 +125,24 @@ export const MasterItemList = React.memo(({ editMode, masterItems }: Props) => {
         if (!gameItemMap) {
             return [];
         }
-        return generateListViewData(masterItems, gameItemMap);
+        return generateListData(masterItems, gameItemMap);
     }, [masterItems, gameItemMap]);
 
-    const renderItemRow = (item: ListViewDataItem, key: number): ReactNode => {
+    const renderItemRow = (data: MasterItemRowData, index: number): ReactNode => {
         return (
-            <MasterItemListRow key={key} item={item} editMode={editMode} />
+            <MasterItemListRow
+                key={index}
+                data={data}
+                editMode={editMode}
+            />
         );
     };
 
-    const renderItemCategory = (category: ListViewDataCategory, key: number): ReactNode => {
+    const renderItemCategory = (category: ListCategoryData, key: number): ReactNode => {
         return (
             <div key={key} className={`${StyleClassPrefix}-item-category`}>
                 <MasterItemListHeader categoryLabel={category.label} showQuantityLabel={key === 0} />
-                {category.items.map(renderItemRow)}
+                {category.rows.map(renderItemRow)}
             </div>
         );
     };

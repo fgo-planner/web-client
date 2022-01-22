@@ -6,13 +6,13 @@ import { GameServantBondIcon } from '../../../../../../components/game/servant/g
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
 import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { AssetConstants } from '../../../../../../constants';
-import { ReadonlyPartial } from '../../../../../../types/internal';
+import { Immutable, ReadonlyPartial } from '../../../../../../types/internal';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
 import { MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRowLabel } from './master-servant-list-row-label.component';
 
 type Props = {
-    servant: Readonly<GameServant> | undefined; // Not optional, but possible to be undefined.
+    servant: Immutable<GameServant> | undefined; // Not optional, but possible to be undefined.
     masterServant: MasterServant;
     bond: MasterServantBondLevel | undefined;
     index: number;

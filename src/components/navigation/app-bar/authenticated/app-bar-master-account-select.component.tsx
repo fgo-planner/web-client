@@ -4,13 +4,14 @@ import { SystemStyleObject, Theme } from '@mui/system';
 import { ChangeEvent, CSSProperties, PureComponent, ReactNode } from 'react';
 import { Subscription } from 'rxjs';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { Nullable, ReadonlyPartialArray } from '../../../../types/internal';
+import { MasterAccountList } from '../../../../types/data';
+import { Immutable, Nullable } from '../../../../types/internal';
 import { InjectablesContainer } from '../../../../utils/dependency-injection/injectables-container';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 
 type Props = {
-    masterAccountList: ReadonlyPartialArray<MasterAccount>;
+    masterAccountList: MasterAccountList;
 };
 
 type State = {
@@ -76,7 +77,7 @@ export const AppBarMasterAccountSelect = class extends PureComponent<Props, Stat
         );
     }
 
-    private _renderSelectOption(account: Partial<MasterAccount>, index: number): ReactNode {
+    private _renderSelectOption(account: Immutable<Partial<MasterAccount>>, index: number): ReactNode {
         let itemLabel = account.name || `Account ${index + 1}`;
         if (account.friendId) {
             itemLabel += ` (${account.friendId})`;

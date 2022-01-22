@@ -8,7 +8,7 @@ import { LayoutPanelScrollable } from '../../../../components/layout/layout-pane
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { GameItemConstants } from '../../../../constants';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { GameItemMap } from '../../../../types/internal';
+import { GameItemMap } from '../../../../types/data';
 import { MasterItemStats, MasterItemStatsFilterOptions } from './master-item-stats.utils';
 
 type Props = {
@@ -127,9 +127,9 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
     }, [includeUnownedServants, includeSoundtracks]);
 
     const renderItem = (itemId: number, index: number): ReactNode => {
-        const item = gameItemMap[itemId];
+        const gameItem = gameItemMap[itemId];
         const stat = stats[itemId];
-        if (!item || !stat) {
+        if (!gameItem || !stat) {
             // TODO Throw exception
             return null;
         }
@@ -141,14 +141,14 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
                 <div className={`${StyleClassPrefix}-data-row`}>
                     <div className={`${StyleClassPrefix}-label-cell`}>
                         <GameItemThumbnail
-                            item={item}
+                            gameItem={gameItem}
                             size={42}
                             showBackground
                             enableLink
                         />
                         <div className="pl-4">
                             {/* TODO Make this a link */}
-                            {item.name}
+                            {gameItem.name}
                         </div>
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>

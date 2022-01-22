@@ -7,14 +7,15 @@ import { GameItemQuantity } from '../../../../components/game/item/game-item-qua
 import { GameServantThumbnail } from '../../../../components/game/servant/game-servant-thumbnail.component';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
+import { Immutable } from '../../../../types/internal';
 
-export type MasterServantCostumeRowData = GameServantCostume & {
+export type MasterServantCostumeRowData = Immutable<GameServantCostume & {
     costumeId: number;
-    servant: Readonly<GameServant>;
-};
+    servant: GameServant;
+}>;
 
 type Props = {
-    costume: Readonly<MasterServantCostumeRowData>;
+    costume: MasterServantCostumeRowData;
     unlocked?: boolean;
     editMode?: boolean;
     openLinksInNewTab?: boolean;
@@ -80,7 +81,7 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
                 continue;
             }
             nodes.push(
-                <GameItemQuantity key={itemId} item={unlockMaterial} quantity={quantity} />
+                <GameItemQuantity key={itemId} gameItem={unlockMaterial} quantity={quantity} />
             );
         }
         return nodes;

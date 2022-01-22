@@ -1,6 +1,7 @@
 import { GameServant, GameServantClass, GameServantRarity, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../../../constants';
-import { GameServantClassSimplified, GameServantMap } from '../../../../types/internal';
+import { GameServantClassSimplified, GameServantMap } from '../../../../types/data';
+import { Immutable } from '../../../../types/internal';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 
 type MasterServantStatGroupedByRarity = {
@@ -153,7 +154,7 @@ export class MasterServantStatsUtils {
     //#region Common data population methods
 
     private static _isServantEligible(
-        servant: GameServant,
+        servant: Immutable<GameServant>,
         filter: Partial<MasterServantStatsFilterOptions>
     ): boolean {
 

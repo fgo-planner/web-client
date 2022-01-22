@@ -1,18 +1,18 @@
 export class ArrayUtils {
 
     static mapArrayToObject<T, K extends string | number | symbol>(
-        arr: Array<T>, 
+        arr: ReadonlyArray<T>, 
         keyFunc: (elem: T) => K
     ): Record<K, T>;
 
     static mapArrayToObject<T, K extends string | number | symbol, V>(
-        arr: Array<T>, 
+        arr: ReadonlyArray<T>, 
         keyFunc: (elem: T) => K,
         valueFunc: (elem: T) => V
     ): Record<K, V>;
 
     static mapArrayToObject<T, K extends string | number | symbol, V>(
-        arr: Array<T>, 
+        arr: ReadonlyArray<T>, 
         keyFunc: (elem: T) => K,
         valueFunc?: (elem: T) => V
     ): Record<K, T | V> {

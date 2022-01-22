@@ -30,6 +30,7 @@ const styles = {
     })
 };
 
+// TODO Convert this to functional component
 export const AppBarResourcesMenu = class extends PureComponent<Props, State> {
 
     private readonly _menuAnchorOrigin: PopoverOrigin = {

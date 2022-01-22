@@ -12,14 +12,14 @@ import { ServantSkillInputField } from '../../../../../../components/input/serva
 import { GameServantConstants } from '../../../../../../constants';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
-import { ReadonlyRecord } from '../../../../../../types/internal';
+import { Immutable, ReadonlyRecord } from '../../../../../../types/internal';
 import { ComponentStyleProps } from '../../../../../../types/internal/props/component-style-props.type';
 import { FormUtils } from '../../../../../../utils/form.utils';
 import { MasterServantEditFormAutocomplete } from './master-servant-edit-form-autocomplete.component';
 
 type Props = {
     formId: string;
-    masterServant: Readonly<MasterServant>;
+    masterServant: Immutable<MasterServant>;
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     unlockedCostumes: ReadonlyArray<number>;
     servantSelectDisabled?: boolean;
@@ -60,7 +60,7 @@ export type SubmitData = {
 };
 
 const generateUnlockedCostumesMap = (
-    servant: GameServant | undefined,
+    servant: Immutable<GameServant> | undefined,
     unlockedCostumes: ReadonlyArray<number>
 ): Record<number, boolean> => {
 
@@ -79,8 +79,8 @@ const generateUnlockedCostumesMap = (
 };
 
 const convertToFormData = (
-    servant: GameServant | undefined,
-    masterServant: MasterServant,
+    gameServant: Immutable<GameServant> | undefined,
+    masterServant: Immutable<MasterServant>,
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
     unlockedCostumes: ReadonlyArray<number>
 ): FormData => {
@@ -98,12 +98,12 @@ const convertToFormData = (
         appendSkills
     } = masterServant;
 
-    const unlockedCostumesMap = generateUnlockedCostumesMap(servant, unlockedCostumes);
+    const unlockedCostumesMap = generateUnlockedCostumesMap(gameServant, unlockedCostumes);
 
     return {
         gameId,
         summoned,
-        summonDate,
+        summonDate: summonDate ? new Date(summonDate as Date) : undefined,
         np: String(np),
         level: String(level),
         ascension: String(ascension),
@@ -202,7 +202,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         className
     } = props;
 
-    const [gameServant, setGameServant] = useState<GameServant>();
+    const [gameServant, setGameServant] = useState<Immutable<GameServant>>();
     const [formData, setFormData] = useState<FormData>(() => convertToFormData(gameServant, masterServant, bondLevels, unlockedCostumes));
 
     const gameServantMap = useGameServantMap();
@@ -235,7 +235,7 @@ export const MasterServantEditForm = React.memo((props: Props) => {
         onStatsChange(data);
     }, [formData, onStatsChange]);
 
-    const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: GameServant): void => {
+    const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: Immutable<GameServant>): void => {
         const servantId = value._id;
         if (formData.gameId !== servantId) {
             const servant = gameServantMap?.[servantId];

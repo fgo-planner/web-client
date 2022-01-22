@@ -3,10 +3,11 @@
 import { GameItem } from '@fgo-planner/types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
+import { Immutable } from '../../../types/internal';
 import { GameItemThumbnail } from './game-item-thumbnail.component';
 
 type Props = {
-    item: Readonly<GameItem>;
+    gameItem: Immutable<GameItem>;
     quantity: number;
     size?: string | number;
 };
@@ -25,7 +26,7 @@ const StyleProps = {
     } as SystemStyleObject<Theme>
 };
 
-export const GameItemQuantity = React.memo(({ item, quantity, size }: Props) => {
+export const GameItemQuantity = React.memo(({ gameItem, quantity, size }: Props) => {
 
     const thumbnailSize = size || DefaultThumbnailSize;
 
@@ -35,7 +36,7 @@ export const GameItemQuantity = React.memo(({ item, quantity, size }: Props) => 
                 {quantity}
             </div>
             <GameItemThumbnail
-                item={item}
+                gameItem={gameItem}
                 size={thumbnailSize}
                 showBackground
             />

@@ -5,12 +5,12 @@ import { SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import NumberFormat from 'react-number-format';
 import { Link } from 'react-router-dom';
-import { MasterAccountList as MasterAccountListType } from '../../../../services/data/master/master-account.service';
-import { ReadonlyPartial } from '../../../../types/internal';
+import { MasterAccountList as MasterAccountListType } from '../../../../types/data';
+import { Immutable } from '../../../../types/internal';
 
 type Props = {
     masterAccountList: MasterAccountListType;
-    onDeleteAccount: (masterAccount: ReadonlyPartial<MasterAccount>) => void;
+    onDeleteAccount: (masterAccount: Immutable<Partial<MasterAccount>>) => void;
 };
 
 export const StyleClassPrefix = 'MasterAccountList';

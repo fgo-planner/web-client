@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, 
 import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../../../../../types/internal';
+import { DialogComponentProps, ImmutableArray } from '../../../../../../types/internal';
 import { PlanServantEdit } from './plan-servant-edit.component';
 
 export type DialogData = {
@@ -12,7 +12,7 @@ export type DialogData = {
 
 type Props = {
     dialogTitle?: string;
-    masterServants: ReadonlyArray<MasterServant>;
+    masterServants: ImmutableArray<MasterServant>;
     /**
      * The planned servant to edit. This will be modified directly, so provide a
      * clone if modification to the original object is not desired.
@@ -20,7 +20,7 @@ type Props = {
      * If this is not provided, then the dialog will remain closed.
      */
     planServant?: PlanServant;
-    planServants: ReadonlyArray<PlanServant>;
+    planServants: ImmutableArray<PlanServant>;
     showAppendSkills?: boolean;
     submitButtonLabel?: string;
     unlockedCostumes: Array<number>;

@@ -5,13 +5,17 @@ import NumberFormat from 'react-number-format';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { GameItemConstants } from '../../../../constants';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
+import { Immutable } from '../../../../types/internal';
 import { MathUtils } from '../../../../utils/math.utils';
 import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 
-type ListViewDataItem = { item: GameItem; masterData: GameItemQuantity };
+export type MasterItemRowData = {
+    gameItem: Immutable<GameItem>;
+    quantity: GameItemQuantity
+};
 
 type Props = {
-    item: ListViewDataItem;
+    data: MasterItemRowData;
     editMode: boolean;
 };
 
@@ -23,7 +27,7 @@ const QuantityInputProps: InputBaseComponentProps = {
 
 export const StyleClassPrefix = 'MasterItemListRow';
 
-export const MasterItemListRow = React.memo(({ item, editMode }: Props) => {
+export const MasterItemListRow = React.memo(({ data, editMode }: Props) => {
 
     const forceUpdate = useForceUpdate();
 
@@ -42,11 +46,11 @@ export const MasterItemListRow = React.memo(({ item, editMode }: Props) => {
         const value = event.target.value;
         const quantity = MathUtils.clamp(~~Number(value), 0, GameItemConstants.MaxItemQuantity);
 
-        // TODO Is it bad practice to modify an object in props?
-        item.masterData.quantity = quantity;
+        // TODO Is it bad practice to modify an object in props without notifying parent?
+        data.quantity.quantity = quantity;
 
         forceUpdate();
-    }, [item, forceUpdate]);
+    }, [data, forceUpdate]);
 
     const handleItemQuantityFocus = useCallback((): void => {
         setActive(true);
@@ -72,7 +76,7 @@ export const MasterItemListRow = React.memo(({ item, editMode }: Props) => {
                 size="small"
                 type="number"
                 inputProps={QuantityInputProps}
-                value={item.masterData.quantity}
+                value={data.quantity.quantity}
                 onChange={handleItemQuantityChange}
                 onFocus={handleItemQuantityFocus}
                 onBlur={handleItemQuantityBlur}
@@ -81,7 +85,7 @@ export const MasterItemListRow = React.memo(({ item, editMode }: Props) => {
     } else {
         itemQuantityNode = (
             <NumberFormat
-                value={item.masterData.quantity}
+                value={data.quantity.quantity}
                 displayType="text"
                 thousandSeparator={true}
             />
@@ -95,7 +99,7 @@ export const MasterItemListRow = React.memo(({ item, editMode }: Props) => {
             active={active}
             borderTop
         >
-            <MasterItemListRowLabel item={item.item} editMode={editMode} />
+            <MasterItemListRowLabel gameItem={data.gameItem} editMode={editMode} />
             <div className="flex-fill" />
             <div>
                 {itemQuantityNode}

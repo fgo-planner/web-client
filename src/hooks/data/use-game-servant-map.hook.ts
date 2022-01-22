@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { GameServantService } from '../../services/data/game/game-servant.service';
-import { GameServantMap, Nullable } from '../../types/internal';
+import { GameServantMap } from '../../types/data';
+import { Nullable } from '../../types/internal';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 /**

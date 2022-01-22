@@ -3,9 +3,10 @@ import { Avatar, AvatarProps } from '@mui/material';
 import React, { PropsWithChildren, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';
+import { Immutable } from '../../../types/internal';
 
 type Props = PropsWithChildren<{
-    servant: Readonly<GameServant>;
+    servant: Immutable<GameServant>;
     stage?: 1 | 2 | 3 | 4;
     costumeId?: number;
     size?: string | number;

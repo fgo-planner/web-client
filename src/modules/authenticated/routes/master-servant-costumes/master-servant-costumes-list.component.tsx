@@ -2,7 +2,7 @@ import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { CacheArray, GameServantList } from '../../../../types/internal';
+import { GameServantList } from '../../../../types/data';
 import { MasterServantCostumeRowData, MasterServantCostumesListRow, StyleClassPrefix as MasterServantCostumesListRowStyleClassPrefix } from './master-servant-costumes-list-row.component';
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
     editMode?: boolean;
 };
 
-const transformCostumesList = (gameServants: GameServantList): CacheArray<MasterServantCostumeRowData> => {
+const transformCostumesList = (gameServants: GameServantList): Array<MasterServantCostumeRowData> => {
     const result: MasterServantCostumeRowData[] = [];
     for (const servant of gameServants) {
         const { costumes } = servant;
@@ -70,7 +70,7 @@ export const MasterServantCostumesList = React.memo(({ unlockedCostumesSet, edit
 
     const costumesList = useMemo(() => {
         if (!gameServantList) {
-            return null;
+            return [];
         }
         return transformCostumesList(gameServantList);
     }, [gameServantList]);
@@ -89,7 +89,10 @@ export const MasterServantCostumesList = React.memo(({ unlockedCostumesSet, edit
         }
     }, [forceUpdate, unlockedCostumesSet]);
 
-    if (!costumesList?.length) {
+    /*
+     * This can be empty during the initial render.
+     */
+    if (!costumesList.length) {
         return null;
     }
 

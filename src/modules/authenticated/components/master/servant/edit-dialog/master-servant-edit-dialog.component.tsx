@@ -4,7 +4,7 @@ import React, { FormEvent, MouseEvent, useCallback, useEffect, useRef } from 're
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
-import { DialogComponentProps } from '../../../../../../types/internal';
+import { DialogComponentProps, Immutable } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantEditForm, SubmitData } from '../edit-form/master-servant-edit-form.component';
 
@@ -15,7 +15,7 @@ type Props = {
      * The master servant to edit. If not provided, the dialog will instantiate a
      * new servant.
      */
-    masterServant?: Readonly<MasterServant>;
+    masterServant?: Immutable<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
     disableServantSelect?: boolean;
@@ -50,7 +50,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         ...dialogProps
     } = props;
 
-    const masterServantRef = useRef<Readonly<MasterServant> | undefined>(masterServant);
+    const masterServantRef = useRef<Immutable<MasterServant> | undefined>(masterServant);
 
     /*
      * Update the `masterServantRef` if the `masterServant` prop has changed. If

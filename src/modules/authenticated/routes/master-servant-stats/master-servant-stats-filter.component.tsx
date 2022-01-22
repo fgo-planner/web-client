@@ -5,7 +5,8 @@ import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../components/input/input-field-container.component';
 import { GameServantConstants } from '../../../../constants';
-import { GameServantClassSimplified, TextFieldChangeEvent } from '../../../../types/internal';
+import { GameServantClassSimplified } from '../../../../types/data';
+import { TextFieldChangeEvent } from '../../../../types/internal';
 import { MasterServantStatsFilterOptions, MasterServantStatsGroupBy } from './master-servant-stats.utils';
 
 export type MasterServantStatsFilterResult = {
@@ -201,13 +202,13 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                     />
                     <ListItemText primary="All" />
                 </MenuItem>
-                {ClassFilterOptions.map(className => (
-                    <MenuItem key={className} value={className}>
+                {ClassFilterOptions.map(servantClassName => (
+                    <MenuItem key={servantClassName} value={servantClassName}>
                         <Checkbox
                             className={`${StyleClassPrefix}-multiSelectCheckbox`}
-                            checked={classFilter.indexOf(className) !== -1}
+                            checked={classFilter.indexOf(servantClassName) !== -1}
                         />
-                        <ListItemText primary={className} />
+                        <ListItemText primary={servantClassName} />
                     </MenuItem>
                 ))}
             </TextField>

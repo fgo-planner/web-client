@@ -10,8 +10,9 @@ import { MasterAccountAddDialog } from '../../../../components/master/account/ma
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
-import { MasterAccountList as MasterAccountListType, MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { ModalOnCloseReason, Nullable, ReadonlyPartial } from '../../../../types/internal';
+import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { MasterAccountList as MasterAccountListType } from '../../../../types/data';
+import { Immutable, ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { MasterAccountList } from './master-account-list.component';
@@ -24,7 +25,7 @@ const AddAccountDialogPaperProps: PaperProps = {
 
 const DeleteAccountDialogTitle = 'Delete Account?';
 
-const generateDeleteAccountDialogPrompt = (masterAccount: ReadonlyPartial<MasterAccount>): string => {
+const generateDeleteAccountDialogPrompt = (masterAccount: Immutable<Partial<MasterAccount>>): string => {
     if (!masterAccount) {
         return '';
     }
@@ -47,7 +48,7 @@ export const MasterAccountsRoute = React.memo(() => {
     const [masterAccountList, setMasterAccountList] = useState<Nullable<MasterAccountListType>>();
     const [addAccountDialogOpen, setAddAccountDialogOpen] = useState<boolean>(false);
     const [deleteAccountDialogOpen, setDeleteAccountDialogOpen] = useState<boolean>(false);
-    const [deleteAccountTarget, setDeleteAccountTarget] = useState<ReadonlyPartial<MasterAccount>>();
+    const [deleteAccountTarget, setDeleteAccountTarget] = useState<Immutable<Partial<MasterAccount>>>();
 
     /*
      * Master account change subscription.
@@ -77,7 +78,7 @@ export const MasterAccountsRoute = React.memo(() => {
         setAddAccountDialogOpen(false);
     }, []);
 
-    const handleDeleteAccount = useCallback((masterAccount: ReadonlyPartial<MasterAccount>): void => {
+    const handleDeleteAccount = useCallback((masterAccount: Immutable<Partial<MasterAccount>>): void => {
         setDeleteAccountTarget(masterAccount);
         setDeleteAccountDialogOpen(true);
     }, []);

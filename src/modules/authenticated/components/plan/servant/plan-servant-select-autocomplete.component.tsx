@@ -19,10 +19,10 @@ type Props = {
     size?: 'small' | 'medium';
 };
 
-type ServantOption = Readonly<{
+type ServantOption = Immutable<{
     label: string;
-    gameServant: Immutable<GameServant>;
-    masterServant: Immutable<MasterServant>;
+    gameServant: GameServant;
+    masterServant: MasterServant;
 }>;
 
 const optionStyles = {
@@ -63,7 +63,7 @@ const isOptionSelected = (option: ServantOption, value: ServantOption): boolean 
     return option.masterServant.instanceId === value.masterServant.instanceId;
 };
 
-const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: Readonly<ServantOption>): ReactNode => {
+const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: ServantOption): ReactNode => {
     const { label, gameServant, masterServant } = option;
     return (
         <li {...props} key={masterServant.instanceId}>
@@ -100,7 +100,7 @@ export const PlanServantSelectAutocomplete = React.memo((props: Props) => {
 
     const gameServantMap = useGameServantMap();
 
-    const options = useMemo((): ReadonlyArray<ServantOption> => {
+    const options = useMemo((): Array<ServantOption> => {
         if (!gameServantMap || !availableServants?.length) {
             return [];
         }

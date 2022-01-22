@@ -4,7 +4,7 @@ import { GameItemThumbnail } from '../../../../../components/game/item/game-item
 import { LoadingIndicator } from '../../../../../components/utils/loading-indicator.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
 import { GameServantService } from '../../../../../services/data/game/game-servant.service';
-import { Nullable } from '../../../../../types/internal';
+import { Immutable, ImmutableRecord, Nullable } from '../../../../../types/internal';
 import { InjectablesContainer } from '../../../../../utils/dependency-injection/injectables-container';
 import { GameItemNotFound } from './game-item-not-found.component';
 
@@ -15,7 +15,7 @@ type TotalUsage = {
 };
 
 type ServantUsage = {
-    servant: Readonly<GameServant>;
+    servant: Immutable<GameServant>;
 } & TotalUsage;
 
 type GameItemUsage = {
@@ -88,7 +88,7 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
         const { servants, total } = itemUsage;
         return (
             <Fragment>
-                <GameItemThumbnail item={item} />
+                <GameItemThumbnail gameItem={item} />
                 <div className="p-2">
                     <div>Ascensions: {total.ascensions}</div>
                     <div>Per Skill (Total): {total.skills} ({total.skills * 3})</div>
@@ -160,7 +160,7 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
         return { servants: servantUsage, total: totalUsage };
     }
 
-    private _computeEnhancementsUsage(enhancements: Record<number, GameServantEnhancement> | undefined, itemId: number): number {
+    private _computeEnhancementsUsage(enhancements: ImmutableRecord<number, GameServantEnhancement> | undefined, itemId: number): number {
         if (!enhancements) {
             return 0;
         }

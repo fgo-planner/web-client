@@ -1,6 +1,7 @@
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantSkillLevel, Plan, PlanServant, PlanServantEnhancements } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
-import { GameServantMap, Immutable, ReadonlyRecord } from '../../types/internal';
+import { GameServantMap } from '../../types/data';
+import { Immutable, ImmutableArray } from '../../types/internal';
 import { ArrayUtils } from '../array.utils';
 import { ObjectUtils } from '../object.utils';
 import { PlanServantUtils } from './plan-servant.utils';
@@ -114,7 +115,7 @@ type SkillEnhancements = Readonly<{
     3?: MasterServantSkillLevel;
 }>;
 
-type ServantEnhancements = Readonly<{
+type ServantEnhancements = Immutable<{
     ascension?: MasterServantAscensionLevel;
     skills: SkillEnhancements;
     appendSkills: SkillEnhancements;
@@ -123,17 +124,17 @@ type ServantEnhancements = Readonly<{
 /**
  * Simplified version of `MasterAccount` for internal use.
  */
-type MasterAccountData = Readonly<{
+type MasterAccountData = Immutable<{
     /**
      * Map of item quantities held by the master account, where the key is the
      * `itemId` and the value is the quantity.
      */
-    items: ReadonlyRecord<number, number>;
+    items: Record<number, number>;
     /**
      * Map of servants in the master account, where the key is the `instanceId` and
      * the value is the `MasterServant`
      */
-    servants: ReadonlyRecord<number, Immutable<MasterServant>>;
+    servants: Record<number, MasterServant>;
     costumes: ReadonlySet<number>;
     qp: number;
 }>;
@@ -152,7 +153,7 @@ export class PlanComputationUtils {
         };
     };
 
-    private static get _defaultTargetEnhancements(): Readonly<ServantEnhancements> {
+    private static get _defaultTargetEnhancements(): Immutable<ServantEnhancements> {
         return {
             ascension: GameServantConstants.MaxAscensionLevel,
             skills: {
@@ -217,9 +218,9 @@ export class PlanComputationUtils {
      */
     static computePlanRequirements(
         gameServantMap: GameServantMap,
-        masterAccount: Readonly<MasterAccount>,
-        targetPlan: Readonly<Plan>,
-        previousPlans?: ReadonlyArray<Plan>,
+        masterAccount: Immutable<MasterAccount>,
+        targetPlan: Immutable<Plan>,
+        previousPlans?: ImmutableArray<Plan>,
         optionsOverride?: ComputationOptions
     ): PlanRequirements {
 
@@ -275,7 +276,7 @@ export class PlanComputationUtils {
         result: PlanRequirements,
         gameServantMap: GameServantMap,
         masterAccountData: MasterAccountData,
-        plan: Readonly<Plan>,
+        plan: Immutable<Plan>,
         options: ComputationOptions,
         isTargetPlan = false
     ): void {
@@ -390,7 +391,7 @@ export class PlanComputationUtils {
         return [planServantRequirements, enhancementRequirements];
     }
 
-    private static _preProcessMasterAccount(masterAccount: Readonly<MasterAccount>): MasterAccountData {
+    private static _preProcessMasterAccount(masterAccount: Immutable<MasterAccount>): MasterAccountData {
         const servants = ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
         const items = ArrayUtils.mapArrayToObject(masterAccount.items, item => item.itemId, item => item.quantity);
         const costumes = new Set(masterAccount.costumes);
@@ -576,7 +577,7 @@ export class PlanComputationUtils {
         target.total += source.total;
     }
 
-    private static _parseComputationOptions(data: Readonly<Plan> | Readonly<PlanServant>): ComputationOptions {
+    private static _parseComputationOptions(data: Immutable<Plan> | Immutable<PlanServant>): ComputationOptions {
         const {
             ascensions,
             skills,

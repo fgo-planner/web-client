@@ -6,9 +6,10 @@ import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
+import { Immutable } from '../../../../types/internal';
 
 type Props = {
-    soundtrack: Readonly<GameSoundtrack>;
+    soundtrack: Immutable<GameSoundtrack>;
     unlocked?: boolean;
     playing?: boolean;
     editMode?: boolean;
@@ -73,7 +74,7 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
             return null;
         }
         return (
-            <GameItemQuantity item={unlockMaterial} quantity={quantity} />
+            <GameItemQuantity gameItem={unlockMaterial} quantity={quantity} />
         );
     }, [soundtrack, gameItemMap]);
 

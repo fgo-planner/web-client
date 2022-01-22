@@ -1,15 +1,15 @@
+/**
+ * This folder contains type definitions that are used internally by more than
+ * one service and/or component of the app.
+ */
+
 export * from './dependency-injection/injectable-definition.type';
 export * from './dependency-injection/injectable-token.type';
 export * from './dependency-injection/injected-field.type';
-export * from './game/item/game-item-list.type';
-export * from './game/item/game-item-map.type';
-export * from './game/servant/game-servant-class-simplified.type';
-export * from './game/servant/game-servant-list.type';
-export * from './game/servant/game-servant-map.type';
-export * from './game/soundtrack/game-soundtrack-list.type';
 export * from './generics/cache-array.type';
 export * from './generics/cache-map.type';
 export * from './generics/immutable-array.type';
+export * from './generics/immutable-record.type';
 export * from './generics/immutable.type';
 export * from './generics/nullable.type';
 export * from './generics/optional.type';

@@ -10,6 +10,7 @@ import { DataPointListItem } from '../../../../components/list/data-point-list-i
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
+import { Immutable } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { ComputationOptions, EnhancementRequirements, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
@@ -37,7 +38,7 @@ const hasDebt = (enhancementRequirements: EnhancementRequirements): boolean => {
     return enhancementRequirements.qp > 0;
 };
 
-const renderFouLevels = (activeServant: Readonly<MasterServant>): JSX.Element => {
+const renderFouLevels = (activeServant: Immutable<MasterServant>): JSX.Element => {
     const { fouAtk, fouHp } = activeServant;
     return (
         <div className={`${StyleClassPrefix}-skill-level-stat`}>
@@ -48,7 +49,7 @@ const renderFouLevels = (activeServant: Readonly<MasterServant>): JSX.Element =>
     );
 };
 
-const renderSkillLevels = (activeServant: Readonly<MasterServant>, stat: 'skills' | 'appendSkills'): JSX.Element => {
+const renderSkillLevels = (activeServant: Immutable<MasterServant>, stat: 'skills' | 'appendSkills'): JSX.Element => {
     const skills = activeServant[stat];
     return (
         <div className={`${StyleClassPrefix}-skill-level-stat`}>
@@ -381,20 +382,20 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 } = requirements;
 
                 const itemId = Number(key);
-                const item = gameItemMap[itemId];
+                const gameItem = gameItemMap[itemId];
 
                 const label = (
                     <div className={`${StyleClassPrefix}-material-stat-label`}>
-                        <GameItemThumbnail item={item} size={24} />
+                        <GameItemThumbnail gameItem={gameItem} size={24} />
                         <div className="pl-2 truncate">
-                            {item.name}
+                            {gameItem.name}
                         </div>
                     </div>
                 );
 
                 const tooltip = (
                     <Fragment>
-                        <div>{item.name}</div>
+                        <div>{gameItem.name}</div>
                         {!!ascensions && <div>Ascensions: {ascensions}</div>}
                         {!!skills && <div>Skills: {skills}</div>}
                         {!!appendSkills && <div>Append skills: {appendSkills}</div>}

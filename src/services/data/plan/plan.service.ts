@@ -1,12 +1,7 @@
 import { Plan, PlanGroup } from '@fgo-planner/types';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { ReadonlyPartialArray } from '../../../types/internal';
+import { MasterAccountPlans } from '../../../types/data';
 import { HttpUtils as Http } from '../../../utils/http.utils';
-
-export type AccountPlans = {
-    plans: ReadonlyPartialArray<Plan>;
-    planGroups: ReadonlyPartialArray<PlanGroup>;
-};
 
 @Injectable
 export class PlanService {
@@ -45,8 +40,8 @@ export class PlanService {
         return Http.delete<PlanGroup>(`${this._BaseUrl}/group/${id}`);
     }
 
-    async getForAccount(accountId: string): Promise<AccountPlans> {
-        return Http.get<AccountPlans>(`${this._BaseUrl}/account/${accountId}`);
+    async getForAccount(accountId: string): Promise<MasterAccountPlans> {
+        return Http.get<MasterAccountPlans>(`${this._BaseUrl}/account/${accountId}`);
     }
 
 }

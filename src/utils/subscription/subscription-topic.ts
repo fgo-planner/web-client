@@ -1,7 +1,6 @@
 import { MasterAccount, UserPreferences } from '@fgo-planner/types';
-import { HttpResponseError, Nullable, PageMetadata, ReadonlyPartialArray, ThemeInfo, UserInfo } from '../../types/internal';
-
-type MasterAccountList = Nullable<ReadonlyPartialArray<MasterAccount>>;
+import { MasterAccountList } from '../../types/data';
+import { HttpResponseError, Nullable, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
 
 export class SubscriptionTopic<T = any> {
     
@@ -15,7 +14,7 @@ export class SubscriptionTopic<T = any> {
     
     static readonly User_CurrentUserPreferencesChange = new SubscriptionTopic<Nullable<UserPreferences>>(() => null);
 
-    static readonly User_MasterAccountListChange = new SubscriptionTopic<MasterAccountList>(() => null);
+    static readonly User_MasterAccountListChange = new SubscriptionTopic<Nullable<MasterAccountList>>(() => null);
 
     static readonly User_Unauthorized = new SubscriptionTopic<HttpResponseError>();
     

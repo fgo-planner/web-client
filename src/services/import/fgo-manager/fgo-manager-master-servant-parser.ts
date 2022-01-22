@@ -2,7 +2,8 @@ import { GameServant, MasterServant, MasterServantBondLevel, MasterServantNobleP
 import { Options } from 'csv-parse';
 import parse from 'csv-parse/lib/sync';
 import { GameServantConstants } from '../../../constants';
-import { ReadonlyRecord } from '../../../types/internal';
+import { GameServantList } from '../../../types/data';
+import { Immutable, ReadonlyRecord } from '../../../types/internal';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MathUtils } from '../../../utils/math.utils';
 import { BaseMasterServantParser } from '../base-master-servant-parser';
@@ -21,13 +22,13 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         skipEmptyLines: true
     };
 
-    private _servantNameMap: ReadonlyRecord<string, GameServant>;
+    private _servantNameMap: ReadonlyRecord<string, Immutable<GameServant>>;
 
-    constructor(data: string, gameServants: ReadonlyArray<Readonly<GameServant>>) {
+    constructor(data: string, gameServants: GameServantList) {
         super(data);
 
         // TODO Move this to a helper method.
-        const servantNameToGameIdMap: Record<string, GameServant> = {};
+        const servantNameToGameIdMap: Record<string, Immutable<GameServant>> = {};
         for (const servant of gameServants) {
             const name = servant.metadata.fgoManagerName;
             if (!name) {
@@ -80,7 +81,7 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
                 results.warnings.push(`Row ${r + 1}: ${message}`);
             }
         }
-        
+
         return results;
     }
 
@@ -147,7 +148,7 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         };
     }
 
-    private _parseGameServant(row: string[], headerMap: Record<FgoManagerColumn, number>): GameServant {
+    private _parseGameServant(row: string[], headerMap: Record<FgoManagerColumn, number>): Immutable<GameServant> {
         const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.ServantName);
         if (!value) {
             throw Error('Servant name is missing.');
@@ -172,7 +173,7 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         result = ~~MathUtils.clamp(result, GameServantConstants.MinNoblePhantasmLevel, GameServantConstants.MaxNoblePhantasmLevel);
         return result as MasterServantNoblePhantasmLevel;
     }
-    
+
     private _parseLevel(row: string[], headerMap: Record<FgoManagerColumn, number>): number {
         const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.Level);
         if (!value) {

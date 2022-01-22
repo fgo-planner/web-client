@@ -1,8 +1,8 @@
 import { GameItem } from '@fgo-planner/types';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { Page, Pagination } from '../../../types/data';
-import { GameItemList, GameItemMap, Nullable } from '../../../types/internal';
+import { GameItemList, GameItemMap, Page, Pagination } from '../../../types/data';
+import { Immutable, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
 
@@ -94,7 +94,7 @@ export class GameItemService {
         return Http.get<Page<GameItem>>(`${this._BaseUrl}/page`, { params });
     }
 
-    private _onItemsCacheLoaded(data: ReadonlyArray<GameItem>): void {
+    private _onItemsCacheLoaded(data: GameItemList): void {
         this._generateCacheMap(this._itemsCache = data);
         this._itemsCachePromise = null;
     }
@@ -111,10 +111,10 @@ export class GameItemService {
         this._itemsCacheMap = null;
     }
 
-    private _generateCacheMap(items: ReadonlyArray<GameItem>): void {
-        const cacheMap: Record<number, Readonly<GameItem>> = {};
+    private _generateCacheMap(items: GameItemList): void {
+        const cacheMap: Record<number, Immutable<GameItem>> = {};
         for (const item of items) {
-            cacheMap[item._id!!] = item;
+            cacheMap[item._id] = item;
         }
         this._itemsCacheMap = cacheMap;
     }

@@ -50,16 +50,16 @@ export const GameItemsRoute = React.memo(() => {
                     <div className={`${StyleClassPrefix}-header`}>HEADER TEST</div>
                 }
             >
-                {gameItems?.map((item, key) => (
+                {gameItems?.map((gameItem, key) => (
                     <div key={key} className={clsx(`${StyleClassPrefix}-row`, 'flex align-center')}>
                         <GameItemThumbnail
-                            item={item}
+                            gameItem={gameItem}
                             size={42}
                             showBackground
                             enableLink
                         />
                         <div className="px-4" style={{ fontSize: '0.875rem' }}>
-                            {item.name}
+                            {gameItem.name}
                         </div>
                     </div>
                 ))}

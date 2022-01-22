@@ -1,15 +1,16 @@
 import { GameItem } from '@fgo-planner/types';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Immutable } from '../../../types/internal';
 
 type Props = {
-    item: Readonly<GameItem>;
-    showBackground?: boolean;
-    size?: string | number;
     enableLink?: boolean;
+    gameItem: Immutable<GameItem>;
     openLinkInNewTab?: boolean;
+    size?: string | number;
+    showBackground?: boolean;
 };
 
 const ImageBaseUrl = AssetConstants.ItemImageBaseUrl;
@@ -42,15 +43,15 @@ const StyleProps = {
 export const GameItemThumbnail = React.memo((props: Props) => {
 
     const {
-        item,
-        showBackground,
-        size,
         enableLink,
-        openLinkInNewTab
+        gameItem,
+        openLinkInNewTab,
+        size,
+        showBackground
     } = props;
 
-    const itemId = item._id;
-    const { name, background } = item;
+    const itemId = gameItem._id;
+    const { name, background } = gameItem;
 
     const imageUrl = `${ImageBaseUrl}/${itemId}.png`;
 

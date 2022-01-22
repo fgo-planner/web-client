@@ -10,9 +10,10 @@ import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { AccountPlans, PlanService } from '../../../../services/data/plan/plan.service';
+import { PlanService } from '../../../../services/data/plan/plan.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { ModalOnCloseReason, ReadonlyPartial } from '../../../../types/internal';
+import { MasterAccountPlans } from '../../../../types/data';
+import { Immutable, ModalOnCloseReason } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { PlanAddDialog } from './plan-add-dialog';
@@ -26,7 +27,7 @@ const AddPlanDialogPaperProps: PaperProps = {
 
 const DeletePlanDialogTitle = 'Delete Plan?';
 
-const generateDeletePlanDialogPrompt = (plan: ReadonlyPartial<Plan> | undefined): string => {
+const generateDeletePlanDialogPrompt = (plan: Immutable<Partial<Plan>> | undefined): string => {
     if (!plan) {
         return '';
     }
@@ -48,10 +49,10 @@ export const PlansRoute = React.memo(() => {
 
     const masterAccountIdRef = useRef<string>();
 
-    const [accountPlans, setAccountPlans] = useState<AccountPlans>();
+    const [accountPlans, setAccountPlans] = useState<MasterAccountPlans>();
     const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
     const [deletePlanDialogOpen, setDeletePlanDialogOpen] = useState<boolean>(false);
-    const [deletePlanTarget, setDeletePlanTarget] = useState<ReadonlyPartial<Plan>>();
+    const [deletePlanTarget, setDeletePlanTarget] = useState<Immutable<Partial<Plan>>>();
     
     const scrollContainerRef = useElevateAppBarOnScroll();
     const loadingIndicatorIdRef = useRef<string>();
@@ -119,7 +120,7 @@ export const PlansRoute = React.memo(() => {
         }
     }, [loadPlansForAccount]);
 
-    const handleDeletePlan = useCallback((plan: ReadonlyPartial<Plan>): void => {
+    const handleDeletePlan = useCallback((plan: Immutable<Partial<Plan>>): void => {
         setDeletePlanTarget(plan);
         setDeletePlanDialogOpen(true);
     }, []);

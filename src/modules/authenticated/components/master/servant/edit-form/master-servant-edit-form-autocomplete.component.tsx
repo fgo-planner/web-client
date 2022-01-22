@@ -4,18 +4,19 @@ import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
 import { useGameServantList } from '../../../../../../hooks/data/use-game-servant-list.hook';
+import { Immutable } from '../../../../../../types/internal';
 import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 
 type Props = {
-    selectedServant: GameServant;
+    selectedServant: Immutable<GameServant>;
     size?: 'small' | 'medium';
     disabled?: boolean;
-    onChange?: (event: ChangeEvent<{}>, value: Readonly<GameServant>) => void;
+    onChange?: (event: ChangeEvent<{}>, value: Immutable<GameServant>) => void;
 };
 
-type ServantOption = Readonly<{
+type ServantOption = Immutable<{
     label: string;
-    servant: Readonly<GameServant>;
+    servant: GameServant;
 }>;
 
 const optionStyles = {
@@ -35,7 +36,7 @@ const optionStyles = {
     } as SystemStyleObject<Theme>
 };
 
-const generateServantOption = (servant: Readonly<GameServant>): ServantOption => {
+const generateServantOption = (servant: Immutable<GameServant>): ServantOption => {
     const label = servant.metadata?.displayName || servant.name || String(servant._id);
     return { label, servant };
 };
@@ -48,11 +49,11 @@ const filterOptions = (options: Array<ServantOption>, state: FilterOptionsState<
     return GameServantUtils.filterServants(inputValue, options, o => o.servant);
 };
 
-const isOptionSelected = (option: Readonly<ServantOption>, value: Readonly<ServantOption>): boolean => {
+const isOptionSelected = (option: ServantOption, value: ServantOption): boolean => {
     return option.servant._id === value.servant._id;
 };
 
-const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: Readonly<ServantOption>): ReactNode => {
+const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: ServantOption): ReactNode => {
     const { servant, label } = option;
     return (
         <li {...props} key={servant._id}>
@@ -88,7 +89,7 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
 
     const gameServantList = useGameServantList();
 
-    const options = useMemo((): ReadonlyArray<ServantOption> => {
+    const options = useMemo((): Array<ServantOption> => {
         if (!gameServantList) {
             return [];
         }

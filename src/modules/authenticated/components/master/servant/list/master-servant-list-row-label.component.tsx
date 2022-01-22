@@ -2,10 +2,11 @@ import { GameServant, MasterServant } from '@fgo-planner/types';
 import React from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
 import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
+import { Immutable } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 
 type Props = {
-    servant: Readonly<GameServant>;
+    servant: Immutable<GameServant>;
     masterServant: MasterServant;
     editMode?: boolean;
     openLinksInNewTab?: boolean;

@@ -4,13 +4,13 @@ import { alpha, IconButton, Link as MuiLink, Table, TableBody, TableCell, TableC
 import { SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AccountPlans } from '../../../../services/data/plan/plan.service';
-import { ReadonlyPartial } from '../../../../types/internal';
+import { MasterAccountPlans } from '../../../../types/data';
+import { Immutable } from '../../../../types/internal';
 
 type Props = {
-    accountPlans: AccountPlans;
-    onDeletePlan?: (plan: ReadonlyPartial<Plan>) => void;
-    onDeletePlanGroup?: (planGroup: ReadonlyPartial<PlanGroup>) => void;
+    accountPlans: MasterAccountPlans;
+    onDeletePlan?: (plan: Immutable<Partial<Plan>>) => void;
+    onDeletePlanGroup?: (planGroup: Immutable<Partial<PlanGroup>>) => void;
 };
 
 const StyleClassPrefix = 'PlanList';

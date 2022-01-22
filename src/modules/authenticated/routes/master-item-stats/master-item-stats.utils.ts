@@ -1,6 +1,7 @@
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/types';
 import { GameItemConstants } from '../../../../constants';
-import { GameServantMap, GameSoundtrackList } from '../../../../types/internal';
+import { GameServantMap, GameSoundtrackList } from '../../../../types/data';
+import { Immutable } from '../../../../types/internal';
 import { ObjectUtils } from '../../../../utils/object.utils';
 
 export type MasterItemStat = {
@@ -109,7 +110,7 @@ export class MasterItemStatsUtils {
 
     private static _updateForOwnedServant(
         stats: Record<number, MasterItemStat>,
-        servant: GameServant,
+        servant: Immutable<GameServant>,
         masterServant: MasterServant,
         includeAppendSkills: boolean,
         unlockedCostumes: Set<number>,
@@ -142,7 +143,7 @@ export class MasterItemStatsUtils {
 
     private static _updateForOwnedServantSkills(
         stats: Record<number, MasterItemStat>,
-        skillMaterials: GameServantSkillMaterials,
+        skillMaterials: Immutable<GameServantSkillMaterials>,
         skillLevels: MasterServant['appendSkills']
     ): void {
         const appendSkill1 = skillLevels[1] ?? 0;
@@ -160,7 +161,7 @@ export class MasterItemStatsUtils {
 
     private static _updateForUnownedServant(
         stats: Record<number, MasterItemStat>,
-        servant: GameServant,
+        servant: Immutable<GameServant>,
         includeAppendSkills: boolean,
         includeCostumes: boolean
     ): void {
@@ -204,7 +205,7 @@ export class MasterItemStatsUtils {
      */
     private static _updateForServantEnhancement(
         stats: Record<number, MasterItemStat>,
-        enhancement: GameServantEnhancement,
+        enhancement: Immutable<GameServantEnhancement>,
         owned = false,
         maxEnhancementCount = 1,
         enhancementCount = 0

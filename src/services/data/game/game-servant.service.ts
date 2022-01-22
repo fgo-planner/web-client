@@ -1,8 +1,8 @@
 import { GameServant } from '@fgo-planner/types';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { Page, Pagination } from '../../../types/data';
-import { GameServantList, GameServantMap, Nullable } from '../../../types/internal';
+import { GameServantList, GameServantMap, Page, Pagination } from '../../../types/data';
+import { Immutable, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
 
@@ -100,7 +100,7 @@ export class GameServantService {
         return Http.get<Page<GameServant>>(`${this._BaseUrl}/page`, { params });
     }
 
-    private _onServantsCacheLoaded(data: ReadonlyArray<GameServant>): void {
+    private _onServantsCacheLoaded(data: GameServantList): void {
         this._generateCacheMap(this._servantsCache = data);
         this._servantsCachePromise = null;
     }
@@ -117,8 +117,8 @@ export class GameServantService {
         this._servantsCacheMap = null;
     }
 
-    private _generateCacheMap(servants: ReadonlyArray<GameServant>): void {
-        const cacheMap: Record<number, Readonly<GameServant>> = {};
+    private _generateCacheMap(servants: GameServantList): void {
+        const cacheMap: Record<number, Immutable<GameServant>> = {};
         for (const servant of servants) {
             cacheMap[servant._id] = servant;
         }

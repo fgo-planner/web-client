@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { GameSoundtrackService } from '../../services/data/game/game-soundtrack.service';
-import { GameSoundtrackList, Nullable } from '../../types/internal';
+import { GameSoundtrackList } from '../../types/data';
+import { Nullable } from '../../types/internal';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 /**

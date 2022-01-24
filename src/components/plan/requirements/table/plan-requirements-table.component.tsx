@@ -1,6 +1,6 @@
 import { MasterAccount, Plan, PlanServant } from '@fgo-planner/types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { ReactNode, UIEvent, useCallback, useMemo, useRef } from 'react';
+import React, { ReactNode, UIEvent, useCallback, useEffect, useMemo, useRef } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { PlanRequirements } from '../../../../types/data';
@@ -22,6 +22,15 @@ type Props = {
 
 const CondensedSize = 42;
 const NormalSize = 52;
+
+const updateContainerWidth = (horizontalScrollContainer: Element, verticalScrollContainer: HTMLDivElement | null): void => {
+    if (!verticalScrollContainer) {
+        return;
+    }
+    const { scrollLeft, clientWidth } = horizontalScrollContainer;
+    const containerWidth = scrollLeft + clientWidth;
+    verticalScrollContainer.style.width = `${containerWidth}px`;
+};
 
 const getDisplayedItems = (
     planRequirements: Immutable<PlanRequirements>,
@@ -81,14 +90,7 @@ const StyleProps = {
         height: '100%',
         boxSizing: 'border-box',
         overflowX: 'hidden',
-        overflowY: 'auto',
-        // pt: '52px',
-        // pb: 'calc( 2 * 52px)',
-        // '&>div': {
-        //     height: '100%',
-        //     overflowX: 'hidden',
-        //     overflowY: 'auto',
-        // }
+        overflowY: 'auto'
     },
     [`& .${StyleClassPrefix}-footer`]: {
         // position: 'absolute'
@@ -110,10 +112,31 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
 
     //#region Element refs
 
+    const horizontalScrollContainerRef = useRef<HTMLDivElement>(null);
+    
     const verticalScrollContainerRef = useRef<HTMLDivElement>(null);
 
     //#endregion
 
+
+    useEffect(() => {
+        const resizeObserver = new ResizeObserver((entries: Array<ResizeObserverEntry>) => {
+            const entry = entries[0];
+            if (!entry) {
+                return;
+            }
+            updateContainerWidth(entry.target, verticalScrollContainerRef.current);
+        });
+        // TODO Is timeout needed?
+        setTimeout(() => {
+            if (horizontalScrollContainerRef.current) {
+                resizeObserver.observe(horizontalScrollContainerRef.current);
+            }
+        });
+
+        return () => resizeObserver.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [horizontalScrollContainerRef.current]);
 
     const masterServantMap = useMemo(() => {
         return ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
@@ -138,12 +161,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     //#region Input event handlers
 
     const handleScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
-        const { scrollLeft, clientWidth } = event.target as Element;
-        if (!verticalScrollContainerRef.current) {
-            return;
-        }
-        const containerWidth = scrollLeft + clientWidth;
-        verticalScrollContainerRef.current.style.width = `${containerWidth}px`;
+        updateContainerWidth(event.target as Element, verticalScrollContainerRef.current);
     }, []);
 
     //#endregion
@@ -181,20 +199,24 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 servantRequirements={servantRequirements}
                 options={internalTableOptions}
                 onEditServant={onEditServant}
-                // TODO Add right click (context) handler
+            // TODO Add right click (context) handler
             />
         );
     };
 
     return (
         <Box sx={StyleProps}>
-            <div className={`${StyleClassPrefix}-horizontal-scroll-container`} onScroll={handleScroll}>
+            <div
+                ref={horizontalScrollContainerRef}
+                className={`${StyleClassPrefix}-horizontal-scroll-container`}
+                onScroll={handleScroll}
+            >
                 <div className={`${StyleClassPrefix}-header`}>
                     <PlanRequirementsTableItemsRow options={internalTableOptions} borderBottom />
                 </div>
                 <div
-                    className={`${StyleClassPrefix}-vertical-scroll-container`}
                     ref={verticalScrollContainerRef}
+                    className={`${StyleClassPrefix}-vertical-scroll-container`}
                 >
                     {planServants.map(renderServantRow)}
                 </div>

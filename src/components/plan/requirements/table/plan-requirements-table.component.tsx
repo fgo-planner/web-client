@@ -174,13 +174,14 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
             <PlanRequirementsTableServantRow
                 key={instanceId}
                 // index={index}
+                borderTop={!!index}
                 gameServant={gameServant}
                 masterServant={masterServant}
                 planServant={planServant}
                 servantRequirements={servantRequirements}
                 options={internalTableOptions}
                 onEditServant={onEditServant}
-            // TODO Add right click (context) handler
+                // TODO Add right click (context) handler
             />
         );
     };
@@ -189,7 +190,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         <Box sx={StyleProps}>
             <div className={`${StyleClassPrefix}-horizontal-scroll-container`} onScroll={handleScroll}>
                 <div className={`${StyleClassPrefix}-header`}>
-                    <PlanRequirementsTableItemsRow options={internalTableOptions} />
+                    <PlanRequirementsTableItemsRow options={internalTableOptions} borderBottom />
                 </div>
                 <div
                     className={`${StyleClassPrefix}-vertical-scroll-container`}

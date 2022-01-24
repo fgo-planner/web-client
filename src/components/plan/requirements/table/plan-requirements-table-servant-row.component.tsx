@@ -10,6 +10,7 @@ import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-
 import { PlanRequirementsTableRow } from './plan-requirements-table-row.component';
 
 type Props = {
+    borderTop?: boolean;
     gameServant: Immutable<GameServant>;
     masterServant: Immutable<MasterServant>;
     onEditServant?: (planServant: Immutable<PlanServant>) => void;
@@ -21,6 +22,7 @@ type Props = {
 export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
 
     const {
+        borderTop,
         gameServant,
         masterServant,
         onEditServant,
@@ -53,7 +55,7 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
     };
 
     return (
-        <PlanRequirementsTableRow borderTop>
+        <PlanRequirementsTableRow borderTop={borderTop}>
             <div style={{ width: 320, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <GameServantThumbnail
                     gameServant={gameServant}

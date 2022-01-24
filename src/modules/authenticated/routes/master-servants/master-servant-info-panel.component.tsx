@@ -10,9 +10,10 @@ import { DataPointListItem } from '../../../../components/list/data-point-list-i
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
+import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../types/data';
 import { Immutable } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
-import { ComputationOptions, EnhancementRequirements, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
+import { ComputationOptions, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
 type Props = {
@@ -207,7 +208,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                 }
                 // TODO Add way to toggle lores
                 const computationOptions = generateComputationOptions(!!showAppendSkills, false);
-                const result = PlanComputationUtils.computeServantRequirements(
+                const result = PlanComputationUtils.computeServantEnhancementRequirements(
                     servant,
                     activeServant,
                     unlockedCostumes,
@@ -246,7 +247,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         if (servant) {
             // TODO Add way to toggle lores
             const computationOptions = generateComputationOptions(!!showAppendSkills, false);
-            const result = PlanComputationUtils.computeServantRequirements(
+            const result = PlanComputationUtils.computeServantEnhancementRequirements(
                 servant,
                 activeServant,
                 unlockedCostumes,

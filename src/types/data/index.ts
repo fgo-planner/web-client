@@ -13,4 +13,8 @@ export * from './master/account/master-account-list.type';
 export * from './master/account/master-account-plans.type';
 export * from './page.type';
 export * from './pagination.type';
+export * from './plan/requirements/plan-enhancement-item-requirements.type';
+export * from './plan/requirements/plan-enhancement-requirements.type';
+export * from './plan/requirements/plan-requirements.type';
+export * from './plan/requirements/plan-servant-requirements.type';
 export * from './user-credentials.type';

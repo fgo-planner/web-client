@@ -6,13 +6,13 @@ import { AssetConstants } from '../../../constants';
 import { Immutable } from '../../../types/internal';
 
 type Props = PropsWithChildren<{
-    servant: Immutable<GameServant>;
-    stage?: 1 | 2 | 3 | 4;
     costumeId?: number;
-    size?: string | number;
-    variant?: AvatarProps['variant'];
     enableLink?: boolean;
+    gameServant: Immutable<GameServant>;
     openLinkInNewTab?: boolean;
+    size?: string | number;
+    stage?: 1 | 2 | 3 | 4;
+    variant?: AvatarProps['variant'];
 }>;
 
 const ThumbnailBaseUrl = AssetConstants.ServantThumbnailBaseUrl;
@@ -26,18 +26,16 @@ const DefaultSize = 56;
 export const GameServantThumbnail = React.memo((props: Props) => {
 
     const {
-        children,
-        servant,
-        stage,
         costumeId,
-        variant,
         enableLink,
-        openLinkInNewTab
+        gameServant,
+        openLinkInNewTab,
+        stage,
+        variant,
+        children
     } = props;
 
-    let {size} = props;
-
-    const servantId = servant._id;
+    const servantId = gameServant._id;
 
     const imageUrl = useMemo(() => {
         if (costumeId) {
@@ -47,13 +45,13 @@ export const GameServantThumbnail = React.memo((props: Props) => {
         return `${ThumbnailBaseUrl}/f_${servantId}${imageVariant}.png`;
     }, [costumeId, servantId, stage]);
 
-    size = size || DefaultSize;
+    const size = props.size || DefaultSize;
 
     const avatar = (
         <Avatar
             src={imageUrl}
             variant={variant || DefaultVariant}
-            style={{width: size, height: size}}
+            style={{ width: size, height: size }}
         >
             {children || '?'}
         </Avatar>

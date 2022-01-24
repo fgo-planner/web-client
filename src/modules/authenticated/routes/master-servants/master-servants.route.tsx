@@ -424,7 +424,8 @@ export const MasterServantsRoute = React.memo(() => {
                     onClick={handleAddServantButtonClick}
                     children={<AddIcon />}
                     disabled={!editMode}
-                    size='large' />
+                    size='large'
+                />
             </div>
         </Tooltip>,
         <Tooltip key='costumes' title='Costumes' placement='right'>
@@ -433,7 +434,8 @@ export const MasterServantsRoute = React.memo(() => {
                     component={Link}
                     to='costumes'
                     children={<AccessibilityNewIcon />}
-                    size='large' />
+                    size='large'
+                />
             </div>
         </Tooltip>,
         <Tooltip key='stats' title='Servant stats' placement='right'>
@@ -442,7 +444,8 @@ export const MasterServantsRoute = React.memo(() => {
                     component={Link}
                     to='stats'
                     children={<EqualizerIcon />}
-                    size='large' />
+                    size='large'
+                />
             </div>
         </Tooltip>,
         <Tooltip key='import' title='Upload servant data' placement='right'>
@@ -451,7 +454,8 @@ export const MasterServantsRoute = React.memo(() => {
                     component={Link}
                     to='../master/data/import/servants'
                     children={<PublishIcon />}
-                    size='large' />
+                    size='large'
+                />
             </div>
         </Tooltip>,
         <Tooltip key='export' title='Download servant data' placement='right'>

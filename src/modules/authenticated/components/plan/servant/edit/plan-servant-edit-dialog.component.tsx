@@ -21,9 +21,10 @@ type Props = {
      */
     planServant?: PlanServant;
     planServants: ImmutableArray<PlanServant>;
+    servantSelectDisabled?: boolean;
     showAppendSkills?: boolean;
     submitButtonLabel?: string;
-    unlockedCostumes: Array<number>;
+    unlockedCostumes: ReadonlyArray<number>;
 } & Omit<DialogComponentProps<DialogData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const DialogWidth = 640;
@@ -43,6 +44,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
         masterServants,
         planServant,
         planServants,
+        servantSelectDisabled,
         showAppendSkills,
         submitButtonLabel,
         unlockedCostumes,
@@ -90,6 +92,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
                         planServants={planServants}
                         showAppendSkills={showAppendSkills}
                         unlockedCostumes={unlockedCostumes}
+                        servantSelectDisabled={servantSelectDisabled}
                     />
                 </DialogContent>
                 <DialogActions>

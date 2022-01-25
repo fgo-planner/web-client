@@ -199,8 +199,13 @@ export const PlanRoute = React.memo(() => {
             // TODO Add previous plans
         );
         planRequirementsRef.current = planRequirements;
-        // TODO Do we need to call forceUpdate here?
-    }, [gameServantMap, masterAccount, plan]);
+        /*
+         * Force update is needed here because if the plan loads in after the other data
+         * (servant map and master account data), then the component wont be re-rendered
+         * after requirements are computed.
+         */
+        forceUpdate();
+    }, [forceUpdate, gameServantMap, masterAccount, plan]);
 
     /*
      * Initial load of plan data.

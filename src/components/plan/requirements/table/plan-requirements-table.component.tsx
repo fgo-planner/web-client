@@ -23,13 +23,30 @@ type Props = {
 const CondensedSize = 42;
 const NormalSize = 52;
 
-const updateContainerWidth = (horizontalScrollContainer: Element, verticalScrollContainer: HTMLDivElement | null): void => {
+/**
+ * Updates the width of the vertical scroll container based on the current with
+ * and scroll position of the horizontal scroll container.
+ *
+ * This allows the vertical scroll container to resize along with the horizontal
+ * scroll so that the vertical scroll bar always remains in a visually fixed
+ * position on the right side of the containers.
+ */
+const updateVerticalScrollContainerWidth = (
+    horizontalScrollContainer: Element,
+    verticalScrollContainer: HTMLDivElement | null,
+    maxWidthOverride?: number
+): void => {
     if (!verticalScrollContainer) {
         return;
     }
-    const { scrollLeft, clientWidth } = horizontalScrollContainer;
-    const containerWidth = scrollLeft + clientWidth;
-    verticalScrollContainer.style.width = `${containerWidth}px`;
+    const {
+        scrollLeft,
+        clientWidth,
+        scrollWidth
+    } = horizontalScrollContainer;
+    
+    const width = Math.min(scrollLeft + clientWidth, maxWidthOverride || scrollWidth);
+    verticalScrollContainer.style.width = `${width}px`;
 };
 
 const getDisplayedItems = (
@@ -85,6 +102,7 @@ const StyleProps = {
     },
     [`& .${StyleClassPrefix}-header`]: {
         // position: 'absolute'
+        width: 'fit-content'
     },
     [`& .${StyleClassPrefix}-vertical-scroll-container`]: {
         height: '100%',
@@ -113,30 +131,58 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     //#region Element refs
 
     const horizontalScrollContainerRef = useRef<HTMLDivElement>(null);
-    
+
     const verticalScrollContainerRef = useRef<HTMLDivElement>(null);
+    
+    const maxWidthElementRef = useRef<HTMLDivElement>(null);
 
     //#endregion
 
-
+    /*
+     * Binds an observer to update the vertical scroll container width when the
+     * horizontal scroll container is resized.
+     */
     useEffect(() => {
+        /**
+         * Observes resize events in the horizontal scroll container and max width
+         * reference element and calls the function to update the width of the vertical
+         * scroll container accordingly.
+         */
         const resizeObserver = new ResizeObserver((entries: Array<ResizeObserverEntry>) => {
-            const entry = entries[0];
-            if (!entry) {
+            const [horizontalScrollContainer, maxWidthElement] = entries;
+            if (!horizontalScrollContainer) {
                 return;
             }
-            updateContainerWidth(entry.target, verticalScrollContainerRef.current);
-        });
-        // TODO Is timeout needed?
-        setTimeout(() => {
-            if (horizontalScrollContainerRef.current) {
-                resizeObserver.observe(horizontalScrollContainerRef.current);
-            }
+            updateVerticalScrollContainerWidth(
+                horizontalScrollContainer.target, 
+                verticalScrollContainerRef.current,
+                maxWidthElement?.target.clientWidth,
+            );
         });
 
+        if (horizontalScrollContainerRef.current) {
+            /*
+             * Observe the horizontal scroll container for resize events. This should allow
+             * the width of the vertical scroll container to be updated accordingly when the
+             * window is resized or zoomed, or when the info panel visibility is toggled.
+             */
+            resizeObserver.observe(horizontalScrollContainerRef.current);
+            /*
+             * Also observe the max width reference element, if it exists.
+             */
+            if (maxWidthElementRef.current) {
+                resizeObserver.observe(maxWidthElementRef.current);
+            }
+        }
+
+        /*
+         * Return a function to clear all observations when the hook is re-triggered or
+         * when the component is destroyed.
+         */
         return () => resizeObserver.disconnect();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [horizontalScrollContainerRef.current]);
+    }, [horizontalScrollContainerRef.current, maxWidthElementRef.current]);
 
     const masterServantMap = useMemo(() => {
         return ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
@@ -161,7 +207,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     //#region Input event handlers
 
     const handleScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
-        updateContainerWidth(event.target as Element, verticalScrollContainerRef.current);
+        updateVerticalScrollContainerWidth(event.target as Element, verticalScrollContainerRef.current);
     }, []);
 
     //#endregion
@@ -199,7 +245,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 servantRequirements={servantRequirements}
                 options={internalTableOptions}
                 onEditServant={onEditServant}
-            // TODO Add right click (context) handler
+                // TODO Add right click (context) handler
             />
         );
     };
@@ -211,7 +257,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 className={`${StyleClassPrefix}-horizontal-scroll-container`}
                 onScroll={handleScroll}
             >
-                <div className={`${StyleClassPrefix}-header`}>
+                <div className={`${StyleClassPrefix}-header`} ref={maxWidthElementRef}>
                     <PlanRequirementsTableItemsRow options={internalTableOptions} borderBottom />
                 </div>
                 <div

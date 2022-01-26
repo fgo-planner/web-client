@@ -1,7 +1,9 @@
 export type PlanRequirementsTableOptionsInternal = {
 
-    displaySize: number;
+    cellSize: number;
 
     displayedItems: Array<number>;
+    
+    stickyColumnLayout: 'condensed' | 'normal';
 
 };

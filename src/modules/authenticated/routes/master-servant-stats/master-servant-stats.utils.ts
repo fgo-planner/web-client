@@ -1,7 +1,7 @@
 import { GameServant, GameServantClass, GameServantRarity, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../../../constants';
 import { GameServantClassSimplified, GameServantMap } from '../../../../types/data';
-import { Immutable } from '../../../../types/internal';
+import { Immutable, Nullable } from '../../../../types/internal';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 
 type MasterServantStatGroupedByRarity = {
@@ -352,10 +352,10 @@ export class MasterServantStatsUtils {
     private static _populateBondStats<T extends Record<string, number>>(
         stats: MasterServantStats<T>,
         statKey: string,
-        bond: MasterServantBondLevel | undefined
+        bond: Nullable<MasterServantBondLevel>
     ): void {
 
-        if (bond === undefined) {
+        if (bond == null) {
             return;
         }
 

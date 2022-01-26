@@ -24,6 +24,10 @@ import { SubscriptionTopic } from '../../../../utils/subscription/subscription-t
 import { DialogData as PlanServantEditDialogData, PlanServantEditDialog } from '../../components/plan/servant/edit/plan-servant-edit-dialog.component';
 
 const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
+    layout: {
+        cells: 'normal',
+        stickyColumn: 'normal'
+    },
     displayItems: {
         unused: true,
         statues: true,
@@ -288,9 +292,13 @@ export const PlanRoute = React.memo(() => {
 
     //#region Input event handlers
 
-    const handleToggleLayout = useCallback((): void => {
-        tableOptions.layout = tableOptions.layout === 'condensed' ? 'normal' : 'condensed';
-        setTableOptions({ ...tableOptions });
+    const handleToggleCellSize = useCallback((): void => {
+        const layout = { ...tableOptions.layout };
+        layout.cells = layout.cells === 'condensed' ? 'normal' : 'condensed';
+        setTableOptions({
+            ...tableOptions,
+            layout
+        });
     }, [tableOptions]);
 
     const handleToggleShowUnused = useCallback((): void => {
@@ -433,7 +441,7 @@ export const PlanRoute = React.memo(() => {
         <Tooltip key='test' title='Test' placement='right'>
             <div>
                 <IconButton
-                    onClick={handleToggleLayout}
+                    onClick={handleToggleCellSize}
                     children={<FormatSizeIcon />}
                     size='large'
                 />

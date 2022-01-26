@@ -1,6 +1,6 @@
 import { GameServant, MasterServant, PlanServant } from '@fgo-planner/types';
 import { Edit as EditIcon } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import React, { ReactNode, useCallback } from 'react';
 import { PlanServantRequirements } from '../../../../types/data';
 import { Immutable } from '../../../../types/internal';
@@ -10,6 +10,7 @@ import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-
 import { PlanRequirementsTableRow } from './plan-requirements-table-row.component';
 
 type Props = {
+    borderBottom?: boolean;
     borderTop?: boolean;
     gameServant: Immutable<GameServant>;
     masterServant: Immutable<MasterServant>;
@@ -22,6 +23,7 @@ type Props = {
 export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
 
     const {
+        borderBottom,
         borderTop,
         gameServant,
         masterServant,
@@ -47,7 +49,7 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
         return (
             <PlanRequirementsTableCell
                 key={itemId}
-                size={options.displaySize}
+                size={options.cellSize}
             >
                 {itemRequirements?.total}
             </PlanRequirementsTableCell>
@@ -55,23 +57,37 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
     };
 
     return (
-        <PlanRequirementsTableRow borderTop={borderTop}>
-            <div style={{ width: 320, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <GameServantThumbnail
-                    gameServant={gameServant}
-                    size={options.displaySize}
-                />
-                <div className="flex-fill px-2">
-                    {gameServant.name}
-                </div>
-                <div>
-                    <IconButton onClick={handleEditClick}>
-                        <EditIcon />
-                    </IconButton>
-                </div>
-            </div>
-            {options.displayedItems.map(renderItemCell)}
-        </PlanRequirementsTableRow>
+        <PlanRequirementsTableRow
+            borderTop={borderTop}
+            borderBottom={borderBottom}
+            options={options}
+            stickyColumn={(
+                <Box
+                    sx={{
+                        width: 320,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <GameServantThumbnail
+                        gameServant={gameServant}
+                        size={options.cellSize}
+                    />
+                    <div className="flex-fill px-2">
+                        {gameServant.name}
+                    </div>
+                    <div>
+                        <IconButton onClick={handleEditClick}>
+                            <EditIcon />
+                        </IconButton>
+                    </div>
+                </Box>
+            )}
+            scrollContents={(
+                options.displayedItems.map(renderItemCell)
+            )}
+        />
     );
 
     //#endregion

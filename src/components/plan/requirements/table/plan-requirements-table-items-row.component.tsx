@@ -28,10 +28,10 @@ export const PlanRequirementsTableItemsRow = React.memo((props: Props) => {
     const renderItemCell = (itemId: number): ReactNode => {
         const gameItem = gameItemMap[itemId];
         return (
-            <PlanRequirementsTableCell key={itemId} size={options.displaySize}>
+            <PlanRequirementsTableCell key={itemId} size={options.cellSize}>
                 <GameItemThumbnail
                     gameItem={gameItem}
-                    size={options.displaySize}
+                    size={options.cellSize}
                     showBackground
                 />
             </PlanRequirementsTableCell>
@@ -39,12 +39,12 @@ export const PlanRequirementsTableItemsRow = React.memo((props: Props) => {
     };
 
     return (
-        <PlanRequirementsTableRow borderTop={borderTop} borderBottom={borderBottom}>
-            <div style={{ width: 320 }}>
-                {/* Empty */}
-            </div>
-            {options.displayedItems.map(renderItemCell)}
-        </PlanRequirementsTableRow>
+        <PlanRequirementsTableRow
+            borderTop={borderTop}
+            borderBottom={borderBottom}
+            options={options}
+            scrollContents={options.displayedItems.map(renderItemCell)}
+        />
     );
 
 });

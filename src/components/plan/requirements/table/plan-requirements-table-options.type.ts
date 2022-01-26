@@ -1,6 +1,9 @@
 export type PlanRequirementsTableOptions = {
 
-    layout?: 'condensed' | 'normal';
+    layout: {
+        cells: 'condensed' | 'normal';
+        stickyColumn: 'condensed' | 'normal';
+    }
 
     displayItems: {
         unused?: boolean;

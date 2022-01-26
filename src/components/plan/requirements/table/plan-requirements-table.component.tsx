@@ -6,11 +6,12 @@ import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.h
 import { PlanRequirements } from '../../../../types/data';
 import { Immutable } from '../../../../types/internal';
 import { ArrayUtils } from '../../../../utils/array.utils';
-import { PlanRequirementsTableItemsRow } from './plan-requirements-table-items-row.component';
+import { PlanRequirementsTableFooter, StyleClassPrefix as PlanRequirementsTableFooterStyleClassPrefix } from './plan-requirements-table-footer.component';
+import { PlanRequirementsTableHeader, StyleClassPrefix as PlanRequirementsTableHeaderStyleClassPrefix } from './plan-requirements-table-header.component';
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
 import { PlanRequirementsTableOptions } from './plan-requirements-table-options.type';
+import { StyleClassPrefix as PlanRequirementsTabletRowStyleClassPrefix } from './plan-requirements-table-row.component';
 import { PlanRequirementsTableServantRow } from './plan-requirements-table-servant-row.component';
-import { PlanRequirementsTableTotalRow } from './plan-requirements-table-total-row.component';
 
 type Props = {
     masterAccount: Immutable<MasterAccount>;
@@ -20,33 +21,20 @@ type Props = {
     planRequirements: PlanRequirements;
 };
 
-const CondensedSize = 42;
-const NormalSize = 52;
+const CellSizeCondensed = 42;
+const CellSizeNormal = 52;
 
 /**
- * Updates the width of the vertical scroll container based on the current with
- * and scroll position of the horizontal scroll container.
- *
- * This allows the vertical scroll container to resize along with the horizontal
- * scroll so that the vertical scroll bar always remains in a visually fixed
- * position on the right side of the containers.
+ * Updates the `left` style property of the rows' scroll container elements to
+ * follow the horizontal scroll of the table.
  */
-const updateVerticalScrollContainerWidth = (
-    horizontalScrollContainer: Element,
-    verticalScrollContainer: HTMLDivElement | null,
-    maxWidthOverride?: number
-): void => {
-    if (!verticalScrollContainer) {
-        return;
+const updateRowHorizontalScroll = ({ scrollLeft }: Element): void => {
+    const targetClassName = `${PlanRequirementsTabletRowStyleClassPrefix}-scroll-contents`; // TODO Un-hardcode this
+    const targetElements = document.getElementsByClassName(targetClassName);
+    const left = `${-scrollLeft}px`;
+    for (const element of targetElements) {
+        (element as HTMLDivElement).style.left = left;
     }
-    const {
-        scrollLeft,
-        clientWidth,
-        scrollWidth
-    } = horizontalScrollContainer;
-    
-    const width = Math.min(scrollLeft + clientWidth, maxWidthOverride || scrollWidth);
-    verticalScrollContainer.style.width = `${width}px`;
 };
 
 const getDisplayedItems = (
@@ -88,32 +76,80 @@ const getDisplayedItems = (
 
 const StyleClassPrefix = 'PlanRequirementsTable';
 
-const StyleProps = {
+const StyleProps = (theme: Theme) => ({
     display: 'flex',
     position: 'relative',
     maxHeight: '100%',
     maxWidth: '100%',
     [`& .${StyleClassPrefix}-horizontal-scroll-container`]: {
+        flex: 1,
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         overflowX: 'auto',
         overflowY: 'clip'
     },
-    [`& .${StyleClassPrefix}-header`]: {
-        // position: 'absolute'
-        width: 'fit-content'
-    },
     [`& .${StyleClassPrefix}-vertical-scroll-container`]: {
+        flex: 1,
         height: '100%',
         boxSizing: 'border-box',
         overflowX: 'hidden',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        position: 'sticky',
+        left: 0
     },
-    [`& .${StyleClassPrefix}-footer`]: {
-        // position: 'absolute'
+    /**
+     * PlanRequirementsTableRow component
+     */
+    [`& .${PlanRequirementsTabletRowStyleClassPrefix}-root`]: {
+        display: 'flex',
+        width: 'fit-content',
+        '&:hover': {
+            // backgroundColor: alpha(theme.palette.text.primary, 0.07)
+        },
+        '&.border-top': {
+            borderTopWidth: 1,
+            borderTopStyle: 'solid',
+            borderTopColor: 'divider'
+        },
+        '&.border-bottom': {
+            borderBottomWidth: 1,
+            borderBottomStyle: 'solid',
+            borderBottomColor: 'divider'
+        },
+        '&.not-expandable': {
+            cursor: 'default'
+        },
+        [`& .${PlanRequirementsTabletRowStyleClassPrefix}-sticky-column-container`]: {
+            position: 'sticky',
+            left: 0,
+            borderRightWidth: 1,
+            borderRightStyle: 'solid',
+            borderRightColor: 'divider'
+        },
+        [`& .${PlanRequirementsTabletRowStyleClassPrefix}-scroll-container`]: {
+            overflow: 'hidden'
+        },
+        [`& .${PlanRequirementsTabletRowStyleClassPrefix}-scroll-contents`]: {
+            display: 'flex',
+            position: 'relative'
+        },
     },
-} as SystemStyleObject<Theme>;
+    /**
+     * PlanRequirementsTableHeader component
+     */
+    [`& .${PlanRequirementsTableHeaderStyleClassPrefix}-root`]: {
+        position: 'sticky',
+        left: 0
+    },
+    /**
+     * PlanRequirementsTableFooter component
+     */
+    [`& .${PlanRequirementsTableFooterStyleClassPrefix}-root`]: {
+        position: 'sticky',
+        left: 0
+    }
+} as SystemStyleObject<Theme>);
 
 export const PlanRequirementsTable = React.memo((props: Props) => {
 
@@ -132,15 +168,11 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
 
     const horizontalScrollContainerRef = useRef<HTMLDivElement>(null);
 
-    const verticalScrollContainerRef = useRef<HTMLDivElement>(null);
-    
-    const maxWidthElementRef = useRef<HTMLDivElement>(null);
-
     //#endregion
 
     /*
-     * Binds an observer to update the vertical scroll container width when the
-     * horizontal scroll container is resized.
+     * Binds an observer to update the `left` style property of the rows' scroll
+     * container elements when horizontal scroll container is resized.
      */
     useEffect(() => {
         /**
@@ -149,30 +181,18 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
          * scroll container accordingly.
          */
         const resizeObserver = new ResizeObserver((entries: Array<ResizeObserverEntry>) => {
-            const [horizontalScrollContainer, maxWidthElement] = entries;
+            const [horizontalScrollContainer] = entries;
             if (!horizontalScrollContainer) {
                 return;
             }
-            updateVerticalScrollContainerWidth(
-                horizontalScrollContainer.target, 
-                verticalScrollContainerRef.current,
-                maxWidthElement?.target.clientWidth,
-            );
+            updateRowHorizontalScroll(horizontalScrollContainer.target);
         });
 
+        /*
+         * Observe the horizontal scroll container for resize events.
+         */
         if (horizontalScrollContainerRef.current) {
-            /*
-             * Observe the horizontal scroll container for resize events. This should allow
-             * the width of the vertical scroll container to be updated accordingly when the
-             * window is resized or zoomed, or when the info panel visibility is toggled.
-             */
             resizeObserver.observe(horizontalScrollContainerRef.current);
-            /*
-             * Also observe the max width reference element, if it exists.
-             */
-            if (maxWidthElementRef.current) {
-                resizeObserver.observe(maxWidthElementRef.current);
-            }
         }
 
         /*
@@ -181,8 +201,8 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
          */
         return () => resizeObserver.disconnect();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [horizontalScrollContainerRef.current, maxWidthElementRef.current]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [horizontalScrollContainerRef.current]);
 
     const masterServantMap = useMemo(() => {
         return ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
@@ -192,22 +212,22 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         return getDisplayedItems(planRequirements, options.displayItems);
     }, [planRequirements, options.displayItems]);
 
-    const displaySize = options.layout === 'condensed' ? CondensedSize : NormalSize;
-
     const internalTableOptions = useMemo((): PlanRequirementsTableOptionsInternal => {
+        const layout = options.layout;
         return {
-            displaySize,
-            displayedItems
+            cellSize: layout.cells === 'condensed' ? CellSizeCondensed : CellSizeNormal,
+            displayedItems,
+            stickyColumnLayout: layout.stickyColumn
         };
-    }, [displaySize, displayedItems]);
+    }, [displayedItems, options.layout]);
 
     const planServants = plan.servants;
 
 
     //#region Input event handlers
 
-    const handleScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
-        updateVerticalScrollContainerWidth(event.target as Element, verticalScrollContainerRef.current);
+    const handleHorizontalScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
+        updateRowHorizontalScroll(event.target as Element);
     }, []);
 
     //#endregion
@@ -238,7 +258,8 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
             <PlanRequirementsTableServantRow
                 key={instanceId}
                 // index={index}
-                borderTop={!!index}
+                borderTop={!index}
+                borderBottom
                 gameServant={gameServant}
                 masterServant={masterServant}
                 planServant={planServant}
@@ -255,24 +276,18 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
             <div
                 ref={horizontalScrollContainerRef}
                 className={`${StyleClassPrefix}-horizontal-scroll-container`}
-                onScroll={handleScroll}
+                onScroll={handleHorizontalScroll}
             >
-                <div className={`${StyleClassPrefix}-header`} ref={maxWidthElementRef}>
-                    <PlanRequirementsTableItemsRow options={internalTableOptions} borderBottom />
-                </div>
-                <div
-                    ref={verticalScrollContainerRef}
-                    className={`${StyleClassPrefix}-vertical-scroll-container`}
-                >
+                <PlanRequirementsTableHeader
+                    options={internalTableOptions}
+                />
+                <div className={`${StyleClassPrefix}-vertical-scroll-container`}>
                     {planServants.map(renderServantRow)}
                 </div>
-                <div className={`${StyleClassPrefix}-footer`}>
-                    <PlanRequirementsTableTotalRow
-                        requirements={planRequirements.group}
-                        options={internalTableOptions}
-                    />
-                    <PlanRequirementsTableItemsRow options={internalTableOptions} />
-                </div>
+                <PlanRequirementsTableFooter
+                    planRequirements={planRequirements}
+                    options={internalTableOptions}
+                />
             </div>
         </Box>
     );

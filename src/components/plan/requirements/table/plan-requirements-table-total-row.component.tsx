@@ -5,6 +5,8 @@ import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-
 import { PlanRequirementsTableRow } from './plan-requirements-table-row.component';
 
 type Props = {
+    borderBottom?: boolean;
+    borderTop?: boolean;
     options: PlanRequirementsTableOptionsInternal;
     requirements: PlanEnhancementRequirements;
 };
@@ -12,6 +14,8 @@ type Props = {
 export const PlanRequirementsTableTotalRow = React.memo((props: Props) => {
 
     const {
+        borderBottom,
+        borderTop,
         options,
         requirements
     } = props;
@@ -29,7 +33,7 @@ export const PlanRequirementsTableTotalRow = React.memo((props: Props) => {
         return (
             <PlanRequirementsTableCell
                 key={itemId}
-                size={options.displaySize}
+                size={options.cellSize}
                 bold
             >
                 {itemRequirements?.total}
@@ -38,12 +42,17 @@ export const PlanRequirementsTableTotalRow = React.memo((props: Props) => {
     };
 
     return (
-        <PlanRequirementsTableRow borderTop borderBottom>
-            <div style={{ width: 320, lineHeight: `${options.displaySize}px`, textAlign: 'center', fontWeight: 500 }}>
-                TOTAL
-            </div>
-            {options.displayedItems.map(renderItemCell)}
-        </PlanRequirementsTableRow>
+        <PlanRequirementsTableRow
+            borderTop={borderTop}
+            borderBottom={borderBottom}
+            options={options}
+            stickyColumn={(
+                <div style={{ width: 320, lineHeight: `${options.cellSize}px`, textAlign: 'center', fontWeight: 500 }}>
+                    TOTAL
+                </div>
+            )}
+            scrollContents={options.displayedItems.map(renderItemCell)}
+        />
     );
 
     //#endregion

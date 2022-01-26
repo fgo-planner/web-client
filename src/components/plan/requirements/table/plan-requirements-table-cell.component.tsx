@@ -39,6 +39,7 @@ export const PlanRequirementsTableCell = styled('div', StyleOptions)<Props>(prop
         height: size,
         backgroundColor,
         color,
+        fontSize: Math.ceil(size / 3) + 2,
         fontWeight: bold ? 500 : undefined,
         borderLeftWidth: 1,
         borderLeftStyle: 'solid',

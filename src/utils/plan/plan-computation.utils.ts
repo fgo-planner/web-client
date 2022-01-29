@@ -1,6 +1,6 @@
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantSkillLevel, Plan, PlanServant, PlanServantEnhancements } from '@fgo-planner/types';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantSkillLevel, Plan, PlanServant } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
-import { GameServantMap } from '../../types/data';
+import { GameServantMap, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types/data';
 import { Immutable, ImmutableArray } from '../../types/internal';
 import { ArrayUtils } from '../array.utils';
 import { ObjectUtils } from '../object.utils';
@@ -14,94 +14,6 @@ export type ComputationOptions = {
     includeAppendSkills?: boolean;
     includeCostumes?: boolean;
     excludeLores?: boolean;
-};
-
-/**
- * Breakdown of the quantities required for each enhancement category for a
- * single item.
- */
-export type ItemRequirements = {
-    ascensions: number;
-    skills: number;
-    appendSkills: number;
-    costumes: number;
-    total: number;
-};
-
-/**
- * Map of items required to reach the targeted enhancement levels. The key is
- * the item's ID, and the value is a breakdown of the quantities required for
- * each enhancement category.
- */
-export type ItemRequirementMap = Record<number, ItemRequirements>;
-
-/**
- * Resources required to reach the targeted enhancement levels. Includes embers,
- * fous (TODO), items, and QP.
- */
-export type EnhancementRequirements = {
-    embers: { [key in 1 | 2 | 3 | 4 | 5]: number };
-    // TODO Add fous
-    items: ItemRequirementMap;
-    qp: number;
-};
-
-/**
- * Computed enhancement requirements for a servant in the target plan. Also
- * includes the effective current and target enhancement level used for the
- * computation.
- */
-export type PlanServantRequirements = {
-    instanceId: number;
-    /**
-     * Effective current skills. This may differ actual current skills set by the
-     * user. Computed based on master servant data and/or previous plans in the
-     * group.
-     */
-    current: PlanServantEnhancements;
-    /**
-     * Effective target skills. This may differ actual current skills set by the
-     * user. Computed based on master servant data and/or previous plans in the
-     * group.
-     */
-    target: PlanServantEnhancements;
-    /**
-     * Requirements for enhancing the servant only for the target plan.
-     */
-    requirements: EnhancementRequirements;
-};
-
-/**
- * Computed enhancements requirements for the plan/plan group.
- */
-export type PlanRequirements = {
-    /**
-     * Total enhancement requirements for the plan group. Only the target plan and
-     * preceding plans are included; proceeding plans are excluded.
-     */
-    group: EnhancementRequirements;
-    /**
-     * Map of item quantities needed based on master's current inventory.
-     */
-    itemDebt: Record<number, number>; // TODO Is this needed here?
-    /**
-     * Enhancement requirements for individual plans that precede target plan within
-     * the plan group. Does not include the target plan or any proceeding plans.
-     *
-     * This is a map where the key is the `_id` field of the plan, and the value is
-     * the material debt total for the plan.
-     */
-    previousPlans: Record<string, EnhancementRequirements>;
-    /**
-     * Map of enhancement requirements for the servants in the target plan. The key
-     * is a servant's `instanceId`, and the value is the enhancement requirements
-     * for the servant.
-     */
-    servants: Record<number, PlanServantRequirements>;
-    /**
-     * Total enhancement requirements for the target plan.
-     */
-    targetPlan: EnhancementRequirements;
 };
 
 //#endregion
@@ -186,7 +98,7 @@ export class PlanComputationUtils {
             if (!targetItems[itemId]) {
                 targetItems[itemId] = { ...value };
             } else {
-                this._addItemRequirements(targetItems[itemId], value);
+                this._addEnhancementItemRequirements(targetItems[itemId], value);
             }
         }
         target.qp += source.qp;
@@ -327,14 +239,15 @@ export class PlanComputationUtils {
             /*
              * Update the result with the computed data.
              */
-            let planRequirements: EnhancementRequirements;
+            let planEnhancementRequirements: EnhancementRequirements;
             if (isTargetPlan) {
                 this.addEnhancementRequirements(planServantRequirements.requirements, enhancementRequirements);
-                planRequirements = result.targetPlan;
+                planEnhancementRequirements = result.targetPlan;
             } else {
-                planRequirements = ObjectUtils.getOrDefault(result.previousPlans, plan._id, this._instantiateEnhancementRequirements);
+                const { previousPlans } = result;
+                planEnhancementRequirements = ObjectUtils.getOrDefault(previousPlans, plan._id, this._instantiateEnhancementRequirements);
             }
-            this.addEnhancementRequirements(planRequirements, enhancementRequirements);
+            this.addEnhancementRequirements(planEnhancementRequirements, enhancementRequirements);
             this.addEnhancementRequirements(result.group, enhancementRequirements);
         }
 
@@ -379,7 +292,7 @@ export class PlanComputationUtils {
 
         const { current, target } = planServantRequirements;
 
-        const enhancementRequirements = this._computeServantRequirements(
+        const enhancementRequirements = this._computeServantEnhancementRequirements(
             gameServant,
             current,
             current.costumes,
@@ -405,14 +318,14 @@ export class PlanComputationUtils {
 
     //#region computeServantRequirements + helper methods
 
-    static computeServantRequirements(
+    static computeServantEnhancementRequirements(
         gameServant: Immutable<GameServant>,
         currentEnhancements: ServantEnhancements,
         currentCostumes: ReadonlyArray<number>,
         options?: ComputationOptions
     ): EnhancementRequirements {
 
-        return this._computeServantRequirements(
+        return this._computeServantEnhancementRequirements(
             gameServant,
             currentEnhancements,
             currentCostumes,
@@ -422,7 +335,7 @@ export class PlanComputationUtils {
         );
     }
 
-    private static _computeServantRequirements(
+    private static _computeServantEnhancementRequirements(
         gameServant: Immutable<GameServant>,
         currentEnhancements: Immutable<ServantEnhancements>,
         currentCostumes: ReadonlyArray<number>,
@@ -546,14 +459,14 @@ export class PlanComputationUtils {
     private static _updateEnhancementRequirementResult(
         result: EnhancementRequirements,
         enhancement: Immutable<GameServantEnhancement>,
-        key: keyof ItemRequirements,
+        key: keyof EnhancementItemRequirements,
         enhancementCount = 1
     ): void {
         /*
          * Update material count.
          */
         for (const { itemId, quantity } of enhancement.materials) {
-            const itemCount = ObjectUtils.getOrDefault(result.items, itemId, this._instantiateItemRequirements);
+            const itemCount = ObjectUtils.getOrDefault(result.items, itemId, this._instantiateEnhancementItemRequirements);
             const total = quantity * enhancementCount;
             itemCount[key] += total;
             itemCount.total += total;
@@ -569,7 +482,7 @@ export class PlanComputationUtils {
 
     //#region Other helper methods
 
-    private static _addItemRequirements(target: ItemRequirements, source: ItemRequirements): void {
+    private static _addEnhancementItemRequirements(target: EnhancementItemRequirements, source: EnhancementItemRequirements): void {
         target.ascensions += source.ascensions;
         target.skills += source.skills;
         target.appendSkills += source.appendSkills;
@@ -608,7 +521,7 @@ export class PlanComputationUtils {
 
     //#region Instantiation methods
 
-    private static _instantiateItemRequirements(): ItemRequirements {
+    private static _instantiateEnhancementItemRequirements(): EnhancementItemRequirements {
         return {
             ascensions: 0,
             skills: 0,

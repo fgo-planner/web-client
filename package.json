@@ -31,6 +31,7 @@
     "formik": "^2.2.9",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "npm-force-resolutions": "0.0.10",
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",
     "react-colorful": "^5.5.1",
@@ -48,11 +49,15 @@
     "yup": "^0.32.9"
   },
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "postinstall": "cd node_modules/@fgo-planner/types && npm run build-ts",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "resolutions": {
+    "react-error-overlay": "6.0.9"
   },
   "browserslist": {
     "production": [

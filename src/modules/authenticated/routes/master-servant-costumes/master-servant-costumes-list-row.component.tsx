@@ -97,7 +97,7 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
             <GameServantThumbnail
                 variant="rounded"
                 size={ServantThumbnailSize}
-                servant={servant}
+                gameServant={servant}
                 costumeId={costumeId}
                 enableLink
                 openLinkInNewTab={openLinksInNewTab}

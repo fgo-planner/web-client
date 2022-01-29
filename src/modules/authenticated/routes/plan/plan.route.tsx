@@ -1,21 +1,44 @@
 import { MasterAccount, MasterServant, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/types';
-import { Add as AddIcon, Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
-import { Button, Fab, Tooltip } from '@mui/material';
+import { Add as AddIcon, Clear as ClearIcon, FormatSize as FormatSizeIcon, HideImageOutlined as HideImageOutlinedIcon, Save as SaveIcon } from '@mui/icons-material';
+import { Fab, IconButton, Tooltip } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import lodash from 'lodash';
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
+import { LayoutPanelContainer, StyleClassPrefix as LayoutPanelContainerStyleClassPrefix } from '../../../../components/layout/layout-panel-container.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
+import { PlanRequirementsTableOptions } from '../../../../components/plan/requirements/table/plan-requirements-table-options.type';
+import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/plan-requirements-table.component';
+import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
+import { PlanRequirements } from '../../../../types/data';
 import { Immutable, ImmutableArray, Nullable } from '../../../../types/internal';
-import { PlanComputationUtils, PlanRequirements } from '../../../../utils/plan/plan-computation.utils';
+import { PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { PlanServantUtils } from '../../../../utils/plan/plan-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { DialogData as PlanServantEditDialogData, PlanServantEditDialog } from '../../components/plan/servant/edit/plan-servant-edit-dialog.component';
+
+const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
+    layout: {
+        cells: 'normal',
+        stickyColumn: 'normal'
+    },
+    displayItems: {
+        unused: true,
+        statues: true,
+        gems: true,
+        lores: true,
+        grails: true,
+        embers: true,
+        fous: true
+    }
+});
 
 /**
  * Instantiates a new `PlanServant` based on the available servants in the
@@ -63,6 +86,41 @@ const clonePlan = (plan: Immutable<Plan>): Plan => {
     };
 };
 
+const StyleClassPrefix = 'Plan';
+
+const StyleProps = (theme: Theme) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    [`& .${StyleClassPrefix}-switch-container`]: {
+        px: 4,
+        mb: -6
+    },
+    [`& .${StyleClassPrefix}-main-content`]: {
+        display: 'flex',
+        flex: '1',
+        width: 'calc(100% - 48px)',
+        [`& .${LayoutPanelContainerStyleClassPrefix}-root`]: {
+            display: 'flex',
+            flex: 1,
+            height: 'fit-content',
+            maxHeight: '100%',
+            pr: 4,
+            py: 4
+        }
+    },
+    [`& .${StyleClassPrefix}-info-panel-container`]: {
+        width: 320,
+        height: 'calc(100% - 84px)',
+        pr: 4,
+        py: 4,
+        boxSizing: 'border-box',
+        [theme.breakpoints.down('xl')]: {
+            width: 300
+        }
+    }
+} as SystemStyleObject<Theme>);
+
 export const PlanRoute = React.memo(() => {
 
     const routeMatch = useMatch<'id'>('/user/master/planner/:id');
@@ -74,7 +132,7 @@ export const PlanRoute = React.memo(() => {
     const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
     const planService = useInjectable(PlanService);
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
     /**
      * The plan data loaded from the backend. This should not be modified or used
      * anywhere in this route, except when reverting changes. Use `planRef` instead.
@@ -86,6 +144,7 @@ export const PlanRoute = React.memo(() => {
     const [dirty, setDirty] = useState<boolean>(false); // TODO Rename this
 
     const [showAppendSkills, setShowAppendSkills] = useState<boolean>(true); // TODO Change this back to false
+    const [tableOptions, setTableOptions] = useState<PlanRequirementsTableOptions>(instantiateDefaultTableOptions);
 
     const [editServantTarget, setEditServantTarget] = useState<PlanServant>();
     // const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
@@ -102,7 +161,7 @@ export const PlanRoute = React.memo(() => {
      *
      * When adding a new servant, this will remain `undefined`.
      */
-    const editServantTargetRef = useRef<PlanServant>();
+    const editServantTargetRef = useRef<Immutable<PlanServant>>();
 
     /**
      * Contains a clone of the currently loaded `Plan` object.
@@ -144,8 +203,13 @@ export const PlanRoute = React.memo(() => {
             // TODO Add previous plans
         );
         planRequirementsRef.current = planRequirements;
-        // TODO Do we need to call forceUpdate here?
-    }, [gameServantMap, masterAccount, plan]);
+        /*
+         * Force update is needed here because if the plan loads in after the other data
+         * (servant map and master account data), then the component wont be re-rendered
+         * after requirements are computed.
+         */
+        forceUpdate();
+    }, [forceUpdate, gameServantMap, masterAccount, plan]);
 
     /*
      * Initial load of plan data.
@@ -225,6 +289,27 @@ export const PlanRoute = React.memo(() => {
 
     }, [computePlanRequirements, loadingIndicatorOverlayService, plan, planService, resetLoadingIndicator]);
 
+
+    //#region Input event handlers
+
+    const handleToggleCellSize = useCallback((): void => {
+        const layout = { ...tableOptions.layout };
+        layout.cells = layout.cells === 'condensed' ? 'normal' : 'condensed';
+        setTableOptions({
+            ...tableOptions,
+            layout
+        });
+    }, [tableOptions]);
+
+    const handleToggleShowUnused = useCallback((): void => {
+        const { displayItems } = tableOptions;
+        displayItems.unused = !displayItems.unused;
+        setTableOptions({
+            ...tableOptions,
+            displayItems: { ...displayItems }
+        });
+    }, [tableOptions]);
+
     const handleSaveButtonClick = useCallback((): void => {
         updatePlan();
     }, [updatePlan]);
@@ -237,8 +322,8 @@ export const PlanRoute = React.memo(() => {
         computePlanRequirements();
     }, [computePlanRequirements, plan]);
 
-    const openEditServantDialog = useCallback((value?: PlanServant): void => {
-        if (!value) {
+    const openEditServantDialog = useCallback((planServant?: Immutable<PlanServant>): void => {
+        if (!planServant) {
             /*
              * Adding a planned servant.
              */
@@ -250,7 +335,6 @@ export const PlanRoute = React.memo(() => {
             /*
              * Editing a planned servant.
              */
-            const planServant = value;
             editServantTargetRef.current = planServant;
             setEditServantTarget(PlanServantUtils.clone(planServant));
         }
@@ -262,6 +346,11 @@ export const PlanRoute = React.memo(() => {
         editServantTargetRef.current = undefined;
         setEditServantTarget(undefined);
     }, []);
+
+    const handleEditServant = useCallback((planServant: Immutable<PlanServant>): void => {
+        openEditServantDialog(planServant);
+    }, [openEditServantDialog]);
+
 
     const handleAddServantButtonClick = useCallback((): void => {
         openEditServantDialog();
@@ -280,24 +369,20 @@ export const PlanRoute = React.memo(() => {
         const planServants = plan.servants;
 
         /*
-         * If a new servant is being added, then `editServant` will be undefined.
-         * Conversely, if an existing servant is being edited, then `editServant`
-         * should be defined.
+         * If a new servant is being added, then `editServantTargetRef.current` will be
+         * undefined. Conversely, if an existing servant is being edited, then
+         * `editServantTargetRef.current` should be defined.
          */
-        if (!editServantTarget) {
+        if (!editServantTargetRef.current) {
             planServants.push(data.planServant);
         } else {
             // TODO Compare objects and just close dialog if there are no changes.
             /*
-             * Merge changes into existing servant object.
-             */
-            lodash.assign(editServantTarget, data.planServant);
-            /*
              * Re-build the servant object to force its row to re-render.
              */
-            const index = planServants.indexOf(editServantTarget);
+            const index = planServants.indexOf(editServantTargetRef.current as PlanServant);
             if (index !== -1) {
-                planServants[index] = { ...editServantTarget };
+                planServants[index] = { ...editServantTarget! };
             }
         }
 
@@ -308,6 +393,8 @@ export const PlanRoute = React.memo(() => {
         computePlanRequirements();
         // updateSelectedServants();
     }, [closeEditServantDialog, computePlanRequirements, editServantTarget]);
+
+    //#endregion
 
     const deleteServantDialogPrompt = useMemo((): string | undefined => {
         if (!deleteServantTarget || !gameServantMap || !masterAccount) {
@@ -323,59 +410,118 @@ export const PlanRoute = React.memo(() => {
         return `Are you sure you want to remove ${servant?.name} from the servant list?`;
     }, [deleteServantTarget, gameServantMap, masterAccount]);
 
-    /*
+    /**
      * These can be undefined during the initial render.
      *
-     * Note that if `planRef.current` is undefined, then `plan` would also be
-     * undefined (and vice versa), so we only need to check one of the two here.
+     * Note that `planRequirementsRef.current` is computed from `planRef.current`,
+     * which itself is a clone of `plan`. Thus, if `planRequirementsRef.current` is
+     * defined, then so will the other two.
      */
-    if (!gameServantMap || !masterAccount || !planRef.current) {
+    if (!gameServantMap || !masterAccount || !planRequirementsRef.current) {
         return null;
-    }  
+    }
+    /**
+     * The clone of `plan`. As noted above, this cannot be undefined at this point.
+     */
+    const _plan = planRef.current!; // TODO Rename this
+
+    /**
+     * NavigationRail children
+     */
+    const navigationRailChildNodes: ReactNode = [
+        <Tooltip key='add' title='Add servant' placement='right'>
+            <div>
+                <IconButton
+                    onClick={handleAddServantButtonClick}
+                    children={<AddIcon />}
+                    size='large'
+                />
+            </div>
+        </Tooltip>,
+        <Tooltip key='test' title='Test' placement='right'>
+            <div>
+                <IconButton
+                    onClick={handleToggleCellSize}
+                    children={<FormatSizeIcon />}
+                    size='large'
+                />
+            </div>
+        </Tooltip>,
+        <Tooltip key='test2' title='Test 2' placement='right'>
+        <div>
+            <IconButton
+                onClick={handleToggleShowUnused}
+                children={<HideImageOutlinedIcon />}
+                size='large'
+            />
+        </div>
+    </Tooltip>,
+    ];
+
+    /**
+     * FabContainer children
+     */
+    const fabContainerChildNodes: ReactNode = [
+        <Tooltip key='revert' title='Revert changes'>
+            <div>
+                <Fab
+                    color='default'
+                    onClick={handleRevertButtonClick}
+                    disabled={!dirty || !!loadingIndicatorIdRef.current}
+                    children={<ClearIcon />}
+                />
+            </div>
+        </Tooltip>,
+        <Tooltip key='save' title='Save changes'>
+            <div>
+                <Fab
+                    color='primary'
+                    onClick={handleSaveButtonClick}
+                    disabled={!dirty || !!loadingIndicatorIdRef.current}
+                    children={<SaveIcon />}
+                />
+            </div>
+        </Tooltip>
+    ];
 
     return (
-        <Fragment>
-            <div>
-                <div>
-                    <Button onClick={handleAddServantButtonClick}>
-                        <AddIcon /> Add Servant
-                    </Button>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <div className='flex justify-space-between align-center'>
+                <PageTitle children={_plan.name} />
+                {/* TODO Add button to edit plan details */}
+            </div>
+            <div className='flex overflow-hidden full-height'>
+                <NavigationRail children={navigationRailChildNodes} />
+                <div className={`${StyleClassPrefix}-main-content`}>
+                    <LayoutPanelContainer
+                        className='scrollbar-track-border'
+                        autoHeight
+                        children={
+                            <PlanRequirementsTable
+                                masterAccount={masterAccount}
+                                plan={_plan}
+                                planRequirements={planRequirementsRef.current!}
+                                options={tableOptions}
+                                onEditServant={handleEditServant}
+                            />
+                        }
+                    />
                 </div>
             </div>
-            <FabContainer>
-                <Tooltip title='Revert changes'>
-                    <div>
-                        <Fab
-                            color='default'
-                            onClick={handleRevertButtonClick}
-                            disabled={!dirty || !!loadingIndicatorIdRef.current}
-                            children={<ClearIcon />}
-                        />
-                    </div>
-                </Tooltip>
-                <Tooltip title='Save changes'>
-                    <div>
-                        <Fab
-                            color='primary'
-                            onClick={handleSaveButtonClick}
-                            disabled={!dirty || !!loadingIndicatorIdRef.current}
-                            children={<SaveIcon />}
-                        />
-                    </div>
-                </Tooltip>
-            </FabContainer>
+            <FabContainer children={fabContainerChildNodes} />
             <PlanServantEditDialog
                 open={!!editServantTarget}
                 dialogTitle={`${!editServantTargetRef.current ? 'Add' : 'Edit'} Servant`}
                 submitButtonLabel='Done'
                 planServant={editServantTarget!}
-                planServants={planRef.current.servants}
+                planServants={_plan.servants}
                 masterServants={masterAccount.servants}
-                showAppendSkills={showAppendSkills}
                 unlockedCostumes={masterAccount.costumes}
+                showAppendSkills={showAppendSkills}
+                servantSelectDisabled={!!editServantTargetRef.current}
                 onClose={handleEditServantDialogClose}
             />
-        </Fragment>
+        </Box>
     );
 
 });

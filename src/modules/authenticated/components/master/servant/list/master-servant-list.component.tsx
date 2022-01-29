@@ -154,6 +154,8 @@ const StyleProps = {
 
 export const MasterServantList = React.memo((props: Props) => {
     
+    const gameServantMap = useGameServantMap();
+
     const {
         masterServants,
         bondLevels,
@@ -292,9 +294,10 @@ export const MasterServantList = React.memo((props: Props) => {
         }
         ArrayUtils.moveElement(masterServants, sourceIndex, destinationIndex);
     }, [masterServants]);
-
-    const gameServantMap = useGameServantMap();
     
+    /**
+     * This can be undefined during the initial render.
+     */
     if (!gameServantMap) {
         return null;
     }

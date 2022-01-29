@@ -23,7 +23,7 @@ type Props = {
     readonly?: boolean;
     servantSelectDisabled?: boolean;
     showAppendSkills?: boolean;
-    unlockedCostumes: Array<number>;
+    unlockedCostumes: ReadonlyArray<number>;
 } & Pick<ComponentStyleProps, 'className'>;
 
 type TabId = 'current' | 'target' | 'costumes';

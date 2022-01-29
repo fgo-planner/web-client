@@ -25,7 +25,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, o
             <GameServantThumbnail
                 variant="rounded"
                 size={48}
-                servant={servant}
+                gameServant={servant}
                 stage={artStage}
                 enableLink
                 openLinkInNewTab={openLinksInNewTab}

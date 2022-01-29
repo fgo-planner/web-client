@@ -25,6 +25,9 @@ export const ThemeScrollbars = styled('div')(({ theme }) => ({
     },
     '& .scrollbar-track-border': {
         '& *::-webkit-scrollbar-track': {
+            borderTopWidth: 1,
+            borderTopStyle: 'solid',
+            borderTopColor: theme.palette.divider,
             borderLeftWidth: 1,
             borderLeftStyle: 'solid',
             borderLeftColor: theme.palette.divider,

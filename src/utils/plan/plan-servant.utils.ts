@@ -33,7 +33,7 @@ export class PlanServantUtils {
     /**
      * Returns a deep clone of the given `PlanServant` object.
      */
-    static clone(planServant: PlanServant): PlanServant {
+    static clone(planServant: Immutable<PlanServant>): PlanServant {
         const { current, target } = planServant;
 
         return {

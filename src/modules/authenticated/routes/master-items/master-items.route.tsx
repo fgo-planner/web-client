@@ -12,17 +12,18 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { Nullable } from '../../../../types/internal';
+import { Immutable, Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { MasterItemList } from './master-item-list.component';
 
-const cloneItemsFromMasterAccount = (account: Nullable<MasterAccount>): Array<GameItemQuantity> => {
+const cloneItemsFromMasterAccount = (account: Nullable<Immutable<MasterAccount>>): Array<GameItemQuantity> => {
     if (!account) {
         return [];
     }
+    const { resources } = account;
     const masterItems: GameItemQuantity[] = [];
-    for (const masterItem of account.items) {
+    for (const masterItem of resources.items) {
         masterItems.push({ ...masterItem });
     }
     /*
@@ -31,7 +32,7 @@ const cloneItemsFromMasterAccount = (account: Nullable<MasterAccount>): Array<Ga
      */
     masterItems.push({
         itemId: GameItemConstants.QpItemId,
-        quantity: account.qp
+        quantity: resources.qp
     });
     return masterItems;
 };
@@ -82,6 +83,9 @@ export const MasterItemsRoute = React.memo(() => {
     }, []);
 
     const handleSaveButtonClick = useCallback(async (): Promise<void> => {
+        if (!masterAccount) {
+            return;
+        }
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
             loadingIndicatorId = loadingIndicatorOverlayService.invoke();
@@ -89,16 +93,19 @@ export const MasterItemsRoute = React.memo(() => {
         loadingIndicatorIdRef.current = loadingIndicatorId;
 
         /*
-         * QP is stored as a standalone property in the `MasterAccount` object, so it
-         * needs to be separated out of the items list.
+         * QP is stored as a standalone property in the `MasterAccount.resources`
+         * object, so it needs to be separated out of the items list.
          */
         const qpItem = masterItems.find(item => item.itemId === GameItemConstants.QpItemId);
         const items = masterItems.filter(item => item.itemId !== GameItemConstants.QpItemId);
 
         const update = {
-            _id: masterAccount?._id,
-            items,
-            qp: qpItem?.quantity || 0
+            _id: masterAccount._id,
+            resources: {
+                ...masterAccount.resources,
+                items,
+                qp: qpItem?.quantity || 0
+            }
         };
         try {
             await masterAccountService.updateAccount(update);

@@ -1,4 +1,4 @@
-import { MasterAccount, MasterServant, Plan, PlanServant } from '@fgo-planner/types';
+import { MasterAccount, MasterServant, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/types';
 import { Add as AddIcon, Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Button, Fab, Tooltip } from '@mui/material';
 import lodash from 'lodash';
@@ -10,7 +10,7 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { ImmutableArray, Nullable } from '../../../../types/internal';
+import { Immutable, ImmutableArray, Nullable } from '../../../../types/internal';
 import { PlanComputationUtils, PlanRequirements } from '../../../../utils/plan/plan-computation.utils';
 import { PlanServantUtils } from '../../../../utils/plan/plan-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
@@ -51,16 +51,15 @@ const instantiatePlanServant = (
 /**
  * Returns cloned servant data from the given plan.
  */
-const clonePlan = (plan: Plan): Plan => {
+const clonePlan = (plan: Immutable<Plan>): Plan => {
     return {
         ...plan,
+        targetDate: new Date(plan.targetDate as Date),
         enabled: {
             ...plan.enabled
         },
         servants: plan.servants.map(servant => PlanServantUtils.clone(servant)),
-        inventory: {
-            ...plan.inventory
-        }
+        upcomingResources: plan.upcomingResources.map(lodash.cloneDeep) as Array<PlanUpcomingResources>
     };
 };
 

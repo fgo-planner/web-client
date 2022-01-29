@@ -393,9 +393,9 @@ export class PlanComputationUtils {
 
     private static _preProcessMasterAccount(masterAccount: Immutable<MasterAccount>): MasterAccountData {
         const servants = ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
-        const items = ArrayUtils.mapArrayToObject(masterAccount.items, item => item.itemId, item => item.quantity);
+        const items = ArrayUtils.mapArrayToObject(masterAccount.resources.items, item => item.itemId, item => item.quantity);
         const costumes = new Set(masterAccount.costumes);
-        const qp = masterAccount.qp;
+        const qp = masterAccount.resources.qp;
 
         return { servants, items, costumes, qp };
     }

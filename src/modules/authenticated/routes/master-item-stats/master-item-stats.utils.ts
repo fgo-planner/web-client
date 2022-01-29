@@ -25,7 +25,7 @@ export class MasterItemStatsUtils {
     static generateStats(
         gameServantMap: GameServantMap,
         gameSoundtrackList: GameSoundtrackList,
-        masterAccount: MasterAccount,
+        masterAccount: Immutable<MasterAccount>,
         filter: MasterItemStatsFilterOptions
     ): MasterItemStats {
 
@@ -97,21 +97,22 @@ export class MasterItemStatsUtils {
         return stats;
     }
 
-    private static _populateInventory(stats: Record<number, MasterItemStat>, masterAccount: MasterAccount): void {
-        for (const masterItem of masterAccount.items) {
+    private static _populateInventory(stats: Record<number, MasterItemStat>, { resources }: Immutable<MasterAccount>): void {
+        const { items, qp } = resources;
+        for (const masterItem of items) {
             const stat = this._instantiateItemStat();
             stat.inventory = masterItem.quantity;
             stats[masterItem.itemId] = stat;
         }
         const stat = this._instantiateItemStat();
-        stat.inventory = masterAccount.qp;
+        stat.inventory = qp;
         stats[GameItemConstants.QpItemId] = stat;
     }
 
     private static _updateForOwnedServant(
         stats: Record<number, MasterItemStat>,
         servant: Immutable<GameServant>,
-        masterServant: MasterServant,
+        masterServant: Immutable<MasterServant>,
         includeAppendSkills: boolean,
         unlockedCostumes: Set<number>,
         includeCostumes: boolean,

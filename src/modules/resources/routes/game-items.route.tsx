@@ -1,6 +1,4 @@
-import { alpha } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import clsx from 'clsx';
 import React from 'react';
 import { GameItemThumbnail } from '../../../components/game/item/game-item-thumbnail.component';
 import { LayoutPanelScrollable } from '../../../components/layout/layout-panel-scrollable.component';
@@ -35,7 +33,7 @@ export const GameItemsRoute = React.memo(() => {
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <PageTitle>Item List</PageTitle>
-            <LayoutPanelScrollable className="m-4 scrollbar-track-border">
+            <LayoutPanelScrollable className='m-4 scrollbar-track-border'>
                 {gameItems?.map((gameItem, index) => (
                     <StaticListRowContainer key={index} borderTop={!!index}>
                         <div className='flex align-center'>
@@ -45,7 +43,7 @@ export const GameItemsRoute = React.memo(() => {
                                 showBackground
                                 enableLink
                             />
-                            <div className="px-4" style={{ fontSize: '0.875rem' }}>
+                            <div className='px-4' style={{ fontSize: '0.875rem' }}>
                                 {gameItem.name}
                             </div>
                         </div>

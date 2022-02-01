@@ -5,6 +5,7 @@ import { LazyLoadFallback } from './components/route-fallback/lazy-load-fallback
 import { ThemeProviderWrapper } from './components/theme/theme-provider-wrapper.component';
 import { RequireAuthentication } from './components/utils/require-authentication.component';
 import { useInjectable } from './hooks/dependency-injection/use-injectable.hook';
+import { AboutRoute } from './routes/about.route';
 import { ErrorRoute } from './routes/error.route';
 import { ForgotPasswordRoute } from './routes/forgot-password.route';
 import { HomeRoute } from './routes/home/home.route';
@@ -51,6 +52,10 @@ const ModuleRoutes = [
     {
         path: '/',
         element: <HomeRoute />
+    },
+    {
+        path: '/about',
+        element: <AboutRoute />
     },
     {
         path: '/login',

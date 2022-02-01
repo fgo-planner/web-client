@@ -60,6 +60,7 @@ export const HomeRoute = React.memo(() => {
             <HomeLink
                 key='about'
                 title='About'
+                to='about'
                 imageUrl='https://static.atlasacademy.io/JP/Faces/f_93053100.png'
             />
         ];
@@ -71,7 +72,12 @@ export const HomeRoute = React.memo(() => {
      */
     const masterAccountLinksNode = useMemo((): ReactNode => {
         return (
-            <HomeLinkSection title='Master'>
+            <HomeLinkSection title='Master Account'>
+                <HomeLink
+                    title='Dashboard'
+                    to='user/master'
+                    imageUrl='https://static.atlasacademy.io/JP/Faces/f_93026000.png'
+                />
                 <HomeLink
                     title='My Servants'
                     to='user/master/servants'

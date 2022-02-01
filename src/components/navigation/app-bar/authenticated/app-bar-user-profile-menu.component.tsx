@@ -159,6 +159,7 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
             <AppBarActionMenuItem
                 label="About"
                 icon={InfoOutlinedIcon}
+                to="/about"
             />
         </AppBarActionMenu>
     );

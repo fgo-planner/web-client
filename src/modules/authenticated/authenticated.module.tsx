@@ -11,6 +11,7 @@ import { MasterServantsRoute } from './routes/master-servants/master-servants.ro
 import { MasterSoundtracksRoute } from './routes/master-soundtracks/master-soundtracks.route';
 import { PlanRoute } from './routes/plan/plan.route';
 import { PlansRoute } from './routes/plans/plans.route';
+import { UserProfileRoute } from './routes/user-profile.route';
 import { UserSettingsRoute } from './routes/user-settings.route';
 import { UserThemesEditRoute } from './routes/user-themes-edit/user-themes-edit.route';
 
@@ -22,6 +23,10 @@ const ModuleRoutes = [
     {
         path: '/',
         element: <Navigate to='./master' />
+    },
+    {
+        path: '/profile',
+        element: <UserProfileRoute />
     },
     {
         path: '/settings',

@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { GameItemThumbnail } from '../../../components/game/item/game-item-thumbnail.component';
 import { LayoutPanelScrollable } from '../../../components/layout/layout-panel-scrollable.component';
+import { StaticListRowContainer } from '../../../components/list/static-list-row-container.component';
 import { PageTitle } from '../../../components/text/page-title.component';
 import { useGameItemList } from '../../../hooks/data/use-game-item-list.hook';
 
@@ -18,16 +19,6 @@ const StyleProps = (theme: Theme) => ({
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         borderBottomColor: 'divider',
-    },
-    [`& .${StyleClassPrefix}-row`]: {
-        height: 52,
-        px: 4,
-        borderBottomWidth: 1,
-        borderBottomStyle: 'solid',
-        borderBottomColor: 'divider',
-        '&:hover': {
-            background: alpha(theme.palette.text.primary, 0.07)
-        }
     },
     [`& .${StyleClassPrefix}-footer`]: {
         height: 64,
@@ -44,24 +35,21 @@ export const GameItemsRoute = React.memo(() => {
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <PageTitle>Item List</PageTitle>
-            <LayoutPanelScrollable
-                className="m-4 scrollbar-track-border"
-                headerContents={
-                    <div className={`${StyleClassPrefix}-header`}>HEADER TEST</div>
-                }
-            >
-                {gameItems?.map((gameItem, key) => (
-                    <div key={key} className={clsx(`${StyleClassPrefix}-row`, 'flex align-center')}>
-                        <GameItemThumbnail
-                            gameItem={gameItem}
-                            size={42}
-                            showBackground
-                            enableLink
-                        />
-                        <div className="px-4" style={{ fontSize: '0.875rem' }}>
-                            {gameItem.name}
+            <LayoutPanelScrollable className="m-4 scrollbar-track-border">
+                {gameItems?.map((gameItem, index) => (
+                    <StaticListRowContainer key={index} borderTop={!!index}>
+                        <div className='flex align-center'>
+                            <GameItemThumbnail
+                                gameItem={gameItem}
+                                size={52}
+                                showBackground
+                                enableLink
+                            />
+                            <div className="px-4" style={{ fontSize: '0.875rem' }}>
+                                {gameItem.name}
+                            </div>
                         </div>
-                    </div>
+                    </StaticListRowContainer>
                 ))}
             </LayoutPanelScrollable>
         </Box>

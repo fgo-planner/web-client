@@ -33,6 +33,22 @@ export const ComponentsOverrides: Components = {
     },
     MuiTypography: {
         styleOverrides: {
+            h2: {
+                fontFamily: ThemeConstants.FontFamilyGoogleSans,
+                fontWeight: 500
+            },
+            h3: {
+                fontFamily: ThemeConstants.FontFamilyGoogleSans,
+                fontWeight: 500
+            },
+            h4: {
+                fontFamily: ThemeConstants.FontFamilyGoogleSans,
+                fontWeight: 500
+            },
+            h5: {
+                fontFamily: ThemeConstants.FontFamilyGoogleSans,
+                fontWeight: 500
+            },
             h6: {
                 fontFamily: ThemeConstants.FontFamilyGoogleSans
             }

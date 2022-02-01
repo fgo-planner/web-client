@@ -1,9 +1,10 @@
-import { alpha, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { PropsWithChildren, ReactNode, useMemo } from 'react';
 import { ComponentStyleProps } from '../../types/internal/props/component-style-props.type';
 import { StyleUtils } from '../../utils/style.utils';
+import { LayoutPanel } from './layout-panel.component';
 
 type Props = PropsWithChildren<{
     title?: string;
@@ -25,9 +26,6 @@ const StyleProps = (theme: Theme) => ({
     },
     [`& .${StyleClassPrefix}-contents`]: {
         height: '100%',
-        backgroundColor: alpha(theme.palette.background.paper, 0.95),
-        borderRadius: theme.spacing(4),
-        overflow: 'hidden',
         '&.auto-height': {
             height: 'initial',
             maxHeight: '100%'
@@ -63,10 +61,10 @@ export const LayoutPanelContainer = React.memo((props: Props) => {
             sx={sxProps}
         >
             {titlePosition === 'outside' && titleNode}
-            <div className={clsx(`${StyleClassPrefix}-contents`, autoHeight && 'auto-height')}>
+            <LayoutPanel className={clsx(`${StyleClassPrefix}-contents`, autoHeight && 'auto-height')}>
                 {titlePosition === 'inside' && titleNode}
                 {children}
-            </div>
+            </LayoutPanel>
         </Box>
     );
 

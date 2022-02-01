@@ -7,7 +7,7 @@ import { RequireAuthentication } from './components/utils/require-authentication
 import { useInjectable } from './hooks/dependency-injection/use-injectable.hook';
 import { ErrorRoute } from './routes/error.route';
 import { ForgotPasswordRoute } from './routes/forgot-password.route';
-import { HomeRoute } from './routes/home.route';
+import { HomeRoute } from './routes/home/home.route';
 import { LoginRoute } from './routes/login.route';
 import { RegistrationRoute } from './routes/registration.route';
 import { BackgroundMusicService } from './services/audio/background-music.service';

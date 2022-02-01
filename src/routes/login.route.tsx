@@ -78,9 +78,9 @@ export const LoginRoute = React.memo(() => {
         setErrorMessage(undefined);
         try {
             await authenticationService.login(values);
-            // Temporarily navigate to servants instead of dashboard.
+            // Temporarily navigate to home instead of dashboard.
             // TODO Navigate to dashboard once the page is implemented.
-            navigate('/user/master/servants');
+            navigate('/');
         } catch (e: any) {
             setIsLoggingIn(false);
             setErrorMessage(e.message || String(e));

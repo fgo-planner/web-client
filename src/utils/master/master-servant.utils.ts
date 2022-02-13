@@ -1,6 +1,7 @@
 import { GameServant, MasterServant, MasterServantAscensionLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
 import { Immutable } from '../../types/internal';
+import { DateTimeUtils } from '../date-time.utils';
 
 export class MasterServantUtils {
 
@@ -25,9 +26,11 @@ export class MasterServantUtils {
     /**
      * Returns a deep clone of the given `MasterServant` object.
      */
-    static clone(masterServant: MasterServant): MasterServant {
+    static clone(masterServant: Immutable<MasterServant>): MasterServant {
+        const summonDate = DateTimeUtils.cloneDate(masterServant.summonDate);
         return {
             ...masterServant,
+            summonDate,
             skills: {
                 ...masterServant.skills
             }

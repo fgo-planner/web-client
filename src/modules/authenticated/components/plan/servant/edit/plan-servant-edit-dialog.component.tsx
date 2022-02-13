@@ -25,7 +25,7 @@ type Props = {
     showAppendSkills?: boolean;
     submitButtonLabel?: string;
     unlockedCostumes: ReadonlyArray<number>;
-} & Omit<DialogComponentProps<DialogData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
+} & Omit<DialogComponentProps<DialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const DialogWidth = 640;
 
@@ -71,7 +71,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
         onClose(event, 'cancel');
     }, [onClose]);
 
-    const open = props.open && !!planServant;
+    const open = !!planServant;
 
     /*
      * Only re-render the dialog child node if the dialog is open. This allows the

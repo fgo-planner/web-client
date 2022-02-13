@@ -13,15 +13,13 @@ import { StyleClassPrefix as MasterServantListRowLabelStyleClassPrefix } from '.
 import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './master-servant-list-row.component';
 
 type Props = {
-    masterServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel>;
+    dragDropMode?: boolean;
+    masterServants: Array<MasterServant>;
     /**
      * Instance IDs of selected servants.
      */
     selectedServants?: ReadonlySet<number>;
-    editMode?: boolean;
-    showAddServantRow?: boolean;
-    openLinksInNewTab?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
     onAddServant?: () => void;
@@ -160,9 +158,7 @@ export const MasterServantList = React.memo((props: Props) => {
         masterServants,
         bondLevels,
         selectedServants,
-        editMode,
-        showAddServantRow,
-        openLinksInNewTab,
+        dragDropMode,
         visibleColumns,
         onAddServant,
         onEditServant,
@@ -317,10 +313,9 @@ export const MasterServantList = React.memo((props: Props) => {
                 masterServant={masterServant}
                 onEditServant={onEditServant}
                 onDeleteServant={onDeleteServant}
-                openLinksInNewTab={openLinksInNewTab}
                 visibleColumns={visibleColumns}
                 active={active}
-                editMode={editMode}
+                dragDropMode={dragDropMode}
                 onClick={handleServantClick}
                 // TODO Add right click (context) handler
             />
@@ -332,7 +327,7 @@ export const MasterServantList = React.memo((props: Props) => {
             <div className={`${StyleClassPrefix}-add-servant-row`}>
                 <Button
                     className={`${StyleClassPrefix}-add-servant-row-button`}
-                    color="secondary"
+                    color='secondary'
                     onClick={onAddServant}
                 >
                     <div className={`${StyleClassPrefix}-add-servant-row-label`}>
@@ -344,19 +339,19 @@ export const MasterServantList = React.memo((props: Props) => {
         );
     };
 
-    if (!editMode) {
-        return (
-            <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-                {masterServants.map(renderMasterServantRow)}
-                {showAddServantRow && renderAddServantRow()}
-            </Box>
-        );
-    }
+    // if (!editMode) {
+    //     return (
+    //         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+    //             {masterServants.map(renderMasterServantRow)}
+    //             {showAddServantRow && renderAddServantRow()}
+    //         </Box>
+    //     );
+    // }
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <DragDropContext onDragEnd={handleServantDragEnd}>
-                <Droppable droppableId="droppable-servant-list">
+                <Droppable droppableId='droppable-servant-list' isDropDisabled={!dragDropMode}>
                     {(provided: DroppableProvided) => (
                         <div ref={provided.innerRef} {...provided.droppableProps}>
                             {masterServants.map(renderMasterServantRow)}
@@ -365,7 +360,6 @@ export const MasterServantList = React.memo((props: Props) => {
                     )}
                 </Droppable>
             </DragDropContext>
-            {showAddServantRow && renderAddServantRow()}
         </Box>
     );
 

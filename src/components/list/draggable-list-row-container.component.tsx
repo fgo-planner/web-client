@@ -1,19 +1,20 @@
 import { DragIndicator as DragIndicatorIcon, SvgIconComponent } from '@mui/icons-material';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
-import React, { DOMAttributes, MouseEvent, PropsWithChildren } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import React, { DOMAttributes, MouseEvent, PropsWithChildren, ReactNode } from 'react';
+import { Draggable, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 import listRowStyle from './list-row-style';
 
 // TODO Add prop for cursor style.
 type Props = PropsWithChildren<{
-    classes?: any;
-    index: number;
-    draggableId: string;
-    dragHandleIcon?: SvgIconComponent;
     active?: boolean;
-    borderTop?: boolean;
     borderBottom?: boolean;
+    borderTop?: boolean;
+    draggableId: string;
+    dragEnabled?: boolean;
+    dragHandleIcon?: SvgIconComponent;
+    dragHandleVisible?: boolean;
+    index: number;
     // TODO Add option(s) to hide/disable drag handle.
 }> & DOMAttributes<HTMLDivElement>;
 
@@ -41,27 +42,60 @@ const RootComponent = styled('div', StyleOptions)(({ theme }) => ({
     },
     [`& .${StyleClassPrefix}-drag-handle`]: {
         margin: theme.spacing(0, -2, 0, 1),
-        opacity: 0.5
+        opacity: 0.5,
+        '&.disabled': {
+            color: theme.palette.text.disabled
+        }
     }
 }));
 
 export const DraggableListRowContainer = React.memo((props: Props) => {
 
     const {
-        children,
-        index,
-        draggableId,
-        dragHandleIcon,
         active,
-        borderTop,
         borderBottom,
+        borderTop,
+        draggableId,
+        dragEnabled,
+        dragHandleIcon,
+        dragHandleVisible,
+        index,
+        children,
         ...domAttributes
     } = props;
 
     const DragHandleIcon = dragHandleIcon ?? DefaultDragHandleIcon;
 
+    const renderDragHandle = (dragHandleProps: DraggableProvidedDragHandleProps | undefined): ReactNode => {
+        console.log("HELLO???", index);
+        if (!dragHandleVisible) {
+            return null;
+        }
+        if (!dragEnabled) {
+            return (
+                <div className={clsx(`${StyleClassPrefix}-drag-handle`, 'disabled')}>
+                    <DragHandleIcon />
+                </div>
+            );
+        }
+        return (
+            <div
+                onClick={handleDragHandleClick}
+                {...dragHandleProps}
+                className={`${StyleClassPrefix}-drag-handle`}
+            >
+                <DragHandleIcon />
+            </div>
+        );
+    };
+
     return (
-        <Draggable draggableId={draggableId} key={draggableId} index={index}>
+        <Draggable
+            index={index}
+            key={draggableId}
+            draggableId={draggableId}
+            isDragDisabled={!dragEnabled || !dragHandleVisible}
+        >
             {(provided, snapshot) => {
                 const classNames = clsx(
                     'row',
@@ -78,13 +112,7 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
                         {...provided.draggableProps}
                         className={classNames}
                     >
-                        <div
-                            onClick={handleDragHandleClick}
-                            {...provided.dragHandleProps}
-                            className={`${StyleClassPrefix}-drag-handle`}
-                        >
-                            <DragHandleIcon />
-                        </div>
+                        {renderDragHandle(provided.dragHandleProps)}
                         {children}
                     </RootComponent>
                 );

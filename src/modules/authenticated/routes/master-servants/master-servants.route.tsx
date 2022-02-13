@@ -1,5 +1,5 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
+import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Equalizer as EqualizerIcon, GetApp, LowPriority as LowPriorityIcon, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, FormControlLabel, FormGroup, IconButton, Switch, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import lodash from 'lodash';
@@ -17,7 +17,7 @@ import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-activ
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
+import { Immutable, ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
@@ -34,25 +34,20 @@ type MasterAccountData = {
     unlockedCostumes: Array<number>;
 };
 
-const getMasterAccountData = (account: Nullable<MasterAccount>, clone = false): MasterAccountData => {
+const getDefaultMasterAccountData = (): MasterAccountData => ({
+    masterServants: [],
+    bondLevels: {},
+    unlockedCostumes: []
+});
+
+const cloneMasterAccountData = (account: Nullable<Immutable<MasterAccount>>): MasterAccountData => {
     if (!account) {
-        return {
-            masterServants: [],
-            bondLevels: {},
-            unlockedCostumes: []
-        };
-    }
-    if (clone) {
-        return {
-            masterServants: account.servants.map(MasterServantUtils.clone),
-            bondLevels: lodash.cloneDeep(account.bondLevels),
-            unlockedCostumes: [...account.costumes]
-        };
+        return getDefaultMasterAccountData();
     }
     return {
-        masterServants: account.servants,
-        bondLevels: account.bondLevels,
-        unlockedCostumes: account.costumes
+        masterServants: account.servants.map(MasterServantUtils.clone),
+        bondLevels: lodash.cloneDeep(account.bondLevels),
+        unlockedCostumes: [...account.costumes]
     };
 };
 
@@ -93,26 +88,49 @@ export const MasterServantsRoute = React.memo(() => {
 
     const gameServantMap = useGameServantMap();
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-    const [showAppendSkills, setShowAppendSkills] = useState<boolean>(false);
-    const [editMode, setEditMode] = useState<boolean>(false);
-    const [editServant, setEditServant] = useState<MasterServant>();
-    const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
-    const [deleteServant, setDeleteServant] = useState<MasterServant>();
-    const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
-
+    /**
+     * The master account data loaded from the backend. This should not be modified
+     * or used anywhere in this route, except when reverting changes. Use
+     * `masterAccountDataRef` instead.
+     */
+    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
     /**
      * Contains the `servants`, `bondLevels`, and `unlockedCostumes` data from the
-     * `MasterAccount` object. In edit mode, the data is cloned to avoid unwanted
-     * modification of the original data.
+     * `MasterAccount` object.
      *
-     * The data is stored as a ref to prevent unwanted triggering of hooks on
-     * change.
-     *
-     * FIXME This will call getMasterAccountData on masterAccount for every render,
-     * even if the ref already contains a value
+     * The data is cloned to avoid unwanted modification of the original data. In
+     * addition, the data is stored as a ref to prevent unwanted triggering of hooks
+     * on change.
      */
-    const masterAccountDataRef = useRef<MasterAccountData>(getMasterAccountData(masterAccount));
+    const masterAccountDataRef = useRef<MasterAccountData>(getDefaultMasterAccountData());
+    /**
+     * Whether the user has made any unsaved changes to the master servant data.
+     */
+    const [isMasterAccountDirty, setIsMasterAccountDirty] = useState<boolean>(false);
+
+    /**
+     * Clone of the servant that is being edited by the servant edit dialog. This
+     * data is passed directly into and modified by the dialog. The original data is
+     * not modified until the changes are submitted.
+     */
+    const [editServantDialogTarget, setEditServantDialogTarget] = useState<MasterServant>();
+    /**
+     * Reference to the original copy of the servant that is being edited. Note that
+     * "original" in this context refers to the data from `masterAccountDataRef` and
+     * not the data from `masterAccount`.
+     *
+     * When adding a new servant, this will remain `undefined`.
+     */
+    const editServantDialogTargetRef = useRef<Immutable<MasterServant>>();
+    // const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
+    
+    const [deleteServantDialogTarget, setDeleteServantDialogTarget] = useState<Immutable<MasterServant>>();
+    // const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
+
+    const [dragDropMode, setDragDropMode] = useState<boolean>(false);
+
+    const [showAppendSkills, setShowAppendSkills] = useState<boolean>(false);
+
 
     const { sm, md, lg, xl } = useActiveBreakpoints();
 
@@ -145,7 +163,7 @@ export const MasterServantsRoute = React.memo(() => {
      */
     const updateSelectedServants = useCallback((): void => {
         const currentSelectionIds = selectedServantsRef.current.instanceIds;
-        if (!currentSelectionIds.size) {
+        if (!currentSelectionIds.size || !masterAccountDataRef.current) {
             return;
         }
         const updatedMasterServants = masterAccountDataRef.current.masterServants;
@@ -164,7 +182,7 @@ export const MasterServantsRoute = React.memo(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopic.User_CurrentMasterAccountChange)
             .subscribe(account => {
-                masterAccountDataRef.current = getMasterAccountData(account);
+                masterAccountDataRef.current = cloneMasterAccountData(account);
                 const isSameAccount = masterAccount?._id === account?._id;
                 if (isSameAccount) {
                     updateSelectedServants();
@@ -175,7 +193,7 @@ export const MasterServantsRoute = React.memo(() => {
                     };
                 }
                 setMasterAccount(account);
-                setEditMode(false);
+                setIsMasterAccountDirty(false);
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
@@ -190,10 +208,8 @@ export const MasterServantsRoute = React.memo(() => {
         }
         invokeLoadingIndicator();
 
-        setEditServant(undefined);
-        setEditServantDialogOpen(false);
-        setDeleteServant(undefined);
-        setDeleteServantDialogOpen(false);
+        setEditServantDialogTarget(undefined);
+        setDeleteServantDialogTarget(undefined);
 
         const {
             masterServants,
@@ -212,9 +228,9 @@ export const MasterServantsRoute = React.memo(() => {
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);
-            masterAccountDataRef.current = getMasterAccountData(masterAccount);
+            masterAccountDataRef.current = cloneMasterAccountData(masterAccount);
             updateSelectedServants();
-            setEditMode(false);
+            setIsMasterAccountDirty(false);
         }
 
         resetLoadingIndicator();
@@ -244,32 +260,34 @@ export const MasterServantsRoute = React.memo(() => {
         forceUpdate();
     }, [forceUpdate]);
 
-    const handleEditButtonClick = useCallback((): void => {
-        masterAccountDataRef.current = getMasterAccountData(masterAccount, true);
-        updateSelectedServants();
-        setEditMode(true);
-    }, [masterAccount, updateSelectedServants]);
+    const handleSaveButtonClick = useCallback((): void => {
+        updateMasterAccount();
+    }, [updateMasterAccount]);
 
-    const handleCancelButtonClick = useCallback((): void => {
+    const handleRevertButtonClick = useCallback((): void => {
         // Copy data back from master account
-        masterAccountDataRef.current = getMasterAccountData(masterAccount);
+        masterAccountDataRef.current = cloneMasterAccountData(masterAccount);
         updateSelectedServants();
-        setEditMode(false);
+        setIsMasterAccountDirty(false);
     }, [masterAccount, updateSelectedServants]);
 
     const openEditServantDialog = useCallback((masterServant?: MasterServant): void => {
-        if (!editMode) {
-            return;
+        console.log("WTF??", masterServant)
+        if (!masterServant) {
+            /*
+             * Adding a new servant.
+             */
+            const editServantDialogTarget = MasterServantUtils.instantiate();
+            editServantDialogTargetRef.current = undefined;
+            setEditServantDialogTarget(editServantDialogTarget);
+        } else {
+            /*
+             * Editing an existing servant.
+             */
+            editServantDialogTargetRef.current = masterServant;
+            setEditServantDialogTarget(MasterServantUtils.clone(masterServant));           
         }
-        setEditServant(masterServant);
-        setEditServantDialogOpen(true);
-        setDeleteServant(undefined);
-        setDeleteServantDialogOpen(false);
-    }, [editMode]);
-
-    const closeEditServantDialog = useCallback((): void => {
-        setEditServant(undefined);
-        setEditServantDialogOpen(false);
+        setDeleteServantDialogTarget(undefined);
     }, []);
 
     const handleAddServantButtonClick = useCallback((): void => {
@@ -278,12 +296,11 @@ export const MasterServantsRoute = React.memo(() => {
 
     const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: MasterServantEditDialogData): void => {
         /*
-         * Close the dialog without taking any further action if the component is not
-         * in edit mode, or if the changes were cancelled (if `data` is undefined, then
-         * the changes were cancelled).
+         * Close the dialog without taking any further action if the changes were
+         * cancelled (if `data` is undefined, then the changes were cancelled).
          */
-        if (!editMode || !data) {
-            return closeEditServantDialog();
+        if (!data) {
+            return setEditServantDialogTarget(undefined);
         }
 
         const {
@@ -314,11 +331,11 @@ export const MasterServantsRoute = React.memo(() => {
         unlockedCostumes.push(...data.costumes);
 
         /*
-         * If a new servant is being added, then `editServant` will be undefined.
-         * Conversely, if an existing servant is being edited, then `editServant`
-         * should be defined.
+         * If a new servant is being added, then `editServantDialogTargetRef.current`
+         * will be undefined. Conversely, if an existing servant is being edited, then
+         * `editServantDialogTargetRef.current` should be defined.
          */
-        if (!editServant) {
+        if (!editServantDialogTargetRef.current) {
             /**
              * Computed instance ID for the new servant.
              */
@@ -338,59 +355,55 @@ export const MasterServantsRoute = React.memo(() => {
 
         } else {
             /*
-             * Merge changes into existing servant object.
-             */
-            lodash.assign(editServant, data.masterServant);
-            /*
              * Re-build the servant object to force its row to re-render.
              */
-            const index = masterServants.indexOf(editServant);
+            const index = masterServants.indexOf(editServantDialogTargetRef.current as MasterServant);
             if (index !== -1) {
-                masterServants[index] = { ...editServant };
+                masterServants[index] = {
+                    ...data.masterServant,
+                    instanceId: editServantDialogTargetRef.current.instanceId
+                };
             }
         }
 
         masterAccountDataRef.current.masterServants = [...masterServants]; // Forces child list to re-render
-        closeEditServantDialog();
+
+        setIsMasterAccountDirty(true);
+        setEditServantDialogTarget(undefined);
         updateSelectedServants();
-    }, [editMode, gameServantMap, editServant, closeEditServantDialog, updateSelectedServants]);
+    }, [gameServantMap, updateSelectedServants]);
 
     const openDeleteServantDialog = useCallback((masterServant: MasterServant): void => {
-        if (!editMode) {
-            return;
-        }
-        setEditServant(undefined);
-        setEditServantDialogOpen(false);
-        setDeleteServant(masterServant);
-        setDeleteServantDialogOpen(true);
-    }, [editMode]);
-
-    const closeDeleteServantDialog = useCallback((): void => {
-        setDeleteServant(undefined);
-        setDeleteServantDialogOpen(false);
+        setEditServantDialogTarget(undefined);
+        setDeleteServantDialogTarget(masterServant);
     }, []);
 
     const handleDeleteServantDialogClose = useCallback((event: MouseEvent, reason: ModalOnCloseReason): any => {
-        if (reason !== 'submit') {
-            return closeDeleteServantDialog();
+        if (!deleteServantDialogTarget || reason !== 'submit') {
+            return setDeleteServantDialogTarget(undefined);
         }
         const { masterServants } = masterAccountDataRef.current;
-        lodash.remove(masterServants, servant => servant.instanceId === deleteServant?.instanceId);
-        // TODO Remove bond/costume data if the last instance of the servant is removed.
-        if (!editMode) {
-            return updateMasterAccount();
-        }
-        masterAccountDataRef.current.masterServants = [...masterServants]; // Forces child list to re-render
-        closeDeleteServantDialog();
-    }, [editMode, deleteServant?.instanceId, closeDeleteServantDialog, updateMasterAccount]);
-    
+        const { instanceId } = deleteServantDialogTarget;
+        /*
+         * Removes the target servant. Also forces the child list to re-render since
+         * filter returns a new array.
+         */
+        masterAccountDataRef.current.masterServants = masterServants.filter(servant => servant.instanceId !== instanceId);
+        /*
+         * TODO Also remove bond/costume data if the last instance of the servant is
+         * removed.
+         */
+        setDeleteServantDialogTarget(undefined);
+        setIsMasterAccountDirty(true);
+    }, [deleteServantDialogTarget]);
+
     const deleteServantDialogPrompt = useMemo((): string | undefined => {
-        if (!gameServantMap || !deleteServant) {
+        if (!gameServantMap || !deleteServantDialogTarget) {
             return undefined;
         }
-        const servant = gameServantMap[deleteServant.gameId];
+        const servant = gameServantMap[deleteServantDialogTarget.gameId];
         return `Are you sure you want to remove ${servant?.name} from the servant list?`;
-    }, [gameServantMap, deleteServant]);
+    }, [gameServantMap, deleteServantDialogTarget]);
 
     /*
      * This can be undefined during the initial render.
@@ -408,7 +421,15 @@ export const MasterServantsRoute = React.memo(() => {
                 <IconButton
                     onClick={handleAddServantButtonClick}
                     children={<AddIcon />}
-                    disabled={!editMode}
+                    size='large'
+                />
+            </div>
+        </Tooltip>,
+        <Tooltip key='reorder' title='Re-order servants' placement='right'>
+            <div>
+                <IconButton
+                    onClick={() => setDragDropMode(!dragDropMode)}
+                    children={<LowPriorityIcon />}
                     size='large'
                 />
             </div>
@@ -454,44 +475,28 @@ export const MasterServantsRoute = React.memo(() => {
     /**
      * FabContainer children
      */
-    let fabContainerChildNodes: ReactNode;
-    if (!editMode) {
-        fabContainerChildNodes = (
-            <Tooltip key='edit' title='Edit mode'>
-                <div>
-                    <Fab
-                        color='primary'
-                        onClick={handleEditButtonClick}
-                        disabled={isLoadingIndicatorActive}
-                        children={<EditIcon />}
-                    />
-                </div>
-            </Tooltip>
-        );
-    } else {
-        fabContainerChildNodes = [
-            <Tooltip key='cancel' title='Cancel'>
-                <div>
-                    <Fab
-                        color='default'
-                        onClick={handleCancelButtonClick}
-                        disabled={isLoadingIndicatorActive}
-                        children={<ClearIcon />}
-                    />
-                </div>
-            </Tooltip>,
-            <Tooltip key='save' title='Save changes'>
-                <div>
-                    <Fab
-                        color='primary'
-                        onClick={updateMasterAccount}
-                        disabled={isLoadingIndicatorActive}
-                        children={<SaveIcon />}
-                    />
-                </div>
-            </Tooltip>
-        ];
-    }
+    let fabContainerChildNodes: ReactNode = [
+        <Tooltip key='cancel' title='Cancel'>
+            <div>
+                <Fab
+                    color='default'
+                    onClick={handleRevertButtonClick}
+                    disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
+                    children={<ClearIcon />}
+                />
+            </div>
+        </Tooltip>,
+        <Tooltip key='save' title='Save changes'>
+            <div>
+                <Fab
+                    color='primary'
+                    onClick={handleSaveButtonClick}
+                    disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
+                    children={<SaveIcon />}
+                />
+            </div>
+        </Tooltip>
+    ];
 
     const {
         masterServants,
@@ -502,12 +507,7 @@ export const MasterServantsRoute = React.memo(() => {
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className='flex justify-space-between align-center'>
-                <PageTitle>
-                    {editMode ?
-                        'Edit Servant Roster' :
-                        'Servant Roster'
-                    }
-                </PageTitle>
+                <PageTitle>Servant Roster</PageTitle>
                 <div className={`${StyleClassPrefix}-switch-container`}>
                     <FormGroup row>
                         <FormControlLabel
@@ -531,7 +531,7 @@ export const MasterServantsRoute = React.memo(() => {
                         autoHeight
                         headerContents={
                             <MasterServantListHeader
-                                editMode={editMode}
+                                // editMode={editMode}
                                 visibleColumns={visibleColumns}
                             />
                         }
@@ -540,10 +540,9 @@ export const MasterServantsRoute = React.memo(() => {
                                 masterServants={masterServants}
                                 bondLevels={bondLevels}
                                 selectedServants={selectedServantsRef.current.instanceIds}
-                                editMode={editMode}
-                                showAddServantRow={editMode}
+                                // showAddServantRow
                                 visibleColumns={visibleColumns}
-                                openLinksInNewTab={editMode}
+                                dragDropMode={dragDropMode}
                                 onServantSelectionChange={handleServantSelectionChange}
                                 onAddServant={handleAddServantButtonClick}
                                 onEditServant={openEditServantDialog}
@@ -558,7 +557,7 @@ export const MasterServantsRoute = React.memo(() => {
                                 bondLevels={bondLevels}
                                 unlockedCostumes={unlockedCostumes}
                                 showAppendSkills={showAppendSkills}
-                                editMode={editMode}
+                                // editMode={editMode}
                                 onStatsChange={handleFormChange}
                             />
                         </LayoutPanelContainer>
@@ -567,18 +566,17 @@ export const MasterServantsRoute = React.memo(() => {
             </div>
             <FabContainer children={fabContainerChildNodes} />
             <MasterServantEditDialog
-                open={editServantDialogOpen}
-                dialogTitle={editServant ? 'Edit Servant Info' : 'Add Servant'}
-                submitButtonLabel={editMode ? 'Done' : 'Save'}
-                disableServantSelect={!!editServant}
-                showAppendSkills={showAppendSkills}
-                masterServant={editServant}
+                dialogTitle={editServantDialogTargetRef.current ? 'Edit Servant Info' : 'Add Servant'}
+                submitButtonLabel='Done'
+                masterServant={editServantDialogTarget}
                 bondLevels={bondLevels}
                 unlockedCostumes={unlockedCostumes}
+                showAppendSkills={showAppendSkills}
+                servantSelectDisabled={!!editServantDialogTargetRef.current}
                 onClose={handleEditServantDialogClose}
             />
             <PromptDialog
-                open={deleteServantDialogOpen}
+                open={!!deleteServantDialogTarget}
                 title='Delete Servant?'
                 prompt={deleteServantDialogPrompt}
                 cancelButtonColor='secondary'

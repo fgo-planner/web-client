@@ -11,18 +11,20 @@ import { MasterServantEditForm, SubmitData } from '../edit-form/master-servant-e
 export type DialogData = SubmitData;
 
 type Props = {
-    /**
-     * The master servant to edit. If not provided, the dialog will instantiate a
-     * new servant.
-     */
-    masterServant?: Immutable<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel>;
-    unlockedCostumes: Array<number>;
-    disableServantSelect?: boolean;
-    showAppendSkills?: boolean;
     dialogTitle?: string;
+    /**
+     * The servant to edit. This will be modified directly, so provide a clone if
+     * modification to the original object is not desired.
+     *
+     * If this is not provided, then the dialog will remain closed.
+     */
+    masterServant?: MasterServant;
+    servantSelectDisabled?: boolean;
+    showAppendSkills?: boolean;
     submitButtonLabel?: string;
-} & Omit<DialogComponentProps<DialogData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
+    unlockedCostumes: Array<number>;
+} & Omit<DialogComponentProps<DialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const FormId = 'master-servant-edit-dialog-form';
 
@@ -39,13 +41,13 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
     const forceUpdate = useForceUpdate();
 
     const {
-        masterServant,
         bondLevels,
-        unlockedCostumes,
-        disableServantSelect,
-        showAppendSkills,
         dialogTitle,
+        masterServant,
+        servantSelectDisabled,
+        showAppendSkills,
         submitButtonLabel,
+        unlockedCostumes,
         onClose,
         ...dialogProps
     } = props;
@@ -91,12 +93,14 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         return null;
     }
 
+    const open = !!masterServant;
+
     /*
      * Only re-render the dialog contents if the dialog is open. This allows the
      * dialog to keep displaying the same contents while it is undergoing its exit
      * transition, even if the props were changed by the parent component.
      */
-    if (!dialogContentsRef.current || props.open) {
+    if (open || !dialogContentsRef.current) {
         dialogContentsRef.current = (
             <Typography component={'div'}>
                 <DialogTitle>
@@ -111,7 +115,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
                         bondLevels={bondLevels}
                         unlockedCostumes={unlockedCostumes}
                         onSubmit={submit}
-                        servantSelectDisabled={disableServantSelect}
+                        servantSelectDisabled={servantSelectDisabled}
                         showAppendSkills={showAppendSkills}
                     />
                 </DialogContent>
@@ -140,6 +144,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         <Dialog
             {...dialogProps}
             PaperProps={DialogPaperProps}
+            open={open}
             fullScreen={fullScreen}
             keepMounted={false}
         >

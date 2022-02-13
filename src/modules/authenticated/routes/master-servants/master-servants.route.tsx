@@ -14,9 +14,9 @@ import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
+import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SetUtils } from '../../../../utils/set.utils';
@@ -87,8 +87,11 @@ export const MasterServantsRoute = React.memo(() => {
 
     const forceUpdate = useForceUpdate();
 
-    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+    
     const masterAccountService = useInjectable(MasterAccountService);
+
+    const gameServantMap = useGameServantMap();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [showAppendSkills, setShowAppendSkills] = useState<boolean>(false);
@@ -97,8 +100,6 @@ export const MasterServantsRoute = React.memo(() => {
     const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
     const [deleteServant, setDeleteServant] = useState<MasterServant>();
     const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
-
-    const loadingIndicatorIdRef = useRef<string>();
 
     /**
      * Contains the `servants`, `bondLevels`, and `unlockedCostumes` data from the
@@ -113,16 +114,6 @@ export const MasterServantsRoute = React.memo(() => {
      */
     const masterAccountDataRef = useRef<MasterAccountData>(getMasterAccountData(masterAccount));
 
-    /**
-     * The selected servants.
-     */
-    const selectedServantsRef = useRef<{ instanceIds: Set<number>, servants: Array<MasterServant> }>({
-        instanceIds: new Set(),
-        servants: []
-    });
-
-    const gameServantMap = useGameServantMap();
-
     const { sm, md, lg, xl } = useActiveBreakpoints();
 
     const visibleColumns = useMemo((): MasterServantListVisibleColumns => ({
@@ -136,14 +127,13 @@ export const MasterServantsRoute = React.memo(() => {
         actions: false
     }), [showAppendSkills, sm, lg, xl]);
 
-    const resetLoadingIndicator = useCallback((): void => {
-        const loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (loadingIndicatorId) {
-            loadingIndicatorOverlayService.waive(loadingIndicatorId);
-            loadingIndicatorIdRef.current = undefined;
-            forceUpdate();
-        }
-    }, [forceUpdate, loadingIndicatorOverlayService]);
+    /**
+     * The selected servants.
+     */
+    const selectedServantsRef = useRef<{ instanceIds: Set<number>, servants: Array<MasterServant> }>({
+        instanceIds: new Set(),
+        servants: []
+    });
 
     /**
      * If the `masterServants` reference changes (due to data being reloaded, etc.)
@@ -198,12 +188,7 @@ export const MasterServantsRoute = React.memo(() => {
         if (!masterAccount) {
             return;
         }
-
-        let loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (!loadingIndicatorId) {
-            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
-        }
-        loadingIndicatorIdRef.current = loadingIndicatorId;
+        invokeLoadingIndicator();
 
         setEditServant(undefined);
         setEditServantDialogOpen(false);
@@ -234,7 +219,7 @@ export const MasterServantsRoute = React.memo(() => {
 
         resetLoadingIndicator();
 
-    }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, resetLoadingIndicator, updateSelectedServants]);
+    }, [invokeLoadingIndicator, masterAccount, masterAccountService, resetLoadingIndicator, updateSelectedServants]);
 
     const handleServantSelectionChange = useCallback((instanceIds: Array<number>): void => {
         const updatedSelectionIds = new Set(instanceIds);
@@ -477,7 +462,7 @@ export const MasterServantsRoute = React.memo(() => {
                     <Fab
                         color='primary'
                         onClick={handleEditButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<EditIcon />}
                     />
                 </div>
@@ -490,7 +475,7 @@ export const MasterServantsRoute = React.memo(() => {
                     <Fab
                         color='default'
                         onClick={handleCancelButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<ClearIcon />}
                     />
                 </div>
@@ -500,7 +485,7 @@ export const MasterServantsRoute = React.memo(() => {
                     <Fab
                         color='primary'
                         onClick={updateMasterAccount}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<SaveIcon />}
                     />
                 </div>

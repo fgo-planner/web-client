@@ -9,9 +9,8 @@ import { LayoutPanelContainer } from '../../../../components/layout/layout-panel
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
-import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
+import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
-import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { MasterAccountPlans } from '../../../../types/data';
 import { Immutable, ModalOnCloseReason } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
@@ -42,40 +41,25 @@ const generateDeletePlanDialogPrompt = (plan: Immutable<Partial<Plan>> | undefin
 
 export const PlansRoute = React.memo(() => {
 
-    const forceUpdate = useForceUpdate();
+    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
 
-    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const scrollContainerRef = useElevateAppBarOnScroll();
+
     const planService = useInjectable(PlanService);
-
-    const masterAccountIdRef = useRef<string>();
 
     const [accountPlans, setAccountPlans] = useState<MasterAccountPlans>();
     const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
     const [deletePlanDialogOpen, setDeletePlanDialogOpen] = useState<boolean>(false);
     const [deletePlanTarget, setDeletePlanTarget] = useState<Immutable<Partial<Plan>>>();
-    
-    const scrollContainerRef = useElevateAppBarOnScroll();
-    const loadingIndicatorIdRef = useRef<string>();
 
-    const resetLoadingIndicator = useCallback((): void => {
-        const loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (loadingIndicatorId) {
-            loadingIndicatorOverlayService.waive(loadingIndicatorId);
-            loadingIndicatorIdRef.current = undefined;
-            forceUpdate();
-        }
-    }, [forceUpdate, loadingIndicatorOverlayService]);
+    const masterAccountIdRef = useRef<string>();
 
     const loadPlansForAccount = useCallback(async () => {
         const masterAccountId = masterAccountIdRef.current;
         if (!masterAccountId) {
             return setAccountPlans(undefined);
         }
-        let loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (!loadingIndicatorId) {
-            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
-        }
-        loadingIndicatorIdRef.current = loadingIndicatorId;
+        invokeLoadingIndicator();
 
         setAddPlanDialogOpen(false);
         setDeletePlanDialogOpen(false);
@@ -88,7 +72,7 @@ export const PlansRoute = React.memo(() => {
             // TODO Handle error
         }
         resetLoadingIndicator();
-    }, [loadingIndicatorOverlayService, planService, resetLoadingIndicator]);
+    }, [invokeLoadingIndicator, planService, resetLoadingIndicator]);
 
     /*
      * Master account change subscription.
@@ -178,7 +162,7 @@ export const PlansRoute = React.memo(() => {
                         <Fab
                             color="primary"
                             onClick={handleAddPlanButtonClick}
-                            disabled={!!loadingIndicatorIdRef.current}
+                            disabled={isLoadingIndicatorActive}
                             children={<AddIcon />}
                         />
                     </div>

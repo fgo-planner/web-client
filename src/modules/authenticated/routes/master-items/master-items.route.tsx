@@ -1,7 +1,7 @@
 import { GameItemQuantity, MasterAccount } from '@fgo-planner/types';
 import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, IconButton, Tooltip } from '@mui/material';
-import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
@@ -9,9 +9,8 @@ import { NavigationRail } from '../../../../components/navigation/navigation-rai
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { GameItemConstants } from '../../../../constants';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
+import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { Immutable, Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
@@ -39,9 +38,8 @@ const cloneItemsFromMasterAccount = (account: Nullable<Immutable<MasterAccount>>
 
 export const MasterItemsRoute = React.memo(() => {
 
-    const forceUpdate = useForceUpdate();
+    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
 
-    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
     const masterAccountService = useInjectable(MasterAccountService);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
@@ -50,17 +48,6 @@ export const MasterItemsRoute = React.memo(() => {
      */
     const [masterItems, setMasterItems] = useState<Array<GameItemQuantity>>([]);
     const [editMode, setEditMode] = useState<boolean>(false);
-
-    const loadingIndicatorIdRef = useRef<string>();
-
-    const resetLoadingIndicator = useCallback((): void => {
-        const loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (loadingIndicatorId) {
-            loadingIndicatorOverlayService.waive(loadingIndicatorId);
-            loadingIndicatorIdRef.current = undefined;
-            forceUpdate();
-        }
-    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     /*
      * Master account change subscription.
@@ -86,11 +73,7 @@ export const MasterItemsRoute = React.memo(() => {
         if (!masterAccount) {
             return;
         }
-        let loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (!loadingIndicatorId) {
-            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
-        }
-        loadingIndicatorIdRef.current = loadingIndicatorId;
+        invokeLoadingIndicator();
 
         /*
          * QP is stored as a standalone property in the `MasterAccount.resources`
@@ -118,7 +101,7 @@ export const MasterItemsRoute = React.memo(() => {
         }
         resetLoadingIndicator();
 
-    }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, masterItems, resetLoadingIndicator]);
+    }, [invokeLoadingIndicator, masterAccount, masterAccountService, masterItems, resetLoadingIndicator]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account
@@ -165,7 +148,7 @@ export const MasterItemsRoute = React.memo(() => {
                     <Fab
                         color="primary"
                         onClick={handleEditButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<EditIcon />}
                     />
                 </div>
@@ -178,7 +161,7 @@ export const MasterItemsRoute = React.memo(() => {
                     <Fab
                         color="default"
                         onClick={handleCancelButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<ClearIcon />}
                     />
                 </div>
@@ -188,7 +171,7 @@ export const MasterItemsRoute = React.memo(() => {
                     <Fab
                         color="primary"
                         onClick={handleSaveButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<SaveIcon />}
                     />
                 </div>

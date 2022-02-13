@@ -13,9 +13,9 @@ import { PlanRequirementsTable } from '../../../../components/plan/requirements/
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
+import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
-import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { PlanRequirements } from '../../../../types/data';
 import { Immutable, ImmutableArray, Nullable } from '../../../../types/internal';
 import { PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
@@ -129,8 +129,11 @@ export const PlanRoute = React.memo(() => {
     const forceUpdate = useForceUpdate();
     const navigate = useNavigate();
 
-    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+
     const planService = useInjectable(PlanService);
+
+    const gameServantMap = useGameServantMap();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
     /**
@@ -152,8 +155,6 @@ export const PlanRoute = React.memo(() => {
     const [deleteServantTarget, setDeleteServantTarget] = useState<PlanServant>();
     const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
 
-    const loadingIndicatorIdRef = useRef<string>();
-
     /**
      * Reference to the original copy of the servant being edited. The
      * `editServantTarget` state contains a clone so that the original is not
@@ -173,17 +174,6 @@ export const PlanRoute = React.memo(() => {
     const planRef = useRef<Plan>();
 
     const planRequirementsRef = useRef<PlanRequirements>();
-
-    const gameServantMap = useGameServantMap();
-
-    const resetLoadingIndicator = useCallback((): void => {
-        const loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (loadingIndicatorId) {
-            loadingIndicatorOverlayService.waive(loadingIndicatorId);
-            loadingIndicatorIdRef.current = undefined;
-            forceUpdate();
-        }
-    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     const computePlanRequirements = useCallback(() => {
         /*
@@ -218,11 +208,7 @@ export const PlanRoute = React.memo(() => {
         if (!planId) {
             console.error('Could not parse plan ID from route.');
         } else {
-            let loadingIndicatorId = loadingIndicatorIdRef.current;
-            if (!loadingIndicatorId) {
-                loadingIndicatorId = loadingIndicatorOverlayService.invoke();
-            }
-            loadingIndicatorIdRef.current = loadingIndicatorId;
+            invokeLoadingIndicator();
             const loadPlan = async (): Promise<void> => {
                 const plan = await planService.getPlan(planId);
                 // TODO Sanitize plan against current master account data.
@@ -232,7 +218,7 @@ export const PlanRoute = React.memo(() => {
             };
             loadPlan();
         }
-    }, [loadingIndicatorOverlayService, planId, planService, resetLoadingIndicator]);
+    }, [invokeLoadingIndicator, planId, planService, resetLoadingIndicator]);
 
     /*
      * Master account change subscription.
@@ -258,11 +244,7 @@ export const PlanRoute = React.memo(() => {
      * Sends plan update request to the back-end.
      */
     const updatePlan = useCallback(async (): Promise<void> => {
-        let loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (!loadingIndicatorId) {
-            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
-        }
-        loadingIndicatorIdRef.current = loadingIndicatorId;
+        invokeLoadingIndicator();
 
         editServantTargetRef.current = undefined;
         setEditServantTarget(undefined);
@@ -287,7 +269,7 @@ export const PlanRoute = React.memo(() => {
         // updateSelectedServants();
         resetLoadingIndicator();
 
-    }, [computePlanRequirements, loadingIndicatorOverlayService, plan, planService, resetLoadingIndicator]);
+    }, [computePlanRequirements, invokeLoadingIndicator, plan, planService, resetLoadingIndicator]);
 
 
     //#region Input event handlers
@@ -467,7 +449,7 @@ export const PlanRoute = React.memo(() => {
                 <Fab
                     color='default'
                     onClick={handleRevertButtonClick}
-                    disabled={!dirty || !!loadingIndicatorIdRef.current}
+                    disabled={!dirty || isLoadingIndicatorActive}
                     children={<ClearIcon />}
                 />
             </div>
@@ -477,7 +459,7 @@ export const PlanRoute = React.memo(() => {
                 <Fab
                     color='primary'
                     onClick={handleSaveButtonClick}
-                    disabled={!dirty || !!loadingIndicatorIdRef.current}
+                    disabled={!dirty || isLoadingIndicatorActive}
                     children={<SaveIcon />}
                 />
             </div>

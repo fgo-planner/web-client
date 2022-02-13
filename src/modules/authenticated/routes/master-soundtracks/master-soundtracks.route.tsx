@@ -1,16 +1,15 @@
 import { GameSoundtrack, MasterAccount } from '@fgo-planner/types';
 import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
+import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { SoundtrackPlayerService } from '../../../../services/audio/soundtrack-player.service';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
@@ -26,29 +25,16 @@ const getUnlockedSoundtracksSetFromMasterAccount = (account: Nullable<MasterAcco
 
 export const MasterSoundtracksRoute = React.memo(() => {
 
-    const forceUpdate = useForceUpdate();
-
-    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
-    const masterAccountService = useInjectable(MasterAccountService);
+    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
 
     const backgroundMusicService = useInjectable(BackgroundMusicService);
+    const masterAccountService = useInjectable(MasterAccountService);
     const soundtrackPlayerService = useInjectable(SoundtrackPlayerService);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [unlockedSoundtracksSet, setUnlockedSoundtracksSet] = useState<Set<number>>(new Set());
     const [playingId, setPlayingId] = useState<number>();
     const [editMode, setEditMode] = useState<boolean>(false);
-
-    const loadingIndicatorIdRef = useRef<string>();
-
-    const resetLoadingIndicator = useCallback((): void => {
-        const loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (loadingIndicatorId) {
-            loadingIndicatorOverlayService.waive(loadingIndicatorId);
-            loadingIndicatorIdRef.current = undefined;
-            forceUpdate();
-        }
-    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     /*
      * Master account change subscription.
@@ -92,12 +78,7 @@ export const MasterSoundtracksRoute = React.memo(() => {
         if (!masterAccountId) {
             return;
         }
-
-        let loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (!loadingIndicatorId) {
-            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
-        }
-        loadingIndicatorIdRef.current = loadingIndicatorId;
+        invokeLoadingIndicator();
 
         const update = {
             _id: masterAccountId,
@@ -114,7 +95,7 @@ export const MasterSoundtracksRoute = React.memo(() => {
         }
         resetLoadingIndicator();
 
-    }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, resetLoadingIndicator, unlockedSoundtracksSet]);
+    }, [invokeLoadingIndicator, masterAccount, masterAccountService, resetLoadingIndicator, unlockedSoundtracksSet]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account
@@ -148,28 +129,28 @@ export const MasterSoundtracksRoute = React.memo(() => {
     /**
      * FabContainer children
      */
-    const fabContainerChildNodes: ReactNode = useMemo(() => {
-        if (!editMode) {
-            return (
-                <Tooltip key="edit" title="Edit">
-                    <div>
-                        <Fab
-                            color="primary"
-                            onClick={handleEditButtonClick}
-                            disabled={!!loadingIndicatorIdRef.current}
-                            children={<EditIcon />}
-                        />
-                    </div>
-                </Tooltip>
-            );
-        }
-        return [
+    let fabContainerChildNodes: ReactNode;
+    if (!editMode) {
+        fabContainerChildNodes = (
+            <Tooltip key="edit" title="Edit">
+                <div>
+                    <Fab
+                        color="primary"
+                        onClick={handleEditButtonClick}
+                        disabled={isLoadingIndicatorActive}
+                        children={<EditIcon />}
+                    />
+                </div>
+            </Tooltip>
+        );
+    } else {
+        fabContainerChildNodes = [
             <Tooltip key="cancel" title="Cancel">
                 <div>
                     <Fab
                         color="default"
                         onClick={handleCancelButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<ClearIcon />}
                     />
                 </div>
@@ -179,13 +160,13 @@ export const MasterSoundtracksRoute = React.memo(() => {
                     <Fab
                         color="primary"
                         onClick={handleSaveButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<SaveIcon />}
                     />
                 </div>
             </Tooltip>
         ];
-    }, [editMode, handleCancelButtonClick, handleEditButtonClick, handleSaveButtonClick]);
+    }
 
     return (
         <div className="flex column full-height">

@@ -1,7 +1,7 @@
 import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
 import _ from 'lodash';
-import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPreferences, UserWebClientTheme } from '../../../../../local_modules/types/lib';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
@@ -9,9 +9,8 @@ import { LayoutPageScrollable } from '../../../../components/layout/layout-page-
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
-import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
+import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { UserService } from '../../../../services/data/user/user.service';
-import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
 import { Nullable, ThemeMode } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
@@ -20,10 +19,12 @@ import { UserThemeEdit } from './user-theme-edit.component';
 
 export const UserThemesEditRoute = React.memo(() => {
 
-    const forceUpdate = useForceUpdate();
     const navigate = useNavigate();
     
-    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+
+    const scrollContainerRef = useElevateAppBarOnScroll();
+
     const themeService = useInjectable(ThemeService);
     const userService = useInjectable(UserService);
 
@@ -37,17 +38,6 @@ export const UserThemesEditRoute = React.memo(() => {
     const [darkTheme, setDarkTheme] = useState<UserWebClientTheme>();
 
     const userPreferencesRef = useRef<Nullable<UserPreferences>>();
-    const loadingIndicatorIdRef = useRef<string>();
-    const scrollContainerRef = useElevateAppBarOnScroll();
-
-    const resetLoadingIndicator = useCallback((): void => {
-        const loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (loadingIndicatorId) {
-            loadingIndicatorOverlayService.waive(loadingIndicatorId);
-            loadingIndicatorIdRef.current = undefined;
-            forceUpdate();
-        }
-    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     useEffect(() => {
         const getUserThemeOrDefault = (userPreferences: Nullable<UserPreferences>, themeMode: ThemeMode): UserWebClientTheme => {
@@ -76,12 +66,7 @@ export const UserThemesEditRoute = React.memo(() => {
             // This case should not be possible.
             return;
         }
-
-        let loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (!loadingIndicatorId) {
-            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
-        }
-        loadingIndicatorIdRef.current = loadingIndicatorId;
+        invokeLoadingIndicator();
 
         const update: Partial<UserPreferences> = {
             webClient: {
@@ -103,7 +88,7 @@ export const UserThemesEditRoute = React.memo(() => {
             resetLoadingIndicator();
         }
 
-    }, [darkTheme, lightTheme, loadingIndicatorOverlayService, navigate, resetLoadingIndicator, userService]);
+    }, [darkTheme, invokeLoadingIndicator, lightTheme, navigate, resetLoadingIndicator, userService]);
 
     const handleCancelButtonClick = useCallback((): void => {
         navigate('/user/settings');
@@ -112,30 +97,28 @@ export const UserThemesEditRoute = React.memo(() => {
     /**
      * FabContainer children
      */
-    const fabContainerChildNodes: ReactNode = useMemo(() => {
-        return [
-            <Tooltip key="cancel" title="Cancel">
-                <div>
-                    <Fab
-                        color="default"
-                        onClick={handleCancelButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
-                        children={<ClearIcon />}
-                    />
-                </div>
-            </Tooltip>,
-            <Tooltip key="save" title="Save">
-                <div>
-                    <Fab
-                        color="primary"
-                        onClick={handleSaveButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
-                        children={<SaveIcon />}
-                    />
-                </div>
-            </Tooltip>
-        ];
-    }, [handleCancelButtonClick, handleSaveButtonClick]);
+    const fabContainerChildNodes: ReactNode = [
+        <Tooltip key="cancel" title="Cancel">
+            <div>
+                <Fab
+                    color="default"
+                    onClick={handleCancelButtonClick}
+                    disabled={isLoadingIndicatorActive}
+                    children={<ClearIcon />}
+                />
+            </div>
+        </Tooltip>,
+        <Tooltip key="save" title="Save">
+            <div>
+                <Fab
+                    color="primary"
+                    onClick={handleSaveButtonClick}
+                    disabled={isLoadingIndicatorActive}
+                    children={<SaveIcon />}
+                />
+            </div>
+        </Tooltip>
+    ];
 
     return (
         <Fragment>

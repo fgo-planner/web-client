@@ -1,21 +1,20 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { Fab, IconButton, Tooltip } from '@mui/material';
 import { Clear as ClearIcon, Edit as EditIcon, FormatListBulleted as FormatListBulletedIcon, Save as SaveIcon } from '@mui/icons-material';
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fab, IconButton, Tooltip } from '@mui/material';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
-import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { LoadingIndicatorOverlayService } from '../../../../services/user-interface/loading-indicator-overlay.service';
-import { Nullable } from '../../../../types/internal';
-import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
-import { MasterServantCostumesList } from './master-servant-costumes-list.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
+import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
+import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
+import { MasterServantCostumesList } from './master-servant-costumes-list.component';
 
 const getUnlockedCostumeSetFromMasterAccount = (account: Nullable<MasterAccount>): Set<number> => {
     if (!account) {
@@ -26,25 +25,13 @@ const getUnlockedCostumeSetFromMasterAccount = (account: Nullable<MasterAccount>
 
 export const MasterServantCostumesRoute = React.memo(() => {
 
-    const forceUpdate = useForceUpdate();
+    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
 
-    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
     const masterAccountService = useInjectable(MasterAccountService);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [unlockedCostumesSet, setUnlockedCostumesSet] = useState<Set<number>>(new Set());
     const [editMode, setEditMode] = useState<boolean>(false);
-
-    const loadingIndicatorIdRef = useRef<string>();
-
-    const resetLoadingIndicator = useCallback((): void => {
-        const loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (loadingIndicatorId) {
-            loadingIndicatorOverlayService.waive(loadingIndicatorId);
-            loadingIndicatorIdRef.current = undefined;
-            forceUpdate();
-        }
-    }, [forceUpdate, loadingIndicatorOverlayService]);
 
     /*
      * Master account change subscription.
@@ -71,12 +58,7 @@ export const MasterServantCostumesRoute = React.memo(() => {
         if (!masterAccountId) {
             return;
         }
-
-        let loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (!loadingIndicatorId) {
-            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
-        }
-        loadingIndicatorIdRef.current = loadingIndicatorId;
+        invokeLoadingIndicator();
         
         const update = {
             _id: masterAccountId,
@@ -93,7 +75,7 @@ export const MasterServantCostumesRoute = React.memo(() => {
         }
         resetLoadingIndicator();
 
-    }, [loadingIndicatorOverlayService, masterAccount, masterAccountService, resetLoadingIndicator, unlockedCostumesSet]);
+    }, [invokeLoadingIndicator, masterAccount, masterAccountService, resetLoadingIndicator, unlockedCostumesSet]);
 
     const handleCancelButtonClick = useCallback((): void => {
         // Re-clone data from master account
@@ -105,45 +87,43 @@ export const MasterServantCostumesRoute = React.memo(() => {
     /**
      * NavigationRail children
      */
-    const navigationRailChildNodes: ReactNode = useMemo(() => {
-        return (
-            <Tooltip key="servants" title="Back to servant list" placement="right">
-                <div>
-                    <IconButton
-                        component={Link}
-                        to="../master/servants"
-                        children={<FormatListBulletedIcon />}
-                        size="large" />
-                </div>
-            </Tooltip>
-        );
-    }, []);
+    const navigationRailChildNodes: ReactNode = (
+        <Tooltip key="servants" title="Back to servant list" placement="right">
+            <div>
+                <IconButton
+                    component={Link}
+                    to="../master/servants"
+                    children={<FormatListBulletedIcon />}
+                    size="large" />
+            </div>
+        </Tooltip>
+    );
 
     /**
      * FabContainer children
      */
-    const fabContainerChildNodes: ReactNode = useMemo(() => {
-        if (!editMode) {
-            return (
-                <Tooltip key="edit" title="Edit">
-                    <div>
-                        <Fab
-                            color="primary"
-                            onClick={handleEditButtonClick}
-                            disabled={!!loadingIndicatorIdRef.current}
-                            children={<EditIcon />}
-                        />
-                    </div>
-                </Tooltip>
-            );
-        }
-        return [
+    let fabContainerChildNodes: ReactNode;
+    if (!editMode) {
+        fabContainerChildNodes = (
+            <Tooltip key="edit" title="Edit">
+                <div>
+                    <Fab
+                        color="primary"
+                        onClick={handleEditButtonClick}
+                        disabled={isLoadingIndicatorActive}
+                        children={<EditIcon />}
+                    />
+                </div>
+            </Tooltip>
+        );
+    } else {
+        fabContainerChildNodes = [
             <Tooltip key="cancel" title="Cancel">
                 <div>
                     <Fab
                         color="default"
                         onClick={handleCancelButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<ClearIcon />}
                     />
                 </div>
@@ -153,13 +133,13 @@ export const MasterServantCostumesRoute = React.memo(() => {
                     <Fab
                         color="primary"
                         onClick={handleSaveButtonClick}
-                        disabled={!!loadingIndicatorIdRef.current}
+                        disabled={isLoadingIndicatorActive}
                         children={<SaveIcon />}
                     />
                 </div>
             </Tooltip>
         ];
-    }, [editMode, handleCancelButtonClick, handleEditButtonClick, handleSaveButtonClick]);
+    }
 
     return (
         <div className="flex column full-height">

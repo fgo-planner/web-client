@@ -29,6 +29,10 @@ type Props = {
     showAppendSkills?: boolean;
 };
 
+type SkillSet = 'skills' | 'appendSkills';
+
+type SkillSlot = 1 | 2 | 3;
+
 const TooltipEnterDelay = 250;
 
 const StyleClassPrefix = 'PlanServantEditEnhancementsTabContent';
@@ -89,11 +93,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     }, [enhancementSet, planServant]);
 
     /**
-     * Notifies the parent component of stats change by invoking the `onStatsChange`
+     * Notifies the parent component of stats change by invoking the `onChange`
      * callback function.
      */
     const pushStatsChange = useCallback((): void => {
-        // TODO Implement this
         onChange?.(planServant);
     }, [onChange, planServant]);
 
@@ -116,11 +119,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         forceUpdate();
     }, [enhancements, forceUpdate, pushStatsChange]);
 
-    const handleSkillInputChange = useCallback((name: string, value: string, pushChanges = false): void => {
-        // TODO The skill input component will have to be reworked.
-        const skillNumber = name[name.length - 1] as '1' | '2' | '3';
-        const skillSet = name.startsWith('skill') ? enhancements.skills : enhancements.appendSkills;
-        skillSet[skillNumber] = value ? Number(value) as MasterServantSkillLevel : undefined;
+    const handleSkillInputChange = useCallback((_, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
+        enhancements[skillSet][slot] = value ? Number(value) as MasterServantSkillLevel : undefined;
         if (pushChanges) {
             pushStatsChange();
         }
@@ -276,6 +276,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             value={String(enhancements.skills[1] || '')}
             label='Skill 1'
             name='skill1'
+            skillSet='skills'
+            slot={1}
             allowEmpty
             onChange={handleSkillInputChange}
             disabled={disabled}
@@ -287,6 +289,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             value={String(enhancements.skills[2] || '')}
             label='Skill 2'
             name='skill2'
+            skillSet='skills'
+            slot={2}
             allowEmpty
             onChange={handleSkillInputChange}
             disabled={disabled}
@@ -298,6 +302,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             value={String(enhancements.skills[3] || '')}
             label='Skill 3'
             name='skill3'
+            skillSet='skills'
+            slot={3}
             allowEmpty
             onChange={handleSkillInputChange}
             disabled={disabled}
@@ -309,6 +315,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             value={String(enhancements.appendSkills[1] || '')}
             label='Append 1'
             name='appendSkill1'
+            skillSet='appendSkills'
+            slot={1}
             allowEmpty
             onChange={handleSkillInputChange}
             disabled={disabled}
@@ -320,6 +328,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             value={String(enhancements.appendSkills[2] || '')}
             label='Append 2'
             name='appendSkill2'
+            skillSet='appendSkills'
+            slot={2}
             allowEmpty
             onChange={handleSkillInputChange}
             disabled={disabled}
@@ -331,6 +341,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             value={String(enhancements.appendSkills[3] || '')}
             label='Append 3'
             name='appendSkill3'
+            skillSet='appendSkills'
+            slot={3}
             allowEmpty
             onChange={handleSkillInputChange}
             disabled={disabled}
@@ -395,7 +407,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                 </InputFieldContainer>
                 <ServantSkillQuickToggleButtons
                     className={`${StyleClassPrefix}-toggle-button-group`}
-                    stat='skills'
+                    skillSet='skills'
                     onClick={handleSkillQuickToggleClick}
                     ignoreTabNavigation
                     disabled={disabled}
@@ -417,7 +429,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                     </InputFieldContainer>
                     <ServantSkillQuickToggleButtons
                         className={`${StyleClassPrefix}-toggle-button-group`}
-                        stat='appendSkills'
+                        skillSet='appendSkills'
                         onClick={handleSkillQuickToggleClick}
                         useClearValuesButton
                         ignoreTabNavigation

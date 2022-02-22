@@ -1,15 +1,13 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { AccessibilityNew as AccessibilityNewIcon, Add as AddIcon, Clear as ClearIcon, Equalizer as EqualizerIcon, GetApp, LowPriority as LowPriorityIcon, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
-import { Fab, FormControlLabel, FormGroup, IconButton, Switch, Tooltip } from '@mui/material';
+import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
+import { Fab, FormControlLabel, FormGroup, Switch, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import lodash from 'lodash';
 import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
 import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -22,17 +20,30 @@ import { MasterServantUtils } from '../../../../utils/master/master-servant.util
 import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
-import { DialogData as MasterServantEditDialogData, MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
+import { MasterServantEditData } from '../../components/master/servant/edit/master-servant-edit-data.type';
+import { MasterServantEditDialog } from '../../components/master/servant/edit/master-servant-edit-dialog.component';
+import { MasterServantEditUtils } from '../../components/master/servant/edit/master-servant-edit.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
-import { MasterServantInfoPanel } from './master-servant-info-panel.component';
+import { MasterServantsInfoPanel } from './master-servants-info-panel.component';
+import { MasterServantsNavigationRail } from './master-servants-navigation-rail.component';
+
+type ServantSelection = {
+    instanceIds: Set<number>;
+    servants: Array<MasterServant>;
+};
 
 type MasterAccountData = {
     masterServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
 };
+
+const getDefaultServantSelection = (): ServantSelection => ({
+    instanceIds: new Set(),
+    servants: []
+});
 
 const getDefaultMasterAccountData = (): MasterAccountData => ({
     masterServants: [],
@@ -83,7 +94,7 @@ export const MasterServantsRoute = React.memo(() => {
     const forceUpdate = useForceUpdate();
 
     const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
-    
+
     const masterAccountService = useInjectable(MasterAccountService);
 
     const gameServantMap = useGameServantMap();
@@ -109,28 +120,36 @@ export const MasterServantsRoute = React.memo(() => {
     const [isMasterAccountDirty, setIsMasterAccountDirty] = useState<boolean>(false);
 
     /**
-     * Clone of the servant that is being edited by the servant edit dialog. This
-     * data is passed directly into and modified by the dialog. The original data is
-     * not modified until the changes are submitted.
-     */
-    const [editServantDialogTarget, setEditServantDialogTarget] = useState<MasterServant>();
-    /**
-     * Reference to the original copy of the servant that is being edited. Note that
-     * "original" in this context refers to the data from `masterAccountDataRef` and
-     * not the data from `masterAccount`.
+     * Contains a copy of the target servants' data that is passed directly into and
+     * modified by the dialog. The original data is not modified until the changes
+     * are submitted.
      *
-     * When adding a new servant, this will remain `undefined`.
+     * The `open` state of the servant edit dialog is also determined by whether
+     * this data is present (dialog is opened if data is defined, and closed if data
+     * is undefined).
      */
-    const editServantDialogTargetRef = useRef<Immutable<MasterServant>>();
-    // const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
-    
-    const [deleteServantDialogTarget, setDeleteServantDialogTarget] = useState<Immutable<MasterServant>>();
-    // const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
+    const [editServantDialogData, setEditServantDialogData] = useState<MasterServantEditData>();
 
-    const [dragDropMode, setDragDropMode] = useState<boolean>(false);
+    /**
+     * Contains the message prompt that is displayed by the delete servant dialog.
+     *
+     * The `open` state of the delete servant dialog is also determined by whether
+     * this data is present (dialog is opened if data is defined, and closed if data
+     * is undefined).
+     */
+    const [deleteServantDialogData, setDeleteServantDialogData] = useState<ReactNode>();
+
+    /**
+     * Shallow clone of the `masterServants` array from `masterAccountDataRef` for
+     * use with drag-drop mode.
+     * 
+     * This will be `undefined` when not in drag-drop mode.
+     */
+    const [dragDropMasterServants, setDragDropMasterServants] = useState<Array<MasterServant>>();
+
+    const dragDropMode = !!dragDropMasterServants;
 
     const [showAppendSkills, setShowAppendSkills] = useState<boolean>(false);
-
 
     const { sm, md, lg, xl } = useActiveBreakpoints();
 
@@ -148,7 +167,7 @@ export const MasterServantsRoute = React.memo(() => {
     /**
      * The selected servants.
      */
-    const selectedServantsRef = useRef<{ instanceIds: Set<number>, servants: Array<MasterServant> }>({
+    const selectedServantsRef = useRef<ServantSelection>({
         instanceIds: new Set(),
         servants: []
     });
@@ -161,7 +180,7 @@ export const MasterServantsRoute = React.memo(() => {
      * This function validates and updates the `selectedServantsRef` data against
      * the updated `masterServants` data.
      */
-    const updateSelectedServants = useCallback((): void => {
+    const updateSelectedServantsRef = useCallback((): void => {
         const currentSelectionIds = selectedServantsRef.current.instanceIds;
         if (!currentSelectionIds.size || !masterAccountDataRef.current) {
             return;
@@ -185,19 +204,19 @@ export const MasterServantsRoute = React.memo(() => {
                 masterAccountDataRef.current = cloneMasterAccountData(account);
                 const isSameAccount = masterAccount?._id === account?._id;
                 if (isSameAccount) {
-                    updateSelectedServants();
+                    updateSelectedServantsRef();
                 } else {
-                    selectedServantsRef.current = {
-                        instanceIds: new Set(),
-                        servants: []
-                    };
+                    selectedServantsRef.current = getDefaultServantSelection();
                 }
                 setMasterAccount(account);
                 setIsMasterAccountDirty(false);
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [masterAccount?._id, updateSelectedServants]);
+    }, [masterAccount?._id, updateSelectedServantsRef]);
+
+
+    //#region Internal helper functions
 
     /**
      * Sends master servant update request to the back-end.
@@ -208,8 +227,8 @@ export const MasterServantsRoute = React.memo(() => {
         }
         invokeLoadingIndicator();
 
-        setEditServantDialogTarget(undefined);
-        setDeleteServantDialogTarget(undefined);
+        setEditServantDialogData(undefined);
+        setDeleteServantDialogData(undefined);
 
         const {
             masterServants,
@@ -229,15 +248,21 @@ export const MasterServantsRoute = React.memo(() => {
             // TODO Display error message to user.
             console.error(error);
             masterAccountDataRef.current = cloneMasterAccountData(masterAccount);
-            updateSelectedServants();
+            updateSelectedServantsRef();
             setIsMasterAccountDirty(false);
         }
 
         resetLoadingIndicator();
 
-    }, [invokeLoadingIndicator, masterAccount, masterAccountService, resetLoadingIndicator, updateSelectedServants]);
+    }, [invokeLoadingIndicator, masterAccount, masterAccountService, resetLoadingIndicator, updateSelectedServantsRef]);
 
-    const handleServantSelectionChange = useCallback((instanceIds: Array<number>): void => {
+    const setServantSelection = useCallback((instanceIds: Array<number>): void => {
+        /*
+         * Servant selection is not allowed in drag-drop mode.
+         */
+        if (dragDropMode) {
+            return;
+        }
         const updatedSelectionIds = new Set(instanceIds);
         if (SetUtils.isEqual(updatedSelectionIds, selectedServantsRef.current.instanceIds)) {
             return;
@@ -248,7 +273,230 @@ export const MasterServantsRoute = React.memo(() => {
             servants: masterServants.filter(servant => updatedSelectionIds.has(servant.instanceId))
         };
         forceUpdate();
-    }, [forceUpdate]);
+    }, [dragDropMode, forceUpdate]);
+
+    const addNewServant = useCallback((data: MasterServantEditData) => {
+
+        const {
+            masterServants,
+            bondLevels,
+            // unlockedCostumes
+        } = masterAccountDataRef.current;
+
+        /**
+         * Computed instance ID for the new servant.
+         */
+        const instanceId = MasterServantUtils.getLastInstanceId(masterServants) + 1;
+        /**
+         * New instance of a `MasterServant` object. This will be populated with the
+         * data returned by the dialog.
+         */
+        const masterServant = MasterServantUtils.instantiate(instanceId);
+        MasterServantEditUtils.applyFromEditData(data, masterServant, bondLevels);
+        /*
+         * Rebuild the entire array with the new servant included to force the child
+         * list to re-render.
+         */
+        masterAccountDataRef.current.masterServants = [...masterServants, masterServant];
+        /*
+         * TODO Also update the unlocked costumes.
+         */
+        setIsMasterAccountDirty(true);
+    }, []);
+
+    /**
+     * Applies the submitted edit to the currently selected servants.
+     */
+    const applyEditToSelectedServants = useCallback((data: MasterServantEditData) => {
+
+        const {
+            masterServants,
+            bondLevels,
+            // unlockedCostumes
+        } = masterAccountDataRef.current;
+
+        /*
+         * Apply the change data for all of the selected servants.
+         */
+        const { servants: selectedServants } = selectedServantsRef.current;
+        MasterServantEditUtils.applyFromEditData(data, selectedServants, bondLevels);
+        /*
+         * FIXME This n^2 operation might get slow as we have more servants.
+         */
+        for (const selectedServant of selectedServants) {
+            /*
+             * The master servants in the `selectedServantsRef` should have the same object
+             * references as the ones in the `masterAccountDataRef`, so we can search
+             * directly by reference.
+             */
+            const index = masterServants.indexOf(selectedServant);
+            if (index !== -1) {
+                /*
+                 * Re-build the servant object to force its row to re-render.
+                 */
+                masterServants[index] = { ...selectedServant };
+            }
+        }
+        /*
+         * Rebuild the entire array to force the child list to re-render.
+         */
+        masterAccountDataRef.current.masterServants = [...masterServants];
+        /*
+         * TODO Also update the unlocked costumes.
+         */
+        updateSelectedServantsRef();
+        setIsMasterAccountDirty(true);
+    }, [updateSelectedServantsRef]);
+
+    /**
+     * Deletes the currently selected servants.
+     */
+    const deleteSelectedServants = useCallback((): void => {
+        const { servants: selectedServants } = selectedServantsRef.current;
+        if (!selectedServants.length) {
+            return;
+        }
+        let { masterServants } = masterAccountDataRef.current;
+        /*
+         * The master servants in the `selectedServantsRef` should have the same object
+         * references as the ones in the `masterAccountDataRef`, so we can search
+         * directly by reference.
+         * 
+         * This will also rebuild the entire array to force the child list to re-render.
+         * 
+         * FIXME This n^2 operation might get slow as we have more servants.
+         */
+        masterServants = masterServants.filter(servant => !selectedServants.includes(servant));
+        masterAccountDataRef.current.masterServants = masterServants;
+        /*
+         * TODO Also remove bond/costume data if the last instance of the servant is
+         * removed.
+         */
+        selectedServantsRef.current = getDefaultServantSelection();
+        setDeleteServantDialogData(undefined);
+        setIsMasterAccountDirty(true);
+    }, []);
+
+    const openEditServantDialog = useCallback((): void => {
+        const { servants: selectedServants } = selectedServantsRef.current;
+        if (!selectedServants.length) {
+            return;
+        }
+
+        const {
+            bondLevels,
+            unlockedCostumes
+        } = masterAccountDataRef.current;
+
+        const editServantDialogData = MasterServantEditUtils.convertToEditData(selectedServants, bondLevels, unlockedCostumes);
+        setEditServantDialogData(editServantDialogData);
+        setDeleteServantDialogData(undefined);
+    }, []);
+
+    const openDeleteServantDialog = useCallback((): void => {
+        if (!gameServantMap) {
+            return;
+        }
+        const { servants: selectedServants } = selectedServantsRef.current;
+        if (!selectedServants.length) {
+            return;
+        }
+        // TODO Un-hardcode static strings.
+        const prompt = <>
+            <p>The following servant{selectedServants.length > 1 && 's'} will be deleted:</p>
+            <ul>
+                {selectedServants.map(({ gameId }) => {
+                    const { name, metadata } = gameServantMap[gameId];
+                    return <li>{metadata?.displayName || name || gameId}</li>;
+                })}
+            </ul>
+            <p>Are you sure you want to proceed?</p>
+        </>;
+        setDeleteServantDialogData(prompt);
+        setEditServantDialogData(undefined);
+    }, [gameServantMap]);
+
+
+    //#endregion
+
+
+    //#endregion Nav rail event handlers
+
+    const handleAddServant = useCallback((): void => {
+        const {
+            bondLevels,
+            unlockedCostumes
+        } = masterAccountDataRef.current;
+
+        const editServantDialogData = MasterServantEditUtils.instantiateForNewServant(bondLevels, unlockedCostumes);
+        setEditServantDialogData(editServantDialogData);
+        setDeleteServantDialogData(undefined);
+    }, []);
+
+    const handleDragDropActivate = useCallback(() => {
+        /*
+         * Deselect servants...servant selection is not allowed in drag-drop mode.
+         */
+        selectedServantsRef.current = getDefaultServantSelection();
+        setDragDropMasterServants([...masterAccountDataRef.current.masterServants]);
+    }, []);
+
+    const handleDragDropApply = useCallback(() => {
+        if (!dragDropMasterServants) {
+            return;
+        }
+        masterAccountDataRef.current.masterServants = dragDropMasterServants;
+        setDragDropMasterServants(undefined);
+        // TODO Check if order actually changed before setting dirty.
+        setIsMasterAccountDirty(true);
+    }, [dragDropMasterServants]);
+
+    const handleDragDropCancel = useCallback(() => {
+        setDragDropMasterServants(undefined);
+    }, []);
+
+    //#endregion
+
+
+    //#region Servant list event handlers
+
+    const handleEditServant = useCallback(({ instanceId }: MasterServant) => {
+        if (dragDropMode) {
+            return;
+        }
+        /*
+         * Select the target servant. This is needed because the servant edit dialog
+         * will target whichever servant are currently selected on submit.
+         */
+        setServantSelection([instanceId]);
+        openEditServantDialog();
+    }, [dragDropMode, openEditServantDialog, setServantSelection]);
+
+    const handleDeleteServant = useCallback(({ instanceId }: MasterServant): void => {
+        if (dragDropMode) {
+            return;
+        }
+        /*
+         * Select the target servant. This is needed because the delete servant dialog
+         * will target whichever servant are currently selected on submit.
+         */
+        setServantSelection([instanceId]);
+        openDeleteServantDialog();
+    }, [dragDropMode, openDeleteServantDialog, setServantSelection]);
+
+    //#endregion
+
+
+    //#region Common event handlers
+
+    const handleEditSelectedServants = openEditServantDialog;
+
+    const handleDeleteSelectedServants = openDeleteServantDialog;
+
+    //#endregion
+
+
+    //#region Other event handlers
 
     const handleShowAppendSkillsChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
         setShowAppendSkills(event.target.checked);
@@ -267,143 +515,34 @@ export const MasterServantsRoute = React.memo(() => {
     const handleRevertButtonClick = useCallback((): void => {
         // Copy data back from master account
         masterAccountDataRef.current = cloneMasterAccountData(masterAccount);
-        updateSelectedServants();
+        updateSelectedServantsRef();
         setIsMasterAccountDirty(false);
-    }, [masterAccount, updateSelectedServants]);
+    }, [masterAccount, updateSelectedServantsRef]);
 
-    const openEditServantDialog = useCallback((masterServant?: MasterServant): void => {
-        console.log("WTF??", masterServant)
-        if (!masterServant) {
-            /*
-             * Adding a new servant.
-             */
-            const editServantDialogTarget = MasterServantUtils.instantiate();
-            editServantDialogTargetRef.current = undefined;
-            setEditServantDialogTarget(editServantDialogTarget);
-        } else {
-            /*
-             * Editing an existing servant.
-             */
-            editServantDialogTargetRef.current = masterServant;
-            setEditServantDialogTarget(MasterServantUtils.clone(masterServant));           
-        }
-        setDeleteServantDialogTarget(undefined);
-    }, []);
-
-    const handleAddServantButtonClick = useCallback((): void => {
-        openEditServantDialog();
-    }, [openEditServantDialog]);
-
-    const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: MasterServantEditDialogData): void => {
+    const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: MasterServantEditData): void => {
+        setEditServantDialogData(undefined);
         /*
          * Close the dialog without taking any further action if the changes were
          * cancelled (if `data` is undefined, then the changes were cancelled).
          */
         if (!data) {
-            return setEditServantDialogTarget(undefined);
+            return;
         }
-
-        const {
-            masterServants,
-            bondLevels,
-            unlockedCostumes
-        } = masterAccountDataRef.current;
-
-        const servantId = data.masterServant.gameId;
-
-        /*
-         * Update the bond level map.
-         * TODO Move this to a separate method/function.
-         */
-        if (data.bond === undefined) {
-            delete bondLevels[servantId];
+        if (data.isNewServant) {
+            addNewServant(data);
         } else {
-            bondLevels[servantId] = data.bond;
+            applyEditToSelectedServants(data);
         }
-
-        /*
-         * Update the unlocked costumes list.
-         * TODO Move this to a separate method/function.
-         */
-        const servant = gameServantMap!![servantId];
-        const costumesIds = Object.keys(servant.costumes).map(Number);
-        unlockedCostumes.filter(c => costumesIds.indexOf(c) === -1);
-        unlockedCostumes.push(...data.costumes);
-
-        /*
-         * If a new servant is being added, then `editServantDialogTargetRef.current`
-         * will be undefined. Conversely, if an existing servant is being edited, then
-         * `editServantDialogTargetRef.current` should be defined.
-         */
-        if (!editServantDialogTargetRef.current) {
-            /**
-             * Computed instance ID for the new servant.
-             */
-            const instanceId = MasterServantUtils.getLastInstanceId(masterServants) + 1;
-            /**
-             * New servant object.
-             */
-            const masterServant: MasterServant = {
-                ...data.masterServant,
-                instanceId
-            };
-            /*
-             * The master servant array will need to be rebuilt to trigger a re-render
-             * after updating the component state.
-             */
-            masterServants.push(masterServant);
-
-        } else {
-            /*
-             * Re-build the servant object to force its row to re-render.
-             */
-            const index = masterServants.indexOf(editServantDialogTargetRef.current as MasterServant);
-            if (index !== -1) {
-                masterServants[index] = {
-                    ...data.masterServant,
-                    instanceId: editServantDialogTargetRef.current.instanceId
-                };
-            }
-        }
-
-        masterAccountDataRef.current.masterServants = [...masterServants]; // Forces child list to re-render
-
-        setIsMasterAccountDirty(true);
-        setEditServantDialogTarget(undefined);
-        updateSelectedServants();
-    }, [gameServantMap, updateSelectedServants]);
-
-    const openDeleteServantDialog = useCallback((masterServant: MasterServant): void => {
-        setEditServantDialogTarget(undefined);
-        setDeleteServantDialogTarget(masterServant);
-    }, []);
+    }, [addNewServant, applyEditToSelectedServants]);
 
     const handleDeleteServantDialogClose = useCallback((event: MouseEvent, reason: ModalOnCloseReason): any => {
-        if (!deleteServantDialogTarget || reason !== 'submit') {
-            return setDeleteServantDialogTarget(undefined);
+        if (reason !== 'submit') {
+            return setDeleteServantDialogData(undefined);
         }
-        const { masterServants } = masterAccountDataRef.current;
-        const { instanceId } = deleteServantDialogTarget;
-        /*
-         * Removes the target servant. Also forces the child list to re-render since
-         * filter returns a new array.
-         */
-        masterAccountDataRef.current.masterServants = masterServants.filter(servant => servant.instanceId !== instanceId);
-        /*
-         * TODO Also remove bond/costume data if the last instance of the servant is
-         * removed.
-         */
-        setDeleteServantDialogTarget(undefined);
-        setIsMasterAccountDirty(true);
-    }, [deleteServantDialogTarget]);
+        deleteSelectedServants();
+    }, [deleteSelectedServants]);
 
-    const deleteServantDialogPrompt = useMemo((): string | undefined => {
-        if (!gameServantMap || !deleteServantDialogTarget) {
-            return undefined;
-        }
-        const servant = gameServantMap[deleteServantDialogTarget.gameId];
-        return `Are you sure you want to remove ${servant?.name} from the servant list?`;
-    }, [gameServantMap, deleteServantDialogTarget]);
+    //#endregion
 
     /*
      * This can be undefined during the initial render.
@@ -412,91 +551,41 @@ export const MasterServantsRoute = React.memo(() => {
         return null;
     }
 
-    /**
-     * NavigationRail children
-     */
-    const navigationRailChildNodes: ReactNode = [
-        <Tooltip key='add' title='Add servant' placement='right'>
-            <div>
-                <IconButton
-                    onClick={handleAddServantButtonClick}
-                    children={<AddIcon />}
-                    size='large'
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key='reorder' title='Re-order servants' placement='right'>
-            <div>
-                <IconButton
-                    onClick={() => setDragDropMode(!dragDropMode)}
-                    children={<LowPriorityIcon />}
-                    size='large'
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key='costumes' title='Costumes' placement='right'>
-            <div>
-                <IconButton
-                    component={Link}
-                    to='costumes'
-                    children={<AccessibilityNewIcon />}
-                    size='large'
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key='stats' title='Servant stats' placement='right'>
-            <div>
-                <IconButton
-                    component={Link}
-                    to='stats'
-                    children={<EqualizerIcon />}
-                    size='large'
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key='import' title='Upload servant data' placement='right'>
-            <div>
-                <IconButton
-                    component={Link}
-                    to='../master/data/import/servants'
-                    children={<PublishIcon />}
-                    size='large'
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key='export' title='Download servant data' placement='right'>
-            <div>
-                {/* TODO Implement this */}
-                <IconButton children={<GetApp />} disabled size='large' />
-            </div>
-        </Tooltip>
-    ];
+    const {
+        instanceIds: selectedInstanceIds,
+        servants: selectedServants
+    } = selectedServantsRef.current;
+
+    const isMultipleServantsSelected = selectedServants.length > 1;
 
     /**
      * FabContainer children
      */
-    let fabContainerChildNodes: ReactNode = [
-        <Tooltip key='cancel' title='Cancel'>
-            <div>
-                <Fab
-                    color='default'
-                    onClick={handleRevertButtonClick}
-                    disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
-                    children={<ClearIcon />}
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key='save' title='Save changes'>
-            <div>
-                <Fab
-                    color='primary'
-                    onClick={handleSaveButtonClick}
-                    disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
-                    children={<SaveIcon />}
-                />
-            </div>
-        </Tooltip>
-    ];
+    let fabContainerChildNodes: ReactNode = null;
+    if (!dragDropMode) {
+        fabContainerChildNodes = [
+            <Tooltip key='cancel' title='Cancel'>
+                <div>
+                    <Fab
+                        color='default'
+                        onClick={handleRevertButtonClick}
+                        disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
+                        children={<ClearIcon />}
+                    />
+                </div>
+            </Tooltip>,
+            <Tooltip key='save' title='Save changes'>
+                <div>
+                    <Fab
+                        color='primary'
+                        onClick={handleSaveButtonClick}
+                        disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
+                        children={<SaveIcon />}
+                    />
+                </div>
+            </Tooltip>
+        ];
+    };
 
     const {
         masterServants,
@@ -524,7 +613,16 @@ export const MasterServantsRoute = React.memo(() => {
                 </div>
             </div>
             <div className='flex overflow-hidden full-height'>
-                <NavigationRail children={navigationRailChildNodes} />
+                <MasterServantsNavigationRail
+                    selectedServantsCount={selectedServants.length}
+                    dragDropMode={dragDropMode}
+                    onAddServant={handleAddServant}
+                    onDeleteSelectedServants={handleDeleteSelectedServants}
+                    onDragDropActivate={handleDragDropActivate}
+                    onDragDropApply={handleDragDropApply}
+                    onDragDropCancel={handleDragDropCancel}
+                    onEditSelectedServants={handleEditSelectedServants}
+                />
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <LayoutPanelScrollable
                         className='py-4 pr-4 full-height flex-fill scrollbar-track-border'
@@ -537,23 +635,23 @@ export const MasterServantsRoute = React.memo(() => {
                         }
                         children={
                             <MasterServantList
-                                masterServants={masterServants}
+                                masterServants={dragDropMasterServants || masterServants}
                                 bondLevels={bondLevels}
-                                selectedServants={selectedServantsRef.current.instanceIds}
+                                selectedServants={selectedInstanceIds}
                                 // showAddServantRow
                                 visibleColumns={visibleColumns}
                                 dragDropMode={dragDropMode}
-                                onServantSelectionChange={handleServantSelectionChange}
-                                onAddServant={handleAddServantButtonClick}
-                                onEditServant={openEditServantDialog}
-                                onDeleteServant={openDeleteServantDialog}
+                                onServantSelectionChange={setServantSelection}
+                                onEditSelectedServants={handleEditSelectedServants}
+                                onEditServant={handleEditServant}
+                                onDeleteServant={handleDeleteServant}
                             />
                         }
                     />
                     {md && <div className={`${StyleClassPrefix}-info-panel-container`}>
                         <LayoutPanelContainer className='flex column full-height' autoHeight>
-                            <MasterServantInfoPanel
-                                activeServants={selectedServantsRef.current.servants}
+                            <MasterServantsInfoPanel
+                                activeServants={selectedServants}
                                 bondLevels={bondLevels}
                                 unlockedCostumes={unlockedCostumes}
                                 showAppendSkills={showAppendSkills}
@@ -566,19 +664,16 @@ export const MasterServantsRoute = React.memo(() => {
             </div>
             <FabContainer children={fabContainerChildNodes} />
             <MasterServantEditDialog
-                dialogTitle={editServantDialogTargetRef.current ? 'Edit Servant Info' : 'Add Servant'}
                 submitButtonLabel='Done'
-                masterServant={editServantDialogTarget}
-                bondLevels={bondLevels}
-                unlockedCostumes={unlockedCostumes}
+                editData={editServantDialogData}
+                multiEditMode={isMultipleServantsSelected}
                 showAppendSkills={showAppendSkills}
-                servantSelectDisabled={!!editServantDialogTargetRef.current}
                 onClose={handleEditServantDialogClose}
             />
             <PromptDialog
-                open={!!deleteServantDialogTarget}
-                title='Delete Servant?'
-                prompt={deleteServantDialogPrompt}
+                open={!!deleteServantDialogData}
+                title={`Delete ${isMultipleServantsSelected ? 'Servants' : 'Servant'}?`}
+                prompt={deleteServantDialogData}
                 cancelButtonColor='secondary'
                 confirmButtonColor='primary'
                 confirmButtonLabel='Delete'

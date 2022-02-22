@@ -2,15 +2,24 @@ import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent 
 import React, { useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';
 
+type SkillSet = 'skills' | 'appendSkills';
+
+type SkillSlot = 1 | 2 | 3;
+
 type Props = {
-    value: string;
-    variant?: BaseTextFieldProps['variant'];
+    allowEmpty?: boolean;
+    disabled?: boolean;
+    /**
+     * @deprecated
+     */
     formId?: string;
     label?: string;
     name: string;
-    allowEmpty?: boolean;
-    disabled?: boolean;
-    onChange: (name: string, value: string, pushChanges: boolean) => void;
+    onChange: (name: string, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges: boolean) => void;
+    skillSet: SkillSet,
+    slot: SkillSlot,
+    value: string;
+    variant?: BaseTextFieldProps['variant'];
 };
 
 const DefaultLabel = 'Skill';
@@ -21,20 +30,22 @@ const DefaultLabel = 'Skill';
 export const ServantSkillInputField = React.memo((props: Props) => {
 
     const {
-        value,
-        variant,
+        allowEmpty,
+        disabled,
         formId,
         label,
         name,
-        allowEmpty,
-        disabled,
-        onChange
+        onChange,
+        skillSet,
+        slot,
+        value,
+        variant
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
         const { name, value } = event.target;
-        onChange(name, value, true);
-    }, [onChange]);
+        onChange(name, skillSet, slot, value, true);
+    }, [onChange, skillSet, slot]);
 
     const fieldId = formId ? `${formId}-${name}` : name;
 

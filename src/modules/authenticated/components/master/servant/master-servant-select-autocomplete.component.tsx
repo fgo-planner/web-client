@@ -2,22 +2,25 @@ import { GameServant } from '@fgo-planner/types';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
-import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
-import { useGameServantList } from '../../../../../../hooks/data/use-game-servant-list.hook';
-import { Immutable } from '../../../../../../types/internal';
-import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
+import { GameServantClassIcon } from '../../../../../components/game/servant/game-servant-class-icon.component';
+import { useGameServantList } from '../../../../../hooks/data/use-game-servant-list.hook';
+import { Immutable } from '../../../../../types/internal';
+import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
 type Props = {
-    selectedServant: Immutable<GameServant>;
-    size?: 'small' | 'medium';
     disabled?: boolean;
+    multiEditMode?: boolean;
     onChange?: (event: ChangeEvent<{}>, value: Immutable<GameServant>) => void;
+    selectedServant?: Immutable<GameServant>;
+    size?: 'small' | 'medium';
 };
 
 type ServantOption = Immutable<{
     label: string;
     servant: GameServant;
 }>;
+
+const MultiSelectionDisplayText = 'Multiple servants selected';
 
 const optionStyles = {
     root: {
@@ -66,7 +69,7 @@ const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: ServantOptio
                     rarity={servant.rarity}
                     sx={optionStyles.classIcon}
                 />
-                <div className="truncate">
+                <div className='truncate'>
                     {label}
                 </div>
             </div>
@@ -75,33 +78,34 @@ const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: ServantOptio
 };
 
 const renderInput = (params: any): ReactNode => {
-    return <TextField {...params} label="Servant" variant="outlined" />;
+    return <TextField {...params} label='Servant' variant='outlined' />;
 };
 
-export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
-
-    const {
-        selectedServant,
-        size,
-        disabled,
-        onChange
-    } = props;
+export const MasterServantSelectAutocomplete = React.memo((props: Props) => {
 
     const gameServantList = useGameServantList();
 
+    const {
+        disabled,
+        multiEditMode,
+        onChange,
+        selectedServant,
+        size
+    } = props;
+
     const options = useMemo((): Array<ServantOption> => {
-        if (!gameServantList) {
+        if (!gameServantList?.length) {
             return [];
         }
         return gameServantList.map(generateServantOption);
     }, [gameServantList]);
 
     const selectedOption = useMemo((): ServantOption | undefined => {
-        if (!selectedServant) {
+        if (!selectedServant || !options.length) {
             return undefined;
         }
         return generateServantOption(selectedServant);
-    }, [selectedServant]);
+    }, [options, selectedServant]);
 
     const handleChange = useCallback((event: ChangeEvent<{}>, value: ServantOption | null): void => {
         if (value === null) {
@@ -111,14 +115,14 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
         onChange?.(event, value.servant);
     }, [onChange]);
 
-    if (disabled) {
+    if (multiEditMode || disabled || !selectedOption) {
         return (
             <TextField
-                variant="outlined"
+                variant='outlined'
                 size={size}
                 fullWidth
-                label="Servant"
-                value={selectedServant.name}
+                label='Servant'
+                value={multiEditMode ? MultiSelectionDisplayText : selectedOption?.servant.name}
                 disabled
             />
         );
@@ -131,7 +135,7 @@ export const MasterServantEditFormAutocomplete = React.memo((props: Props) => {
             fullWidth
             size={size}
             options={options}
-            noOptionsText="No results"
+            noOptionsText='No results'
             isOptionEqualToValue={isOptionSelected}
             filterOptions={filterOptions}
             renderOption={renderOption}

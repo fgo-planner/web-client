@@ -14,7 +14,6 @@ import { PlanEnhancementRequirements as EnhancementRequirements } from '../../..
 import { Immutable } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { ComputationOptions, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
-import { MasterServantEditForm, SubmitData } from '../../components/master/servant/edit-form/master-servant-edit-form.component';
 
 type Props = {
     activeServants: Array<MasterServant>;
@@ -22,7 +21,7 @@ type Props = {
     unlockedCostumes: Array<number>;
     showAppendSkills?: boolean;
     editMode?: boolean;
-    onStatsChange?: (data: SubmitData) => void;
+    onStatsChange?: (data: any) => void;
 };
 
 const FormId = 'master-servant-info-panel-form';
@@ -180,7 +179,7 @@ const StyleProps = {
     }
 } as SystemStyleObject<Theme>;
 
-export const MasterServantInfoPanel = React.memo((props: Props) => {
+export const MasterServantsInfoPanel = React.memo((props: Props) => {
 
     const {
         activeServants,
@@ -220,7 +219,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
         }
     }, [activeServants, gameServantMap, showAppendSkills, unlockedCostumes]);
 
-    const handleStatsChange = useCallback((data: SubmitData): void => {
+    const handleStatsChange = useCallback((data: any): void => {
         if (!editMode || !gameServantMap || activeServants.length !== 1) {
             return;
         }
@@ -299,20 +298,20 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
             return null;
         }
         const activeServant = activeServants[0];
-        if (editMode) {
-            return (
-                <MasterServantEditForm
-                    formId={FormId}
-                    className="p-4"
-                    masterServant={activeServant}
-                    bondLevels={bondLevels}
-                    unlockedCostumes={unlockedCostumes}
-                    showAppendSkills={showAppendSkills}
-                    onStatsChange={handleStatsChange}
-                    layout="panel"
-                />
-            );
-        } else {
+        // if (editMode) {
+        //     return (
+        //         <MasterServantEditForm
+        //             formId={FormId}
+        //             className="p-4"
+        //             masterServant={activeServant}
+        //             bondLevels={bondLevels}
+        //             unlockedCostumes={unlockedCostumes}
+        //             showAppendSkills={showAppendSkills}
+        //             onStatsChange={handleStatsChange}
+        //             layout="panel"
+        //         />
+        //     );
+        // } else {
             return (
                 <div className={`${StyleClassPrefix}-servant-stats-container`}>
                     <DataPointListItem
@@ -361,7 +360,7 @@ export const MasterServantInfoPanel = React.memo((props: Props) => {
                     />
                 </div>
             );
-        }
+        // }
     }, [activeServants, bondLevels, editMode, handleStatsChange, showAppendSkills, unlockedCostumes]);
 
     const servantMaterialDebtNode: ReactNode = useMemo(() => {

@@ -10,9 +10,15 @@ type Props = {
     allowEmpty?: boolean;
     ascension: string;
     disabled?: boolean;
-    gameServant: Immutable<GameServant>;
+    /**
+     * The game servant data that corresponds to the servant being edited. This
+     * should be set to `undefined` if and only if multiple servants are being
+     * edited, in which case, in which case the the field will be disabled.
+     */
+    gameServant?: Immutable<GameServant>;
     label?: string;
     level: string;
+    multiEditMode?: boolean;
     name: string;
     onChange: (name: string, level: string, ascension: string, pushChanges?: boolean) => void;
     variant?: BaseTextFieldProps['variant'];
@@ -43,6 +49,7 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         gameServant,
         label,
         level,
+        multiEditMode,
         name,
         onChange,
         variant
@@ -58,6 +65,9 @@ export const ServantLevelInputField = React.memo((props: Props) => {
     }, [allowEmpty, ascension, name, onChange]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
+        if (!gameServant) {
+            return;
+        }
         const { value } = event.target;
         if (!value && allowEmpty) {
             return onChange(name, value, ascension, true);
@@ -67,6 +77,13 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         onChange(name, String(updatedLevel), String(updatedAscension), true);
     }, [allowEmpty, ascension, gameServant, name, onChange]);
 
+    if (!gameServant && !multiEditMode) {
+        console.error('ServantLevelInputField: gameServant must be provided when editing single servant');
+        return null;
+    }
+
+    const value = multiEditMode ? '' : level;
+
     return (
         <TextField
             variant={variant}
@@ -75,10 +92,10 @@ export const ServantLevelInputField = React.memo((props: Props) => {
             name={name}
             type='number'
             inputProps={InputProps}
-            value={level}
+            value={value}
             onChange={handleChange}
             onBlur={handleBlur}
-            disabled={disabled}
+            disabled={disabled || multiEditMode}
         />
     );
 

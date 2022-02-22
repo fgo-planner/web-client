@@ -11,7 +11,7 @@ type Props = {
 export const PlanServantEditCostumesTabContent = React.memo((props: Props) => {
 
     return (
-        <div>TODO Implement this</div>
+        <i>Feature not yet available</i>
     );
 
 });

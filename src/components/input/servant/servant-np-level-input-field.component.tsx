@@ -3,13 +3,17 @@ import React, { useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';
 
 type Props = {
+    disabled?: boolean;
+    /**
+     * @deprecated
+     */
+    formId?: string;
+    label?: string;
+    multiEditMode?: boolean;
+    name: string;
+    onChange: (name: string, value: string, pushChanges: boolean) => void;
     value: string;
     variant?: BaseTextFieldProps['variant'];
-    formId: string;
-    label?: string;
-    name: string;
-    disabled?: boolean;
-    onChange: (name: string, value: string, pushChanges: boolean) => void;
 };
 
 const DefaultLabel = 'NP Level';
@@ -20,13 +24,14 @@ const DefaultLabel = 'NP Level';
 export const ServantNpLevelInputField = React.memo((props: Props) => {
 
     const {
-        value,
-        variant,
+        disabled,
         formId,
         label,
+        multiEditMode,
         name,
-        disabled,
-        onChange
+        onChange,
+        value,
+        variant
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
@@ -34,18 +39,21 @@ export const ServantNpLevelInputField = React.memo((props: Props) => {
         onChange(name, value, true);
     }, [onChange]);
 
+    const fieldId = formId ? `${formId}-${name}` : name;
+
     return (
         <FormControl variant={variant} fullWidth>
             <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
-                id={`${formId}-${name}`}
+                id={fieldId}
                 name={name}
                 label={label || DefaultLabel}
                 value={value}
                 onChange={handleChange}
                 disabled={disabled}
             >
+                {multiEditMode && <option key={-1} value={-1}>{'?'}</option>}
                 {GameServantConstants.NoblePhantasmLevels.map(value => (
                     <option key={value} value={value}>
                         {value}

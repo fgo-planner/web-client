@@ -1,53 +1,47 @@
-import { MasterServant, PlanServant } from '@fgo-planner/types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
-import React, { MouseEvent, useCallback, useRef } from 'react';
+import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps, ImmutableArray } from '../../../../../../types/internal';
-import { PlanServantEdit } from './plan-servant-edit.component';
-
-export type DialogData = {
-    planServant: PlanServant;
-};
+import { DialogComponentProps } from '../../../../../../types/internal';
+import { MasterServantEditData } from './master-servant-edit-data.type';
+import { MasterServantEdit } from './master-servant-edit.component';
 
 type Props = {
-    dialogTitle?: string;
-    masterServants: ImmutableArray<MasterServant>;
     /**
-     * The planned servant to edit. This will be modified directly, so provide a
-     * clone if modification to the original object is not desired.
-     * 
-     * If this is not provided, then the dialog will remain closed.
+     * The servant data to edit. This will be modified directly, so provide a clone
+     * if modification to the original object is not desired.
+     *
+     * If this is `undefined`, then the dialog will remain closed.
      */
-    planServant?: PlanServant;
-    planServants: ImmutableArray<PlanServant>;
-    servantSelectDisabled?: boolean;
+    editData?: MasterServantEditData;
+    /**
+     * Whether multiple servants are being edited. In this mode, various parameters
+     * will not be available for edit.
+     */
+    multiEditMode?: boolean;
     showAppendSkills?: boolean;
     submitButtonLabel?: string;
-    unlockedCostumes: ReadonlyArray<number>;
-} & Omit<DialogComponentProps<DialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
+} & Omit<DialogComponentProps<MasterServantEditData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
-const DialogWidth = 640;
+const DefaultSubmitButtonLabel = 'Submit';
+
+const DefaultCancelButtonLabel = 'Cancel';
+
+const DialogWidth = 600;
 
 const DialogPaperProps = {
     style: {
-        width: DialogWidth,
-        maxWidth: DialogWidth,
-        margin: 0
+        width: DialogWidth
     }
 } as PaperProps;
 
-export const PlanServantEditDialog = React.memo((props: Props) => {
+export const MasterServantEditDialog = React.memo((props: Props) => {
 
     const {
-        dialogTitle,
-        masterServants,
-        planServant,
-        planServants,
-        servantSelectDisabled,
+        editData,
+        multiEditMode,
         showAppendSkills,
         submitButtonLabel,
-        unlockedCostumes,
         onClose,
         ...dialogProps
     } = props;
@@ -55,7 +49,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
     /**
      * Contains cache of the dialog contents.
      */
-    const dialogChildRef = useRef<JSX.Element>();
+    const dialogContentsRef = useRef<JSX.Element>();
 
     const {
         fullScreen,
@@ -64,35 +58,50 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
     } = useAutoResizeDialog(props);
 
     const handleSubmitButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-        planServant && onClose(event, 'submit', { planServant });
-    }, [onClose, planServant]);
+        onClose(event, 'submit', editData);
+    }, [editData, onClose]);
 
     const handleCancelButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         onClose(event, 'cancel');
     }, [onClose]);
 
-    const open = !!planServant;
+    const handleDialogClose = useCallback((event, reason: 'backdropClick' | 'escapeKeyDown'): void => {
+        onClose(event, reason);
+    }, [onClose]);
+
+    const dialogTitle = useMemo((): string => {
+        if (!editData) {
+            return '';
+        }
+        // TODO Un-hardcode the strings.
+        if (editData.isNewServant) {
+            return 'Add Servant';
+        } else if (multiEditMode)  {
+            return 'Edit Servants';
+        } else {
+            return 'Edit Servant';
+        }
+    }, [editData, multiEditMode]);
+
+    const open = !!editData;
 
     /*
-     * Only re-render the dialog child node if the dialog is open. This allows the
+     * Only re-render the dialog contents if the dialog is open. This allows the
      * dialog to keep displaying the same contents while it is undergoing its exit
      * transition, even if the props were changed by the parent component.
      */
-    if (open || !dialogChildRef.current) {
-        dialogChildRef.current = (
+    if (open) {
+        dialogContentsRef.current = (
             <Typography component={'div'}>
                 <DialogTitle>
                     {dialogTitle}
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
                 <DialogContent>
-                    <PlanServantEdit
-                        masterServants={masterServants}
-                        planServant={planServant!}
-                        planServants={planServants}
+                    <MasterServantEdit
+                        editData={editData!}
+                        multiEditMode={multiEditMode}
                         showAppendSkills={showAppendSkills}
-                        unlockedCostumes={unlockedCostumes}
-                        servantSelectDisabled={servantSelectDisabled}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -101,14 +110,14 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
                         color='secondary'
                         onClick={handleCancelButtonClick}
                     >
-                        Cancel
+                        {DefaultCancelButtonLabel}
                     </Button>
                     <Button
                         variant={actionButtonVariant}
                         color='primary'
                         onClick={handleSubmitButtonClick}
                     >
-                        {submitButtonLabel || 'Submit'}
+                        {submitButtonLabel || DefaultSubmitButtonLabel}
                     </Button>
                 </DialogActions>
             </Typography>
@@ -122,8 +131,9 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
             open={open}
             fullScreen={fullScreen}
             keepMounted={false}
+            onClose={handleDialogClose}
         >
-            {dialogChildRef.current}
+            {dialogContentsRef.current}
         </Dialog>
     );
 

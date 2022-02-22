@@ -4,7 +4,6 @@ import { IconButton } from '@mui/material';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
-import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { AssetConstants } from '../../../../../../constants';
 import { Immutable, ReadonlyPartial } from '../../../../../../types/internal';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
@@ -20,12 +19,12 @@ type Props = {
     masterServant: MasterServant;
     servant: Immutable<GameServant> | undefined; // Not optional, but possible to be undefined.
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
-    onEditServant?: (servant: MasterServant) => void;
-    onDeleteServant?: (servant: MasterServant) => void;
     onClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
-    onDoubleClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
     onContextMenu?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
-} & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onDoubleClick' | 'onContextMenu'>;
+    onDeleteServant?: (servant: MasterServant) => void;
+    onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
+    onEditServant?: (servant: MasterServant) => void;
+} & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu'>;
 
 const shouldSkipUpdate = (prevProps: Readonly<Props>, nextProps: Readonly<Props>): boolean => {
     if (!ObjectUtils.isShallowEquals(prevProps, nextProps)) {
@@ -123,11 +122,11 @@ export const MasterServantListRow = React.memo((props: Props) => {
         masterServant,
         servant,
         visibleColumns,
+        onClick,
+        onContextMenu,
+        onDragOrderChange,
         onEditServant,
         onDeleteServant,
-        onClick,
-        onDoubleClick,
-        onContextMenu,
         ...domAttributes
     } = props;
 
@@ -193,29 +192,18 @@ export const MasterServantListRow = React.memo((props: Props) => {
 
     return (
         <DraggableListRowContainer
-            draggableId={`draggable-servant-${masterServant.instanceId}`}
+            draggableId={masterServant.instanceId}
             index={index}
             borderBottom={!lastRow}
             active={active}
-            dragHandleVisible
+            dragHandleVisible={dragDropMode}
             dragEnabled={dragDropMode}
+            onDragOrderChange={onDragOrderChange}
             onClick={handleClick}
-            onDoubleClick={handleEditServant}
             {...domAttributes}
         >
             {rowContents}
         </DraggableListRowContainer>
     );
-
-    // return (
-    //     <StaticListRowContainer
-    //         borderBottom={!lastRow}
-    //         active={active}
-    //         onClick={handleClick}
-    //         {...domAttributes}
-    //     >
-    //         {rowContents}
-    //     </StaticListRowContainer>
-    // );
 
 }, shouldSkipUpdate);

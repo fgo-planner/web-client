@@ -8,16 +8,16 @@ export class MasterServantUtils {
     /**
      * Instantiates a default `MasterServant` object.
      */
-    static instantiate(summoned = true): MasterServant {
+    static instantiate(instanceId = 0): MasterServant {
         return {
-            instanceId: 0,
-            gameId: 100100, // TODO Un-hardcode this
-            summoned,
+            instanceId,
+            gameId: GameServantConstants.DefaultServantId,
+            summoned: true, // Assume servant has been summoned by player by default
             np: 1,
-            level: 1,
-            ascension: 0,
+            level: GameServantConstants.MinLevel,
+            ascension: GameServantConstants.MinAscensionLevel,
             skills: {
-                1: 1
+                1: GameServantConstants.MinSkillLevel
             },
             appendSkills: {}
         };
@@ -193,10 +193,9 @@ export class MasterServantUtils {
     static roundToNearestValidAscensionLevel(
         level: number,
         ascension: number,
-        servant: Immutable<GameServant>
+        { maxLevel }: Immutable<GameServant>
     ): MasterServantAscensionLevel {
 
-        const { maxLevel } = servant;
         if (level > maxLevel - 10) {
             return 4;
         }
@@ -231,10 +230,9 @@ export class MasterServantUtils {
     static roundToNearestValidLevel(
         ascension: number,
         level: number,
-        servant: Immutable<GameServant>
+        { maxLevel }: Immutable<GameServant>
     ): number {
 
-        const { maxLevel } = servant;
         switch (ascension) {
         case 4:
             return Math.max(maxLevel - 10, level);

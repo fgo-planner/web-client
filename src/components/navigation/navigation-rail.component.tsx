@@ -16,6 +16,11 @@ const StyleProps = {
     '& >*': {
         // https://material.io/components/navigation-rail#specs
         py: 1
+    },
+    '& >.MuiDivider-root': {
+        width: '50%',
+        py: 0,
+        my: 4
     }
 } as SystemStyleObject<Theme>;
 

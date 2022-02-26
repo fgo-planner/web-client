@@ -666,7 +666,7 @@ export const MasterServantsRoute = React.memo(() => {
             <MasterServantEditDialog
                 submitButtonLabel='Done'
                 editData={editServantDialogData}
-                multiEditMode={isMultipleServantsSelected}
+                isMultipleServantsSelected={isMultipleServantsSelected}
                 showAppendSkills={showAppendSkills}
                 onClose={handleEditServantDialogClose}
             />

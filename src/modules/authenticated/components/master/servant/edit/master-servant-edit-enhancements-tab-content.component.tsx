@@ -156,6 +156,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
             value={String(masterServant.fouHp ?? '')}
             label='HP Fou'
             name='fouHp'
+            multiEditMode={multiEditMode}
             onChange={handleInputChange}
             onBlur={handleInputBlurEvent}
             disabled={readonly}
@@ -167,6 +168,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
             value={String(masterServant.fouAtk ?? '')}
             label='ATK Fou'
             name='fouAtk'
+            multiEditMode={multiEditMode}
             onChange={handleInputChange}
             onBlur={handleInputBlurEvent}
             disabled={readonly}
@@ -180,6 +182,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
             name='skill1'
             skillSet='skills'
             slot={1}
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
             disabled={readonly}
         />
@@ -193,6 +196,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
             skillSet='skills'
             slot={2}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
             disabled={readonly}
         />
@@ -206,6 +210,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
             skillSet='skills'
             slot={3}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
             disabled={readonly}
         />
@@ -219,6 +224,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
             skillSet='appendSkills'
             slot={1}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
             disabled={readonly}
         />
@@ -232,6 +238,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
             skillSet='appendSkills'
             slot={2}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
             disabled={readonly}
         />
@@ -245,6 +252,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
             skillSet='appendSkills'
             slot={3}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
             disabled={readonly}
         />

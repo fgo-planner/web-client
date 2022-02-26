@@ -14,6 +14,7 @@ type Props = {
      */
     formId?: string;
     label?: string;
+    multiEditMode?: boolean;
     name: string;
     onChange: (name: string, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges: boolean) => void;
     skillSet: SkillSet,
@@ -34,6 +35,7 @@ export const ServantSkillInputField = React.memo((props: Props) => {
         disabled,
         formId,
         label,
+        multiEditMode,
         name,
         onChange,
         skillSet,
@@ -61,6 +63,7 @@ export const ServantSkillInputField = React.memo((props: Props) => {
                 onChange={handleChange}
                 disabled={disabled}
             >
+                {multiEditMode && <option key={-1} value={-1}>{'?'}</option>}
                 {allowEmpty && <option value=''>{'\u2014'}</option>}
                 {GameServantConstants.SkillLevels.map(value => (
                     <option key={value} value={value}>

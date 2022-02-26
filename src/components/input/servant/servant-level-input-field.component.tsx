@@ -26,6 +26,8 @@ type Props = {
 
 const DefaultLabel = 'Servant Level';
 
+const IndeterminateDisplayText = '?';
+
 const InputProps = {
     step: 1,
     min: GameServantConstants.MinLevel,
@@ -82,7 +84,17 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         return null;
     }
 
-    const value = multiEditMode ? '' : level;
+    if (multiEditMode) {
+        return (
+            <TextField
+                variant={variant}
+                fullWidth
+                label={label || DefaultLabel}
+                value={IndeterminateDisplayText}
+                disabled
+            />
+        );
+    }
 
     return (
         <TextField
@@ -92,7 +104,7 @@ export const ServantLevelInputField = React.memo((props: Props) => {
             name={name}
             type='number'
             inputProps={InputProps}
-            value={value}
+            value={level}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={disabled || multiEditMode}

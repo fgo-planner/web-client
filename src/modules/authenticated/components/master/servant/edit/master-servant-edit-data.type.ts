@@ -19,7 +19,7 @@ export type MasterServantEditData = {
          * The ID of the `GameServant` that this servant is an instance of.
          *
          * If multiple servants are being edited, a value of `-1` can be used to
-         * represent a non-deterministic state.
+         * represent a indeterminate state.
          */
         gameId: number;
         /**
@@ -27,7 +27,7 @@ export type MasterServantEditData = {
          * tentative.
          * 
          * If multiple servants are being edited, a value of `undefined` can be used to
-         * represent a non-deterministic state.
+         * represent a indeterminate state.
          */
         summoned?: boolean;
         /**
@@ -35,14 +35,14 @@ export type MasterServantEditData = {
          * epoch.
          *
          * If multiple servants are being edited, a value of `-1` can be used to
-         * represent a non-deterministic state.
+         * represent a indeterminate state.
          */
         summonDate?: number;
         /**
          * The servant's noble phantasm level.
          *
          * If multiple servants are being edited, a value of `-1` can be used to
-         * represent a non-deterministic state.
+         * represent a indeterminate state.
          */
         np: MasterServantNoblePhantasmLevel | -1;
         /**
@@ -65,21 +65,21 @@ export type MasterServantEditData = {
          * The servant's attack fou enhancement.
          *
          * If multiple servants are being edited, a value of `-1` can be used to
-         * represent a non-deterministic state.
+         * represent a indeterminate state.
          */
         fouAtk?: number;
         /**
          * The servant's HP fou enhancement.
          * 
          * If multiple servants are being edited, a value of `-1` can be used to
-         * represent a non-deterministic state.
+         * represent a indeterminate state.
          */
         fouHp?: number;
         /**
          * The servant's skill levels.
          * 
          * If multiple servants are being edited, a value of `-1` can be used to
-         * represent a non-deterministic state.
+         * represent a indeterminate state.
          */
         skills: {
             1: MasterServantSkillLevel | -1;
@@ -90,7 +90,7 @@ export type MasterServantEditData = {
          * The servant's append skill levels.
          * 
          * If multiple servants are being edited, a value of `-1` can be used to
-         * represent a non-deterministic state.
+         * represent a indeterminate state.
          */
         appendSkills: {
             1?: MasterServantSkillLevel | -1;
@@ -103,7 +103,7 @@ export type MasterServantEditData = {
      * The servant's bond level.
      *
      * If multiple servants are being edited, a value of `-1` can be used to
-     * represent a non-deterministic state.
+     * represent a indeterminate state.
      */
     bondLevel?: MasterServantBondLevel | -1;
 

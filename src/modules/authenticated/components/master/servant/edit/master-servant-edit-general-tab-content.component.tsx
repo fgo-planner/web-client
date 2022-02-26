@@ -122,6 +122,7 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
             value={String(masterServant.np ?? '')}
             label='NP Level'
             name='np'
+            multiEditMode={multiEditMode}
             onChange={handleInputChange}
             disabled={readonly}
         />
@@ -133,6 +134,7 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
             label='Bond'
             name='bondLevel'
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleBondInputChange}
             disabled={readonly}
         />

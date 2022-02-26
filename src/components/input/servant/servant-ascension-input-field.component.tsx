@@ -29,6 +29,8 @@ type Props = {
 
 const DefaultLabel = 'Ascension';
 
+const IndeterminateDisplayText = '?';
+
 /**
  * Input field for servant's ascension level.
  */
@@ -70,6 +72,7 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
                 variant={variant}
                 fullWidth
                 label={label || DefaultLabel}
+                value={IndeterminateDisplayText}
                 disabled
             />
         );

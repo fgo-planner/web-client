@@ -19,6 +19,8 @@ type Props = {
 
 const DefaultLabel = 'Bond';
 
+const IndeterminateDisplayText = '?';
+
 /**
  * Input field for servant's bond level.
  */
@@ -55,7 +57,7 @@ export const ServantBondInputField = React.memo((props: Props) => {
                 onChange={handleChange}
                 disabled={disabled}
             >
-                {multiEditMode && <option key={-1} value={-1}>{'?'}</option>}
+                {multiEditMode && <option key={-1} value={-1}>{IndeterminateDisplayText}</option>}
                 {allowEmpty && <option value=''>{'\u2014'}</option>}
                 {GameServantConstants.BondLevels.map(value => (
                     <option key={value} value={value}>

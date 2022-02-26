@@ -1,19 +1,23 @@
 import { BaseTextFieldProps, TextField } from '@mui/material';
-import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
+import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';
 import { FormUtils } from '../../../utils/form.utils';
 
 type Props = {
+    disabled?: boolean;
+    label?: string;
+    multiEditMode?: boolean;
+    name: string;
+    onBlur?: (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
+    onChange: (name: string, value: string) => void;
     value: string;
     variant?: BaseTextFieldProps['variant'];
-    label?: string;
-    name: string;
-    disabled?: boolean;
-    onChange: (name: string, value: string) => void;
-    onBlur?: (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
 };
 
 const DefaultLabel = 'Fou';
+
+const IndeterminateDisplayText = '?';
+const IndeterminateValue = '-1';
 
 /**
  * Calculates the step size for the Fou number input fields based on the current
@@ -37,13 +41,14 @@ const getFouInputStepSize = (value: string | undefined): number => {
 export const ServantFouInputField = React.memo((props: Props) => {
 
     const {
-        value,
-        variant,
-        label,
-        name,
         disabled,
+        label,
+        multiEditMode,
+        name,
         onChange,
-        onBlur
+        onBlur,
+        value,
+        variant
     } = props;
 
     const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
@@ -56,11 +61,53 @@ export const ServantFouInputField = React.memo((props: Props) => {
     }, [onChange]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        const { name, value } = event.target;
-        const transformedValue = FormUtils.transformInputToFouValue(value) ?? '';
-        onChange(name, String(transformedValue));
+        const { name, value: inputValue } = event.target;
+        let transformedValue: string;
+        if (multiEditMode && inputValue === IndeterminateDisplayText) {
+            transformedValue = IndeterminateValue;
+        } else {
+            transformedValue = String(FormUtils.transformInputToFouValue(inputValue) ?? '');
+        }
+        onChange(name, transformedValue);
         onBlur?.(event);
-    }, [onBlur, onChange]);
+    }, [multiEditMode, onBlur, onChange]);
+
+    /**
+     * Allows the user to set the field back to indeterminate state when
+     * multiple servants are being edited by typing in a `?` symbol. Normally
+     * this is not allowed because the input only accepts numbers.
+     */
+    const handleIndeterminateInput = useCallback((event: KeyboardEvent<HTMLInputElement>): void => {
+        /*
+         * Ignore the event if only a single servant is being edited, or if the key
+         * pressed was not the `?` key.
+         */
+        if (!multiEditMode || event.key !== '?') {
+            return;
+        }
+        onChange(name, IndeterminateValue);
+        /*
+         * Prevent the onChange event from firing again.
+         */
+        event.preventDefault();
+    }, [multiEditMode, name, onChange]);
+
+    if (multiEditMode && value === IndeterminateValue) {
+        return (
+            <TextField
+                variant={variant}
+                fullWidth
+                label={label || DefaultLabel}
+                name={name}
+                inputProps={{
+                    onKeyPress: handleIndeterminateInput
+                }}
+                value={IndeterminateDisplayText}
+                onChange={handleChange}
+                onBlur={handleBlur}
+            />
+        );
+    }
 
     return (
         <TextField
@@ -72,7 +119,8 @@ export const ServantFouInputField = React.memo((props: Props) => {
             inputProps={{
                 step: getFouInputStepSize(value),
                 min: GameServantConstants.MinFou,
-                max: GameServantConstants.MaxFou
+                max: GameServantConstants.MaxFou,
+                onKeyPress: handleIndeterminateInput
             }}
             value={value}
             onChange={handleChange}

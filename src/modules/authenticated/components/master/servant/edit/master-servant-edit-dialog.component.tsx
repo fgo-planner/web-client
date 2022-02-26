@@ -18,7 +18,7 @@ type Props = {
      * Whether multiple servants are being edited. In this mode, various parameters
      * will not be available for edit.
      */
-    multiEditMode?: boolean;
+    isMultipleServantsSelected?: boolean;
     showAppendSkills?: boolean;
     submitButtonLabel?: string;
 } & Omit<DialogComponentProps<MasterServantEditData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
@@ -39,7 +39,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
 
     const {
         editData,
-        multiEditMode,
+        isMultipleServantsSelected,
         showAppendSkills,
         submitButtonLabel,
         onClose,
@@ -76,14 +76,16 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         // TODO Un-hardcode the strings.
         if (editData.isNewServant) {
             return 'Add Servant';
-        } else if (multiEditMode)  {
+        } else if (isMultipleServantsSelected)  {
             return 'Edit Servants';
         } else {
             return 'Edit Servant';
         }
-    }, [editData, multiEditMode]);
+    }, [editData, isMultipleServantsSelected]);
 
     const open = !!editData;
+
+    const multiEditMode = isMultipleServantsSelected && !editData?.isNewServant;
 
     /*
      * Only re-render the dialog contents if the dialog is open. This allows the

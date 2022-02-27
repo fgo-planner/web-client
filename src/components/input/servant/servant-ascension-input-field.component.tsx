@@ -32,7 +32,8 @@ const DefaultLabel = 'Ascension';
 const IndeterminateDisplayText = '?';
 
 /**
- * Input field for servant's ascension level.
+ * Input field for a servant's ascension level. This is applicable to both master
+ * and planned servants.
  */
 export const ServantAscensionInputField = React.memo((props: Props) => {
 

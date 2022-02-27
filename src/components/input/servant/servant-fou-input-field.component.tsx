@@ -36,7 +36,8 @@ const getFouInputStepSize = (value: string | undefined): number => {
 };
 
 /**
- * Input field for servant's Fou level.
+ * Input field for a servant's Fou level. This is applicable to both master and
+ * planned servants.
  */
 export const ServantFouInputField = React.memo((props: Props) => {
 

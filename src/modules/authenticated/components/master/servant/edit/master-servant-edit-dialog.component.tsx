@@ -31,7 +31,9 @@ const DialogWidth = 600;
 
 const DialogPaperProps = {
     style: {
-        width: DialogWidth
+        width: DialogWidth,
+        maxWidth: DialogWidth,
+        margin: 0
     }
 } as PaperProps;
 

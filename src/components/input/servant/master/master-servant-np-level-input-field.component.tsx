@@ -1,6 +1,6 @@
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
-import { GameServantConstants } from '../../../constants';
+import { GameServantConstants } from '../../../../constants';
 
 type Props = {
     disabled?: boolean;
@@ -19,9 +19,10 @@ type Props = {
 const DefaultLabel = 'NP Level';
 
 /**
- * Input field for servant's NP level.
+ * Input field for a servant's NP level. This is currently only applicable to
+ * master servants.
  */
-export const ServantNpLevelInputField = React.memo((props: Props) => {
+export const MasterServantNpLevelInputField = React.memo((props: Props) => {
 
     const {
         disabled,

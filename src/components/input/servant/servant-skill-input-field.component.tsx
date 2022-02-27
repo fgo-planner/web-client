@@ -26,7 +26,8 @@ type Props = {
 const DefaultLabel = 'Skill';
 
 /**
- * Input field for a servant's skill level.
+ * Input field for a servant's skill level. This is applicable to both master
+ * and planned servants.
  */
 export const ServantSkillInputField = React.memo((props: Props) => {
 

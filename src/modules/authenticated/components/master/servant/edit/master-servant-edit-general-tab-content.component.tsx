@@ -1,12 +1,15 @@
 import { GameServant, MasterServantBondLevel } from '@fgo-planner/types';
-import React, { useCallback } from 'react';
-import { ServantBondInputField } from '../../../../../../components/input/servant/servant-bond-input-field.component';
-import { ServantNpLevelInputField } from '../../../../../../components/input/servant/servant-np-level-input-field.component';
+import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
+import React, { ChangeEvent, useCallback } from 'react';
+import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
+import { MasterServantBondInputField } from '../../../../../../components/input/servant/master/master-servant-bond-input-field.component';
+import { MasterServantNpLevelInputField } from '../../../../../../components/input/servant/master/master-servant-np-level-input-field.component';
+import { MasterServantSummonDateInputField } from '../../../../../../components/input/servant/master/master-servant-summon-date-input-field.component';
+import { MasterServantSummonedCheckbox } from '../../../../../../components/input/servant/master/master-servant-summoned-checkbox.component';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { Immutable } from '../../../../../../types/internal';
 import { MasterServantEditData } from './master-servant-edit-data.type';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
-import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 
 type Props = {
     /**
@@ -105,6 +108,23 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
         forceUpdate();
     }, [forceUpdate, masterServant, pushStatsChange]);
 
+    const handleSummonedCheckboxChange = useCallback((_, value: boolean | undefined, pushChanges = false): void => {
+        masterServant.summoned = value;
+        if (pushChanges) {
+            pushStatsChange();
+        }
+        forceUpdate();
+    }, [forceUpdate, masterServant, pushStatsChange]);
+
+    const handleSummonDateInputChange = useCallback((_, value: number | undefined, pushChanges = false): void => {
+        masterServant.summonDate = value;
+        if (pushChanges) {
+            pushStatsChange();
+        }
+        forceUpdate();
+    }, [forceUpdate, masterServant, pushStatsChange]);
+
+
     const handleInputBlurEvent = useCallback((): void => {
         pushStatsChange();
         forceUpdate();
@@ -117,8 +137,28 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
 
     // TODO Add inputs for `summoned` and `summonDate`.
 
+    const summonedField = (
+        <MasterServantSummonedCheckbox
+            value={masterServant.summoned}
+            name='summoned'
+            multiEditMode={multiEditMode}
+            onChange={handleSummonedCheckboxChange}
+            disabled={readonly}
+        />
+    );
+
+    const summonDateField = (
+        <MasterServantSummonDateInputField
+            value={masterServant.summonDate}
+            name='summonDate'
+            multiEditMode={multiEditMode}
+            onChange={handleSummonDateInputChange}
+            disabled={readonly}
+        />
+    );
+
     const npField = (
-        <ServantNpLevelInputField
+        <MasterServantNpLevelInputField
             value={String(masterServant.np ?? '')}
             label='NP Level'
             name='np'
@@ -129,7 +169,7 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
     );
 
     const bondField = (
-        <ServantBondInputField
+        <MasterServantBondInputField
             value={String(bondLevel ?? '')}
             label='Bond'
             name='bondLevel'
@@ -149,8 +189,18 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
+                    {summonedField}
+                </InputFieldContainer>
+                <InputFieldContainer>
+                    {summonDateField}
+                </InputFieldContainer>
+            </div>
+            <div className={`${StyleClassPrefix}-input-field-group`}>
+                <InputFieldContainer>
                     {npField}
                 </InputFieldContainer>
+            </div>
+            <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
                     {bondField}
                 </InputFieldContainer>

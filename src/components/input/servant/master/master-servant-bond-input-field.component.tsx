@@ -1,6 +1,6 @@
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
-import { GameServantConstants } from '../../../constants';
+import { GameServantConstants } from '../../../../constants';
 
 type Props = {
     allowEmpty?: boolean;
@@ -22,9 +22,10 @@ const DefaultLabel = 'Bond';
 const IndeterminateDisplayText = '?';
 
 /**
- * Input field for servant's bond level.
+ * Input field for a servant's bond level. This is currently only applicable to
+ * master servants.
  */
-export const ServantBondInputField = React.memo((props: Props) => {
+export const MasterServantBondInputField = React.memo((props: Props) => {
 
     const {
         allowEmpty,

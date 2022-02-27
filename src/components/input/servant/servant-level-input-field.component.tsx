@@ -40,7 +40,8 @@ const transformLevelValue = (value: string): number => {
 };
 
 /**
- * Input field for servant's level.
+ * Input field for a servant's level. This is applicable to both master and
+ * planned servants.
  */
 export const ServantLevelInputField = React.memo((props: Props) => {
 

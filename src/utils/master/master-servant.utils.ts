@@ -155,15 +155,15 @@ export class MasterServantUtils {
      */
     static getArtStage(ascension: MasterServantAscensionLevel): 1 | 2 | 3 | 4 {
         switch (ascension) {
-        case 0:
-            return 1;
-        case 1:
-        case 2:
-            return 2;
-        case 3:
-            return 3;
-        case 4:
-            return 4;
+            case 0:
+                return 1;
+            case 1:
+            case 2:
+                return 2;
+            case 3:
+                return 3;
+            case 4:
+                return 4;
         }
     }
 
@@ -234,16 +234,16 @@ export class MasterServantUtils {
     ): number {
 
         switch (ascension) {
-        case 4:
-            return Math.max(maxLevel - 10, level);
-        case 3:
-            return Math.max(maxLevel - 20, Math.min(level, maxLevel - 10));
-        case 2:
-            return Math.max(maxLevel - 30, Math.min(level, maxLevel - 20));
-        case 1:
-            return Math.max(maxLevel - 40, Math.min(level, maxLevel - 30));
-        case 0:
-            return Math.min(maxLevel - 40, level);
+            case 4:
+                return Math.max(maxLevel - 10, level);
+            case 3:
+                return Math.max(maxLevel - 20, Math.min(level, maxLevel - 10));
+            case 2:
+                return Math.max(maxLevel - 30, Math.min(level, maxLevel - 20));
+            case 1:
+                return Math.max(maxLevel - 40, Math.min(level, maxLevel - 30));
+            case 0:
+                return Math.min(maxLevel - 40, level);
         }
         return GameServantConstants.MinLevel;
     }

@@ -149,7 +149,7 @@ export class MasterServantEditUtils {
          */
         for (let i = 1; i < masterServants.length; i++) {
             const masterServant = masterServants[i];
-            if (summonDate !== -1 && summonDate !== masterServant.summonDate) {
+            if (summonDate !== -1 && summonDate !== masterServant.summonDate?.getTime()) {
                 summonDate = -1;
             }
             if (summoned !== undefined && summoned !== masterServant.summoned) {

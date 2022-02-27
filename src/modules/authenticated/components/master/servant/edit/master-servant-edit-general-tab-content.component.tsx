@@ -153,6 +153,7 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
             name='summonDate'
             multiEditMode={multiEditMode}
             onChange={handleSummonDateInputChange}
+            onBlur={handleInputBlurEvent}
             disabled={readonly}
         />
     );

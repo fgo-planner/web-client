@@ -46,8 +46,8 @@ export const ServantFouInputField = React.memo((props: Props) => {
         label,
         multiEditMode,
         name,
-        onChange,
         onBlur,
+        onChange,
         value,
         variant
     } = props;

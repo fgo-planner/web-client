@@ -277,7 +277,7 @@ export class MasterServantEditUtils {
         /*
          * gameId is not allowed to be changed for existing servants.
          */
-        if (gameId !== -1 && !isNewServant) {
+        if (gameId !== -1 && isNewServant) {
             target.gameId = gameId;
         }
         if (summoned !== undefined) {

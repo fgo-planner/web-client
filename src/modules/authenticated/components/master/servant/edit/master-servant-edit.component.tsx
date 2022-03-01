@@ -1,7 +1,7 @@
 import { GameServant } from '@fgo-planner/types';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
-import React, { ChangeEvent, ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { Immutable } from '../../../../../../types/internal';
@@ -107,7 +107,7 @@ export const MasterServantEdit = React.memo((props: Props) => {
 
     //#region Input event handlers
 
-    const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: Immutable<GameServant>): void => {
+    const handleSelectedServantChange = useCallback((value: Immutable<GameServant>): void => {
         if (!gameServantMap || servantSelectDisabled) {
             return;
         }
@@ -126,7 +126,7 @@ export const MasterServantEdit = React.memo((props: Props) => {
         setGameServant(gameServant);
     }, [gameServantMap, masterServant, servantSelectDisabled]);
 
-    const handleActiveTabChange = useCallback((event: SyntheticEvent, value: TabId) => {
+    const handleActiveTabChange = useCallback((_: SyntheticEvent, value: TabId) => {
         setActiveTab(value);
     }, []);
 

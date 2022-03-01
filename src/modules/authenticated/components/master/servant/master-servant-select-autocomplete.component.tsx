@@ -1,7 +1,7 @@
 import { GameServant } from '@fgo-planner/types';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
-import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
+import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCallback, useMemo } from 'react';
 import { GameServantClassIcon } from '../../../../../components/game/servant/game-servant-class-icon.component';
 import { useGameServantList } from '../../../../../hooks/data/use-game-servant-list.hook';
 import { Immutable } from '../../../../../types/internal';
@@ -10,7 +10,7 @@ import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 type Props = {
     disabled?: boolean;
     multiEditMode?: boolean;
-    onChange?: (event: ChangeEvent<{}>, value: Immutable<GameServant>) => void;
+    onChange?: (value: Immutable<GameServant>) => void;
     selectedServant?: Immutable<GameServant>;
     size?: 'small' | 'medium';
 };
@@ -107,12 +107,12 @@ export const MasterServantSelectAutocomplete = React.memo((props: Props) => {
         return generateServantOption(selectedServant);
     }, [options, selectedServant]);
 
-    const handleChange = useCallback((event: ChangeEvent<{}>, value: ServantOption | null): void => {
+    const handleChange = useCallback((_: SyntheticEvent, value: ServantOption | null): void => {
         if (value === null) {
             // Is this case even possible?
             return;
         }
-        onChange?.(event, value.servant);
+        onChange?.(value.servant);
     }, [onChange]);
 
     if (multiEditMode || disabled || !selectedOption) {

@@ -664,6 +664,7 @@ export const MasterServantsRoute = React.memo(() => {
             </div>
             <FabContainer children={fabContainerChildNodes} />
             <MasterServantEditDialog
+                bondLevels={bondLevels}
                 submitButtonLabel='Done'
                 editData={editServantDialogData}
                 isMultipleServantsSelected={isMultipleServantsSelected}

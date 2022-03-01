@@ -1,10 +1,10 @@
-import { GameServant } from '@fgo-planner/types';
+import { GameServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { Immutable } from '../../../../../../types/internal';
+import { Immutable, ReadonlyRecord } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantSelectAutocomplete } from '../master-servant-select-autocomplete.component';
 import { MasterServantEditCostumesTabContent } from './master-servant-edit-costumes-tab-content.component';
@@ -13,6 +13,7 @@ import { MasterServantEditEnhancementsTabContent } from './master-servant-edit-e
 import { MasterServantEditGeneralTabContent } from './master-servant-edit-general-tab-content.component';
 
 type Props = {
+    bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     /**
      * The servant data to edit. This will be modified directly, so provide a clone
      * if modification to the original object is not desired.
@@ -70,6 +71,7 @@ export const MasterServantEdit = React.memo((props: Props) => {
     const gameServantMap = useGameServantMap();
 
     const {
+        bondLevels,
         editData,
         multiEditMode,
         readonly,
@@ -122,9 +124,13 @@ export const MasterServantEdit = React.memo((props: Props) => {
          */
         const { ascension, level } = masterServant;
         masterServant.level = MasterServantUtils.roundToNearestValidLevel(ascension, level, gameServant);
+        /*
+         * Also update the bond level.
+         */
+        editData.bondLevel = bondLevels[gameId];
 
         setGameServant(gameServant);
-    }, [gameServantMap, masterServant, servantSelectDisabled]);
+    }, [bondLevels, editData, gameServantMap, masterServant, servantSelectDisabled]);
 
     const handleActiveTabChange = useCallback((_: SyntheticEvent, value: TabId) => {
         setActiveTab(value);

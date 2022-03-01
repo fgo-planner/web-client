@@ -1,12 +1,14 @@
+import { MasterServantBondLevel } from '@fgo-planner/types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
 import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../../../../../types/internal';
+import { DialogComponentProps, ReadonlyRecord } from '../../../../../../types/internal';
 import { MasterServantEditData } from './master-servant-edit-data.type';
 import { MasterServantEdit } from './master-servant-edit.component';
 
 type Props = {
+    bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     /**
      * The servant data to edit. This will be modified directly, so provide a clone
      * if modification to the original object is not desired.
@@ -40,6 +42,7 @@ const DialogPaperProps = {
 export const MasterServantEditDialog = React.memo((props: Props) => {
 
     const {
+        bondLevels,
         editData,
         isMultipleServantsSelected,
         showAppendSkills,
@@ -103,6 +106,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
                 </DialogTitle>
                 <DialogContent>
                     <MasterServantEdit
+                        bondLevels={bondLevels}
                         editData={editData!}
                         multiEditMode={multiEditMode}
                         showAppendSkills={showAppendSkills}

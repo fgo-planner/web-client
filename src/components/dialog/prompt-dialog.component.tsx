@@ -1,12 +1,12 @@
 import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import React, { Fragment, MouseEvent, useCallback, useRef } from 'react';
+import React, { Fragment, MouseEvent, ReactNode, useCallback, useRef } from 'react';
 import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { DialogComponentProps } from '../../types/internal';
 import { DialogCloseButton } from './dialog-close-button.component';
 
 type Props = {
     title?: string;
-    prompt?: string;
+    prompt?: ReactNode;
     cancelButtonLabel?: string;
     cancelButtonColor?: ButtonProps['color'];
     confirmButtonLabel?: string;

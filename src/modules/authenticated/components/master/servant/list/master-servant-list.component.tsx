@@ -1,11 +1,10 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { PersonAddOutlined } from '@mui/icons-material';
-import { Button } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { MouseEvent, ReactNode, useCallback, useEffect, useRef } from 'react';
-import { DragDropContext, Droppable, DroppableProvided, DropResult } from 'react-beautiful-dnd';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { ThemeConstants } from '../../../../../../styles/theme-constants';
+import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { ReadonlyPartial } from '../../../../../../types/internal';
 import { ArrayUtils } from '../../../../../../utils/array.utils';
 import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
@@ -13,19 +12,18 @@ import { StyleClassPrefix as MasterServantListRowLabelStyleClassPrefix } from '.
 import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './master-servant-list-row.component';
 
 type Props = {
-    masterServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel>;
+    dragDropMode?: boolean;
+    masterServants: Array<MasterServant>;
     /**
      * Instance IDs of selected servants.
      */
     selectedServants?: ReadonlySet<number>;
-    editMode?: boolean;
-    showAddServantRow?: boolean;
-    openLinksInNewTab?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
-    onAddServant?: () => void;
+    onEditSelectedServants?: () => void;
     onEditServant?: (servant: MasterServant) => void;
+    onDeleteSelectedServants?: () => void;
     onDeleteServant?: (servant: MasterServant) => void;
     onServantSelectionChange?: (instanceIds: Array<number>) => void;
 };
@@ -33,26 +31,8 @@ type Props = {
 const StyleClassPrefix = 'MasterServantList';
 
 const StyleProps = {
-    [`& .${StyleClassPrefix}-add-servant-row`]: {
-        borderTopWidth: 1,
-        borderTopStyle: 'solid',
-        borderTopColor: 'divider'
-    },
-    [`& .${StyleClassPrefix}-add-servant-row-button`]: {
-        width: '100%',
-        height: 54
-    },
-    [`& .${StyleClassPrefix}-add-servant-row-label`]: {
-        display: 'flex',
-        alignItems: 'center',
-        fontFamily: ThemeConstants.FontFamilyRoboto,
-        textTransform: 'uppercase',
-        fontSize: '0.875rem',
-        '& >div': {
-            pl: 3
-        }
-    },
     [`& .${MasterServantListRowStyleClassPrefix}-root`]: {
+        userSelect: 'none',
         flex: 1,
         display: 'flex',
         alignContent: 'center',
@@ -154,18 +134,19 @@ const StyleProps = {
 
 export const MasterServantList = React.memo((props: Props) => {
     
+    const forceUpdate = useForceUpdate();
+
     const gameServantMap = useGameServantMap();
 
     const {
         masterServants,
         bondLevels,
         selectedServants,
-        editMode,
-        showAddServantRow,
-        openLinksInNewTab,
+        dragDropMode,
         visibleColumns,
-        onAddServant,
+        onEditSelectedServants,
         onEditServant,
+        onDeleteSelectedServants,
         onDeleteServant,
         onServantSelectionChange
     } = props;
@@ -173,13 +154,13 @@ export const MasterServantList = React.memo((props: Props) => {
     const lastClickIndexRef = useRef<number>();
 
     /**
-     * Stores the `masterServants` set internally to prevent `handleServantClick`
-     * from being redefined when the object reference changes.
+     * Stores the `masterServants` set as a ref to prevent `handleServantClick` from
+     * being redefined when the object reference changes.
      */
     const masterServantsRef = useRef<Array<MasterServant>>(masterServants);
 
     /**
-     * Stores the `selectedServants` set internally to prevent `handleServantClick`
+     * Stores the `selectedServants` set as a ref to prevent `handleServantClick`
      * from being redefined when the object reference changes.
      */
     const selectedServantsRef = useRef<ReadonlySet<number>>();
@@ -191,6 +172,24 @@ export const MasterServantList = React.memo((props: Props) => {
     useEffect(() => {
         selectedServantsRef.current = selectedServants;
     }, [selectedServants]);
+
+    /*
+     * Adds a listener to invoke the `onDeleteSelectedServants` callback when the
+     * delete key is pressed.
+     */
+    useEffect(() => {
+        if (!onDeleteSelectedServants) {
+            return;
+        }
+        const listener = (event: KeyboardEvent): void => {
+            if (event.key !== 'Delete') {
+                return;
+            }
+            onDeleteSelectedServants();
+        };
+        window.addEventListener('keydown', listener);
+        return () => window.removeEventListener('keydown', listener);
+    }, [onDeleteSelectedServants]);
 
     const handleServantClick = useCallback((e: MouseEvent<HTMLDivElement>, index: number): void => {
         if (!onServantSelectionChange) {
@@ -283,18 +282,17 @@ export const MasterServantList = React.memo((props: Props) => {
 
     }, [onServantSelectionChange]);
 
-    const handleServantDragEnd = useCallback((result: DropResult): void => {
-        if (!result.destination) {
+    const onDragOrderChange = useCallback((sourceInstanceId: number, destinationInstanceId: number): void => {
+        console.log(sourceInstanceId, destinationInstanceId);
+        if (sourceInstanceId === destinationInstanceId) {
             return;
         }
-        const sourceIndex = result.source.index;
-        const destinationIndex = result.destination.index;
-        if (sourceIndex === destinationIndex) {
-            return;
-        }
+        const sourceIndex = masterServants.findIndex(s => s.instanceId === sourceInstanceId);
+        const destinationIndex = masterServants.findIndex(s => s.instanceId === destinationInstanceId);
         ArrayUtils.moveElement(masterServants, sourceIndex, destinationIndex);
-    }, [masterServants]);
-    
+        forceUpdate();
+    }, [forceUpdate, masterServants]);
+
     /**
      * This can be undefined during the initial render.
      */
@@ -317,55 +315,22 @@ export const MasterServantList = React.memo((props: Props) => {
                 masterServant={masterServant}
                 onEditServant={onEditServant}
                 onDeleteServant={onDeleteServant}
-                openLinksInNewTab={openLinksInNewTab}
                 visibleColumns={visibleColumns}
                 active={active}
-                editMode={editMode}
+                dragDropMode={dragDropMode}
+                onDragOrderChange={onDragOrderChange}
                 onClick={handleServantClick}
+                onDoubleClick={onEditSelectedServants}
                 // TODO Add right click (context) handler
             />
         );
     };
 
-    const renderAddServantRow = (): ReactNode => {
-        return (
-            <div className={`${StyleClassPrefix}-add-servant-row`}>
-                <Button
-                    className={`${StyleClassPrefix}-add-servant-row-button`}
-                    color="secondary"
-                    onClick={onAddServant}
-                >
-                    <div className={`${StyleClassPrefix}-add-servant-row-label`}>
-                        <PersonAddOutlined />
-                        <div>Add servant</div>
-                    </div>
-                </Button>
-            </div>
-        );
-    };
-
-    if (!editMode) {
-        return (
-            <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-                {masterServants.map(renderMasterServantRow)}
-                {showAddServantRow && renderAddServantRow()}
-            </Box>
-        );
-    }
-
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <DragDropContext onDragEnd={handleServantDragEnd}>
-                <Droppable droppableId="droppable-servant-list">
-                    {(provided: DroppableProvided) => (
-                        <div ref={provided.innerRef} {...provided.droppableProps}>
-                            {masterServants.map(renderMasterServantRow)}
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
-            </DragDropContext>
-            {showAddServantRow && renderAddServantRow()}
+            <DndProvider backend={HTML5Backend}>
+                {masterServants.map(renderMasterServantRow)}
+            </DndProvider>
         </Box>
     );
 

@@ -43,7 +43,8 @@
                 "ignoredNodes": [
                     "JSXElement *",
                     "JSXElement"
-                ]
+                ],
+                "SwitchCase": 1
             }
         ],
         "@typescript-eslint/semi": [

@@ -4,7 +4,6 @@ import { IconButton } from '@mui/material';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
-import { StaticListRowContainer } from '../../../../../../components/list/static-list-row-container.component';
 import { AssetConstants } from '../../../../../../constants';
 import { Immutable, ReadonlyPartial } from '../../../../../../types/internal';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
@@ -12,21 +11,20 @@ import { MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRowLabel } from './master-servant-list-row-label.component';
 
 type Props = {
-    servant: Immutable<GameServant> | undefined; // Not optional, but possible to be undefined.
-    masterServant: MasterServant;
+    active?: boolean;
     bond: MasterServantBondLevel | undefined;
+    dragDropMode?: boolean;
     index: number;
     lastRow?: boolean;
-    active?: boolean;
-    editMode?: boolean;
-    openLinksInNewTab?: boolean;
+    masterServant: MasterServant;
+    servant: Immutable<GameServant> | undefined; // Not optional, but possible to be undefined.
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
-    onEditServant?: (servant: MasterServant) => void;
-    onDeleteServant?: (servant: MasterServant) => void;
     onClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
-    onDoubleClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
     onContextMenu?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
-} & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onDoubleClick' | 'onContextMenu'>;
+    onDeleteServant?: (servant: MasterServant) => void;
+    onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
+    onEditServant?: (servant: MasterServant) => void;
+} & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu'>;
 
 const shouldSkipUpdate = (prevProps: Readonly<Props>, nextProps: Readonly<Props>): boolean => {
     if (!ObjectUtils.isShallowEquals(prevProps, nextProps)) {
@@ -41,7 +39,7 @@ export const StyleClassPrefix = 'MasterServantListRow';
 const renderNpLevel = (masterServant: MasterServant): ReactNode => {
     return (
         <div className={`${StyleClassPrefix}-np-level`}>
-            <img src={AssetConstants.ServantNoblePhantasmIconSmallUrl} alt="Noble Phantasm" />
+            <img src={AssetConstants.ServantNoblePhantasmIconSmallUrl} alt='Noble Phantasm' />
             <div>
                 {masterServant.np}
             </div>
@@ -54,11 +52,11 @@ const renderLevel = (masterServant: MasterServant): ReactNode => {
     const iconUrl = ascension ? AssetConstants.ServantAscensionOnIcon : AssetConstants.ServantAscensionOffIcon;
     return (
         <div className={`${StyleClassPrefix}-level`}>
-            <div className="value">
+            <div className='value'>
                 {level}
             </div>
-            <img src={iconUrl} alt="Ascension" />
-            <div className="ascension">
+            <img src={iconUrl} alt='Ascension' />
+            <div className='ascension'>
                 {ascension}
             </div>
             {/* TODO Add grail icon */}
@@ -80,15 +78,15 @@ const renderSkillLevels = (masterServant: MasterServant, stat: 'skills' | 'appen
     const classNameSuffix = stat === 'appendSkills' ? 'append-skills' : 'skills';
     return (
         <div className={`${StyleClassPrefix}-${classNameSuffix}`}>
-            <div className="value">
+            <div className='value'>
                 {skills[1] ?? '\u2013'}
             </div>
             /
-            <div className="value">
+            <div className='value'>
                 {skills[2] ?? '\u2013'}
             </div>
             /
-            <div className="value">
+            <div className='value'>
                 {skills[3] ?? '\u2013'}
             </div>
         </div>
@@ -106,7 +104,7 @@ const renderBondLevel = (bond?: MasterServantBondLevel): ReactNode => {
     return (
         <div className={`${StyleClassPrefix}-bond-level`}>
             <GameServantBondIcon bond={bond} size={28} />
-            <div className="value">
+            <div className='value'>
                 {bond}
             </div>
         </div>
@@ -116,20 +114,19 @@ const renderBondLevel = (bond?: MasterServantBondLevel): ReactNode => {
 export const MasterServantListRow = React.memo((props: Props) => {
 
     const {
-        servant,
-        masterServant,
+        active,
         bond,
+        dragDropMode,
         index,
         lastRow,
-        active,
-        editMode,
-        openLinksInNewTab,
+        masterServant,
+        servant,
         visibleColumns,
+        onClick,
+        onContextMenu,
+        onDragOrderChange,
         onEditServant,
         onDeleteServant,
-        onClick,
-        onDoubleClick,
-        onContextMenu,
         ...domAttributes
     } = props;
 
@@ -138,11 +135,11 @@ export const MasterServantListRow = React.memo((props: Props) => {
     }, [index, onClick]);
 
     const handleEditServant = useCallback((): void => {
-        onEditServant && onEditServant(masterServant);
+        onEditServant?.(masterServant);
     }, [masterServant, onEditServant]);
 
     const handleDeleteServant = useCallback((): void => {
-        onDeleteServant && onDeleteServant(masterServant);
+        onDeleteServant?.(masterServant);
     }, [masterServant, onDeleteServant]);
 
     if (!servant) {
@@ -166,10 +163,10 @@ export const MasterServantListRow = React.memo((props: Props) => {
 
     const actionButtonsNode: ReactNode = actions && (
         <div className={`${StyleClassPrefix}-actions`}>
-            <IconButton color="primary" onClick={handleEditServant} size="large">
+            <IconButton color='primary' onClick={handleEditServant} size='large'>
                 <EditIcon />
             </IconButton>
-            <IconButton color="secondary" onClick={handleDeleteServant} size="large">
+            <IconButton color='secondary' onClick={handleDeleteServant} size='large'>
                 <DeleteIcon />
             </IconButton>
         </div>
@@ -180,8 +177,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
             <MasterServantListRowLabel
                 servant={servant}
                 masterServant={masterServant}
-                editMode={editMode}
-                openLinksInNewTab={openLinksInNewTab}
+                openLinksInNewTab
             />
             {npLevel && renderNpLevel(masterServant)}
             {level && renderLevel(masterServant)}
@@ -194,31 +190,20 @@ export const MasterServantListRow = React.memo((props: Props) => {
         </div>
     );
 
-    if (editMode) {
-        return (
-            <DraggableListRowContainer
-                draggableId={`draggable-servant-${masterServant.instanceId}`}
-                index={index}
-                borderBottom={!lastRow}
-                active={active}
-                onClick={handleClick}
-                onDoubleClick={handleEditServant}
-                {...domAttributes}
-            >
-                {rowContents}
-            </DraggableListRowContainer>
-        );
-    }
-
     return (
-        <StaticListRowContainer
+        <DraggableListRowContainer
+            draggableId={masterServant.instanceId}
+            index={index}
             borderBottom={!lastRow}
             active={active}
+            dragHandleVisible={dragDropMode}
+            dragEnabled={dragDropMode}
+            onDragOrderChange={onDragOrderChange}
             onClick={handleClick}
             {...domAttributes}
         >
             {rowContents}
-        </StaticListRowContainer>
+        </DraggableListRowContainer>
     );
 
 }, shouldSkipUpdate);

@@ -18,6 +18,7 @@ import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { PlanRequirements } from '../../../../types/data';
 import { Immutable, ImmutableArray, Nullable } from '../../../../types/internal';
+import { DateTimeUtils } from '../../../../utils/date-time.utils';
 import { PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { PlanServantUtils } from '../../../../utils/plan/plan-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
@@ -75,9 +76,10 @@ const instantiatePlanServant = (
  * Returns cloned servant data from the given plan.
  */
 const clonePlan = (plan: Immutable<Plan>): Plan => {
+    const targetDate = DateTimeUtils.cloneDate(plan.targetDate);
     return {
         ...plan,
-        targetDate: new Date(plan.targetDate as Date),
+        targetDate,
         enabled: {
             ...plan.enabled
         },
@@ -136,34 +138,12 @@ export const PlanRoute = React.memo(() => {
     const gameServantMap = useGameServantMap();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
+    
     /**
      * The plan data loaded from the backend. This should not be modified or used
      * anywhere in this route, except when reverting changes. Use `planRef` instead.
      */
-    const [plan, setPlan] = useState<Plan>();
-    /**
-     * Whether the user has made any unsaved changes.
-     */
-    const [dirty, setDirty] = useState<boolean>(false); // TODO Rename this
-
-    const [showAppendSkills, setShowAppendSkills] = useState<boolean>(true); // TODO Change this back to false
-    const [tableOptions, setTableOptions] = useState<PlanRequirementsTableOptions>(instantiateDefaultTableOptions);
-
-    const [editServantTarget, setEditServantTarget] = useState<PlanServant>();
-    // const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
-
-    const [deleteServantTarget, setDeleteServantTarget] = useState<PlanServant>();
-    const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
-
-    /**
-     * Reference to the original copy of the servant being edited. The
-     * `editServantTarget` state contains a clone so that the original is not
-     * modified until the changes are submitted.
-     *
-     * When adding a new servant, this will remain `undefined`.
-     */
-    const editServantTargetRef = useRef<Immutable<PlanServant>>();
-
+    const [plan, setPlan] = useState<Immutable<Plan>>();
     /**
      * Contains a clone of the currently loaded `Plan` object.
      *
@@ -172,6 +152,31 @@ export const PlanRoute = React.memo(() => {
      * on change.
      */
     const planRef = useRef<Plan>();
+
+    /**
+     * Whether the user has made any unsaved changes.
+     */
+    const [dirty, setDirty] = useState<boolean>(false); // TODO Rename this
+
+    const [showAppendSkills, setShowAppendSkills] = useState<boolean>(true); // TODO Change this back to false
+    const [tableOptions, setTableOptions] = useState<PlanRequirementsTableOptions>(instantiateDefaultTableOptions);
+
+    /**
+     * Clone of the servant that is being edited by the servant edit dialog. This
+     * data is passed directly into and modified by the dialog. The original data is
+     * not modified until the changes are submitted.
+     */
+    const [editServantTarget, setEditServantTarget] = useState<PlanServant>();
+    /**
+     * Reference to the original data of the servant that is being edited.
+     *
+     * When adding a new servant, this will remain `undefined`.
+     */
+    const editServantTargetRef = useRef<Immutable<PlanServant>>();
+    // const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
+
+    const [deleteServantTarget, setDeleteServantTarget] = useState<PlanServant>();
+    const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
 
     const planRequirementsRef = useRef<PlanRequirements>();
 
@@ -430,14 +435,14 @@ export const PlanRoute = React.memo(() => {
             </div>
         </Tooltip>,
         <Tooltip key='test2' title='Test 2' placement='right'>
-        <div>
-            <IconButton
-                onClick={handleToggleShowUnused}
-                children={<HideImageOutlinedIcon />}
-                size='large'
-            />
-        </div>
-    </Tooltip>,
+            <div>
+                <IconButton
+                    onClick={handleToggleShowUnused}
+                    children={<HideImageOutlinedIcon />}
+                    size='large'
+                />
+            </div>
+        </Tooltip>,
     ];
 
     /**
@@ -492,7 +497,6 @@ export const PlanRoute = React.memo(() => {
             </div>
             <FabContainer children={fabContainerChildNodes} />
             <PlanServantEditDialog
-                open={!!editServantTarget}
                 dialogTitle={`${!editServantTargetRef.current ? 'Add' : 'Edit'} Servant`}
                 submitButtonLabel='Done'
                 planServant={editServantTarget!}

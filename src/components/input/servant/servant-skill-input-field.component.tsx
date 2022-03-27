@@ -2,39 +2,53 @@ import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent 
 import React, { useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';
 
+type SkillSet = 'skills' | 'appendSkills';
+
+type SkillSlot = 1 | 2 | 3;
+
 type Props = {
-    value: string;
-    variant?: BaseTextFieldProps['variant'];
-    formId?: string;
-    label?: string;
-    name: string;
     allowEmpty?: boolean;
     disabled?: boolean;
-    onChange: (name: string, value: string, pushChanges: boolean) => void;
+    /**
+     * @deprecated
+     */
+    formId?: string;
+    label?: string;
+    multiEditMode?: boolean;
+    name: string;
+    onChange: (name: string, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges: boolean) => void;
+    skillSet: SkillSet,
+    slot: SkillSlot,
+    value: string;
+    variant?: BaseTextFieldProps['variant'];
 };
 
 const DefaultLabel = 'Skill';
 
 /**
- * Input field for a servant's skill level.
+ * Input field for a servant's skill level. This is applicable to both master
+ * and planned servants.
  */
 export const ServantSkillInputField = React.memo((props: Props) => {
 
     const {
-        value,
-        variant,
-        formId,
-        label,
-        name,
         allowEmpty,
         disabled,
-        onChange
+        formId,
+        label,
+        multiEditMode,
+        name,
+        onChange,
+        skillSet,
+        slot,
+        value,
+        variant
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
         const { name, value } = event.target;
-        onChange(name, value, true);
-    }, [onChange]);
+        onChange(name, skillSet, slot, value, true);
+    }, [onChange, skillSet, slot]);
 
     const fieldId = formId ? `${formId}-${name}` : name;
 
@@ -50,6 +64,7 @@ export const ServantSkillInputField = React.memo((props: Props) => {
                 onChange={handleChange}
                 disabled={disabled}
             >
+                {multiEditMode && <option key={-1} value={-1}>{'?'}</option>}
                 {allowEmpty && <option value=''>{'\u2014'}</option>}
                 {GameServantConstants.SkillLevels.map(value => (
                     <option key={value} value={value}>

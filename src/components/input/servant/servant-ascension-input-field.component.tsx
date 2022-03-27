@@ -1,5 +1,5 @@
 import { GameServant } from '@fgo-planner/types';
-import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
+import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
 import React, { useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';
 import { Immutable } from '../../../types/internal';
@@ -9,10 +9,19 @@ type Props = {
     allowEmpty?: boolean;
     ascension: string;
     disabled?: boolean;
+    /**
+     * @deprecated
+     */
     formId?: string;
-    gameServant: Immutable<GameServant>;
+    /**
+     * The game servant data that corresponds to the servant being edited. This
+     * should be set to `undefined` if and only if multiple servants are being
+     * edited, in which case, in which case the the field will be disabled.
+     */
+    gameServant?: Immutable<GameServant>;
     label?: string;
     level: string;
+    multiEditMode?: boolean;
     name: string;
     onChange: (name: string, level: string, ascension: string, pushChanges: boolean) => void;
     variant?: BaseTextFieldProps['variant'];
@@ -20,8 +29,11 @@ type Props = {
 
 const DefaultLabel = 'Ascension';
 
+const IndeterminateDisplayText = '?';
+
 /**
- * Input field for servant's ascension level.
+ * Input field for a servant's ascension level. This is applicable to both master
+ * and planned servants.
  */
 export const ServantAscensionInputField = React.memo((props: Props) => {
 
@@ -33,18 +45,39 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
         gameServant,
         label,
         level,
+        multiEditMode,
         name,
         onChange,
         variant
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
+        if (!gameServant) {
+            return;
+        }
         const { value } = event.target;
         const updatedLevel = MasterServantUtils.roundToNearestValidLevel(Number(value), Number(level), gameServant);
         onChange(name, String(updatedLevel), value, true);
     }, [gameServant, level, name, onChange]);
 
+    if (!gameServant && !multiEditMode) {
+        console.error('ServantAscensionInputField: gameServant must be provided when editing single servant');
+        return null;
+    }
+
     const fieldId = formId ? `${formId}-${name}` : name;
+
+    if (multiEditMode) {
+        return (
+            <TextField
+                variant={variant}
+                fullWidth
+                label={label || DefaultLabel}
+                value={IndeterminateDisplayText}
+                disabled
+            />
+        );
+    }
 
     return (
         <FormControl variant={variant} fullWidth>

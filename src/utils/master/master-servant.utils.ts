@@ -1,22 +1,23 @@
 import { GameServant, MasterServant, MasterServantAscensionLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
 import { Immutable } from '../../types/internal';
+import { DateTimeUtils } from '../date-time.utils';
 
 export class MasterServantUtils {
 
     /**
      * Instantiates a default `MasterServant` object.
      */
-    static instantiate(summoned = true): MasterServant {
+    static instantiate(instanceId = 0): MasterServant {
         return {
-            instanceId: 0,
-            gameId: 100100, // TODO Un-hardcode this
-            summoned,
+            instanceId,
+            gameId: GameServantConstants.DefaultServantId,
+            summoned: true, // Assume servant has been summoned by player by default
             np: 1,
-            level: 1,
-            ascension: 0,
+            level: GameServantConstants.MinLevel,
+            ascension: GameServantConstants.MinAscensionLevel,
             skills: {
-                1: 1
+                1: GameServantConstants.MinSkillLevel
             },
             appendSkills: {}
         };
@@ -25,9 +26,11 @@ export class MasterServantUtils {
     /**
      * Returns a deep clone of the given `MasterServant` object.
      */
-    static clone(masterServant: MasterServant): MasterServant {
+    static clone(masterServant: Immutable<MasterServant>): MasterServant {
+        const summonDate = DateTimeUtils.cloneDate(masterServant.summonDate);
         return {
             ...masterServant,
+            summonDate,
             skills: {
                 ...masterServant.skills
             }
@@ -152,15 +155,15 @@ export class MasterServantUtils {
      */
     static getArtStage(ascension: MasterServantAscensionLevel): 1 | 2 | 3 | 4 {
         switch (ascension) {
-        case 0:
-            return 1;
-        case 1:
-        case 2:
-            return 2;
-        case 3:
-            return 3;
-        case 4:
-            return 4;
+            case 0:
+                return 1;
+            case 1:
+            case 2:
+                return 2;
+            case 3:
+                return 3;
+            case 4:
+                return 4;
         }
     }
 
@@ -190,10 +193,9 @@ export class MasterServantUtils {
     static roundToNearestValidAscensionLevel(
         level: number,
         ascension: number,
-        servant: Immutable<GameServant>
+        { maxLevel }: Immutable<GameServant>
     ): MasterServantAscensionLevel {
 
-        const { maxLevel } = servant;
         if (level > maxLevel - 10) {
             return 4;
         }
@@ -228,21 +230,20 @@ export class MasterServantUtils {
     static roundToNearestValidLevel(
         ascension: number,
         level: number,
-        servant: Immutable<GameServant>
+        { maxLevel }: Immutable<GameServant>
     ): number {
 
-        const { maxLevel } = servant;
         switch (ascension) {
-        case 4:
-            return Math.max(maxLevel - 10, level);
-        case 3:
-            return Math.max(maxLevel - 20, Math.min(level, maxLevel - 10));
-        case 2:
-            return Math.max(maxLevel - 30, Math.min(level, maxLevel - 20));
-        case 1:
-            return Math.max(maxLevel - 40, Math.min(level, maxLevel - 30));
-        case 0:
-            return Math.min(maxLevel - 40, level);
+            case 4:
+                return Math.max(maxLevel - 10, level);
+            case 3:
+                return Math.max(maxLevel - 20, Math.min(level, maxLevel - 10));
+            case 2:
+                return Math.max(maxLevel - 30, Math.min(level, maxLevel - 20));
+            case 1:
+                return Math.max(maxLevel - 40, Math.min(level, maxLevel - 30));
+            case 0:
+                return Math.min(maxLevel - 40, level);
         }
         return GameServantConstants.MinLevel;
     }

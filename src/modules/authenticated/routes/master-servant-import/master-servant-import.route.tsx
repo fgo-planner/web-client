@@ -54,7 +54,7 @@ const MasterServantImportRoute = React.memo(() => {
     const masterAccountService = useInjectable(MasterAccountService);
 
     const gameServantList = useGameServantList();
-    
+
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [parsedData, setParsedData] = useState<MasterServantParserResult>();
     const [importStatus, setImportStatus] = useState<ImportStatus>('none');
@@ -190,14 +190,14 @@ const MasterServantImportRoute = React.memo(() => {
 
     const handleImportStatusDialogAction = useCallback((): void => {
         switch (importStatus) {
-        case 'importSuccess':
-            return navigate('/user/master/servants');
-        case 'parseFail':
-        case 'importFail':
-            setImportStatus('none');
-            break;
-        default:
-        // Do nothing
+            case 'importSuccess':
+                return navigate('/user/master/servants');
+            case 'parseFail':
+            case 'importFail':
+                setImportStatus('none');
+                break;
+            default:
+            // Do nothing
         }
         setImportStatusDialogOpen(false);
     }, [navigate, importStatus]);

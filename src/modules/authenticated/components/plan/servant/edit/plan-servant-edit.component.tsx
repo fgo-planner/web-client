@@ -1,11 +1,10 @@
 import { GameServant, MasterServant, PlanServant } from '@fgo-planner/types';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
-import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { ComponentStyleProps, Immutable, ImmutableArray } from '../../../../../../types/internal';
+import { Immutable, ImmutableArray } from '../../../../../../types/internal';
 import { PlanServantUtils } from '../../../../../../utils/plan/plan-servant.utils';
 import { PlanServantSelectAutocomplete } from '../plan-servant-select-autocomplete.component';
 import { PlanServantEditCostumesTabContent } from './plan-servant-edit-costumes-tab-content.component';
@@ -24,7 +23,7 @@ type Props = {
     servantSelectDisabled?: boolean;
     showAppendSkills?: boolean;
     unlockedCostumes: ReadonlyArray<number>;
-} & Pick<ComponentStyleProps, 'className'>;
+};
 
 type TabId = 'current' | 'target' | 'costumes';
 
@@ -74,8 +73,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
         planServants,
         readonly,
         servantSelectDisabled,
-        showAppendSkills,
-        className
+        showAppendSkills
     } = props;
 
     /**
@@ -134,6 +132,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
         if (gameServant?._id !== gameId) {
             setGameServant(gameServantMap[gameId]);
         }
+        // TODO Need to update ascension and level as needed.
         // TODO Is force update needed?
     }, [gameServant?._id, gameServantMap, planServant, servantSelectDisabled]);
 
@@ -174,7 +173,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
     }
 
     return (
-        <Box className={clsx(`${StyleClassPrefix}-root`, className)} sx={StyleProps} >
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps} >
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
                     <PlanServantSelectAutocomplete

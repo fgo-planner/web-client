@@ -25,7 +25,7 @@ type Props = {
     showAppendSkills?: boolean;
     submitButtonLabel?: string;
     unlockedCostumes: ReadonlyArray<number>;
-} & Omit<DialogComponentProps<DialogData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
+} & Omit<DialogComponentProps<DialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const DialogWidth = 640;
 
@@ -63,15 +63,15 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
         actionButtonVariant
     } = useAutoResizeDialog(props);
 
-    const submit = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
+    const handleSubmitButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         planServant && onClose(event, 'submit', { planServant });
     }, [onClose, planServant]);
 
-    const cancel = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
+    const handleCancelButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         onClose(event, 'cancel');
     }, [onClose]);
 
-    const open = props.open && !!planServant;
+    const open = !!planServant;
 
     /*
      * Only re-render the dialog child node if the dialog is open. This allows the
@@ -83,7 +83,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
             <Typography component={'div'}>
                 <DialogTitle>
                     {dialogTitle}
-                    {closeIconEnabled && <DialogCloseButton onClick={cancel} />}
+                    {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
                 <DialogContent>
                     <PlanServantEdit
@@ -99,14 +99,14 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
                     <Button
                         variant={actionButtonVariant}
                         color='secondary'
-                        onClick={cancel}
+                        onClick={handleCancelButtonClick}
                     >
                         Cancel
                     </Button>
                     <Button
                         variant={actionButtonVariant}
                         color='primary'
-                        onClick={submit}
+                        onClick={handleSubmitButtonClick}
                     >
                         {submitButtonLabel || 'Submit'}
                     </Button>

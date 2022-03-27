@@ -6,15 +6,14 @@ import { Immutable } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 
 type Props = {
-    servant: Immutable<GameServant>;
     masterServant: MasterServant;
-    editMode?: boolean;
     openLinksInNewTab?: boolean;
+    servant: Immutable<GameServant>;
 };
 
 export const StyleClassPrefix = 'MasterServantListRowLabel';
 
-export const MasterServantListRowLabel = React.memo(({ servant, masterServant, openLinksInNewTab }: Props) => {
+export const MasterServantListRowLabel = React.memo(({ masterServant, openLinksInNewTab, servant }: Props) => {
 
     const { ascension } = masterServant;
 
@@ -23,7 +22,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, o
     return (
         <div className={`${StyleClassPrefix}-root`}>
             <GameServantThumbnail
-                variant="rounded"
+                variant='rounded'
                 size={48}
                 gameServant={servant}
                 stage={artStage}
@@ -37,7 +36,7 @@ export const MasterServantListRowLabel = React.memo(({ servant, masterServant, o
             <div className={`${StyleClassPrefix}-rarity`}>
                 {`${servant.rarity} \u2605`}
             </div>
-            <div className="truncate">
+            <div className='truncate'>
                 {servant.name}
             </div>
         </div>

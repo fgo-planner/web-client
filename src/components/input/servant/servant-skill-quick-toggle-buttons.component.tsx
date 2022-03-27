@@ -7,11 +7,13 @@ import { ComponentStyleProps } from '../../../types/internal';
 import { NineOutlinedIcon, TenOutlinedIcon } from '../../icons';
 import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
 
+type SkillSet = 'skills' | 'appendSkills';
+
 type Props = {
     disabled?: boolean;
     ignoreTabNavigation?: boolean;
-    onClick?: (value: MasterServantSkillLevel | undefined, stat: 'skills' | 'appendSkills') => void;
-    stat: 'skills' | 'appendSkills';
+    onClick?: (value: MasterServantSkillLevel | undefined, skillSet: SkillSet) => void;
+    skillSet: SkillSet;
     /**
      * Whether to show the button that clear all values instead of the button that
      * sets all values to 1.
@@ -31,7 +33,7 @@ export const ServantSkillQuickToggleButtons = React.memo((props: Props) => {
         disabled,
         ignoreTabNavigation,
         onClick,
-        stat,
+        skillSet,
         useClearValuesButton,
         className
     } = props;
@@ -45,17 +47,17 @@ export const ServantSkillQuickToggleButtons = React.memo((props: Props) => {
             // Left button
             leftButtonIcon={useClearValuesButton ? <IndeterminateCheckBoxOutlinedIcon /> : <LooksOneOutlined />}
             leftButtonTooltip={useClearValuesButton ? 'Clear all' : `Set all to ${GameServantConstants.MinSkillLevel}`}
-            onLeftButtonClick={() => onClick?.(useClearValuesButton ? undefined : GameServantConstants.MinSkillLevel, stat)}
+            onLeftButtonClick={() => onClick?.(useClearValuesButton ? undefined : GameServantConstants.MinSkillLevel, skillSet)}
 
             // Center button
             centerButtonIcon={<NineOutlinedIcon />}
             centerButtonTooltip='Set all to 9'
-            onCenterButtonClick={() => onClick?.(9, stat)}
+            onCenterButtonClick={() => onClick?.(9, skillSet)}
 
             // Right button
             rightButtonIcon={<TenOutlinedIcon />}
             rightButtonTooltip={`Set all to ${GameServantConstants.MaxSkillLevel}`}
-            onRightButtonClick={() => onClick?.(GameServantConstants.MaxSkillLevel, stat)}
+            onRightButtonClick={() => onClick?.(GameServantConstants.MaxSkillLevel, skillSet)}
         />
     );
 

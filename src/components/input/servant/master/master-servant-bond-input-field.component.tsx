@@ -1,32 +1,42 @@
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
-import { GameServantConstants } from '../../../constants';
+import { GameServantConstants } from '../../../../constants';
 
 type Props = {
+    allowEmpty?: boolean;
+    disabled?: boolean;
+    /**
+     * @deprecated
+     */
+    formId?: string;
+    label?: string;
+    multiEditMode?: boolean;
+    name: string;
+    onChange: (name: string, value: string, pushChanges: boolean) => void;
     value: string;
     variant?: BaseTextFieldProps['variant'];
-    formId: string;
-    label?: string;
-    name: string;
-    disabled?: boolean;
-    onChange: (name: string, value: string, pushChanges: boolean) => void;
 };
 
-const DefaultLabel = 'NP Level';
+const DefaultLabel = 'Bond';
+
+const IndeterminateDisplayText = '?';
 
 /**
- * Input field for servant's NP level.
+ * Input field for a servant's bond level. This is currently only applicable to
+ * master servants.
  */
-export const ServantNpLevelInputField = React.memo((props: Props) => {
+export const MasterServantBondInputField = React.memo((props: Props) => {
 
     const {
-        value,
-        variant,
+        allowEmpty,
+        disabled,
         formId,
         label,
+        multiEditMode,
         name,
-        disabled,
-        onChange
+        onChange,
+        value,
+        variant
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
@@ -34,19 +44,23 @@ export const ServantNpLevelInputField = React.memo((props: Props) => {
         onChange(name, value, true);
     }, [onChange]);
 
+    const fieldId = formId ? `${formId}-${name}` : name;
+
     return (
         <FormControl variant={variant} fullWidth>
             <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
-                id={`${formId}-${name}`}
+                id={fieldId}
                 name={name}
                 label={label || DefaultLabel}
                 value={value}
                 onChange={handleChange}
                 disabled={disabled}
             >
-                {GameServantConstants.NoblePhantasmLevels.map(value => (
+                {multiEditMode && <option key={-1} value={-1}>{IndeterminateDisplayText}</option>}
+                {allowEmpty && <option value=''>{'\u2014'}</option>}
+                {GameServantConstants.BondLevels.map(value => (
                     <option key={value} value={value}>
                         {value}
                     </option>

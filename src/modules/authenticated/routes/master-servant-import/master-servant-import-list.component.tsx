@@ -93,19 +93,19 @@ export const MasterServantImportList = React.memo((props: Props) => {
 
     const fabContainerNode: ReactNode = (
         <FabContainer>
-            <Tooltip title="Cancel">
+            <Tooltip title='Cancel'>
                 <div>
                     <Fab
-                        color="default"
+                        color='default'
                         onClick={onCancel}
                         children={<ClearIcon />}
                     />
                 </div>
             </Tooltip>
-            <Tooltip title="Confirm">
+            <Tooltip title='Confirm'>
                 <div>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={handleSubmitButtonClick}
                         children={<DoneIcon />}
                     />
@@ -125,7 +125,6 @@ export const MasterServantImportList = React.memo((props: Props) => {
                         visibleColumns={ServantListVisibleColumns}
                     />
                     <MasterServantList
-                        openLinksInNewTab
                         masterServants={masterServants}
                         bondLevels={bondLevels}
                         visibleColumns={ServantListVisibleColumns}
@@ -135,7 +134,7 @@ export const MasterServantImportList = React.memo((props: Props) => {
             {fabContainerNode}
             <MasterServantImportExistingDialog
                 open={showExistingDialog}
-                confirmButtonColor="primary"
+                confirmButtonColor='primary'
                 onClose={handleExistingDialogAction}
             />
         </Fragment>

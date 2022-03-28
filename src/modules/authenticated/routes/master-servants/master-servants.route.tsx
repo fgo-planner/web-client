@@ -26,6 +26,7 @@ import { MasterServantEditUtils } from '../../components/master/servant/edit/mas
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
+import { MasterServantContextMenu } from './master-servants-context-menu.component';
 import { MasterServantsInfoPanel } from './master-servants-info-panel.component';
 import { MasterServantsNavigationRail } from './master-servants-navigation-rail.component';
 
@@ -118,6 +119,11 @@ export const MasterServantsRoute = React.memo(() => {
      * Whether the user has made any unsaved changes to the master servant data.
      */
     const [isMasterAccountDirty, setIsMasterAccountDirty] = useState<boolean>(false);
+
+    /**
+     * The anchor coordinates for the servant context menu.
+     */
+    const [servantContextMenuPosition, setServantContextMenuPosition] = useState<{ x: number, y: number }>();
 
     /**
      * Contains a copy of the target servants' data that is passed directly into and
@@ -275,6 +281,16 @@ export const MasterServantsRoute = React.memo(() => {
         forceUpdate();
     }, [dragDropMode, forceUpdate]);
 
+    const selectAllServants = useCallback((): void => {
+        const { masterServants } = masterAccountDataRef.current;
+        const instanceIds = masterServants.map(servant => servant.instanceId);
+        setServantSelection(instanceIds);
+    }, [setServantSelection]);
+
+    const deselectAllServants = useCallback((): void => {
+        setServantSelection([]);
+    }, [setServantSelection]);
+
     const addNewServant = useCallback((data: MasterServantEditData) => {
 
         const {
@@ -420,18 +436,7 @@ export const MasterServantsRoute = React.memo(() => {
     //#endregion
 
 
-    //#endregion Nav rail event handlers
-
-    const handleAddServant = useCallback((): void => {
-        const {
-            bondLevels,
-            unlockedCostumes
-        } = masterAccountDataRef.current;
-
-        const editServantDialogData = MasterServantEditUtils.instantiateForNewServant(bondLevels, unlockedCostumes);
-        setEditServantDialogData(editServantDialogData);
-        setDeleteServantDialogData(undefined);
-    }, []);
+    //#endregion Navigation rail event handlers
 
     const handleDragDropActivate = useCallback(() => {
         /*
@@ -460,7 +465,7 @@ export const MasterServantsRoute = React.memo(() => {
 
     //#region Servant list event handlers
 
-    const handleEditServant = useCallback(({ instanceId }: MasterServant) => {
+    const handleEditServant = useCallback(({ instanceId }: MasterServant): void => {
         if (dragDropMode) {
             return;
         }
@@ -484,10 +489,43 @@ export const MasterServantsRoute = React.memo(() => {
         openDeleteServantDialog();
     }, [dragDropMode, openDeleteServantDialog, setServantSelection]);
 
+    const handleServantContextMenuOpen = useCallback((e: MouseEvent<HTMLDivElement>): void => {
+        const { pageX: x, pageY: y } = e;
+        setServantContextMenuPosition({ x, y });
+    }, []);
+
+    const handleServantContextMenuClose = useCallback((): void => {
+        setServantContextMenuPosition(undefined);
+    }, []);
+
+    //#endregion
+    
+    
+    //#region Context menu event handlers
+    
+    const handleSelectAllServants = useCallback(() => {
+        selectAllServants();
+    }, [selectAllServants]);
+
+    const handleDeselectAllServants = useCallback(() => {
+        deselectAllServants();
+    }, [deselectAllServants]);
+    
     //#endregion
 
 
     //#region Common event handlers
+
+    const handleAddServant = useCallback((): void => {
+        const {
+            bondLevels,
+            unlockedCostumes
+        } = masterAccountDataRef.current;
+
+        const editServantDialogData = MasterServantEditUtils.instantiateForNewServant(bondLevels, unlockedCostumes);
+        setEditServantDialogData(editServantDialogData);
+        setDeleteServantDialogData(undefined);
+    }, []);
 
     const handleEditSelectedServants = openEditServantDialog;
 
@@ -543,6 +581,9 @@ export const MasterServantsRoute = React.memo(() => {
     }, [deleteSelectedServants]);
 
     //#endregion
+
+
+    //#region Component rendering
 
     /*
      * This can be undefined during the initial render.
@@ -642,6 +683,7 @@ export const MasterServantsRoute = React.memo(() => {
                                 visibleColumns={visibleColumns}
                                 dragDropMode={dragDropMode}
                                 onServantSelectionChange={setServantSelection}
+                                onServantContextMenu={handleServantContextMenuOpen}
                                 onEditSelectedServants={handleEditSelectedServants}
                                 onEditServant={handleEditServant}
                                 onDeleteServant={handleDeleteServant}
@@ -680,6 +722,19 @@ export const MasterServantsRoute = React.memo(() => {
                 confirmButtonLabel='Delete'
                 onClose={handleDeleteServantDialogClose}
             />
+            <MasterServantContextMenu
+                position={servantContextMenuPosition}
+                selectedServantsCount={selectedServants.length}
+                onAddServant={handleAddServant}
+                onDeleteSelectedServants={handleDeleteSelectedServants}
+                onEditSelectedServants={handleEditSelectedServants}
+                onSelectAllServants={handleSelectAllServants}
+                onDeselectAllServants={handleDeselectAllServants}
+                onClose={handleServantContextMenuClose}
+            />
         </Box>
     );
+
+    //#endregion
+
 });

@@ -25,6 +25,7 @@ type Props = {
     onEditServant?: (servant: MasterServant) => void;
     onDeleteSelectedServants?: () => void;
     onDeleteServant?: (servant: MasterServant) => void;
+    onServantContextMenu?: (e: MouseEvent<HTMLDivElement>) => void;
     onServantSelectionChange?: (instanceIds: Array<number>) => void;
 };
 
@@ -133,7 +134,7 @@ const StyleProps = {
 } as SystemStyleObject<Theme>;
 
 export const MasterServantList = React.memo((props: Props) => {
-    
+
     const forceUpdate = useForceUpdate();
 
     const gameServantMap = useGameServantMap();
@@ -148,6 +149,7 @@ export const MasterServantList = React.memo((props: Props) => {
         onEditServant,
         onDeleteSelectedServants,
         onDeleteServant,
+        onServantContextMenu,
         onServantSelectionChange
     } = props;
 
@@ -191,11 +193,23 @@ export const MasterServantList = React.memo((props: Props) => {
         return () => window.removeEventListener('keydown', listener);
     }, [onDeleteSelectedServants]);
 
+
+    //#region Event handlers
+
+    /**
+     * Handles both the left click (onClick) and right (onContextmenu) events from
+     * the servant row.
+     */
     const handleServantClick = useCallback((e: MouseEvent<HTMLDivElement>, index: number): void => {
         if (!onServantSelectionChange) {
             return;
         }
-        
+
+        /*
+         * Whether the right mouse button (contextmenu) was clicked.
+         */
+        const isRightClick = e.type === 'contextmenu';
+
         const masterServants = masterServantsRef.current;
         const selectedServants = selectedServantsRef.current;
 
@@ -203,7 +217,7 @@ export const MasterServantList = React.memo((props: Props) => {
          * The instance ID of the servant that was clicked.
          */
         const clickedInstanceId = masterServants[index].instanceId;
-        
+
         /**
          * Array containing the instance IDs of the updated selection.
          */
@@ -262,6 +276,13 @@ export const MasterServantList = React.memo((props: Props) => {
             if (!alreadySelected) {
                 updatedSelection.push(clickedInstanceId);
             }
+        } else if (isRightClick && selectedServants?.has(clickedInstanceId)) {
+            /**
+             * If the right button was clicked, and the clicked servant was already
+             * selected, then dont modify the selection. We want the context menu to apply
+             * to the current select.
+             */
+            updatedSelection.push(...selectedServants);
         } else {
             /*
              * If no modifier keys were pressed, then change the selection to just the
@@ -280,7 +301,16 @@ export const MasterServantList = React.memo((props: Props) => {
          */
         lastClickIndexRef.current = index;
 
-    }, [onServantSelectionChange]);
+        /*
+         * If the right button was clicked, then also notify the parent to open the
+         * context menu.
+         */
+        if (isRightClick) {
+            e.preventDefault();
+            onServantContextMenu?.(e);
+        }
+
+    }, [onServantContextMenu, onServantSelectionChange]);
 
     const onDragOrderChange = useCallback((sourceInstanceId: number, destinationInstanceId: number): void => {
         console.log(sourceInstanceId, destinationInstanceId);
@@ -292,6 +322,11 @@ export const MasterServantList = React.memo((props: Props) => {
         ArrayUtils.moveElement(masterServants, sourceIndex, destinationIndex);
         forceUpdate();
     }, [forceUpdate, masterServants]);
+
+    //#endregion
+
+
+    //#region Component rendering
 
     /**
      * This can be undefined during the initial render.
@@ -305,7 +340,7 @@ export const MasterServantList = React.memo((props: Props) => {
         const servant = gameServantMap[gameId];
         const bondLevel = bondLevels[gameId];
         const active = selectedServants?.has(instanceId);
-        
+
         return (
             <MasterServantListRow
                 key={instanceId}
@@ -321,7 +356,7 @@ export const MasterServantList = React.memo((props: Props) => {
                 onDragOrderChange={onDragOrderChange}
                 onClick={handleServantClick}
                 onDoubleClick={onEditSelectedServants}
-                // TODO Add right click (context) handler
+                onContextMenu={handleServantClick}
             />
         );
     };
@@ -333,5 +368,7 @@ export const MasterServantList = React.memo((props: Props) => {
             </DndProvider>
         </Box>
     );
+
+    //#endregion
 
 });

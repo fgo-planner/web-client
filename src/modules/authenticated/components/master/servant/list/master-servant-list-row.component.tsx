@@ -134,6 +134,10 @@ export const MasterServantListRow = React.memo((props: Props) => {
         onClick?.(e, index);
     }, [index, onClick]);
 
+    const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>): void => {
+        onContextMenu?.(e, index);
+    }, [index, onContextMenu]);
+
     const handleEditServant = useCallback((): void => {
         onEditServant?.(masterServant);
     }, [masterServant, onEditServant]);
@@ -200,6 +204,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
             dragEnabled={dragDropMode}
             onDragOrderChange={onDragOrderChange}
             onClick={handleClick}
+            onContextMenu={handleContextMenu}
             {...domAttributes}
         >
             {rowContents}

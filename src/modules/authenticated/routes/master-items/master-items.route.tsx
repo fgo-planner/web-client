@@ -38,7 +38,11 @@ const cloneItemsFromMasterAccount = (account: Nullable<Immutable<MasterAccount>>
 
 export const MasterItemsRoute = React.memo(() => {
 
-    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+    const {
+        invokeLoadingIndicator,
+        resetLoadingIndicator,
+        isLoadingIndicatorActive
+    } = useLoadingIndicator();
 
     const masterAccountService = useInjectable(MasterAccountService);
 

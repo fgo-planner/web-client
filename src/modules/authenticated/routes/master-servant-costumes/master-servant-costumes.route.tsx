@@ -25,7 +25,11 @@ const getUnlockedCostumeSetFromMasterAccount = (account: Nullable<MasterAccount>
 
 export const MasterServantCostumesRoute = React.memo(() => {
 
-    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+    const {
+        invokeLoadingIndicator,
+        resetLoadingIndicator,
+        isLoadingIndicatorActive
+    } = useLoadingIndicator();
 
     const masterAccountService = useInjectable(MasterAccountService);
 

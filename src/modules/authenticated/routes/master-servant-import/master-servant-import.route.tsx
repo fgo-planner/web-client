@@ -47,7 +47,11 @@ const MasterServantImportRoute = React.memo(() => {
 
     const navigate = useNavigate();
 
-    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+    const {
+        invokeLoadingIndicator,
+        resetLoadingIndicator,
+        isLoadingIndicatorActive
+    } = useLoadingIndicator();
 
     const scrollContainerRef = useElevateAppBarOnScroll();
 

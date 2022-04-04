@@ -131,7 +131,11 @@ export const PlanRoute = React.memo(() => {
     const forceUpdate = useForceUpdate();
     const navigate = useNavigate();
 
-    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+    const {
+        invokeLoadingIndicator,
+        resetLoadingIndicator,
+        isLoadingIndicatorActive
+    } = useLoadingIndicator();
 
     const planService = useInjectable(PlanService);
 

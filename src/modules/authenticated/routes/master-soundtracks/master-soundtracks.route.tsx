@@ -25,7 +25,11 @@ const getUnlockedSoundtracksSetFromMasterAccount = (account: Nullable<MasterAcco
 
 export const MasterSoundtracksRoute = React.memo(() => {
 
-    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+    const {
+        invokeLoadingIndicator,
+        resetLoadingIndicator,
+        isLoadingIndicatorActive
+    } = useLoadingIndicator();
 
     const backgroundMusicService = useInjectable(BackgroundMusicService);
     const masterAccountService = useInjectable(MasterAccountService);

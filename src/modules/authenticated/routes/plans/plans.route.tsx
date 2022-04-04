@@ -41,7 +41,11 @@ const generateDeletePlanDialogPrompt = (plan: Immutable<Partial<Plan>> | undefin
 
 export const PlansRoute = React.memo(() => {
 
-    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+    const {
+        invokeLoadingIndicator,
+        resetLoadingIndicator,
+        isLoadingIndicatorActive
+    } = useLoadingIndicator();
 
     const scrollContainerRef = useElevateAppBarOnScroll();
 

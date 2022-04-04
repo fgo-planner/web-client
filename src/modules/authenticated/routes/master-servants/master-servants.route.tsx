@@ -94,7 +94,11 @@ export const MasterServantsRoute = React.memo(() => {
 
     const forceUpdate = useForceUpdate();
 
-    const [invokeLoadingIndicator, resetLoadingIndicator, isLoadingIndicatorActive] = useLoadingIndicator();
+    const {
+        invokeLoadingIndicator,
+        resetLoadingIndicator,
+        isLoadingIndicatorActive
+    } = useLoadingIndicator();
 
     const masterAccountService = useInjectable(MasterAccountService);
 

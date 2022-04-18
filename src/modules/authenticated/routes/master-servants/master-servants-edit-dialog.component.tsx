@@ -1,11 +1,11 @@
 import { MasterServantBondLevel } from '@fgo-planner/types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
 import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
-import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
-import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps, ReadonlyRecord } from '../../../../../../types/internal';
-import { MasterServantEditData } from './master-servant-edit-data.type';
-import { MasterServantEdit } from './master-servant-edit.component';
+import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
+import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
+import { DialogComponentProps, ReadonlyRecord } from '../../../../types/internal';
+import { MasterServantEditData } from '../../components/master/servant/edit/master-servant-edit-data.type';
+import { MasterServantEdit } from '../../components/master/servant/edit/master-servant-edit.component';
 
 type Props = {
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
@@ -22,12 +22,10 @@ type Props = {
      */
     isMultipleServantsSelected?: boolean;
     showAppendSkills?: boolean;
-    submitButtonLabel?: string;
 } & Omit<DialogComponentProps<MasterServantEditData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
-const DefaultSubmitButtonLabel = 'Submit';
-
-const DefaultCancelButtonLabel = 'Cancel';
+const CancelButtonLabel = 'Cancel';
+const SubmitButtonLabel = 'Done';
 
 const DialogWidth = 600;
 
@@ -39,14 +37,17 @@ const DialogPaperProps = {
     }
 } as PaperProps;
 
-export const MasterServantEditDialog = React.memo((props: Props) => {
+/**
+ * Dialog for adding single master servants, as well as single and bulk editing
+ * existing master servants. Specific to the master-servants route.
+ */
+export const MasterServantsEditDialog = React.memo((props: Props) => {
 
     const {
         bondLevels,
         editData,
         isMultipleServantsSelected,
         showAppendSkills,
-        submitButtonLabel,
         onClose,
         ...dialogProps
     } = props;
@@ -118,14 +119,14 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
                         color='secondary'
                         onClick={handleCancelButtonClick}
                     >
-                        {DefaultCancelButtonLabel}
+                        {CancelButtonLabel}
                     </Button>
                     <Button
                         variant={actionButtonVariant}
                         color='primary'
                         onClick={handleSubmitButtonClick}
                     >
-                        {submitButtonLabel || DefaultSubmitButtonLabel}
+                        {SubmitButtonLabel}
                     </Button>
                 </DialogActions>
             </Typography>

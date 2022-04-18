@@ -21,13 +21,14 @@ import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
 import { MasterServantEditData } from '../../components/master/servant/edit/master-servant-edit-data.type';
-import { MasterServantEditDialog } from '../../components/master/servant/edit/master-servant-edit-dialog.component';
 import { MasterServantEditUtils } from '../../components/master/servant/edit/master-servant-edit.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantContextMenu } from './master-servants-context-menu.component';
+import { MasterServantsEditDialog } from './master-servants-edit-dialog.component';
 import { MasterServantsInfoPanel } from './master-servants-info-panel.component';
+import { MasterServantsMultiAddDialog, MultiAddServantData } from './master-servants-multi-add-dialog.component';
 import { MasterServantsNavigationRail } from './master-servants-navigation-rail.component';
 
 type ServantSelection = {
@@ -128,6 +129,11 @@ export const MasterServantsRoute = React.memo(() => {
      * The anchor coordinates for the servant context menu.
      */
     const [servantContextMenuPosition, setServantContextMenuPosition] = useState<{ x: number, y: number }>();
+
+    /**
+     * Whether the multi-add servant dialog is open.
+     */
+    const [isMultiAddServantDialogOpen, setIsMultiAddServantDialogOpen] = useState<boolean>(false);
 
     /**
      * Contains a copy of the target servants' data that is passed directly into and
@@ -324,6 +330,34 @@ export const MasterServantsRoute = React.memo(() => {
         setIsMasterAccountDirty(true);
     }, []);
 
+    const addNewServants = useCallback((servantIds: Array<number>, summoned: boolean) => {
+
+        const { masterServants } = masterAccountDataRef.current;
+
+        /**
+         * Computed instance ID for the new servants.
+         */
+        let instanceId = MasterServantUtils.getLastInstanceId(masterServants) + 1;
+        /**
+         * The new `MasterServant` objects to be added.
+         */
+        const newMasterServants = servantIds.map(servantId => {
+            const newMasterServant = MasterServantUtils.instantiate(instanceId++);
+            newMasterServant.gameId = servantId;
+            newMasterServant.summoned = summoned;
+            return newMasterServant;
+        });
+        /*
+         * Rebuild the entire array with the new servant included to force the child
+         * list to re-render.
+         */
+        masterAccountDataRef.current.masterServants = [...masterServants, ...newMasterServants];
+        /*
+         * TODO Also update the unlocked costumes.
+         */
+        setIsMasterAccountDirty(true);
+    }, []);
+
     /**
      * Applies the submitted edit to the currently selected servants.
      */
@@ -397,6 +431,24 @@ export const MasterServantsRoute = React.memo(() => {
         setIsMasterAccountDirty(true);
     }, []);
 
+    const openAddServantDialog = useCallback((): void => {
+        const {
+            bondLevels,
+            unlockedCostumes
+        } = masterAccountDataRef.current;
+
+        const editServantDialogData = MasterServantEditUtils.instantiateForNewServant(bondLevels, unlockedCostumes);
+        setEditServantDialogData(editServantDialogData);
+        setIsMultiAddServantDialogOpen(false);
+        setDeleteServantDialogData(undefined);
+    }, []);
+
+    const openMultiAddServantDialog = useCallback((): void => {
+        setIsMultiAddServantDialogOpen(true);
+        setEditServantDialogData(undefined);
+        setDeleteServantDialogData(undefined);
+    }, []);
+
     const openEditServantDialog = useCallback((): void => {
         const { servants: selectedServants } = selectedServantsRef.current;
         if (!selectedServants.length) {
@@ -410,6 +462,7 @@ export const MasterServantsRoute = React.memo(() => {
 
         const editServantDialogData = MasterServantEditUtils.convertToEditData(selectedServants, bondLevels, unlockedCostumes);
         setEditServantDialogData(editServantDialogData);
+        setIsMultiAddServantDialogOpen(false);
         setDeleteServantDialogData(undefined);
     }, []);
 
@@ -433,6 +486,7 @@ export const MasterServantsRoute = React.memo(() => {
             <p>Are you sure you want to proceed?</p>
         </>;
         setDeleteServantDialogData(prompt);
+        setIsMultiAddServantDialogOpen(false);
         setEditServantDialogData(undefined);
     }, [gameServantMap]);
 
@@ -441,6 +495,8 @@ export const MasterServantsRoute = React.memo(() => {
 
 
     //#endregion Navigation rail event handlers
+
+    const handleMultiAddServant = openMultiAddServantDialog;
 
     const handleDragDropActivate = useCallback(() => {
         /*
@@ -520,16 +576,7 @@ export const MasterServantsRoute = React.memo(() => {
 
     //#region Common event handlers
 
-    const handleAddServant = useCallback((): void => {
-        const {
-            bondLevels,
-            unlockedCostumes
-        } = masterAccountDataRef.current;
-
-        const editServantDialogData = MasterServantEditUtils.instantiateForNewServant(bondLevels, unlockedCostumes);
-        setEditServantDialogData(editServantDialogData);
-        setDeleteServantDialogData(undefined);
-    }, []);
+    const handleAddServant = openAddServantDialog;
 
     const handleEditSelectedServants = openEditServantDialog;
 
@@ -560,6 +607,13 @@ export const MasterServantsRoute = React.memo(() => {
         updateSelectedServantsRef();
         setIsMasterAccountDirty(false);
     }, [masterAccount, updateSelectedServantsRef]);
+
+    const handleMultiAddServantDialogClose = useCallback((event: any, reason: any, data?: MultiAddServantData): void => {
+        if (data) {
+            addNewServants(data.gameIds, data.summoned);
+        }
+        setIsMultiAddServantDialogOpen(false);
+    }, [addNewServants]);
 
     const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: MasterServantEditData): void => {
         setEditServantDialogData(undefined);
@@ -662,6 +716,7 @@ export const MasterServantsRoute = React.memo(() => {
                     selectedServantsCount={selectedServants.length}
                     dragDropMode={dragDropMode}
                     onAddServant={handleAddServant}
+                    onMultiAddServant={handleMultiAddServant}
                     onDeleteSelectedServants={handleDeleteSelectedServants}
                     onDragDropActivate={handleDragDropActivate}
                     onDragDropApply={handleDragDropApply}
@@ -709,13 +764,17 @@ export const MasterServantsRoute = React.memo(() => {
                 </div>
             </div>
             <FabContainer children={fabContainerChildNodes} />
-            <MasterServantEditDialog
+            <MasterServantsEditDialog
                 bondLevels={bondLevels}
-                submitButtonLabel='Done'
                 editData={editServantDialogData}
                 isMultipleServantsSelected={isMultipleServantsSelected}
                 showAppendSkills={showAppendSkills}
                 onClose={handleEditServantDialogClose}
+            />
+            <MasterServantsMultiAddDialog
+                open={isMultiAddServantDialogOpen}
+                masterServants={masterServants}
+                onClose={handleMultiAddServantDialogClose}
             />
             <PromptDialog
                 open={!!deleteServantDialogData}
@@ -736,6 +795,7 @@ export const MasterServantsRoute = React.memo(() => {
                 onDeselectAllServants={handleDeselectAllServants}
                 onClose={handleServantContextMenuClose}
             />
+
         </Box>
     );
 

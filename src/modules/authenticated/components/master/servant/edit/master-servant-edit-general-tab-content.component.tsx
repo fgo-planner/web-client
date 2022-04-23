@@ -1,7 +1,6 @@
 import { GameServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { ChangeEvent, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { MasterServantBondInputField } from '../../../../../../components/input/servant/master/master-servant-bond-input-field.component';
 import { MasterServantNpLevelInputField } from '../../../../../../components/input/servant/master/master-servant-np-level-input-field.component';
@@ -135,8 +134,6 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
 
     //#region Input fields
 
-    // TODO Add inputs for `summoned` and `summonDate`.
-
     const summonedField = (
         <MasterServantSummonedCheckbox
             value={masterServant.summoned}
@@ -151,6 +148,7 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
         <MasterServantSummonDateInputField
             value={masterServant.summonDate}
             name='summonDate'
+            label={masterServant.summoned ? 'Summon date' : 'Planned summon date'}
             multiEditMode={multiEditMode}
             onChange={handleSummonDateInputChange}
             onBlur={handleInputBlurEvent}

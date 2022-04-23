@@ -123,11 +123,12 @@ const StyleProps = {
              * @see https://css-tricks.com/flexbox-truncated-text/
              */
             minWidth: 0,
-            '& >div': {
+            [`& .${MasterServantListRowLabelStyleClassPrefix}-class-icon`]: {
                 pl: 4
             },
             [`& .${MasterServantListRowLabelStyleClassPrefix}-rarity`]: {
-                minWidth: 24
+                minWidth: 24,
+                px: 4
             }
         }
     }

@@ -795,7 +795,6 @@ export const MasterServantsRoute = React.memo(() => {
                 onDeselectAllServants={handleDeselectAllServants}
                 onClose={handleServantContextMenuClose}
             />
-
         </Box>
     );
 

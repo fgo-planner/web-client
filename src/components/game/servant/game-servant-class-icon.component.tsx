@@ -13,7 +13,7 @@ type Props = {
     size?: string | number;
     tooltip?: boolean;
     tooltipPlacement?: TooltipProps['placement'];
-} & Pick<ComponentStyleProps, 'sx'>;
+} & Pick<ComponentStyleProps, 'className' | 'sx'>;
 
 const ClassIconBaseUrl = AssetConstants.ServantClassIconBaseUrl;
 
@@ -92,12 +92,13 @@ const styles = {
 export const GameServantClassIcon = React.memo((props: Props) => {
 
     const {
-        servantClass,
+        className,
         rarity,
+        servantClass,
         size,
+        sx,
         tooltip,
         tooltipPlacement,
-        sx
     } = props;
 
     const sizeStyle = useMemo((): CSSProperties => ({
@@ -113,17 +114,17 @@ export const GameServantClassIcon = React.memo((props: Props) => {
     const iconNode = useMemo((): JSX.Element => {
         if (sx) {
             return (
-                <Box style={sizeStyle} sx={sx}>
+                <Box className={className} style={sizeStyle} sx={sx}>
                     <img style={styles.img} src={imageUrl} alt={servantClass} />
                 </Box>
             );
         }
         return (
-            <div style={sizeStyle}>
+            <div className={className} style={sizeStyle}>
                 <img style={styles.img} src={imageUrl} alt={servantClass} />
             </div>
         );
-    }, [sizeStyle, imageUrl, servantClass, sx]);
+    }, [sx, className, sizeStyle, imageUrl, servantClass]);
 
     if (tooltip) {
         return (

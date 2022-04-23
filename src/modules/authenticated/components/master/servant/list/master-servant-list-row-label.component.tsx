@@ -15,7 +15,10 @@ export const StyleClassPrefix = 'MasterServantListRowLabel';
 
 export const MasterServantListRowLabel = React.memo(({ masterServant, openLinksInNewTab, servant }: Props) => {
 
-    const { ascension } = masterServant;
+    const {
+        ascension,
+        summoned
+    } = masterServant;
 
     const artStage = MasterServantUtils.getArtStage(ascension);
 
@@ -26,10 +29,13 @@ export const MasterServantListRowLabel = React.memo(({ masterServant, openLinksI
                 size={48}
                 gameServant={servant}
                 stage={artStage}
+                unsummoned={!summoned}
                 enableLink
                 openLinkInNewTab={openLinksInNewTab}
+                showOpenInNewTabIndicator={openLinksInNewTab}
             />
             <GameServantClassIcon
+                className={`${StyleClassPrefix}-class-icon`}
                 servantClass={servant.class}
                 rarity={servant.rarity}
             />

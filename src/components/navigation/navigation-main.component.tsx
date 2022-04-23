@@ -1,5 +1,5 @@
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { ThemeConstants } from '../../styles/theme-constants';
 import { AppBar } from './app-bar/app-bar.component';
 import { LoadingIndicatorOverlay } from './loading-indicator-overlay';
@@ -27,7 +27,7 @@ const StyleProps = (theme: Theme) => ({
     } 
 } as SystemStyleObject<Theme>);
 
-export const NavigationMain = React.memo(({ children }) => (
+export const NavigationMain = React.memo(({ children }: PropsWithChildren<{}>) => (
     <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
         {/* <ThemeBackground /> */}
         <div className={`${StyleClassPrefix}-upper-section`}>

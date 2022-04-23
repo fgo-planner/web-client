@@ -161,7 +161,7 @@ export const MasterServantsMultiAddDialog = React.memo((props: Props) => {
         onClose(event, 'cancel');
     }, [onClose]);
 
-    const handleDialogClose = useCallback((event, reason: 'backdropClick' | 'escapeKeyDown'): void => {
+    const handleDialogClose = useCallback((event: any, reason: 'backdropClick' | 'escapeKeyDown'): void => {
         setSelectedServants([]);
         setSummoned(DefaultSummonedState);
         onClose(event, reason);

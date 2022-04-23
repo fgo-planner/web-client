@@ -1,5 +1,5 @@
-import { DesktopDatePicker, LocalizationProvider } from '@mui/lab';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { BaseTextFieldProps, TextField, TextFieldProps } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useRef } from 'react';
 import { DateTimeUtils } from '../../../../utils/date-time.utils';

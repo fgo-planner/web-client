@@ -89,7 +89,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     //#region Input event handlers
 
-    const handleLevelAscensionInputChange = useCallback((_, level: string, ascension: string, pushChanges = false): void => {
+    const handleLevelAscensionInputChange = useCallback((_: any, level: string, ascension: string, pushChanges = false): void => {
         masterServant.level = Number(level);
         masterServant.ascension = Number(ascension) as MasterServantAscensionLevel;
         if (pushChanges) {
@@ -98,7 +98,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
         forceUpdate();
     }, [forceUpdate, masterServant, pushStatsChange]);
 
-    const handleSkillInputChange = useCallback((_, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
+    const handleSkillInputChange = useCallback((_: any, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
         masterServant[skillSet][slot] = value ? Number(value) as MasterServantSkillLevel : undefined;
         if (pushChanges) {
             pushStatsChange();

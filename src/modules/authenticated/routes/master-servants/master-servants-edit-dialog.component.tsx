@@ -71,7 +71,7 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
         onClose(event, 'cancel');
     }, [onClose]);
 
-    const handleDialogClose = useCallback((event, reason: 'backdropClick' | 'escapeKeyDown'): void => {
+    const handleDialogClose = useCallback((event: any, reason: 'backdropClick' | 'escapeKeyDown'): void => {
         onClose(event, reason);
     }, [onClose]);
 

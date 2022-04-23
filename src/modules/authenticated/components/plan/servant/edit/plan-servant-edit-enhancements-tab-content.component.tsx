@@ -119,7 +119,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         forceUpdate();
     }, [enhancements, forceUpdate, pushStatsChange]);
 
-    const handleSkillInputChange = useCallback((_, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
+    const handleSkillInputChange = useCallback((_: any, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
         enhancements[skillSet][slot] = value ? Number(value) as MasterServantSkillLevel : undefined;
         if (pushChanges) {
             pushStatsChange();

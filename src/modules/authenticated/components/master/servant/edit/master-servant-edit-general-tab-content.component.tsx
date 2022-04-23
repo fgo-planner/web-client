@@ -86,7 +86,7 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
 
     //#region Input event handlers
 
-    const handleBondInputChange = useCallback((_, value: string, pushChanges = false): void => {
+    const handleBondInputChange = useCallback((_: any, value: string, pushChanges = false): void => {
         if (!value) {
             editData.bondLevel = undefined;
         } else {
@@ -107,7 +107,7 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
         forceUpdate();
     }, [forceUpdate, masterServant, pushStatsChange]);
 
-    const handleSummonedCheckboxChange = useCallback((_, value: boolean | undefined, pushChanges = false): void => {
+    const handleSummonedCheckboxChange = useCallback((_: any, value: boolean | undefined, pushChanges = false): void => {
         masterServant.summoned = value;
         if (pushChanges) {
             pushStatsChange();
@@ -115,7 +115,7 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
         forceUpdate();
     }, [forceUpdate, masterServant, pushStatsChange]);
 
-    const handleSummonDateInputChange = useCallback((_, value: number | undefined, pushChanges = false): void => {
+    const handleSummonDateInputChange = useCallback((_: any, value: number | undefined, pushChanges = false): void => {
         masterServant.summonDate = value;
         if (pushChanges) {
             pushStatsChange();

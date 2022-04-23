@@ -4,6 +4,7 @@ import { Fab, IconButton, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import lodash from 'lodash';
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPanelContainer, StyleClassPrefix as LayoutPanelContainerStyleClassPrefix } from '../../../../components/layout/layout-panel-container.component';
@@ -40,6 +41,10 @@ const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
         fous: true
     }
 });
+
+const PathMatchPattern: PathPattern = {
+    path: '/user/master/planner/:id'
+};
 
 /**
  * Instantiates a new `PlanServant` based on the available servants in the
@@ -125,7 +130,7 @@ const StyleProps = (theme: Theme) => ({
 
 export const PlanRoute = React.memo(() => {
 
-    const routeMatch = useMatch<'id'>('/user/master/planner/:id');
+    const routeMatch = useMatch<'id', string>(PathMatchPattern);
     const planId = routeMatch?.params.id;
 
     const forceUpdate = useForceUpdate();

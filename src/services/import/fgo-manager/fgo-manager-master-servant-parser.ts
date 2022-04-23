@@ -1,6 +1,6 @@
 import { GameServant, MasterServant, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/types';
 import { Options } from 'csv-parse';
-import parse from 'csv-parse/lib/sync';
+import { parse } from 'csv-parse/sync';
 import { GameServantConstants } from '../../../constants';
 import { GameServantList } from '../../../types/data';
 import { Immutable, ReadonlyRecord } from '../../../types/internal';

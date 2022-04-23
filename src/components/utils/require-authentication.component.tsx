@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, PropsWithChildren, useEffect, useState } from 'react';
 import { Navigate } from 'react-router';
 import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
@@ -10,7 +10,7 @@ import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
  * rendered and navigates the user back to the login page if the user is not
  * authenticated (logged in).
  */
-export const RequireAuthentication = React.memo(({ children }) => {
+export const RequireAuthentication = React.memo(({ children }: PropsWithChildren<{}>) => {
 
     const authenticationService = useInjectable(AuthenticationService);
 

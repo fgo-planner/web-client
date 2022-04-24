@@ -41,7 +41,8 @@ const ContainerStyleOptions = {
     slot: 'root',
     skipSx: true,
     shouldForwardProp: ((prop: string) => (
-        prop !== 'size'
+        prop !== 'size' &&
+        prop !== 'showOpenInNewTabIndicator'
     )) as unknown
 } as FilteringStyledOptions<ContainerProps>;
 

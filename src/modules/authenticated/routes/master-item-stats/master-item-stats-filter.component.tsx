@@ -8,14 +8,14 @@ type Props = {
 
 export const MasterItemStatsFilter = React.memo(({ onFilterChange }: Props) => {
 
-    const [includeUnownedServants, setIncludeUnownedServants] = useState<boolean>(false);
+    const [includeUnsummonedServants, setIncludeUnsummonedServants] = useState<boolean>(false);
     const [includeAppendSkills, setIncludeAppendSkills] = useState<boolean>(false);
     const [includeCostumes, setIncludeCostumes] = useState<boolean>(true);
     const [includeSoundtracks, setIncludeSoundtracks] = useState<boolean>(false);
 
     useEffect(() => {
         onFilterChange({
-            includeUnownedServants,
+            includeUnsummonedServants,
             includeAppendSkills,
             includeCostumes,
             includeSoundtracks
@@ -24,12 +24,12 @@ export const MasterItemStatsFilter = React.memo(({ onFilterChange }: Props) => {
         includeCostumes,
         includeAppendSkills,
         includeSoundtracks,
-        includeUnownedServants,
+        includeUnsummonedServants,
         onFilterChange
     ]);
 
-    const handleIncludeUnownedServantsChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-        setIncludeUnownedServants(event.target.checked);
+    const handleIncludeUnsummonedServantsChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        setIncludeUnsummonedServants(event.target.checked);
     }, []);
 
     const handleIncludeAppendSkillsChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -50,9 +50,9 @@ export const MasterItemStatsFilter = React.memo(({ onFilterChange }: Props) => {
                 <FormControlLabel
                     control={
                         <Checkbox
-                            name="includeUnownedServants"
-                            checked={includeUnownedServants}
-                            onChange={handleIncludeUnownedServantsChange}
+                            name="includeUnsummonedServants"
+                            checked={includeUnsummonedServants}
+                            onChange={handleIncludeUnsummonedServantsChange}
                         />
                     }
                     label="Un-summoned servants"

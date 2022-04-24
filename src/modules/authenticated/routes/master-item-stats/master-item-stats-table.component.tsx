@@ -19,11 +19,11 @@ type Props = {
 
 const CostColumnTooltip = 'Amount needed for servant enhancements';
 
-const CostColumnTooltipInclUnowned = `${CostColumnTooltip}, including servants that have not yet been summoned`;
+const CostColumnTooltipInclUnsummoned = `${CostColumnTooltip}, including servants that have not yet been summoned`;
 
 const CostColumnTooltipInclSoundtracks = `${CostColumnTooltip} and soundtracks unlocks`;
 
-const CostColumnTooltipInclUnownedAndSoundtracks = `${CostColumnTooltipInclUnowned}, and soundtracks unlocks`;
+const CostColumnTooltipInclUnsummonedAndSoundtracks = `${CostColumnTooltipInclUnsummoned}, and soundtracks unlocks`;
 
 const UsedColumnTooltip = 'Amount used for servant enhancements';
 
@@ -33,11 +33,11 @@ const InventoryColumnTooltip = 'Current amount in inventory';
 
 const DebtColumnTooltip = 'Amount needed for remaining servant enhancements';
 
-const DebtColumnTooltipInclUnowned = `${DebtColumnTooltip}, including servants that have not yet been summoned`;
+const DebtColumnTooltipInclUnsummoned = `${DebtColumnTooltip}, including servants that have not yet been summoned`;
 
 const DebtColumnTooltipInclSoundtracks = `${DebtColumnTooltip} and soundtracks unlocks`;
 
-const DebtColumnTooltipInclUnownedAndSoundtracks = `${DebtColumnTooltipInclUnowned}, and soundtracks unlocks`;
+const DebtColumnTooltipInclUnsummonedAndSoundtracks = `${DebtColumnTooltipInclUnsummoned}, and soundtracks unlocks`;
 
 const DifferenceColumnTooltip = 'Additional amount that needs to be acquired in order to fullfil the \'Remaining Needed\' column';
 
@@ -92,19 +92,19 @@ const StyleProps = {
 
 export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: Props) => {
 
-    const { includeUnownedServants, includeSoundtracks } = filter;
+    const { includeUnsummonedServants, includeSoundtracks } = filter;
 
     const costColumnTooltip = useMemo(() => {
-        if (!includeUnownedServants && !includeSoundtracks) {
+        if (!includeUnsummonedServants && !includeSoundtracks) {
             return CostColumnTooltip;
-        } else if (includeUnownedServants) {
-            return CostColumnTooltipInclUnowned;
+        } else if (includeUnsummonedServants) {
+            return CostColumnTooltipInclUnsummoned;
         } else if (includeSoundtracks) {
             return CostColumnTooltipInclSoundtracks;
         } else {
-            return CostColumnTooltipInclUnownedAndSoundtracks;
+            return CostColumnTooltipInclUnsummonedAndSoundtracks;
         }
-    }, [includeUnownedServants, includeSoundtracks]);
+    }, [includeUnsummonedServants, includeSoundtracks]);
 
     const usedColumnTooltip = useMemo(() => {
         if (!includeSoundtracks) {
@@ -115,16 +115,16 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
     }, [includeSoundtracks]);
 
     const debtColumnTooltip = useMemo(() => {
-        if (!includeUnownedServants && !includeSoundtracks) {
+        if (!includeUnsummonedServants && !includeSoundtracks) {
             return DebtColumnTooltip;
-        } else if (includeUnownedServants) {
-            return DebtColumnTooltipInclUnowned;
+        } else if (includeUnsummonedServants) {
+            return DebtColumnTooltipInclUnsummoned;
         } else if (includeSoundtracks) {
             return DebtColumnTooltipInclSoundtracks;
         } else {
-            return DebtColumnTooltipInclUnownedAndSoundtracks;
+            return DebtColumnTooltipInclUnsummonedAndSoundtracks;
         }
-    }, [includeUnownedServants, includeSoundtracks]);
+    }, [includeUnsummonedServants, includeSoundtracks]);
 
     const renderItem = (itemId: number, index: number): ReactNode => {
         const gameItem = gameItemMap[itemId];

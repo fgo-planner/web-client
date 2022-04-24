@@ -1,6 +1,7 @@
 import { MasterAccount } from '@fgo-planner/types';
 import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
+import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
@@ -14,6 +15,8 @@ import { MasterServantStatsFilter, MasterServantStatsFilterResult } from './mast
 import { MasterServantStatsTable } from './master-servant-stats-table.component';
 import { MasterServantStatsGroupedByClass, MasterServantStatsGroupedByRarity, MasterServantStatsUtils } from './master-servant-stats.utils';
 
+const OmitUnsummonedMessage = 'Un-summoned servants are omitted from stats calculation';
+
 const renderRarityHeaderLabel = (value: string | number): ReactNode => {
     if (value === 'overall') {
         return 'Overall';
@@ -26,26 +29,51 @@ const renderClassHeaderLabel = (value: string | number): ReactNode => {
         return 'Overall';
     }
     return (
-        <div className="flex justify-center">
+        <div className='flex justify-center'>
             <GameServantClassIcon
                 servantClass={value as any}
                 rarity={3}
                 size={24}
                 tooltip
-                tooltipPlacement="top"
+                tooltipPlacement='top'
             />
         </div>
     );
 };
 
+const StyleClassPrefix = 'MasterServants';
+
+const StyleProps = (theme: Theme) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    [`& .${StyleClassPrefix}-contents`]: {
+        display: 'flex',
+        overflow: 'hidden'
+    },
+    [`& .${StyleClassPrefix}-main-content`]: {
+        display: 'flex',
+        flexDirection: 'column',
+        flex: '1'
+    },
+    [`& .${StyleClassPrefix}-filter-controls-row`]: {
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between'
+    },
+    [`& .${StyleClassPrefix}-omit-unsummoned-message`]: {
+        color: theme.palette.warning.main,
+        pr: 8
+    }
+} as SystemStyleObject<Theme>);
+
 export const MasterServantStatsRoute = React.memo(() => {
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [filter, setFilter] = useState<MasterServantStatsFilterResult>();
-    const [stats, setStats] = useState<MasterServantStatsGroupedByRarity | MasterServantStatsGroupedByClass>();
 
     const gameServantMap = useGameServantMap();
-    
+
     /*
      * Master account change subscription.
      */
@@ -57,37 +85,47 @@ export const MasterServantStatsRoute = React.memo(() => {
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, []);
 
-    useEffect(() => {
+    const stats: MasterServantStatsGroupedByRarity | MasterServantStatsGroupedByClass | undefined = useMemo(() => {
         if (!gameServantMap || !masterAccount || !filter) {
-            return;
+            return undefined;
         }
-        let stats;
         if (filter.groupBy === 'rarity') {
-            stats = MasterServantStatsUtils.generateStatsGroupedByRarity(gameServantMap, masterAccount, filter);
+            return MasterServantStatsUtils.generateStatsGroupedByRarity(gameServantMap, masterAccount, filter);
         } else {
-            stats = MasterServantStatsUtils.generateStatsGroupedByClass(gameServantMap, masterAccount, filter);
+            return MasterServantStatsUtils.generateStatsGroupedByClass(gameServantMap, masterAccount, filter);
         }
-        setStats(stats);
     }, [gameServantMap, masterAccount, filter]);
+
+    const hasUnsummonedServants: boolean = useMemo(() => {
+        if (!masterAccount?.servants.length) {
+            return false;
+        }
+        for (const { summoned } of masterAccount.servants) {
+            if (summoned) {
+                return true;
+            }
+        }
+        return false;
+    }, [masterAccount]);
 
     /**
      * NavigationRail children
      */
     const navigationRailChildNodes: ReactNode = useMemo(() => {
         return [
-            <Tooltip key="servants" title="Back to servant list" placement="right">
+            <Tooltip key='servants' title='Back to servant list' placement='right'>
                 <div>
                     <IconButton
                         component={Link}
-                        to="../master/servants"
+                        to='../master/servants'
                         children={<FormatListBulletedIcon />}
-                        size="large" />
+                        size='large' />
                 </div>
             </Tooltip>,
-            <Tooltip key="export" title="Download servant stats" placement="right">
+            <Tooltip key='export' title='Download servant stats' placement='right'>
                 <div>
                     {/* TODO Implement this */}
-                    <IconButton children={<GetAppIcon />} disabled size="large" />
+                    <IconButton children={<GetAppIcon />} disabled size='large' />
                 </div>
             </Tooltip>
         ];
@@ -119,16 +157,23 @@ export const MasterServantStatsRoute = React.memo(() => {
     }, [filter, stats]);
 
     return (
-        <div className="flex column full-height">
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <PageTitle>Servant Stats</PageTitle>
-            <div className="flex overflow-hidden">
+            <div className={`${StyleClassPrefix}-contents`}>
                 <NavigationRail children={navigationRailChildNodes} />
-                <div className="flex column flex-fill">
-                    <MasterServantStatsFilter onFilterChange={setFilter}></MasterServantStatsFilter>
+                <div className={`${StyleClassPrefix}-main-content`}>
+                    <div className={`${StyleClassPrefix}-filter-controls-row`}>
+                        <MasterServantStatsFilter onFilterChange={setFilter}></MasterServantStatsFilter>
+                        {hasUnsummonedServants &&
+                            <div className={`${StyleClassPrefix}-omit-unsummoned-message`}>
+                                {OmitUnsummonedMessage}
+                            </div>
+                        }
+                    </div>
                     {statsTableNode}
                 </div>
             </div>
-        </div>
+        </Box>
     );
 
 });

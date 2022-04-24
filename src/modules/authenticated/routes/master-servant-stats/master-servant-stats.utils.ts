@@ -61,7 +61,6 @@ export class MasterServantStatsUtils {
         masterAccount: MasterAccount,
         filter: MasterServantStatsFilterOptions
     ): MasterServantStatsGroupedByRarity {
-
         const start = window.performance.now();
 
         const statsByRarity = this._instantiateStatsGroupedByRarity();
@@ -71,6 +70,13 @@ export class MasterServantStatsUtils {
 
         const masterServantIds = new Set<number>();
         for (const masterServant of masterAccount.servants) {
+            /*
+             * Skip servant if it is not summoned.
+             */
+            if (!masterServant.summoned) {
+                continue;
+            }
+
             const servantId = masterServant.gameId;
             const servant = gameServantMap[servantId];
             if (!servant) {
@@ -119,6 +125,13 @@ export class MasterServantStatsUtils {
 
         const masterServantIds = new Set<number>();
         for (const masterServant of masterAccount.servants) {
+            /*
+             * Skip servant if it is not summoned.
+             */
+            if (!masterServant.summoned) {
+                continue;
+            }
+            
             const servantId = masterServant.gameId;
             const servant = gameServantMap[servantId];
             if (!servant) {

@@ -1,5 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React, { ReactNode } from 'react';
+import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { PageMetadata } from './components/utils/page-metadata.component';
 import './index.css';
@@ -22,6 +22,8 @@ import { PageMetadataService } from './services/user-interface/page-metadata.ser
 import { ThemeService } from './services/user-interface/theme.service';
 import './styles/styles.scss';
 import { InjectablesContainer } from './utils/dependency-injection/injectables-container';
+
+const RootElementId = 'root';
 
 // TODO Maybe move this to a separate file.
 InjectablesContainer.registerInjectables(
@@ -64,7 +66,7 @@ InjectablesContainer.registerInjectables(
     ThemeService
 );
 
-const element = (
+const rootNode: ReactNode = (
     <React.StrictMode>
         <PageMetadata />
         <BrowserRouter>
@@ -73,9 +75,13 @@ const element = (
     </React.StrictMode>
 );
 
-const container = document.getElementById('root');
+const rootElement = document.getElementById(RootElementId);
 
-ReactDOM.render(element, container);
+if (!rootElement) {
+    console.error(`Root element id='${RootElementId}' could not be found.`);
+} else {
+    ReactDOM.createRoot(rootElement).render(rootNode);
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

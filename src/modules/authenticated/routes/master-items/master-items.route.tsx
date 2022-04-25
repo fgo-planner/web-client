@@ -13,7 +13,7 @@ import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loadin
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { Immutable, Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterItemList } from './master-item-list.component';
 
 const cloneItemsFromMasterAccount = (account: Nullable<Immutable<MasterAccount>>): Array<GameItemQuantity> => {
@@ -58,7 +58,7 @@ export const MasterItemsRoute = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(account => {
                 const masterItems = cloneItemsFromMasterAccount(account);
                 setMasterAccount(account);

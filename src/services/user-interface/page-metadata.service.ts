@@ -1,7 +1,7 @@
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import { PageMetadata } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 
 @Injectable
 export class PageMetadataService {
@@ -9,7 +9,7 @@ export class PageMetadataService {
     private _metadata: PageMetadata = {};
 
     private get _onMetadataChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.UserInterface_MetadataChange);
+        return SubscribablesContainer.get(SubscriptionTopics.UserInterface.MetadataChange);
     }
 
     setTitle(title: string | undefined): void {

@@ -8,6 +8,7 @@ export * from './dependency-injection/injectable-token.type';
 export * from './dependency-injection/injected-field.type';
 export * from './generics/cache-array.type';
 export * from './generics/cache-map.type';
+export * from './generics/functions.type';
 export * from './generics/immutable-array.type';
 export * from './generics/immutable-record.type';
 export * from './generics/immutable.type';

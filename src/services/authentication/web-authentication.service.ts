@@ -3,7 +3,7 @@ import { UserCredentials } from '../../types/data';
 import { HttpResponseError } from '../../types/internal';
 import { JwtUtils } from '../../utils/jwt.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { AuthenticationService } from './authentication.service';
 
 @Injectable
@@ -29,7 +29,7 @@ export class WebAuthenticationService extends AuthenticationService {
     }
 
     private get _onCurrentUserChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.User_CurrentUserChange);
+        return SubscribablesContainer.get(SubscriptionTopics.User.CurrentUserChange);
     }
 
     private _invalidatingCredentials = false;
@@ -43,7 +43,7 @@ export class WebAuthenticationService extends AuthenticationService {
          * unsubscribe from subscriptions.
          */
         SubscribablesContainer
-            .get(SubscriptionTopic.User_Unauthorized)
+            .get(SubscriptionTopics.User.Unauthorized)
             .subscribe(this._handleUnauthorizedResponse.bind(this));
     }
 

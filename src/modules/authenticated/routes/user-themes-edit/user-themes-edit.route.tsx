@@ -14,7 +14,7 @@ import { UserService } from '../../../../services/data/user/user.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
 import { Nullable, ThemeMode } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { UserThemeEdit } from './user-theme-edit.component';
 
 export const UserThemesEditRoute = React.memo(() => {
@@ -54,7 +54,7 @@ export const UserThemesEditRoute = React.memo(() => {
         };
 
         const onCurrentUserPreferencesChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentUserPreferencesChange)
+            .get(SubscriptionTopics.User.CurrentUserPreferencesChange)
             .subscribe(userPreferences => {
                 userPreferencesRef.current = userPreferences;
                 setLightTheme(getUserThemeOrDefault(userPreferences, 'light'));

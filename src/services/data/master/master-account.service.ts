@@ -4,7 +4,7 @@ import { MasterAccountList } from '../../../types/data';
 import { Nullable, UserInfo } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 
 @Injectable
 export class MasterAccountService {
@@ -27,11 +27,11 @@ export class MasterAccountService {
     private _masterAccountList: Nullable<MasterAccountList>;
 
     private get _onCurrentMasterAccountChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.User_CurrentMasterAccountChange);
+        return SubscribablesContainer.get(SubscriptionTopics.User.CurrentMasterAccountChange);
     }
 
     private get _onMasterAccountListChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.User_MasterAccountListChange);
+        return SubscribablesContainer.get(SubscriptionTopics.User.MasterAccountListChange);
     }
 
     constructor() {
@@ -40,7 +40,7 @@ export class MasterAccountService {
          * unsubscribe from subscriptions.
          */
         SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentUserChange)
+            .get(SubscriptionTopics.User.CurrentUserChange)
             .subscribe(this._handleCurrentUserChange.bind(this));
     }
 

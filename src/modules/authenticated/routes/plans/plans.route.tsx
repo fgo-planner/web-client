@@ -14,7 +14,7 @@ import { PlanService } from '../../../../services/data/plan/plan.service';
 import { MasterAccountPlans } from '../../../../types/data';
 import { Immutable, ModalOnCloseReason } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { PlanAddDialog } from './plan-add-dialog';
 import { PlanList } from './plan-list.component';
 
@@ -83,7 +83,7 @@ export const PlansRoute = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(masterAccount => {
                 const masterAccountId = masterAccount?._id;
                 if (masterAccountId !== masterAccountIdRef.current) {

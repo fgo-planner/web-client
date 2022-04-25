@@ -1,7 +1,7 @@
 import { HttpOptions, HttpResponseError, HttpResponseType, Nullable } from '../types/internal';
 import { JwtUtils } from './jwt.utils';
 import { SubscribablesContainer } from './subscription/subscribables-container';
-import { SubscriptionTopic } from './subscription/subscription-topic';
+import { SubscriptionTopics } from './subscription/subscription-topics';
 
 type RequestBody = string | Record<string, unknown>;
 
@@ -12,7 +12,7 @@ export class HttpUtils {
     private static readonly _ContentTypeHeader = 'Content-Type';
 
     private static get _onUnauthorized() {
-        return SubscribablesContainer.get(SubscriptionTopic.User_Unauthorized);
+        return SubscribablesContainer.get(SubscriptionTopics.User.Unauthorized);
     }
 
     static async get<T = any>(url: string, options?: HttpOptions): Promise<T> {

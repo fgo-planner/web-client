@@ -8,7 +8,7 @@ import defaultDarkTheme from '../../styles/theme-default-dark';
 import defaultLightTheme from '../../styles/theme-default-light';
 import { Nullable, ThemeInfo, ThemeMode } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { PageMetadataService } from './page-metadata.service';
 
 type UserThemes = {
@@ -28,7 +28,7 @@ export class ThemeService {
     private readonly _pageMetadataService!: PageMetadataService;
 
     private get _onThemeChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.UserInterface_ThemeChange);
+        return SubscribablesContainer.get(SubscriptionTopics.UserInterface.ThemeChange);
     }
 
     private _themeMode: ThemeMode;
@@ -39,6 +39,7 @@ export class ThemeService {
         this._themeMode = this._loadThemeModeFromStorage();
 
         const themeInfo = this._getDefaultThemeForMode(this._themeMode);
+        console.log('ThemeService constructed', this._themeMode, themeInfo);
         this._onThemeChange.next(themeInfo);
 
         /*
@@ -51,7 +52,7 @@ export class ThemeService {
              * unsubscribe from subscriptions.
              */
             SubscribablesContainer
-                .get(SubscriptionTopic.User_CurrentUserPreferencesChange)
+                .get(SubscriptionTopics.User.CurrentUserPreferencesChange)
                 .subscribe(this._handleCurrentUserPreferencesChange.bind(this));
         });
     }

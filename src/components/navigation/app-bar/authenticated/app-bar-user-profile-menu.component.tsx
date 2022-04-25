@@ -11,7 +11,7 @@ import { ThemeService } from '../../../../services/user-interface/theme.service'
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ModalOnCloseHandler, ThemeInfo } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
 import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
 
@@ -71,10 +71,10 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
 
     useEffect(() => {
         const onThemeChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.UserInterface_ThemeChange)
+            .get(SubscriptionTopics.UserInterface.ThemeChange)
             .subscribe(setThemeInfo);
         const onPlayStatusChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.Audio_BackgroundPlayStatusChange)
+            .get(SubscriptionTopics.Audio.BackgroundPlayStatusChange)
             .subscribe(setIsBackgroundMusicPlaying);
 
         return () => {

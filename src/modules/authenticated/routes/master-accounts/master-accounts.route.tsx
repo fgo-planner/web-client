@@ -14,7 +14,7 @@ import { MasterAccountService } from '../../../../services/data/master/master-ac
 import { MasterAccountList as MasterAccountListType } from '../../../../types/data';
 import { Immutable, ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterAccountList } from './master-account-list.component';
 
 const AddAccountDialogPaperProps: PaperProps = {
@@ -55,7 +55,7 @@ export const MasterAccountsRoute = React.memo(() => {
      */
     useEffect(() => {
         const onMasterAccountListChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_MasterAccountListChange)
+            .get(SubscriptionTopics.User.MasterAccountListChange)
             .subscribe(setMasterAccountList);
 
         return () => onMasterAccountListChangeSubscription.unsubscribe();

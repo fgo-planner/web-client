@@ -8,7 +8,7 @@ import { BackgroundMusicService } from '../../../../services/audio/background-mu
 import { ThemeService } from '../../../../services/user-interface/theme.service';
 import { ModalOnCloseReason, ThemeInfo } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { LoginDialog } from '../../../login/login-dialog.component';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
@@ -48,10 +48,10 @@ export const AppBarGuestUser = React.memo(() => {
 
     useEffect(() => {
         const onThemeChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.UserInterface_ThemeChange)
+            .get(SubscriptionTopics.UserInterface.ThemeChange)
             .subscribe(setThemeInfo);
         const onPlayStatusChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.Audio_BackgroundPlayStatusChange)
+            .get(SubscriptionTopics.Audio.BackgroundPlayStatusChange)
             .subscribe(setIsBackgroundMusicPlaying);
 
 

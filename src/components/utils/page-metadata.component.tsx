@@ -2,7 +2,7 @@ import React, { DetailedHTMLProps, MetaHTMLAttributes, useEffect, useState } fro
 import { Helmet } from 'react-helmet';
 import { PageMetadata as PageMetadataType } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 
 type HelmetMetaProp = DetailedHTMLProps<MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>[];
 
@@ -20,7 +20,7 @@ const generateMeta = (metadata: PageMetadataType): HelmetMetaProp => {
 };
 
 /**
- * Listens for changes from the `UserInterface_MetadataChange` topic and updates the
+ * Listens for changes from the `UserInterface.MetadataChange` topic and updates the
  * page metadata (in the HTML `head` tag) accordingly.
  */
 export const PageMetadata = React.memo(() => {
@@ -29,7 +29,7 @@ export const PageMetadata = React.memo(() => {
 
     useEffect(() => {
         const onMetadataChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.UserInterface_MetadataChange)
+            .get(SubscriptionTopics.UserInterface.MetadataChange)
             .subscribe(setMetadata);
             
         return () => onMetadataChangeSubscription.unsubscribe();

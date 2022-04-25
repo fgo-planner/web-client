@@ -23,7 +23,7 @@ import { DateTimeUtils } from '../../../../utils/date-time.utils';
 import { PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { PlanServantUtils } from '../../../../utils/plan/plan-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { DialogData as PlanServantEditDialogData, PlanServantEditDialog } from '../../components/plan/servant/edit/plan-servant-edit-dialog.component';
 
 const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
@@ -239,7 +239,7 @@ export const PlanRoute = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(account => {
                 const isSameAccount = masterAccount?._id === account?._id;
                 if (!masterAccount || isSameAccount) {

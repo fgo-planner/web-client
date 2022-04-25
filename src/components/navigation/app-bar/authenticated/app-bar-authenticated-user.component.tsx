@@ -7,7 +7,7 @@ import { BasicUser } from '../../../../services/data/user/user.service';
 import { MasterAccountList as MasterAccountListType } from '../../../../types/data';
 import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { AppBarLink } from '../app-bar-link.component';
 import { AppBarLinks } from '../app-bar-links.component';
 import { AppBarResourcesMenu } from '../app-bar-resources-menu.component';
@@ -55,7 +55,7 @@ export const AppBarAuthenticatedUser = React.memo(({ currentUser }: Props) => {
      */
     useEffect(() => {
         const onMasterAccountListChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_MasterAccountListChange)
+            .get(SubscriptionTopics.User.MasterAccountListChange)
             .subscribe(setMasterAccountList);
 
         return () => onMasterAccountListChangeSubscription.unsubscribe();

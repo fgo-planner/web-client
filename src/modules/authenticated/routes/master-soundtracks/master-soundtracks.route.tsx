@@ -12,7 +12,7 @@ import { SoundtrackPlayerService } from '../../../../services/audio/soundtrack-p
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterSoundtracksListHeader } from './master-soundtracks-list-header.component';
 import { MasterSoundtracksList } from './master-soundtracks-list.component';
 
@@ -45,7 +45,7 @@ export const MasterSoundtracksRoute = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(account => {
                 const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(account);
                 setMasterAccount(account);
@@ -61,7 +61,7 @@ export const MasterSoundtracksRoute = React.memo(() => {
      */
     useEffect(() => {
         const onPlayStatusChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.Audio_SoundtrackPlayStatusChange)
+            .get(SubscriptionTopics.Audio.SoundtrackPlayStatusChange)
             .subscribe(status => {
                 if (!status) {
                     setPlayingId(undefined);

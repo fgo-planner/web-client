@@ -1,6 +1,6 @@
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 
 @Injectable
 export class LoadingIndicatorOverlayService {
@@ -10,7 +10,7 @@ export class LoadingIndicatorOverlayService {
     private _display = false;
 
     private get _onDisplayStatusChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.UserInterface_LoadingIndicatorDisplayChange);
+        return SubscribablesContainer.get(SubscriptionTopics.UserInterface.LoadingIndicatorDisplayChange);
     }
 
     invoke(): string {

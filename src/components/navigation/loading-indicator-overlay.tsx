@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { LoadingIndicator } from '../utils/loading-indicator.component';
 
 export const LoadingIndicatorOverlay = React.memo(() => {
@@ -9,7 +9,7 @@ export const LoadingIndicatorOverlay = React.memo(() => {
 
     useEffect(() => {
         const onDisplayStatusChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.UserInterface_LoadingIndicatorDisplayChange)
+            .get(SubscriptionTopics.UserInterface.LoadingIndicatorDisplayChange)
             .subscribe(setVisible);
 
         return () => onDisplayStatusChangeSubscription.unsubscribe();

@@ -12,7 +12,7 @@ import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loadin
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
 import { MasterServantCostumesList } from './master-servant-costumes-list.component';
 
@@ -42,7 +42,7 @@ export const MasterServantCostumesRoute = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(account => {
                 const unlockedCostumesSet = getUnlockedCostumeSetFromMasterAccount(account);
                 setMasterAccount(account);

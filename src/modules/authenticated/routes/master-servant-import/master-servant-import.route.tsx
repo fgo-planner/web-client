@@ -13,7 +13,7 @@ import { MasterServantParserResult } from '../../../../services/import/master-se
 import { Nullable, ReadonlyRecord } from '../../../../types/internal';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
 import { MasterServantImportFileInput } from './master-servant-import-file-input';
 import { MasterServantImportList } from './master-servant-import-list.component';
@@ -69,7 +69,7 @@ const MasterServantImportRoute = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(setMasterAccount);
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();

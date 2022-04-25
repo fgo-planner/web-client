@@ -19,7 +19,7 @@ import { Immutable, ModalOnCloseReason, Nullable } from '../../../../types/inter
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantEditData } from '../../components/master/servant/edit/master-servant-edit-data.type';
 import { MasterServantEditUtils } from '../../components/master/servant/edit/master-servant-edit.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
@@ -215,7 +215,7 @@ export const MasterServantsRoute = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(account => {
                 masterAccountDataRef.current = cloneMasterAccountData(account);
                 const isSameAccount = masterAccount?._id === account?._id;

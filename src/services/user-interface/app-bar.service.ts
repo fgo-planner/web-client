@@ -1,12 +1,12 @@
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 
 @Injectable
 export class AppBarService {
 
     private get _onElevatedChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.UserInterface_AppBarElevatedChange);
+        return SubscribablesContainer.get(SubscriptionTopics.UserInterface.AppBarElevatedChange);
     }
 
     private _elevated = false;

@@ -10,7 +10,7 @@ import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.h
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
 import { Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterItemStatsFilter } from './master-item-stats-filter.component';
 import { MasterItemStatsTable } from './master-item-stats-table.component';
 import { MasterItemStats, MasterItemStatsFilterOptions, MasterItemStatsUtils } from './master-item-stats.utils';
@@ -35,7 +35,7 @@ export const MasterItemStatsRoute = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(setMasterAccount);
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();

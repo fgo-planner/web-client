@@ -3,7 +3,7 @@ import { Injectable } from '../../../decorators/dependency-injection/injectable.
 import { Nullable, UserInfo } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 import { BasicUser, UserService } from './user.service';
 
 @Injectable
@@ -12,7 +12,7 @@ export class WebUserService extends UserService {
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user`;
 
     private get _onCurrentUserPreferencesChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.User_CurrentUserPreferencesChange);
+        return SubscribablesContainer.get(SubscriptionTopics.User.CurrentUserPreferencesChange);
     }
     
     constructor() {
@@ -23,7 +23,7 @@ export class WebUserService extends UserService {
          * unsubscribe from subscriptions.
          */
         SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentUserChange)
+            .get(SubscriptionTopics.User.CurrentUserChange)
             .subscribe(this._handleCurrentUserChange.bind(this));
     }
 

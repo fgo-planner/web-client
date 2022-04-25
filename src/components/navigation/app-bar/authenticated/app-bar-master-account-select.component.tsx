@@ -8,7 +8,7 @@ import { MasterAccountList } from '../../../../types/data';
 import { Immutable, Nullable } from '../../../../types/internal';
 import { InjectablesContainer } from '../../../../utils/dependency-injection/injectables-container';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 
 type Props = {
     masterAccountList: MasterAccountList;
@@ -51,7 +51,7 @@ export const AppBarMasterAccountSelect = class extends PureComponent<Props, Stat
 
     componentDidMount(): void {
         this._onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(this._handleCurrentMasterAccountChange.bind(this));
     }
 

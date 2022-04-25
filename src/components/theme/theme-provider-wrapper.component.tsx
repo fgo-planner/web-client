@@ -4,7 +4,7 @@ import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { BackgroundImageContext } from '../../contexts/background-image.context';
 import { ThemeInfo } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { ThemeBackground } from './theme-background.component';
 import { ThemeScrollbars } from './theme-scrollbars.component';
 
@@ -26,7 +26,7 @@ export const ThemeProviderWrapper = React.memo(({ children }: Props) => {
 
     useEffect(() => {
         const onThemeChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.UserInterface_ThemeChange)
+            .get(SubscriptionTopics.UserInterface.ThemeChange)
             .subscribe((themeInfo: ThemeInfo) => {
                 const { themeOptions, backgroundImageUrl } = themeInfo;
                 setTheme(createTheme(themeOptions));

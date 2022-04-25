@@ -1,6 +1,6 @@
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 
 @Injectable
 export class SoundtrackPlayerService {
@@ -10,7 +10,7 @@ export class SoundtrackPlayerService {
     private _audioEl?: HTMLAudioElement;
 
     private get _onSoundtrackPlayStatusChange() {
-        return SubscribablesContainer.get(SubscriptionTopic.Audio_SoundtrackPlayStatusChange);
+        return SubscribablesContainer.get(SubscriptionTopics.Audio.SoundtrackPlayStatusChange);
     }
 
     constructor() {
@@ -19,7 +19,7 @@ export class SoundtrackPlayerService {
          * unsubscribe from subscriptions.
          */
         SubscribablesContainer
-            .get(SubscriptionTopic.Audio_BackgroundPlayStatusChange)
+            .get(SubscriptionTopics.Audio.BackgroundPlayStatusChange)
             .subscribe(this._handleBackgroundPlayStatusChange.bind(this));
     }
 

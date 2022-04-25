@@ -4,7 +4,7 @@ import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react'
 import { useElevateAppBarOnScroll } from '../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { Immutable, Nullable } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopic } from '../../utils/subscription/subscription-topic';
+import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { HomeLinkSection } from './home-link-section.component';
 import { HomeLink } from './home-link.component';
 
@@ -27,7 +27,7 @@ export const HomeRoute = React.memo(() => {
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopic.User_CurrentMasterAccountChange)
+            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(setMasterAccount);
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();

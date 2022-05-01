@@ -4,7 +4,7 @@ import { Avatar, AvatarProps } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
 import { styled, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
-import React, { useMemo } from 'react';
+import React, { MouseEventHandler, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';
 import { Immutable } from '../../../types/internal';
@@ -13,11 +13,16 @@ type Props = {
     costumeId?: number;
     enableLink?: boolean;
     gameServant: Immutable<GameServant>;
+    /**
+     * Whether to render the thumbnail with a filter effect to indicate that the
+     * servant is inactive (disabled, etc.).
+     */
+    inactive?: boolean;
     openLinkInNewTab?: boolean;
+    onClick?: MouseEventHandler;
     showOpenInNewTabIndicator?: boolean;
     size?: string | number;
     stage?: 1 | 2 | 3 | 4;
-    unsummoned?: boolean;
     variant?: AvatarProps['variant'];
 };
 
@@ -32,7 +37,7 @@ const DefaultSize = 56;
 const StyleClassPrefix = 'GameServantThumbnail';
 
 type ContainerProps = {
-    showOpenInNewTabIndicator?: boolean;
+    renderNewTabIndicator?: boolean;
     size: string | number;
 };
 
@@ -42,14 +47,14 @@ const ContainerStyleOptions = {
     skipSx: true,
     shouldForwardProp: ((prop: string) => (
         prop !== 'size' &&
-        prop !== 'showOpenInNewTabIndicator'
+        prop !== 'renderNewTabIndicator'
     )) as unknown
 } as FilteringStyledOptions<ContainerProps>;
 
 const Container = styled('div', ContainerStyleOptions)<ContainerProps>(props => {
 
     const {
-        showOpenInNewTabIndicator,
+        renderNewTabIndicator,
         size
     } = props;
 
@@ -59,16 +64,16 @@ const Container = styled('div', ContainerStyleOptions)<ContainerProps>(props => 
         '& .MuiAvatar-root': {
             width: size,
             height: size,
-            '&.unsummoned': {
+            '&.inactive': {
                 filter: 'grayscale(1.0) contrast(0.69) brightness(0.69)'
             }
         }
     } as SystemStyleObject<Theme>;
 
-    if (showOpenInNewTabIndicator) {
+    if (renderNewTabIndicator) {
         style = {
             ...style,
-            '& .open-in-new-tab-indicator': {
+            '& .new-tab-indicator': {
                 height: 0,
                 '&>div': {
                     height: size,
@@ -83,9 +88,9 @@ const Container = styled('div', ContainerStyleOptions)<ContainerProps>(props => 
             },
             '&:hover': {
                 '& .MuiAvatar-root>img': {
-                    filter: 'grayscale(0.69) contrast(0.69) blur(1px)'
+                    filter: 'contrast(0.86) brightness(0.86)'
                 },
-                '& .open-in-new-tab-indicator>div': {
+                '& .new-tab-indicator>div': {
                     display: 'flex'
                 }
             }
@@ -101,10 +106,11 @@ export const GameServantThumbnail = React.memo((props: Props) => {
         costumeId,
         enableLink,
         gameServant,
+        inactive,
         openLinkInNewTab,
+        onClick,
         showOpenInNewTabIndicator,
         stage,
-        unsummoned,
         variant
     } = props;
 
@@ -122,7 +128,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
 
     const avatar = (
         <Avatar
-            className={clsx(unsummoned && 'unsummoned')}
+            className={clsx(inactive && 'inactive')}
             src={imageUrl}
             variant={variant || DefaultVariant}
         />
@@ -135,23 +141,23 @@ export const GameServantThumbnail = React.memo((props: Props) => {
     const href = `/resources/servants/${servantId}`;
     const target = openLinkInNewTab ? '_blank' : undefined;
 
-    if (!showOpenInNewTabIndicator) {
-        return (
-            <Container size={size}>
-                <Link to={href} target={target}>{avatar}</Link>
-            </Container>
-        );
-    }
+    const renderNewTabIndicator = openLinkInNewTab && showOpenInNewTabIndicator;
 
     return (
-        <Container size={size} showOpenInNewTabIndicator>
+        <Container
+            size={size}
+            onClick={onClick}
+            renderNewTabIndicator={renderNewTabIndicator}
+        >
             <Link to={href} target={target}>
                 {avatar}
-                <div className='open-in-new-tab-indicator'>
-                    <div>
-                        <OpenInNewIcon />
+                {renderNewTabIndicator &&
+                    <div className='new-tab-indicator'>
+                        <div>
+                            <OpenInNewIcon />
+                        </div>
                     </div>
-                </div>
+                }
             </Link>
         </Container>
     );

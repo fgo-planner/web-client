@@ -7,7 +7,6 @@ import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useEffect, useM
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
-import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -23,7 +22,6 @@ import { SubscriptionTopics } from '../../../../utils/subscription/subscription-
 import { MasterServantEditData } from '../../components/master/servant/edit/master-servant-edit-data.type';
 import { MasterServantEditUtils } from '../../components/master/servant/edit/master-servant-edit.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
-import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantContextMenu } from './master-servants-context-menu.component';
 import { MasterServantsEditDialog } from './master-servants-edit-dialog.component';
@@ -724,15 +722,9 @@ export const MasterServantsRoute = React.memo(() => {
                     onEditSelectedServants={handleEditSelectedServants}
                 />
                 <div className={`${StyleClassPrefix}-main-content`}>
-                    <LayoutPanelScrollable
-                        className='py-4 pr-4 full-height flex-fill scrollbar-track-border'
+                    <LayoutPanelContainer
+                        className='py-4 pr-4 full-height flex-fill scrollbar-track-border flex column'
                         autoHeight
-                        headerContents={
-                            <MasterServantListHeader
-                                // editMode={editMode}
-                                visibleColumns={visibleColumns}
-                            />
-                        }
                         children={
                             <MasterServantList
                                 masterServants={dragDropMasterServants || masterServants}

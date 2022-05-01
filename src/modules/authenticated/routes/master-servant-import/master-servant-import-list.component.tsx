@@ -7,7 +7,6 @@ import { LayoutPanelContainer, StyleClassPrefix as LayoutPanelContainerStyleClas
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
 import { ModalOnCloseReason } from '../../../../types/internal';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
-import { MasterServantListHeader } from '../../components/master/servant/list/master-servant-list-header.component';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantImportExistingDialog } from './master-servant-import-existing-dialog.component';
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
@@ -121,9 +120,6 @@ export const MasterServantImportList = React.memo((props: Props) => {
                     {ParseResultHelperText}
                 </div>
                 <LayoutPanelContainer>
-                    <MasterServantListHeader
-                        visibleColumns={ServantListVisibleColumns}
-                    />
                     <MasterServantList
                         masterServants={masterServants}
                         bondLevels={bondLevels}

@@ -6,19 +6,22 @@ import { Immutable } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 
 type Props = {
+    gameServant: Immutable<GameServant>;
     masterServant: MasterServant;
     openLinksInNewTab?: boolean;
-    servant: Immutable<GameServant>;
 };
 
-export const StyleClassPrefix = 'MasterServantListRowLabel';
+export const StyleClassPrefix = 'MasterServantListRowInfo';
 
-export const MasterServantListRowLabel = React.memo(({ masterServant, openLinksInNewTab, servant }: Props) => {
+export const MasterServantListRowInfo = React.memo((props: Props) => {
 
     const {
-        ascension,
-        summoned
-    } = masterServant;
+        gameServant,
+        masterServant: {
+            ascension
+        },
+        openLinksInNewTab
+    } = props;
 
     const artStage = MasterServantUtils.getArtStage(ascension);
 
@@ -27,23 +30,22 @@ export const MasterServantListRowLabel = React.memo(({ masterServant, openLinksI
             <GameServantThumbnail
                 variant='rounded'
                 size={48}
-                gameServant={servant}
+                gameServant={gameServant}
                 stage={artStage}
-                unsummoned={!summoned}
                 enableLink
                 openLinkInNewTab={openLinksInNewTab}
                 showOpenInNewTabIndicator={openLinksInNewTab}
             />
             <GameServantClassIcon
                 className={`${StyleClassPrefix}-class-icon`}
-                servantClass={servant.class}
-                rarity={servant.rarity}
+                servantClass={gameServant.class}
+                rarity={gameServant.rarity}
             />
             <div className={`${StyleClassPrefix}-rarity`}>
-                {`${servant.rarity} \u2605`}
+                {`${gameServant.rarity} \u2605`}
             </div>
             <div className='truncate'>
-                {servant.name}
+                {gameServant.name}
             </div>
         </div>
     );

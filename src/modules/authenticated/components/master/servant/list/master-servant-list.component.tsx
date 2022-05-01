@@ -8,7 +8,14 @@ import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.h
 import { ReadonlyPartial } from '../../../../../../types/internal';
 import { ArrayUtils } from '../../../../../../utils/array.utils';
 import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
-import { StyleClassPrefix as MasterServantListRowLabelStyleClassPrefix } from './master-servant-list-row-label.component';
+import { MasterServantListHeader } from './master-servant-list-header.component';
+import { StyleClassPrefix as MasterServantListRowBondLevelStyleClassPrefix } from './master-servant-list-row-bond-level.component';
+import { StyleClassPrefix as MasterServantListRowFouLevelStyleClassPrefix } from './master-servant-list-row-fou-level.component';
+import { StyleClassPrefix as MasterServantListRowInfoStyleClassPrefix } from './master-servant-list-row-info.component';
+import { StyleClassPrefix as MasterServantListRowLevelStyleClassPrefix } from './master-servant-list-row-level.component';
+import { StyleClassPrefix as MasterServantListRowNpLevelStyleClassPrefix } from './master-servant-list-row-np-level.component';
+import { StyleClassPrefix as MasterServantListRowSkillLevelStyleClassPrefix } from './master-servant-list-row-skill-level.component';
+import { StyleClassPrefix as MasterServantListRowStatsStyleClassPrefix } from './master-servant-list-row-stats.component';
 import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './master-servant-list-row.component';
 
 type Props = {
@@ -32,103 +39,106 @@ type Props = {
 const StyleClassPrefix = 'MasterServantList';
 
 const StyleProps = {
-    [`& .${MasterServantListRowStyleClassPrefix}-root`]: {
-        userSelect: 'none',
-        flex: 1,
-        display: 'flex',
-        alignContent: 'center',
-        alignItems: 'center',
-        textAlign: 'center',
-        height: 52,
-        pl: 4,
-        fontSize: '0.875rem',
-        [`& .${MasterServantListRowStyleClassPrefix}-np-level`]: {
-            flex: ColumnWidths.npLevel,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '& img': {
-                pr: 1,
-                width: '18px',
-                height: '18px'
-            }
-        },
-        [`& .${MasterServantListRowStyleClassPrefix}-level`]: {
-            flex: ColumnWidths.level,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '&>.value': {
-                width: '28px',
-                textAlign: 'right',
-                pr: 3
-            },
-            '&>img': {
-                width: '16px',
-                height: '16px'
-            },
-            '&>.ascension': {
-                width: '16px'
-            }
-        },
-        [`& .${MasterServantListRowStyleClassPrefix}-fou-hp`]: {
-            flex: ColumnWidths.fouHp
-        },
-        [`& .${MasterServantListRowStyleClassPrefix}-fou-atk`]: {
-            flex: ColumnWidths.fouAtk
-        },
-        [`& .${MasterServantListRowStyleClassPrefix}-skills`]: {
-            flex: ColumnWidths.skills,
-            display: 'flex',
-            textAlign: 'center',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '&>.value': {
-                width: '1.25rem'
-            },
-        },
-        [`& .${MasterServantListRowStyleClassPrefix}-append-skills`]: {
-            flex: ColumnWidths.appendSkills,
-            display: 'flex',
-            textAlign: 'center',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '&>.value': {
-                width: '1.25rem'
-            },
-        },
-        [`& .${MasterServantListRowStyleClassPrefix}-bond-level`]: {
-            flex: ColumnWidths.bondLevel,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            '&>.value': {
-                pl: 1.5,
-                width: '1.25rem',
-                textAlign: 'left'
-            }
-        },
-        [`& .${MasterServantListRowStyleClassPrefix}-actions`]: {
-            width: ColumnWidths.actions,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
-        [`& .${MasterServantListRowLabelStyleClassPrefix}-root`]: {
-            display: 'flex',
-            alignItems: 'center',
-            flex: ColumnWidths.label,
-            /**
-             * This fixes text truncation issues inside flex box.
-             * @see https://css-tricks.com/flexbox-truncated-text/
-             */
-            minWidth: 0,
-            [`& .${MasterServantListRowLabelStyleClassPrefix}-class-icon`]: {
-                pl: 4
-            },
-            [`& .${MasterServantListRowLabelStyleClassPrefix}-rarity`]: {
-                minWidth: 24,
-                px: 4
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    [`& .${StyleClassPrefix}-header`]: {
+
+    },
+    [`& .${StyleClassPrefix}-list-container`]: {
+        overflow: 'auto',
+        [`& .${StyleClassPrefix}-list`]: {
+            [`& .${MasterServantListRowStyleClassPrefix}-root`]: {
+                userSelect: 'none',
+                flex: 1,
+                display: 'flex',
+                alignContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+                height: 52,
+                pl: 4,
+                fontSize: '0.875rem',
+                [`& .${MasterServantListRowInfoStyleClassPrefix}-root`]: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    flex: ColumnWidths.info,
+                    /**
+                     * This fixes text truncation issues inside flex box.
+                     * @see https://css-tricks.com/flexbox-truncated-text/
+                     */
+                    minWidth: 0,
+                    [`& .${MasterServantListRowInfoStyleClassPrefix}-class-icon`]: {
+                        pl: 4
+                    },
+                    [`& .${MasterServantListRowInfoStyleClassPrefix}-rarity`]: {
+                        minWidth: 24,
+                        px: 4
+                    }
+                },
+                [`& .${MasterServantListRowStatsStyleClassPrefix}-root`]: {
+                    flex: ColumnWidths.stats.container,
+                    display: 'flex',
+                    alignItems: 'center',
+                    [`& .${MasterServantListRowNpLevelStyleClassPrefix}-root`]: {
+                        flex: ColumnWidths.stats.npLevel,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        '& img': {
+                            pr: 1,
+                            width: '18px',
+                            height: '18px'
+                        }
+                    },
+                    [`& .${MasterServantListRowLevelStyleClassPrefix}-root`]: {
+                        flex: ColumnWidths.stats.level,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        '&>.value': {
+                            width: '28px',
+                            textAlign: 'right',
+                            pr: 3
+                        },
+                        '&>img': {
+                            width: '16px',
+                            height: '16px'
+                        },
+                        '&>.ascension': {
+                            width: '16px'
+                        }
+                    },
+                    [`& .${MasterServantListRowFouLevelStyleClassPrefix}-root`]: {
+                        flex: ColumnWidths.stats.fou
+                    },
+                    [`& .${MasterServantListRowSkillLevelStyleClassPrefix}-root`]: {
+                        flex: ColumnWidths.stats.skills,
+                        display: 'flex',
+                        textAlign: 'center',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        '&>.value': {
+                            width: '1.25rem'
+                        },
+                    },
+                    [`& .${MasterServantListRowBondLevelStyleClassPrefix}-root`]: {
+                        flex: ColumnWidths.stats.bondLevel,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        '&>.value': {
+                            pl: 1.5,
+                            width: '1.25rem',
+                            textAlign: 'left'
+                        }
+                    }
+                },
+                [`& .${MasterServantListRowStyleClassPrefix}-actions`]: {
+                    width: ColumnWidths.actions,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }
             }
         }
     }
@@ -338,7 +348,7 @@ export const MasterServantList = React.memo((props: Props) => {
 
     const renderMasterServantRow = (masterServant: MasterServant, index: number): ReactNode => {
         const { gameId, instanceId } = masterServant;
-        const servant = gameServantMap[gameId];
+        const gameServant = gameServantMap[gameId];
         const bondLevel = bondLevels[gameId];
         const active = selectedServants?.has(instanceId);
 
@@ -346,7 +356,7 @@ export const MasterServantList = React.memo((props: Props) => {
             <MasterServantListRow
                 key={instanceId}
                 index={index}
-                servant={servant}
+                gameServant={gameServant}
                 bond={bondLevel}
                 masterServant={masterServant}
                 onEditServant={onEditServant}
@@ -364,9 +374,19 @@ export const MasterServantList = React.memo((props: Props) => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <DndProvider backend={HTML5Backend}>
-                {masterServants.map(renderMasterServantRow)}
-            </DndProvider>
+            <div className={`${StyleClassPrefix}-header`}>
+                <MasterServantListHeader
+                    visibleColumns={visibleColumns}
+                    dragDropMode={dragDropMode}
+                />
+            </div>
+            <div className={`${StyleClassPrefix}-list-container`}>
+                <div className={`${StyleClassPrefix}-list`}>
+                    <DndProvider backend={HTML5Backend}>
+                        {masterServants.map(renderMasterServantRow)}
+                    </DndProvider>
+                </div>
+            </div>
         </Box>
     );
 

@@ -6,7 +6,7 @@ import { ReadonlyPartial } from '../../../../../../types/internal';
 import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
 
 type Props = {
-    editMode?: boolean;
+    dragDropMode?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
 };
@@ -25,39 +25,43 @@ const StyleProps = {
     fontWeight: 500,
     textAlign: 'center',
     fontSize: '0.875rem',
-    '&.edit-mode': {
+    '&.drag-drop-mode': {
         pl: 4 + 5
     },
-    [`& .${StyleClassPrefix}-label`]: {
-        flex: ColumnWidths.label
+    [`& .${StyleClassPrefix}-info`]: {
+        flex: ColumnWidths.info
     },
-    [`& .${StyleClassPrefix}-np-level`]: {
-        flex: ColumnWidths.npLevel
-    },
-    [`& .${StyleClassPrefix}-level`]: {
-        flex: ColumnWidths.level
-    },
-    [`& .${StyleClassPrefix}-fou-hp`]: {
-        flex: ColumnWidths.fouHp
-    },
-    [`& .${StyleClassPrefix}-fou-atk`]: {
-        flex: ColumnWidths.fouAtk
-    },
-    [`& .${StyleClassPrefix}-skills`]: {
-        flex: ColumnWidths.skills
-    },
-    [`& .${StyleClassPrefix}-append-skills`]: {
-        flex: ColumnWidths.appendSkills
-    },
-    [`& .${StyleClassPrefix}-bond-level`]: {
-        flex: ColumnWidths.bondLevel
+    [`& .${StyleClassPrefix}-stats`]: {
+        display: 'flex',
+        flex: ColumnWidths.stats.container,
+        [`& .${StyleClassPrefix}-np-level`]: {
+            flex: ColumnWidths.stats.npLevel
+        },
+        [`& .${StyleClassPrefix}-level`]: {
+            flex: ColumnWidths.stats.level
+        },
+        [`& .${StyleClassPrefix}-fou-hp`]: {
+            flex: ColumnWidths.stats.fou
+        },
+        [`& .${StyleClassPrefix}-fou-atk`]: {
+            flex: ColumnWidths.stats.fou
+        },
+        [`& .${StyleClassPrefix}-skills`]: {
+            flex: ColumnWidths.stats.skills
+        },
+        [`& .${StyleClassPrefix}-append-skills`]: {
+            flex: ColumnWidths.stats.skills
+        },
+        [`& .${StyleClassPrefix}-bond-level`]: {
+            flex: ColumnWidths.stats.bondLevel
+        }
     },
     [`& .${StyleClassPrefix}-actions`]: {
         width: ColumnWidths.actions
     }
 } as SystemStyleObject<Theme>;
 
-export const MasterServantListHeader = React.memo(({ editMode, visibleColumns }: Props) => {
+export const MasterServantListHeader = React.memo(({ dragDropMode, visibleColumns }: Props) => {
 
     const {
         npLevel,
@@ -71,50 +75,52 @@ export const MasterServantListHeader = React.memo(({ editMode, visibleColumns }:
     } = visibleColumns || {};
 
     return (
-        <Box className={clsx(`${StyleClassPrefix}-root`, editMode && 'edit-mode')} sx={StyleProps}>
-            <div className={`${StyleClassPrefix}-label`}>
+        <Box className={clsx(`${StyleClassPrefix}-root`, dragDropMode && 'drag-drop-mode')} sx={StyleProps}>
+            <div className={`${StyleClassPrefix}-info`}>
                 Servant
             </div>
-            {npLevel &&
-                <div className={`${StyleClassPrefix}-np-level`}>
-                    NP
-                </div>
-            }
-            {level &&
-                <div className={`${StyleClassPrefix}-level`}>
-                    Level
-                </div>
-            }
-            {fouHp &&
-                <div className={`${StyleClassPrefix}-fou-hp`}>
-                    Fou (HP)
-                </div>
-            }
-            {fouAtk &&
-                <div className={`${StyleClassPrefix}-fou-atk`}>
-                    Fou (ATK)
-                </div>
-            }
-            {skills &&
-                <div className={`${StyleClassPrefix}-skills`}>
-                    Skills
-                </div>
-            }
-            {appendSkills &&
-                <div className={`${StyleClassPrefix}-append-skills`}>
-                    Append
-                </div>
-            }
-            {bondLevel &&
-                <div className={`${StyleClassPrefix}-bond-level`}>
-                    Bond
-                </div>
-            }
-            {actions &&
-                <div className={`${StyleClassPrefix}-actions`}>
-                    Actions
-                </div>}
+            <div className={`${StyleClassPrefix}-stats`}>
+                {npLevel &&
+                    <div className={`${StyleClassPrefix}-np-level`}>
+                        NP
+                    </div>
+                }
+                {level &&
+                    <div className={`${StyleClassPrefix}-level`}>
+                        Level
+                    </div>
+                }
+                {fouHp &&
+                    <div className={`${StyleClassPrefix}-fou-hp`}>
+                        Fou (HP)
+                    </div>
+                }
+                {fouAtk &&
+                    <div className={`${StyleClassPrefix}-fou-atk`}>
+                        Fou (ATK)
+                    </div>
+                }
+                {skills &&
+                    <div className={`${StyleClassPrefix}-skills`}>
+                        Skills
+                    </div>
+                }
+                {appendSkills &&
+                    <div className={`${StyleClassPrefix}-append-skills`}>
+                        Append
+                    </div>
+                }
+                {bondLevel &&
+                    <div className={`${StyleClassPrefix}-bond-level`}>
+                        Bond
+                    </div>
+                }
+                {actions &&
+                    <div className={`${StyleClassPrefix}-actions`}>
+                        Actions
+                    </div>}
+            </div>
         </Box>
     );
-    
+
 });

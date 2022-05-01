@@ -62,6 +62,11 @@ const renderSkillLevels = (activeServant: Immutable<MasterServant>, stat: 'skill
     );
 };
 
+const renderNpLevel = (activeServant: Immutable<MasterServant>): string | number => {
+    const { summoned, np: npLevel } = activeServant;
+    return summoned ? npLevel : 'Not summoned';
+};
+
 const renderBondLevel = (bond?: MasterServantBondLevel): JSX.Element => {
     if (bond == null) {
         return (
@@ -350,7 +355,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                         className={`${StyleClassPrefix}-servant-stat`}
                         label="Noble Phantasm"
                         labelWidth={ServantStatLabelWidth}
-                        value={activeServant.np}
+                        value={renderNpLevel(activeServant)}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}

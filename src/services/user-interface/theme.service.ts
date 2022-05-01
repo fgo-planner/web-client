@@ -7,6 +7,8 @@ import { Injectable } from '../../decorators/dependency-injection/injectable.dec
 import defaultDarkTheme from '../../styles/theme-default-dark';
 import defaultLightTheme from '../../styles/theme-default-light';
 import { Nullable, ThemeInfo, ThemeMode } from '../../types/internal';
+import { StorageKeys } from '../../utils/storage/storage-keys';
+import { StorageUtils } from '../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { PageMetadataService } from './page-metadata.service';
@@ -18,11 +20,6 @@ type UserThemes = {
 
 @Injectable
 export class ThemeService {
-    /**
-     * Key used for storing and retrieving the last used theme mode from local
-     * storage.
-     */
-    private readonly _ThemeModeKey = 'theme_mode';
 
     @Inject(PageMetadataService)
     private readonly _pageMetadataService!: PageMetadataService;
@@ -69,7 +66,7 @@ export class ThemeService {
     }
 
     private _loadThemeModeFromStorage(): ThemeMode {
-        let themeMode = localStorage.getItem(this._ThemeModeKey);
+        let themeMode = StorageUtils.getItem(StorageKeys.LocalUserPreference.ThemeMode);
         if (themeMode !== 'dark') {
             /*
              * Any value that is not `dark` will be defaulted to `light`, including any
@@ -86,7 +83,7 @@ export class ThemeService {
      */
     private _setThemeMode(themeMode: ThemeMode): void {
         this._themeMode = themeMode;
-        localStorage.setItem(this._ThemeModeKey, themeMode);
+        StorageUtils.setItem(StorageKeys.LocalUserPreference.ThemeMode, themeMode);
     }
 
     private async _handleCurrentUserPreferencesChange(userPreferences: Nullable<UserPreferences>): Promise<void> {

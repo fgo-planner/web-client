@@ -3,6 +3,8 @@ import { Injectable } from '../../../decorators/dependency-injection/injectable.
 import { MasterAccountList } from '../../../types/data';
 import { Nullable, UserInfo } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
+import { StorageKeys } from '../../../utils/storage/storage-keys';
+import { StorageUtils } from '../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 
@@ -175,11 +177,7 @@ export class MasterAccountService {
 
     private _writeCurrentAccountToSessionStorage(): void {
         const accountId = this._currentMasterAccount?._id;
-        if (!accountId) {
-            sessionStorage.removeItem(this._CurrentAccountIdKey);
-        } else {
-            sessionStorage.setItem(this._CurrentAccountIdKey, accountId);
-        }
+        StorageUtils.setItem(StorageKeys.User.CurrentMasterAccountId, accountId);
     }
 
 }

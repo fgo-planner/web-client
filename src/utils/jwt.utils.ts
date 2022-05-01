@@ -1,25 +1,26 @@
-import { UserInfo } from '../types/internal';
 import jwt from 'jsonwebtoken';
+import { UserInfo } from '../types/internal';
+import { StorageKeys } from './storage/storage-keys';
+import { StorageUtils } from './storage/storage.utils';
 
 export class JwtUtils {
 
-    /**
-     * The local storage key that contains the access token.
-     */
-    private static readonly AccessTokenKey = 'access_token';
-
     private static readonly BearerTokenPrefix = 'Bearer ';
 
+    private constructor() {
+        
+    }
+
     static readTokenFromStorage(): string | null {
-        return localStorage.getItem(this.AccessTokenKey);
+        return StorageUtils.getItem(StorageKeys.User.AccessToken);
     }
 
     static writeTokenToStorage(token: string): void {
-        localStorage.setItem(this.AccessTokenKey, token);
+        StorageUtils.setItem(StorageKeys.User.AccessToken, token);
     }
 
     static removeTokenFromStorage(): void {
-        localStorage.removeItem(this.AccessTokenKey);
+        StorageUtils.removeItem(StorageKeys.User.AccessToken);
     }
 
     /**
@@ -30,7 +31,7 @@ export class JwtUtils {
             return null;
         }
         if (token.startsWith(this.BearerTokenPrefix)) {
-            token = token.substr(this.BearerTokenPrefix.length);
+            token = token.substring(this.BearerTokenPrefix.length);
         }
         return jwt.decode(token) as UserInfo;
     }

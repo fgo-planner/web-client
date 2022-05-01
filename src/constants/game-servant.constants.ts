@@ -45,4 +45,8 @@ export class GameServantConstants {
      */
     static readonly DefaultServantId = 100100;
 
+    private constructor () {
+        
+    }
+
 }

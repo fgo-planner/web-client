@@ -1,26 +1,9 @@
 import { SxProps, Theme } from '@mui/system';
-import { Nullable } from '../types/internal';
 
 export class StyleUtils {
 
-    /**
-     * @deprecated Use the `clsx` library instead.
-     */
-    static appendClassNames(...classNames: Nullable<string | false>[]) {
-        if (!classNames.length) {
-            return '';
-        }
-        if (classNames.length === 1) {
-            return classNames[0] || '';
-        }
-        let result = '';
-        for (const className of classNames) {
-            if (!className) {
-                continue;
-            }
-            result += result.length ? ` ${className}` : className;
-        }
-        return result;
+    private constructor () {
+        
     }
 
     static filterClasses(target: Record<string, string>, source: Record<string, string>): Record<string, string> {

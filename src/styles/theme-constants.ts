@@ -32,4 +32,8 @@ export class ThemeConstants {
 
     static FontFamilyRoboto = 'Roboto, sans-serif';
 
+    private constructor () {
+        
+    }
+
 }

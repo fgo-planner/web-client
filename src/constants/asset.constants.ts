@@ -61,4 +61,8 @@ export class AssetConstants {
 
     static readonly BackgroundMusic = `${AssetConstants._InternalSoundAssetsBaseUrl}/background.mp3`;
 
+    private constructor () {
+        
+    }
+
 }

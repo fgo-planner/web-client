@@ -4,6 +4,10 @@ import { MasterServantUtils } from '../master/master-servant.utils';
 
 export class PlanServantUtils {
 
+    private constructor () {
+        
+    }
+
     /**
      * Instantiates a default `PlanServant` object.
      */

@@ -5,6 +5,10 @@ import { DateTimeUtils } from '../date-time.utils';
 
 export class MasterServantUtils {
 
+    private constructor () {
+        
+    }
+
     /**
      * Instantiates a default `MasterServant` object.
      */

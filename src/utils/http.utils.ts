@@ -15,6 +15,10 @@ export class HttpUtils {
         return SubscribablesContainer.get(SubscriptionTopics.User.Unauthorized);
     }
 
+    private constructor () {
+        
+    }
+
     static async get<T = any>(url: string, options?: HttpOptions): Promise<T> {
         if (options?.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;

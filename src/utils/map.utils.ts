@@ -1,5 +1,9 @@
 export class MapUtils {
 
+    private constructor () {
+        
+    }
+
     static getOrDefault<K extends string | number | symbol, V>(map: Map<K, V>, key: K, defaultValue: V | (() => V)): V {
         let value = map.get(key);
         if (value !== undefined) {

@@ -13,5 +13,9 @@ export const emptyObjectSupplier: Supplier<{}> = () => ({});
 /*
 export class FunctionUtils {
 
+    private constructor () {
+        
+    }
+
 }
 */

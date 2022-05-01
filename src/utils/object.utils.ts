@@ -1,5 +1,9 @@
 export class ObjectUtils {
 
+    private constructor () {
+        
+    }
+
     static getOrDefault<K extends string | number | symbol, V>(obj: Record<K, V>, key: K, defaultValue: V | (() => V)): V {
         let value = obj[key];
         if (value !== undefined) {

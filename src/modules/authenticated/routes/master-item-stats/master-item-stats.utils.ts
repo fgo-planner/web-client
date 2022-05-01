@@ -22,6 +22,10 @@ export type MasterItemStats = Record<number, MasterItemStat>;
 
 export class MasterItemStatsUtils {
 
+    private constructor () {
+        
+    }
+
     static generateStats(
         gameServantMap: GameServantMap,
         gameSoundtrackList: GameSoundtrackList,

@@ -53,6 +53,9 @@ export type MasterServantStatsFilterOptions = {
 
 export class MasterServantStatsUtils {
 
+    private constructor () {
+        
+    }
 
     //#region Stats by rarity
 

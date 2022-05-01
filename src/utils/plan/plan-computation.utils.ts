@@ -81,6 +81,10 @@ export class PlanComputationUtils {
         };
     };
 
+    private constructor () {
+        
+    }
+
     /**
      * Adds the values from the source `EnhancementRequirements` to the target
      * `EnhancementRequirements`. Only the the target map will be updated; the

@@ -1,5 +1,9 @@
 export class ArrayUtils {
 
+    private constructor () {
+        
+    }
+
     static mapArrayToObject<T, K extends string | number | symbol>(
         arr: ReadonlyArray<T>, 
         keyFunc: (elem: T) => K

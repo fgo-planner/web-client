@@ -5,6 +5,10 @@ import { Immutable } from '../../types/internal';
 
 export class GameServantUtils {
 
+    private constructor () {
+        
+    }
+
     static convertToSimplifiedClass(servantClass: GameServantClass): GameServantClassSimplified {
         switch (servantClass) {
             case GameServantClass.Saber:

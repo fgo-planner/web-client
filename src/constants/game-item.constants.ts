@@ -126,4 +126,8 @@ export class GameItemConstants {
 
     static readonly QpItemId = 5;
 
+    private constructor () {
+        
+    }
+
 }

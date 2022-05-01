@@ -5,6 +5,10 @@ export class SubscribablesContainer {
 
     private static readonly _Observables = new Map<SubscriptionTopic, Subject<any>>();
 
+    private constructor () {
+        
+    }
+
     /**
      * Returns a observable `Subject` for the given `SubscriptionTopic`. If the
      * `SubscriptionTopic` was defined with a default value initializer, then the

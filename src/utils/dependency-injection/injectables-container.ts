@@ -6,6 +6,10 @@ export class InjectablesContainer {
 
     private static readonly _Injectables = new Map<InjectableToken | undefined, Record<string, any>>();
 
+    private constructor () {
+        
+    }
+
     static registerInjectables(...injectablesDefinitions: Array<InjectableDefinition>) {
         for (const injectableDefinition of injectablesDefinitions) {
             if (typeof injectableDefinition === 'function') {

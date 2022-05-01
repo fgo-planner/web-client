@@ -1,5 +1,9 @@
 export class SetUtils {
 
+    private constructor () {
+        
+    }
+
     static isEqual<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): boolean {
         if (a.size !== b.size) {
             return false;

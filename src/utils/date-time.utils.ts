@@ -3,6 +3,10 @@ import { Immutable } from '../types/internal';
 
 export class DateTimeUtils {
 
+    private constructor () {
+        
+    }
+
     // private static readonly
 
     static cloneDate(date: Date | Immutable<Date> | undefined): Date | undefined {

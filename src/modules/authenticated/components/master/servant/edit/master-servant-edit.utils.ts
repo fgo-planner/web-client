@@ -5,6 +5,10 @@ import { MasterServantEditData } from './master-servant-edit-data.type';
 
 export class MasterServantEditUtils {
 
+    private constructor () {
+        
+    }
+
     //#region Instantiate edit data for new master servant
 
     /**

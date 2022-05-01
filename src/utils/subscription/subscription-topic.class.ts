@@ -22,7 +22,7 @@ export class SubscriptionTopic<T = any> {
      * Instantiates a `SubscriptionTopic` that doesn't retain any previous values.
      * Subscriptions are made through a `Subject`.
      */
-    static instantiate<T = any>(): SubscriptionTopic<T> {
+    static forSubject<T = any>(): SubscriptionTopic<T> {
         return new SubscriptionTopic<T>(false);
     }
 
@@ -30,7 +30,7 @@ export class SubscriptionTopic<T = any> {
      * Instantiates a `SubscriptionTopic` that retains the last emitted value.
      * Subscriptions are made through a `ReplaySubject` set to buffer size of `1`.
      */
-    static instantiateWithPreviousValue<T = any>(): SubscriptionTopic<T> {
+    static forReplaySubject<T = any>(): SubscriptionTopic<T> {
         return new SubscriptionTopic<T>(true);
     }
 
@@ -39,7 +39,7 @@ export class SubscriptionTopic<T = any> {
      * is also initialized with a default value. Subscriptions are made through a
      * `BehaviorSubject`.
      */
-    static instantiateWithPreviousAndInitialValue<T = any>(initialValueSupplier: Supplier<T>): SubscriptionTopic<T> {
+    static forBehaviorSubject<T = any>(initialValueSupplier: Supplier<T>): SubscriptionTopic<T> {
         return new SubscriptionTopic<T>(true, initialValueSupplier);
     }
 

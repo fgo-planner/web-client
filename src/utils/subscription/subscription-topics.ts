@@ -26,9 +26,9 @@ export class SubscriptionTopics {
 
 class Audio {
 
-    static readonly BackgroundPlayStatusChange = SubscriptionTopic.instantiate<boolean>();
+    static readonly BackgroundPlayStatusChange = SubscriptionTopic.forSubject<boolean>();
 
-    static readonly SoundtrackPlayStatusChange = SubscriptionTopic.instantiate<boolean>();
+    static readonly SoundtrackPlayStatusChange = SubscriptionTopic.forSubject<boolean>();
 
     private constructor() {
         
@@ -40,15 +40,15 @@ class User {
 
     /* eslint-disable max-len */
 
-    static readonly CurrentMasterAccountChange = SubscriptionTopic.instantiateWithPreviousAndInitialValue<Nullable<MasterAccount>>(nullSupplier);
+    static readonly CurrentMasterAccountChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccount>>(nullSupplier);
 
-    static readonly CurrentUserChange = SubscriptionTopic.instantiateWithPreviousAndInitialValue<Nullable<UserInfo>>(nullSupplier);
+    static readonly CurrentUserChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserInfo>>(nullSupplier);
 
-    static readonly CurrentUserPreferencesChange = SubscriptionTopic.instantiateWithPreviousAndInitialValue<Nullable<UserPreferences>>(nullSupplier);
+    static readonly CurrentUserPreferencesChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserPreferences>>(nullSupplier);
     
-    static readonly MasterAccountListChange = SubscriptionTopic.instantiateWithPreviousAndInitialValue<Nullable<MasterAccountList>>(nullSupplier);
+    static readonly MasterAccountListChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccountList>>(nullSupplier);
     
-    static readonly Unauthorized = SubscriptionTopic.instantiateWithPreviousValue<HttpResponseError>();
+    static readonly Unauthorized = SubscriptionTopic.forReplaySubject<HttpResponseError>();
     
     /* eslint-enable max-len */
 
@@ -60,13 +60,13 @@ class User {
 
 class UserInterface {
 
-    static readonly AppBarElevatedChange = SubscriptionTopic.instantiateWithPreviousValue<boolean>();
+    static readonly AppBarElevatedChange = SubscriptionTopic.forReplaySubject<boolean>();
 
-    static readonly LoadingIndicatorDisplayChange = SubscriptionTopic.instantiateWithPreviousValue<boolean>();
+    static readonly LoadingIndicatorDisplayChange = SubscriptionTopic.forReplaySubject<boolean>();
 
-    static readonly MetadataChange = SubscriptionTopic.instantiateWithPreviousValue<PageMetadata>();
+    static readonly MetadataChange = SubscriptionTopic.forReplaySubject<PageMetadata>();
 
-    static readonly ThemeChange = SubscriptionTopic.instantiateWithPreviousValue<ThemeInfo>();
+    static readonly ThemeChange = SubscriptionTopic.forReplaySubject<ThemeInfo>();
 
     private constructor() {
         

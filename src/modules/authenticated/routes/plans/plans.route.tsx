@@ -4,8 +4,8 @@ import { Fab, PaperProps, Tooltip } from '@mui/material';
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
+import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
-import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
@@ -132,7 +132,7 @@ export const PlansRoute = React.memo(() => {
                 <PageTitle>
                     My Plans
                 </PageTitle>
-                <LayoutPanelContainer className="p-4">
+                <LayoutContentSection className="p-4">
                     {!!accountPlans ?
                         <PlanList
                             accountPlans={accountPlans}
@@ -142,7 +142,7 @@ export const PlansRoute = React.memo(() => {
                             No plans found
                         </div>
                     }
-                </LayoutPanelContainer>
+                </LayoutContentSection>
                 <div className="py-10" />
             </LayoutPageScrollable>
             <PlanAddDialog

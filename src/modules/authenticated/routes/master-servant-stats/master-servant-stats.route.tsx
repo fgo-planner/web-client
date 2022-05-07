@@ -2,17 +2,20 @@ import { MasterAccount } from '@fgo-planner/types';
 import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
+import clsx from 'clsx';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
+import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { ThemeConstants } from '../../../../styles/theme-constants';
 import { Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantStatsFilter, MasterServantStatsFilterResult } from './master-servant-stats-filter.component';
-import { MasterServantStatsTable } from './master-servant-stats-table.component';
+import { MasterServantStatsTable, StyleClassPrefix as MasterServantStatsTableStyleClassPrefix } from './master-servant-stats-table.component';
 import { MasterServantStatsGroupedByClass, MasterServantStatsGroupedByRarity, MasterServantStatsUtils } from './master-servant-stats.utils';
 
 const OmitUnsummonedMessage = 'Un-summoned servants are omitted from stats calculation';
@@ -54,16 +57,25 @@ const StyleProps = (theme: Theme) => ({
     [`& .${StyleClassPrefix}-main-content`]: {
         display: 'flex',
         flexDirection: 'column',
-        flex: '1'
-    },
-    [`& .${StyleClassPrefix}-filter-controls-row`]: {
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between'
-    },
-    [`& .${StyleClassPrefix}-omit-unsummoned-message`]: {
-        color: theme.palette.warning.main,
-        pr: 8
+        flex: '1',
+        [`& .${StyleClassPrefix}-filter-controls-row`]: {
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between'
+        },
+        [`& .${StyleClassPrefix}-omit-unsummoned-message`]: {
+            color: theme.palette.warning.main,
+            pr: 8
+        },
+        [`& .${StyleClassPrefix}-table-container`]: {
+            pr: 4,
+            py: 4,
+            flex: 1,
+            [`& .${MasterServantStatsTableStyleClassPrefix}-root`]: {
+                height: '100%',
+                overflow:'auto'
+            }
+        }
     }
 } as SystemStyleObject<Theme>);
 
@@ -148,11 +160,17 @@ export const MasterServantStatsRoute = React.memo(() => {
             headerLabelRenderer = renderClassHeaderLabel;
         }
         return (
-            <MasterServantStatsTable
-                stats={stats}
-                dataColumnWidth={dataColumnWidth}
-                headerLabelRenderer={headerLabelRenderer}
-            />
+            <LayoutContentSection
+                className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}
+                autoContentHeight
+                layout='column'
+            >
+                <MasterServantStatsTable
+                    stats={stats}
+                    dataColumnWidth={dataColumnWidth}
+                    headerLabelRenderer={headerLabelRenderer}
+                />
+            </LayoutContentSection>
         );
     }, [filter, stats]);
 

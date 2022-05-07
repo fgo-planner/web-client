@@ -7,9 +7,9 @@ export const StyleClassPrefix = 'MasterSoundtracksListHeader';
 
 const StyleProps = {
     display: 'flex',
-    height: 52,
     alignItems: 'center',
     pr: ThemeConstants.ScrollbarWidthScale,
+    py: 4,
     fontFamily: ThemeConstants.FontFamilyGoogleSans,
     fontWeight: 500,
     fontSize: '0.875rem',
@@ -17,9 +17,10 @@ const StyleProps = {
     borderBottomStyle: 'solid',
     borderBottomColor: 'divider',
     [`& .${StyleClassPrefix}-unlocked-status`]: {
+        display: 'flex',
+        justifyContent: 'center',
         width: 42,
-        px: 2,
-        textAlign: 'center'
+        px: 2
     },
     [`& .${StyleClassPrefix}-thumbnail`]: {
         width: 96,

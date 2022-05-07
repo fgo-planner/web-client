@@ -1,39 +1,24 @@
-import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { GameItemThumbnail } from '../../../components/game/item/game-item-thumbnail.component';
-import { LayoutPanelScrollable } from '../../../components/layout/layout-panel-scrollable.component';
+import { LayoutContentSection } from '../../../components/layout/layout-content-section.component';
+import { LayoutPageScrollable } from '../../../components/layout/layout-page-scrollable.component';
 import { StaticListRowContainer } from '../../../components/list/static-list-row-container.component';
 import { PageTitle } from '../../../components/text/page-title.component';
 import { useGameItemList } from '../../../hooks/data/use-game-item-list.hook';
+import { useElevateAppBarOnScroll } from '../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 
 const StyleClassPrefix = 'GameItems';
-
-const StyleProps = (theme: Theme) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    [`& .${StyleClassPrefix}-header`]: {
-        height: 64,
-        borderBottomWidth: 1,
-        borderBottomStyle: 'solid',
-        borderBottomColor: 'divider',
-    },
-    [`& .${StyleClassPrefix}-footer`]: {
-        height: 64,
-        borderTopWidth: 1,
-        borderTopStyle: 'solid',
-        borderTopColor: 'divider',
-    }
-} as SystemStyleObject<Theme>);
 
 export const GameItemsRoute = React.memo(() => {
 
     const gameItems = useGameItemList();
 
+    const scrollContainer = useElevateAppBarOnScroll();
+
     return (
-        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+        <LayoutPageScrollable className={`${StyleClassPrefix}-root`} scrollContainerRef={scrollContainer}>
             <PageTitle>Item List</PageTitle>
-            <LayoutPanelScrollable className='m-4 scrollbar-track-border'>
+            <LayoutContentSection className='m-4'>
                 {gameItems?.map((gameItem, index) => (
                     <StaticListRowContainer key={index} borderTop={!!index}>
                         <div className='flex align-center'>
@@ -49,8 +34,8 @@ export const GameItemsRoute = React.memo(() => {
                         </div>
                     </StaticListRowContainer>
                 ))}
-            </LayoutPanelScrollable>
-        </Box>
+            </LayoutContentSection>
+        </LayoutPageScrollable>
     );
 
 });

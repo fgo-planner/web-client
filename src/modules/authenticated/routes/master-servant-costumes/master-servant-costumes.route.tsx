@@ -4,7 +4,7 @@ import { Fab, IconButton, Tooltip } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
+import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -63,7 +63,7 @@ export const MasterServantCostumesRoute = React.memo(() => {
             return;
         }
         invokeLoadingIndicator();
-        
+
         const update = {
             _id: masterAccountId,
             costumes: [...unlockedCostumesSet]
@@ -92,13 +92,13 @@ export const MasterServantCostumesRoute = React.memo(() => {
      * NavigationRail children
      */
     const navigationRailChildNodes: ReactNode = (
-        <Tooltip key="servants" title="Back to servant list" placement="right">
+        <Tooltip key='servants' title='Back to servant list' placement='right'>
             <div>
                 <IconButton
                     component={Link}
-                    to="../master/servants"
+                    to='../master/servants'
                     children={<FormatListBulletedIcon />}
-                    size="large" />
+                    size='large' />
             </div>
         </Tooltip>
     );
@@ -109,10 +109,10 @@ export const MasterServantCostumesRoute = React.memo(() => {
     let fabContainerChildNodes: ReactNode;
     if (!editMode) {
         fabContainerChildNodes = (
-            <Tooltip key="edit" title="Edit">
+            <Tooltip key='edit' title='Edit'>
                 <div>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={handleEditButtonClick}
                         disabled={isLoadingIndicatorActive}
                         children={<EditIcon />}
@@ -122,20 +122,20 @@ export const MasterServantCostumesRoute = React.memo(() => {
         );
     } else {
         fabContainerChildNodes = [
-            <Tooltip key="cancel" title="Cancel">
+            <Tooltip key='cancel' title='Cancel'>
                 <div>
                     <Fab
-                        color="default"
+                        color='default'
                         onClick={handleCancelButtonClick}
                         disabled={isLoadingIndicatorActive}
                         children={<ClearIcon />}
                     />
                 </div>
             </Tooltip>,
-            <Tooltip key="save" title="Save">
+            <Tooltip key='save' title='Save'>
                 <div>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={handleSaveButtonClick}
                         disabled={isLoadingIndicatorActive}
                         children={<SaveIcon />}
@@ -146,32 +146,35 @@ export const MasterServantCostumesRoute = React.memo(() => {
     }
 
     return (
-        <div className="flex column full-height">
+        <div className='flex column full-height'>
             <PageTitle>
                 {editMode ?
                     'Edit Unlocked Costumes' :
                     'Unlocked Costumes'
                 }
             </PageTitle>
-            <div className="flex overflow-hidden">
+            <div className='flex overflow-hidden'>
                 <NavigationRail children={navigationRailChildNodes} />
-                <div className="flex flex-fill" style={{maxWidth: 'calc(100% - 56px)'}}>
-                    <LayoutPanelScrollable 
-                        className="py-4 pr-4 full-height flex-fill scrollbar-track-border"
-                        headerContents={
+                <div className='flex flex-fill' style={{ maxWidth: 'calc(100% - 56px)' }}>
+                    <LayoutContentSection
+                        className='py-4 pr-4 flex-fill'
+                        fullHeight
+                        scrollbarTrackBorder
+                    >
+                        <div className='flex column full-height'>
                             <MasterServantCostumesListHeader />
-                        }
-                        children={
-                            <MasterServantCostumesList
-                                unlockedCostumesSet={unlockedCostumesSet}
-                                editMode={editMode}
-                            />
-                        }
-                    />
+                            <div className='overflow-auto'>
+                                <MasterServantCostumesList
+                                    unlockedCostumesSet={unlockedCostumesSet}
+                                    editMode={editMode}
+                                />
+                            </div>
+                        </div>
+                    </LayoutContentSection>
                 </div>
             </div>
             <FabContainer children={fabContainerChildNodes} />
-        </div>
+        </div >
     );
 
 });

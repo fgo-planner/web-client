@@ -3,7 +3,7 @@ import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@mui/ico
 import { Fab, Tooltip } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
+import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
@@ -181,20 +181,23 @@ export const MasterSoundtracksRoute = React.memo(() => {
                 }
             </PageTitle>
             <div className="flex overflow-hidden">
-                <LayoutPanelScrollable
-                    className="p-4 full-height flex-fill scrollbar-track-border"
-                    headerContents={
+                <LayoutContentSection
+                    className='py-4 pr-4 flex-fill'
+                    fullHeight
+                    scrollbarTrackBorder
+                >
+                    <div className='flex column full-height'>
                         <MasterSoundtracksListHeader />
-                    }
-                    children={
-                        <MasterSoundtracksList
-                            unlockedSoundtracksSet={unlockedSoundtracksSet}
-                            playingId={playingId}
-                            editMode={editMode}
-                            onPlayButtonClick={handlePlayButtonClick}
-                        />
-                    }
-                />
+                        <div className='overflow-auto'>
+                            <MasterSoundtracksList
+                                unlockedSoundtracksSet={unlockedSoundtracksSet}
+                                playingId={playingId}
+                                editMode={editMode}
+                                onPlayButtonClick={handlePlayButtonClick}
+                            />
+                        </div>
+                    </div>
+                </LayoutContentSection>
             </div>
             <FabContainer children={fabContainerChildNodes} />
         </div>

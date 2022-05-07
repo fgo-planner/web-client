@@ -3,6 +3,7 @@ import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } fr
 import { IconButton, Tooltip } from '@mui/material';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
@@ -46,19 +47,19 @@ export const MasterItemStatsRoute = React.memo(() => {
      */
     const navigationRailChildNodes: ReactNode = useMemo(() => {
         return [
-            <Tooltip key="items" title="Back to item list" placement="right">
+            <Tooltip key='items' title='Back to item list' placement='right'>
                 <div>
                     <IconButton
                         component={Link}
-                        to="../master/items"
+                        to='../master/items'
                         children={<FormatListBulletedIcon />}
-                        size="large" />
+                        size='large' />
                 </div>
             </Tooltip>,
-            <Tooltip key="export" title="Download item stats" placement="right">
+            <Tooltip key='export' title='Download item stats' placement='right'>
                 <div>
                     {/* TODO Implement this */}
-                    <IconButton children={<GetAppIcon />} disabled size="large" />
+                    <IconButton children={<GetAppIcon />} disabled size='large' />
                 </div>
             </Tooltip>
         ];
@@ -69,22 +70,29 @@ export const MasterItemStatsRoute = React.memo(() => {
             return null;
         }
         return (
-            <MasterItemStatsTable
-                stats={stats}
-                gameItemMap={gameItemMap}
-                filter={filter}
-            />
+            <LayoutContentSection
+                className='py-4 pr-4 flex-fill'
+                autoContentHeight
+                layout='column'
+                scrollbarTrackBorder
+            >
+                <MasterItemStatsTable
+                    stats={stats}
+                    gameItemMap={gameItemMap}
+                    filter={filter}
+                />
+            </LayoutContentSection>
         );
     }, [filter, gameItemMap, stats]);
 
     return (
-        <div className="flex column full-height">
+        <div className='flex column full-height'>
             <PageTitle>Item Stats</PageTitle>
-            <div className="flex overflow-hidden">
+            <div className='flex overflow-hidden'>
                 <NavigationRail>
                     {navigationRailChildNodes}
                 </NavigationRail>
-                <div className="flex column flex-fill">
+                <div className='flex column flex-fill'>
                     <MasterItemStatsFilter onFilterChange={setFilter} />
                     {statsTableNode}
                 </div>

@@ -14,12 +14,12 @@ const StyleOptions = {
     name: StyleClassPrefix,
     slot: 'root',
     skipSx: true,
-    shouldForwardProp: ((prop: string) => (
+    shouldForwardProp: ((prop: string): prop is keyof Props => (
         prop !== 'backgroundColor' &&
         prop !== 'bold' &&
         prop !== 'color' &&
         prop !== 'size'
-    )) as unknown
+    ))
 } as FilteringStyledOptions<Props>;
 
 export const PlanRequirementsTableCell = styled('div', StyleOptions)<Props>(props => {

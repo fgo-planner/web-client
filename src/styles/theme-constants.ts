@@ -28,9 +28,21 @@ export class ThemeConstants {
 
     //#endregion
 
+
+    //#region Style property value
+
     static FontFamilyGoogleSans = 'Google Sans, Roboto, sans-serif';
 
     static FontFamilyRoboto = 'Roboto, sans-serif';
+
+    //#endregion
+
+
+    //#region Style class names
+
+    static ClassScrollbarTrackBorder = 'scrollbar-track-border';
+
+    //#endregion
 
     private constructor () {
         

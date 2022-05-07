@@ -3,6 +3,14 @@
 @import './utilities.scss';
 @import './backdrop-blur.scss';
 
+body {
+    /*
+     * This is needed to fix scrollbar from appearing on the body element appearing
+     * when a visible tooltip is scrolled outside of the viewport.
+     */
+    overflow: hidden;
+}
+
 .section-subheader {
     font-family: var(--font-family-google-sans);
     font-size: 16px;

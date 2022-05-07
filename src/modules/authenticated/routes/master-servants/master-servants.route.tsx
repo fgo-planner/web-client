@@ -6,7 +6,7 @@ import lodash from 'lodash';
 import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
+import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -722,27 +722,32 @@ export const MasterServantsRoute = React.memo(() => {
                     onEditSelectedServants={handleEditSelectedServants}
                 />
                 <div className={`${StyleClassPrefix}-main-content`}>
-                    <LayoutPanelContainer
-                        className='py-4 pr-4 full-height flex-fill scrollbar-track-border flex column'
-                        autoHeight
-                        children={
-                            <MasterServantList
-                                masterServants={dragDropMasterServants || masterServants}
-                                bondLevels={bondLevels}
-                                selectedServants={selectedInstanceIds}
-                                // showAddServantRow
-                                visibleColumns={visibleColumns}
-                                dragDropMode={dragDropMode}
-                                onServantSelectionChange={setServantSelection}
-                                onServantContextMenu={handleServantContextMenuOpen}
-                                onEditSelectedServants={handleEditSelectedServants}
-                                onEditServant={handleEditServant}
-                                onDeleteServant={handleDeleteServant}
-                            />
-                        }
-                    />
+                    <LayoutContentSection
+                        className='py-4 pr-4 flex-fill'
+                        autoContentHeight
+                        layout='column'
+                        scrollbarTrackBorder
+                    >
+                        <MasterServantList
+                            masterServants={dragDropMasterServants || masterServants}
+                            bondLevels={bondLevels}
+                            selectedServants={selectedInstanceIds}
+                            // showAddServantRow
+                            visibleColumns={visibleColumns}
+                            dragDropMode={dragDropMode}
+                            onServantSelectionChange={setServantSelection}
+                            onServantContextMenu={handleServantContextMenuOpen}
+                            onEditSelectedServants={handleEditSelectedServants}
+                            onEditServant={handleEditServant}
+                            onDeleteServant={handleDeleteServant}
+                        />
+                    </LayoutContentSection>
                     {md && <div className={`${StyleClassPrefix}-info-panel-container`}>
-                        <LayoutPanelContainer className='flex column full-height' autoHeight>
+                        <LayoutContentSection
+                            autoContentHeight
+                            fullHeight
+                            layout='column'
+                        >
                             <MasterServantsInfoPanel
                                 activeServants={selectedServants}
                                 bondLevels={bondLevels}
@@ -751,7 +756,7 @@ export const MasterServantsRoute = React.memo(() => {
                                 // editMode={editMode}
                                 onStatsChange={handleFormChange}
                             />
-                        </LayoutPanelContainer>
+                        </LayoutContentSection>
                     </div>}
                 </div>
             </div>

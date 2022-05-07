@@ -1,7 +1,6 @@
 import React, { ReactNode, useMemo } from 'react';
 import NumberFormat from 'react-number-format';
 import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
-import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
 import { GameServantConstants } from '../../../../constants';
 import { MasterServantStatPanelData, MasterServantStatPanelRow, MasterServantStatsExpandablePanel } from './master-servant-stats-expandable-panel.component';
 import { MasterServantStats } from './master-servant-stats.utils';
@@ -51,7 +50,7 @@ const applyFormatOneDecimal = (value: number): ReactNode => (
         value={value}
         decimalScale={1}
         fixedDecimalScale
-        displayType="text"
+        displayType='text'
     />
 );
 
@@ -60,9 +59,11 @@ const applyFormatThreeDecimals = (value: number): ReactNode => (
         value={value}
         decimalScale={3}
         fixedDecimalScale
-        displayType="text"
+        displayType='text'
     />
 );
+
+export const StyleClassPrefix = 'MasterServantStatsTable';
 
 export const MasterServantStatsTable = React.memo((props: Props) => {
 
@@ -214,9 +215,9 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
         for (const bondLevel of GameServantConstants.BondLevels) {
             rows.push({
                 label: (
-                    <div className="flex">
+                    <div className='flex'>
                         <GameServantBondIcon bond={bondLevel} size={20} />
-                        <div className="pl-2">
+                        <div className='pl-2'>
                             {bondLevel}
                         </div>
                     </div>
@@ -262,48 +263,48 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
 
     const expandablePanelNodes: ReactNode = [
         <MasterServantStatsExpandablePanel
-            key="totalServantsData"
+            key='totalServantsData'
             data={totalServantsData}
             dataColumnWidth={dataColumnWidth}
         />,
         <MasterServantStatsExpandablePanel
-            key="uniqueServantsData"
+            key='uniqueServantsData'
             data={uniqueServantsData}
             dataColumnWidth={dataColumnWidth}
             borderTop
         />,
         <MasterServantStatsExpandablePanel
-            key="npLevelData"
+            key='npLevelData'
             data={npLevelData}
             dataColumnWidth={dataColumnWidth}
             borderTop
         />,
         <MasterServantStatsExpandablePanel
-            key="ascensionLevelData"
+            key='ascensionLevelData'
             data={ascensionLevelData}
             dataColumnWidth={dataColumnWidth}
             borderTop
         />,
         <MasterServantStatsExpandablePanel
-            key="skillLevelData"
+            key='skillLevelData'
             data={skillLevelData}
             dataColumnWidth={dataColumnWidth}
             borderTop
         />,
         <MasterServantStatsExpandablePanel
-            key="appendSkillLevelData"
+            key='appendSkillLevelData'
             data={appendSkillLevelData}
             dataColumnWidth={dataColumnWidth}
             borderTop
         />,
         <MasterServantStatsExpandablePanel
-            key="bondLevelData"
+            key='bondLevelData'
             data={bondLevelData}
             dataColumnWidth={dataColumnWidth}
             borderTop
         />,
         <MasterServantStatsExpandablePanel
-            key="fouEnhancementData"
+            key='fouEnhancementData'
             data={fouEnhancementData}
             dataColumnWidth={dataColumnWidth}
             borderTop
@@ -311,18 +312,15 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
     ];
 
     return (
-        <LayoutPanelScrollable
-            className="pr-4 py-4 full-height scrollbar-track-border"
-            headerContents={
-                <MasterServantStatsExpandablePanel
-                    key="headerData"
-                    data={headerData}
-                    dataColumnWidth={dataColumnWidth}
-                    borderBottom
-                />
-            }
-            children={expandablePanelNodes}
-        />
+        <div className={`${StyleClassPrefix}-root`}>
+            <MasterServantStatsExpandablePanel
+                key='headerData'
+                data={headerData}
+                dataColumnWidth={dataColumnWidth}
+                borderBottom
+            />
+            {expandablePanelNodes}
+        </div>
     );
 
 });

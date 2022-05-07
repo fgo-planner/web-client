@@ -1,10 +1,8 @@
-import { Tooltip } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
-import clsx from 'clsx';
 import React, { ReactNode, useMemo } from 'react';
 import NumberFormat from 'react-number-format';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
-import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { GameItemConstants } from '../../../../constants';
 import { ThemeConstants } from '../../../../styles/theme-constants';
@@ -54,9 +52,9 @@ const ItemIds = [
 const StyleClassPrefix = 'MasterItemStatsTable';
 
 const StyleProps = {
+    display: 'flex',
+    flexDirection: 'column',
     height: '100%',
-    pr: 4,
-    py: 4,
     [`& .${StyleClassPrefix}-header`]: {
         display: 'flex',
         pr: 2,
@@ -69,6 +67,9 @@ const StyleProps = {
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         borderBottomColor: 'divider'
+    },
+    [`& .${StyleClassPrefix}-scroll-container`]: {
+        overflow: 'auto'
     },
     [`& .${StyleClassPrefix}-data-row`]: {
         display: 'flex',
@@ -192,29 +193,27 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
     };
 
     return (
-        <LayoutPanelScrollable
-            className={clsx(`${StyleClassPrefix}-root`, 'scrollbar-track-border')}
-            sx={StyleProps}
-            headerContents={
-                <div className={`${StyleClassPrefix}-header`}>
-                    <Tooltip title={costColumnTooltip} placement="top">
-                        <div className={`${StyleClassPrefix}-data-cell`}>Total Needed</div>
-                    </Tooltip>
-                    <Tooltip title={usedColumnTooltip} placement="top">
-                        <div className={`${StyleClassPrefix}-data-cell`}>Total Consumed</div>
-                    </Tooltip>
-                    <Tooltip title={InventoryColumnTooltip} placement="top">
-                        <div className={`${StyleClassPrefix}-data-cell`}>Current Inventory</div>
-                    </Tooltip>
-                    <Tooltip title={debtColumnTooltip} placement="top" >
-                        <div className={`${StyleClassPrefix}-data-cell`}>Remaining Needed</div>
-                    </Tooltip>
-                    <Tooltip title={DifferenceColumnTooltip} placement="top">
-                        <div className={`${StyleClassPrefix}-data-cell`}>Deficit</div>
-                    </Tooltip>
-                </div>
-            }
-            children={ItemIds.map(renderItem)}
-        />
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <div className={`${StyleClassPrefix}-header`}>
+                <Tooltip title={costColumnTooltip} placement="top">
+                    <div className={`${StyleClassPrefix}-data-cell`}>Total Needed</div>
+                </Tooltip>
+                <Tooltip title={usedColumnTooltip} placement="top">
+                    <div className={`${StyleClassPrefix}-data-cell`}>Total Consumed</div>
+                </Tooltip>
+                <Tooltip title={InventoryColumnTooltip} placement="top">
+                    <div className={`${StyleClassPrefix}-data-cell`}>Current Inventory</div>
+                </Tooltip>
+                <Tooltip title={debtColumnTooltip} placement="top" >
+                    <div className={`${StyleClassPrefix}-data-cell`}>Remaining Needed</div>
+                </Tooltip>
+                <Tooltip title={DifferenceColumnTooltip} placement="top">
+                    <div className={`${StyleClassPrefix}-data-cell`}>Deficit</div>
+                </Tooltip>
+            </div>
+            <div className={`${StyleClassPrefix}-scroll-container`}>
+                {ItemIds.map(renderItem)}
+            </div>
+        </Box>
     );
 });

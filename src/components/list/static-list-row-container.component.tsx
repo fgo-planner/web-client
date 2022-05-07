@@ -28,7 +28,6 @@ export const StaticListRowContainer = React.memo((props: Props) => {
         active,
         borderTop,
         borderBottom,
-        classes,
         className,
         style,
         sx,

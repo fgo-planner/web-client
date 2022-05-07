@@ -1,4 +1,5 @@
 import React, { CSSProperties, PropsWithChildren, UIEventHandler } from 'react';
+import { ComponentStyleProps } from '../../types/internal';
 
 type Props = PropsWithChildren<{
     scrollContainerRef?: React.LegacyRef<HTMLDivElement>,
@@ -7,7 +8,7 @@ type Props = PropsWithChildren<{
      * @deprecated Use function components whenever possible.
      */
     onScrollHandler?: UIEventHandler<HTMLDivElement>
-}>;
+}> & Pick<ComponentStyleProps, 'className'>;
 
 // This component does not need StyleClassPrefix.
 
@@ -19,14 +20,16 @@ const StyleProps = {
 export const LayoutPageScrollable = React.memo((props: Props) => {
 
     const {
-        children,
+        onScrollHandler,
         scrollContainerRef,
-        onScrollHandler
+        children,
+        className
     } = props;
 
     return (
         <div
             style={StyleProps}
+            className={className}
             ref={scrollContainerRef}
             onScroll={onScrollHandler}
         >

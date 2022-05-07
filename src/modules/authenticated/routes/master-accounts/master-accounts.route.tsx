@@ -4,8 +4,8 @@ import { Fab, PaperProps, Tooltip } from '@mui/material';
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
+import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
-import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
 import { MasterAccountAddDialog } from '../../../../components/master/account/master-account-add-dialog.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -101,14 +101,14 @@ export const MasterAccountsRoute = React.memo(() => {
                 <PageTitle>
                     Master Accounts
                 </PageTitle>
-                <LayoutPanelContainer className="p-4">
+                <LayoutContentSection className="p-4">
                     {!masterAccountList ? <div>Loading...</div> :
                         <MasterAccountList
                             masterAccountList={masterAccountList}
                             onDeleteAccount={handleDeleteAccount}
                         />
                     }
-                </LayoutPanelContainer>
+                </LayoutContentSection>
                 <div className="py-10" />
             </LayoutPageScrollable>
             <MasterAccountAddDialog

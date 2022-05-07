@@ -42,9 +42,6 @@ const StyleProps = {
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
-    [`& .${StyleClassPrefix}-header`]: {
-
-    },
     [`& .${StyleClassPrefix}-list-container`]: {
         overflow: 'auto',
         [`& .${StyleClassPrefix}-list`]: {
@@ -374,12 +371,10 @@ export const MasterServantList = React.memo((props: Props) => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <div className={`${StyleClassPrefix}-header`}>
-                <MasterServantListHeader
-                    visibleColumns={visibleColumns}
-                    dragDropMode={dragDropMode}
-                />
-            </div>
+            <MasterServantListHeader
+                visibleColumns={visibleColumns}
+                dragDropMode={dragDropMode}
+            />
             <div className={`${StyleClassPrefix}-list-container`}>
                 <div className={`${StyleClassPrefix}-list`}>
                     <DndProvider backend={HTML5Backend}>

@@ -3,7 +3,7 @@ import { Fab, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useCallback, useState } from 'react';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutPanelContainer, StyleClassPrefix as LayoutPanelContainerStyleClassPrefix } from '../../../../components/layout/layout-panel-container.component';
+import { LayoutContentSection, StyleClassPrefix as LayoutContentSectionStyleClassPrefix } from '../../../../components/layout/layout-content-section.component';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
 import { ModalOnCloseReason } from '../../../../types/internal';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
@@ -51,7 +51,7 @@ const StyleProps = (theme: Theme) => ({
     [`& .${StyleClassPrefix}-footer-padding`]: {
         py: 10
     },
-    [`& .${LayoutPanelContainerStyleClassPrefix}-root`]: {
+    [`& .${LayoutContentSectionStyleClassPrefix}-root`]: {
         p: 4
     }
 } as SystemStyleObject<Theme>);
@@ -119,13 +119,13 @@ export const MasterServantImportList = React.memo((props: Props) => {
                 <div className={`${StyleClassPrefix}-helper-text`}>
                     {ParseResultHelperText}
                 </div>
-                <LayoutPanelContainer>
+                <LayoutContentSection>
                     <MasterServantList
                         masterServants={masterServants}
                         bondLevels={bondLevels}
                         visibleColumns={ServantListVisibleColumns}
                     />
-                </LayoutPanelContainer>
+                </LayoutContentSection>
             </Box>
             {fabContainerNode}
             <MasterServantImportExistingDialog

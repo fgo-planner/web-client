@@ -1,8 +1,8 @@
 import { Button } from '@mui/material';
-import React, { useMemo } from 'react';
-import { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { UserWebClientTheme } from '../../../../../local_modules/types/lib';
-import { LayoutPanelContainer } from '../../../../components/layout/layout-panel-container.component';
+import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
+import { SectionTitle } from '../../../../components/text/section-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
@@ -41,30 +41,33 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
     }
 
     return (
-        <LayoutPanelContainer className="m-4" title={title} titlePosition="inside">
-            <div className="flex">
+        <LayoutContentSection className='m-4'>
+            <SectionTitle>
+                {title}
+            </SectionTitle>
+            <div className='flex'>
                 <div style={{ flex: 0.5 }}>
                     <UserThemeColor
                         color={userTheme.backgroundColor}
-                        label="Background"
+                        label='Background'
                         allowEditAlpha
                     />
                     <UserThemeColor
                         color={userTheme.foregroundColor}
-                        label="Foreground"
+                        label='Foreground'
                         allowEditAlpha
                     />
                     <UserThemeColor
                         color={userTheme.primaryColor}
-                        label="Primary"
+                        label='Primary'
                     />
                     <UserThemeColor
                         color={userTheme.secondaryColor}
-                        label="Secondary"
+                        label='Secondary'
                     />
                     <UserThemeColor
                         color={userTheme.dividerColor}
-                        label="Divider"
+                        label='Divider'
                         allowEditAlpha
                     />
                 </div>
@@ -75,12 +78,12 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
                     />
                 </div>
             </div>
-            <div className="p-6">
-                <Button variant="contained" color="secondary" onClick={handleResetDefaultClick}>
+            <div className='p-6'>
+                <Button variant='contained' color='secondary' onClick={handleResetDefaultClick}>
                     Reset to Default
                 </Button>
             </div>
-        </LayoutPanelContainer>
+        </LayoutContentSection>
     );
 
 });

@@ -4,7 +4,7 @@ import { Fab, IconButton, Tooltip } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutPanelScrollable } from '../../../../components/layout/layout-panel-scrollable.component';
+import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { GameItemConstants } from '../../../../constants';
@@ -118,25 +118,25 @@ export const MasterItemsRoute = React.memo(() => {
      * NavigationRail children
      */
     const navigationRailChildNodes = [
-        <Tooltip key="stats" title="Item stats" placement="right">
+        <Tooltip key='stats' title='Item stats' placement='right'>
             <div>
                 <IconButton
                     component={Link}
-                    to="stats"
+                    to='stats'
                     children={<EqualizerIcon />}
-                    size="large" />
+                    size='large' />
             </div>
         </Tooltip>,
-        <Tooltip key="import" title="Upload item data" placement="right">
+        <Tooltip key='import' title='Upload item data' placement='right'>
             <div>
                 {/* TODO Implement this */}
-                <IconButton children={<PublishIcon />} disabled size="large" />
+                <IconButton children={<PublishIcon />} disabled size='large' />
             </div>
         </Tooltip>,
-        <Tooltip key="export" title="Download item data" placement="right">
+        <Tooltip key='export' title='Download item data' placement='right'>
             <div>
                 {/* TODO Implement this */}
-                <IconButton children={<GetApp />} disabled size="large" />
+                <IconButton children={<GetApp />} disabled size='large' />
             </div>
         </Tooltip>
     ];
@@ -147,10 +147,10 @@ export const MasterItemsRoute = React.memo(() => {
     let fabContainerChildNodes: ReactNode;
     if (!editMode) {
         fabContainerChildNodes = (
-            <Tooltip key="edit" title="Edit">
+            <Tooltip key='edit' title='Edit'>
                 <div>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={handleEditButtonClick}
                         disabled={isLoadingIndicatorActive}
                         children={<EditIcon />}
@@ -160,20 +160,20 @@ export const MasterItemsRoute = React.memo(() => {
         );
     } else {
         fabContainerChildNodes = [
-            <Tooltip key="cancel" title="Cancel">
+            <Tooltip key='cancel' title='Cancel'>
                 <div>
                     <Fab
-                        color="default"
+                        color='default'
                         onClick={handleCancelButtonClick}
                         disabled={isLoadingIndicatorActive}
                         children={<ClearIcon />}
                     />
                 </div>
             </Tooltip>,
-            <Tooltip key="save" title="Save">
+            <Tooltip key='save' title='Save'>
                 <div>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={handleSaveButtonClick}
                         disabled={isLoadingIndicatorActive}
                         children={<SaveIcon />}
@@ -184,20 +184,26 @@ export const MasterItemsRoute = React.memo(() => {
     }
 
     return (
-        <div className="flex column full-height">
+        <div className='flex column full-height'>
             <PageTitle>
                 {editMode ?
                     'Edit Item Inventory' :
                     'Item Inventory'
                 }
             </PageTitle>
-            <div className="flex overflow-hidden">
+            <div className='flex overflow-hidden'>
                 <NavigationRail>
                     {navigationRailChildNodes}
                 </NavigationRail>
-                <LayoutPanelScrollable className="py-4 pr-4 full-height flex-fill scrollbar-track-border">
-                    <MasterItemList editMode={editMode} masterItems={masterItems} />
-                </LayoutPanelScrollable>
+                <LayoutContentSection 
+                    className='py-4 pr-4 flex-fill'
+                    fullHeight
+                    scrollbarTrackBorder
+                >
+                    <div className='flex column full-height overflow-auto'>
+                        <MasterItemList editMode={editMode} masterItems={masterItems} />
+                    </div>
+                </LayoutContentSection>
             </div>
             <FabContainer children={fabContainerChildNodes} />
         </div>

@@ -7,7 +7,7 @@ import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } f
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutPanelContainer, StyleClassPrefix as LayoutPanelContainerStyleClassPrefix } from '../../../../components/layout/layout-panel-container.component';
+import { LayoutContentSection, StyleClassPrefix as LayoutContentSectionStyleClassPrefix } from '../../../../components/layout/layout-content-section.component';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
 import { PlanRequirementsTableOptions } from '../../../../components/plan/requirements/table/plan-requirements-table-options.type';
 import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/plan-requirements-table.component';
@@ -107,7 +107,7 @@ const StyleProps = (theme: Theme) => ({
         display: 'flex',
         flex: '1',
         width: 'calc(100% - 48px)',
-        [`& .${LayoutPanelContainerStyleClassPrefix}-root`]: {
+        [`& .${LayoutContentSectionStyleClassPrefix}-root`]: {
             display: 'flex',
             flex: 1,
             height: 'fit-content',
@@ -489,19 +489,18 @@ export const PlanRoute = React.memo(() => {
             <div className='flex overflow-hidden full-height'>
                 <NavigationRail children={navigationRailChildNodes} />
                 <div className={`${StyleClassPrefix}-main-content`}>
-                    <LayoutPanelContainer
-                        className='scrollbar-track-border'
-                        autoHeight
-                        children={
-                            <PlanRequirementsTable
-                                masterAccount={masterAccount}
-                                plan={_plan}
-                                planRequirements={planRequirementsRef.current!}
-                                options={tableOptions}
-                                onEditServant={handleEditServant}
-                            />
-                        }
-                    />
+                    <LayoutContentSection
+                        autoContentHeight
+                        scrollbarTrackBorder
+                    >
+                        <PlanRequirementsTable
+                            masterAccount={masterAccount}
+                            plan={_plan}
+                            planRequirements={planRequirementsRef.current!}
+                            options={tableOptions}
+                            onEditServant={handleEditServant}
+                        />
+                    </LayoutContentSection>
                 </div>
             </div>
             <FabContainer children={fabContainerChildNodes} />

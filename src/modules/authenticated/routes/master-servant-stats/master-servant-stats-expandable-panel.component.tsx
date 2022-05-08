@@ -149,7 +149,7 @@ export const MasterServantStatsExpandablePanel = React.memo((props: Props) => {
             square
         >
             <AccordionSummary>
-                <div className="full-width">
+                <div className='full-width'>
                     <div className={headerRowClassName}>
                         <div className={clsx(`${StyleClassPrefix}-row-label`, 'truncate')}>
                             {header.label}
@@ -163,7 +163,7 @@ export const MasterServantStatsExpandablePanel = React.memo((props: Props) => {
                 </div>
             </AccordionSummary>
             <AccordionDetails>
-                <div className="full-width">
+                <div className='full-width'>
                     {rows?.map(row => renderDetailRow(row))}
                 </div>
             </AccordionDetails>

@@ -109,22 +109,22 @@ export const AppBarGuestUser = React.memo(() => {
             <Box sx={StyleProps}>
                 <AppBarLinks>
                     <AppBarLink
-                        label="Servants"
-                        route="/resources/servants"
+                        label='Servants'
+                        route='/resources/servants'
                         active={isLinkActive('/resources/servants') && !loginModalOpen}
                     />
                     <AppBarLink
-                        label="Items"
-                        route="/resources/items"
+                        label='Items'
+                        route='/resources/items'
                         active={isLinkActive('/resources/items') && !loginModalOpen}
                     />
                     <AppBarLink
-                        label="Events"
-                        route="/resources/events"
+                        label='Events'
+                        route='/resources/events'
                         active={isLinkActive('/resources/events') && !loginModalOpen}
                     />
                     <AppBarLink
-                        label="Login"
+                        label='Login'
                         onClick={openLoginDialog}
                         active={isLinkActive('/login') || loginModalOpen}
                     />
@@ -132,11 +132,11 @@ export const AppBarGuestUser = React.memo(() => {
                 <IconButton
                     onClick={handleThemeModeToggle}
                     children={themeInfo?.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
-                    size="large" />
+                    size='large' />
                 <IconButton
                     onClick={handleBackgroundMusicButtonClick}
                     children={isBackgroundMusicPlaying ? <VolumeUpIcon /> : <VolumeOffIcon />}
-                    size="large" />
+                    size='large' />
             </Box>
             <LoginDialog
                 PaperProps={LoginDialogPaperProps}

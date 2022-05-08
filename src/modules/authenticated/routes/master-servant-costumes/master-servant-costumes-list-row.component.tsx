@@ -95,7 +95,7 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
         >
             {unlockedStatusNode}
             <GameServantThumbnail
-                variant="rounded"
+                variant='rounded'
                 size={ServantThumbnailSize}
                 gameServant={servant}
                 costumeId={costumeId}

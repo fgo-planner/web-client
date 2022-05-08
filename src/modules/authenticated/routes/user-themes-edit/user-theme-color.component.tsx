@@ -149,10 +149,10 @@ export const UserThemeColor = React.memo((props: Props) => {
 
     const colorInputField = (
         <TextField
-            variant="outlined"
+            variant='outlined'
             fullWidth
-            label="Color (Hex or RGBA)"
-            type="string"
+            label='Color (Hex or RGBA)'
+            type='string'
             value={colorInputValue}
             onChange={handleColorInputFieldChange}
             onBlur={handleColorInputFieldBlur}
@@ -161,10 +161,10 @@ export const UserThemeColor = React.memo((props: Props) => {
 
     const alphaInputField = (
         <TextField
-            variant="outlined"
+            variant='outlined'
             fullWidth
-            label="Alpha"
-            type="number"
+            label='Alpha'
+            type='number'
             inputProps={AlphaInputProps}
             value={alphaInputValue}
             onChange={handleAlphaInputFieldChange}

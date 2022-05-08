@@ -41,7 +41,7 @@ export const DataPointListItem = React.memo((props: Props) => {
             <div className={clsx(`${StyleClassPrefix}-label`, 'truncate')} style={labelStyle}>
                 {label}
             </div>
-            <div className="truncate">
+            <div className='truncate'>
                 {value}
             </div>
         </Box>

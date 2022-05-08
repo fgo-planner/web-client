@@ -39,7 +39,7 @@ export const LoadingIndicator = React.memo(({ visible, zIndex }: Props) => {
     }
 
     return (
-        <div className="backdrop-blur" style={rootStyle}>
+        <div className='backdrop-blur' style={rootStyle}>
             <div style={styles.progressContainer}>
                 <CircularProgress size={indicatorSize} thickness={CircularProgressThickness} />
             </div>

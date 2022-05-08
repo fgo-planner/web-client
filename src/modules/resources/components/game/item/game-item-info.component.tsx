@@ -89,7 +89,7 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
         return (
             <Fragment>
                 <GameItemThumbnail gameItem={item} />
-                <div className="p-2">
+                <div className='p-2'>
                     <div>Ascensions: {total.ascensions}</div>
                     <div>Per Skill (Total): {total.skills} ({total.skills * 3})</div>
                     <div>Costumes: {total.costumes}</div>
@@ -97,9 +97,9 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
                 </div>
                 <div>
                     {servants.map((servant, index) => (
-                        <div key={index} className="flex px-2 py-1">
+                        <div key={index} className='flex px-2 py-1'>
                             <div>{servant.servant.name}</div>
-                            <div className="px-2" />
+                            <div className='px-2' />
                             <div>{servant.ascensions}, {servant.skills}({servant.skills * 3}), {servant.costumes}</div>
                         </div>
                     ))}

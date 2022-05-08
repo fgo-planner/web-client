@@ -53,12 +53,12 @@ export const LoginForm = React.memo((props: Props) => {
                 noValidate
                 onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
             >
-                <InputFieldContainer width="100%">
+                <InputFieldContainer width='100%'>
                     <TextField
-                        variant="outlined"
+                        variant='outlined'
                         fullWidth
-                        label="Username"
-                        name="username"
+                        label='Username'
+                        name='username'
                         value={values.username}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -66,13 +66,13 @@ export const LoginForm = React.memo((props: Props) => {
                         helperText={touchedErrors.username}
                     />
                 </InputFieldContainer>
-                <InputFieldContainer width="100%">
+                <InputFieldContainer width='100%'>
                     <TextField
-                        variant="outlined"
+                        variant='outlined'
                         fullWidth
-                        label="Password"
-                        name="password"
-                        type="password"
+                        label='Password'
+                        name='password'
+                        type='password'
                         value={values.password}
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -84,12 +84,12 @@ export const LoginForm = React.memo((props: Props) => {
                     <FormControlLabel
                         control={
                             <Checkbox
-                                name="noExpire"
+                                name='noExpire'
                                 checked={values.noExpire}
                                 onChange={handleChange}
                             />
                         }
-                        label="Stay signed in"
+                        label='Stay signed in'
                     />
                 </FormGroup>
             </form>

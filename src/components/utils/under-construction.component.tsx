@@ -18,7 +18,7 @@ const StyleProps = {
 export const UnderConstruction = React.memo(() => (
     <Box sx={StyleProps}>
         <ConstructionIcon fontSize='large' />
-        <Typography variant="h4">This page is under construction</Typography>
+        <Typography variant='h4'>This page is under construction</Typography>
         <ConstructionIcon fontSize='large' />
     </Box>
 ));

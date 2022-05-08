@@ -156,19 +156,19 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
      */
     const groupBySelect = (
         <TextField
-            variant="outlined"
-            color="secondary"
+            variant='outlined'
+            color='secondary'
             select
             fullWidth
-            label="Group By"
+            label='Group By'
             SelectProps={{
                 MenuProps: SelectMenuProps
             }}
             value={groupBy}
             onChange={handleStatsGroupByChange}
         >
-            <MenuItem value="rarity" style={{ height: 54 }}>Rarity</MenuItem>
-            <MenuItem value="class" style={{ height: 54 }}>Class</MenuItem>
+            <MenuItem value='rarity' style={{ height: 54 }}>Rarity</MenuItem>
+            <MenuItem value='class' style={{ height: 54 }}>Class</MenuItem>
         </TextField>
     );
 
@@ -181,11 +181,11 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
         const allSelected = classFilter.length === ClassFilterOptions.length;
         classFilterSelect = (
             <TextField
-                variant="outlined"
-                color="secondary"
+                variant='outlined'
+                color='secondary'
                 select
                 fullWidth
-                label="Class"
+                label='Class'
                 SelectProps={{
                     multiple: true,
                     MenuProps: SelectMenuProps,
@@ -200,7 +200,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                         checked={!!classFilter.length}
                         indeterminate={!allSelected && !!classFilter.length}
                     />
-                    <ListItemText primary="All" />
+                    <ListItemText primary='All' />
                 </MenuItem>
                 {ClassFilterOptions.map(servantClassName => (
                     <MenuItem key={servantClassName} value={servantClassName}>
@@ -224,11 +224,11 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
         const allSelected = rarityFilter.length === GameServantConstants.RarityValues.length;
         rarityFilterSelect = (
             <TextField
-                variant="outlined"
-                color="secondary"
+                variant='outlined'
+                color='secondary'
                 select
                 fullWidth
-                label="Rarity"
+                label='Rarity'
                 SelectProps={{
                     multiple: true,
                     MenuProps: SelectMenuProps,
@@ -243,7 +243,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                         checked={!!rarityFilter.length}
                         indeterminate={!allSelected && !!rarityFilter.length}
                     />
-                    <ListItemText primary="All" />
+                    <ListItemText primary='All' />
                 </MenuItem>
                 {GameServantConstants.RarityValues.map(rarity => (
                     <MenuItem key={rarity} value={rarity}>
@@ -268,13 +268,13 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 {classFilterSelect}
                 {rarityFilterSelect}
             </InputFieldContainer>
-            <Tooltip key="reset" title="Reset filters" placement="right">
+            <Tooltip key='reset' title='Reset filters' placement='right'>
                 <div>
                     <IconButton
-                        color="secondary"
+                        color='secondary'
                         children={<ReplayIcon />}
                         onClick={handleResetFilterClick}
-                        size="large" />
+                        size='large' />
                 </div>
             </Tooltip>
         </Box>

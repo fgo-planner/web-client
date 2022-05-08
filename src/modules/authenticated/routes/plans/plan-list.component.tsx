@@ -38,29 +38,29 @@ export const PlanList = React.memo(({ accountPlans, onDeletePlan, onDeletePlanGr
                     <TableCell>Name</TableCell>
                     <TableCell>Description</TableCell>
                     <TableCell />
-                    <TableCell width={69} align="center">Actions</TableCell>
+                    <TableCell width={69} align='center'>Actions</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
                 {accountPlans.plans.map(plan => (
                     <TableRow key={plan._id} className={`${StyleClassPrefix}-data-row`}>
-                        <TableCell className="truncate">
-                            <MuiLink component={Link} to={`../master/planner/${plan._id}`} underline="none">
+                        <TableCell className='truncate'>
+                            <MuiLink component={Link} to={`../master/planner/${plan._id}`} underline='none'>
                                 {plan.name || 'No Name'}
                             </MuiLink>
                         </TableCell>
-                        <TableCell className="truncate">
+                        <TableCell className='truncate'>
                             {plan.description || '\u2013'}
                         </TableCell>
                         <TableCell />
-                        <TableCell align="center">
-                            <Tooltip title="Delete account" placement="left">
+                        <TableCell align='center'>
+                            <Tooltip title='Delete account' placement='left'>
                                 <IconButton
                                     className={`${StyleClassPrefix}-action-button`}
-                                    color="secondary"
+                                    color='secondary'
                                     onClick={() => onDeletePlan?.(plan)}
                                     children={<DeleteForeverIcon />}
-                                    size="large" />
+                                    size='large' />
                             </Tooltip>
                         </TableCell>
                     </TableRow>

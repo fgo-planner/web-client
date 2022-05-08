@@ -86,7 +86,7 @@ export const AppBarResourcesMenu = class extends PureComponent<Props, State> {
                 <MenuItem
                     sx={styles.link}
                     component={Link}
-                    to="/resources/servants"
+                    to='/resources/servants'
                     onClick={this._handleLinkClick}
                 >
                     Servants
@@ -94,7 +94,7 @@ export const AppBarResourcesMenu = class extends PureComponent<Props, State> {
                 <MenuItem
                     sx={styles.link}
                     component={Link}
-                    to="/resources/items"
+                    to='/resources/items'
                     onClick={this._handleLinkClick}
                 >
                     Items
@@ -102,7 +102,7 @@ export const AppBarResourcesMenu = class extends PureComponent<Props, State> {
                 <MenuItem
                     sx={styles.link}
                     component={Link}
-                    to="/resources/events"
+                    to='/resources/events'
                     onClick={this._handleLinkClick}
                 >
                     Events

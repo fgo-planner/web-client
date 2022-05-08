@@ -132,7 +132,7 @@ export const PlansRoute = React.memo(() => {
                 <PageTitle>
                     My Plans
                 </PageTitle>
-                <LayoutContentSection className="p-4">
+                <LayoutContentSection className='p-4'>
                     {!!accountPlans ?
                         <PlanList
                             accountPlans={accountPlans}
@@ -143,7 +143,7 @@ export const PlansRoute = React.memo(() => {
                         </div>
                     }
                 </LayoutContentSection>
-                <div className="py-10" />
+                <div className='py-10' />
             </LayoutPageScrollable>
             <PlanAddDialog
                 open={addPlanDialogOpen}
@@ -155,16 +155,16 @@ export const PlansRoute = React.memo(() => {
                 open={deletePlanDialogOpen}
                 title={DeletePlanDialogTitle}
                 prompt={deletePlanDialogPrompt}
-                cancelButtonColor="secondary"
-                confirmButtonColor="primary"
-                confirmButtonLabel="Delete"
+                cancelButtonColor='secondary'
+                confirmButtonColor='primary'
+                confirmButtonLabel='Delete'
                 onClose={handleDeletePlanDialogClose}
             />
             <FabContainer>
-                <Tooltip key="add" title="Create new plan">
+                <Tooltip key='add' title='Create new plan'>
                     <div>
                         <Fab
-                            color="primary"
+                            color='primary'
                             onClick={handleAddPlanButtonClick}
                             disabled={isLoadingIndicatorActive}
                             children={<AddIcon />}

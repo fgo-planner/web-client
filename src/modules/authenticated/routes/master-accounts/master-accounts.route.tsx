@@ -101,7 +101,7 @@ export const MasterAccountsRoute = React.memo(() => {
                 <PageTitle>
                     Master Accounts
                 </PageTitle>
-                <LayoutContentSection className="p-4">
+                <LayoutContentSection className='p-4'>
                     {!masterAccountList ? <div>Loading...</div> :
                         <MasterAccountList
                             masterAccountList={masterAccountList}
@@ -109,7 +109,7 @@ export const MasterAccountsRoute = React.memo(() => {
                         />
                     }
                 </LayoutContentSection>
-                <div className="py-10" />
+                <div className='py-10' />
             </LayoutPageScrollable>
             <MasterAccountAddDialog
                 PaperProps={AddAccountDialogPaperProps}
@@ -120,15 +120,15 @@ export const MasterAccountsRoute = React.memo(() => {
                 open={deleteAccountDialogOpen}
                 title={DeleteAccountDialogTitle}
                 prompt={deleteAccountDialogPrompt}
-                cancelButtonColor="secondary"
-                confirmButtonColor="primary"
-                confirmButtonLabel="Delete"
+                cancelButtonColor='secondary'
+                confirmButtonColor='primary'
+                confirmButtonLabel='Delete'
                 onClose={handleDeleteAccountDialogClose}
             />
             <FabContainer>
-                <Tooltip key="add" title="Add master account">
+                <Tooltip key='add' title='Add master account'>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={openAddAccountDialog}
                         children={<AddIcon />}
                     />

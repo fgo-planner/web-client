@@ -25,7 +25,7 @@ export const RequireAuthentication = React.memo(({ children }: PropsWithChildren
     }, [authenticationService]);
 
     if (!isLoggedIn) {
-        return <Navigate to="/" />;
+        return <Navigate to='/' />;
     }
 
     return <Fragment>{children}</Fragment>;

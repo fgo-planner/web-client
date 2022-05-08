@@ -94,7 +94,7 @@ export const AppBar = React.memo(() => {
             {/* <ThemeBackground className={`${StyleClassPrefix}-background-image`} /> */}
             <div className={`${StyleClassPrefix}-contents`}>
                 {/* TODO Add logo */}
-                <Link className={`${StyleClassPrefix}-title`} to="/">
+                <Link className={`${StyleClassPrefix}-title`} to='/'>
                     FGO Servant Planner
                 </Link>
                 {currentUser ?

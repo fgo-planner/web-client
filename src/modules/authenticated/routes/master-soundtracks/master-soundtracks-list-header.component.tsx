@@ -42,7 +42,7 @@ const StyleProps = {
 export const MasterSoundtracksListHeader = React.memo(() => (
     <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
         <div className={`${StyleClassPrefix}-unlocked-status`}>
-            <LockOpen fontSize="small" />
+            <LockOpen fontSize='small' />
         </div>
         <div className={`${StyleClassPrefix}-thumbnail`} />
         <div className={`${StyleClassPrefix}-title`}>

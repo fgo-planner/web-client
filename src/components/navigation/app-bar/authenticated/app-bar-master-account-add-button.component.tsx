@@ -30,19 +30,19 @@ export const AppBarMasterAccountAddButton = class extends PureComponent<Props, S
         return (
             <Fragment>
                 <Button
-                    variant="outlined"
-                    color="primary"
+                    variant='outlined'
+                    color='primary'
                     onClick={this._openDialog}
                 >
                     <PersonAddIcon />
-                    <div className="pl-2">
+                    <div className='pl-2'>
                         Add Account
                     </div>
                 </Button>
                 <MasterAccountAddDialog
                     // FIXME Inline paper props
                     PaperProps={{ style: { minWidth: 360 } }}
-                    showCloseIcon="never"
+                    showCloseIcon='never'
                     open={dialogOpen}
                     onClose={this._handleDialogClose}
                 />

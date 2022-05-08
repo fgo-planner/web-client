@@ -65,8 +65,8 @@ export const AppBarMasterAccountSelect = class extends PureComponent<Props, Stat
         return (
             <TextField
                 select
-                variant="outlined"
-                size="small"
+                variant='outlined'
+                size='small'
                 className={StyleClassPrefix}
                 sx={styles}
                 value={currentMasterAccountId}

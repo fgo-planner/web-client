@@ -119,12 +119,12 @@ export const PlanAddDialog = React.memo((props: Props) => {
                         noValidate
                         onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
                     >
-                        <InputFieldContainer width="100%">
+                        <InputFieldContainer width='100%'>
                             <TextField
-                                variant="outlined"
+                                variant='outlined'
                                 fullWidth
-                                label="Plan Name"
-                                name="name"
+                                label='Plan Name'
+                                name='name'
                                 value={values.name}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
@@ -132,12 +132,12 @@ export const PlanAddDialog = React.memo((props: Props) => {
                                 helperText={touchedErrors.name}
                             />
                         </InputFieldContainer>
-                        <InputFieldContainer width="100%">
+                        <InputFieldContainer width='100%'>
                             <TextField
-                                variant="outlined"
+                                variant='outlined'
                                 fullWidth
-                                label="Description"
-                                name="description"
+                                label='Description'
+                                name='description'
                                 value={values.description}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
@@ -149,24 +149,24 @@ export const PlanAddDialog = React.memo((props: Props) => {
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        name="autoUpdate"
+                                        name='autoUpdate'
                                         checked={values.autoUpdate}
                                         onChange={handleChange}
                                     />
                                 }
-                                label="Auto-update"
+                                label='Auto-update'
                             />
                         </FormGroup>
                         <FormGroup>
                             <FormControlLabel
                                 control={
                                     <Checkbox
-                                        name="shared"
+                                        name='shared'
                                         checked={values.shared}
                                         onChange={handleChange}
                                     />
                                 }
-                                label="Shared"
+                                label='Shared'
                             />
                         </FormGroup>
                     </form>
@@ -198,16 +198,16 @@ export const PlanAddDialog = React.memo((props: Props) => {
                 <DialogActions>
                     <Button
                         variant={actionButtonVariant}
-                        color="secondary"
+                        color='secondary'
                         onClick={cancel}
                     >
                         Cancel
                     </Button>
                     <Button
                         variant={actionButtonVariant}
-                        color="primary"
+                        color='primary'
                         form={FormId}
-                        type="submit"
+                        type='submit'
                         disabled={isSubmitting || !masterAccountId}
                     >
                         Create

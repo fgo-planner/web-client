@@ -48,7 +48,7 @@ export const UserThemeColorSwatch = React.memo(({ color, allowEditAlpha, onClick
         onClick={onClick}
     >
         <div className={`${StyleClassPrefix}-color-picker-icon`}>
-            <ColorizeIcon fontSize="large" />
+            <ColorizeIcon fontSize='large' />
         </div>
     </Box>
 ));

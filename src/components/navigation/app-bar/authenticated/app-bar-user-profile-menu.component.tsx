@@ -102,7 +102,7 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
 
     const menuHeaderNode = (
         <div className={`${StyleClassPrefix}-menu-header`}>
-            <Avatar className={`${StyleClassPrefix}-avatar`} src="https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png" />
+            <Avatar className={`${StyleClassPrefix}-avatar`} src='https://assets.atlasacademy.io/GameData/JP/MasterFace/equip00052.png' />
             <div className={`${StyleClassPrefix}-user-info`}>
                 <div className={clsx(`${StyleClassPrefix}-username`, 'truncate')}>
                     {currentUser.username}
@@ -126,22 +126,22 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
             {menuHeaderNode}
             <Divider />
             <AppBarActionMenuItem
-                label="Profile"
+                label='Profile'
                 icon={AccountCircleIcon}
-                to="/user/profile"
+                to='/user/profile'
             />
             <AppBarActionMenuItem
-                label="Settings"
+                label='Settings'
                 icon={SettingsIcon}
-                to="/user/settings"
+                to='/user/settings'
             />
             <AppBarActionMenuItem
-                label="Master Accounts"
+                label='Master Accounts'
                 icon={SupervisedUserCircleIcon}
-                to="/user/master-accounts"
+                to='/user/master-accounts'
             />
             <AppBarActionMenuItem
-                label="Log Out"
+                label='Log Out'
                 icon={ExitToAppIcon}
                 onClick={handleLogout}
             />
@@ -157,9 +157,9 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
                 onClick={handleBackgroundMusicButtonClick}
             />
             <AppBarActionMenuItem
-                label="About"
+                label='About'
                 icon={InfoOutlinedIcon}
-                to="/about"
+                to='/about'
             />
         </AppBarActionMenu>
     );

@@ -53,10 +53,10 @@ export const UserThemeBackgroundImage = React.memo(({ url, onChange }: Props) =>
 
     const urlInputField = (
         <TextField
-            variant="outlined"
+            variant='outlined'
             fullWidth
-            label="Background Image URL"
-            type="string"
+            label='Background Image URL'
+            type='string'
             value={urlInputValue}
             onChange={handleUrlInputChange}
             onBlur={handleUrlInputBlur}
@@ -70,7 +70,7 @@ export const UserThemeBackgroundImage = React.memo(({ url, onChange }: Props) =>
         }
         return (
             <div className={`${StyleClassPrefix}-imagePreviewContainer`}>
-                <img className={`${StyleClassPrefix}-imagePreview`} src={url} alt="Not found" />
+                <img className={`${StyleClassPrefix}-imagePreview`} src={url} alt='Not found' />
                 {/* TODO Add fallback when image is not found. */}
             </div>
         );

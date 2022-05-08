@@ -27,7 +27,7 @@ export const DialogCloseButton = React.memo(({ icon, onClick }: Props) => {
             className={`${StyleClassPrefix}-root`}
             sx={StyleProps}
             onClick={onClick}
-            size="large"
+            size='large'
         >
             <Icon />
         </IconButton>

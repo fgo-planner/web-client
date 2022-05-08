@@ -36,37 +36,37 @@ export const MasterAccountList = React.memo(({ masterAccountList, onDeleteAccoun
             <TableHead>
                 <TableRow>
                     <TableCell>Account Name</TableCell>
-                    <TableCell align="center">Friend ID</TableCell>
+                    <TableCell align='center'>Friend ID</TableCell>
                     <TableCell />
-                    <TableCell width={69} align="center">Actions</TableCell>
+                    <TableCell width={69} align='center'>Actions</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
                 {masterAccountList.map((masterAccount, i) => (
                     <TableRow key={masterAccount._id} className={`${StyleClassPrefix}-data-row`}>
                         <TableCell>
-                            <MuiLink component={Link} to='../master' underline="none">
+                            <MuiLink component={Link} to='../master' underline='none'>
                                 {masterAccount.name || `Account ${i + 1}`}
                             </MuiLink>
                         </TableCell>
-                        <TableCell align="center">
+                        <TableCell align='center'>
                             {!masterAccount.friendId ? '\u2013' :
                                 <NumberFormat
                                     thousandSeparator
-                                    displayType="text"
+                                    displayType='text'
                                     value={masterAccount.friendId}
                                 />
                             }
                         </TableCell>
                         <TableCell />
-                        <TableCell align="center">
-                            <Tooltip title="Delete account" placement="left">
+                        <TableCell align='center'>
+                            <Tooltip title='Delete account' placement='left'>
                                 <IconButton
                                     className={`${StyleClassPrefix}-action-button`}
-                                    color="secondary"
+                                    color='secondary'
                                     onClick={() => onDeleteAccount(masterAccount)}
                                     children={<DeleteForeverIcon />}
-                                    size="large" />
+                                    size='large' />
                             </Tooltip>
                         </TableCell>
                     </TableRow>

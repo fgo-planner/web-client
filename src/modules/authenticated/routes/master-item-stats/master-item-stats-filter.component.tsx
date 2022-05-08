@@ -45,47 +45,47 @@ export const MasterItemStatsFilter = React.memo(({ onFilterChange }: Props) => {
     }, []);
 
     return (
-        <div className="px-4 pt-4">
+        <div className='px-4 pt-4'>
             <FormGroup row>
                 <FormControlLabel
                     control={
                         <Checkbox
-                            name="includeUnsummonedServants"
+                            name='includeUnsummonedServants'
                             checked={includeUnsummonedServants}
                             onChange={handleIncludeUnsummonedServantsChange}
                         />
                     }
-                    label="Un-summoned servants"
+                    label='Un-summoned servants'
                 />
                 <FormControlLabel
                     control={
                         <Checkbox
-                            name="includeAppendSkills"
+                            name='includeAppendSkills'
                             checked={includeAppendSkills}
                             onChange={handleIncludeAppendSkillsChange}
                         />
                     }
-                    label="Append skills"
+                    label='Append skills'
                 />
                 <FormControlLabel
                     control={
                         <Checkbox
-                            name="includeCostumes"
+                            name='includeCostumes'
                             checked={includeCostumes}
                             onChange={handleIncludeCostumesChange}
                         />
                     }
-                    label="Costumes"
+                    label='Costumes'
                 />
                 <FormControlLabel
                     control={
                         <Checkbox
-                            name="includeSoundtracks"
+                            name='includeSoundtracks'
                             checked={includeSoundtracks}
                             onChange={handleIncludeSoundtracksChange}
                         />
                     }
-                    label="Soundtracks"
+                    label='Soundtracks'
                 />
             </FormGroup>
         </div>

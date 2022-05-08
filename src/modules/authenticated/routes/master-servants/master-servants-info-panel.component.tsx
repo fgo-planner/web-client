@@ -78,7 +78,7 @@ const renderBondLevel = (bond?: MasterServantBondLevel): JSX.Element => {
     return (
         <div className={`${StyleClassPrefix}-bond-level-stat`}>
             <GameServantBondIcon bond={bond} size={24} />
-            <div className="pl-1">{bond}</div>
+            <div className='pl-1'>{bond}</div>
         </div>
     );
 };
@@ -307,13 +307,13 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
         //     return (
         //         <MasterServantEditForm
         //             formId={FormId}
-        //             className="p-4"
+        //             className='p-4'
         //             masterServant={activeServant}
         //             bondLevels={bondLevels}
         //             unlockedCostumes={unlockedCostumes}
         //             showAppendSkills={showAppendSkills}
         //             onStatsChange={handleStatsChange}
-        //             layout="panel"
+        //             layout='panel'
         //         />
         //     );
         // } else {
@@ -321,45 +321,45 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 <div className={`${StyleClassPrefix}-servant-stats-container`}>
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
-                        label="Level"
+                        label='Level'
                         labelWidth={ServantStatLabelWidth}
                         value={activeServant.level}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
-                        label="Ascension"
+                        label='Ascension'
                         labelWidth={ServantStatLabelWidth}
                         value={activeServant.ascension}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
-                        label="Fou (HP/ATK)"
+                        label='Fou (HP/ATK)'
                         labelWidth={ServantStatLabelWidth}
                         value={renderFouLevels(activeServant)}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
-                        label="Skills"
+                        label='Skills'
                         labelWidth={ServantStatLabelWidth}
                         value={renderSkillLevels(activeServant, 'skills')}
                     />
                     {showAppendSkills &&
                         <DataPointListItem
                             className={`${StyleClassPrefix}-servant-stat`}
-                            label="Append Skills"
+                            label='Append Skills'
                             labelWidth={ServantStatLabelWidth}
                             value={renderSkillLevels(activeServant, 'appendSkills')}
                         />
                     }
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
-                        label="Noble Phantasm"
+                        label='Noble Phantasm'
                         labelWidth={ServantStatLabelWidth}
                         value={renderNpLevel(activeServant)}
                     />
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
-                        label="Bond"
+                        label='Bond'
                         labelWidth={ServantStatLabelWidth}
                         value={renderBondLevel(bondLevels[activeServant.gameId])}
                     />
@@ -392,7 +392,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 const label = (
                     <div className={`${StyleClassPrefix}-material-stat-label`}>
                         <GameItemThumbnail gameItem={gameItem} size={24} />
-                        <div className="pl-2 truncate">
+                        <div className='pl-2 truncate'>
                             {gameItem.name}
                         </div>
                     </div>
@@ -413,7 +413,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                     <Tooltip
                         key={itemId}
                         title={tooltip}
-                        placement="left-start"
+                        placement='left-start'
                         enterDelay={250}
                     >
                         <div>
@@ -464,7 +464,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 </div>
                 {links.map(({ label, url }, index) => (
                     <div className={`${StyleClassPrefix}-external-link`}>
-                        <Link key={index} color="secondary" href={url} target="_blank">
+                        <Link key={index} color='secondary' href={url} target='_blank'>
                             {label}
                         </Link>
                     </div>

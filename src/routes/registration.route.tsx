@@ -217,12 +217,12 @@ export const RegistrationRoute = React.memo(() => {
                 onSubmit={e => { e.preventDefault(); handleSubmit(e); }}
             >
                 <Box sx={styles.form}>
-                    <InputFieldContainer width="100%">
+                    <InputFieldContainer width='100%'>
                         <TextField
-                            variant="outlined"
+                            variant='outlined'
                             fullWidth
-                            label="Username"
-                            name="username"
+                            label='Username'
+                            name='username'
                             value={values.username}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -231,13 +231,13 @@ export const RegistrationRoute = React.memo(() => {
                             required
                         />
                     </InputFieldContainer>
-                    <InputFieldContainer width="100%">
+                    <InputFieldContainer width='100%'>
                         <TextField
-                            variant="outlined"
+                            variant='outlined'
                             fullWidth
-                            label="Password"
-                            name="password"
-                            type="password"
+                            label='Password'
+                            name='password'
+                            type='password'
                             value={values.password}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -246,13 +246,13 @@ export const RegistrationRoute = React.memo(() => {
                             required
                         />
                     </InputFieldContainer>
-                    <InputFieldContainer width="100%">
+                    <InputFieldContainer width='100%'>
                         <TextField
-                            variant="outlined"
+                            variant='outlined'
                             fullWidth
-                            label="Confirm Password"
-                            name="confirmPassword"
-                            type="password"
+                            label='Confirm Password'
+                            name='confirmPassword'
+                            type='password'
                             value={values.confirmPassword}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -260,12 +260,12 @@ export const RegistrationRoute = React.memo(() => {
                             helperText={touchedErrors.confirmPassword}
                         />
                     </InputFieldContainer>
-                    <InputFieldContainer width="100%">
+                    <InputFieldContainer width='100%'>
                         <TextField
-                            variant="outlined"
+                            variant='outlined'
                             fullWidth
-                            label="Email (for account recovery)"
-                            name="email"
+                            label='Email (for account recovery)'
+                            name='email'
                             value={values.email}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -273,12 +273,12 @@ export const RegistrationRoute = React.memo(() => {
                             helperText={touchedErrors.email}
                         />
                     </InputFieldContainer>
-                    <InputFieldContainer width="100%">
+                    <InputFieldContainer width='100%'>
                         <TextField
-                            variant="outlined"
+                            variant='outlined'
                             fullWidth
-                            label="Friend ID"
-                            name="friendId"
+                            label='Friend ID'
+                            name='friendId'
                             value={values.friendId}
                             onChange={e => handleFriendIdChange(e, setFieldValue)}
                             onBlur={handleBlur}
@@ -290,12 +290,12 @@ export const RegistrationRoute = React.memo(() => {
                         <FormControlLabel
                             control={
                                 <Checkbox
-                                    name="noExpire"
+                                    name='noExpire'
                                     checked={termsAccepted}
                                     onChange={handleTermsCheckboxChange}
                                 />
                             }
-                            label="I accept terms and conditions"
+                            label='I accept terms and conditions'
                         />
                     </FormGroup>
                 </Box>
@@ -326,19 +326,19 @@ export const RegistrationRoute = React.memo(() => {
                             </div>
                             <Button
                                 component={Link}
-                                variant="text"
-                                color="secondary"
-                                to="/login"
+                                variant='text'
+                                color='secondary'
+                                to='/login'
                             >
                                 Login instead
                             </Button>
                         </Box>
-                        <Tooltip title={termsAccepted ? '' : 'Terms must be accepted'} placement="top">
+                        <Tooltip title={termsAccepted ? '' : 'Terms must be accepted'} placement='top'>
                             <div>
                                 <Button
-                                    color="primary"
-                                    variant="contained"
-                                    type="submit"
+                                    color='primary'
+                                    variant='contained'
+                                    type='submit'
                                     form={FormId}
                                     disabled={!termsAccepted || isRegistering}
                                 >
@@ -363,9 +363,9 @@ export const RegistrationRoute = React.memo(() => {
                 </Box>
                 <Button
                     component={Link}
-                    variant="text"
-                    color="secondary"
-                    to="/login"
+                    variant='text'
+                    color='secondary'
+                    to='/login'
                 >
                     Click here to login
                 </Button>
@@ -376,7 +376,7 @@ export const RegistrationRoute = React.memo(() => {
     return (
         <Box sx={styles.root}>
             <Box sx={styles.formContainer}>
-                <PageTitle className="pb-8">
+                <PageTitle className='pb-8'>
                     {success ? 'Success!' : 'Create Account'}
                 </PageTitle>
                 {stageContentsNode}

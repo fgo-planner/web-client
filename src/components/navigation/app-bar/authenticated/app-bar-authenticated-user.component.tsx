@@ -99,22 +99,22 @@ export const AppBarAuthenticatedUser = React.memo(({ currentUser }: Props) => {
             <AppBarLinks>
                 <AppBarLink
                     label={<HomeOutlinedIcon />}
-                    route="/user/master"
+                    route='/user/master'
                     active={isLinkActive('/user/master', true)}
                 />
                 <AppBarLink
-                    label="My Servants"
-                    route="/user/master/servants"
+                    label='My Servants'
+                    route='/user/master/servants'
                     active={isLinkActive('/user/master/servants')}
                 />
                 <AppBarLink
-                    label="My Items"
-                    route="/user/master/items"
+                    label='My Items'
+                    route='/user/master/items'
                     active={isLinkActive('/user/master/items')}
                 />
                 <AppBarLink
-                    label="Planner"
-                    route="/user/master/planner"
+                    label='Planner'
+                    route='/user/master/planner'
                     active={isLinkActive('/user/master/planner')}
                 />
             </AppBarLinks>
@@ -125,17 +125,17 @@ export const AppBarAuthenticatedUser = React.memo(({ currentUser }: Props) => {
         <Fragment>
             <Box sx={StyleProps}>
                 {masterAccountNodes}
-                <div className="flex-fill" />
+                <div className='flex-fill' />
                 <AppBarLinks>
                     <AppBarLink
-                        label="Resources"
+                        label='Resources'
                         onClick={handleResourcesLinkClick}
                         onMouseOver={handleResourcesLinkMouseOver}
                         onMouseOut={handleResourcesLinkMouseOut}
                     />
                 </AppBarLinks>
                 <Avatar
-                    className="avatar"
+                    className='avatar'
                     src={AvatarImageUrl}
                     onClick={handleAvatarClick}
                 />

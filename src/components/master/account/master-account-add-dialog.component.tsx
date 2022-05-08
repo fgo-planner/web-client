@@ -94,24 +94,24 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
                     <Box sx={{ p: 2 }}>
                         <form id={FormId} onSubmit={submit}>
                             {/* TODO Add form validation */}
-                            <InputFieldContainer width="100%">
+                            <InputFieldContainer width='100%'>
                                 <TextField
-                                    variant="outlined"
+                                    variant='outlined'
                                     fullWidth
-                                    label="Nickname (Optional)"
-                                    id="name"
-                                    name="name"
+                                    label='Nickname (Optional)'
+                                    id='name'
+                                    name='name'
                                     value={formValues.name}
                                     onChange={handleInputChange}
                                 />
                             </InputFieldContainer>
-                            <InputFieldContainer width="100%">
+                            <InputFieldContainer width='100%'>
                                 <TextField
-                                    variant="outlined"
+                                    variant='outlined'
                                     fullWidth
-                                    label="Friend ID (Optional)"
-                                    id="friendId"
-                                    name="friendId"
+                                    label='Friend ID (Optional)'
+                                    id='friendId'
+                                    name='friendId'
                                     value={formValues.friendId}
                                     onChange={handleInputChange}
                                 />
@@ -122,16 +122,16 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
                 <DialogActions>
                     <Button
                         variant={actionButtonVariant}
-                        color="secondary"
+                        color='secondary'
                         onClick={cancel}
                     >
                         Cancel
                     </Button>
                     <Button
                         variant={actionButtonVariant}
-                        color="primary"
+                        color='primary'
                         form={FormId}
-                        type="submit"
+                        type='submit'
                         disabled={isSubmitting}
                     >
                         Add

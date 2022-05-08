@@ -102,20 +102,20 @@ export const UserThemesEditRoute = React.memo(() => {
      * FabContainer children
      */
     const fabContainerChildNodes: ReactNode = [
-        <Tooltip key="cancel" title="Cancel">
+        <Tooltip key='cancel' title='Cancel'>
             <div>
                 <Fab
-                    color="default"
+                    color='default'
                     onClick={handleCancelButtonClick}
                     disabled={isLoadingIndicatorActive}
                     children={<ClearIcon />}
                 />
             </div>
         </Tooltip>,
-        <Tooltip key="save" title="Save">
+        <Tooltip key='save' title='Save'>
             <div>
                 <Fab
-                    color="primary"
+                    color='primary'
                     onClick={handleSaveButtonClick}
                     disabled={isLoadingIndicatorActive}
                     children={<SaveIcon />}
@@ -128,8 +128,8 @@ export const UserThemesEditRoute = React.memo(() => {
         <Fragment>
             <LayoutPageScrollable scrollContainerRef={scrollContainerRef}>
                 <PageTitle>Edit Themes</PageTitle>
-                <UserThemeEdit userTheme={lightTheme} forThemeMode="light" />
-                <UserThemeEdit userTheme={darkTheme} forThemeMode="dark" />
+                <UserThemeEdit userTheme={lightTheme} forThemeMode='light' />
+                <UserThemeEdit userTheme={darkTheme} forThemeMode='dark' />
             </LayoutPageScrollable>
             <FabContainer children={fabContainerChildNodes} />
         </Fragment>

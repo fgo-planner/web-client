@@ -136,10 +136,10 @@ export const MasterSoundtracksRoute = React.memo(() => {
     let fabContainerChildNodes: ReactNode;
     if (!editMode) {
         fabContainerChildNodes = (
-            <Tooltip key="edit" title="Edit">
+            <Tooltip key='edit' title='Edit'>
                 <div>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={handleEditButtonClick}
                         disabled={isLoadingIndicatorActive}
                         children={<EditIcon />}
@@ -149,20 +149,20 @@ export const MasterSoundtracksRoute = React.memo(() => {
         );
     } else {
         fabContainerChildNodes = [
-            <Tooltip key="cancel" title="Cancel">
+            <Tooltip key='cancel' title='Cancel'>
                 <div>
                     <Fab
-                        color="default"
+                        color='default'
                         onClick={handleCancelButtonClick}
                         disabled={isLoadingIndicatorActive}
                         children={<ClearIcon />}
                     />
                 </div>
             </Tooltip>,
-            <Tooltip key="save" title="Save">
+            <Tooltip key='save' title='Save'>
                 <div>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={handleSaveButtonClick}
                         disabled={isLoadingIndicatorActive}
                         children={<SaveIcon />}
@@ -173,14 +173,14 @@ export const MasterSoundtracksRoute = React.memo(() => {
     }
 
     return (
-        <div className="flex column full-height">
+        <div className='flex column full-height'>
             <PageTitle>
                 {editMode ?
                     'Edit Unlocked Soundtracks' :
                     'Unlocked Soundtracks'
                 }
             </PageTitle>
-            <div className="flex overflow-hidden">
+            <div className='flex overflow-hidden'>
                 <LayoutContentSection
                     className='py-4 pr-4 flex-fill'
                     fullHeight

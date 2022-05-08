@@ -23,7 +23,7 @@ export const GameServantBondIcon = React.memo(({ bond, size }: Props) => {
     return (
         <div style={sizeStyle}>
             <img
-                className="full-width full-height"
+                className='full-width full-height'
                 src={imageUrl}
                 alt={`Bond ${bond}`}
             />

@@ -72,9 +72,9 @@ export const MasterItemListRow = React.memo(({ data, editMode }: Props) => {
         itemQuantityNode = (
             <TextField
                 inputRef={itemQuantityInputRef}
-                variant="outlined"
-                size="small"
-                type="number"
+                variant='outlined'
+                size='small'
+                type='number'
                 inputProps={QuantityInputProps}
                 value={data.quantity.quantity}
                 onChange={handleItemQuantityChange}
@@ -86,7 +86,7 @@ export const MasterItemListRow = React.memo(({ data, editMode }: Props) => {
         itemQuantityNode = (
             <NumberFormat
                 value={data.quantity.quantity}
-                displayType="text"
+                displayType='text'
                 thousandSeparator={true}
             />
         );
@@ -100,7 +100,7 @@ export const MasterItemListRow = React.memo(({ data, editMode }: Props) => {
             borderTop
         >
             <MasterItemListRowLabel gameItem={data.gameItem} editMode={editMode} />
-            <div className="flex-fill" />
+            <div className='flex-fill' />
             <div>
                 {itemQuantityNode}
             </div>

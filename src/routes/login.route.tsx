@@ -90,7 +90,7 @@ export const LoginRoute = React.memo(() => {
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-form-container`}>
-                <PageTitle className="pb-8">
+                <PageTitle className='pb-8'>
                     Login
                 </PageTitle>
                 {errorMessage &&
@@ -106,25 +106,25 @@ export const LoginRoute = React.memo(() => {
                     <div className={`${StyleClassPrefix}-actions-links`}>
                         <Button
                             component={Link}
-                            variant="text"
-                            color="secondary"
-                            to="/forgot-password"
+                            variant='text'
+                            color='secondary'
+                            to='/forgot-password'
                         >
                             Forgot password
                         </Button>
                         <Button
                             component={Link}
-                            variant="text"
-                            color="secondary"
-                            to="/register"
+                            variant='text'
+                            color='secondary'
+                            to='/register'
                         >
                             Create account
                         </Button>
                     </div>
                     <Button
-                        color="primary"
-                        variant="contained"
-                        type="submit"
+                        color='primary'
+                        variant='contained'
+                        type='submit'
                         form={FormId}
                         disabled={isLoggingIn}
                     >

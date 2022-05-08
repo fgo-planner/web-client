@@ -59,10 +59,10 @@ export const MasterServantImportFileInput = React.memo(({ onSubmit, disableSubmi
 
     const fabContainerNode: ReactNode = (
         <FabContainer>
-            <Tooltip title="Parse data">
+            <Tooltip title='Parse data'>
                 <div>
                     <Fab
-                        color="primary"
+                        color='primary'
                         onClick={handleSubmitButtonClick}
                         disabled={!hasImportData || disableSubmit}
                         children={<PublishIcon />}
@@ -89,7 +89,7 @@ export const MasterServantImportFileInput = React.memo(({ onSubmit, disableSubmi
                             <div className={`${StyleClassPrefix}-input-actions-helper-text`}>
                                 {FileInputActionsHelperText}
                             </div>
-                            <Button variant="contained" color="secondary" onClick={openFileUploadDialog}>
+                            <Button variant='contained' color='secondary' onClick={openFileUploadDialog}>
                                 Select File
                             </Button>
                         </div>

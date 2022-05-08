@@ -81,7 +81,7 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
     const playButtonNode: ReactNode = useMemo(() => {
         return (
             <div className={`${StyleClassPrefix}-play-button`} onClick={handlePlayButtonClick}>
-                <IconButton color="primary" size="large">
+                <IconButton color='primary' size='large'>
                     {playing ?
                         <PauseIcon /> :
                         <PlayArrowIcon />

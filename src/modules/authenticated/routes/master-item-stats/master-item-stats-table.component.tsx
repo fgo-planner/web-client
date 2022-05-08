@@ -147,7 +147,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
                             showBackground
                             enableLink
                         />
-                        <div className="pl-4">
+                        <div className='pl-4'>
                             {/* TODO Make this a link */}
                             {gameItem.name}
                         </div>
@@ -155,35 +155,35 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
                     <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
-                            displayType="text"
+                            displayType='text'
                             value={cost}
                         />
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
-                            displayType="text"
+                            displayType='text'
                             value={used}
                         />
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
-                            displayType="text"
+                            displayType='text'
                             value={inventory}
                         />
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
-                            displayType="text"
+                            displayType='text'
                             value={debt}
                         />
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumberFormat
                             thousandSeparator
-                            displayType="text"
+                            displayType='text'
                             value={Math.max(0, debt - inventory)}
                         />
                     </div>
@@ -195,19 +195,19 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-header`}>
-                <Tooltip title={costColumnTooltip} placement="top">
+                <Tooltip title={costColumnTooltip} placement='top'>
                     <div className={`${StyleClassPrefix}-data-cell`}>Total Needed</div>
                 </Tooltip>
-                <Tooltip title={usedColumnTooltip} placement="top">
+                <Tooltip title={usedColumnTooltip} placement='top'>
                     <div className={`${StyleClassPrefix}-data-cell`}>Total Consumed</div>
                 </Tooltip>
-                <Tooltip title={InventoryColumnTooltip} placement="top">
+                <Tooltip title={InventoryColumnTooltip} placement='top'>
                     <div className={`${StyleClassPrefix}-data-cell`}>Current Inventory</div>
                 </Tooltip>
-                <Tooltip title={debtColumnTooltip} placement="top" >
+                <Tooltip title={debtColumnTooltip} placement='top' >
                     <div className={`${StyleClassPrefix}-data-cell`}>Remaining Needed</div>
                 </Tooltip>
-                <Tooltip title={DifferenceColumnTooltip} placement="top">
+                <Tooltip title={DifferenceColumnTooltip} placement='top'>
                     <div className={`${StyleClassPrefix}-data-cell`}>Deficit</div>
                 </Tooltip>
             </div>

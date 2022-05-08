@@ -74,7 +74,7 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
                         gameServant={gameServant}
                         size={options.cellSize}
                     />
-                    <div className="flex-fill px-2">
+                    <div className='flex-fill px-2'>
                         {gameServant.name}
                     </div>
                     <div>

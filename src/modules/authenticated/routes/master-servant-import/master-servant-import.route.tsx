@@ -237,8 +237,8 @@ const MasterServantImportRoute = React.memo(() => {
             <AlertDialog
                 open={importStatusDialogOpen}
                 message={message}
-                confirmButtonColor="primary"
-                confirmButtonLabel="OK"
+                confirmButtonColor='primary'
+                confirmButtonLabel='OK'
                 onClose={handleImportStatusDialogAction}
             />
         );

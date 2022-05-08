@@ -110,28 +110,28 @@ export const LoginDialog = React.memo((props: Props) => {
                     <div className={`${StyleClassPrefix}-action-links`}>
                         <Button
                             component={Link}
-                            variant="text"
-                            color="secondary"
-                            to="/forgot-password"
+                            variant='text'
+                            color='secondary'
+                            to='/forgot-password'
                             onClick={cancel}
                         >
                             Forgot password
                         </Button>
                         <Button
                             component={Link}
-                            variant="text"
-                            color="secondary"
-                            to="/register"
+                            variant='text'
+                            color='secondary'
+                            to='/register'
                             onClick={cancel}
                         >
                             Create account
                         </Button>
                     </div>
                     <Button
-                        variant="contained"
-                        color="primary"
+                        variant='contained'
+                        color='primary'
                         form={FormId}
-                        type="submit"
+                        type='submit'
                         disabled={isLoggingIn}
                     >
                         Login

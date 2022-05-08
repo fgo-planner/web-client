@@ -30,7 +30,6 @@ const DialogPaperProps = {
         width: DialogWidth,
         maxWidth: DialogWidth,
         height: DialogHeight,
-        maxHeight: '100vh',
         m: 0,
         '& .contents-container': {
             display: 'flex',

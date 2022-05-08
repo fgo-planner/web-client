@@ -13,13 +13,13 @@ const StyleProps = (theme: Theme) => ({
     top: 0,
     left: 0,
     right: 0,
-    height: '100vh',
+    height: '100%',
     [`& .${StyleClassPrefix}-upper-section`]: {
         zIndex: 2
     },
     [`& .${StyleClassPrefix}-lower-section`]: {
         // display: 'flex',
-        height: `calc(100vh - ${theme.spacing(ThemeConstants.AppBarHeightScale)})`,
+        height: `calc(100% - ${theme.spacing(ThemeConstants.AppBarHeightScale)})`,
         flex: 1,
         overflow: 'hidden',
         bgcolor: 'background.default',

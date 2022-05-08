@@ -5,10 +5,9 @@ import React, { Fragment, ReactNode, useCallback, useEffect, useRef, useState } 
 import { useNavigate } from 'react-router-dom';
 import { UserPreferences, UserWebClientTheme } from '../../../../../local_modules/types/lib';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
+import { AppBarElevateOnScroll } from '../../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { UserService } from '../../../../services/data/user/user.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
@@ -26,8 +25,6 @@ export const UserThemesEditRoute = React.memo(() => {
         resetLoadingIndicator,
         isLoadingIndicatorActive
     } = useLoadingIndicator();
-
-    const scrollContainerRef = useElevateAppBarOnScroll();
 
     const themeService = useInjectable(ThemeService);
     const userService = useInjectable(UserService);
@@ -126,11 +123,11 @@ export const UserThemesEditRoute = React.memo(() => {
 
     return (
         <Fragment>
-            <LayoutPageScrollable scrollContainerRef={scrollContainerRef}>
+            <AppBarElevateOnScroll>
                 <PageTitle>Edit Themes</PageTitle>
                 <UserThemeEdit userTheme={lightTheme} forThemeMode='light' />
                 <UserThemeEdit userTheme={darkTheme} forThemeMode='dark' />
-            </LayoutPageScrollable>
+            </AppBarElevateOnScroll>
             <FabContainer children={fabContainerChildNodes} />
         </Fragment>
     );

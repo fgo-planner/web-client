@@ -5,10 +5,9 @@ import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } fr
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
+import { AppBarElevateOnScroll } from '../../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { MasterAccountPlans } from '../../../../types/data';
@@ -46,8 +45,6 @@ export const PlansRoute = React.memo(() => {
         resetLoadingIndicator,
         isLoadingIndicatorActive
     } = useLoadingIndicator();
-
-    const scrollContainerRef = useElevateAppBarOnScroll();
 
     const planService = useInjectable(PlanService);
 
@@ -128,7 +125,7 @@ export const PlansRoute = React.memo(() => {
 
     return (
         <Fragment>
-            <LayoutPageScrollable scrollContainerRef={scrollContainerRef}>
+            <AppBarElevateOnScroll>
                 <PageTitle>
                     My Plans
                 </PageTitle>
@@ -144,7 +141,7 @@ export const PlansRoute = React.memo(() => {
                     }
                 </LayoutContentSection>
                 <div className='py-10' />
-            </LayoutPageScrollable>
+            </AppBarElevateOnScroll>
             <PlanAddDialog
                 open={addPlanDialogOpen}
                 PaperProps={AddPlanDialogPaperProps}

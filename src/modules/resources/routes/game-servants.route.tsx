@@ -1,11 +1,10 @@
 import React from 'react';
 import { GameServantThumbnail } from '../../../components/game/servant/game-servant-thumbnail.component';
 import { LayoutContentSection } from '../../../components/layout/layout-content-section.component';
-import { LayoutPageScrollable } from '../../../components/layout/layout-page-scrollable.component';
 import { StaticListRowContainer } from '../../../components/list/static-list-row-container.component';
+import { AppBarElevateOnScroll } from '../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { PageTitle } from '../../../components/text/page-title.component';
 import { useGameServantList } from '../../../hooks/data/use-game-servant-list.hook';
-import { useElevateAppBarOnScroll } from '../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 
 const StyleClassPrefix = 'GameServants';
 
@@ -13,10 +12,8 @@ export const GameServantsRoute = React.memo(() => {
 
     const gameServants = useGameServantList();
 
-    const scrollContainer = useElevateAppBarOnScroll();
-
     return (
-        <LayoutPageScrollable className={`${StyleClassPrefix}-root`} scrollContainerRef={scrollContainer}>
+        <AppBarElevateOnScroll className={`${StyleClassPrefix}-root`}>
             <PageTitle>Servant List</PageTitle>
             <LayoutContentSection className='m-4'>
                 {gameServants?.map((servant, index) => (
@@ -34,7 +31,7 @@ export const GameServantsRoute = React.memo(() => {
                     </StaticListRowContainer>
                 ))}
             </LayoutContentSection>
-        </LayoutPageScrollable>
+        </AppBarElevateOnScroll>
     );
 
 });

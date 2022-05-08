@@ -5,11 +5,10 @@ import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'reac
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
 import { MasterAccountAddDialog } from '../../../../components/master/account/master-account-add-dialog.component';
+import { AppBarElevateOnScroll } from '../../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { MasterAccountList as MasterAccountListType } from '../../../../types/data';
 import { Immutable, ModalOnCloseReason, Nullable } from '../../../../types/internal';
@@ -61,8 +60,6 @@ export const MasterAccountsRoute = React.memo(() => {
         return () => onMasterAccountListChangeSubscription.unsubscribe();
     }, []);
 
-    const scrollContainerRef = useElevateAppBarOnScroll();
-
     const deleteAccountDialogPrompt = useMemo(() => {
         if (!deleteAccountTarget) {
             return '';
@@ -97,7 +94,7 @@ export const MasterAccountsRoute = React.memo(() => {
 
     return (
         <Fragment>
-            <LayoutPageScrollable scrollContainerRef={scrollContainerRef}>
+            <AppBarElevateOnScroll>
                 <PageTitle>
                     Master Accounts
                 </PageTitle>
@@ -110,7 +107,7 @@ export const MasterAccountsRoute = React.memo(() => {
                     }
                 </LayoutContentSection>
                 <div className='py-10' />
-            </LayoutPageScrollable>
+            </AppBarElevateOnScroll>
             <MasterAccountAddDialog
                 PaperProps={AddAccountDialogPaperProps}
                 open={addAccountDialogOpen}

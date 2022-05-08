@@ -2,10 +2,9 @@ import { MasterAccount } from '@fgo-planner/types';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog } from '../../../../components/dialog/alert-dialog.component';
-import { LayoutPageScrollable } from '../../../../components/layout/layout-page-scrollable.component';
+import { AppBarElevateOnScroll } from '../../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useElevateAppBarOnScroll } from '../../../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { FgoManagerMasterServantParser } from '../../../../services/import/fgo-manager/fgo-manager-master-servant-parser';
@@ -52,8 +51,6 @@ const MasterServantImportRoute = React.memo(() => {
         resetLoadingIndicator,
         isLoadingIndicatorActive
     } = useLoadingIndicator();
-
-    const scrollContainerRef = useElevateAppBarOnScroll();
 
     const masterAccountService = useInjectable(MasterAccountService);
 
@@ -246,9 +243,9 @@ const MasterServantImportRoute = React.memo(() => {
 
     return (
         <Fragment>
-            <LayoutPageScrollable scrollContainerRef={scrollContainerRef}>
+            <AppBarElevateOnScroll>
                 {mainContentNode}
-            </LayoutPageScrollable>
+            </AppBarElevateOnScroll>
             {importStatusDialog}
         </Fragment>
     );

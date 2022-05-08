@@ -1,7 +1,7 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
-import { useElevateAppBarOnScroll } from '../../hooks/user-interface/use-elevate-app-bar-on-scroll.hook';
+import { AppBarElevateOnScroll } from '../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { Immutable, Nullable } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
@@ -17,8 +17,6 @@ const StyleProps = {
 const StyleClassPrefix = 'Home';
 
 export const HomeRoute = React.memo(() => {
-
-    const scrollContainerRef = useElevateAppBarOnScroll();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
 
@@ -153,12 +151,8 @@ export const HomeRoute = React.memo(() => {
     }, [commonResourcesLinkNodes, masterAccount, masterAccountLinksNode, userAccountLinksNode]);
 
     return (
-        <Box
-            ref={scrollContainerRef}
-            className={`${StyleClassPrefix}-root`}
-            sx={StyleProps}
-        >
+        <AppBarElevateOnScroll className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             {linksNode}
-        </Box>
+        </AppBarElevateOnScroll>
     );
 });

@@ -1,12 +1,12 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
-import { Fab, FormControlLabel, FormGroup, Switch, Tooltip } from '@mui/material';
+import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import lodash from 'lodash';
 import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
-import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
+import { BottomBarActions } from '../../../../components/navigation/bottom-bar/bottom-bar-actions.component';
+import { BottomBar } from '../../../../components/navigation/bottom-bar/bottom-bar.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -39,6 +39,8 @@ type MasterAccountData = {
     bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
 };
+
+const UnsavedChangesMessage = 'The changes you made have not been saved yet. Use the buttons on the right to revert or save the changes.';
 
 const getDefaultServantSelection = (): ServantSelection => ({
     instanceIds: new Set(),
@@ -75,18 +77,21 @@ const StyleProps = (theme: Theme) => ({
     [`& .${StyleClassPrefix}-main-content`]: {
         display: 'flex',
         flex: '1',
-        width: 'calc(100% - 48px)'
+        // width: 'calc(100% - 48px)'
     },
     [`& .${StyleClassPrefix}-info-panel-container`]: {
         width: 320,
-        height: 'calc(100% - 84px)',
+        height: '100%',
         pr: 4,
         py: 4,
         boxSizing: 'border-box',
         [theme.breakpoints.down('xl')]: {
             width: 300
         }
-    }
+    },
+    [`& .${StyleClassPrefix}-unsaved-message`]: {
+        color: theme.palette.warning.main
+    },
 } as SystemStyleObject<Theme>);
 
 export const MasterServantsRoute = React.memo(() => {
@@ -656,32 +661,35 @@ export const MasterServantsRoute = React.memo(() => {
     const isMultipleServantsSelected = selectedServants.length > 1;
 
     /**
-     * FabContainer children
+     * Bottom bar node
      */
-    let fabContainerChildNodes: ReactNode = null;
+    let bottomBarNode: ReactNode;
     if (!dragDropMode) {
-        fabContainerChildNodes = [
-            <Tooltip key='cancel' title='Cancel'>
-                <div>
-                    <Fab
-                        color='default'
+        bottomBarNode =(
+            <BottomBar show={isMasterAccountDirty}>
+                <div className={`${StyleClassPrefix}-unsaved-message`}>
+                    {UnsavedChangesMessage}
+                </div>
+                <BottomBarActions>
+                    <Button
+                        variant='contained'
+                        color='secondary'
                         onClick={handleRevertButtonClick}
                         disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
-                        children={<ClearIcon />}
-                    />
-                </div>
-            </Tooltip>,
-            <Tooltip key='save' title='Save changes'>
-                <div>
-                    <Fab
+                    >
+                        Revert
+                    </Button>
+                    <Button
+                        variant='contained'
                         color='primary'
                         onClick={handleSaveButtonClick}
                         disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
-                        children={<SaveIcon />}
-                    />
-                </div>
-            </Tooltip>
-        ];
+                    >
+                        Save
+                    </Button>
+                </BottomBarActions>
+            </BottomBar>
+        );
     };
 
     const {
@@ -760,7 +768,10 @@ export const MasterServantsRoute = React.memo(() => {
                     </div>}
                 </div>
             </div>
-            <FabContainer children={fabContainerChildNodes} />
+            <div>
+                {bottomBarNode}
+            </div>
+            {/* <FabContainer children={fabContainerChildNodes} /> */}
             <MasterServantsEditDialog
                 bondLevels={bondLevels}
                 editData={editServantDialogData}

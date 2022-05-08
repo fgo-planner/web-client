@@ -7,7 +7,7 @@ import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';

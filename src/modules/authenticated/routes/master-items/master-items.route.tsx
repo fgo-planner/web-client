@@ -5,7 +5,7 @@ import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { GameItemConstants } from '../../../../constants';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';

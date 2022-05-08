@@ -2,7 +2,7 @@ import { AccessibilityNew as AccessibilityNewIcon, BarChart as BarChartIcon, Cle
 import { Divider, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
 
 type Props = {
     dragDropMode: boolean;

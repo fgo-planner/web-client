@@ -8,7 +8,7 @@ import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutContentSection, StyleClassPrefix as LayoutContentSectionStyleClassPrefix } from '../../../../components/layout/layout-content-section.component';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
 import { PlanRequirementsTableOptions } from '../../../../components/plan/requirements/table/plan-requirements-table-options.type';
 import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/plan-requirements-table.component';
 import { PageTitle } from '../../../../components/text/page-title.component';

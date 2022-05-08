@@ -2,7 +2,7 @@ import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { PropsWithChildren } from 'react';
 import { ThemeConstants } from '../../styles/theme-constants';
 import { AppBar } from './app-bar/app-bar.component';
-import { LoadingIndicatorOverlay } from './loading-indicator-overlay';
+import { LoadingIndicatorOverlay } from '../utils/loading-indicator-overlay.component';
 
 const StyleClassPrefix = 'NavigationMain';
 

@@ -67,10 +67,23 @@ export class MasterServantUtils {
 
     private static _merge(target: MasterServant, source: MasterServant): void {
         /*
-         * Copy the deep cloned fields over to the target. The deep cloning is for
-         * creating new instances of nested object(s).
+         * Keep track of the  original `instanceId` of the target so that it can be
+         * copied back later. We do not want teh merge operation to modify the
+         * `instanceId`.
          */
-        Object.assign(target, this.clone(source));
+        const { instanceId } = target;
+        /*
+         * Deep clone to create new instances of nested object(s).
+         */
+        const clone = this.clone(source);
+        /*
+         * Copy the deep cloned fields over to the target. 
+         */
+        Object.assign(target, clone);
+        /*
+         * Reassign the original `instanceId`.
+         */
+        target.instanceId = instanceId;
     }
 
     private static _mergeArrays(target: Array<MasterServant>, source: Array<MasterServant>): void {

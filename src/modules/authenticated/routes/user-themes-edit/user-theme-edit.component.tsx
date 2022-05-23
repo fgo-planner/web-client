@@ -59,7 +59,7 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
                     />
                     <UserThemeColor
                         color={userTheme.drawerColor}
-                        label='Primary'
+                        label='Drawer'
                     />
                     <UserThemeColor
                         color={userTheme.primaryColor}

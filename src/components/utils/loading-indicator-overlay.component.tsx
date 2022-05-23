@@ -9,7 +9,7 @@ export const LoadingIndicatorOverlay = React.memo(() => {
 
     useEffect(() => {
         const onDisplayStatusChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopics.UserInterface.LoadingIndicatorDisplayChange)
+            .get(SubscriptionTopics.UserInterface.LoadingIndicatorActiveChange)
             .subscribe(setVisible);
 
         return () => onDisplayStatusChangeSubscription.unsubscribe();

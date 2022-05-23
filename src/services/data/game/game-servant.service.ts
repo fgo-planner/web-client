@@ -4,15 +4,15 @@ import { Injectable } from '../../../decorators/dependency-injection/injectable.
 import { GameServantList, GameServantMap, Page, Pagination } from '../../../types/data';
 import { Immutable, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
-import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
+import { UserInterfaceService } from '../../user-interface/user-interface.service';
 
 @Injectable
 export class GameServantService {
 
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-servant`;
 
-    @Inject(LoadingIndicatorOverlayService)
-    private readonly _loadingIndicatorOverlayService!: LoadingIndicatorOverlayService;
+    @Inject(UserInterfaceService)
+    private readonly _userInterfaceService!: UserInterfaceService;
 
     private _servantsCache: Nullable<GameServantList>;
 
@@ -39,7 +39,7 @@ export class GameServantService {
             return this._servantsCache;
         }
         if (!this._servantsCachePromise) {
-            const loadingIndicatorId = this._loadingIndicatorOverlayService.invoke();
+            const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
             /*
              * TODO Currently, every servant is retrieved and cached with this call. This
              * may need to modify the caching system for servants so that servants are 
@@ -48,10 +48,10 @@ export class GameServantService {
             this._servantsCachePromise = Http.get<GameServant[]>(`${this._BaseUrl}`);
             this._servantsCachePromise.then(cache => {
                 this._onServantsCacheLoaded(cache);
-                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             }).catch(error => {
                 this._onServantsCacheLoadError(error);
-                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             });
         }
         return this._servantsCachePromise;

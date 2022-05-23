@@ -1,3 +1,3 @@
 import { ModalOnCloseReason } from './modal-on-close-reason.type';
 
-export type ModalOnCloseHandler<T = {}> = (event: any, reason: ModalOnCloseReason, data?: T) => void;
+export type ModalOnCloseHandler<T = {}, R = ModalOnCloseReason> = (event: any, reason: R, data?: T) => void;

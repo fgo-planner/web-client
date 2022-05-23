@@ -1,6 +1,6 @@
 import { MasterAccount, UserPreferences } from '@fgo-planner/types';
 import { MasterAccountList } from '../../types/data';
-import { HttpResponseError, Nullable, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
+import { HttpResponseError, Nullable, PageMetadata, NavigationDrawerContent, ThemeInfo, UserInfo } from '../../types/internal';
 import { nullSupplier } from '../function.utils';
 import { SubscriptionTopic } from './subscription-topic.class';
 
@@ -62,9 +62,13 @@ class UserInterface {
 
     static readonly AppBarElevatedChange = SubscriptionTopic.forReplaySubject<boolean>();
 
-    static readonly LoadingIndicatorDisplayChange = SubscriptionTopic.forReplaySubject<boolean>();
+    static readonly LoadingIndicatorActiveChange = SubscriptionTopic.forReplaySubject<boolean>();
 
     static readonly MetadataChange = SubscriptionTopic.forReplaySubject<PageMetadata>();
+
+    // static readonly NavigationDrawerContentChange = SubscriptionTopic.forReplaySubject<Nullable<NavigationDrawerContent>>();
+    
+    static readonly NavigationDrawerOpenChange = SubscriptionTopic.forReplaySubject<boolean>();
 
     static readonly ThemeChange = SubscriptionTopic.forReplaySubject<ThemeInfo>();
 

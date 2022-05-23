@@ -1,9 +1,9 @@
-import { createTheme, ThemeProvider, Typography } from '@mui/material';
-import { StyledEngineProvider, SystemStyleObject, Theme } from '@mui/system';
+import { createTheme, Palette, ThemeProvider, Typography, Theme } from '@mui/material';
+import { StyledEngineProvider, SystemStyleObject,  } from '@mui/system';
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { BackgroundImageContext } from '../../contexts/background-image.context';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { ThemeInfo } from '../../types/internal';
+import { SxPropsFunction, ThemeInfo } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { ThemeBackground } from './theme-background.component';
@@ -11,10 +11,31 @@ import { ThemeBackground } from './theme-background.component';
 type Props = PropsWithChildren<{}>;
 
 /**
+ * Augments custom colors in the theme palette that were not automatically
+ * augmented by MUI.
+ */
+const augmentAdditionalColors = (theme: Theme): void => {
+
+    const palette = theme.palette as Palette;
+
+    const {
+        augmentColor,
+        drawer,
+        mode
+    } = palette;
+
+    if (drawer) {
+        palette.drawer = augmentColor({ name: 'drawer', color: drawer });
+    }
+
+    console.log(mode, theme); // TODO Remove this
+};
+
+/**
  * Replaces the default scrollbar styles with the theme based scrollbars for
  * the children nodes.
  */
-const ScrollbarStyleProps = (theme: Theme) => ({
+const ScrollbarStyleProps = ((theme: Theme) => ({
     '& *::-webkit-scrollbar': {
         width: theme.spacing(ThemeConstants.ScrollbarWidthScale),
         height: theme.spacing(ThemeConstants.ScrollbarWidthScale)
@@ -35,8 +56,15 @@ const ScrollbarStyleProps = (theme: Theme) => ({
             borderLeftStyle: 'solid',
             borderLeftColor: theme.palette.divider,
         }
+    },
+    [`& .${ThemeConstants.ClassScrollbarHidden}`]: {
+        '&::-webkit-scrollbar': {
+            display: 'none'
+        },
+        msOverflowStyle: 'none',
+        scrollbarWidth: 'none'
     }
-} as SystemStyleObject<Theme>);
+} as SystemStyleObject)) as SxPropsFunction;
 
 /**
  * Utility component for listening for theme changes from the `ThemeService` and
@@ -53,7 +81,9 @@ export const ThemeProviderWrapper = React.memo(({ children }: Props) => {
             .get(SubscriptionTopics.UserInterface.ThemeChange)
             .subscribe((themeInfo: ThemeInfo) => {
                 const { themeOptions, backgroundImageUrl } = themeInfo;
-                setTheme(createTheme(themeOptions));
+                const theme = createTheme(themeOptions);
+                augmentAdditionalColors(theme);
+                setTheme(theme);
                 setBackgroundImageUrl(backgroundImageUrl);
             });
 

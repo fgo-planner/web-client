@@ -1,4 +1,4 @@
-import { AccessibilityNew as AccessibilityNewIcon, BarChart as BarChartIcon, Clear as ClearIcon, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, GroupAddOutlined, ImportExport as ImportExportIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon } from '@mui/icons-material';
+import { BarChart as BarChartIcon, Clear as ClearIcon, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, GroupAddOutlined, ImportExport as ImportExportIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon } from '@mui/icons-material';
 import { Divider, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -107,17 +107,6 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
                 </div>
             </Tooltip>
             <Divider />
-            
-            <Tooltip key='costumes' title='Costumes' placement='right'>
-                <div>
-                    <IconButton
-                        component={Link}
-                        to='costumes'
-                        children={<AccessibilityNewIcon />}
-                        size='large'
-                    />
-                </div>
-            </Tooltip>
             <Tooltip key='stats' title='Servant stats' placement='right'>
                 <div>
                     <IconButton

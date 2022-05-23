@@ -6,6 +6,7 @@
 export * from './dependency-injection/injectable-definition.type';
 export * from './dependency-injection/injectable-token.type';
 export * from './dependency-injection/injected-field.type';
+export * from './dto/navigation-drawer-content.type';
 export * from './generics/cache-array.type';
 export * from './generics/cache-map.type';
 export * from './generics/functions.type';
@@ -26,6 +27,7 @@ export * from './modal-on-close-reason.type';
 export * from './page-metadata.type';
 export * from './props/component-style-props.type';
 export * from './props/dialog-component-props.type';
+export * from './sx-props-function.type';
 export * from './text-field-change-event.type';
 export * from './theme-info.type';
 export * from './user-info.type';

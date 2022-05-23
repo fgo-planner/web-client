@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect } from 'react';
 import { RouteObject, useRoutes } from 'react-router-dom';
-import { NavigationMain } from './components/navigation/navigation-main.component';
+import { NavigationLayout } from './components/navigation/navigation-layout.component';
 import { LazyLoadFallback } from './components/route-fallback/lazy-load-fallback.component';
 import { ThemeProviderWrapper } from './components/theme/theme-provider-wrapper.component';
 import { RequireAuthentication } from './components/utils/require-authentication.component';
@@ -29,10 +29,12 @@ Planned navigation outline:
     ↳ Authenticated (module)
         ↳ User Profile
         ↳ Master Accounts
-            ↳ Profile
-            ↳ Items
-            ↳ Servants
+            ↳ Dashboard
             ↳ Planner
+            ↳ Servants
+            ↳ Items
+            ↳ Costumes
+            ↳ Soundtracks
             ↳ Data Import/Export (lazy loaded)
         ↳ Friends
             ↳ Items
@@ -108,9 +110,9 @@ export const RootModule = React.memo(() => {
 
     return (
         <ThemeProviderWrapper>
-            <NavigationMain>
+            <NavigationLayout>
                 {activeRouteElement}
-            </NavigationMain>
+            </NavigationLayout>
         </ThemeProviderWrapper>
     );
 

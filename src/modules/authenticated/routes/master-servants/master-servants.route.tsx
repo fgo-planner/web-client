@@ -497,7 +497,7 @@ export const MasterServantsRoute = React.memo(() => {
     //#endregion
 
 
-    //#endregion Navigation rail event handlers
+    //#region Navigation rail event handlers
 
     const handleMultiAddServant = openMultiAddServantDialog;
 

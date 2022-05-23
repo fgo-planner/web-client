@@ -22,6 +22,22 @@ export class ThemeConstants {
 
     //#endregion
 
+    //#region Navigation drawer
+
+    /**
+     * The width of the navigation drawer in its condensed state as a factor of the
+     * spacing transformation value.
+     */
+    static NavigationDrawerCondensedWidthScale = 16;
+ 
+    /**
+     * The width of the navigation drawer in its expanded state as a factor of the
+     * spacing transformation value.
+     */
+    static NavigationDrawerExpandedWidthScale = 64;
+
+    //#endregion
+
 
     //#region Other scaling values
 
@@ -51,6 +67,8 @@ export class ThemeConstants {
     //#region Style class names
 
     static ClassScrollbarTrackBorder = 'scrollbar-track-border';
+
+    static ClassScrollbarHidden = 'scrollbar-hidden';
 
     //#endregion
 

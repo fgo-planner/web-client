@@ -1,4 +1,5 @@
 import { FilteringStyledOptions } from '@mui/styled-engine';
+import { CSSProperties } from '@mui/styles';
 import { MuiStyledOptions, styled, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren } from 'react';
@@ -33,7 +34,7 @@ const StyleProps = (props: Props & { theme: Theme }) => {
     return {
         overflow: 'hidden',
         boxSizing: 'border-box'
-    } as SystemStyleObject<Theme> as {};
+    } as CSSProperties;
 };
 
 const AutoContentsHeightStyleProps = (props: Props & { theme: Theme }) => {
@@ -61,7 +62,7 @@ const FullHeightStyleProps = (props: Props & { theme: Theme }) => {
     }
     return {
         height: '100%'
-    } as SystemStyleObject<Theme> as {};
+    } as CSSProperties;
 };
 
 const LayoutStyleProps = (props: Props & { theme: Theme }) => {
@@ -72,7 +73,7 @@ const LayoutStyleProps = (props: Props & { theme: Theme }) => {
     return {
         display: 'flex',
         flexDirection: layout
-    } as SystemStyleObject<Theme> as {};
+    } as CSSProperties;
 };
 
 const RootComponent = styled('div', StyleOptions)<Props>(

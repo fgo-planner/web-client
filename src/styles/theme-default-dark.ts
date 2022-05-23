@@ -20,7 +20,10 @@ const themeDefaultDark = () => {
             secondary: {
                 main: pink[200]
             },
-            divider: '#001E3C'
+            divider: '#001E3C',
+            drawer: {
+                main: '#000F1F'
+            }
         },
         breakpoints: BreakpointOverrides,
         components: ComponentsOverrides

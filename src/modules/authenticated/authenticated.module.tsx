@@ -45,12 +45,16 @@ const ModuleRoutes = [
         element: <MasterAccountHomeRoute />
     },
     {
-        path: '/master/servants',
-        element: <MasterServantsRoute />
+        path: '/master/planner',
+        element: <PlansRoute />
     },
     {
-        path: '/master/servants/costumes',
-        element: <MasterServantCostumesRoute />
+        path: '/master/planner/:id',
+        element: <PlanRoute />
+    },
+    {
+        path: '/master/servants',
+        element: <MasterServantsRoute />
     },
     {
         path: '/master/servants/stats',
@@ -65,16 +69,12 @@ const ModuleRoutes = [
         element: <MasterItemStatsRoute />
     },
     {
+        path: '/master/costumes',
+        element: <MasterServantCostumesRoute />
+    },
+    {
         path: '/master/soundtracks',
         element: <MasterSoundtracksRoute />
-    },
-    {
-        path: '/master/planner',
-        element: <PlansRoute />
-    },
-    {
-        path: '/master/planner/:id',
-        element: <PlanRoute />
     },
     {
         path: '/master/data/import/servants',

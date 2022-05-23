@@ -1,6 +1,6 @@
 import { MasterAccount, UserPreferences } from '@fgo-planner/types';
 import { MasterAccountList } from '../../types/data';
-import { HttpResponseError, Nullable, PageMetadata, NavigationDrawerContent, ThemeInfo, UserInfo } from '../../types/internal';
+import { HttpResponseError, Nullable, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
 import { nullSupplier } from '../function.utils';
 import { SubscriptionTopic } from './subscription-topic.class';
 
@@ -44,6 +44,7 @@ class User {
 
     static readonly CurrentUserChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserInfo>>(nullSupplier);
 
+    // TODO Wrap UserPreferences with Immutable<>
     static readonly CurrentUserPreferencesChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserPreferences>>(nullSupplier);
     
     static readonly MasterAccountListChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccountList>>(nullSupplier);

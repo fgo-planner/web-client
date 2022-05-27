@@ -88,6 +88,8 @@ export class MasterItemStatsUtils {
             );
         }
 
+        this._computeFinalDebt(stats);
+
         const end = window.performance.now();
         console.log(`Stats took ${(end - start).toFixed(2)}ms to compute.`);
 
@@ -215,6 +217,12 @@ export class MasterItemStatsUtils {
             } else {
                 stat.used += cost;
             }
+        }
+    }
+
+    private static _computeFinalDebt(stats: Record<number, MasterItemStat>): void {
+        for (const [, stat] of Object.entries(stats)) {
+            stat.debt = Math.max(0, stat.debt - stat.inventory);
         }
     }
 

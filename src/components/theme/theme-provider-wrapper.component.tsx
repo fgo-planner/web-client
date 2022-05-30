@@ -1,5 +1,5 @@
 import { createTheme, Palette, ThemeProvider, Typography, Theme } from '@mui/material';
-import { StyledEngineProvider, SystemStyleObject,  } from '@mui/system';
+import { StyledEngineProvider, SystemStyleObject } from '@mui/system';
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { BackgroundImageContext } from '../../contexts/background-image.context';
 import { ThemeConstants } from '../../styles/theme-constants';
@@ -35,26 +35,26 @@ const augmentAdditionalColors = (theme: Theme): void => {
  * Replaces the default scrollbar styles with the theme based scrollbars for
  * the children nodes.
  */
-const ScrollbarStyleProps = ((theme: Theme) => ({
+const ScrollbarStyleProps = (({ palette, spacing }: Theme) => ({
     '& *::-webkit-scrollbar': {
-        width: theme.spacing(ThemeConstants.ScrollbarWidthScale),
-        height: theme.spacing(ThemeConstants.ScrollbarWidthScale)
+        width: spacing(ThemeConstants.ScrollbarWidthScale),
+        height: spacing(ThemeConstants.ScrollbarWidthScale)
     },
     '& *::-webkit-scrollbar-corner': {
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: palette.background.paper,
     },
     '& *::-webkit-scrollbar-thumb': {
-        backgroundColor: theme.palette.primary.main,
-        borderRadius: theme.spacing(ThemeConstants.ScrollbarWidthScale / 2)
+        backgroundColor: palette.primary.main,
+        borderRadius: spacing(ThemeConstants.ScrollbarWidthScale / 2)
     },
     [`& .${ThemeConstants.ClassScrollbarTrackBorder}`]: {
         '& *::-webkit-scrollbar-track': {
             borderTopWidth: 1,
             borderTopStyle: 'solid',
-            borderTopColor: theme.palette.divider,
+            borderTopColor: palette.divider,
             borderLeftWidth: 1,
             borderLeftStyle: 'solid',
-            borderLeftColor: theme.palette.divider,
+            borderLeftColor: palette.divider,
         }
     },
     [`& .${ThemeConstants.ClassScrollbarHidden}`]: {

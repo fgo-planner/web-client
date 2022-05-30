@@ -1,17 +1,15 @@
 import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@mui/icons-material';
 import { IconButton, PaperProps } from '@mui/material';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import { Box, SystemStyleObject } from '@mui/system';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
-import { ModalOnCloseReason, ThemeInfo } from '../../../../types/internal';
+import { ThemeInfo } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { LoginDialog } from '../../../login/login-dialog.component';
-import { AppBarLink } from '../app-bar-link.component';
-import { AppBarLinks } from '../app-bar-links.component';
 
 const LoginDialogPaperProps: PaperProps = {
     style: {
@@ -29,7 +27,7 @@ const StyleProps = {
     alignItems: 'center',
     px: 4,
     py: 0
-} as SystemStyleObject<Theme>;
+} as SystemStyleObject;
 
 /**
  * Renders the app bar contents for a guest (not logged in) user.
@@ -73,6 +71,7 @@ export const AppBarGuestUser = React.memo(() => {
         }
     }, [backgroundMusicService, isBackgroundMusicPlaying]);
 
+    // TODO Move this to higher component.
     const openLoginDialog = useCallback((): void => {
         const pathname = location.pathname;
         /*
@@ -89,61 +88,32 @@ export const AppBarGuestUser = React.memo(() => {
         }
     }, [location.pathname, navigate]);
 
-    const handleLoginDialogClose = useCallback((event: any, reason: ModalOnCloseReason): void => {
+    const handleLoginDialogClose = useCallback((): void => {
         setLoginModalOpen(false);
     }, []);
 
-    const isLinkActive = (route: string, exact?: boolean): boolean => {
-        if (!route) {
-            return false;
-        }
-        if (exact) {
-            return location?.pathname === route;
-        } else {
-            return location?.pathname.startsWith(route);
-        }
-    };
-
     return (
-        <Fragment>
+        <>
             <Box sx={StyleProps}>
-                <AppBarLinks>
-                    <AppBarLink
-                        label='Servants'
-                        route='/resources/servants'
-                        active={isLinkActive('/resources/servants') && !loginModalOpen}
-                    />
-                    <AppBarLink
-                        label='Items'
-                        route='/resources/items'
-                        active={isLinkActive('/resources/items') && !loginModalOpen}
-                    />
-                    <AppBarLink
-                        label='Events'
-                        route='/resources/events'
-                        active={isLinkActive('/resources/events') && !loginModalOpen}
-                    />
-                    <AppBarLink
-                        label='Login'
-                        onClick={openLoginDialog}
-                        active={isLinkActive('/login') || loginModalOpen}
-                    />
-                </AppBarLinks>
                 <IconButton
                     onClick={handleThemeModeToggle}
                     children={themeInfo?.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
-                    size='large' />
+                    size='large'
+                />
                 <IconButton
                     onClick={handleBackgroundMusicButtonClick}
                     children={isBackgroundMusicPlaying ? <VolumeUpIcon /> : <VolumeOffIcon />}
-                    size='large' />
+                    size='large'
+                />
             </Box>
+
+            {/* TODO Move this to a higher component */}
             <LoginDialog
                 PaperProps={LoginDialogPaperProps}
                 open={loginModalOpen}
                 onClose={handleLoginDialogClose}
             />
-        </Fragment>
+        </>
     );
 
 });

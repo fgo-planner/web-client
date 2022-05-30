@@ -32,6 +32,8 @@ const StyleProps = (theme: Theme) => ({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
         pl: 3,
         [`& .${StyleClassPrefix}-title`]: {
             fontFamily: ThemeConstants.FontFamilyGoogleSans,

@@ -1,15 +1,13 @@
 import { Button, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEvent, useCallback, useMemo } from 'react';
+import React, { MouseEvent, useCallback, useContext, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { NavigationDrawerActionItem as ActionItem, NavigationDrawerItem as Item, NavigationDrawerLinkItem as LinkItem, Supplier, SxPropsFunction } from '../../../types/internal';
+import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
+import { NavigationDrawerActionItem as ActionItem, NavigationDrawerItem as Item, NavigationDrawerLinkItem as LinkItem, SxPropsFunction } from '../../../types/internal';
 
 type Props = {
-    expanded?: boolean;
     item: Item;
-    mobileView?: boolean;
-    onClose: Supplier<void>;
 };
 
 const TooltipEnterDelay = 250;
@@ -78,19 +76,18 @@ const StyleProps = ((theme: Theme) => {
             [`& .${StyleClassPrefix}-icon, .${StyleClassPrefix}-label`]: {
                 color: palette.primary.main
             }
+        },
+        [`&.${StyleClassPrefix}-no-animations .${StyleClassPrefix}-icon`]: {
+            transition: 'none !important'
         }
     } as SystemStyleObject;
     
 }) as SxPropsFunction;
 
-export const NavigationDrawerContentItem = React.memo((props: Props) => {
+export const NavigationDrawerContentItem = React.memo(({ item }: Props) => {
 
-    const {
-        expanded,
-        item,
-        mobileView,
-        onClose
-    } = props;
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const {
         activeIcon,
@@ -99,8 +96,12 @@ export const NavigationDrawerContentItem = React.memo((props: Props) => {
         tooltip
     } = item;
 
-    const location = useLocation();
-    const navigate = useNavigate();
+    const {
+        animationsDisabled,
+        expanded,
+        mobileView,
+        onClose
+    } = useContext(NavigationDrawerContext);
 
     const isLink = !!(item as LinkItem).route;
 
@@ -143,6 +144,7 @@ export const NavigationDrawerContentItem = React.memo((props: Props) => {
     const className = clsx(
         `${StyleClassPrefix}-root`,
         expanded ? `${StyleClassPrefix}-expanded` : `${StyleClassPrefix}-condensed`,
+        animationsDisabled && `${StyleClassPrefix}-no-animations`,
         isLinkActive && `${StyleClassPrefix}-active`
     );
 

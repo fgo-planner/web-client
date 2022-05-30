@@ -12,6 +12,7 @@ import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.h
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
+import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animiations.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { Immutable, ModalOnCloseReason, Nullable } from '../../../../types/internal';
@@ -95,6 +96,8 @@ const StyleProps = (theme: Theme) => ({
 } as SystemStyleObject<Theme>);
 
 export const MasterServantsRoute = React.memo(() => {
+
+    useNavigationDrawerNoAnimations();
 
     const forceUpdate = useForceUpdate();
 

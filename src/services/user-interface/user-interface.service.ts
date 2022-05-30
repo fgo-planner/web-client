@@ -10,12 +10,16 @@ import { SubscriptionTopics } from '../../utils/subscription/subscription-topics
 export class UserInterfaceService {
 
     private readonly _LoadingIndicatorInvocationIdSet = new Set<string>();
-    
+
     private readonly _AppBarElevateInvocationIdSet = new Set<string>();
+
+    private readonly _NavigationDrawerNoAnimationsInvocationIdSet = new Set<string>();
 
     private _loadingIndicatorActive = false;
 
     private _appBarElevated = false;
+
+    private _navigationDrawerNoAnimations = false;
 
     private _navigationDrawerOpen = false;
 
@@ -31,35 +35,55 @@ export class UserInterfaceService {
         return SubscribablesContainer.get(SubscriptionTopics.UserInterface.NavigationDrawerOpenChange);
     }
 
+    private get _onNavigationDrawerNoAnimationsChange() {
+        return SubscribablesContainer.get(SubscriptionTopics.UserInterface.NavigationDrawerNoAnimationsChange);
+    }
+
     invokeLoadingIndicator(): string {
-        const id = String(new Date().getTime());
-        this._LoadingIndicatorInvocationIdSet.add(id);
+        const invocationId = String(new Date().getTime());
+        this._LoadingIndicatorInvocationIdSet.add(invocationId);
         if (!this._loadingIndicatorActive) {
             this._onLoadingIndicatorActiveChange.next(this._loadingIndicatorActive = true);
         }
-        return id;
+        return invocationId;
     }
 
-    waiveLoadingIndicator(id: string): void {
-        this._LoadingIndicatorInvocationIdSet.delete(id);
+    waiveLoadingIndicator(invocationId: string): void {
+        this._LoadingIndicatorInvocationIdSet.delete(invocationId);
         if (!this._LoadingIndicatorInvocationIdSet.size) {
             this._onLoadingIndicatorActiveChange.next(this._loadingIndicatorActive = false);
         }
     }
 
     invokeAppBarElevation(): string {
-        const id = String(new Date().getTime());
-        this._AppBarElevateInvocationIdSet.add(id);
+        const invocationId = String(new Date().getTime());
+        this._AppBarElevateInvocationIdSet.add(invocationId);
         if (!this._appBarElevated) {
             this._onAppBarElevatedChange.next(this._appBarElevated = true);
         }
-        return id;
+        return invocationId;
     }
 
-    waiveAppBarElevation(id: string): void {
-        this._AppBarElevateInvocationIdSet.delete(id);
+    waiveAppBarElevation(invocationId: string): void {
+        this._AppBarElevateInvocationIdSet.delete(invocationId);
         if (!this._AppBarElevateInvocationIdSet.size) {
             this._onAppBarElevatedChange.next(this._appBarElevated = false);
+        }
+    }
+
+    invokeNavigationDrawerNoAnimations(): string {
+        const invocationId = String(new Date().getTime());
+        this._NavigationDrawerNoAnimationsInvocationIdSet.add(invocationId);
+        if (!this._navigationDrawerNoAnimations) {
+            this._onNavigationDrawerNoAnimationsChange.next(this._navigationDrawerNoAnimations = true);
+        }
+        return invocationId;
+    }
+
+    waiveNavigationDrawerNoAnimations(invocationId: string): void {
+        this._NavigationDrawerNoAnimationsInvocationIdSet.delete(invocationId);
+        if (!this._NavigationDrawerNoAnimationsInvocationIdSet.size) {
+            this._onNavigationDrawerNoAnimationsChange.next(this._navigationDrawerNoAnimations = false);
         }
     }
 
@@ -75,5 +99,6 @@ export class UserInterfaceService {
         this._navigationDrawerOpen = !this._navigationDrawerOpen;
         this._onNavigationDrawerOpenChange.next(this._navigationDrawerOpen);
     }
+
 
 }

@@ -70,6 +70,8 @@ class UserInterface {
     // static readonly NavigationDrawerContentChange = SubscriptionTopic.forReplaySubject<Nullable<NavigationDrawerContent>>();
     
     static readonly NavigationDrawerOpenChange = SubscriptionTopic.forReplaySubject<boolean>();
+    
+    static readonly NavigationDrawerNoAnimationsChange = SubscriptionTopic.forReplaySubject<boolean>();
 
     static readonly ThemeChange = SubscriptionTopic.forReplaySubject<ThemeInfo>();
 

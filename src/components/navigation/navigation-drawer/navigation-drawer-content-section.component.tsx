@@ -1,16 +1,14 @@
 import { Divider } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useContext } from 'react';
+import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { NavigationDrawerSection as Section, Supplier } from '../../../types/internal';
+import { NavigationDrawerSection as Section } from '../../../types/internal';
 import { NavigationDrawerContentItem } from './navigation-drawer-content-item.component';
 
 type Props = {
-    expanded?: boolean;
     hideDivider?: boolean;
-    mobileView?: boolean;
-    onClose: Supplier<void>;
     section: Section;
 };
 
@@ -28,22 +26,18 @@ const StyleProps = (theme: Theme) => ({
 export const NavigationDrawerContentSection = React.memo((props: Props) => {
 
     const {
-        expanded,
         hideDivider,
-        mobileView,
-        onClose,
         section: {
             items
         }
     } = props;
 
+    const { expanded } = useContext(NavigationDrawerContext);
+
     const itemNodes = items.map(item => (
         <NavigationDrawerContentItem
             key={item.key}
             item={item}
-            onClose={onClose}
-            mobileView={mobileView}
-            expanded={expanded}
         />
     ));
 

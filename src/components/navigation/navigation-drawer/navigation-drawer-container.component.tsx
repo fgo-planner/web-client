@@ -2,7 +2,8 @@ import { MasterAccount } from '@fgo-planner/types';
 import { CalendarMonth as CalendarMonthIcon, CalendarMonthOutlined as CalendarMonthOutlinedIcon, Category as CategoryIcon, CategoryOutlined as CategoryOutlinedIcon, Checkroom as CheckroomIcon, Dashboard as DashboardIcon, DashboardOutlined as DashboardOutlinedIcon, Group as GroupIcon, GroupOutlined as GroupOutlinedIcon, Inventory2 as Inventory2Icon, Inventory2Outlined as Inventory2OutlinedIcon, Login as LoginIcon, Logout as LogoutIcon, MusicNote as MusicNoteIcon, MusicNoteOutlined as MusicNoteOutlinedIcon, PeopleAlt as PeopleAltIcon, PeopleAltOutlined as PeopleAltOutlinedIcon, TheaterComedy as TheaterComedyIcon, TheaterComedyOutlined as TheaterComedyOutlinedIcon } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
-import React, { PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
+import { NavigationDrawerContext, NavigationDrawerContextProps } from '../../../contexts/navigation-drawer.context';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { AuthenticationService } from '../../../services/authentication/authentication.service';
 import { UserInterfaceService } from '../../../services/user-interface/user-interface.service';
@@ -14,7 +15,7 @@ import { NavigationDrawerDesktop } from './navigation-drawer-desktop.component';
 import { NavigationDrawerMobile } from './navigation-drawer-mobile.component';
 
 type Props = PropsWithChildren<{
-    mobileView?: boolean;
+    mobileView: boolean;
 }>;
 
 const MasterAccountRoutesSection: Section = {
@@ -124,6 +125,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
     const userInterfaceService = useInjectable(UserInterfaceService);
 
     const [open, setOpen] = useState<boolean>(false);
+    const [animationsDisabled, setAnimationsDisabled] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
 
@@ -152,7 +154,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
     }, []);
 
     /*
-     * Side nav open state change subscription
+     * Navigation drawer open state change subscription
      */
     useEffect(() => {
         const onNavigationDrawerOpenChangeSubscription = SubscribablesContainer
@@ -162,9 +164,28 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
         return () => onNavigationDrawerOpenChangeSubscription.unsubscribe();
     }, []);
 
+    /*
+     * Navigation drawer no animations change subscription
+     */
+    useEffect(() => {
+        const onNavigationDrawerNoAnimationsChangeSubscription = SubscribablesContainer
+            .get(SubscriptionTopics.UserInterface.NavigationDrawerNoAnimationsChange)
+            .subscribe(setAnimationsDisabled);
+
+        return () => onNavigationDrawerNoAnimationsChangeSubscription.unsubscribe();
+    }, []);
+
     const handleDrawerClose = useCallback((): void => {
         userInterfaceService.setNavigationDrawerOpen(false);
     }, [userInterfaceService]);
+
+    const contextValue = useMemo((): NavigationDrawerContextProps => ({
+        animationsDisabled,
+        expanded: mobileView || open, // Contents are always displayed in expanded mode in mobile view.
+        mobileView,
+        onClose: handleDrawerClose,
+        open
+    }), [animationsDisabled, handleDrawerClose, mobileView, open]);
 
     const content = useMemo((): Content => {
         const sections = [] as Array<Section>;
@@ -211,33 +232,19 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
         return { sections };
     }, [authenticationService, isLoggedIn, masterAccount]);
 
-    const drawerNode = useMemo((): ReactNode => {
-        if (mobileView) {
-            return (
-                <NavigationDrawerMobile
-                    content={content}
-                    onClose={handleDrawerClose}
-                    open={open}
-                />
-            );
-        } else {
-            return (
-                <NavigationDrawerDesktop
-                    content={content}
-                    onClose={handleDrawerClose}
-                    open={open}
-                />
-            );
-        }
-    }, [content, handleDrawerClose, mobileView, open]);
+    const drawerNode = mobileView ?
+        <NavigationDrawerMobile content={content} /> :
+        <NavigationDrawerDesktop content={content} />;
 
     return (
-        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            {drawerNode}
-            <div className={`${StyleClassPrefix}-children`}>
-                {children}
-            </div>
-        </Box>
+        <NavigationDrawerContext.Provider value={contextValue}>
+            <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+                {drawerNode}
+                <div className={`${StyleClassPrefix}-children`}>
+                    {children}
+                </div>
+            </Box>
+        </NavigationDrawerContext.Provider>
     );
 
 });

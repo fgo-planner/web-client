@@ -3,18 +3,18 @@ import { FilteringStyledOptions } from '@mui/styled-engine';
 import { CSSProperties } from '@mui/styles';
 import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useContext } from 'react';
+import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { NavigationDrawerContent as Content, Supplier } from '../../../types/internal';
+import { NavigationDrawerContent as Content } from '../../../types/internal';
 import { NavigationDrawerContent } from './navigation-drawer-content.component';
 
 type Props = {
     content: Content;
-    onClose: Supplier<void>;
-    open: boolean;
 };
 
 type RootComponentProps = {
+    animationsDisabled?: boolean;
     expanded: boolean;
 };
 
@@ -22,6 +22,7 @@ const StyleClassPrefix = 'NavigationDrawerDesktop';
 
 const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => {
     return (
+        prop !== 'animationsDisabled' &&
         prop !== 'expanded'
     );
 };
@@ -58,19 +59,35 @@ const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
 };
 
 const CondensedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
-    if (props.expanded) {
+    const {
+        animationsDisabled,
+        expanded,
+        theme
+    } = props;
+
+    if (expanded) {
         return;
     }
 
-    const { transitions } = props.theme as Theme;
+    const { transitions } = theme as Theme;
 
-    return {
-        transition: `${transitions.duration.leavingScreen}ms ${transitions.easing.sharp}`
-    } as CSSProperties;
+    const properties = {} as CSSProperties;
+
+    if (!animationsDisabled) {
+        properties.transition = `${transitions.duration.leavingScreen}ms ${transitions.easing.sharp}`;
+    }
+
+    return properties;
 };
 
 const ExpandedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
-    if (!props.expanded) {
+    const {
+        animationsDisabled,
+        expanded,
+        theme
+    } = props;
+
+    if (!expanded) {
         return;
     }
 
@@ -78,13 +95,18 @@ const ExpandedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) 
         palette,
         spacing,
         transitions
-    } = props.theme as Theme;
+    } = theme as Theme;
 
-    return {
+    const properties = {
         background: palette.background.paper,
         width: spacing(ThemeConstants.NavigationDrawerExpandedWidthScale),
-        transition: `${transitions.duration.enteringScreen}ms ${transitions.easing.easeOut}`
     } as CSSProperties;
+
+    if (!animationsDisabled) {
+        properties.transition = `${transitions.duration.enteringScreen}ms ${transitions.easing.easeOut}`;
+    }
+
+    return properties;
 };
 
 const RootComponent = styled('div', StyleOptions)<RootComponentProps>(
@@ -98,23 +120,23 @@ const RootComponent = styled('div', StyleOptions)<RootComponentProps>(
  * custom implementation for the drawer, stylized to closely match MUI's
  * implementation.
  */
-export const NavigationDrawerDesktop = React.memo((props: Props) => {
+export const NavigationDrawerDesktop = React.memo(({ content }: Props) => {
 
     const {
-        content,
-        onClose,
+        animationsDisabled,
+        expanded,
         open
-    } = props;
+    } = useContext(NavigationDrawerContext);
 
     return (
-        <RootComponent className={`${StyleClassPrefix}-root`} expanded={open}>
+        <RootComponent
+            className={`${StyleClassPrefix}-root`}
+            animationsDisabled={animationsDisabled}
+            expanded={expanded}
+        >
             <div className={`${StyleClassPrefix}-header`} />
             <div className={clsx(`${StyleClassPrefix}-content-container`, !open && ThemeConstants.ClassScrollbarHidden)} >
-                <NavigationDrawerContent
-                    content={content}
-                    onClose={onClose}
-                    expanded={open}
-                />
+                <NavigationDrawerContent content={content} />
             </div>
         </RootComponent >
     );

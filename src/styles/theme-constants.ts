@@ -13,6 +13,11 @@ export class ThemeConstants {
     static AppBarHeightScale = 16;
 
     /**
+     * The height of the app bar as a factor of the spacing transformation value.
+     */
+    static AppBarHeightScaleCondensed = 14;
+
+    /**
      * Elevation (in dp) of the app bar when it's in the elevated state.
      * @see https://material.io/design/environment/elevation.html
      */
@@ -29,7 +34,7 @@ export class ThemeConstants {
      * spacing transformation value.
      */
     static NavigationDrawerCondensedWidthScale = 16;
- 
+
     /**
      * The width of the navigation drawer in its expanded state as a factor of the
      * spacing transformation value.
@@ -72,8 +77,8 @@ export class ThemeConstants {
 
     //#endregion
 
-    private constructor () {
-        
+    private constructor() {
+
     }
 
 }

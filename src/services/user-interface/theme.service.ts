@@ -96,8 +96,15 @@ export class ThemeService {
     /**
      * Sets the `theme-color` metadata.
      */
-    private _setThemeColorMeta(themeOptions: ThemeOptions): void {
-        this._pageMetadataService.setThemeColor(themeOptions.palette?.background?.default);
+    private _setThemeColorMeta({ palette }: ThemeOptions): void {
+        let color: string | undefined;
+        if (palette?.drawer) {
+            // TODO Add support for ColorPartial
+            color = (palette.drawer as SimplePaletteColorOptions).main;
+        } else {
+            color = palette?.background?.default;
+        }
+        this._pageMetadataService.setThemeColor(color);
     }
 
     private _loadThemesFromUserPreferences(userPreferences: Nullable<UserPreferences>): UserThemes {

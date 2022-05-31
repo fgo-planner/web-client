@@ -1,5 +1,5 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { CalendarMonth as CalendarMonthIcon, CalendarMonthOutlined as CalendarMonthOutlinedIcon, Category as CategoryIcon, CategoryOutlined as CategoryOutlinedIcon, Checkroom as CheckroomIcon, Dashboard as DashboardIcon, DashboardOutlined as DashboardOutlinedIcon, Group as GroupIcon, GroupOutlined as GroupOutlinedIcon, Inventory2 as Inventory2Icon, Inventory2Outlined as Inventory2OutlinedIcon, Login as LoginIcon, Logout as LogoutIcon, MusicNote as MusicNoteIcon, MusicNoteOutlined as MusicNoteOutlinedIcon, PeopleAlt as PeopleAltIcon, PeopleAltOutlined as PeopleAltOutlinedIcon, TheaterComedy as TheaterComedyIcon, TheaterComedyOutlined as TheaterComedyOutlinedIcon } from '@mui/icons-material';
+import { CalendarMonth as CalendarMonthIcon, CalendarMonthOutlined as CalendarMonthOutlinedIcon, Category as CategoryIcon, CategoryOutlined as CategoryOutlinedIcon, Checkroom as CheckroomIcon, Dashboard as DashboardIcon, DashboardOutlined as DashboardOutlinedIcon, Group as GroupIcon, GroupOutlined as GroupOutlinedIcon, Home as HomeIcon, HomeOutlined as HomeOutlinedIcon, Inventory2 as Inventory2Icon, Inventory2Outlined as Inventory2OutlinedIcon, Login as LoginIcon, Logout as LogoutIcon, MusicNote as MusicNoteIcon, MusicNoteOutlined as MusicNoteOutlinedIcon, PeopleAlt as PeopleAltIcon, PeopleAltOutlined as PeopleAltOutlinedIcon, TheaterComedy as TheaterComedyIcon, TheaterComedyOutlined as TheaterComedyOutlinedIcon } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
@@ -18,9 +18,23 @@ type Props = PropsWithChildren<{
     mobileView: boolean;
 }>;
 
+const HomeButtonSection: Section = {
+    key: 'home',
+    hideDivider: true,
+    items: [
+        {
+            key: 'app-home',
+            icon: HomeOutlinedIcon,
+            activeIcon: HomeIcon,
+            label: 'Home',
+            route: '/',
+            exact: true
+        }
+    ]
+};
+
 const MasterAccountRoutesSection: Section = {
     key: 'master-account',
-    label: 'Master Account',
     items: [
         {
             key: 'account-dashboard',
@@ -70,7 +84,6 @@ const MasterAccountRoutesSection: Section = {
 
 const ResourceRoutesSection: Section = {
     key: 'resources',
-    label: 'Resources',
     items: [
         {
             key: 'servants',
@@ -102,6 +115,10 @@ const StyleProps = (({ spacing }: Theme) => ({
     display: 'flex',
     height: '100%',
     '& .MuiDrawer-root>.MuiPaper-root': {
+        /*
+         * Condensed app bar scaling is not needed because these rules only apply to
+         * desktop screen widths, where condensed app bar is never displayed.
+         */
         top: spacing(ThemeConstants.AppBarHeightScale),
         height: `calc(100% - ${spacing(ThemeConstants.AppBarHeightScale)})`
     },
@@ -205,7 +222,6 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
         if (isLoggedIn) {
             sections.push({
                 key: 'logout',
-                label: 'Account',
                 items: [
                     {
                         key: 'logout',
@@ -216,9 +232,8 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
                 ]
             });
         } else {
-            sections.push({
+            sections.unshift({
                 key: 'login',
-                label: 'Account',
                 items: [
                     {
                         key: 'login',
@@ -229,6 +244,10 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
                 ]
             });
         }
+        /*
+         * Add home button to the top of the list.
+         */
+        sections.unshift(HomeButtonSection);
         return { sections };
     }, [authenticationService, isLoggedIn, masterAccount]);
 

@@ -22,8 +22,8 @@ export type NavigationDrawerItem = NavigationDrawerLinkItem | NavigationDrawerAc
 
 export type NavigationDrawerSection = Readonly<{
     key: React.Key;
+    hideDivider?: boolean;
     items: ReadonlyArray<NavigationDrawerItem>;
-    label?: string;
 }>;
 
 export type NavigationDrawerContent = {

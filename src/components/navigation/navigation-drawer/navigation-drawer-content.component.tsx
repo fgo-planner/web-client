@@ -6,13 +6,13 @@ type Props = {
     content: Content;
 };
 
-export const NavigationDrawerContent = React.memo(({ content }: Props) => (
+export const NavigationDrawerContent = React.memo(({ content: { sections } }: Props) => (
     <>
-        {content.sections.map((section, index) => (
+        {sections.map((section, index) => (
             <NavigationDrawerContentSection
                 key={section.key}
                 section={section}
-                hideDivider={!index}
+                isLastSection={index === sections.length - 1}
             />
         ))}
     </>

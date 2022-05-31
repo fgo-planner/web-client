@@ -62,6 +62,7 @@ export const AppBarMasterAccountSelect = class extends PureComponent<Props, Stat
     render(): ReactNode {
         const { masterAccountList } = this.props;
         const { currentMasterAccountId } = this.state;
+        // TODO Return a native select if on a mobile device.
         return (
             <TextField
                 select

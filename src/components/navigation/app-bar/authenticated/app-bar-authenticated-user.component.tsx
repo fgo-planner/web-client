@@ -26,7 +26,7 @@ const StyleProps = {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    px: 4,
+    px: 3,
     '& .MuiAvatar-root': {
         cursor: 'pointer',
         width: AvatarSize,

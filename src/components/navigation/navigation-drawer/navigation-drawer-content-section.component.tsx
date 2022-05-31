@@ -8,7 +8,7 @@ import { NavigationDrawerSection as Section } from '../../../types/internal';
 import { NavigationDrawerContentItem } from './navigation-drawer-content-item.component';
 
 type Props = {
-    hideDivider?: boolean;
+    isLastSection: boolean;
     section: Section;
 };
 
@@ -26,8 +26,9 @@ const StyleProps = (theme: Theme) => ({
 export const NavigationDrawerContentSection = React.memo((props: Props) => {
 
     const {
-        hideDivider,
+        isLastSection,
         section: {
+            hideDivider,
             items
         }
     } = props;
@@ -48,8 +49,8 @@ export const NavigationDrawerContentSection = React.memo((props: Props) => {
 
     return (
         <Box className={className} sx={StyleProps}>
-            {!hideDivider && <Divider />}
             {itemNodes}
+            {!isLastSection && !hideDivider && <Divider />}
         </Box>
     );
 

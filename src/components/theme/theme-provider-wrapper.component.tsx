@@ -1,7 +1,6 @@
-import { createTheme, Palette, ThemeProvider, Typography, Theme } from '@mui/material';
+import { createTheme, Palette, Theme, ThemeProvider, Typography } from '@mui/material';
 import { StyledEngineProvider, SystemStyleObject } from '@mui/system';
-import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
-import { BackgroundImageContext } from '../../contexts/background-image.context';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { ThemeConstants } from '../../styles/theme-constants';
 import { SxPropsFunction, ThemeInfo } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
@@ -90,22 +89,15 @@ export const ThemeProviderWrapper = React.memo(({ children }: Props) => {
         return () => onThemeChangeSubscription.unsubscribe();
     }, []);
 
-    // This is temporary...
-    const backgroundImageContextValue = useMemo(() => ({
-        imageUrl: backgroundImageUrl
-    }), [backgroundImageUrl]);
-
-    return (
-        <BackgroundImageContext.Provider value={backgroundImageContextValue}>
-            <ThemeBackground />
-            <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={theme}>
-                    <Typography component={'div'} sx={ScrollbarStyleProps}>
-                        {children}
-                    </Typography>
-                </ThemeProvider>
-            </StyledEngineProvider>
-        </BackgroundImageContext.Provider>
-    );
+    return <>
+        <ThemeBackground imageUrl={backgroundImageUrl} />
+        <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+                <Typography component={'div'} sx={ScrollbarStyleProps}>
+                    {children}
+                </Typography>
+            </ThemeProvider>
+        </StyledEngineProvider>
+    </>;
 
 });

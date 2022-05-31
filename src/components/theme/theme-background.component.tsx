@@ -1,6 +1,10 @@
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { CSSProperties, useContext, useMemo } from 'react';
-import { BackgroundImageContext } from '../../contexts/background-image.context';
+import React, { CSSProperties, useMemo } from 'react';
+
+type Props = {
+    blur?: number;
+    imageUrl?: string;
+};
 
 const StyleClassPrefix = 'ThemeBackground';
 
@@ -16,9 +20,9 @@ const StyleProps = {
     } 
 } as SystemStyleObject<Theme>;
 
-export const ThemeBackground = React.memo(() => {
+export const ThemeBackground = React.memo((props: Props) => {
 
-    const { imageUrl, blur } = useContext(BackgroundImageContext);
+    const { imageUrl, blur } = props;
 
     const backgroundStyle = useMemo(() => {
         const style: CSSProperties = {};

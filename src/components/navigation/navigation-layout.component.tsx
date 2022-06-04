@@ -5,6 +5,7 @@ import { useActiveBreakpoints } from '../../hooks/user-interface/use-active-brea
 import { SxPropsFunction } from '../../types/internal';
 import { LoadingIndicatorOverlay } from '../utils/loading-indicator-overlay.component';
 import { AppBar } from './app-bar/app-bar.component';
+import { GlobalDialogs } from './global-dialogs-container.component';
 import { NavigationDrawerContainer } from './navigation-drawer/navigation-drawer-container.component';
 
 const StyleClassPrefix = 'NavigationLayout';
@@ -32,7 +33,7 @@ export const NavigationLayout = React.memo(({ children }: PropsWithChildren<{}>)
 
     const { lg, xl } = useActiveBreakpoints();
 
-    return (
+    return <>
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <NavigationDrawerContainer mobileView={!lg && !xl}>
                 <div className={`${StyleClassPrefix}-upper-section`}>
@@ -42,8 +43,9 @@ export const NavigationLayout = React.memo(({ children }: PropsWithChildren<{}>)
                     {children}
                 </div>
             </NavigationDrawerContainer>
-            <LoadingIndicatorOverlay />
         </Box>
-    );
+        <GlobalDialogs />
+        <LoadingIndicatorOverlay />
+    </>;
 
 });

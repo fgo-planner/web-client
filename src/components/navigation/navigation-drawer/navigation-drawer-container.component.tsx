@@ -226,7 +226,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
                     {
                         key: 'logout',
                         icon: LogoutIcon,
-                        label: 'Sign Out',
+                        label: 'Log Out',
                         onClick: () => authenticationService.logout()
                     }
                 ]
@@ -238,8 +238,8 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
                     {
                         key: 'login',
                         icon: LoginIcon,
-                        label: 'Sign In',
-                        onClick: () => console.log('Login button clicked') // TODO Open login dialog
+                        label: 'Log In',
+                        onClick: () => userInterfaceService.setLoginDialogOpen(true)
                     }
                 ]
             });
@@ -249,7 +249,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
          */
         sections.unshift(HomeButtonSection);
         return { sections };
-    }, [authenticationService, isLoggedIn, masterAccount]);
+    }, [authenticationService, isLoggedIn, masterAccount, userInterfaceService]);
 
     const drawerNode = mobileView ?
         <NavigationDrawerMobile content={content} /> :

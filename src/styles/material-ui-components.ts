@@ -10,7 +10,11 @@ export const ComponentsOverrides: Components = {
             root: {
                 fontFamily: ThemeConstants.FontFamilyGoogleSans,
                 letterSpacing: '0.015625rem',
-                textTransform: 'none'
+                textTransform: 'none',
+                borderRadius: '18.25px'
+            },
+            contained: {
+                boxShadow: 'none !important'
             }
         }
     },

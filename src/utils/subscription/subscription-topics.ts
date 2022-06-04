@@ -65,6 +65,8 @@ class UserInterface {
 
     static readonly LoadingIndicatorActiveChange = SubscriptionTopic.forReplaySubject<boolean>();
 
+    static readonly LoginDialogOpenChange = SubscriptionTopic.forReplaySubject<boolean>();
+
     static readonly MetadataChange = SubscriptionTopic.forReplaySubject<PageMetadata>();
 
     // static readonly NavigationDrawerContentChange = SubscriptionTopic.forReplaySubject<Nullable<NavigationDrawerContent>>();

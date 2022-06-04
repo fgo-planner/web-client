@@ -1,21 +1,14 @@
 import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@mui/icons-material';
-import { IconButton, PaperProps } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
+import { UserInterfaceService } from '../../../../services/user-interface/user-interface.service';
 import { ThemeInfo } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { LoginDialog } from '../../../login/login-dialog.component';
-
-const LoginDialogPaperProps: PaperProps = {
-    style: {
-        minWidth: 360
-    }
-};
 
 // This component does not need StyleClassPrefix.
 
@@ -26,7 +19,10 @@ const StyleProps = {
     justifyContent: 'flex-end',
     alignItems: 'center',
     px: 4,
-    py: 0
+    py: 0,
+    '& .MuiButton-root': {
+        ml: 3
+    }
 } as SystemStyleObject;
 
 /**
@@ -34,13 +30,10 @@ const StyleProps = {
  */
 export const AppBarGuestUser = React.memo(() => {
 
-    const location = useLocation();
-    const navigate = useNavigate();
-
     const backgroundMusicService = useInjectable(BackgroundMusicService);
     const themeService = useInjectable(ThemeService);
+    const userInterfaceService = useInjectable(UserInterfaceService);
 
-    const [loginModalOpen, setLoginModalOpen] = useState<boolean>(false);
     const [themeInfo, setThemeInfo] = useState<ThemeInfo>();
     const [isBackgroundMusicPlaying, setIsBackgroundMusicPlaying] = useState<boolean>(false);
 
@@ -71,49 +64,22 @@ export const AppBarGuestUser = React.memo(() => {
         }
     }, [backgroundMusicService, isBackgroundMusicPlaying]);
 
-    // TODO Move this to higher component.
-    const openLoginDialog = useCallback((): void => {
-        const pathname = location.pathname;
-        /*
-         * If the user is on a resources page, then show the dialog for logging in
-         * instead of redirecting to the login page. This is so the user can continue
-         * to view the resource page after logging in without interruption.
-         * 
-         * TODO Maybe this is not a good idea...
-         */
-        if (pathname?.includes('resources')) {
-            setLoginModalOpen(true);
-        } else {
-            navigate('/login');
-        }
-    }, [location.pathname, navigate]);
-
-    const handleLoginDialogClose = useCallback((): void => {
-        setLoginModalOpen(false);
-    }, []);
+    const handleLoginButtonClick = useCallback((): void => {
+        userInterfaceService.setLoginDialogOpen(true);
+    }, [userInterfaceService]);
 
     return (
-        <>
-            <Box sx={StyleProps}>
-                <IconButton
-                    onClick={handleThemeModeToggle}
-                    children={themeInfo?.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
-                    size='large'
-                />
-                <IconButton
-                    onClick={handleBackgroundMusicButtonClick}
-                    children={isBackgroundMusicPlaying ? <VolumeUpIcon /> : <VolumeOffIcon />}
-                    size='large'
-                />
-            </Box>
-
-            {/* TODO Move this to a higher component */}
-            <LoginDialog
-                PaperProps={LoginDialogPaperProps}
-                open={loginModalOpen}
-                onClose={handleLoginDialogClose}
-            />
-        </>
+        <Box sx={StyleProps}>
+            <IconButton size='large' onClick={handleThemeModeToggle}>
+                {themeInfo?.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
+            </IconButton>
+            <IconButton size='large' onClick={handleBackgroundMusicButtonClick}>
+                {isBackgroundMusicPlaying ? <VolumeUpIcon /> : <VolumeOffIcon />}
+            </IconButton>
+            <Button variant='contained' onClick={handleLoginButtonClick}>
+                Log In
+            </Button>
+        </Box>
     );
 
 });

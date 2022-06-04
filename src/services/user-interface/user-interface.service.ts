@@ -23,6 +23,8 @@ export class UserInterfaceService {
 
     private _navigationDrawerOpen = false;
 
+    private _loginDialogOpen = false;
+
     private get _onLoadingIndicatorActiveChange() {
         return SubscribablesContainer.get(SubscriptionTopics.UserInterface.LoadingIndicatorActiveChange);
     }
@@ -37,6 +39,10 @@ export class UserInterfaceService {
 
     private get _onNavigationDrawerNoAnimationsChange() {
         return SubscribablesContainer.get(SubscriptionTopics.UserInterface.NavigationDrawerNoAnimationsChange);
+    }
+
+    private get _onLoginDialogOpenChange() {
+        return SubscribablesContainer.get(SubscriptionTopics.UserInterface.LoginDialogOpenChange);
     }
 
     invokeLoadingIndicator(): string {
@@ -100,5 +106,12 @@ export class UserInterfaceService {
         this._onNavigationDrawerOpenChange.next(this._navigationDrawerOpen);
     }
 
+    setLoginDialogOpen(open: boolean): void {
+        if (this._loginDialogOpen === open) {
+            return;
+        }
+        this._loginDialogOpen = open;
+        this._onLoginDialogOpenChange.next(open);
+    }
 
 }

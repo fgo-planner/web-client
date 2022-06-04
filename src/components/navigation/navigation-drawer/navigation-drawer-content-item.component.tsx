@@ -108,7 +108,16 @@ export const NavigationDrawerContentItem = React.memo(({ item }: Props) => {
     const handleClick = useCallback((event: MouseEvent<HTMLElement>) => {
         event.preventDefault();
         if (isLink) {
-            navigate((item as LinkItem).route);
+            /*
+             * If an onClick handler was provided, then call it instead of navigating the
+             * user to the route. In this case, the route path is only used to determine
+             * the active status of the link.
+             */
+            if (item.onClick) {
+                item.onClick(event);
+            } else {
+                navigate((item as LinkItem).route);
+            }
             /*
              * Also close the drawer if in mobile view.
              */

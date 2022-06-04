@@ -12,6 +12,7 @@ type BaseNavigationDrawerItem = {
 export type NavigationDrawerLinkItem = Readonly<BaseNavigationDrawerItem & {
     route: string;
     exact?: boolean;
+    onClick?: React.MouseEventHandler<HTMLElement>;
 }>;
 
 export type NavigationDrawerActionItem = Readonly<BaseNavigationDrawerItem & {

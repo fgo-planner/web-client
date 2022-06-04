@@ -1,6 +1,7 @@
-import React, { Fragment, PropsWithChildren, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { Navigate } from 'react-router';
 import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
+import { MasterAccountDataProviderWrapper } from '../../modules/authenticated/components/master/master-account-data-provider-wrapper.component';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
@@ -28,6 +29,10 @@ export const RequireAuthentication = React.memo(({ children }: PropsWithChildren
         return <Navigate to='/' />;
     }
 
-    return <Fragment>{children}</Fragment>;
+    return (
+        <MasterAccountDataProviderWrapper>
+            {children}
+        </MasterAccountDataProviderWrapper>
+    );
 
 });

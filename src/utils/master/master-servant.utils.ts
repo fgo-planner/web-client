@@ -156,7 +156,7 @@ export class MasterServantUtils {
         }
     }
 
-    static getLastInstanceId(masterServants: Array<MasterServant>): number {
+    static getLastInstanceId(masterServants: ReadonlyArray<MasterServant>): number {
         if (!masterServants.length) {
             return 0;
         }

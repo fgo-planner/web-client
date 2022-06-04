@@ -8,7 +8,7 @@ import { Immutable, ReadonlyRecord } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantSelectAutocomplete } from '../master-servant-select-autocomplete.component';
 import { MasterServantEditCostumesTabContent } from './master-servant-edit-costumes-tab-content.component';
-import { MasterServantEditData } from './master-servant-edit-data.type';
+import { MasterServantEditData } from '../../../../../../types/internal/dto/master-servant-edit-data.type';
 import { MasterServantEditEnhancementsTabContent } from './master-servant-edit-enhancements-tab-content.component';
 import { MasterServantEditGeneralTabContent } from './master-servant-edit-general-tab-content.component';
 

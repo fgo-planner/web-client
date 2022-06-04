@@ -1,22 +1,18 @@
-import { GameItem, GameItemQuantity } from '@fgo-planner/types';
+import { GameItem } from '@fgo-planner/types';
 import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import NumberFormat from 'react-number-format';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { GameItemConstants } from '../../../../constants';
-import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { Immutable } from '../../../../types/internal';
 import { MathUtils } from '../../../../utils/math.utils';
 import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 
-export type MasterItemRowData = {
-    gameItem: Immutable<GameItem>;
-    quantity: GameItemQuantity
-};
-
 type Props = {
-    data: MasterItemRowData;
     editMode: boolean;
+    gameItem: Immutable<GameItem>;
+    onChange: (itemId: number, quantity: number) => void;
+    quantity: number;
 };
 
 const QuantityInputProps: InputBaseComponentProps = {
@@ -27,9 +23,14 @@ const QuantityInputProps: InputBaseComponentProps = {
 
 export const StyleClassPrefix = 'MasterItemListRow';
 
-export const MasterItemListRow = React.memo(({ data, editMode }: Props) => {
+export const MasterItemListRow = React.memo((props: Props) => {
 
-    const forceUpdate = useForceUpdate();
+    const {
+        editMode,
+        gameItem,
+        onChange,
+        quantity
+    } = props;
 
     const [active, setActive] = useState<boolean>(false);
 
@@ -45,12 +46,8 @@ export const MasterItemListRow = React.memo(({ data, editMode }: Props) => {
     const handleItemQuantityChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         const value = event.target.value;
         const quantity = MathUtils.clamp(~~Number(value), 0, GameItemConstants.MaxItemQuantity);
-
-        // TODO Is it bad practice to modify an object in props without notifying parent?
-        data.quantity.quantity = quantity;
-
-        forceUpdate();
-    }, [data, forceUpdate]);
+        onChange(gameItem._id, quantity);
+    }, [gameItem._id, onChange]);
 
     const handleItemQuantityFocus = useCallback((): void => {
         setActive(true);
@@ -76,7 +73,7 @@ export const MasterItemListRow = React.memo(({ data, editMode }: Props) => {
                 size='small'
                 type='number'
                 inputProps={QuantityInputProps}
-                value={data.quantity.quantity}
+                value={quantity}
                 onChange={handleItemQuantityChange}
                 onFocus={handleItemQuantityFocus}
                 onBlur={handleItemQuantityBlur}
@@ -85,7 +82,7 @@ export const MasterItemListRow = React.memo(({ data, editMode }: Props) => {
     } else {
         itemQuantityNode = (
             <NumberFormat
-                value={data.quantity.quantity}
+                value={quantity}
                 displayType='text'
                 thousandSeparator={true}
             />
@@ -99,7 +96,7 @@ export const MasterItemListRow = React.memo(({ data, editMode }: Props) => {
             active={active}
             borderTop
         >
-            <MasterItemListRowLabel gameItem={data.gameItem} editMode={editMode} />
+            <MasterItemListRowLabel gameItem={gameItem} editMode={editMode} />
             <div className='flex-fill' />
             <div>
                 {itemQuantityNode}

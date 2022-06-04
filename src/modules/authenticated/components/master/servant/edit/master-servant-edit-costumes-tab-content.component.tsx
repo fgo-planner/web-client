@@ -1,7 +1,7 @@
 import { GameServant } from '@fgo-planner/types';
 import React from 'react';
 import { Immutable } from '../../../../../../types/internal';
-import { MasterServantEditData } from './master-servant-edit-data.type';
+import { MasterServantEditData } from '../../../../../../types/internal/dto/master-servant-edit-data.type';
 
 type Props = {
     /**

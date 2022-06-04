@@ -8,7 +8,7 @@ import { MasterServantSummonDateInputField } from '../../../../../../components/
 import { MasterServantSummonedCheckbox } from '../../../../../../components/input/servant/master/master-servant-summoned-checkbox.component';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { Immutable } from '../../../../../../types/internal';
-import { MasterServantEditData } from './master-servant-edit-data.type';
+import { MasterServantEditData } from '../../../../../../types/internal/dto/master-servant-edit-data.type';
 
 type Props = {
     /**

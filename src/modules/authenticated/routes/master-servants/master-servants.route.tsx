@@ -20,8 +20,8 @@ import { MasterServantUtils } from '../../../../utils/master/master-servant.util
 import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { MasterServantEditData } from '../../components/master/servant/edit/master-servant-edit-data.type';
-import { MasterServantEditUtils } from '../../components/master/servant/edit/master-servant-edit.utils';
+import { MasterServantEditData } from '../../../../types/internal/dto/master-servant-edit-data.type';
+import { MasterServantEditUtils } from '../../../../utils/master/master-servant-edit.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantContextMenu } from './master-servants-context-menu.component';

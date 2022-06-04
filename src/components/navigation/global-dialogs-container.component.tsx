@@ -1,5 +1,6 @@
 import { PaperProps } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
 import { UserInterfaceService } from '../../services/user-interface/user-interface.service';
 import { Nullable, UserInfo } from '../../types/internal';
@@ -13,7 +14,24 @@ const LoginDialogPaperProps: PaperProps = {
     }
 };
 
+const LoginDialogDisabledPathsRegex = new RegExp('login|register|forgot-password');
+
+/**
+ * Whether to redirect the user to the login page instead of open the login
+ * dialog, based on current location. This special behavior currently applies to
+ * the following routes:
+ * - /login
+ * - /register
+ * - /forgot-password
+ */
+const shouldRedirectToLoginRoute = (pathname: string): boolean => {
+    return LoginDialogDisabledPathsRegex.test(pathname);
+};
+
 export const GlobalDialogs = React.memo(() => {
+
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const userInterfaceService = useInjectable(UserInterfaceService);
 
@@ -37,10 +55,20 @@ export const GlobalDialogs = React.memo(() => {
     useEffect(() => {
         const onLoginDialogOpenChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopics.UserInterface.LoginDialogOpenChange)
-            .subscribe(setLoginDialogOpen);
+            .subscribe((open: boolean): void => {
+                if (!open) {
+                    return setLoginDialogOpen(false);
+                }
+                if (shouldRedirectToLoginRoute(location.pathname)) {
+                    navigate('/login');
+                    userInterfaceService.setLoginDialogOpen(false);
+                } else {
+                    setLoginDialogOpen(true);
+                }
+            });
 
         return () => onLoginDialogOpenChangeSubscription.unsubscribe();
-    }, []);
+    }, [location.pathname, navigate, userInterfaceService]);
 
     const handleLoginDialogClose = useCallback((): void => {
         userInterfaceService.setLoginDialogOpen(false);

@@ -6,7 +6,7 @@ import { ThemeConstants } from './theme-constants';
 
 const themeDefaultDark = () => {
     return {
-        spacing: ThemeConstants.Spacing,
+        spacing: ThemeConstants.SpacingFunction,
         palette: {
             mode: 'dark',
             background: {

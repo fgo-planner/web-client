@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { Navigate, useRoutes } from 'react-router';
 import { LazyLoadFallback } from '../../components/route-fallback/lazy-load-fallback.component';
+import { MasterAccountDataProviderWrapper } from './components/master/master-account-data-provider-wrapper.component';
 import { MasterAccountHomeRoute } from './routes/master-account-home.route';
 import { MasterAccountsRoute } from './routes/master-accounts/master-accounts.route';
 import { MasterItemStatsRoute } from './routes/master-item-stats/master-item-stats.route';
@@ -87,7 +88,15 @@ const ModuleRoutes = [
 ];
 
 const AuthenticatedModule = React.memo(() => {
-    return useRoutes(ModuleRoutes);
+
+    const moduleRoutes = useRoutes(ModuleRoutes);
+
+    return (
+        <MasterAccountDataProviderWrapper>
+            {moduleRoutes}
+        </MasterAccountDataProviderWrapper>
+    );
+
 });
 
 export default AuthenticatedModule;

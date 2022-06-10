@@ -1,7 +1,7 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { createContext } from 'react';
 import { ReadonlySet } from 'typescript';
-import { Immutable, MasterServantEditData, Nullable } from '../../../types/internal';
+import { Immutable, MasterServantUpdate, Nullable } from '../../../types/internal';
 
 // TODO Move this to a utils file or something.
 const DefaultFunction = () => {};
@@ -37,8 +37,8 @@ export type MasterAccountDataContextProps = Readonly<{
         soundtracks: ReadonlySet<number>;
     }>;
     updateItem: (itemId: number, quantity: number) => void;
-    addServant: (data: MasterServantEditData) => void;
-    updateServants: (instanceIds: Set<number>, data: MasterServantEditData) => void;
+    addServant: (update: MasterServantUpdate) => void;
+    updateServants: (instanceIds: Set<number>, update: MasterServantUpdate) => void;
     deleteServants: (instanceIds: Set<number>) => void;
     revertChanges: () => void;
     persistChanges: () => Promise<void>;

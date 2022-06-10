@@ -1,6 +1,5 @@
 import { GameServant, MasterServant, MasterServantAscensionLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
-import { MasterServantPartial } from '../../types/data';
 import { Immutable } from '../../types/internal';
 import { DateTimeUtils } from '../date-time.utils';
 
@@ -18,7 +17,7 @@ export class MasterServantUtils {
             instanceId,
             gameId: GameServantConstants.DefaultServantId,
             summoned: true, // Assume servant has been summoned by player by default
-            np: 1,
+            np: GameServantConstants.MinNoblePhantasmLevel,
             level: GameServantConstants.MinLevel,
             ascension: GameServantConstants.MinAscensionLevel,
             skills: {
@@ -26,18 +25,6 @@ export class MasterServantUtils {
             },
             appendSkills: {}
         };
-    }
-
-    /**
-     * Converts a `MasterServantPartial` object, which can potentially only contain
-     * partial servant data, into a full `MasterServant` object. Missing data from
-     * the source will use default values as found in the `instantiate` method.
-     */
-    static partialToFull(source: MasterServantPartial): MasterServant {
-        const masterServant = this.instantiate();
-        this._merge(masterServant, source, true);
-
-        return masterServant;
     }
 
     /**
@@ -57,150 +44,11 @@ export class MasterServantUtils {
         };
     }
 
-    /**
-     * Merges a `MasterServant` object into another.
-     */
-    static merge(target: MasterServant, source: MasterServantPartial): void;
-
-    /**
-     * Merges an array of `MasterServant` objects into another. Servants that exist
-     * in both arrays (matched by `gameId`) will be merged together. In case of
-     * duplicates in one or both lists, they will be matched by their order of
-     * appearance (index).
-     */
-    static merge(target: Array<MasterServant>, source: Array<MasterServantPartial>): void;
-
-    /**
-     * Method implementation
-     */
-    static merge(target: MasterServant | Array<MasterServant>, source: MasterServantPartial | Array<MasterServantPartial>): void {
-        if (!Array.isArray(target) && !Array.isArray(source)) {
-            this._merge(target, source);
-        } else if (Array.isArray(target) && Array.isArray(source)) {
-            this._mergeArrays(target, source);
-        }
-    }
-
-    private static _merge(target: MasterServant, source: MasterServantPartial, mergeInstanceId = false): void {
-        /**
-         * `gameId` is always present.
-         */
-        target.gameId = source.gameId;
-        if (mergeInstanceId) {
-            target.instanceId = source.instanceId;
-        }
-        if (Object.hasOwn(source, 'summoned')) {
-            target.summoned = source.summoned!;
-        }
-        if (Object.hasOwn(source, 'summonDate')) {
-            target.summonDate = source.summonDate;
-        }
-        if (Object.hasOwn(source, 'np')) {
-            target.np = source.np!!;
-        }
-        if (Object.hasOwn(source, 'level')) {
-            target.level = source.level!;
-        }
-        if (Object.hasOwn(source, 'ascension')) {
-            target.ascension = source.ascension!;
-        }
-        if (Object.hasOwn(source, 'fouAtk')) {
-            target.fouAtk = source.fouAtk;
-        }
-        if (Object.hasOwn(source, 'fouHp')) {
-            target.fouHp = source.fouHp;
-        }
-        /*
-         * Note that new objects are instantiated for `skills` and `appendSkills`.
-         */
-        if (Object.hasOwn(source, 'skills')) {
-            target.skills = { ...source.skills! };
-        }
-        if (Object.hasOwn(source, 'appendSkills')) {
-            target.appendSkills = { ...source.appendSkills! };
-        }
-    }
-
-    private static _mergeArrays(target: Array<MasterServant>, source: Array<MasterServantPartial>): void {
-        /*
-         * Nothing to do, return.
-         */
-        if (!source.length) {
-            return;
-        }
-
-        /*
-         * No need to do any individual merges, just copy the entire list.
-         */
-        if (!target.length) {
-            target.push(...source.map(this.partialToFull));
-            return;
-        }
-
-        /**
-         * The last `instanceId` of the target list.
-         */
-        let lastInstanceId = this.getLastInstanceId(target);
-
-        /**
-         * A map of the target list where the key is the servant `gameId` and the
-         * values are buckets containing the servants with the `gameId`.
-         */
-        const targetMapByGameId = new Map<number, Array<MasterServant>>();
-        for (const targetServant of target) {
-            const { gameId } = targetServant;
-            let bucket = targetMapByGameId.get(gameId);
-            if (!bucket) {
-                targetMapByGameId.set(gameId, bucket = []);
-            }
-            bucket.push(targetServant);
-        }
-
-        /**
-         * Keeps track of the number of servants by `gameId` have that have been merged
-         * into the target list.
-         */
-        const mergeCountByGameId: Record<number, number> = {};
-
-        /*
-         * Iterate through the source list.
-         */
-        for (const sourceServant of source) {
-            const { gameId } = sourceServant;
-            const mergeCount = mergeCountByGameId[gameId] || 0;
-            const bucket = targetMapByGameId.get(gameId);
-
-            /**
-             * The target servant to merge into.
-             */
-            const mergeTarget = bucket?.[mergeCount];
-
-            /*
-             * If a suitable merge target could not be found, then just add the servant to
-             * the target list. Otherwise, merge the source servant into the target and
-             * update the merge count.
-             */
-            if (!mergeTarget) {
-                const servant = this.partialToFull(sourceServant);
-                servant.instanceId = ++lastInstanceId;
-                target.push(servant);
-            } else {
-                this._merge(mergeTarget, sourceServant);
-                mergeCountByGameId[gameId] = mergeCount + 1;
-            }
-
-        }
-    }
-
     static getLastInstanceId(masterServants: ReadonlyArray<MasterServant>): number {
         if (!masterServants.length) {
             return 0;
         }
         return Math.max(...masterServants.map(servant => servant.instanceId));
-    }
-
-    static reassignInstanceIds(masterServants: Array<Partial<MasterServant>>, startId = 1) {
-        masterServants.forEach((servant, index) => servant.instanceId = startId + index);
     }
 
     /**

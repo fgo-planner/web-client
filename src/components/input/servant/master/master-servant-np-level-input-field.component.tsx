@@ -1,6 +1,7 @@
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
 import { GameServantConstants } from '../../../../constants';
+import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../types/internal';
 
 type Props = {
     disabled?: boolean;
@@ -17,6 +18,8 @@ type Props = {
 };
 
 const DefaultLabel = 'NP Level';
+
+const IndeterminateDisplayText = '?';
 
 /**
  * Input field for a servant's NP level. This is currently only applicable to
@@ -54,7 +57,7 @@ export const MasterServantNpLevelInputField = React.memo((props: Props) => {
                 onChange={handleChange}
                 disabled={disabled}
             >
-                {multiEditMode && <option key={-1} value={-1}>{'?'}</option>}
+                {multiEditMode && <option key={IndeterminateValue} value={IndeterminateValue}>{IndeterminateDisplayText}</option>}
                 {GameServantConstants.NoblePhantasmLevels.map(value => (
                     <option key={value} value={value}>
                         {value}

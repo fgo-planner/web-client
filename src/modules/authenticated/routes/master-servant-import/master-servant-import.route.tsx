@@ -1,4 +1,4 @@
-import { MasterAccount } from '@fgo-planner/types';
+import { MasterAccount, MasterServant } from '@fgo-planner/types';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog } from '../../../../components/dialog/alert-dialog.component';
@@ -9,7 +9,8 @@ import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loadin
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { FgoManagerMasterServantParser } from '../../../../services/import/fgo-manager/fgo-manager-master-servant-parser';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
-import { Nullable, ReadonlyRecord } from '../../../../types/internal';
+import { MasterServantUpdateIndeterminateValue as IndeterminateValue, Nullable, ReadonlyRecord } from '../../../../types/internal';
+import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
@@ -108,7 +109,7 @@ const MasterServantImportRoute = React.memo(() => {
         setTimeout(async () => {
             const parser = new FgoManagerMasterServantParser(data, gameServantList || []);
             const parsedData = parser.parse();
-            if (!parsedData.masterServants.length) {
+            if (!parsedData.servantUpdates.length) {
                 setImportStatus('parseFail');
             } else {
                 setImportStatus('parseSuccess');
@@ -130,19 +131,25 @@ const MasterServantImportRoute = React.memo(() => {
         }
         invokeLoadingIndicator();
 
+        const bondLevels = { ...masterAccount.bondLevels };
+        /*
+         * Existing bond levels are always merged with imported data, regardless of the
+         * selected action.
+         */
+        for (const { gameId, bondLevel } of parsedData.servantUpdates) {
+            if (bondLevel === undefined) {
+                delete bondLevels[gameId];
+            } else if (bondLevel !== IndeterminateValue) {
+                bondLevels[gameId] = bondLevel;
+            }
+        }
+
         /**
          * The update payload.
          */
         const update: Partial<MasterAccount> = {
             _id: masterAccount._id,
-            /*
-             * Existing bond levels are always merged with imported data, regardless of the
-             * selected action.
-             */
-            bondLevels: {
-                ...masterAccount.bondLevels,
-                ...parsedData.bondLevels
-            }
+            bondLevels
         };
 
         /*
@@ -157,25 +164,28 @@ const MasterServantImportRoute = React.memo(() => {
             /*
              * Merge the parsed servants into the existing servants.
              */
-            MasterServantUtils.merge(servants, parsedData.masterServants);
+            MasterServantUpdateUtils.bulkApplyFromUpdatePayloads(servants, parsedData.servantUpdates, bondLevels);
 
             update.servants = servants;
         } else {
             /*
-             * Update `instanceId` to continue off from the old list. This needs to be done
-             * for both the `Append` and `Overwrite` actions.
+             * The `instanceId` needs to continue off from the old list, for both the
+             * `Append` and `Overwrite` actions.
              */
-            const lastInstanceId = MasterServantUtils.getLastInstanceId(masterAccount.servants);
-            MasterServantUtils.reassignInstanceIds(parsedData.masterServants, lastInstanceId + 1);
+            let instanceId = MasterServantUtils.getLastInstanceId(masterAccount.servants) + 1;
+            const masterServants = [] as Array<MasterServant>;
+            for (const parsedUpdate of parsedData.servantUpdates) {
+                const masterServant = MasterServantUpdateUtils.convertToMasterServant(instanceId++, parsedUpdate, bondLevels);
+                masterServants.push(masterServant);
+            }
             
-            const partialToFull = MasterServantUtils.partialToFull.bind(MasterServantUtils);
             if (existingAction === ExistingAction.Append) {
                 update.servants = [
                     ...masterAccount.servants,
-                    ...parsedData.masterServants.map(partialToFull)
+                    ...masterServants
                 ];
             } else {
-                update.servants = parsedData.masterServants.map(partialToFull);
+                update.servants = masterServants;
             }
         }
 
@@ -208,7 +218,7 @@ const MasterServantImportRoute = React.memo(() => {
         /*
          * If data has been successfully parsed, then show the parsed servant list.
          */
-        if (parsedData && parsedData.masterServants.length) {
+        if (parsedData && parsedData.servantUpdates.length) {
             return (
                 <MasterServantImportList
                     parsedData={parsedData}

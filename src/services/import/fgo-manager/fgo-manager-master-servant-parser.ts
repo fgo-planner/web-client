@@ -1,10 +1,10 @@
-import { GameServant, MasterServantBondLevel, MasterServantNoblePhantasmLevel } from '@fgo-planner/types';
+import { GameServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/types';
 import { Options } from 'csv-parse';
 import { parse } from 'csv-parse/sync';
 import { parse as parseDate } from 'date-fns';
 import { GameServantConstants } from '../../../constants';
-import { GameServantList, MasterServantPartial } from '../../../types/data';
-import { Immutable, ReadonlyRecord } from '../../../types/internal';
+import { GameServantList } from '../../../types/data';
+import { Array2D, Immutable, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateNew, ReadonlyRecord } from '../../../types/internal';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MathUtils } from '../../../utils/math.utils';
 import { BaseMasterServantParser } from '../base-master-servant-parser';
@@ -25,7 +25,17 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         skipEmptyLines: true
     };
 
-    private _servantNameMap: ReadonlyRecord<string, Immutable<GameServant>>;
+    private readonly _servantNameMap: ReadonlyRecord<string, Immutable<GameServant>>;
+
+    private _isParsing = false;
+
+    private _parseResult?: MasterServantParserResult;
+
+    private _currentRowNumber = 0;
+
+    private _currentRowData?: Array<string>
+
+    private _headerMap?: Record<FgoManagerColumn, number>;
 
     constructor(data: string, gameServants: GameServantList) {
         super(data);
@@ -42,15 +52,25 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         this._servantNameMap = servantNameToGameIdMap;
     }
 
-    parse(startInstanceId = 1): MasterServantParserResult {
-        const results: MasterServantParserResult = {
-            masterServants: [],
-            bondLevels: {},
+    parse(): MasterServantParserResult {
+
+        if (this._isParsing) {
+            return {
+                servantUpdates: [],
+                errors: ['Parsing is already in progress for this parser.'],
+                warnings: []
+            };
+        }
+
+        this._isParsing = true;
+        this._parseResult = {
+            servantUpdates: [],
             errors: [],
             warnings: []
         };
+
         try {
-            const data: string[][] = parse(this._data, FgoManagerMasterServantParser._ParseOptions);
+            const data: Array2D<string> = parse(this._data, FgoManagerMasterServantParser._ParseOptions);
             /*
              * The header is on row 2, so if there are only 2 rows or less, then the data
              * does not contain any servants.
@@ -58,38 +78,33 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
             if (data.length < 3) {
                 if (data.length < 2) {
                     // Header is missing
-                    results.errors.push('Invalid data');
+                    throw Error('Header is missing or invalid');
                 }
-                return results;
             }
-            this._parse(results, data, startInstanceId);
+            this._parse(data);
         } catch (e: any) {
-            results.errors.push(typeof e === 'string' ? e : e.message);
+            this._parseResult.errors.push(typeof e === 'string' ? e : e.message);
         }
+
+        const results = this._parseResult!;
+        this._resetVariables();
         return results;
     }
 
-    private _parse(results: MasterServantParserResult, data: string[][], startInstanceId: number): MasterServantParserResult {
-        const headerData = data[1]; // Header is on second row.
-        const headerMap = this._parseHeader(headerData);
-        const bondLevels = results.bondLevels;
-        let instanceId = startInstanceId;
-        for (let r = 2, length = data.length; r < length; r++) {
-            const row = data[r];
+    private _parse(data: Array2D<string>): void {
+        const { servantUpdates, errors } = this._parseResult!;
+        const headerData = data[this._currentRowNumber = 1]; // Header is on second row.
+        this._headerMap = this._parseHeader(headerData);
+        for (this._currentRowNumber = 2; this._currentRowNumber < data.length; this._currentRowNumber++) {
+            this._currentRowData = data[this._currentRowNumber];
             try {
-                const masterServant = this._parseRow(row, headerMap, instanceId++, bondLevels);
-                results.masterServants.push(masterServant);
+                const servant = this._parseCurrentRow();
+                servantUpdates.push(servant);
             } catch (e: any) {
-                /*
-                 * TODO Refactor the methods so that the errors/warnings are pushed into the
-                 * results immediately rather than throwing and catching.
-                 */
                 const message: string = typeof e === 'string' ? e : e.message;
-                results.warnings.push(`Row ${r + 1}: ${message}`);
+                errors.push(`${this._getCurrentRowLabel()} ${message}`);
             }
         }
-
-        return results;
     }
 
     private _parseHeader(headerData: string[]): Record<FgoManagerColumn, number> {
@@ -112,162 +127,181 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         throw Error(`Column '${columnName} could not be found.`);
     }
 
-    private _parseRow(
-        row: string[],
-        headerMap: Record<FgoManagerColumn, number>,
-        instanceId: number,
-        bondLevels: Record<number, MasterServantBondLevel>
-    ): MasterServantPartial {
+    private _parseCurrentRow(): MasterServantUpdateNew {
 
-        const gameServant = this._parseGameServant(row, headerMap);
+        const gameServant = this._parseGameServant();
         const gameId = gameServant._id;
-        const summonDate = this._parseSummonDate(row, headerMap);
-        const np = this._parseNoblePhantasm(row, headerMap);
-        const level = this._parseLevel(row, headerMap);
-        const ascension = level === undefined ? undefined : MasterServantUtils.roundToNearestValidAscensionLevel(level, 0, gameServant);
-        const bond = this._parseBond(row, headerMap);
-        const fouHp = this._parseFou(row, headerMap, 'FouHp');
-        const fouAtk = this._parseFou(row, headerMap, 'FouAtk');
-        const skill1 = this._parseSkill(row, headerMap, 1) || 1;
-        const skill2 = this._parseSkill(row, headerMap, 2);
-        const skill3 = this._parseSkill(row, headerMap, 3);
+        const summonDate = this._parseSummonDate();
+        const np = this._parseNoblePhantasm();
+        const { level, ascension } = this._parseLevelAndAscension(gameServant);
+        const bondLevel = this._parseBond();
+        const fouHp = this._parseFou('FouHp');
+        const fouAtk = this._parseFou('FouAtk');
+        const skill1 = this._parseSkill(1, false);
+        const skill2 = this._parseSkill(2, true);
+        const skill3 = this._parseSkill(3, true);
 
-        if (bond !== undefined) {
-            bondLevels[gameId] = bond;
-        }
-
-        const result = {
-            instanceId,
+        return {
+            isNewServant: true,
             gameId,
             summoned: true,
+            summonDate,
+            np,
+            level,
+            ascension,
+            fouHp,
+            fouAtk,
             skills: {
                 1: skill1,
                 2: skill2,
                 3: skill3
-            }
-        } as MasterServantPartial;
-
-        if (summonDate !== undefined) {
-            result.summonDate = summonDate;
-        }
-        if (np !== undefined) {
-            result.np = np;
-        }
-        if (level !== undefined) {
-            result.level = level;
-        }
-        if (ascension !== undefined) {
-            result.ascension = ascension;
-        }
-        if (fouHp !== undefined) {
-            result.fouHp = fouHp;
-        }
-        if (fouHp !== undefined) {
-            result.fouAtk = fouAtk;
-        }
-        
-        return result;
+            },
+            appendSkills: {},
+            bondLevel
+        };
     }
 
-    private _parseGameServant(row: string[], headerMap: Record<FgoManagerColumn, number>): Immutable<GameServant> {
-        const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.ServantName);
+    private _parseGameServant(): Immutable<GameServant> {
+        const value = this._parseDataFromCurrentRow(FgoManagerColumn.ServantName);
         if (!value) {
-            throw Error('Servant name is missing.');
+            throw Error('Servant name is missing, row will be skipped.');
         }
         const result = this._servantNameMap[value];
         if (result === undefined) {
-            throw Error(`Servant name '${value}' could not be found.`);
+            throw Error(`Data for servant name '${value}' could not be found, row will be skipped.`);
         }
         return result;
     }
 
-    private _parseNoblePhantasm(row: string[], headerMap: Record<FgoManagerColumn, number>): MasterServantNoblePhantasmLevel | undefined {
-        const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.NoblePhantasmLevel);
+    private _parseNoblePhantasm(): MasterServantNoblePhantasmLevel | Indeterminate {
+        const value = this._parseDataFromCurrentRow(FgoManagerColumn.NoblePhantasmLevel);
         if (!value) {
-            return undefined;
+            return IndeterminateValue;
         }
-        const cleanValue = value.substr(FgoManagerMasterServantParser._NoblePhantasmLevelPrefix.length);
+        const cleanValue = value.substring(FgoManagerMasterServantParser._NoblePhantasmLevelPrefix.length);
         let result = Number(cleanValue);
         if (isNaN(result)) {
-            throw Error(`'${value}' is not a NP level value.`);
+            this._parseResult!.warnings.push(`${this._getCurrentRowLabel()} '${value}' is not a NP level value.`);
+            return IndeterminateValue;
         }
         result = ~~MathUtils.clamp(result, GameServantConstants.MinNoblePhantasmLevel, GameServantConstants.MaxNoblePhantasmLevel);
         return result as MasterServantNoblePhantasmLevel;
     }
 
-    private _parseLevel(row: string[], headerMap: Record<FgoManagerColumn, number>): number | undefined {
-        const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.Level);
+    private _parseLevelAndAscension(gameServant: Immutable<GameServant>): {
+        level: number | Indeterminate;
+        ascension: MasterServantAscensionLevel | Indeterminate;
+    } {
+        const column = FgoManagerColumn.Level;
+        const value = this._parseDataFromCurrentRow(column);
         if (!value) {
-            return undefined;
+            return {
+                level: IndeterminateValue,
+                ascension: IndeterminateValue
+            };
         }
-        const cleanValue = value.substr(FgoManagerMasterServantParser._LevelPrefix.length);
-        let result = Number(cleanValue);
-        if (isNaN(result)) {
-            throw Error(`'${value}' is not a valid level value.`);
+        const cleanValue = value.substring(FgoManagerMasterServantParser._LevelPrefix.length);
+        let level = Number(cleanValue);
+        if (isNaN(level)) {
+            this._parseResult!.warnings.push(`${this._getCurrentRowAndColumnLabel(column)} '${value}' is not a valid value.`);
+            return {
+                level: IndeterminateValue,
+                ascension: IndeterminateValue
+            };
         }
-        result = ~~MathUtils.clamp(result, GameServantConstants.MinLevel, GameServantConstants.MaxLevel);
-        return result;
+        level = ~~MathUtils.clamp(level, GameServantConstants.MinLevel, GameServantConstants.MaxLevel);
+        const ascension = MasterServantUtils.roundToNearestValidAscensionLevel(level, 0, gameServant);
+        return { level, ascension };
     }
 
-    private _parseBond(row: string[], headerMap: Record<FgoManagerColumn, number>): MasterServantBondLevel | undefined {
-        const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.BondLevel);
+    private _parseBond(): MasterServantBondLevel | Indeterminate {
+        const column = FgoManagerColumn.BondLevel;
+        const value = this._parseDataFromCurrentRow(column);
         if (!value) {
-            return undefined;
+            return IndeterminateValue;
         }
         let result = Number(value);
         if (isNaN(result)) {
-            throw Error(`Bond level '${value}' is not a valid number.`);
+            this._parseResult!.warnings.push(`${this._getCurrentRowAndColumnLabel(column)} '${value}' is not a valid number.`);
+            return IndeterminateValue;
         }
         result = ~~MathUtils.clamp(result, GameServantConstants.MinBondLevel, GameServantConstants.MaxBondLevel);
         return result as MasterServantBondLevel;
     }
 
-    private _parseFou(row: string[], headerMap: Record<FgoManagerColumn, number>, stat: 'FouHp' | 'FouAtk'): number | undefined {
-        const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn[stat]);
+    private _parseFou(stat: 'FouHp' | 'FouAtk'): number | Indeterminate {
+        const column = FgoManagerColumn[stat];
+        const value = this._parseDataFromCurrentRow(column);
         if (!value) {
-            return undefined;
+            return IndeterminateValue;
         }
         let result = Number(value);
         if (isNaN(result)) {
-            throw Error(`${stat} value '${value}' is not a valid number.`);
+            this._parseResult!.warnings.push(`${this._getCurrentRowAndColumnLabel(column)} '${value}' is not a valid number.`);
+            return IndeterminateValue;
         }
         result = MasterServantUtils.roundToNearestValidFouValue(result);
         return result;
     }
 
-    private _parseSkill(row: string[], headerMap: Record<FgoManagerColumn, number>, skill: 1 | 2 | 3): number | undefined {
+    private _parseSkill(skill: 1 | 2 | 3, canBeUndefined: false): MasterServantSkillLevel | Indeterminate;
+    private _parseSkill(skill: 1 | 2 | 3, canBeUndefined: true): MasterServantSkillLevel | undefined;
+    private _parseSkill(skill: 1 | 2 | 3, canBeUndefined: boolean): MasterServantSkillLevel | undefined | Indeterminate {
         const path = `SkillLevel${skill}` as keyof typeof FgoManagerColumn;
-        const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn[path]);
+        const column = FgoManagerColumn[path];
+        const value = this._parseDataFromCurrentRow(column);
         if (!value) {
-            return undefined;
+            return canBeUndefined ? undefined : IndeterminateValue;
         }
         let result = Number(value);
         if (result === 0) {
-            return undefined;
+            return canBeUndefined ? undefined : IndeterminateValue;
         }
         if (isNaN(result)) {
-            throw Error(`Skill ${skill} level '${value}' is not a valid number.`);
+            this._parseResult!.warnings.push(`${this._getCurrentRowAndColumnLabel(column)} '${value}' is not a valid number.`);
+            return canBeUndefined ? undefined : IndeterminateValue;
         }
         result = ~~MathUtils.clamp(result, GameServantConstants.MinSkillLevel, GameServantConstants.MaxSkillLevel);
-        return result;
+        return result as MasterServantSkillLevel;
     }
 
-    private _parseSummonDate(row: string[], headerMap: Record<FgoManagerColumn, number>): Date | undefined {
-        const value = this._parseDataFromRow(row, headerMap, FgoManagerColumn.AcquisitionDate);
+    private _parseSummonDate(): number | Indeterminate {
+        const column = FgoManagerColumn.AcquisitionDate;
+        const value = this._parseDataFromCurrentRow(column);
         if (!value) {
-            return undefined;
+            return IndeterminateValue;
         }
         try {
-            return parseDate(value, FgoManagerMasterServantParser._AcquisitionDateFormat, new Date(0));
+            const date = parseDate(value, FgoManagerMasterServantParser._AcquisitionDateFormat, new Date(0));
+            return date.getTime();
         } catch (e) {
             console.error(e);
-            throw Error(`Date value '${value}' could not be parsed.`);
+            this._parseResult!.warnings.push(`${this._getCurrentRowAndColumnLabel(column)} Date value '${value}' could not be parsed.`);
+            return IndeterminateValue;
         }
     }
 
-    private _parseDataFromRow(row: string[], headerMap: Record<FgoManagerColumn, number>, column: FgoManagerColumn): string | undefined {
-        const columnIndex = headerMap[column];
-        return row[columnIndex];
+    private _parseDataFromCurrentRow(column: FgoManagerColumn): string | undefined {
+        const columnIndex = this._headerMap![column];
+        return this._currentRowData![columnIndex];
     }
+
+    private _getCurrentRowLabel(): string {
+        return `Row ${this._currentRowNumber}:`;
+    }
+
+    private _getCurrentRowAndColumnLabel(column: FgoManagerColumn): string {
+        return `Row ${this._currentRowNumber}, column ${FgoManagerColumnNames[column]}:`;
+    }
+
+    private _resetVariables(): void {
+        this._isParsing = false;
+        this._parseResult = undefined;
+        this._currentRowNumber = 0;
+        this._currentRowData = undefined;
+        this._headerMap = undefined;
+    }
+
+
 
 }

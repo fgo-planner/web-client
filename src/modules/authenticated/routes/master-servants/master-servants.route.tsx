@@ -15,13 +15,12 @@ import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loadin
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { Immutable, ModalOnCloseReason, Nullable } from '../../../../types/internal';
+import { Immutable, MasterServantUpdate, ModalOnCloseReason, Nullable } from '../../../../types/internal';
+import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { MasterServantEditData } from '../../../../types/internal/dto/master-servant-edit-data.type';
-import { MasterServantEditUtils } from '../../../../utils/master/master-servant-edit.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantContextMenu } from './master-servants-context-menu.component';
@@ -150,7 +149,7 @@ export const MasterServantsRoute = React.memo(() => {
      * this data is present (dialog is opened if data is defined, and closed if data
      * is undefined).
      */
-    const [editServantDialogData, setEditServantDialogData] = useState<MasterServantEditData>();
+    const [editServantDialogData, setEditServantDialogData] = useState<MasterServantUpdate>();
 
     /**
      * Contains the message prompt that is displayed by the delete servant dialog.
@@ -307,7 +306,7 @@ export const MasterServantsRoute = React.memo(() => {
         setServantSelection([]);
     }, [setServantSelection]);
 
-    const addNewServant = useCallback((data: MasterServantEditData) => {
+    const addNewServant = useCallback((update: MasterServantUpdate) => {
 
         const {
             masterServants,
@@ -324,7 +323,7 @@ export const MasterServantsRoute = React.memo(() => {
          * data returned by the dialog.
          */
         const masterServant = MasterServantUtils.instantiate(instanceId);
-        MasterServantEditUtils.applyFromEditData(data, masterServant, bondLevels);
+        MasterServantUpdateUtils.applyFromUpdatePayload(masterServant, update, bondLevels);
         /*
          * Rebuild the entire array with the new servant included to force the child
          * list to re-render.
@@ -367,7 +366,7 @@ export const MasterServantsRoute = React.memo(() => {
     /**
      * Applies the submitted edit to the currently selected servants.
      */
-    const applyEditToSelectedServants = useCallback((data: MasterServantEditData) => {
+    const applyUpdateToSelectedServants = useCallback((update: MasterServantUpdate) => {
 
         const {
             masterServants,
@@ -379,7 +378,7 @@ export const MasterServantsRoute = React.memo(() => {
          * Apply the change data for all of the selected servants.
          */
         const { servants: selectedServants } = selectedServantsRef.current;
-        MasterServantEditUtils.applyFromEditData(data, selectedServants, bondLevels);
+        MasterServantUpdateUtils.applyFromUpdatePayload(selectedServants, update, bondLevels);
         /*
          * FIXME This n^2 operation might get slow as we have more servants.
          */
@@ -443,7 +442,7 @@ export const MasterServantsRoute = React.memo(() => {
             unlockedCostumes
         } = masterAccountDataRef.current;
 
-        const editServantDialogData = MasterServantEditUtils.instantiateForNewServant(bondLevels, unlockedCostumes);
+        const editServantDialogData = MasterServantUpdateUtils.instantiateForNewServant(bondLevels, unlockedCostumes);
         setEditServantDialogData(editServantDialogData);
         setIsMultiAddServantDialogOpen(false);
         setDeleteServantDialogData(undefined);
@@ -466,7 +465,7 @@ export const MasterServantsRoute = React.memo(() => {
             unlockedCostumes
         } = masterAccountDataRef.current;
 
-        const editServantDialogData = MasterServantEditUtils.convertToEditData(selectedServants, bondLevels, unlockedCostumes);
+        const editServantDialogData = MasterServantUpdateUtils.convertToUpdatePayload(selectedServants, bondLevels, unlockedCostumes);
         setEditServantDialogData(editServantDialogData);
         setIsMultiAddServantDialogOpen(false);
         setDeleteServantDialogData(undefined);
@@ -621,7 +620,7 @@ export const MasterServantsRoute = React.memo(() => {
         setIsMultiAddServantDialogOpen(false);
     }, [addNewServants]);
 
-    const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: MasterServantEditData): void => {
+    const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: MasterServantUpdate): void => {
         setEditServantDialogData(undefined);
         /*
          * Close the dialog without taking any further action if the changes were
@@ -633,9 +632,9 @@ export const MasterServantsRoute = React.memo(() => {
         if (data.isNewServant) {
             addNewServant(data);
         } else {
-            applyEditToSelectedServants(data);
+            applyUpdateToSelectedServants(data);
         }
-    }, [addNewServant, applyEditToSelectedServants]);
+    }, [addNewServant, applyUpdateToSelectedServants]);
 
     const handleDeleteServantDialogClose = useCallback((event: MouseEvent, reason: ModalOnCloseReason): any => {
         if (reason !== 'submit') {
@@ -777,7 +776,7 @@ export const MasterServantsRoute = React.memo(() => {
             {/* <FabContainer children={fabContainerChildNodes} /> */}
             <MasterServantsEditDialog
                 bondLevels={bondLevels}
-                editData={editServantDialogData}
+                masterServantUpdate={editServantDialogData}
                 isMultipleServantsSelected={isMultipleServantsSelected}
                 showAppendSkills={showAppendSkills}
                 onClose={handleEditServantDialogClose}

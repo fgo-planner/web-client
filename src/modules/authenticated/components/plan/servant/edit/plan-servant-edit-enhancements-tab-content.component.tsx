@@ -33,6 +33,8 @@ type SkillSet = 'skills' | 'appendSkills';
 
 type SkillSlot = 1 | 2 | 3;
 
+type FouStat = 'fouHp' | 'fouAtk';
+
 const TooltipEnterDelay = 250;
 
 const StyleClassPrefix = 'PlanServantEditEnhancementsTabContent';
@@ -127,14 +129,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         forceUpdate();
     }, [enhancements, forceUpdate, pushStatsChange]);
 
-    const handleInputChange = useCallback((name: string, value: string, pushChanges = false): void => {
-        // TODO Maybe have a separate handler for each stat.
-        (enhancements as any)[name] = value ? Number(value) : undefined;
-        if (pushChanges) {
-            pushStatsChange();
-        }
+    const handleFouInputChange = useCallback((_: string, stat: FouStat, value: string): void => {
+        enhancements[stat] = value ? Number(value) : undefined;
         forceUpdate();
-    }, [enhancements, forceUpdate, pushStatsChange]);
+    }, [enhancements, forceUpdate]);
 
     const handleInputBlurEvent = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         pushStatsChange();
@@ -254,7 +252,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             value={String(enhancements.fouHp ?? '')}
             label='HP Fou'
             name='fouHp'
-            onChange={handleInputChange}
+            stat='fouHp'
+            onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
             disabled={disabled}
         />
@@ -265,7 +264,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             value={String(enhancements.fouAtk ?? '')}
             label='ATK Fou'
             name='fouAtk'
-            onChange={handleInputChange}
+            stat='fouAtk'
+            onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
             disabled={disabled}
         />

@@ -11,7 +11,6 @@ export * from './game/servant/game-servant-map.type';
 export * from './game/soundtrack/game-soundtrack-list.type';
 export * from './master/account/master-account-list.type';
 export * from './master/account/master-account-plans.type';
-export * from './master/servant/master-servant-partial.type';
 export * from './page.type';
 export * from './pagination.type';
 export * from './plan/requirements/plan-enhancement-item-requirements.type';

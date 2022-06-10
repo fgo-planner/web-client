@@ -1,4 +1,4 @@
-import { GameServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { GameServant, MasterServantBondLevel, MasterServantNoblePhantasmLevel } from '@fgo-planner/types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
@@ -7,23 +7,22 @@ import { MasterServantNpLevelInputField } from '../../../../../../components/inp
 import { MasterServantSummonDateInputField } from '../../../../../../components/input/servant/master/master-servant-summon-date-input-field.component';
 import { MasterServantSummonedCheckbox } from '../../../../../../components/input/servant/master/master-servant-summoned-checkbox.component';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
-import { Immutable } from '../../../../../../types/internal';
-import { MasterServantEditData } from '../../../../../../types/internal/dto/master-servant-edit-data.type';
+import { Immutable, MasterServantUpdate, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../../../types/internal';
 
 type Props = {
-    /**
-     * The servant data to edit. This will be modified directly, so provide a clone
-     * if modification to the original object is not desired.
-     */
-    editData: MasterServantEditData;
     /**
      * The game servant data that corresponds to the servant being edited. This
      * should be set to `undefined` if and only if multiple servants are being
      * edited.
      */
     gameServant?: Immutable<GameServant>;
+    /**
+     * The update payload for editing. This will be modified directly, so provide a
+     * clone if modification to the original object is not desired.
+     */
+    masterServantUpdate: MasterServantUpdate;
     multiEditMode?: boolean;
-    onChange: (data: MasterServantEditData) => void;
+    onChange: (update: MasterServantUpdate) => void;
     readonly?: boolean;
     showAppendSkills?: boolean;
 };
@@ -60,68 +59,64 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
     const forceUpdate = useForceUpdate();
 
     const {
-        editData,
-        gameServant,
+        masterServantUpdate,
         multiEditMode,
         onChange,
-        readonly,
-        showAppendSkills
+        readonly
     } = props;
-
-    const {
-        bondLevel,
-        isNewServant,
-        masterServant,
-        unlockedCostumes
-    } = editData;
 
     /**
      * Notifies the parent component of stats change by invoking the `onChange`
      * callback function.
      */
     const pushStatsChange = useCallback((): void => {
-        onChange?.(editData);
-    }, [onChange, editData]);
+        onChange?.(masterServantUpdate);
+    }, [onChange, masterServantUpdate]);
 
 
     //#region Input event handlers
 
-    const handleBondInputChange = useCallback((_: any, value: string, pushChanges = false): void => {
+    const handleBondInputChange = useCallback((_: string, value: string, pushChanges = false): void => {
         if (!value) {
-            editData.bondLevel = undefined;
+            masterServantUpdate.bondLevel = undefined;
+        } else if (value === IndeterminateValue) {
+            masterServantUpdate.bondLevel = IndeterminateValue;
         } else {
-            editData.bondLevel = Number(value) as MasterServantBondLevel | -1;
+            masterServantUpdate.bondLevel = Number(value) as MasterServantBondLevel;
         }
         if (pushChanges) {
             pushStatsChange();
         }
         forceUpdate();
-    }, [editData, forceUpdate, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
-    const handleInputChange = useCallback((name: string, value: string, pushChanges = false): void => {
-        // TODO Maybe have a separate handler for each stat.
-        (masterServant as any)[name] = value ? Number(value) : undefined;
+    const handleNpInputChange = useCallback((_: string, value: string, pushChanges = false): void => {
+        if (value === IndeterminateValue) {
+            masterServantUpdate.np = IndeterminateValue;
+        } else {
+            masterServantUpdate.np = Number(value) as MasterServantNoblePhantasmLevel;
+        }
         if (pushChanges) {
             pushStatsChange();
         }
         forceUpdate();
-    }, [forceUpdate, masterServant, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
-    const handleSummonedCheckboxChange = useCallback((_: any, value: boolean | undefined, pushChanges = false): void => {
-        masterServant.summoned = value;
+    const handleSummonedCheckboxChange = useCallback((_: string, value: boolean | Indeterminate, pushChanges = false): void => {
+        masterServantUpdate.summoned = value;
         if (pushChanges) {
             pushStatsChange();
         }
         forceUpdate();
-    }, [forceUpdate, masterServant, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
-    const handleSummonDateInputChange = useCallback((_: any, value: number | undefined, pushChanges = false): void => {
-        masterServant.summonDate = value;
+    const handleSummonDateInputChange = useCallback((_: string, value: number | undefined | Indeterminate, pushChanges = false): void => {
+        masterServantUpdate.summonDate = value;
         if (pushChanges) {
             pushStatsChange();
         }
         forceUpdate();
-    }, [forceUpdate, masterServant, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
 
     const handleInputBlurEvent = useCallback((): void => {
@@ -134,9 +129,16 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
 
     //#region Input fields
 
+    const {
+        summoned,
+        summonDate,
+        np,
+        bondLevel
+    } = masterServantUpdate;
+
     const summonedField = (
         <MasterServantSummonedCheckbox
-            value={masterServant.summoned}
+            value={summoned}
             name='summoned'
             multiEditMode={multiEditMode}
             onChange={handleSummonedCheckboxChange}
@@ -146,9 +148,9 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
 
     const summonDateField = (
         <MasterServantSummonDateInputField
-            value={masterServant.summonDate}
+            value={summonDate}
             name='summonDate'
-            label={masterServant.summoned ? 'Summon date' : 'Planned summon date'}
+            label={summoned ? 'Summon date' : 'Planned summon date'}
             multiEditMode={multiEditMode}
             onChange={handleSummonDateInputChange}
             onBlur={handleInputBlurEvent}
@@ -158,11 +160,11 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
 
     const npField = (
         <MasterServantNpLevelInputField
-            value={String(masterServant.np ?? '')}
+            value={String(np ?? '')}
             label='NP Level'
             name='np'
             multiEditMode={multiEditMode}
-            onChange={handleInputChange}
+            onChange={handleNpInputChange}
             disabled={readonly}
         />
     );

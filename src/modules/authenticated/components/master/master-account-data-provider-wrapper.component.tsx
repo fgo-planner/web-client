@@ -5,9 +5,9 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { Immutable, MasterServantEditData, Nullable, ReadonlyRecord } from '../../../../types/internal';
+import { Immutable, MasterServantUpdate, Nullable, ReadonlyRecord } from '../../../../types/internal';
 import { ArrayUtils } from '../../../../utils/array.utils';
-import { MasterServantEditUtils } from '../../../../utils/master/master-servant-edit.utils';
+import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
@@ -103,7 +103,7 @@ export const MasterAccountDataProviderWrapper = React.memo(({ children }: Props)
         }
     }, [editData, forceUpdate, updateQp]);
 
-    const addServant = useCallback((data: MasterServantEditData): void => {
+    const addServant = useCallback((update: MasterServantUpdate): void => {
 
         const {
             servants,
@@ -120,7 +120,7 @@ export const MasterAccountDataProviderWrapper = React.memo(({ children }: Props)
          * data returned by the dialog.
          */
         const newServant = MasterServantUtils.instantiate(instanceId);
-        MasterServantEditUtils.applyFromEditData(data, newServant, bondLevels);
+        MasterServantUpdateUtils.applyFromUpdatePayload(newServant, update, bondLevels);
         /*
          * Rebuild the array with the new servant included to conform with the context
          * specifications.
@@ -130,7 +130,7 @@ export const MasterAccountDataProviderWrapper = React.memo(({ children }: Props)
         forceUpdate();
     }, [editData, forceUpdate]);
 
-    const updateServants = useCallback((instanceIds: Set<number>, data: MasterServantEditData): void => {
+    const updateServants = useCallback((instanceIds: Set<number>, update: MasterServantUpdate): void => {
 
         const {
             servants,
@@ -158,7 +158,7 @@ export const MasterAccountDataProviderWrapper = React.memo(({ children }: Props)
              * re-constructed to conform with the context specifications.
              */
             const targetServant = { ...servant };
-            MasterServantEditUtils.applyFromEditData(data, targetServant, bondLevels);
+            MasterServantUpdateUtils.applyFromUpdatePayload(targetServant, update, bondLevels);
             // TODO Set dirty...
             updatedServants.push(targetServant);
         }

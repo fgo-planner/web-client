@@ -1,6 +1,7 @@
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
 import { GameServantConstants } from '../../../../constants';
+import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../types/internal';
 
 type Props = {
     allowEmpty?: boolean;
@@ -58,7 +59,7 @@ export const MasterServantBondInputField = React.memo((props: Props) => {
                 onChange={handleChange}
                 disabled={disabled}
             >
-                {multiEditMode && <option key={-1} value={-1}>{IndeterminateDisplayText}</option>}
+                {multiEditMode && <option key={IndeterminateValue} value={IndeterminateValue}>{IndeterminateDisplayText}</option>}
                 {allowEmpty && <option value=''>{'\u2014'}</option>}
                 {GameServantConstants.BondLevels.map(value => (
                     <option key={value} value={value}>

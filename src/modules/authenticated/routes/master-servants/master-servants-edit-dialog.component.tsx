@@ -3,26 +3,25 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, 
 import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps, ReadonlyRecord } from '../../../../types/internal';
-import { MasterServantEditData } from '../../../../types/internal/dto/master-servant-edit-data.type';
+import { DialogComponentProps, MasterServantUpdate, ReadonlyRecord } from '../../../../types/internal';
 import { MasterServantEdit } from '../../components/master/servant/edit/master-servant-edit.component';
 
 type Props = {
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     /**
-     * The servant data to edit. This will be modified directly, so provide a clone
-     * if modification to the original object is not desired.
-     *
-     * If this is `undefined`, then the dialog will remain closed.
-     */
-    editData?: MasterServantEditData;
-    /**
      * Whether multiple servants are being edited. In this mode, various parameters
      * will not be available for edit.
      */
     isMultipleServantsSelected?: boolean;
+    /**
+     * The update payload for editing. This will be modified directly, so provide a
+     * clone if modification to the original object is not desired.
+     *
+     * If this is `undefined`, then the dialog will remain closed.
+     */
+    masterServantUpdate?: MasterServantUpdate;
     showAppendSkills?: boolean;
-} & Omit<DialogComponentProps<MasterServantEditData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
+} & Omit<DialogComponentProps<MasterServantUpdate>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';
 const SubmitButtonLabel = 'Done';
@@ -45,8 +44,8 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
 
     const {
         bondLevels,
-        editData,
         isMultipleServantsSelected,
+        masterServantUpdate,
         showAppendSkills,
         onClose,
         ...dialogProps
@@ -64,8 +63,8 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
     } = useAutoResizeDialog(props);
 
     const handleSubmitButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-        onClose(event, 'submit', editData);
-    }, [editData, onClose]);
+        onClose(event, 'submit', masterServantUpdate);
+    }, [onClose, masterServantUpdate]);
 
     const handleCancelButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         onClose(event, 'cancel');
@@ -76,22 +75,22 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
     }, [onClose]);
 
     const dialogTitle = useMemo((): string => {
-        if (!editData) {
+        if (!masterServantUpdate) {
             return '';
         }
         // TODO Un-hardcode the strings.
-        if (editData.isNewServant) {
+        if (masterServantUpdate.isNewServant) {
             return 'Add Servant';
         } else if (isMultipleServantsSelected)  {
             return 'Edit Servants';
         } else {
             return 'Edit Servant';
         }
-    }, [editData, isMultipleServantsSelected]);
+    }, [isMultipleServantsSelected, masterServantUpdate]);
 
-    const open = !!editData;
+    const open = !!masterServantUpdate;
 
-    const multiEditMode = isMultipleServantsSelected && !editData?.isNewServant;
+    const multiEditMode = isMultipleServantsSelected && !masterServantUpdate?.isNewServant;
 
     /*
      * Only re-render the dialog contents if the dialog is open. This allows the
@@ -108,7 +107,7 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
                 <DialogContent>
                     <MasterServantEdit
                         bondLevels={bondLevels}
-                        editData={editData!}
+                        masterServantUpdate={masterServantUpdate!}
                         multiEditMode={multiEditMode}
                         showAppendSkills={showAppendSkills}
                     />

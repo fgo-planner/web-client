@@ -1,28 +1,27 @@
 import { GameServant } from '@fgo-planner/types';
 import React from 'react';
-import { Immutable } from '../../../../../../types/internal';
-import { MasterServantEditData } from '../../../../../../types/internal/dto/master-servant-edit-data.type';
+import { Immutable, MasterServantUpdate } from '../../../../../../types/internal';
 
 type Props = {
-    /**
-     * The servant data to edit. This will be modified directly, so provide a clone
-     * if modification to the original object is not desired.
-     */
-    editData: MasterServantEditData;
     /**
      * The game servant data that corresponds to the servant being edited. This
      * should be set to `undefined` if and only if multiple servants are being
      * edited.
      */
     gameServant?: Immutable<GameServant>;
-    onChange?: (data: MasterServantEditData) => void;
+    /**
+     * The update payload for editing. This will be modified directly, so provide a
+     * clone if modification to the original object is not desired.
+     */
+    masterServantUpdate: MasterServantUpdate;
+    onChange?: (update: MasterServantUpdate) => void;
 };
 
 export const MasterServantEditCostumesTabContent = React.memo((props: Props) => {
 
     const {
-        editData,
         gameServant,
+        masterServantUpdate,
         onChange
     } = props;
 

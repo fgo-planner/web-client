@@ -235,7 +235,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
          * `instanceId` value, but it should not affect the `merge` method; we just need
          * to typecast to `any` to bypass the type check error.
          */
-        MasterServantUtils.merge(activeServant, data.masterServant as any);
+        // MasterServantUtils.merge(activeServant, data.masterServant as any);
         if (data.bond === undefined) {
             delete bondLevels[gameId];
         } else {

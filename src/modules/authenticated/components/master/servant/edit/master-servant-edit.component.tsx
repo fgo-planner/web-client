@@ -4,21 +4,20 @@ import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { Immutable, ReadonlyRecord } from '../../../../../../types/internal';
+import { Immutable, MasterServantUpdate, ReadonlyRecord, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { MasterServantSelectAutocomplete } from '../master-servant-select-autocomplete.component';
 import { MasterServantEditCostumesTabContent } from './master-servant-edit-costumes-tab-content.component';
-import { MasterServantEditData } from '../../../../../../types/internal/dto/master-servant-edit-data.type';
 import { MasterServantEditEnhancementsTabContent } from './master-servant-edit-enhancements-tab-content.component';
 import { MasterServantEditGeneralTabContent } from './master-servant-edit-general-tab-content.component';
 
 type Props = {
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     /**
-     * The servant data to edit. This will be modified directly, so provide a clone
-     * if modification to the original object is not desired.
+     * The update payload for editing. This will be modified directly, so provide a
+     * clone if modification to the original object is not desired.
      */
-    editData: MasterServantEditData;
+    masterServantUpdate: MasterServantUpdate;
     /**
      * Whether multiple servants are being edited. In this mode, various parameters
      * will not be available for edit.
@@ -72,16 +71,13 @@ export const MasterServantEdit = React.memo((props: Props) => {
 
     const {
         bondLevels,
-        editData,
+        masterServantUpdate,
         multiEditMode,
         readonly,
         showAppendSkills
     } = props;
 
-    const {
-        isNewServant,
-        masterServant
-    } = editData;
+    const { isNewServant } = masterServantUpdate;
 
     const servantSelectDisabled = readonly || multiEditMode || !isNewServant;
 
@@ -97,15 +93,15 @@ export const MasterServantEdit = React.memo((props: Props) => {
         if (!gameServantMap) {
             return;
         }
-        const gameId = masterServant.gameId;
+        const gameId = masterServantUpdate.gameId;
         console.log(gameId);
-        if (gameId === -1) {
+        if (gameId === IndeterminateValue) {
             setGameServant(undefined);
         } else {
             setGameServant(gameServantMap[gameId]);
         }
         // TODO Recompute level/ascension values?
-    }, [gameServantMap, masterServant.gameId]);
+    }, [gameServantMap, masterServantUpdate.gameId]);
 
     //#region Input event handlers
 
@@ -114,28 +110,40 @@ export const MasterServantEdit = React.memo((props: Props) => {
             return;
         }
         const { _id: gameId } = value;
-        if (masterServant.gameId === gameId) {
+        if (masterServantUpdate.gameId === gameId) {
             return;
         }
         const gameServant = gameServantMap[gameId];
-        masterServant.gameId = gameId;
+        masterServantUpdate.gameId = gameId;
         /*
          * Recompute level/ascension values in case the servant rarity has changed.
          */
-        const { ascension, level } = masterServant;
-        masterServant.level = MasterServantUtils.roundToNearestValidLevel(ascension, level, gameServant);
+        const { ascension, level } = masterServantUpdate;
+        if (level !== IndeterminateValue && ascension !== IndeterminateValue) {
+            masterServantUpdate.level = MasterServantUtils.roundToNearestValidLevel(ascension, level, gameServant);
+        }
         /*
          * Also update the bond level.
          */
-        editData.bondLevel = bondLevels[gameId];
+        masterServantUpdate.bondLevel = bondLevels[gameId];
 
         setGameServant(gameServant);
-    }, [bondLevels, editData, gameServantMap, masterServant, servantSelectDisabled]);
+    }, [bondLevels, gameServantMap, servantSelectDisabled, masterServantUpdate]);
 
     const handleActiveTabChange = useCallback((_: SyntheticEvent, value: TabId) => {
         setActiveTab(value);
     }, []);
 
+    //#endregion
+    
+
+    //#region Other event handlers
+    
+    const handleUpdateChange = useCallback((update: MasterServantUpdate): void => {
+        // TODO Do something with this.
+        console.log(update);
+    }, []);
+    
     //#endregion
 
 
@@ -152,29 +160,29 @@ export const MasterServantEdit = React.memo((props: Props) => {
     if (activeTab === 'costumes') {
         tabsContentNode = (
             <MasterServantEditCostumesTabContent
-                editData={editData}
+                masterServantUpdate={masterServantUpdate}
                 gameServant={gameServant}
-                onChange={e => console.log(e)}
+                onChange={handleUpdateChange}
             />
         );
     } else if (activeTab === 'enhancements') {
         tabsContentNode = (
             <MasterServantEditEnhancementsTabContent
-                editData={editData}
+                masterServantUpdate={masterServantUpdate}
                 gameServant={gameServant}
                 multiEditMode={multiEditMode}
                 showAppendSkills={showAppendSkills}
-                onChange={e => console.log(e)}
+                onChange={handleUpdateChange}
             />
         );
     } else {
         tabsContentNode = (
             <MasterServantEditGeneralTabContent
-                editData={editData}
+                masterServantUpdate={masterServantUpdate}
                 gameServant={gameServant}
                 multiEditMode={multiEditMode}
                 showAppendSkills={showAppendSkills}
-                onChange={e => console.log(e)}
+                onChange={handleUpdateChange}
             />
         );
     }

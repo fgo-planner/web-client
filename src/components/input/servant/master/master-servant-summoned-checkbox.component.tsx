@@ -1,14 +1,15 @@
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { MouseEvent, useCallback } from 'react';
+import { MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../types/internal';
 
 type Props = {
     disabled?: boolean;
     label?: string;
     multiEditMode?: boolean;
     name: string;
-    onChange: (name: string, value: boolean | undefined, pushChanges: boolean) => void;
-    value: boolean | undefined; // Can be undefined, but is not optional.
+    onChange: (name: string, value: boolean | Indeterminate, pushChanges: boolean) => void;
+    value: boolean | Indeterminate;
 };
 
 const DefaultLabel = 'Servant is summoned';
@@ -41,20 +42,20 @@ export const MasterServantSummonedCheckbox = React.memo((props: Props) => {
          * The next value in the cycle. The possible values depends on the whether
          * `multiEditMode` is `true` or not:
          *
-         * If `true`, the possible values are: `false` -> `true` -> `undefined`.
+         * If `true`, the possible values are: `false` -> `true` -> `IndeterminateValue`.
          *
          * Else, the possible values are: `false` -> `true`.
          */
-        let nextValue: boolean | undefined;
+        let nextValue: boolean | Indeterminate;
         switch (value) {
-            case undefined:
+            case IndeterminateValue:
                 nextValue = multiEditMode ? false : true;
                 break;
             case false:
                 nextValue = true;
                 break;
             case true:
-                nextValue = multiEditMode ? undefined : false;
+                nextValue = multiEditMode ? IndeterminateValue : false;
                 break;
         }
         onChange(name, nextValue, true);
@@ -63,7 +64,7 @@ export const MasterServantSummonedCheckbox = React.memo((props: Props) => {
     const checkboxNode = (
         <Checkbox
             name={name}
-            indeterminate={value === undefined}
+            indeterminate={value === IndeterminateValue}
             checked={!!value}
             onClick={handleClick}
             disabled={disabled}

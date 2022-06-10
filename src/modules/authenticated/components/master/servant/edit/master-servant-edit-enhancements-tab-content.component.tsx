@@ -7,23 +7,22 @@ import { ServantFouInputField } from '../../../../../../components/input/servant
 import { ServantLevelInputField } from '../../../../../../components/input/servant/servant-level-input-field.component';
 import { ServantSkillInputField } from '../../../../../../components/input/servant/servant-skill-input-field.component';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
-import { Immutable } from '../../../../../../types/internal';
-import { MasterServantEditData } from '../../../../../../types/internal/dto/master-servant-edit-data.type';
+import { Immutable, MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../../../types/internal';
 
 type Props = {
-    /**
-     * The servant data to edit. This will be modified directly, so provide a clone
-     * if modification to the original object is not desired.
-     */
-    editData: MasterServantEditData;
     /**
      * The game servant data that corresponds to the servant being edited. This
      * should be set to `undefined` if and only if multiple servants are being
      * edited.
      */
     gameServant?: Immutable<GameServant>;
+    /**
+     * The update payload for editing. This will be modified directly, so provide a
+     * clone if modification to the original object is not desired.
+     */
+    masterServantUpdate: MasterServantUpdate;
     multiEditMode?: boolean;
-    onChange: (data: MasterServantEditData) => void;
+    onChange: (update: MasterServantUpdate) => void;
     readonly?: boolean;
     showAppendSkills?: boolean;
 };
@@ -31,6 +30,8 @@ type Props = {
 type SkillSet = 'skills' | 'appendSkills';
 
 type SkillSlot = 1 | 2 | 3;
+
+type FouStat = 'fouHp' | 'fouAtk';
 
 const StyleClassPrefix = 'MasterServantEditEnhancementsTabContent';
 
@@ -64,56 +65,58 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
     const forceUpdate = useForceUpdate();
 
     const {
-        editData,
         gameServant,
+        masterServantUpdate,
         multiEditMode,
         onChange,
         readonly,
         showAppendSkills
     } = props;
 
-    const {
-        isNewServant,
-        masterServant,
-        unlockedCostumes
-    } = editData;
-
     /**
      * Notifies the parent component of stats change by invoking the `onChange`
      * callback function.
      */
     const pushStatsChange = useCallback((): void => {
-        onChange?.(editData);
-    }, [onChange, editData]);
+        onChange?.(masterServantUpdate);
+    }, [onChange, masterServantUpdate]);
 
 
     //#region Input event handlers
 
     const handleLevelAscensionInputChange = useCallback((_: any, level: string, ascension: string, pushChanges = false): void => {
-        masterServant.level = Number(level);
-        masterServant.ascension = Number(ascension) as MasterServantAscensionLevel;
+        masterServantUpdate.level = Number(level);
+        masterServantUpdate.ascension = Number(ascension) as MasterServantAscensionLevel;
         if (pushChanges) {
             pushStatsChange();
         }
         forceUpdate();
-    }, [forceUpdate, masterServant, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
     const handleSkillInputChange = useCallback((_: any, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
-        masterServant[skillSet][slot] = value ? Number(value) as MasterServantSkillLevel : undefined;
+        if (!value) {
+            masterServantUpdate[skillSet][slot] = undefined;
+        } else if (value === IndeterminateValue) {
+            masterServantUpdate[skillSet][slot] = IndeterminateValue;
+        } else {
+            masterServantUpdate[skillSet][slot] = Number(value) as MasterServantSkillLevel;
+        }
         if (pushChanges) {
             pushStatsChange();
         }
         forceUpdate();
-    }, [forceUpdate, masterServant, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
-    const handleInputChange = useCallback((name: string, value: string, pushChanges = false): void => {
-        // TODO Maybe have a separate handler for each stat.
-        (masterServant as any)[name] = value ? Number(value) : undefined;
-        if (pushChanges) {
-            pushStatsChange();
+    const handleFouInputChange = useCallback((_: string, stat: FouStat, value: string): void => {
+        if (!value) {
+            masterServantUpdate[stat] = undefined;
+        } else if (value === IndeterminateValue) {
+            masterServantUpdate[stat] = IndeterminateValue;
+        } else {
+            masterServantUpdate[stat] = Number(value);
         }
         forceUpdate();
-    }, [forceUpdate, masterServant, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate]);
 
     const handleInputBlurEvent = useCallback((): void => {
         pushStatsChange();
@@ -125,10 +128,19 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     //#region Input fields
 
+    const {
+        level,
+        ascension,
+        fouAtk,
+        fouHp,
+        skills,
+        appendSkills
+    } = masterServantUpdate;
+
     const levelField = (
         <ServantLevelInputField
-            level={String(masterServant.level || '')}
-            ascension={String(masterServant.level)}
+            level={String(level || '')}
+            ascension={String(ascension)}
             gameServant={gameServant}
             label='Level'
             name='level'
@@ -140,8 +152,8 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     const ascensionField = (
         <ServantAscensionInputField
-            level={String(masterServant.level || '')}
-            ascension={String(masterServant.ascension)}
+            level={String(level || '')}
+            ascension={String(ascension)}
             gameServant={gameServant}
             label='Ascension'
             name='ascension'
@@ -153,11 +165,12 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     const fouHpField = (
         <ServantFouInputField
-            value={String(masterServant.fouHp ?? '')}
+            value={String(fouHp ?? '')}
             label='HP Fou'
             name='fouHp'
+            stat='fouHp'
             multiEditMode={multiEditMode}
-            onChange={handleInputChange}
+            onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
             disabled={readonly}
         />
@@ -165,11 +178,12 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     const fouAtkField = (
         <ServantFouInputField
-            value={String(masterServant.fouAtk ?? '')}
+            value={String(fouAtk ?? '')}
             label='ATK Fou'
             name='fouAtk'
+            stat='fouAtk'
             multiEditMode={multiEditMode}
-            onChange={handleInputChange}
+            onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
             disabled={readonly}
         />
@@ -177,7 +191,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     const skill1Field = (
         <ServantSkillInputField
-            value={String(masterServant.skills[1] || '')}
+            value={String(skills[1] || '')}
             label='Skill 1'
             name='skill1'
             skillSet='skills'
@@ -190,7 +204,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     const skill2Field = (
         <ServantSkillInputField
-            value={String(masterServant.skills[2] || '')}
+            value={String(skills[2] || '')}
             label='Skill 2'
             name='skill2'
             skillSet='skills'
@@ -204,7 +218,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     const skill3Field = (
         <ServantSkillInputField
-            value={String(masterServant.skills[3] || '')}
+            value={String(skills[3] || '')}
             label='Skill 3'
             name='skill3'
             skillSet='skills'
@@ -218,7 +232,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     const appendSkill1Field = (
         <ServantSkillInputField
-            value={String(masterServant.appendSkills[1] || '')}
+            value={String(appendSkills[1] || '')}
             label='Append 1'
             name='appendSkill1'
             skillSet='appendSkills'
@@ -232,7 +246,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     const appendSkill2Field = (
         <ServantSkillInputField
-            value={String(masterServant.appendSkills[2] || '')}
+            value={String(appendSkills[2] || '')}
             label='Append 2'
             name='appendSkill2'
             skillSet='appendSkills'
@@ -246,7 +260,7 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
 
     const appendSkill3Field = (
         <ServantSkillInputField
-            value={String(masterServant.appendSkills[3] || '')}
+            value={String(appendSkills[3] || '')}
             label='Append 3'
             name='appendSkill3'
             skillSet='appendSkills'

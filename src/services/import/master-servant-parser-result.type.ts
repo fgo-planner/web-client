@@ -1,9 +1,7 @@
-import { MasterServantBondLevel } from '@fgo-planner/types';
-import { MasterServantPartial } from '../../types/data';
+import { MasterServantUpdateNew } from '../../types/internal';
 
 export type MasterServantParserResult = {
-    masterServants: Array<MasterServantPartial>;
-    bondLevels: Record<number, MasterServantBondLevel>;
+    servantUpdates: Array<MasterServantUpdateNew>;
     errors: Array<string>;
     warnings: Array<string>;
 };

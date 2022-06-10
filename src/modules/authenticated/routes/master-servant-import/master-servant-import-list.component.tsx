@@ -1,3 +1,4 @@
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Clear as ClearIcon, Done as DoneIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
@@ -5,8 +6,8 @@ import React, { Fragment, ReactNode, useCallback, useMemo, useState } from 'reac
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutContentSection, StyleClassPrefix as LayoutContentSectionStyleClassPrefix } from '../../../../components/layout/layout-content-section.component';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
-import { ModalOnCloseReason } from '../../../../types/internal';
-import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
+import { MasterServantUpdateIndeterminateValue as IndeterminateValue, ModalOnCloseReason } from '../../../../types/internal';
+import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantImportExistingDialog } from './master-servant-import-existing-dialog.component';
@@ -68,14 +69,25 @@ export const MasterServantImportList = React.memo((props: Props) => {
 
     const [showExistingDialog, setShowExistingDialog] = useState<boolean>(false);
 
-    const {
-        masterServants: parsedMasterServants,
-        bondLevels
-    } = parsedData;
+    const parsedMasterServantUpdates = parsedData.servantUpdates;
 
-    const masterServants = useMemo(() => {
-        return parsedMasterServants.map(MasterServantUtils.partialToFull.bind(MasterServantUtils));
-    }, [parsedMasterServants]);
+    const masterServantListData = useMemo((): { 
+        masterServants: Array<MasterServant>;
+        bondLevels: Record<number, MasterServantBondLevel>;
+    } => {
+        const masterServants = [] as Array<MasterServant>;
+        const bondLevels = {} as Record<number, MasterServantBondLevel>;
+        let instanceId = 0;
+        for (const parsedUpdate of parsedMasterServantUpdates) {
+            const bondLevel = parsedUpdate.bondLevel;
+            if (bondLevel !== undefined && bondLevel !== IndeterminateValue) {
+                bondLevels[parsedUpdate.gameId] = bondLevel;
+            }
+            const masterServant = MasterServantUpdateUtils.convertToMasterServant(instanceId++, parsedUpdate, bondLevels);
+            masterServants.push(masterServant);
+        }
+        return { masterServants, bondLevels };
+    }, [parsedMasterServantUpdates]);
 
     const handleSubmitButtonClick = useCallback((): void => {
         /*
@@ -129,8 +141,8 @@ export const MasterServantImportList = React.memo((props: Props) => {
                 </div>
                 <LayoutContentSection>
                     <MasterServantList
-                        masterServants={masterServants}
-                        bondLevels={bondLevels}
+                        masterServants={masterServantListData.masterServants}
+                        bondLevels={masterServantListData.bondLevels}
                         visibleColumns={ServantListVisibleColumns}
                     />
                 </LayoutContentSection>

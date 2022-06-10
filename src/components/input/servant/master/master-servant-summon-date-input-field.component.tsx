@@ -1,7 +1,8 @@
+import { BaseTextFieldProps, TextField, TextFieldProps } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { BaseTextFieldProps, TextField, TextFieldProps } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useRef } from 'react';
+import { MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../types/internal';
 import { DateTimeUtils } from '../../../../utils/date-time.utils';
 
 type Props = {
@@ -13,7 +14,7 @@ type Props = {
      */
     name: string;
     onBlur?: (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
-    onChange: (name: string, value: number | undefined, pushChanges: boolean) => void;
+    onChange: (name: string, value: number | undefined | Indeterminate, pushChanges: boolean) => void;
     /**
      * The servant's summoning date in number of milliseconds since the ECMAScript
      * epoch. This is expected to be truncated such that the UTC hours and lower
@@ -21,7 +22,7 @@ type Props = {
      *
      * Can be `undefined`, but is not optional.
      */
-    value: number | undefined;
+    value: number | undefined | Indeterminate;
     variant?: BaseTextFieldProps['variant'];
 };
 
@@ -37,13 +38,12 @@ const DateFormat = 'yyyy-MM-dd';
 const DateFormatMask = '____-__-__';
 
 const IndeterminateDisplayText = '?';
-const IndeterminateValue = -1;
 
 /**
  * Transforms the given date value into a value that can be used by the date
  * picker component.
  */
-const transformDateValueForInput = (value: number | undefined): Date | null => {
+const transformDateValueForInput = (value: number | undefined | Indeterminate): Date | null => {
     if (value === undefined || value === IndeterminateValue) {
         return null;
     }
@@ -138,7 +138,7 @@ export const MasterServantSummonDateInputField = React.memo((props: Props) => {
     }, [multiEditMode, name, onChange]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        let transformedValue: number | undefined;
+        let transformedValue: number | undefined | Indeterminate;
         if (isIndeterminate) {
             transformedValue = IndeterminateValue;
         } else {

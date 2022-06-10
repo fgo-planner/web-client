@@ -1,7 +1,10 @@
 import { BaseTextFieldProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';
+import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../types/internal';
 import { FormUtils } from '../../../utils/form.utils';
+
+type FouStat = 'fouHp' | 'fouAtk';
 
 type Props = {
     disabled?: boolean;
@@ -9,7 +12,8 @@ type Props = {
     multiEditMode?: boolean;
     name: string;
     onBlur?: (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
-    onChange: (name: string, value: string) => void;
+    onChange: (name: string, stat: FouStat, value: string) => void;
+    stat: FouStat;
     value: string;
     variant?: BaseTextFieldProps['variant'];
 };
@@ -17,7 +21,6 @@ type Props = {
 const DefaultLabel = 'Fou';
 
 const IndeterminateDisplayText = '?';
-const IndeterminateValue = '-1';
 
 /**
  * Calculates the step size for the Fou number input fields based on the current
@@ -48,6 +51,7 @@ export const ServantFouInputField = React.memo((props: Props) => {
         name,
         onBlur,
         onChange,
+        stat,
         value,
         variant
     } = props;
@@ -58,8 +62,8 @@ export const ServantFouInputField = React.memo((props: Props) => {
          * Rounding/capping is not done until onBlur is trigger to allow the user to
          * type without interference.
          */
-        onChange(name, value);
-    }, [onChange]);
+        onChange(name, stat, value);
+    }, [onChange, stat]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         const { name, value: inputValue } = event.target;
@@ -69,9 +73,9 @@ export const ServantFouInputField = React.memo((props: Props) => {
         } else {
             transformedValue = String(FormUtils.transformInputToFouValue(inputValue) ?? '');
         }
-        onChange(name, transformedValue);
+        onChange(name, stat, transformedValue);
         onBlur?.(event);
-    }, [multiEditMode, onBlur, onChange]);
+    }, [multiEditMode, onBlur, onChange, stat]);
 
     /**
      * Allows the user to set the field back to indeterminate state when
@@ -86,12 +90,12 @@ export const ServantFouInputField = React.memo((props: Props) => {
         if (!multiEditMode || event.key !== '?') {
             return;
         }
-        onChange(name, IndeterminateValue);
+        onChange(name, stat, IndeterminateValue);
         /*
          * Prevent the onChange event from firing again.
          */
         event.preventDefault();
-    }, [multiEditMode, name, onChange]);
+    }, [multiEditMode, name, onChange, stat]);
 
     if (multiEditMode && value === IndeterminateValue) {
         return (

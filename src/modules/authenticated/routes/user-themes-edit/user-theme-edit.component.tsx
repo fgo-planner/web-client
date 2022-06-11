@@ -27,7 +27,7 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
 
     const handleResetDefaultClick = useCallback((): void => {
         const defaultTheme = themeService.getDefaultUserWebClientTheme(forThemeMode);
-        Object.assign(userTheme, defaultTheme);
+        Object.assign(userTheme!!, defaultTheme);
         forceUpdate();
     }, [forThemeMode, forceUpdate, themeService, userTheme]);
 
@@ -56,6 +56,10 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
                         color={userTheme.foregroundColor}
                         label='Foreground'
                         allowEditAlpha
+                    />
+                    <UserThemeColor
+                        color={userTheme.drawerColor}
+                        label='Drawer'
                     />
                     <UserThemeColor
                         color={userTheme.primaryColor}

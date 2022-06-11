@@ -88,7 +88,7 @@ export const HomeRoute = React.memo(() => {
                 />
                 <HomeLink
                     title='My Costumes'
-                    to='user/master/servants/costumes'
+                    to='user/master/costumes'
                     imageUrl='https://static.atlasacademy.io/JP/Faces/f_93048800.png'
                 />
                 <HomeLink

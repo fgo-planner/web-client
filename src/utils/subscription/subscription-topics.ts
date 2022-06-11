@@ -44,6 +44,7 @@ class User {
 
     static readonly CurrentUserChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserInfo>>(nullSupplier);
 
+    // TODO Wrap UserPreferences with Immutable<>
     static readonly CurrentUserPreferencesChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserPreferences>>(nullSupplier);
     
     static readonly MasterAccountListChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccountList>>(nullSupplier);
@@ -62,9 +63,17 @@ class UserInterface {
 
     static readonly AppBarElevatedChange = SubscriptionTopic.forReplaySubject<boolean>();
 
-    static readonly LoadingIndicatorDisplayChange = SubscriptionTopic.forReplaySubject<boolean>();
+    static readonly LoadingIndicatorActiveChange = SubscriptionTopic.forReplaySubject<boolean>();
+
+    static readonly LoginDialogOpenChange = SubscriptionTopic.forReplaySubject<boolean>();
 
     static readonly MetadataChange = SubscriptionTopic.forReplaySubject<PageMetadata>();
+
+    // static readonly NavigationDrawerContentChange = SubscriptionTopic.forReplaySubject<Nullable<NavigationDrawerContent>>();
+    
+    static readonly NavigationDrawerOpenChange = SubscriptionTopic.forReplaySubject<boolean>();
+    
+    static readonly NavigationDrawerNoAnimationsChange = SubscriptionTopic.forReplaySubject<boolean>();
 
     static readonly ThemeChange = SubscriptionTopic.forReplaySubject<ThemeInfo>();
 

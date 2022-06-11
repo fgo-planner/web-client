@@ -1,6 +1,5 @@
 import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
-import _ from 'lodash';
 import React, { Fragment, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPreferences, UserWebClientTheme } from '../../../../../local_modules/types/lib';
@@ -42,11 +41,12 @@ export const UserThemesEditRoute = React.memo(() => {
 
     useEffect(() => {
         const getUserThemeOrDefault = (userPreferences: Nullable<UserPreferences>, themeMode: ThemeMode): UserWebClientTheme => {
+            const defaultTheme = themeService.getDefaultUserWebClientTheme(themeMode);
             const userTheme = userPreferences?.webClient.themes[themeMode];
             if (!userTheme) {
-                return themeService.getDefaultUserWebClientTheme(themeMode);
+                return defaultTheme;
             } else {
-                return _.cloneDeep(userTheme); // Return a clone for editing
+                return Object.assign(defaultTheme, userTheme);
             }
         };
 

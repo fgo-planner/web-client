@@ -16,10 +16,9 @@ import { MasterAccountService } from './services/data/master/master-account.serv
 import { PlanService } from './services/data/plan/plan.service';
 import { UserService } from './services/data/user/user.service';
 import { WebUserService } from './services/data/user/web-user.service';
-import { AppBarService } from './services/user-interface/app-bar.service';
-import { LoadingIndicatorOverlayService } from './services/user-interface/loading-indicator-overlay.service';
 import { PageMetadataService } from './services/user-interface/page-metadata.service';
 import { ThemeService } from './services/user-interface/theme.service';
+import { UserInterfaceService } from './services/user-interface/user-interface.service';
 import './styles/styles.scss';
 import { InjectablesContainer } from './utils/dependency-injection/injectables-container';
 
@@ -60,10 +59,9 @@ InjectablesContainer.registerInjectables(
     /*
      * user-interface
      */
-    AppBarService,
-    LoadingIndicatorOverlayService,
     PageMetadataService,
-    ThemeService
+    ThemeService,
+    UserInterfaceService
 );
 
 const rootNode: ReactNode = (

@@ -453,7 +453,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
         }
         const activeServant = activeServants[0];
         const servant = gameServantMap?.[activeServant.gameId];
-        const links = servant?.metadata.links;
+        const links = servant?.metadata?.links
         if (!links?.length) {
             return null;
         }

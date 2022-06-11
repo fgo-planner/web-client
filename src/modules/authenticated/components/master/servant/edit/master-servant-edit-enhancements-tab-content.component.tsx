@@ -8,7 +8,7 @@ import { ServantLevelInputField } from '../../../../../../components/input/serva
 import { ServantSkillInputField } from '../../../../../../components/input/servant/servant-skill-input-field.component';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { Immutable } from '../../../../../../types/internal';
-import { MasterServantEditData } from './master-servant-edit-data.type';
+import { MasterServantEditData } from '../../../../../../types/internal/dto/master-servant-edit-data.type';
 
 type Props = {
     /**

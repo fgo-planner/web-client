@@ -1,11 +1,14 @@
-import { Paper } from '@mui/material';
-import { SystemStyleObject, Theme } from '@mui/system';
+import { Menu as MenuIcon } from '@mui/icons-material';
+import { IconButton, Theme } from '@mui/material';
+import { Box, SystemStyleObject } from '@mui/system';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { BasicUser, UserService } from '../../../services/data/user/user.service';
+import { UserInterfaceService } from '../../../services/user-interface/user-interface.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
+import { SxPropsFunction } from '../../../types/internal';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';
@@ -13,42 +16,56 @@ import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
 
 const StyleClassPrefix = 'AppBar';
 
-const StyleProps = (theme: Theme) => ({
-    height: theme.spacing(ThemeConstants.AppBarHeightScale),
-    bgcolor: 'background.default',
-    transition: 'box-shadow 200ms 50ms linear',
-    backgroundImage: 'none',
-    '&.no-elevation': {
-        // Simulates 1px solid border
-        // boxShadow: `0px 1px 0px ${theme.palette.divider}`
-        boxShadow: 'none'
-    },
-    [`& .${StyleClassPrefix}-background-image`]: {
-        height: theme.spacing(ThemeConstants.AppBarHeightScale),
-    },
-    [`& .${StyleClassPrefix}-contents`]: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        pl: 4
-    },
-    [`& .${StyleClassPrefix}-title`]: {
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontSize: '24px',
-        color: 'text.primary',
-        textDecoration: 'none',
-        mr: 6,
-        [theme.breakpoints.down('lg')]: {
-            display: 'none'
-        }
-    }
-} as SystemStyleObject<Theme>);
+const StyleProps = ((theme: Theme) => {
+    const {
+        breakpoints,
+        palette,
+        shadows,
+        spacing
+    } = theme;
+
+    return {
+        height: spacing(ThemeConstants.AppBarHeightScale),
+        bgcolor: palette.background.default,
+        transition: 'box-shadow 200ms 50ms linear',
+        backgroundImage: 'none',
+        boxShadow: `0px 1px 0px ${palette.divider}`, // Simulates 1px solid border
+        [`&.${StyleClassPrefix}-elevated`]: {
+            boxShadow: shadows[ThemeConstants.AppBarElevatedElevation]
+        },
+        [`& .${StyleClassPrefix}-contents`]: {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            pl: 2,
+            [`& .${StyleClassPrefix}-title`]: {
+                fontFamily: ThemeConstants.FontFamilyGoogleSans,
+                fontSize: '24px',
+                color: 'text.primary',
+                textDecoration: 'none',
+                pl: 4,
+                mr: 6,
+                [breakpoints.down('lg')]: {
+                    display: 'none'
+                }
+            }
+        },
+        [breakpoints.down('lg')]: {
+            // bgcolor: palette.drawer?.main,
+            // boxShadow: 'none',
+            height: spacing(ThemeConstants.AppBarHeightScaleCondensed)
+        }    
+    } as SystemStyleObject;
+}) as SxPropsFunction;
 
 /**
  * The app bar component.
  */
 export const AppBar = React.memo(() => {
 
+    const userInterfaceService = useInjectable(UserInterfaceService);
     const userService = useInjectable(UserService);
 
     const [currentUser, setCurrentUser] = useState<BasicUser>();
@@ -84,15 +101,22 @@ export const AppBar = React.memo(() => {
         return () => onElevatedChangeSubscription.unsubscribe();
     }, []);
 
+    const handleNavigationDrawerButtonClick = useCallback((): void => {
+        userInterfaceService.toggleNavigationDrawerOpen();
+    }, [userInterfaceService]);
+
+    const className = clsx(
+        `${StyleClassPrefix}-root`,
+        elevated && `${StyleClassPrefix}-elevated`
+    );
+
     return (
-        <Paper
-            className={clsx(`${StyleClassPrefix}-root`, !elevated && 'no-elevation')}
-            sx={StyleProps}
-            elevation={ThemeConstants.AppBarElevatedElevation}
-            square={true}
-        >
-            {/* <ThemeBackground className={`${StyleClassPrefix}-background-image`} /> */}
+        <Box className={className} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-contents`}>
+                {/* TODO Hide menu button in desktop view */}
+                <IconButton onClick={handleNavigationDrawerButtonClick}>
+                    <MenuIcon />
+                </IconButton>
                 {/* TODO Add logo */}
                 <Link className={`${StyleClassPrefix}-title`} to='/'>
                     FGO Servant Planner
@@ -102,7 +126,7 @@ export const AppBar = React.memo(() => {
                     <AppBarGuestUser />
                 }
             </div>
-        </Paper>
+        </Box>
     );
 
 });

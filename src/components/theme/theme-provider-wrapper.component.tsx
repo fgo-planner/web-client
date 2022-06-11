@@ -1,9 +1,8 @@
-import { createTheme, ThemeProvider, Typography } from '@mui/material';
-import { StyledEngineProvider, SystemStyleObject, Theme } from '@mui/system';
-import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
-import { BackgroundImageContext } from '../../contexts/background-image.context';
+import { createTheme, Palette, Theme, ThemeProvider, Typography } from '@mui/material';
+import { StyledEngineProvider, SystemStyleObject } from '@mui/system';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { ThemeInfo } from '../../types/internal';
+import { SxPropsFunction, ThemeInfo } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { ThemeBackground } from './theme-background.component';
@@ -11,32 +10,60 @@ import { ThemeBackground } from './theme-background.component';
 type Props = PropsWithChildren<{}>;
 
 /**
+ * Augments custom colors in the theme palette that were not automatically
+ * augmented by MUI.
+ */
+const augmentAdditionalColors = (theme: Theme): void => {
+
+    const palette = theme.palette as Palette;
+
+    const {
+        augmentColor,
+        drawer,
+        mode
+    } = palette;
+
+    if (drawer) {
+        palette.drawer = augmentColor({ name: 'drawer', color: drawer });
+    }
+
+    console.log(mode, theme); // TODO Remove this
+};
+
+/**
  * Replaces the default scrollbar styles with the theme based scrollbars for
  * the children nodes.
  */
-const ScrollbarStyleProps = (theme: Theme) => ({
+const ScrollbarStyleProps = (({ palette, spacing }: Theme) => ({
     '& *::-webkit-scrollbar': {
-        width: theme.spacing(ThemeConstants.ScrollbarWidthScale),
-        height: theme.spacing(ThemeConstants.ScrollbarWidthScale)
+        width: spacing(ThemeConstants.ScrollbarWidthScale),
+        height: spacing(ThemeConstants.ScrollbarWidthScale)
     },
     '& *::-webkit-scrollbar-corner': {
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: palette.background.paper,
     },
     '& *::-webkit-scrollbar-thumb': {
-        backgroundColor: theme.palette.primary.main,
-        borderRadius: theme.spacing(ThemeConstants.ScrollbarWidthScale / 2)
+        backgroundColor: palette.primary.main,
+        borderRadius: spacing(ThemeConstants.ScrollbarWidthScale / 2)
     },
     [`& .${ThemeConstants.ClassScrollbarTrackBorder}`]: {
         '& *::-webkit-scrollbar-track': {
             borderTopWidth: 1,
             borderTopStyle: 'solid',
-            borderTopColor: theme.palette.divider,
+            borderTopColor: palette.divider,
             borderLeftWidth: 1,
             borderLeftStyle: 'solid',
-            borderLeftColor: theme.palette.divider,
+            borderLeftColor: palette.divider,
         }
+    },
+    [`& .${ThemeConstants.ClassScrollbarHidden}`]: {
+        '&::-webkit-scrollbar': {
+            display: 'none'
+        },
+        msOverflowStyle: 'none',
+        scrollbarWidth: 'none'
     }
-} as SystemStyleObject<Theme>);
+} as SystemStyleObject)) as SxPropsFunction;
 
 /**
  * Utility component for listening for theme changes from the `ThemeService` and
@@ -53,29 +80,24 @@ export const ThemeProviderWrapper = React.memo(({ children }: Props) => {
             .get(SubscriptionTopics.UserInterface.ThemeChange)
             .subscribe((themeInfo: ThemeInfo) => {
                 const { themeOptions, backgroundImageUrl } = themeInfo;
-                setTheme(createTheme(themeOptions));
+                const theme = createTheme(themeOptions);
+                augmentAdditionalColors(theme);
+                setTheme(theme);
                 setBackgroundImageUrl(backgroundImageUrl);
             });
 
         return () => onThemeChangeSubscription.unsubscribe();
     }, []);
 
-    // This is temporary...
-    const backgroundImageContextValue = useMemo(() => ({
-        imageUrl: backgroundImageUrl
-    }), [backgroundImageUrl]);
-
-    return (
-        <BackgroundImageContext.Provider value={backgroundImageContextValue}>
-            <ThemeBackground />
-            <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={theme}>
-                    <Typography component={'div'} sx={ScrollbarStyleProps}>
-                        {children}
-                    </Typography>
-                </ThemeProvider>
-            </StyledEngineProvider>
-        </BackgroundImageContext.Provider>
-    );
+    return <>
+        <ThemeBackground imageUrl={backgroundImageUrl} />
+        <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+                <Typography component={'div'} sx={ScrollbarStyleProps}>
+                    {children}
+                </Typography>
+            </ThemeProvider>
+        </StyledEngineProvider>
+    </>;
 
 });

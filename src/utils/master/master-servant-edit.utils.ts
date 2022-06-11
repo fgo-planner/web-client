@@ -1,7 +1,7 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { GameServantConstants } from '../../../../../../constants';
-import { ReadonlyRecord } from '../../../../../../types/internal';
-import { MasterServantEditData } from './master-servant-edit-data.type';
+import { GameServantConstants } from '../../constants';
+import { ReadonlyRecord } from '../../types/internal';
+import { MasterServantEditData } from '../../types/internal/dto/master-servant-edit-data.type';
 
 export class MasterServantEditUtils {
 
@@ -226,21 +226,21 @@ export class MasterServantEditUtils {
     static applyFromEditData(
         masterServantEditData: MasterServantEditData,
         masterServant: MasterServant,
-        bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
+        bondLevels: Record<number, MasterServantBondLevel>,
         // unlockedCostumes: Array<number>
     ): void;
 
     static applyFromEditData(
         masterServantEditData: MasterServantEditData,
         masterServants: Array<MasterServant>,
-        bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
+        bondLevels: Record<number, MasterServantBondLevel>,
         // unlockedCostumes: Array<number>
     ): void;
 
     static applyFromEditData(
         masterServantEditData: MasterServantEditData,
         target: Array<MasterServant> | MasterServant,
-        bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
+        bondLevels: Record<number, MasterServantBondLevel>,
         // unlockedCostumes: Array<number>
     ): void {
         if (Array.isArray(target)) {

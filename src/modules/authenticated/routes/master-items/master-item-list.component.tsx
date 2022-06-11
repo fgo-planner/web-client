@@ -1,48 +1,53 @@
-import { GameItemQuantity } from '@fgo-planner/types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { GameItemMap } from '../../../../types/data';
-import { ImmutableArray } from '../../../../types/internal';
+import { ImmutableArray, ReadonlyRecord } from '../../../../types/internal';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { StyleClassPrefix as MasterItemListRowLabelStyleClassPrefix } from './master-item-list-row-label.component';
-import { MasterItemListRow, MasterItemRowData, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';
+import { MasterItemListRow, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';
 
-type ItemCategory = { label: string; itemIds: ReadonlyArray<number> };
-
-type ListCategoryData = { label: string; rows: Array<MasterItemRowData> };
-
-type ListData = Array<ListCategoryData>;
+type ItemCategory = {
+    key: string;
+    label: string;
+    itemIds: ReadonlyArray<number>;
+};
 
 type Props = {
     editMode: boolean;
-    viewLayout?: any; // TODO Make use of this
-    masterItems: Array<GameItemQuantity>;
+    itemQuantities: ReadonlyRecord<number, number>;
+    onChange: (itemId: number, quantity: number) => void;
+    qp: number;
 };
 
 const ItemCategories: ImmutableArray<ItemCategory> = [
     {
+        key: 'skill-gems',
         label: 'Skill Gems',
         itemIds: GameItemConstants.SkillGems
     },
     {
+        key: 'bronze-mats',
         label: 'Bronze Materials',
         itemIds: GameItemConstants.BronzeEnhancementMaterials
     },
     {
+        key: 'silver-mats',
         label: 'Silver Materials',
         itemIds: GameItemConstants.SilverEnhancementMaterials
     },
     {
+        key: 'gold-mats',
         label: 'Gold Materials',
         itemIds: GameItemConstants.GoldEnhancementMaterials
     },
     {
+        key: 'statues',
         label: 'Ascension Statues',
         itemIds: GameItemConstants.AscensionStatues
     },
     {
+        key: 'other',
         label: 'Other Materials',
         itemIds: [
             ...GameItemConstants.OtherEnhancementMaterials,
@@ -50,50 +55,6 @@ const ItemCategories: ImmutableArray<ItemCategory> = [
         ]
     },
 ];
-
-const generateListData = (masterItems: Array<GameItemQuantity>, gameItemMap: GameItemMap): ListData => {
-    /*
-     * Convert the user account items into a map for faster lookup.
-     */
-    const masterItemsMap: { [key: number]: GameItemQuantity } = {};
-    for (const masterItem of masterItems) {
-        masterItemsMap[masterItem.itemId] = masterItem;
-    }
-
-    /*
-     * Generate the view data array.
-     */
-    const listViewData: ListData = [];
-    for (const itemCategory of ItemCategories) {
-
-        const rows = [];
-        for (const itemId of itemCategory.itemIds) {
-            /*
-             * Retrieve item data from items map.
-             */
-            const gameItem = gameItemMap[itemId];
-            if (!gameItem) {
-                console.warn(`Item ID ${itemId} could not be retrieved from the map.`);
-            }
-            /*
-             * Retrieve user data for the item from the user items map. If the item is not
-             * present in the user data, then backfill it. The only exception is QP, which
-             * is displayed on the screen but not stored as a master item.
-             */
-            let masterItem = masterItemsMap[itemId];
-            if (!masterItem) {
-                masterItem = { itemId, quantity: 0 };
-                // TODO Is it bad practice to modify an object in props?
-                masterItems.push(masterItem);
-            }
-
-            rows.push({ gameItem, quantity: masterItem });
-        }
-        listViewData.push({ label: itemCategory.label, rows });
-    }
-
-    return listViewData;
-};
 
 const StyleClassPrefix = 'MasterItemList';
 
@@ -117,39 +78,50 @@ const StyleProps = {
     }
 } as SystemStyleObject<Theme>;
 
-export const MasterItemList = React.memo(({ editMode, masterItems }: Props) => {
+export const MasterItemList = React.memo((props: Props) => {
+
+    const {
+        editMode,
+        itemQuantities,
+        onChange,
+        qp
+    } = props;
 
     const gameItemMap = useGameItemMap();
 
-    const listViewData = useMemo(() => {
-        if (!gameItemMap) {
-            return [];
-        }
-        return generateListData(masterItems, gameItemMap);
-    }, [masterItems, gameItemMap]);
+    if (!gameItemMap) {
+        return null;
+    }
 
-    const renderItemRow = (data: MasterItemRowData, index: number): ReactNode => {
+    const renderItemRow = (itemId: number): ReactNode => {
+        const gameItem = gameItemMap[itemId];
+        if (!gameItem) {
+            return;
+        }
+        const quantity = itemId === GameItemConstants.QpItemId ? qp : itemQuantities[itemId] || 0;
         return (
             <MasterItemListRow
-                key={index}
-                data={data}
+                key={itemId}
+                gameItem={gameItem}
+                quantity={quantity}
                 editMode={editMode}
+                onChange={onChange}
             />
         );
     };
 
-    const renderItemCategory = (category: ListCategoryData, key: number): ReactNode => {
+    const renderItemCategory = (category: ItemCategory, index: number): ReactNode => {
         return (
-            <div key={key} className={`${StyleClassPrefix}-item-category`}>
-                <MasterItemListHeader categoryLabel={category.label} showQuantityLabel={key === 0} />
-                {category.rows.map(renderItemRow)}
+            <div key={category.key} className={`${StyleClassPrefix}-item-category`}>
+                <MasterItemListHeader categoryLabel={category.label} showQuantityLabel={index === 0} />
+                {category.itemIds.map(renderItemRow)}
             </div>
         );
     };
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            {listViewData.map(renderItemCategory)}
+            {ItemCategories.map(renderItemCategory)}
         </Box>
     );
 

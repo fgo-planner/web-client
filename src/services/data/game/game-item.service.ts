@@ -4,15 +4,15 @@ import { Injectable } from '../../../decorators/dependency-injection/injectable.
 import { GameItemList, GameItemMap, Page, Pagination } from '../../../types/data';
 import { Immutable, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
-import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
+import { UserInterfaceService } from '../../user-interface/user-interface.service';
 
 @Injectable
 export class GameItemService {
 
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-item`;
 
-    @Inject(LoadingIndicatorOverlayService)
-    private readonly _loadingIndicatorOverlayService!: LoadingIndicatorOverlayService;
+    @Inject(UserInterfaceService)
+    private readonly _userInterfaceService!: UserInterfaceService;
 
     private _itemsCache: Nullable<GameItemList>;
 
@@ -38,14 +38,14 @@ export class GameItemService {
             return this._itemsCache;
         }
         if (!this._itemsCachePromise) {
-            const loadingIndicatorId = this._loadingIndicatorOverlayService.invoke();
+            const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
             this._itemsCachePromise = Http.get<GameItem[]>(`${this._BaseUrl}`);
             this._itemsCachePromise.then(cache => {
                 this._onItemsCacheLoaded(cache);
-                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             }).catch(error => {
                 this._onItemsCacheLoadError(error);
-                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             });
         }
         return this._itemsCachePromise;

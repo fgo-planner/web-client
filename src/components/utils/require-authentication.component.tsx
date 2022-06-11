@@ -1,4 +1,4 @@
-import React, { Fragment, PropsWithChildren, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { Navigate } from 'react-router';
 import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
@@ -28,6 +28,8 @@ export const RequireAuthentication = React.memo(({ children }: PropsWithChildren
         return <Navigate to='/' />;
     }
 
-    return <Fragment>{children}</Fragment>;
+    return <>
+        {children}
+    </>;
 
 });

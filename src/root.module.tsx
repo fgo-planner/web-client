@@ -1,9 +1,10 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useMemo } from 'react';
 import { RouteObject, useRoutes } from 'react-router-dom';
-import { NavigationMain } from './components/navigation/navigation-main.component';
+import { NavigationLayout } from './components/navigation/navigation-layout.component';
 import { LazyLoadFallback } from './components/route-fallback/lazy-load-fallback.component';
 import { ThemeProviderWrapper } from './components/theme/theme-provider-wrapper.component';
 import { RequireAuthentication } from './components/utils/require-authentication.component';
+import { DeviceInfoContext } from './contexts/device-info.context';
 import { useInjectable } from './hooks/dependency-injection/use-injectable.hook';
 import { AboutRoute } from './routes/about.route';
 import { ErrorRoute } from './routes/error.route';
@@ -12,6 +13,8 @@ import { HomeRoute } from './routes/home/home.route';
 import { LoginRoute } from './routes/login.route';
 import { RegistrationRoute } from './routes/registration.route';
 import { BackgroundMusicService } from './services/audio/background-music.service';
+import { DeviceInfo, DeviceType } from './types/internal';
+import { UAParser } from 'ua-parser-js';
 
 console.log('RootModule loaded');
 
@@ -29,10 +32,12 @@ Planned navigation outline:
     ↳ Authenticated (module)
         ↳ User Profile
         ↳ Master Accounts
-            ↳ Profile
-            ↳ Items
-            ↳ Servants
+            ↳ Dashboard
             ↳ Planner
+            ↳ Servants
+            ↳ Items
+            ↳ Costumes
+            ↳ Soundtracks
             ↳ Data Import/Export (lazy loaded)
         ↳ Friends
             ↳ Items
@@ -106,12 +111,57 @@ export const RootModule = React.memo(() => {
 
     const activeRouteElement = useRoutes(ModuleRoutes);
 
+    /**
+     * Device info as parsed from the user agent string.
+     */
+    const deviceInfo = useMemo((): DeviceInfo => {
+        const uaParser = new UAParser();
+        const rawDeviceType = uaParser.getDevice().type;
+        /*
+         * Convert the raw device type from `UAParser` into a simplified categorization
+         * consisting of phone, tablet, and desktop.
+         */
+        let deviceType: DeviceType;
+        switch (rawDeviceType) {
+            case 'wearable':
+                /*
+                 * Wearable devices are not actually supported, but we will just categorize it
+                 * as a phone for now.
+                 *
+                 * eslint-disable-next-line no-fallthrough
+                 */
+            case 'mobile':
+                deviceType = DeviceType.Phone;
+                break;
+            case 'tablet':
+                deviceType = DeviceType.Tablet;
+                break;
+            default:
+                /*
+                 * Any other values (console, smarttv, embedded) will be categorized as a
+                 * desktop browser. In addition, `UAParser` will return `undefined` type for
+                 * actual desktop browsers.
+                 */
+                deviceType = DeviceType.Desktop;
+        }
+
+        return {
+            deviceType,
+            isMobile: deviceType < DeviceType.Desktop
+        };
+
+    }, []);
+
+    console.log('Device info', deviceInfo);
+
     return (
-        <ThemeProviderWrapper>
-            <NavigationMain>
-                {activeRouteElement}
-            </NavigationMain>
-        </ThemeProviderWrapper>
+        <DeviceInfoContext.Provider value={deviceInfo}>
+            <ThemeProviderWrapper>
+                <NavigationLayout>
+                    {activeRouteElement}
+                </NavigationLayout>
+            </ThemeProviderWrapper>
+        </DeviceInfoContext.Provider>
     );
 
 });

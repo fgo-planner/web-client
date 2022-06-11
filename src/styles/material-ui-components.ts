@@ -9,8 +9,12 @@ export const ComponentsOverrides: Components = {
         styleOverrides: {
             root: {
                 fontFamily: ThemeConstants.FontFamilyGoogleSans,
-                letterSpacing: '0.25px',
-                textTransform: 'none'
+                letterSpacing: '0.015625rem',
+                textTransform: 'none',
+                borderRadius: '18.25px'
+            },
+            contained: {
+                boxShadow: 'none !important'
             }
         }
     },
@@ -26,7 +30,7 @@ export const ComponentsOverrides: Components = {
             root: {
                 fontFamily: ThemeConstants.FontFamilyGoogleSans,
                 // fontSize: 16,
-                letterSpacing: '0.25px',
+                letterSpacing: '0.015625rem',
                 textTransform: 'none'
             }
         }

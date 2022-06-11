@@ -4,15 +4,15 @@ import { Injectable } from '../../../decorators/dependency-injection/injectable.
 import { GameSoundtrackList, Page, Pagination } from '../../../types/data';
 import { Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
-import { LoadingIndicatorOverlayService } from '../../user-interface/loading-indicator-overlay.service';
+import { UserInterfaceService } from '../../user-interface/user-interface.service';
 
 @Injectable
 export class GameSoundtrackService {
 
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-soundtrack`;
 
-    @Inject(LoadingIndicatorOverlayService)
-    private readonly _loadingIndicatorOverlayService!: LoadingIndicatorOverlayService;
+    @Inject(UserInterfaceService)
+    private readonly _userInterfaceService!: UserInterfaceService;
 
     private _soundtracksCache: Nullable<GameSoundtrackList>;
 
@@ -37,14 +37,14 @@ export class GameSoundtrackService {
             return this._soundtracksCache;
         }
         if (!this._soundtracksCachePromise) {
-            const loadingIndicatorId = this._loadingIndicatorOverlayService.invoke();
+            const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
             this._soundtracksCachePromise = Http.get<GameSoundtrack[]>(`${this._BaseUrl}`);
             this._soundtracksCachePromise.then(cache => {
                 this._onSoundtracksCacheLoaded(cache);
-                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             }).catch(error => {
                 this._onSoundtracksCacheLoadError(error);
-                this._loadingIndicatorOverlayService.waive(loadingIndicatorId);
+                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             });
         }
         return this._soundtracksCachePromise;

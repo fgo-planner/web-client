@@ -1,11 +1,12 @@
 import { Clear as ClearIcon, Done as DoneIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { Fragment, ReactNode, useCallback, useState } from 'react';
+import React, { Fragment, ReactNode, useCallback, useMemo, useState } from 'react';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutContentSection, StyleClassPrefix as LayoutContentSectionStyleClassPrefix } from '../../../../components/layout/layout-content-section.component';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
 import { ModalOnCloseReason } from '../../../../types/internal';
+import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantImportExistingDialog } from './master-servant-import-existing-dialog.component';
@@ -65,9 +66,16 @@ export const MasterServantImportList = React.memo((props: Props) => {
         onSubmit
     } = props;
 
-    const { masterServants, bondLevels } = parsedData;
-
     const [showExistingDialog, setShowExistingDialog] = useState<boolean>(false);
+
+    const {
+        masterServants: parsedMasterServants,
+        bondLevels
+    } = parsedData;
+
+    const masterServants = useMemo(() => {
+        return parsedMasterServants.map(MasterServantUtils.partialToFull.bind(MasterServantUtils));
+    }, [parsedMasterServants]);
 
     const handleSubmitButtonClick = useCallback((): void => {
         /*

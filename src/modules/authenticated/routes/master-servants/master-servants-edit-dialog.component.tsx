@@ -4,7 +4,7 @@ import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { DialogComponentProps, ReadonlyRecord } from '../../../../types/internal';
-import { MasterServantEditData } from '../../components/master/servant/edit/master-servant-edit-data.type';
+import { MasterServantEditData } from '../../../../types/internal/dto/master-servant-edit-data.type';
 import { MasterServantEdit } from '../../components/master/servant/edit/master-servant-edit.component';
 
 type Props = {

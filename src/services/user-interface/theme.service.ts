@@ -86,8 +86,8 @@ export class ThemeService {
         StorageUtils.setItem(StorageKeys.LocalUserPreference.ThemeMode, themeMode);
     }
 
-    private async _handleCurrentUserPreferencesChange(userPreferences: Nullable<UserPreferences>): Promise<void> {
-        this._currentUserThemes = this._loadThemesForCurrentUser(userPreferences);
+    private _handleCurrentUserPreferencesChange(userPreferences: Nullable<UserPreferences>): void {
+        this._currentUserThemes = this._loadThemesFromUserPreferences(userPreferences);
         const themeInfo = this._currentUserThemes[this._themeMode];
         this._setThemeColorMeta(themeInfo.themeOptions);
         this._onThemeChange.next(themeInfo);
@@ -96,11 +96,18 @@ export class ThemeService {
     /**
      * Sets the `theme-color` metadata.
      */
-    private _setThemeColorMeta(themeOptions: ThemeOptions): void {
-        this._pageMetadataService.setThemeColor(themeOptions.palette?.background?.default);
+    private _setThemeColorMeta({ palette }: ThemeOptions): void {
+        let color: string | undefined;
+        if (palette?.drawer) {
+            // TODO Add support for ColorPartial
+            color = (palette.drawer as SimplePaletteColorOptions).main;
+        } else {
+            color = palette?.background?.default;
+        }
+        this._pageMetadataService.setThemeColor(color);
     }
 
-    private _loadThemesForCurrentUser(userPreferences: Nullable<UserPreferences>): UserThemes {
+    private _loadThemesFromUserPreferences(userPreferences: Nullable<UserPreferences>): UserThemes {
         let light: ThemeInfo;
         let dark: ThemeInfo;
         const userThemePreferences = userPreferences?.webClient?.themes;
@@ -155,6 +162,7 @@ export class ThemeService {
         const {
             backgroundColor,
             foregroundColor,
+            drawerColor,
             primaryColor,
             secondaryColor,
             dividerColor
@@ -177,6 +185,16 @@ export class ThemeService {
         }
         if (foregroundColor) {
             background.paper = colord(foregroundColor).toRgbString();
+        }
+
+        /*
+         * Drawer color
+         */
+        if (drawerColor) {
+            if (!palette.drawer) {
+                palette.drawer = {};
+            }
+            (palette.drawer as SimplePaletteColorOptions).main = colord(drawerColor).toRgbString();
         }
 
         /*
@@ -232,12 +250,14 @@ export class ThemeService {
         const { palette } = themeOptions;
         const backgroundColor = colord(palette?.background?.default || '').toRgb();
         const foregroundColor = colord(palette?.background?.paper || '').toRgb();
+        const drawerColor = colord((palette?.drawer as SimplePaletteColorOptions)?.main || '').toRgb();
         const primaryColor = colord((palette?.primary as SimplePaletteColorOptions)?.main || '').toRgb();
         const secondaryColor = colord((palette?.secondary as SimplePaletteColorOptions)?.main || '').toRgb();
         const dividerColor = colord(palette?.divider || '').toRgb();
         return {
             backgroundColor,
             foregroundColor,
+            drawerColor,
             primaryColor,
             secondaryColor,
             dividerColor,

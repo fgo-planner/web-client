@@ -89,6 +89,7 @@ export const LoginDialog = React.memo((props: Props) => {
             className={`${StyleClassPrefix}-root`}
             sx={StyleProps}
             fullScreen={fullScreen}
+            onClose={onClose}
         >
             <Typography component={'div'}>
                 <DialogTitle>

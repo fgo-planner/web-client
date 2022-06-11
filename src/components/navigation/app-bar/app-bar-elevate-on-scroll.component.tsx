@@ -1,7 +1,8 @@
-import { styled, SystemStyleObject, Theme } from '@mui/system';
-import React, { DOMAttributes, PropsWithChildren, useEffect, useRef } from 'react';
+import { CSSProperties } from '@mui/styles';
+import { styled } from '@mui/system';
+import React, { DOMAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
-import { AppBarService } from '../../../services/user-interface/app-bar.service';
+import { UserInterfaceService } from '../../../services/user-interface/user-interface.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { ComponentStyleProps } from '../../../types/internal';
 
@@ -12,7 +13,7 @@ type Props = PropsWithChildren<{}> & ComponentStyleProps & DOMAttributes<HTMLDiv
 const RootComponent = styled('div')<{}>(() => ({
     overflow: 'auto',
     height: '100%'
-} as SystemStyleObject<Theme> as {}));
+} as CSSProperties));
 
 /**
  * Utility component that automatically sets the app bar's elevation state based
@@ -29,16 +30,25 @@ export const AppBarElevateOnScroll = React.memo((props: Props) => {
         ...componentProps
     } = props;
 
-    const appBarService = useInjectable(AppBarService);
+    const userInterfaceService = useInjectable(UserInterfaceService);
+
+    const [, setElevationRequestId] = useState<string>();
+
+    const elevationRequestIdRef = useRef<string>();
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     /*
-     * Resets the app bar elevated state to `false` when the component unmounts.
+     * Cancels the elevation request from the component when the component unmounts.
      */
     useEffect(() => {
-        return () => appBarService.setElevated(false);
-    }, [appBarService]);
+        return () => {
+            const elevationRequestId = elevationRequestIdRef.current;
+            if (elevationRequestId) {
+                userInterfaceService.waiveAppBarElevation(elevationRequestId);
+            }
+        };
+    }, [userInterfaceService]);
 
     useEffect(() => {
         const element = scrollContainerRef.current;
@@ -49,11 +59,18 @@ export const AppBarElevateOnScroll = React.memo((props: Props) => {
          * Bind handler for the `onscroll` event.
          */
         element.onscroll = (event: Event): void => {
+            let elevationRequestId = elevationRequestIdRef.current;
             const scrollAmount = (event.target as Element)?.scrollTop;
-            const appBarElevated = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
-            appBarService.setElevated(appBarElevated);
+            const shouldElevate = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
+            if (shouldElevate && !elevationRequestId) {
+                elevationRequestId = userInterfaceService.invokeAppBarElevation();
+            } else if (!shouldElevate && elevationRequestId) {
+                userInterfaceService.waiveAppBarElevation(elevationRequestId);
+                elevationRequestId = undefined;
+            }
+            setElevationRequestId(elevationRequestIdRef.current = elevationRequestId);
         };
-    }, [appBarService]);
+    }, [userInterfaceService]);
 
     return (
         <RootComponent {...componentProps} ref={scrollContainerRef}>

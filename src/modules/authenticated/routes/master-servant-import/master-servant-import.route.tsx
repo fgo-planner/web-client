@@ -167,14 +167,15 @@ const MasterServantImportRoute = React.memo(() => {
              */
             const lastInstanceId = MasterServantUtils.getLastInstanceId(masterAccount.servants);
             MasterServantUtils.reassignInstanceIds(parsedData.masterServants, lastInstanceId + 1);
-
+            
+            const partialToFull = MasterServantUtils.partialToFull.bind(MasterServantUtils);
             if (existingAction === ExistingAction.Append) {
                 update.servants = [
                     ...masterAccount.servants,
-                    ...parsedData.masterServants
+                    ...parsedData.masterServants.map(partialToFull)
                 ];
             } else {
-                update.servants = parsedData.masterServants;
+                update.servants = parsedData.masterServants.map(partialToFull);
             }
         }
 

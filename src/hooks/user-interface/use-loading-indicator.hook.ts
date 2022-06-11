@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { LoadingIndicatorOverlayService } from '../../services/user-interface/loading-indicator-overlay.service';
+import { UserInterfaceService } from '../../services/user-interface/user-interface.service';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 type LoadingIndicatorHookResult = {
@@ -28,7 +28,7 @@ type LoadingIndicatorHookResult = {
 
 export const useLoadingIndicator = (): LoadingIndicatorHookResult => {
 
-    const loadingIndicatorOverlayService = useInjectable(LoadingIndicatorOverlayService);
+    const userInterfaceService = useInjectable(UserInterfaceService);
 
     const [, setLoadingIndicatorId] = useState<string>();
 
@@ -37,19 +37,19 @@ export const useLoadingIndicator = (): LoadingIndicatorHookResult => {
     const invokeLoadingIndicator = useCallback((): string => {
         let loadingIndicatorId = loadingIndicatorIdRef.current;
         if (!loadingIndicatorId) {
-            loadingIndicatorId = loadingIndicatorOverlayService.invoke();
+            loadingIndicatorId = userInterfaceService.invokeLoadingIndicator();
         }
         setLoadingIndicatorId(loadingIndicatorIdRef.current = loadingIndicatorId);
         return loadingIndicatorId;
-    }, [loadingIndicatorOverlayService]);
+    }, [userInterfaceService]);
 
     const resetLoadingIndicator = useCallback((): void => {
         const loadingIndicatorId = loadingIndicatorIdRef.current;
         if (loadingIndicatorId) {
-            loadingIndicatorOverlayService.waive(loadingIndicatorId);
+            userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             setLoadingIndicatorId(loadingIndicatorIdRef.current = undefined);
         }
-    }, [loadingIndicatorOverlayService]);
+    }, [userInterfaceService]);
 
     /*
      * Resets the loading indicator for the component if it is still active when the

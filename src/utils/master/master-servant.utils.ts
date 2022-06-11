@@ -1,5 +1,6 @@
 import { GameServant, MasterServant, MasterServantAscensionLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
+import { MasterServantPartial } from '../../types/data';
 import { Immutable } from '../../types/internal';
 import { DateTimeUtils } from '../date-time.utils';
 
@@ -28,6 +29,18 @@ export class MasterServantUtils {
     }
 
     /**
+     * Converts a `MasterServantPartial` object, which can potentially only contain
+     * partial servant data, into a full `MasterServant` object. Missing data from
+     * the source will use default values as found in the `instantiate` method.
+     */
+    static partialToFull(source: MasterServantPartial): MasterServant {
+        const masterServant = this.instantiate();
+        this._merge(masterServant, source, true);
+
+        return masterServant;
+    }
+
+    /**
      * Returns a deep clone of the given `MasterServant` object.
      */
     static clone(masterServant: Immutable<MasterServant>): MasterServant {
@@ -37,6 +50,9 @@ export class MasterServantUtils {
             summonDate,
             skills: {
                 ...masterServant.skills
+            },
+            appendSkills: {
+                ...masterServant.appendSkills
             }
         };
     }
@@ -44,7 +60,7 @@ export class MasterServantUtils {
     /**
      * Merges a `MasterServant` object into another.
      */
-    static merge(target: MasterServant, source: MasterServant): void;
+    static merge(target: MasterServant, source: MasterServantPartial): void;
 
     /**
      * Merges an array of `MasterServant` objects into another. Servants that exist
@@ -52,12 +68,12 @@ export class MasterServantUtils {
      * duplicates in one or both lists, they will be matched by their order of
      * appearance (index).
      */
-    static merge(target: Array<MasterServant>, source: Array<MasterServant>): void;
+    static merge(target: Array<MasterServant>, source: Array<MasterServantPartial>): void;
 
     /**
      * Method implementation
      */
-    static merge(target: MasterServant | Array<MasterServant>, source: MasterServant | Array<MasterServant>): void {
+    static merge(target: MasterServant | Array<MasterServant>, source: MasterServantPartial | Array<MasterServantPartial>): void {
         if (!Array.isArray(target) && !Array.isArray(source)) {
             this._merge(target, source);
         } else if (Array.isArray(target) && Array.isArray(source)) {
@@ -65,28 +81,47 @@ export class MasterServantUtils {
         }
     }
 
-    private static _merge(target: MasterServant, source: MasterServant): void {
-        /*
-         * Keep track of the  original `instanceId` of the target so that it can be
-         * copied back later. We do not want teh merge operation to modify the
-         * `instanceId`.
+    private static _merge(target: MasterServant, source: MasterServantPartial, mergeInstanceId = false): void {
+        /**
+         * `gameId` is always present.
          */
-        const { instanceId } = target;
+        target.gameId = source.gameId;
+        if (mergeInstanceId) {
+            target.instanceId = source.instanceId;
+        }
+        if (Object.hasOwn(source, 'summoned')) {
+            target.summoned = source.summoned!;
+        }
+        if (Object.hasOwn(source, 'summonDate')) {
+            target.summonDate = source.summonDate;
+        }
+        if (Object.hasOwn(source, 'np')) {
+            target.np = source.np!!;
+        }
+        if (Object.hasOwn(source, 'level')) {
+            target.level = source.level!;
+        }
+        if (Object.hasOwn(source, 'ascension')) {
+            target.ascension = source.ascension!;
+        }
+        if (Object.hasOwn(source, 'fouAtk')) {
+            target.fouAtk = source.fouAtk;
+        }
+        if (Object.hasOwn(source, 'fouHp')) {
+            target.fouHp = source.fouHp;
+        }
         /*
-         * Deep clone to create new instances of nested object(s).
+         * Note that new objects are instantiated for `skills` and `appendSkills`.
          */
-        const clone = this.clone(source);
-        /*
-         * Copy the deep cloned fields over to the target. 
-         */
-        Object.assign(target, clone);
-        /*
-         * Reassign the original `instanceId`.
-         */
-        target.instanceId = instanceId;
+        if (Object.hasOwn(source, 'skills')) {
+            target.skills = { ...source.skills! };
+        }
+        if (Object.hasOwn(source, 'appendSkills')) {
+            target.appendSkills = { ...source.appendSkills! };
+        }
     }
 
-    private static _mergeArrays(target: Array<MasterServant>, source: Array<MasterServant>): void {
+    private static _mergeArrays(target: Array<MasterServant>, source: Array<MasterServantPartial>): void {
         /*
          * Nothing to do, return.
          */
@@ -98,7 +133,7 @@ export class MasterServantUtils {
          * No need to do any individual merges, just copy the entire list.
          */
         if (!target.length) {
-            target.push(...source);
+            target.push(...source.map(this.partialToFull));
             return;
         }
 
@@ -146,8 +181,9 @@ export class MasterServantUtils {
              * update the merge count.
              */
             if (!mergeTarget) {
-                sourceServant.instanceId = ++lastInstanceId;
-                target.push(sourceServant);
+                const servant = this.partialToFull(sourceServant);
+                servant.instanceId = ++lastInstanceId;
+                target.push(servant);
             } else {
                 this._merge(mergeTarget, sourceServant);
                 mergeCountByGameId[gameId] = mergeCount + 1;
@@ -156,14 +192,14 @@ export class MasterServantUtils {
         }
     }
 
-    static getLastInstanceId(masterServants: Array<MasterServant>): number {
+    static getLastInstanceId(masterServants: ReadonlyArray<MasterServant>): number {
         if (!masterServants.length) {
             return 0;
         }
         return Math.max(...masterServants.map(servant => servant.instanceId));
     }
 
-    static reassignInstanceIds(masterServants: Array<MasterServant>, startId = 1) {
+    static reassignInstanceIds(masterServants: Array<Partial<MasterServant>>, startId = 1) {
         masterServants.forEach((servant, index) => servant.instanceId = startId + index);
     }
 

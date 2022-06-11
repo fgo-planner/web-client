@@ -6,7 +6,7 @@ import { ThemeConstants } from './theme-constants';
 
 const themeDefaultDark = () => {
     return {
-        spacing: ThemeConstants.Spacing,
+        spacing: ThemeConstants.SpacingFunction,
         palette: {
             mode: 'dark',
             background: {
@@ -20,7 +20,10 @@ const themeDefaultDark = () => {
             secondary: {
                 main: pink[200]
             },
-            divider: '#001E3C'
+            divider: '#001E3C',
+            drawer: {
+                main: '#000F1F'
+            }
         },
         breakpoints: BreakpointOverrides,
         components: ComponentsOverrides

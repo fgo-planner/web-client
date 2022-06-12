@@ -1,6 +1,6 @@
 import { Clear as ClearIcon, Edit as EditIcon, Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, IconButton, Tooltip } from '@mui/material';
-import React, { ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
@@ -8,7 +8,7 @@ import { NavigationRail } from '../../../../components/navigation/navigation-rai
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { MasterAccountDataContext } from '../../contexts/master-account-data.context';
+import { useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterItemList } from './master-item-list.component';
 
 export const MasterItemsRoute = React.memo(() => {
@@ -18,7 +18,7 @@ export const MasterItemsRoute = React.memo(() => {
         updateItem,
         revertChanges,
         persistChanges
-    } = useContext(MasterAccountDataContext);
+    } = useMasterAccountDataEditHook({ includeItems: true });
 
     const [editMode, setEditMode] = useState<boolean>(false);
     const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);

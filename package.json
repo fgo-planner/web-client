@@ -3,6 +3,11 @@
   "description": "Web browser client for the FGO Planner project.",
   "version": "0.1.0",
   "private": true,
+  "jest": {
+    "testPathIgnorePatterns": [
+      "test-data"
+    ]
+  },
   "dependencies": {
     "@babel/preset-env": "^7.15.6",
     "@date-io/date-fns": "^2.13.1",

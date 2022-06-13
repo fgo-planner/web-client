@@ -88,8 +88,6 @@ export class MasterItemStatsUtils {
             );
         }
 
-        this._computeFinalDebt(stats);
-
         const end = window.performance.now();
         console.log(`Stats took ${(end - start).toFixed(2)}ms to compute.`);
 
@@ -146,15 +144,15 @@ export class MasterItemStatsUtils {
         skillMaterials: Immutable<GameServantSkillMaterials>,
         skillLevels: MasterServant['appendSkills']
     ): void {
-        const appendSkill1 = skillLevels[1] ?? 0;
-        const appendSkill2 = skillLevels[2] ?? 0;
-        const appendSkill3 = skillLevels[3] ?? 0;
+        const skill1 = skillLevels[1] ?? 0;
+        const skill2 = skillLevels[2] ?? 0;
+        const skill3 = skillLevels[3] ?? 0;
         for (const [key, skill] of Object.entries(skillMaterials)) {
             const skillLevel = Number(key);
             const skillUpgradeCount =
-                (appendSkill1 > skillLevel ? 1 : 0) +
-                (appendSkill2 > skillLevel ? 1 : 0) +
-                (appendSkill3 > skillLevel ? 1 : 0);
+                (skill1 > skillLevel ? 1 : 0) +
+                (skill2 > skillLevel ? 1 : 0) +
+                (skill3 > skillLevel ? 1 : 0);
             this._updateForServantEnhancement(stats, skill, 3, skillUpgradeCount);
         }
     }
@@ -217,12 +215,6 @@ export class MasterItemStatsUtils {
             } else {
                 stat.used += cost;
             }
-        }
-    }
-
-    private static _computeFinalDebt(stats: Record<number, MasterItemStat>): void {
-        for (const [, stat] of Object.entries(stats)) {
-            stat.debt = Math.max(0, stat.debt - stat.inventory);
         }
     }
 

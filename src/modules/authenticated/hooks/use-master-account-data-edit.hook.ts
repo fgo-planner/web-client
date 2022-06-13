@@ -345,23 +345,39 @@ export function useMasterAccountDataEditHook(
     //#region Back-end API functions
 
     const persistChanges = useCallback(async (): Promise<void> => {
-        if (!masterAccount) {
+        if (!masterAccount || (!includeItems && !includeServants && !includeCostumes && !includeSoundtracks)) {
             return;
         }
         invokeLoadingIndicator();
         // TODO Only update dirty data types
         const update: Partial<MasterAccount> = {
-            _id: masterAccount._id,
-            resources: {
+            _id: masterAccount._id
+        };
+        if (includeItems) {
+            update.resources = {
                 ...masterAccount.resources,
                 items: Object.entries(editData.items).map(([itemId, quantity]) => ({ itemId: Number(itemId), quantity })),
                 qp: editData.qp
-            },
-            servants: [...editData.servants],
-            costumes: [...editData.costumes],
-            bondLevels: { ...editData.bondLevels },
-            soundtracks: [...editData.soundtracks]
-        };
+            };
+        }
+        if (includeServants) {
+            update.servants = [
+                ...editData.servants
+            ];
+            update.bondLevels = {
+                ...editData.bondLevels
+            };
+        }
+        if (includeCostumes) {
+            update.costumes = [
+                ...editData.costumes
+            ];
+        }
+        if (includeSoundtracks) {
+            update.soundtracks = [
+                ...editData.soundtracks
+            ];
+        }
         try {
             await masterAccountService.updateAccount(update);
             resetLoadingIndicator();
@@ -373,7 +389,17 @@ export function useMasterAccountDataEditHook(
              */
             throw error;
         }
-    }, [editData, invokeLoadingIndicator, masterAccount, masterAccountService, resetLoadingIndicator]);
+    }, [
+        editData,
+        includeCostumes,
+        includeItems,
+        includeServants,
+        includeSoundtracks,
+        invokeLoadingIndicator,
+        masterAccount,
+        masterAccountService,
+        resetLoadingIndicator
+    ]);
 
     //#endregion
 

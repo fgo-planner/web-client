@@ -72,7 +72,7 @@ const StyleProps = ((theme: Theme) => {
                 display: 'flex',
                 flexWrap: 'nowrap',
                 '&>.MuiButtonBase-root': {
-                    '&:not(:first-child)': {
+                    '&:not(:first-of-type)': {
                         ml: 3,
                         [breakpoints.down('sm')]: {
                             ml: 1

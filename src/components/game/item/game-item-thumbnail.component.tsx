@@ -90,6 +90,7 @@ export const GameItemThumbnail = React.memo((props: Props) => {
         thumbnail = (
             <Link
                 // style={sizeStyle}
+                tabIndex={-1}
                 to={href}
                 target={target}
             >

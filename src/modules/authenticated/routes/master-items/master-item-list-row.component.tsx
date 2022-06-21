@@ -1,7 +1,7 @@
 import { GameItem } from '@fgo-planner/types';
 import { InputBaseComponentProps, TextField } from '@mui/material';
-import React, { ChangeEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import NumberFormat from 'react-number-format';
+import React, { FocusEvent, useCallback, useMemo, useRef, useState } from 'react';
+import NumberFormat, { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { GameItemConstants } from '../../../../constants';
 import { Immutable } from '../../../../types/internal';
@@ -9,16 +9,16 @@ import { MathUtils } from '../../../../utils/math.utils';
 import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 
 type Props = {
-    editMode: boolean;
     gameItem: Immutable<GameItem>;
     onChange: (itemId: number, quantity: number) => void;
     quantity: number;
 };
 
-const QuantityInputProps: InputBaseComponentProps = {
-    step: 1,
-    min: 0,
-    max: GameItemConstants.MaxItemQuantity
+const isQuantityValueAllowed = ({floatValue}: NumberFormatValues): boolean => {
+    if (floatValue === undefined) {
+        return true;
+    }
+    return floatValue >= 0 && floatValue <= 9_999_999_999;
 };
 
 export const StyleClassPrefix = 'MasterItemListRow';
@@ -26,7 +26,6 @@ export const StyleClassPrefix = 'MasterItemListRow';
 export const MasterItemListRow = React.memo((props: Props) => {
 
     const {
-        editMode,
         gameItem,
         onChange,
         quantity
@@ -36,21 +35,22 @@ export const MasterItemListRow = React.memo((props: Props) => {
 
     const itemQuantityInputRef = useRef<HTMLInputElement | null>(null);
 
-    /*
-     * Deactivate row when editMode flag changes, regardless of what it changes to.
-     */
-    useEffect(() => {
-        setActive(false);
-    }, [editMode]);
-
-    const handleItemQuantityChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        const value = event.target.value;
-        const quantity = MathUtils.clamp(~~Number(value), 0, GameItemConstants.MaxItemQuantity);
+    const handleItemQuantityChange = useCallback((values: NumberFormatValues, sourceInfo: SourceInfo): void => {
+        const value = Math.floor(values.floatValue || 0);
+        const quantity = MathUtils.clamp(value, 0, GameItemConstants.MaxItemQuantity);
         onChange(gameItem._id, quantity);
     }, [gameItem._id, onChange]);
 
-    const handleItemQuantityFocus = useCallback((): void => {
+    const handleItemQuantityFocus = useCallback((event: FocusEvent<HTMLInputElement>): void => {
         setActive(true);
+        /**
+         * Need to re-select the input text again in a setTimeout because when the input
+         * field is initially focused, its numeric value will be un-formatted, which
+         * causes the text to be deselected.
+         */
+        setTimeout(() => {
+            event.target.select();
+        });
     }, []);
 
     const handleItemQuantityBlur = useCallback((): void => {
@@ -58,36 +58,32 @@ export const MasterItemListRow = React.memo((props: Props) => {
     }, []);
 
     const handleRowClick = useCallback((): void => {
-        if (!editMode) {
-            return;
-        }
         itemQuantityInputRef.current?.focus();
-    }, [editMode]);
+    }, []);
 
-    let itemQuantityNode: ReactNode;
-    if (editMode) {
-        itemQuantityNode = (
-            <TextField
-                inputRef={itemQuantityInputRef}
-                variant='outlined'
-                size='small'
-                type='number'
-                inputProps={QuantityInputProps}
-                value={quantity}
-                onChange={handleItemQuantityChange}
-                onFocus={handleItemQuantityFocus}
-                onBlur={handleItemQuantityBlur}
-            />
-        );
-    } else {
-        itemQuantityNode = (
-            <NumberFormat
-                value={quantity}
-                displayType='text'
-                thousandSeparator={true}
-            />
-        );
-    }
+    const quantityInputProps = useMemo((): InputBaseComponentProps => ({
+        type: active ? 'number' : 'text',
+        step: 1,
+        min: 0,
+        max: GameItemConstants.MaxItemQuantity
+    }), [active]);
+
+    const itemQuantityInputNode = (
+        <NumberFormat
+            customInput={TextField}
+            inputRef={itemQuantityInputRef}
+            variant='outlined'
+            size='small'
+            inputProps={quantityInputProps}
+            value={String(quantity)}
+            thousandSeparator={!active}
+            isNumericString
+            isAllowed={isQuantityValueAllowed}
+            onValueChange={handleItemQuantityChange}
+            onFocus={handleItemQuantityFocus}
+            onBlur={handleItemQuantityBlur}
+        />
+    );
 
     return (
         <StaticListRowContainer
@@ -96,10 +92,10 @@ export const MasterItemListRow = React.memo((props: Props) => {
             active={active}
             borderTop
         >
-            <MasterItemListRowLabel gameItem={gameItem} editMode={editMode} />
+            <MasterItemListRowLabel gameItem={gameItem} />
             <div className='flex-fill' />
             <div>
-                {itemQuantityNode}
+                {itemQuantityInputNode}
             </div>
         </StaticListRowContainer>
     );

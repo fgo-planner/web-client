@@ -2,7 +2,7 @@ import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { ImmutableArray, ReadonlyRecord } from '../../../../types/internal';
+import { ImmutableArray, ReadonlyRecord, SxPropsFunction } from '../../../../types/internal';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { StyleClassPrefix as MasterItemListRowLabelStyleClassPrefix } from './master-item-list-row-label.component';
 import { MasterItemListRow, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';
@@ -14,7 +14,6 @@ type ItemCategory = {
 };
 
 type Props = {
-    editMode: boolean;
     itemQuantities: ReadonlyRecord<number, number>;
     onChange: (itemId: number, quantity: number) => void;
     qp: number;
@@ -58,10 +57,11 @@ const ItemCategories: ImmutableArray<ItemCategory> = [
 
 const StyleClassPrefix = 'MasterItemList';
 
-const StyleProps = {
-    pb: 12,
+const StyleProps = (({ breakpoints }: Theme) => ({
     [`& .${StyleClassPrefix}-item-category`]: {
-        pb: 8
+        '&:not(:last-child)': {
+            pb: 8
+        }
     },
     [`& .${MasterItemListRowStyleClassPrefix}-root`]: {
         display: 'flex',
@@ -73,15 +73,20 @@ const StyleProps = {
         py: 0,
         fontSize: '0.875rem',
         [`& .${MasterItemListRowLabelStyleClassPrefix}-item-name`]: {
-            px: 4
+            px: 4,
+            [breakpoints.only('xs')]: {
+                display: 'none'
+            }
+        },
+        '& .MuiInputBase-input': {
+            width: '8rem'
         }
     }
-} as SystemStyleObject<Theme>;
+} as SystemStyleObject)) as SxPropsFunction;
 
 export const MasterItemList = React.memo((props: Props) => {
 
     const {
-        editMode,
         itemQuantities,
         onChange,
         qp
@@ -104,7 +109,6 @@ export const MasterItemList = React.memo((props: Props) => {
                 key={itemId}
                 gameItem={gameItem}
                 quantity={quantity}
-                editMode={editMode}
                 onChange={onChange}
             />
         );

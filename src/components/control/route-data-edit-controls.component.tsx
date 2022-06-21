@@ -72,14 +72,20 @@ const StyleProps = ((theme: Theme) => {
                 display: 'flex',
                 flexWrap: 'nowrap',
                 '&>.MuiButtonBase-root': {
-                    mx: 1
+                    '&:not(:first-child)': {
+                        ml: 3,
+                        [breakpoints.down('sm')]: {
+                            ml: 1
+                        }
+                    }
                 },
                 '&>.MuiButton-root': {
                     width: '5rem'
                 }
             },
-            [breakpoints.down('md')]: {
-                justifyContent: 'space-between'
+            [breakpoints.down('sm')]: {
+                justifyContent: 'space-between',
+                pr: 3
             }
         }
     } as SystemStyleObject;

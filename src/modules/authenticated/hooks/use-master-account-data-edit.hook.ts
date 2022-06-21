@@ -224,6 +224,9 @@ export function useMasterAccountDataEditHook(
         if (!includeItems) {
             return;
         }
+        if (editData.qp === amount) {
+            return;
+        }
         editData.qp = amount;
         setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();

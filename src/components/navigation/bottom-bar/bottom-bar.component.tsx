@@ -29,6 +29,9 @@ const StyleProps = (theme: Theme) => ({
     }
 } as SystemStyleObject<Theme>);
 
+/**
+ * @deprecated Currently unused
+ */
 export const BottomBar = React.memo((props: Props) => {
 
     const {

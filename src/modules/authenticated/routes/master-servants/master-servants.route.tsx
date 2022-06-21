@@ -1,13 +1,10 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import lodash from 'lodash';
-import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { BottomBarActions } from '../../../../components/navigation/bottom-bar/bottom-bar-actions.component';
-import { BottomBar } from '../../../../components/navigation/bottom-bar/bottom-bar.component';
-import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
@@ -40,8 +37,6 @@ type MasterAccountData = {
     unlockedCostumes: Array<number>;
 };
 
-const UnsavedChangesMessage = 'The changes you made have not been saved yet. Use the buttons on the right to revert or save the changes.';
-
 const getDefaultServantSelection = (): ServantSelection => ({
     instanceIds: new Set(),
     servants: []
@@ -70,10 +65,6 @@ const StyleProps = (theme: Theme) => ({
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
-    [`& .${StyleClassPrefix}-switch-container`]: {
-        px: 4,
-        mb: -6
-    },
     [`& .${StyleClassPrefix}-main-content`]: {
         display: 'flex',
         flex: '1',
@@ -170,7 +161,8 @@ export const MasterServantsRoute = React.memo(() => {
 
     const dragDropMode = !!dragDropMasterServants;
 
-    const [showAppendSkills, setShowAppendSkills] = useState<boolean>(false);
+    // TODO No way to toggle this right now...
+    const [showAppendSkills,] = useState<boolean>(true);
 
     const { sm, md, lg, xl } = useActiveBreakpoints();
 
@@ -592,10 +584,6 @@ export const MasterServantsRoute = React.memo(() => {
 
     //#region Other event handlers
 
-    const handleShowAppendSkillsChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
-        setShowAppendSkills(event.target.checked);
-    }, []);
-
     const handleFormChange = useCallback((): void => {
         const masterAccountData = masterAccountDataRef.current;
         masterAccountData.masterServants = [...masterAccountData.masterServants]; // Forces child list to re-render
@@ -662,38 +650,6 @@ export const MasterServantsRoute = React.memo(() => {
 
     const isMultipleServantsSelected = selectedServants.length > 1;
 
-    /**
-     * Bottom bar node
-     */
-    let bottomBarNode: ReactNode;
-    if (!dragDropMode) {
-        bottomBarNode =(
-            <BottomBar show={isMasterAccountDirty}>
-                <div className={`${StyleClassPrefix}-unsaved-message`}>
-                    {UnsavedChangesMessage}
-                </div>
-                <BottomBarActions>
-                    <Button
-                        variant='contained'
-                        color='secondary'
-                        onClick={handleRevertButtonClick}
-                        disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
-                    >
-                        Revert
-                    </Button>
-                    <Button
-                        variant='contained'
-                        color='primary'
-                        onClick={handleSaveButtonClick}
-                        disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
-                    >
-                        Save
-                    </Button>
-                </BottomBarActions>
-            </BottomBar>
-        );
-    };
-
     const {
         masterServants,
         bondLevels,
@@ -702,23 +658,13 @@ export const MasterServantsRoute = React.memo(() => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <div className='flex justify-space-between align-center'>
-                <PageTitle>Servant Roster</PageTitle>
-                <div className={`${StyleClassPrefix}-switch-container`}>
-                    <FormGroup row>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    name='showAppendSkills'
-                                    checked={showAppendSkills}
-                                    onChange={handleShowAppendSkillsChange}
-                                />
-                            }
-                            label='Append Skills'
-                        />
-                    </FormGroup>
-                </div>
-            </div>
+            <RouteDataEditControls
+                title='Servant Roster'
+                hasUnsavedData={isMasterAccountDirty}
+                onRevertButtonClick={handleRevertButtonClick}
+                onSaveButtonClick={handleSaveButtonClick}
+                disabled={isLoadingIndicatorActive}
+            />
             <div className='flex overflow-hidden full-height'>
                 <MasterServantsNavigationRail
                     selectedServantsCount={selectedServants.length}
@@ -770,10 +716,6 @@ export const MasterServantsRoute = React.memo(() => {
                     </div>}
                 </div>
             </div>
-            <div>
-                {bottomBarNode}
-            </div>
-            {/* <FabContainer children={fabContainerChildNodes} /> */}
             <MasterServantsEditDialog
                 bondLevels={bondLevels}
                 masterServantUpdate={editServantDialogData}

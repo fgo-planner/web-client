@@ -107,8 +107,6 @@ export const RouteDataEditControls = React.memo((props: Props) => {
 
     const { sm, md } = useActiveBreakpoints();
 
-    console.log(sm, md);
-
     const titleNode = (title && (md || !hasUnsavedData)) && (
         <PageTitle className={`${StyleClassPrefix}-title`}>
             {title}
@@ -176,8 +174,6 @@ export const RouteDataEditControls = React.memo((props: Props) => {
     );
 
     const hidden = hideOnEmpty && !titleNode && !unsavedDataNode;
-
-    console.log(hideOnEmpty, !titleNode, !unsavedDataNode, hidden);
 
     if (hidden) {
         return null;

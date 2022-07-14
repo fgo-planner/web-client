@@ -133,14 +133,11 @@ const StyleProps = (theme: SystemTheme) => {
             lineHeight: '32px'
         },
         [`& .${StyleClassPrefix}-scroll-container`]: {
+            backgroundColor: palette.background.paper,
             overflowY: 'auto',
-            height: '100%',
             '>:last-child': {
                 px: 6,
                 pt: 4
-            },
-            '>div': {
-                backgroundColor: palette.background.paper
             },
             [`& .${StyleClassPrefix}-divider`]: {
                 borderBottomWidth: 1,
@@ -502,7 +499,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
     }, [servantLinksNode, servantMaterialDebtNode, servantStatsNode]);
 
     return (
-        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+        <Box className={clsx(`${StyleClassPrefix}-root`, ThemeConstants.ClassScrollbarTrackBorder)} sx={StyleProps}>
             {servantNameNode}
             {scrollContainerNode}
         </Box>

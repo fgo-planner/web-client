@@ -21,11 +21,10 @@ const StyleProps = (theme: SystemTheme) => {
     } = theme as Theme;
 
     return {
-        // overflowX: 'auto',
-        // overflowY: 'hidden',
         position: 'sticky',
         top: 0,
         width: 'fit-content',
+        minWidth: '100%',
         minHeight: 54,
         backgroundColor: palette.background.paper,
         borderBottomWidth: 1,

@@ -34,7 +34,7 @@ const DefaultStage = 2;
 
 const DefaultSize = 56;
 
-const StyleClassPrefix = 'GameServantThumbnail';
+export const StyleClassPrefix = 'GameServantThumbnail';
 
 type ContainerProps = {
     renderNewTabIndicator?: boolean;
@@ -42,8 +42,6 @@ type ContainerProps = {
 };
 
 const ContainerStyleOptions = {
-    name: StyleClassPrefix,
-    slot: 'root',
     skipSx: true,
     shouldForwardProp: ((prop: string) => (
         prop !== 'size' &&
@@ -145,6 +143,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
 
     return (
         <Container
+            className={`${StyleClassPrefix}-root`}
             size={size}
             onClick={onClick}
             renderNewTabIndicator={renderNewTabIndicator}

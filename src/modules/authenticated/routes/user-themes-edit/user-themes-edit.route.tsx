@@ -1,5 +1,6 @@
 import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
+import _ from 'lodash';
 import React, { Fragment, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPreferences, UserWebClientTheme } from '../../../../../local_modules/types/lib';
@@ -46,7 +47,7 @@ export const UserThemesEditRoute = React.memo(() => {
             if (!userTheme) {
                 return defaultTheme;
             } else {
-                return Object.assign(defaultTheme, userTheme);
+                return Object.assign(defaultTheme, _.cloneDeep(userTheme));
             }
         };
 

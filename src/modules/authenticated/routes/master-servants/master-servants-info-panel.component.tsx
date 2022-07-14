@@ -1,6 +1,6 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Link, Tooltip } from '@mui/material';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
@@ -12,8 +12,8 @@ import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.h
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../types/data';
 import { Immutable } from '../../../../types/internal';
-import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { ComputationOptions, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
+import { Theme } from '@mui/material';
 
 type Props = {
     activeServants: Array<MasterServant>;
@@ -24,7 +24,7 @@ type Props = {
     onStatsChange?: (data: any) => void;
 };
 
-const FormId = 'master-servant-info-panel-form';
+// const FormId = 'master-servant-info-panel-form';
 
 const generateComputationOptions = (showAppendSkills: boolean, includeLores: boolean): ComputationOptions => ({
     includeAscensions: true,
@@ -89,100 +89,112 @@ const MaterialLabelWidth = '80%';
 
 const StyleClassPrefix = 'MasterServantInfoPanel';
 
-const StyleProps = {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    [`& .${StyleClassPrefix}-title`]: {
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        palette
+    } = theme as Theme;
+
+    return {
         display: 'flex',
-        flexWrap: 'nowrap',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        px: 6,
-        py: 4
-    },
-    [`& .${StyleClassPrefix}-section-title`]: {
-        fontSize: '0.875rem',
-        fontWeight: 500,
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        py: 1
-    },
-    [`& .${StyleClassPrefix}-helper-text`]: {
-        fontSize: '0.875rem',
-        color: 'text.secondary',
-        fontStyle: 'italic',
-        lineHeight: '32px'
-    },
-    [`& .${StyleClassPrefix}-servant-name`]: {
-        fontSize: '1.125rem',
-        fontWeight: 500,
-        fontFamily: ThemeConstants.FontFamilyGoogleSans
-    },
-    [`& .${StyleClassPrefix}-rarity-class-icon`]: {
-        minWidth: 56,
-        pl: 2,
-        display: 'flex',
-        flexWrap: 'nowrap',
-        justifyContent: 'space-between'
-    },
-    [`& .${StyleClassPrefix}-scroll-container`]: {
-        overflowY: 'auto',
+        flexDirection: 'column',
         height: '100%',
-        '>:last-child': {
+        [`& .${StyleClassPrefix}-title`]: {
+            backgroundColor: palette.background.paper,
+            display: 'flex',
+            flexWrap: 'nowrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             px: 6,
-            pt: 4
+            py: 4,
+            [`& .${StyleClassPrefix}-servant-name`]: {
+                fontSize: '1.125rem',
+                fontWeight: 500,
+                fontFamily: ThemeConstants.FontFamilyGoogleSans
+            },
+            [`& .${StyleClassPrefix}-rarity-class-icon`]: {
+                minWidth: 56,
+                pl: 2,
+                display: 'flex',
+                flexWrap: 'nowrap',
+                justifyContent: 'space-between'
+            }
+        },
+        [`& .${StyleClassPrefix}-section-title`]: {
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            fontFamily: ThemeConstants.FontFamilyGoogleSans,
+            py: 1
+        },
+        [`& .${StyleClassPrefix}-helper-text`]: {
+            fontSize: '0.875rem',
+            color: palette.text.secondary,
+            fontStyle: 'italic',
+            lineHeight: '32px'
+        },
+        [`& .${StyleClassPrefix}-scroll-container`]: {
+            overflowY: 'auto',
+            height: '100%',
+            '>:last-child': {
+                px: 6,
+                pt: 4
+            },
+            '>div': {
+                backgroundColor: palette.background.paper
+            },
+            [`& .${StyleClassPrefix}-divider`]: {
+                borderBottomWidth: 1,
+                borderBottomStyle: 'solid',
+                borderBottomColor: palette.divider,
+            },
+            [`& .${StyleClassPrefix}-servant-stats-container`]: {
+                px: 6,
+                pt: 2,
+                pb: 4,
+                [`& .${StyleClassPrefix}-servant-stat`]: {
+                    justifyContent: 'space-between',
+                },
+                [`& .${StyleClassPrefix}-servant-stats-delimiter`]: {
+                    width: '1rem'
+                },
+                [`& .${StyleClassPrefix}-skill-level-stat`]: {
+                    display: 'flex',
+                    textAlign: 'center',
+                    alignItems: 'center',
+                },
+                [`& .${StyleClassPrefix}-bond-level-stat`]: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }
+            },
+            [`& .${StyleClassPrefix}-material-stats-container`]: {
+                pb: 4,
+                [`& .${StyleClassPrefix}-material-stats-list`]: {
+                    pt: 2
+                },
+                [`& .${StyleClassPrefix}-material-stat`]: {
+                    cursor: 'default',
+                    justifyContent: 'space-between',
+                    ml: -1
+                },
+                [`& .${StyleClassPrefix}-material-stat-label`]: {
+                    display: 'flex',
+                    alignItems: 'center'
+                }
+            },
+            [`& .${StyleClassPrefix}-external-links-container`]: {
+                pt: 2,
+                pb: 6,
+                [`& .${StyleClassPrefix}-external-link`]: {
+                    fontSize: '0.875rem',
+                    pt: 2
+                }
+            }
         }
-    },
-    [`& .${StyleClassPrefix}-servant-stats-container`]: {
-        px: 6,
-        pt: 2,
-        pb: 4
-    },
-    [`& .${StyleClassPrefix}-servant-stat`]: {
-        justifyContent: 'space-between',
-    },
-    [`& .${StyleClassPrefix}-servant-stats-delimiter`]: {
-        width: '1rem'
-    },
-    [`& .${StyleClassPrefix}-skill-level-stat`]: {
-        display: 'flex',
-        textAlign: 'center',
-        alignItems: 'center',
-    },
-    [`& .${StyleClassPrefix}-bond-level-stat`]: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    [`& .${StyleClassPrefix}-divider`]: {
-        borderBottomWidth: 1,
-        borderBottomStyle: 'solid',
-        borderBottomColor: 'divider',
-    },
-    [`& .${StyleClassPrefix}-material-stats-container`]: {
-        pb: 4
-    },
-    [`& .${StyleClassPrefix}-material-stats-list`]: {
-        pt: 2
-    },
-    [`& .${StyleClassPrefix}-material-stat`]: {
-        cursor: 'default',
-        justifyContent: 'space-between',
-        ml: -1
-    },
-    [`& .${StyleClassPrefix}-material-stat-label`]: {
-        display: 'flex',
-        alignItems: 'center'
-    },
-    [`& .${StyleClassPrefix}-external-links-container`]: {
-        pt: 2,
-        pb: 6
-    },
-    [`& .${StyleClassPrefix}-external-link`]: {
-        fontSize: '0.875rem',
-        pt: 2
-    }
-} as SystemStyleObject<Theme>;
+
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const MasterServantsInfoPanel = React.memo((props: Props) => {
 
@@ -317,54 +329,54 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
         //         />
         //     );
         // } else {
-            return (
-                <div className={`${StyleClassPrefix}-servant-stats-container`}>
+        return (
+            <div className={`${StyleClassPrefix}-servant-stats-container`}>
+                <DataPointListItem
+                    className={`${StyleClassPrefix}-servant-stat`}
+                    label='Level'
+                    labelWidth={ServantStatLabelWidth}
+                    value={activeServant.level}
+                />
+                <DataPointListItem
+                    className={`${StyleClassPrefix}-servant-stat`}
+                    label='Ascension'
+                    labelWidth={ServantStatLabelWidth}
+                    value={activeServant.ascension}
+                />
+                <DataPointListItem
+                    className={`${StyleClassPrefix}-servant-stat`}
+                    label='Fou (HP/ATK)'
+                    labelWidth={ServantStatLabelWidth}
+                    value={renderFouLevels(activeServant)}
+                />
+                <DataPointListItem
+                    className={`${StyleClassPrefix}-servant-stat`}
+                    label='Skills'
+                    labelWidth={ServantStatLabelWidth}
+                    value={renderSkillLevels(activeServant, 'skills')}
+                />
+                {showAppendSkills &&
                     <DataPointListItem
                         className={`${StyleClassPrefix}-servant-stat`}
-                        label='Level'
+                        label='Append Skills'
                         labelWidth={ServantStatLabelWidth}
-                        value={activeServant.level}
+                        value={renderSkillLevels(activeServant, 'appendSkills')}
                     />
-                    <DataPointListItem
-                        className={`${StyleClassPrefix}-servant-stat`}
-                        label='Ascension'
-                        labelWidth={ServantStatLabelWidth}
-                        value={activeServant.ascension}
-                    />
-                    <DataPointListItem
-                        className={`${StyleClassPrefix}-servant-stat`}
-                        label='Fou (HP/ATK)'
-                        labelWidth={ServantStatLabelWidth}
-                        value={renderFouLevels(activeServant)}
-                    />
-                    <DataPointListItem
-                        className={`${StyleClassPrefix}-servant-stat`}
-                        label='Skills'
-                        labelWidth={ServantStatLabelWidth}
-                        value={renderSkillLevels(activeServant, 'skills')}
-                    />
-                    {showAppendSkills &&
-                        <DataPointListItem
-                            className={`${StyleClassPrefix}-servant-stat`}
-                            label='Append Skills'
-                            labelWidth={ServantStatLabelWidth}
-                            value={renderSkillLevels(activeServant, 'appendSkills')}
-                        />
-                    }
-                    <DataPointListItem
-                        className={`${StyleClassPrefix}-servant-stat`}
-                        label='Noble Phantasm'
-                        labelWidth={ServantStatLabelWidth}
-                        value={renderNpLevel(activeServant)}
-                    />
-                    <DataPointListItem
-                        className={`${StyleClassPrefix}-servant-stat`}
-                        label='Bond'
-                        labelWidth={ServantStatLabelWidth}
-                        value={renderBondLevel(bondLevels[activeServant.gameId])}
-                    />
-                </div>
-            );
+                }
+                <DataPointListItem
+                    className={`${StyleClassPrefix}-servant-stat`}
+                    label='Noble Phantasm'
+                    labelWidth={ServantStatLabelWidth}
+                    value={renderNpLevel(activeServant)}
+                />
+                <DataPointListItem
+                    className={`${StyleClassPrefix}-servant-stat`}
+                    label='Bond'
+                    labelWidth={ServantStatLabelWidth}
+                    value={renderBondLevel(bondLevels[activeServant.gameId])}
+                />
+            </div>
+        );
         // }
     }, [activeServants, bondLevels, editMode, handleStatsChange, showAppendSkills, unlockedCostumes]);
 
@@ -381,7 +393,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 const {
                     ascensions,
                     skills,
-                    appendSkills, 
+                    appendSkills,
                     costumes,
                     total
                 } = requirements;
@@ -453,7 +465,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
         }
         const activeServant = activeServants[0];
         const servant = gameServantMap?.[activeServant.gameId];
-        const links = servant?.metadata?.links
+        const links = servant?.metadata?.links;
         if (!links?.length) {
             return null;
         }
@@ -495,4 +507,5 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
             {scrollContainerNode}
         </Box>
     );
+    
 });

@@ -66,7 +66,7 @@ export class ThemeConstants {
      * The width of the custom scrollbars as a factor of the spacing transformation
      * value.
      */
-    static readonly ScrollbarWidthScale = 2;
+    static readonly ScrollbarWidthScale = 2.5;
 
     //#endregion
 

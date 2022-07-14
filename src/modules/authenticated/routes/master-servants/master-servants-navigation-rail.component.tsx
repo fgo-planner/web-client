@@ -32,7 +32,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
 
     if (dragDropMode) {
         return (
-            <NavigationRail>
+            <NavigationRail borderRight>
                 <Tooltip key='apply' title='Apply order changes' placement='right'>
                     <div>
                         <IconButton
@@ -57,7 +57,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
     }
 
     return (
-        <NavigationRail>
+        <NavigationRail borderRight>
             <Tooltip key='add' title='Add servant' placement='right'>
                 <div>
                     <IconButton

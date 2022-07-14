@@ -1,25 +1,18 @@
-import { MuiStyledOptions, styled } from '@mui/system';
+import { styled } from '@mui/system';
 import clsx from 'clsx';
-import React, { DOMAttributes, PropsWithChildren } from 'react';
+import React, { DOMAttributes, PropsWithChildren, ReactNode } from 'react';
 import { ComponentStyleProps } from '../../types/internal';
-import listRowStyle from './list-row-style';
+import BaseListRowStyle from './list-row-style';
 
 // TODO Add prop for cursor style.
 type Props = PropsWithChildren<{
     active?: boolean;
     borderTop?: boolean;
     borderBottom?: boolean;
+    stickyContent?: ReactNode;
 }> & ComponentStyleProps & DOMAttributes<HTMLDivElement>;
 
-export const StyleClassPrefix = 'StaticListRowContainer';
-
-const StyleOptions = {
-    name: StyleClassPrefix
-} as MuiStyledOptions;
-
-const RootComponent = styled('div', StyleOptions)(({ theme }) => {
-    return listRowStyle(theme) as any; // TODO Find out which type this is supposed to be.
-});
+const RootComponent = styled('div')(BaseListRowStyle);
 
 export const StaticListRowContainer = React.memo((props: Props) => {
 
@@ -28,6 +21,7 @@ export const StaticListRowContainer = React.memo((props: Props) => {
         active,
         borderTop,
         borderBottom,
+        stickyContent,
         className,
         style,
         sx,
@@ -49,6 +43,9 @@ export const StaticListRowContainer = React.memo((props: Props) => {
             sx={sx}
             {...domAttributes}
         >
+            {stickyContent && <div className='sticky-content'>
+                {stickyContent}
+            </div>}
             {children}
         </RootComponent >
     );

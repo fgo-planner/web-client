@@ -12,14 +12,13 @@ export type MasterServantListVisibleColumns = {
 };
 
 const ColumnWidths = {
-    info: '32%',
+    label: 300,
     stats: {
-        container: '68%',
-        npLevel: '12.5%',
-        level: '15%',
-        fou: '15%', // *2 = 30% total
-        skills: '15%', // *2 = 30% total
-        bondLevel: '12.5%'
+        npLevel: 120,
+        level: 160,
+        fou: 160, // *2 = 30% total
+        skills: 160, // *2 = 30% total
+        bondLevel: 120
     },
     actions: '120px'
 };

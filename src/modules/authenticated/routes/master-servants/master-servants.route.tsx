@@ -1,17 +1,18 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Theme } from '@mui/material';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import clsx from 'clsx';
 import lodash from 'lodash';
 import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
-import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
-import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { ThemeConstants } from '../../../../styles/theme-constants';
 import { Immutable, MasterServantUpdate, ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
@@ -19,7 +20,7 @@ import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
-import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
+import { MasterServantList, StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantContextMenu } from './master-servants-context-menu.component';
 import { MasterServantsEditDialog } from './master-servants-edit-dialog.component';
 import { MasterServantsInfoPanel } from './master-servants-info-panel.component';
@@ -60,34 +61,53 @@ const cloneMasterAccountData = (account: Nullable<Immutable<MasterAccount>>): Ma
 };
 
 const StyleClassPrefix = 'MasterServants';
+ 
+const StyleProps = (theme: SystemTheme) => {
 
-const StyleProps = (theme: Theme) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    [`& .${StyleClassPrefix}-main-content`]: {
+    const {
+        breakpoints,
+        palette
+    } = theme as Theme;
+
+    return {
         display: 'flex',
-        flex: '1',
-        // width: 'calc(100% - 48px)'
-    },
-    [`& .${StyleClassPrefix}-info-panel-container`]: {
-        width: 320,
+        flexDirection: 'column',
         height: '100%',
-        pr: 4,
-        py: 4,
-        boxSizing: 'border-box',
-        [theme.breakpoints.down('xl')]: {
-            width: 300
+        [`& .${StyleClassPrefix}-main-content`]: {
+            display: 'flex',
+            width: 'calc(100% - 56px)',
+            [`& .${StyleClassPrefix}-list-container`]: {
+                // background: palette.background.paper,
+                flex: 1,
+                overflow: 'hidden',
+                [`& .${MasterServantListStyleClassPrefix}-root`]: {
+                    background: palette.background.paper,
+                    borderRightWidth: 1,
+                    borderRightStyle: 'solid',
+                    borderRightColor: palette.divider,
+                    [`& .${MasterServantListStyleClassPrefix}-list-container`]: {
+                        height: '100%'
+                    }
+                }
+            },
+            [`& .${StyleClassPrefix}-info-panel-container`]: {
+                width: 320,
+                height: '100%',
+                boxSizing: 'border-box',
+                [breakpoints.down('xl')]: {
+                    width: 300
+                }
+            },
+        },
+        [`& .${StyleClassPrefix}-unsaved-message`]: {
+            color: palette.warning.main
         }
-    },
-    [`& .${StyleClassPrefix}-unsaved-message`]: {
-        color: theme.palette.warning.main
-    },
-} as SystemStyleObject<Theme>);
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const MasterServantsRoute = React.memo(() => {
 
-    useNavigationDrawerNoAnimations();
+    // useNavigationDrawerNoAnimations();
 
     const forceUpdate = useForceUpdate();
 
@@ -164,18 +184,19 @@ export const MasterServantsRoute = React.memo(() => {
     // TODO No way to toggle this right now...
     const [showAppendSkills,] = useState<boolean>(true);
 
-    const { sm, md, lg, xl } = useActiveBreakpoints();
+    const { sm, md } = useActiveBreakpoints();
 
+    // TODO Make this user configurable...
     const visibleColumns = useMemo((): MasterServantListVisibleColumns => ({
-        npLevel: lg,
+        npLevel: sm,
         level: sm,
-        bondLevel: xl,
-        fouHp: lg,
-        fouAtk: lg,
+        bondLevel: sm,
+        fouHp: sm,
+        fouAtk: sm,
         skills: sm,
         appendSkills: sm && showAppendSkills,
         actions: false
-    }), [showAppendSkills, sm, lg, xl]);
+    }), [showAppendSkills, sm]);
 
     /**
      * The selected servants.
@@ -678,12 +699,7 @@ export const MasterServantsRoute = React.memo(() => {
                     onEditSelectedServants={handleEditSelectedServants}
                 />
                 <div className={`${StyleClassPrefix}-main-content`}>
-                    <LayoutContentSection
-                        className='py-4 pr-4 flex-fill'
-                        autoContentHeight
-                        layout='column'
-                        scrollbarTrackBorder
-                    >
+                    <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <MasterServantList
                             masterServants={dragDropMasterServants || masterServants}
                             bondLevels={bondLevels}
@@ -697,22 +713,16 @@ export const MasterServantsRoute = React.memo(() => {
                             onEditServant={handleEditServant}
                             onDeleteServant={handleDeleteServant}
                         />
-                    </LayoutContentSection>
+                    </div>
                     {md && <div className={`${StyleClassPrefix}-info-panel-container`}>
-                        <LayoutContentSection
-                            autoContentHeight
-                            fullHeight
-                            layout='column'
-                        >
-                            <MasterServantsInfoPanel
-                                activeServants={selectedServants}
-                                bondLevels={bondLevels}
-                                unlockedCostumes={unlockedCostumes}
-                                showAppendSkills={showAppendSkills}
-                                // editMode={editMode}
-                                onStatsChange={handleFormChange}
-                            />
-                        </LayoutContentSection>
+                        <MasterServantsInfoPanel
+                            activeServants={selectedServants}
+                            bondLevels={bondLevels}
+                            unlockedCostumes={unlockedCostumes}
+                            showAppendSkills={showAppendSkills}
+                            // editMode={editMode}
+                            onStatsChange={handleFormChange}
+                        />
                     </div>}
                 </div>
             </div>

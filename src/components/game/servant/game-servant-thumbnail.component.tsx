@@ -2,7 +2,8 @@ import { GameServant } from '@fgo-planner/types';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import { Avatar, AvatarProps } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { styled, SystemStyleObject, Theme } from '@mui/system';
+import { CSSProperties } from '@mui/styles';
+import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEventHandler, useMemo } from 'react';
 import { Link } from 'react-router-dom';
@@ -36,27 +37,27 @@ const DefaultSize = 56;
 
 export const StyleClassPrefix = 'GameServantThumbnail';
 
-type ContainerProps = {
+type RootComponentProps = {
     renderNewTabIndicator?: boolean;
     size: string | number;
 };
 
+const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
+    prop !== 'size' &&
+    prop !== 'renderNewTabIndicator'
+);
+
 const ContainerStyleOptions = {
     skipSx: true,
-    shouldForwardProp: ((prop: string) => (
-        prop !== 'size' &&
-        prop !== 'renderNewTabIndicator'
-    )) as unknown
-} as FilteringStyledOptions<ContainerProps>;
+    skipVariantsResolver: true,
+    shouldForwardProp
+} as MuiStyledOptions & FilteringStyledOptions<RootComponentProps>;
 
-const Container = styled('div', ContainerStyleOptions)<ContainerProps>(props => {
+const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
 
-    const {
-        renderNewTabIndicator,
-        size
-    } = props;
+    const { size } = props;
 
-    let style = {
+    return {
         width: size,
         height: size,
         '& .MuiAvatar-root': {
@@ -66,37 +67,49 @@ const Container = styled('div', ContainerStyleOptions)<ContainerProps>(props => 
                 filter: 'grayscale(1.0) contrast(0.69) brightness(0.69)'
             }
         }
-    } as SystemStyleObject<Theme>;
+    } as CSSProperties;
+};
 
-    if (renderNewTabIndicator) {
-        style = {
-            ...style,
-            '& .new-tab-indicator': {
-                height: 0,
-                '&>div': {
-                    height: size,
-                    width: size,
-                    position: 'relative',
-                    top: -size,
-                    display: 'none',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white'
-                }
-            },
-            '&:hover': {
-                '& .MuiAvatar-root>img': {
-                    filter: 'contrast(0.86) brightness(0.86)'
-                },
-                '& .new-tab-indicator>div': {
-                    display: 'flex'
-                }
-            }
-        };
+const NewTabIndicatorStyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
+
+    const {
+        renderNewTabIndicator,
+        size
+    } = props;
+
+    if (!renderNewTabIndicator) {
+        return;
     }
 
-    return style as any;
-});
+    return {
+        [`& .${StyleClassPrefix}-new-tab-indicator`]: {
+            height: 0,
+            '&>div': {
+                height: size,
+                width: size,
+                position: 'relative',
+                top: -size,
+                display: 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white'
+            }
+        },
+        '&:hover': {
+            '& .MuiAvatar-root>img': {
+                filter: 'contrast(0.86) brightness(0.86)'
+            },
+            [`& .${StyleClassPrefix}-new-tab-indicator>div`]: {
+                display: 'flex'
+            }
+        }
+    } as CSSProperties;
+};
+
+const RootComponent = styled('div', ContainerStyleOptions)<RootComponentProps>(
+    StyleProps,
+    NewTabIndicatorStyleProps
+);
 
 export const GameServantThumbnail = React.memo((props: Props) => {
 
@@ -133,7 +146,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
     );
 
     if (!enableLink) {
-        return <Container size={size}>{avatar}</Container>;
+        return <RootComponent size={size}>{avatar}</RootComponent>;
     }
 
     const href = `/resources/servants/${servantId}`;
@@ -142,7 +155,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
     const renderNewTabIndicator = openLinkInNewTab && showOpenInNewTabIndicator;
 
     return (
-        <Container
+        <RootComponent
             className={`${StyleClassPrefix}-root`}
             size={size}
             onClick={onClick}
@@ -151,14 +164,14 @@ export const GameServantThumbnail = React.memo((props: Props) => {
             <Link to={href} target={target}>
                 {avatar}
                 {renderNewTabIndicator &&
-                    <div className='new-tab-indicator'>
+                    <div className={`${StyleClassPrefix}-new-tab-indicator`}>
                         <div>
                             <OpenInNewIcon />
                         </div>
                     </div>
                 }
             </Link>
-        </Container>
+        </RootComponent>
     );
 
 });

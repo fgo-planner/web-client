@@ -11,8 +11,6 @@ type Props = PropsWithChildren<{
 export const StyleClassPrefix = 'LayoutPanel';
 
 const StyleOptions = {
-    name: StyleClassPrefix,
-    slot: 'root',
     skipSx: true,
     skipVariantsResolver: true
 } as MuiStyledOptions & FilteringStyledOptions<Props>;

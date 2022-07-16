@@ -6,7 +6,7 @@ export type MasterServantUpdateIndeterminate = Indeterminate;
 
 export const MasterServantUpdateIndeterminateValue: Indeterminate = 'indeterminate';
 
-type MasterServantUpdateBase = {
+type BaseMasterServantUpdate = {
 
     /**
      * Whether this data represents a new servant that is being added.
@@ -93,7 +93,7 @@ type MasterServantUpdateBase = {
 
 };
 
-export type MasterServantUpdateNew = MasterServantUpdateBase & {
+export type NewMasterServantUpdate = BaseMasterServantUpdate & {
     readonly isNewServant: true;
     /**
      * The ID of the servant that is being added.
@@ -101,7 +101,7 @@ export type MasterServantUpdateNew = MasterServantUpdateBase & {
     gameId: number;
 };
 
-export type MasterServantUpdateExisting = MasterServantUpdateBase & {
+export type ExistingMasterServantUpdate = BaseMasterServantUpdate & {
     readonly isNewServant: false;
     /**
      * The ID of the servant that is being added. Supports indeterminate value when
@@ -119,4 +119,4 @@ export type MasterServantUpdateExisting = MasterServantUpdateBase & {
  * Data conversion between the update payload and master servant (and related
  * data) is handled by the `MasterServantUpdateUtils` class. 
  */
-export type MasterServantUpdate = MasterServantUpdateNew | MasterServantUpdateExisting;
+export type MasterServantUpdate = NewMasterServantUpdate | ExistingMasterServantUpdate;

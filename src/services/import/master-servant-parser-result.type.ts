@@ -1,7 +1,7 @@
-import { MasterServantUpdateNew } from '../../types/internal';
+import { NewMasterServantUpdate } from '../../types/internal';
 
 export type MasterServantParserResult = {
-    servantUpdates: Array<MasterServantUpdateNew>;
+    servantUpdates: Array<NewMasterServantUpdate>;
     errors: Array<string>;
     warnings: Array<string>;
 };

@@ -1,38 +1,33 @@
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Link, Tooltip } from '@mui/material';
+import { GameServantClass, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
+import { IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
 import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
-import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
 import { DataPointListItem } from '../../../../components/list/data-point-list-item.component';
+import { GameServantConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../types/data';
 import { Immutable } from '../../../../types/internal';
 import { ComputationOptions, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
-import { Theme } from '@mui/material';
 
 type Props = {
     activeServants: Array<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel>;
-    unlockedCostumes: Array<number>;
-    showAppendSkills?: boolean;
     editMode?: boolean;
+    keepChildrenMounted?: boolean;
+    onOpenToggle: () => void;
     onStatsChange?: (data: any) => void;
+    open?: boolean;
+    statsOptions?: ComputationOptions;
+    unlockedCostumes: Array<number>;
 };
 
 // const FormId = 'master-servant-info-panel-form';
-
-const generateComputationOptions = (showAppendSkills: boolean, includeLores: boolean): ComputationOptions => ({
-    includeAscensions: true,
-    includeSkills: true,
-    includeAppendSkills: showAppendSkills,
-    includeCostumes: true,
-    excludeLores: !includeLores // TODO Add prop to toggle lores.
-});
 
 const hasDebt = (enhancementRequirements: EnhancementRequirements): boolean => {
     return enhancementRequirements.qp > 0;
@@ -92,21 +87,41 @@ const StyleClassPrefix = 'MasterServantInfoPanel';
 const StyleProps = (theme: SystemTheme) => {
 
     const {
-        palette
+        palette,
+        breakpoints,
+        spacing
     } = theme as Theme;
 
     return {
+        // backgroundColor: palette.background.paper,
+        width: spacing(90),  // 360px
         display: 'flex',
         flexDirection: 'column',
+        position: 'relative',
         height: '100%',
+        [`& .${StyleClassPrefix}-actions-container`]: {
+            // backgroundColor: palette.background.paper,
+            display: 'flex',
+            flexDirection: 'row-reverse',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            zIndex: 1,
+            '&>div': {
+                p: 1
+            }
+        },
         [`& .${StyleClassPrefix}-title`]: {
             backgroundColor: palette.background.paper,
+            position: 'absolute',
             display: 'flex',
             flexWrap: 'nowrap',
             alignItems: 'center',
             justifyContent: 'space-between',
-            px: 6,
+            width: '100%',
+            pl: 6,
+            pr: 14,
             py: 4,
+            boxSizing: 'border-box',
             [`& .${StyleClassPrefix}-servant-name`]: {
                 fontSize: '1.125rem',
                 fontWeight: 500,
@@ -132,17 +147,17 @@ const StyleProps = (theme: SystemTheme) => {
             fontStyle: 'italic',
             lineHeight: '32px'
         },
+        [`& .${StyleClassPrefix}-divider`]: {
+            borderBottomWidth: 1,
+            borderBottomStyle: 'solid',
+            borderBottomColor: palette.divider
+        },
         [`& .${StyleClassPrefix}-scroll-container`]: {
             backgroundColor: palette.background.paper,
             overflowY: 'auto',
             '>:last-child': {
                 px: 6,
                 pt: 4
-            },
-            [`& .${StyleClassPrefix}-divider`]: {
-                borderBottomWidth: 1,
-                borderBottomStyle: 'solid',
-                borderBottomColor: palette.divider,
             },
             [`& .${StyleClassPrefix}-servant-stats-container`]: {
                 px: 6,
@@ -188,8 +203,26 @@ const StyleProps = (theme: SystemTheme) => {
                     pt: 2
                 }
             }
+        },
+        [breakpoints.down('xl')]: {
+            width: spacing(80)  // 320px
+        },
+        [breakpoints.down('lg')]: {
+            width: spacing(75)  // 300px
+        },
+        [`&:not(.${StyleClassPrefix}-open)`]: {
+            width: spacing(14),  // 56px
+            [`& .${StyleClassPrefix}-actions-container`]: {
+                backgroundColor: 'initial',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                pt: 2
+            },
+            '&>:not(:first-of-type)': {
+                display: 'none'
+            }
         }
-
     } as SystemStyleObject<SystemTheme>;
 };
 
@@ -198,10 +231,13 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
     const {
         activeServants,
         bondLevels,
-        unlockedCostumes,
-        showAppendSkills,
         editMode,
-        onStatsChange
+        keepChildrenMounted,
+        onOpenToggle,
+        onStatsChange,
+        open,
+        statsOptions,
+        unlockedCostumes
     } = props;
 
     const gameItemMap = useGameItemMap();
@@ -209,8 +245,10 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
 
     const [selectedServantsEnhancementRequirements, setSelectedServantsEnhancementRequirements] = useState<EnhancementRequirements>();
 
+    const renderChildren = open || keepChildrenMounted;
+
     useEffect(() => {
-        if (!gameServantMap || !activeServants.length) {
+        if (!gameServantMap || !renderChildren || !activeServants.length) {
             setSelectedServantsEnhancementRequirements(undefined);
         } else {
             const results = [];
@@ -219,20 +257,21 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 if (!servant) {
                     continue;
                 }
-                // TODO Add way to toggle lores
-                const computationOptions = generateComputationOptions(!!showAppendSkills, false);
                 const result = PlanComputationUtils.computeServantEnhancementRequirements(
                     servant,
                     activeServant,
                     unlockedCostumes,
-                    computationOptions
+                    statsOptions
                 );
                 results.push(result);
             }
             setSelectedServantsEnhancementRequirements(PlanComputationUtils.sumEnhancementRequirements(results));
         }
-    }, [activeServants, gameServantMap, showAppendSkills, unlockedCostumes]);
+    }, [activeServants, gameServantMap, renderChildren, statsOptions, unlockedCostumes]);
 
+    /**
+     * For edit mode, currently unused.
+     */
     const handleStatsChange = useCallback((data: any): void => {
         if (!editMode || !gameServantMap || activeServants.length !== 1) {
             return;
@@ -258,21 +297,38 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
          */
         const servant = gameServantMap[gameId];
         if (servant) {
-            // TODO Add way to toggle lores
-            const computationOptions = generateComputationOptions(!!showAppendSkills, false);
             const result = PlanComputationUtils.computeServantEnhancementRequirements(
                 servant,
                 activeServant,
                 unlockedCostumes,
-                computationOptions
+                statsOptions
             );
             setSelectedServantsEnhancementRequirements(result);
         }
 
         onStatsChange && onStatsChange(data);
-    }, [activeServants, bondLevels, editMode, gameServantMap, onStatsChange, showAppendSkills, unlockedCostumes]);
+    }, [activeServants, bondLevels, editMode, gameServantMap, onStatsChange, statsOptions, unlockedCostumes]);
+
+    const actionButtonsNode: ReactNode = (
+        <div className={`${StyleClassPrefix}-actions-container`}>
+            <div>
+                <IconButton size='large' onClick={onOpenToggle}>
+                    {open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                </IconButton>
+            </div>
+            {/* Implement button to toggle edit mode */}
+            {/* <div>
+                <IconButton size='large'>
+                    <EditIcon />
+                </IconButton>
+            </div> */}
+        </div>
+    );
 
     const servantNameNode: ReactNode = useMemo(() => {
+        if (!renderChildren) {
+            return null;
+        }
         if (activeServants.length !== 1) {
             return (
                 <div className={`${StyleClassPrefix}-title`}>
@@ -294,24 +350,16 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 <div className={clsx(`${StyleClassPrefix}-servant-name`, 'truncate')}>
                     {servant.name}
                 </div>
-                <div className={`${StyleClassPrefix}-rarity-class-icon`}>
-                    <div>
-                        {`${servant.rarity} \u2605`}
-                    </div>
-                    <GameServantClassIcon
-                        servantClass={servant.class}
-                        rarity={servant.rarity}
-                    />
-                </div>
             </div>
         );
-    }, [activeServants, gameServantMap]);
+    }, [activeServants, gameServantMap, renderChildren]);
 
     const servantStatsNode: ReactNode = useMemo(() => {
-        if (activeServants.length !== 1) {
+        if (!gameServantMap || !renderChildren || activeServants.length !== 1) {
             return null;
         }
         const activeServant = activeServants[0];
+        const servant = gameServantMap[activeServant.gameId];
         // if (editMode) {
         //     return (
         //         <MasterServantEditForm
@@ -326,8 +374,20 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
         //         />
         //     );
         // } else {
-        return (
+        return <>
             <div className={`${StyleClassPrefix}-servant-stats-container`}>
+                <DataPointListItem
+                    className={`${StyleClassPrefix}-servant-stat`}
+                    label='Rarity'
+                    labelWidth={ServantStatLabelWidth}
+                    value={`${servant?.rarity || '\u2014'} \u2605`}
+                />
+                <DataPointListItem
+                    className={`${StyleClassPrefix}-servant-stat`}
+                    label='Class'
+                    labelWidth={ServantStatLabelWidth}
+                    value={GameServantConstants.ClassDisplayNameMap[servant?.class || GameServantClass.Unknown]}
+                />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Level'
@@ -352,14 +412,12 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                     labelWidth={ServantStatLabelWidth}
                     value={renderSkillLevels(activeServant, 'skills')}
                 />
-                {showAppendSkills &&
-                    <DataPointListItem
-                        className={`${StyleClassPrefix}-servant-stat`}
-                        label='Append Skills'
-                        labelWidth={ServantStatLabelWidth}
-                        value={renderSkillLevels(activeServant, 'appendSkills')}
-                    />
-                }
+                <DataPointListItem
+                    className={`${StyleClassPrefix}-servant-stat`}
+                    label='Append Skills'
+                    labelWidth={ServantStatLabelWidth}
+                    value={renderSkillLevels(activeServant, 'appendSkills')}
+                />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Noble Phantasm'
@@ -373,12 +431,13 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                     value={renderBondLevel(bondLevels[activeServant.gameId])}
                 />
             </div>
-        );
+            <div className={`${StyleClassPrefix}-divider`} />
+        </>;
         // }
-    }, [activeServants, bondLevels, editMode, handleStatsChange, showAppendSkills, unlockedCostumes]);
+    }, [activeServants, bondLevels, gameServantMap, renderChildren]);
 
     const servantMaterialDebtNode: ReactNode = useMemo(() => {
-        if (!selectedServantsEnhancementRequirements || !gameItemMap) {
+        if (!gameItemMap || !renderChildren || !selectedServantsEnhancementRequirements) {
             return null;
         }
 
@@ -454,10 +513,10 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 </div>
             </div>
         );
-    }, [gameItemMap, selectedServantsEnhancementRequirements]);
+    }, [gameItemMap, renderChildren, selectedServantsEnhancementRequirements]);
 
     const servantLinksNode: ReactNode = useMemo(() => {
-        if (activeServants.length !== 1) {
+        if (!renderChildren || activeServants.length !== 1) {
             return null;
         }
         const activeServant = activeServants[0];
@@ -480,7 +539,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 ))}
             </div>
         );
-    }, [activeServants, gameServantMap]);
+    }, [activeServants, gameServantMap, renderChildren]);
 
     const scrollContainerNode: ReactNode = useMemo(() => {
         if (!servantMaterialDebtNode) {
@@ -489,7 +548,6 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
         return (
             <div className={`${StyleClassPrefix}-scroll-container`}>
                 {servantStatsNode}
-                <div className={`${StyleClassPrefix}-divider`} />
                 <div>
                     {servantMaterialDebtNode}
                     {servantLinksNode}
@@ -498,11 +556,19 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
         );
     }, [servantLinksNode, servantMaterialDebtNode, servantStatsNode]);
 
+    const className = clsx(
+        `${StyleClassPrefix}-root`,
+        ThemeConstants.ClassScrollbarTrackBorder,
+        open && `${StyleClassPrefix}-open`
+    );
+
     return (
-        <Box className={clsx(`${StyleClassPrefix}-root`, ThemeConstants.ClassScrollbarTrackBorder)} sx={StyleProps}>
+        <Box className={className} sx={StyleProps}>
+            {actionButtonsNode}
             {servantNameNode}
             {scrollContainerNode}
+            <div className={`${StyleClassPrefix}-divider`} />
         </Box>
     );
-    
+
 });

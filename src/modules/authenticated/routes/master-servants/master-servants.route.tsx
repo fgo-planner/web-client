@@ -14,6 +14,7 @@ import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { Immutable, MasterServantUpdate, ModalOnCloseReason, Nullable } from '../../../../types/internal';
+import { Functions } from '../../../../utils/functions';
 import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SetUtils } from '../../../../utils/set.utils';
@@ -91,11 +92,10 @@ const StyleProps = (theme: SystemTheme) => {
                 }
             },
             [`& .${StyleClassPrefix}-info-panel-container`]: {
-                width: 320,
                 height: '100%',
                 boxSizing: 'border-box',
-                [breakpoints.down('xl')]: {
-                    width: 300
+                [breakpoints.down('md')]: {
+                    display: 'none'
                 }
             },
         },
@@ -145,6 +145,11 @@ export const MasterServantsRoute = React.memo(() => {
      * The anchor coordinates for the servant context menu.
      */
     const [servantContextMenuPosition, setServantContextMenuPosition] = useState<{ x: number, y: number }>();
+
+    /**
+     * Whether the info panel is open (expanded).
+     */
+    const [isInfoPanelOpen, setIsInfoPanelOpen] = useState<boolean>(true);
 
     /**
      * Whether the multi-add servant dialog is open.
@@ -594,6 +599,15 @@ export const MasterServantsRoute = React.memo(() => {
 
     //#region Common event handlers
 
+    const handleToggleInfoPanelOpen = useCallback(() => {
+        setIsInfoPanelOpen(Functions.toggleTruthy);
+    }, []);
+
+    //#endregion
+
+
+    //#region Common event handlers
+
     const handleAddServant = openAddServantDialog;
 
     const handleEditSelectedServants = openEditServantDialog;
@@ -714,16 +728,18 @@ export const MasterServantsRoute = React.memo(() => {
                             onDeleteServant={handleDeleteServant}
                         />
                     </div>
-                    {md && <div className={`${StyleClassPrefix}-info-panel-container`}>
+                    <div className={`${StyleClassPrefix}-info-panel-container`}>
                         <MasterServantsInfoPanel
+                            keepChildrenMounted  // TODO Change this to false for mobile view, also make it user configurable.
                             activeServants={selectedServants}
                             bondLevels={bondLevels}
                             unlockedCostumes={unlockedCostumes}
-                            showAppendSkills={showAppendSkills}
                             // editMode={editMode}
-                            onStatsChange={handleFormChange}
+                            onStatsChange={handleFormChange}  // This currently doesn't do anything
+                            open={isInfoPanelOpen && md}
+                            onOpenToggle={handleToggleInfoPanelOpen}
                         />
-                    </div>}
+                    </div>
                 </div>
             </div>
             <MasterServantsEditDialog

@@ -1,6 +1,6 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
-import { MasterServantUpdate, MasterServantUpdateExisting, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateNew, ReadonlyRecord } from '../../types/internal';
+import { MasterServantUpdate, ExistingMasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue, NewMasterServantUpdate, ReadonlyRecord } from '../../types/internal';
 import { MasterServantUtils } from './master-servant.utils';
 
 export class MasterServantUpdateUtils {
@@ -46,19 +46,19 @@ export class MasterServantUpdateUtils {
         masterServant: MasterServant,
         bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
         unlockedCostumes: Array<number>
-    ): MasterServantUpdateExisting;
+    ): ExistingMasterServantUpdate;
 
     static convertToUpdatePayload(
         masterServants: Array<MasterServant>,
         bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
         unlockedCostumes: Array<number>
-    ): MasterServantUpdateExisting;
+    ): ExistingMasterServantUpdate;
 
     static convertToUpdatePayload(
         data: Array<MasterServant> | MasterServant,
         bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
         unlockedCostumes: Array<number>
-    ): MasterServantUpdateExisting {
+    ): ExistingMasterServantUpdate {
         if (Array.isArray(data)) {
             return this._convertToUpdatePayloadForMultiple(data, bondLevels, unlockedCostumes);
         }
@@ -69,7 +69,7 @@ export class MasterServantUpdateUtils {
         masterServant: MasterServant,
         bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
         unlockedCostumes: Array<number>
-    ): MasterServantUpdateExisting {
+    ): ExistingMasterServantUpdate {
 
         const {
             gameId,
@@ -105,7 +105,7 @@ export class MasterServantUpdateUtils {
         masterServants: Array<MasterServant>,
         bondLevels: ReadonlyRecord<number, MasterServantBondLevel>,
         unlockedCostumes: Array<number>
-    ): MasterServantUpdateExisting {
+    ): ExistingMasterServantUpdate {
 
         /*
          * Edge cases
@@ -296,7 +296,7 @@ export class MasterServantUpdateUtils {
          * gameId is only present for new servants.
          */
         if (isNewServant) {
-            target.gameId = (masterServantUpdate as MasterServantUpdateNew).gameId;
+            target.gameId = (masterServantUpdate as NewMasterServantUpdate).gameId;
         }
         if (summoned !== IndeterminateValue) {
             target.summoned = summoned;
@@ -349,11 +349,11 @@ export class MasterServantUpdateUtils {
     //#endregion
 
 
-    //#region Bulk apply from update payloads (currently used for data import)
+    //#region Batch apply from update payloads (currently used for data import)
 
-    static bulkApplyFromUpdatePayloads(
+    static batchApplyFromUpdatePayloads(
         masterServants: Array<MasterServant>,
-        servantUpdates: Array<MasterServantUpdateNew>,
+        servantUpdates: Array<NewMasterServantUpdate>,
         bondLevels: Record<number, MasterServantBondLevel>,
         // unlockedCostumes: Array<number>
     ): void {

@@ -4,7 +4,7 @@ import { parse } from 'csv-parse/sync';
 import { parse as parseDate } from 'date-fns';
 import { GameServantConstants } from '../../../constants';
 import { GameServantList } from '../../../types/data';
-import { Array2D, Immutable, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateNew, ReadonlyRecord } from '../../../types/internal';
+import { Array2D, Immutable, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue, NewMasterServantUpdate, ReadonlyRecord } from '../../../types/internal';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { MathUtils } from '../../../utils/math.utils';
 import { BaseMasterServantParser } from '../base-master-servant-parser';
@@ -127,7 +127,7 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
         throw Error(`Column '${columnName} could not be found.`);
     }
 
-    private _parseCurrentRow(): MasterServantUpdateNew {
+    private _parseCurrentRow(): NewMasterServantUpdate {
 
         const gameServant = this._parseGameServant();
         const gameId = gameServant._id;
@@ -156,7 +156,11 @@ export class FgoManagerMasterServantParser extends BaseMasterServantParser<strin
                 2: skill2,
                 3: skill3
             },
-            appendSkills: {},
+            appendSkills: {
+                1: IndeterminateValue,
+                2: IndeterminateValue,
+                3: IndeterminateValue
+            },
             bondLevel
         };
     }

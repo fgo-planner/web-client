@@ -1,17 +1,18 @@
 import { GameSoundtrack } from '@fgo-planner/types';
-import { alpha, Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { ReactNode, useCallback, useMemo } from 'react';
+import { Theme } from '@mui/material';
+import { alpha, Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import React, { ReactNode, useMemo } from 'react';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
-import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { GameSoundtrackList } from '../../../../types/data';
 import { Nullable } from '../../../../types/internal';
+import { MasterSoundtracksListHeader } from './master-soundtracks-list-header.component';
 import { MasterSoundtracksListRow, StyleClassPrefix as MasterSoundtracksListRowStyleClassPrefix } from './master-soundtracks-list-row.component';
 
 type Props = {
-    unlockedSoundtracksSet: Set<number>;
-    playingId?: number;
-    editMode?: boolean;
+    onChange: (soundtrackId: number, unlocked: boolean) => void;
     onPlayButtonClick?: (soundtrack: GameSoundtrack, action: 'play' | 'pause') => void;
+    playingId?: number;
+    unlockedSoundtracks: ReadonlySet<number>;
 };
 
 /**
@@ -34,52 +35,73 @@ const sortByPriority = (gameSoundtrackList: Nullable<GameSoundtrackList>): GameS
 
 const StyleClassPrefix = 'MasterSoundtracksList';
 
-const StyleProps = {
-    pb: 20,
-    [`& .${MasterSoundtracksListRowStyleClassPrefix}-root`]: {
-        height: 52,
-        display: 'flex',
-        alignItems: 'center',
-        fontSize: '0.875rem',
-        '&:not(:hover) .play-icon': {
-            opacity: 0
-        },
-        [`& .${MasterSoundtracksListRowStyleClassPrefix}-unlocked-status`]: {
-            width: 42,
-            px: 2,
-            textAlign: 'center',
-        },
-        [`& .${MasterSoundtracksListRowStyleClassPrefix}-thumbnail`]: {
-            width: 96,
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        breakpoints,
+        palette,
+        spacing
+    } = theme as Theme;
+
+    return {
+        backgroundColor: palette.background.paper,
+        height: '100%',
+        overflow: 'auto',
+        [`& .${StyleClassPrefix}-list-container`]: {
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: alpha('#ffffff', 0.69),
-            mr: 6
-        },
-        [`& .${MasterSoundtracksListRowStyleClassPrefix}-title`]: {
-            flex: '1 1'
-        },
-        [`& .${MasterSoundtracksListRowStyleClassPrefix}-unlocked-icon`]: {
-            color: 'limegreen'
-        },
-        [`& .${MasterSoundtracksListRowStyleClassPrefix}-play-button`]: {
-            width: 48,
-            pr: 24,
-            pl: 4
+            flexDirection: 'column',
+            [`& .${MasterSoundtracksListRowStyleClassPrefix}-root`]: {
+                height: 52,
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: '0.875rem',
+                '&:not(:hover) .play-icon': {
+                    opacity: 0
+                },
+                [`& .${MasterSoundtracksListRowStyleClassPrefix}-unlocked-status`]: {
+                    width: 42,
+                    px: 2,
+                    textAlign: 'center',
+                },
+                [`& .${MasterSoundtracksListRowStyleClassPrefix}-thumbnail`]: {
+                    width: 96,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: alpha('#ffffff', 0.69),
+                    mr: 6,
+                    [breakpoints.down('sm')]: {
+                        display: 'none'
+                    }
+                },
+                [`& .${MasterSoundtracksListRowStyleClassPrefix}-play-button`]: {
+                    width: spacing(14)  // 56px
+                },
+                [`& .${MasterSoundtracksListRowStyleClassPrefix}-title`]: {
+                    flex: '1 1'
+                },
+                [`& .${MasterSoundtracksListRowStyleClassPrefix}-unlock-material`]: {
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    minWidth: spacing(20),  // 80px
+                    pr: 8,
+                    [breakpoints.down('sm')]: {
+                        pr: 6
+                    }
+                }
+            }
         }
-    }
-} as SystemStyleObject<Theme>;
+    } as SystemStyleObject<SystemTheme>;
+};
+
 
 export const MasterSoundtracksList = React.memo((props: Props) => {
 
-    const forceUpdate = useForceUpdate();
-
     const {
-        unlockedSoundtracksSet,
+        onChange,
+        onPlayButtonClick,
         playingId,
-        editMode,
-        onPlayButtonClick
+        unlockedSoundtracks
     } = props;
 
     const gameSoundtrackList = useGameSoundtrackList();
@@ -88,43 +110,34 @@ export const MasterSoundtracksList = React.memo((props: Props) => {
         return sortByPriority(gameSoundtrackList);
     }, [gameSoundtrackList]);
 
-    const handleUnlockToggle = useCallback((id: number, value: boolean) => {
-        if (value) {
-            if (!unlockedSoundtracksSet.has(id)) {
-                unlockedSoundtracksSet.add(id);
-                forceUpdate();
-            }
-        } else {
-            if (unlockedSoundtracksSet.has(id)) {
-                unlockedSoundtracksSet.delete(id);
-                forceUpdate();
-            }
-        }
-    }, [unlockedSoundtracksSet, forceUpdate]);
-
+    /*
+     * This can be empty during the initial render.
+     */
     if (!gameSoundtrackSortedList.length) {
         return null;
     }
 
     const renderSoundtrackRow = (soundtrack: GameSoundtrack): ReactNode => {
         const soundtrackId = soundtrack._id;
-        const unlocked = unlockedSoundtracksSet.has(soundtrackId) || !soundtrack.material;
+        const unlocked = unlockedSoundtracks.has(soundtrackId);
         return (
             <MasterSoundtracksListRow
                 key={soundtrackId}
                 soundtrack={soundtrack}
                 playing={soundtrackId === playingId}
-                editMode={editMode}
                 unlocked={unlocked}
                 onPlayButtonClick={onPlayButtonClick}
-                onUnlockToggle={handleUnlockToggle}
+                onChange={onChange}
             />
         );
     };
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            {gameSoundtrackSortedList.map(renderSoundtrackRow)}
+            <div className={`${StyleClassPrefix}-list-container`}>
+                <MasterSoundtracksListHeader />
+                {gameSoundtrackSortedList.map(renderSoundtrackRow)}
+            </div>
         </Box>
     );
 

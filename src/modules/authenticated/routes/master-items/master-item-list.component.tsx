@@ -79,7 +79,7 @@ const StyleProps = (theme: SystemTheme) => {
             alignContent: 'center',
             alignItems: 'center',
             height: 52,
-            pl: 4,
+            pl: 3,
             pr: 8,
             py: 0,
             fontSize: '0.875rem',
@@ -91,6 +91,9 @@ const StyleProps = (theme: SystemTheme) => {
             },
             '& .MuiInputBase-input': {
                 width: '8rem'
+            },
+            [breakpoints.down('sm')]: {
+                pr: 6
             }
         }
     } as SystemStyleObject<SystemTheme>;

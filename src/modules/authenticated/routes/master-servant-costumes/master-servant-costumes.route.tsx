@@ -1,180 +1,86 @@
-import { MasterAccount } from '@fgo-planner/types';
-import { Clear as ClearIcon, Edit as EditIcon, FormatListBulleted as FormatListBulletedIcon, Save as SaveIcon } from '@mui/icons-material';
-import { Fab, IconButton, Tooltip } from '@mui/material';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
-import { PageTitle } from '../../../../components/text/page-title.component';
-import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
-import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { Nullable } from '../../../../types/internal';
-import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import clsx from 'clsx';
+import React, { useCallback, useState } from 'react';
+import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
+import { ThemeConstants } from '../../../../styles/theme-constants';
+import { useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterServantCostumesList } from './master-servant-costumes-list.component';
 
-const getUnlockedCostumeSetFromMasterAccount = (account: Nullable<MasterAccount>): Set<number> => {
-    if (!account) {
-        return new Set();
+const StyleClassPrefix = 'MasterCostumes';
+
+const StyleProps = {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    [`& .${StyleClassPrefix}-main-content`]: {
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        [`& .${StyleClassPrefix}-list-container`]: {
+            flex: 1,
+            overflow: 'hidden'
+        }
     }
-    return new Set(account.costumes);
-};
+} as SystemStyleObject<SystemTheme>;
 
 export const MasterServantCostumesRoute = React.memo(() => {
 
     const {
-        invokeLoadingIndicator,
-        resetLoadingIndicator,
-        isLoadingIndicatorActive
-    } = useLoadingIndicator();
+        isDataDirty,
+        masterAccountEditData,
+        updateCostumes,
+        revertChanges,
+        persistChanges
+    } = useMasterAccountDataEditHook({ includeCostumes: true });
 
-    const masterAccountService = useInjectable(MasterAccountService);
+    const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-    const [unlockedCostumesSet, setUnlockedCostumesSet] = useState<Set<number>>(new Set());
-    const [editMode, setEditMode] = useState<boolean>(false);
-
-    /*
-     * Master account change subscription.
-     */
-    useEffect(() => {
-        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
-            .subscribe(account => {
-                const unlockedCostumesSet = getUnlockedCostumeSetFromMasterAccount(account);
-                setMasterAccount(account);
-                setUnlockedCostumesSet(unlockedCostumesSet);
-                setEditMode(false);
-            });
-
-        return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, []);
-
-    const handleEditButtonClick = useCallback((): void => {
-        setEditMode(true);
-    }, []);
+    const handleCostumeChange = useCallback((costumeId: number, unlocked: boolean): void => {
+        let updatedCostumes: Array<number>;
+        if (unlocked) {
+            updatedCostumes = [...masterAccountEditData.costumes, costumeId];
+        } else {
+            updatedCostumes = [...masterAccountEditData.costumes].filter(id => id !== costumeId);
+        }
+        updateCostumes(updatedCostumes);
+    }, [masterAccountEditData, updateCostumes]);
 
     const handleSaveButtonClick = useCallback(async (): Promise<void> => {
-        const masterAccountId = masterAccount?._id;
-        if (!masterAccountId) {
-            return;
-        }
-        invokeLoadingIndicator();
-
-        const update = {
-            _id: masterAccountId,
-            costumes: [...unlockedCostumesSet]
-        };
+        setAwaitingRequest(true);
         try {
-            await masterAccountService.updateAccount(update);
+            await persistChanges();
+            setAwaitingRequest(false);
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);
-            const unlockedCostumesSet = getUnlockedCostumeSetFromMasterAccount(masterAccount);
-            setUnlockedCostumesSet(unlockedCostumesSet);
-            setEditMode(false);
+            setAwaitingRequest(false);
+            revertChanges();
         }
-        resetLoadingIndicator();
+    }, [persistChanges, revertChanges]);
 
-    }, [invokeLoadingIndicator, masterAccount, masterAccountService, resetLoadingIndicator, unlockedCostumesSet]);
-
-    const handleCancelButtonClick = useCallback((): void => {
-        // Re-clone data from master account
-        const unlockedCostumesSet = getUnlockedCostumeSetFromMasterAccount(masterAccount);
-        setUnlockedCostumesSet(unlockedCostumesSet);
-        setEditMode(false);
-    }, [masterAccount]);
-
-    /**
-     * NavigationRail children
-     */
-    const navigationRailChildNodes: ReactNode = (
-        <Tooltip key='servants' title='Back to servant list' placement='right'>
-            <div>
-                <IconButton
-                    component={Link}
-                    to='../master/servants'
-                    children={<FormatListBulletedIcon />}
-                    size='large' />
-            </div>
-        </Tooltip>
-    );
-
-    /**
-     * FabContainer children
-     */
-    let fabContainerChildNodes: ReactNode;
-    if (!editMode) {
-        fabContainerChildNodes = (
-            <Tooltip key='edit' title='Edit'>
-                <div>
-                    <Fab
-                        color='primary'
-                        onClick={handleEditButtonClick}
-                        disabled={isLoadingIndicatorActive}
-                        children={<EditIcon />}
-                    />
-                </div>
-            </Tooltip>
-        );
-    } else {
-        fabContainerChildNodes = [
-            <Tooltip key='cancel' title='Cancel'>
-                <div>
-                    <Fab
-                        color='default'
-                        onClick={handleCancelButtonClick}
-                        disabled={isLoadingIndicatorActive}
-                        children={<ClearIcon />}
-                    />
-                </div>
-            </Tooltip>,
-            <Tooltip key='save' title='Save'>
-                <div>
-                    <Fab
-                        color='primary'
-                        onClick={handleSaveButtonClick}
-                        disabled={isLoadingIndicatorActive}
-                        children={<SaveIcon />}
-                    />
-                </div>
-            </Tooltip>
-        ];
-    }
+    const handleRevertButtonClick = useCallback((): void => {
+        revertChanges();
+    }, [revertChanges]);
 
     return (
-        <div className='flex column full-height'>
-            <PageTitle>
-                {editMode ?
-                    'Edit Unlocked Costumes' :
-                    'Unlocked Costumes'
-                }
-            </PageTitle>
-            <div className='flex overflow-hidden'>
-                <NavigationRail children={navigationRailChildNodes} />
-                <div className='flex flex-fill' style={{ maxWidth: 'calc(100% - 56px)' }}>
-                    <LayoutContentSection
-                        className='py-4 pr-4 flex-fill'
-                        fullHeight
-                        scrollbarTrackBorder
-                    >
-                        <div className='flex column full-height'>
-                            <MasterServantCostumesListHeader />
-                            <div className='overflow-auto'>
-                                <MasterServantCostumesList
-                                    unlockedCostumesSet={unlockedCostumesSet}
-                                    editMode={editMode}
-                                />
-                            </div>
-                        </div>
-                    </LayoutContentSection>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <RouteDataEditControls
+                title='Unlocked Costumes'
+                hasUnsavedData={isDataDirty}
+                onSaveButtonClick={handleSaveButtonClick}
+                onRevertButtonClick={handleRevertButtonClick}
+                disabled={awaitingRequest}
+            />
+            <div className={`${StyleClassPrefix}-main-content`}>
+                <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
+                    <MasterServantCostumesList
+                        unlockedCostumes={masterAccountEditData.costumes}
+                        onChange={handleCostumeChange}
+                    />
                 </div>
             </div>
-            <FabContainer children={fabContainerChildNodes} />
-        </div >
+        </Box>
     );
 
 });

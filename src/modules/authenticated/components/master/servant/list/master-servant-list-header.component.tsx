@@ -16,9 +16,7 @@ export const StyleClassPrefix = 'MasterServantListHeader';
 
 const StyleProps = (theme: SystemTheme) => {
 
-    const {
-        palette
-    } = theme as Theme;
+    const { palette } = theme as Theme;
 
     return {
         position: 'sticky',
@@ -38,7 +36,7 @@ const StyleProps = (theme: SystemTheme) => {
             fontFamily: ThemeConstants.FontFamilyGoogleSans,
             fontWeight: 500,
             textAlign: 'center',
-            fontSize: '0.875rem',
+            fontSize: '0.9375rem',
             '&.drag-drop-mode': {
                 pl: 10
             },

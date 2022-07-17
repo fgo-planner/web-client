@@ -13,7 +13,7 @@ export const MasterItemListRowLabel = React.memo(({ gameItem }: Props) => (
     <>
         <GameItemThumbnail
             gameItem={gameItem}
-            size={42}
+            size={52}
             showBackground
             enableLink
             openLinkInNewTab

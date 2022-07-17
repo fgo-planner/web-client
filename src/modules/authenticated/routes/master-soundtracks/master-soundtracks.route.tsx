@@ -1,60 +1,51 @@
-import { GameSoundtrack, MasterAccount } from '@fgo-planner/types';
-import { Clear as ClearIcon, Edit as EditIcon, Save as SaveIcon } from '@mui/icons-material';
-import { Fab, Tooltip } from '@mui/material';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { PageTitle } from '../../../../components/text/page-title.component';
+import { GameSoundtrack } from '@fgo-planner/types';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import clsx from 'clsx';
+import React, { useCallback, useEffect, useState } from 'react';
+import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { SoundtrackPlayerService } from '../../../../services/audio/soundtrack-player.service';
-import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { Nullable } from '../../../../types/internal';
+import { ThemeConstants } from '../../../../styles/theme-constants';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { MasterSoundtracksListHeader } from './master-soundtracks-list-header.component';
+import { useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterSoundtracksList } from './master-soundtracks-list.component';
 
-const getUnlockedSoundtracksSetFromMasterAccount = (account: Nullable<MasterAccount>): Set<number> => {
-    if (!account) {
-        return new Set();
+const StyleClassPrefix = 'MasterSoundtracks';
+
+const StyleProps = {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    [`& .${StyleClassPrefix}-main-content`]: {
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        [`& .${StyleClassPrefix}-list-container`]: {
+            flex: 1,
+            overflow: 'hidden'
+        }
     }
-    return new Set(account.soundtracks);
-};
+} as SystemStyleObject<SystemTheme>;
 
 export const MasterSoundtracksRoute = React.memo(() => {
 
     const {
-        invokeLoadingIndicator,
-        resetLoadingIndicator,
-        isLoadingIndicatorActive
-    } = useLoadingIndicator();
+        isDataDirty,
+        masterAccountEditData,
+        updateSoundtracks,
+        revertChanges,
+        persistChanges
+    } = useMasterAccountDataEditHook({ includeSoundtracks: true });
 
     const backgroundMusicService = useInjectable(BackgroundMusicService);
-    const masterAccountService = useInjectable(MasterAccountService);
     const soundtrackPlayerService = useInjectable(SoundtrackPlayerService);
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-    const [unlockedSoundtracksSet, setUnlockedSoundtracksSet] = useState<Set<number>>(new Set());
+    const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
+
     const [playingId, setPlayingId] = useState<number>();
-    const [editMode, setEditMode] = useState<boolean>(false);
-
-    /*
-     * Master account change subscription.
-     */
-    useEffect(() => {
-        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
-            .subscribe(account => {
-                const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(account);
-                setMasterAccount(account);
-                setUnlockedSoundtracksSet(unlockedSoundtracksSet);
-                setEditMode(false);
-            });
-
-        return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, []);
 
     /*
      * Play status change subscription.
@@ -72,41 +63,6 @@ export const MasterSoundtracksRoute = React.memo(() => {
             onPlayStatusChangeSubscription.unsubscribe();
         };
     }, [soundtrackPlayerService]);
-
-    const handleEditButtonClick = useCallback((): void => {
-        setEditMode(true);
-    }, []);
-
-    const handleSaveButtonClick = useCallback(async (): Promise<void> => {
-        const masterAccountId = masterAccount?._id;
-        if (!masterAccountId) {
-            return;
-        }
-        invokeLoadingIndicator();
-
-        const update = {
-            _id: masterAccountId,
-            soundtracks: [...unlockedSoundtracksSet]
-        };
-        try {
-            await masterAccountService.updateAccount(update);
-        } catch (error: any) {
-            // TODO Display error message to user.
-            console.error(error);
-            const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(masterAccount);
-            setUnlockedSoundtracksSet(unlockedSoundtracksSet);
-            setEditMode(false);
-        }
-        resetLoadingIndicator();
-
-    }, [invokeLoadingIndicator, masterAccount, masterAccountService, resetLoadingIndicator, unlockedSoundtracksSet]);
-
-    const handleCancelButtonClick = useCallback((): void => {
-        // Re-clone data from master account
-        const unlockedSoundtracksSet = getUnlockedSoundtracksSetFromMasterAccount(masterAccount);
-        setUnlockedSoundtracksSet(unlockedSoundtracksSet);
-        setEditMode(false);
-    }, [masterAccount]);
 
     const handlePlayButtonClick = useCallback((soundtrack: GameSoundtrack, action: 'play' | 'pause'): void => {
         const { audioUrl } = soundtrack;
@@ -129,78 +85,54 @@ export const MasterSoundtracksRoute = React.memo(() => {
         soundtrackPlayerService.play(audioUrl);
         setPlayingId(soundtrack._id);
     }, [backgroundMusicService, soundtrackPlayerService]);
+    
+    const handleSoundtrackChange = useCallback((soundtrackId: number, unlocked: boolean): void => {
+        let updatedSoundtracks: Array<number>;
+        if (unlocked) {
+            updatedSoundtracks = [...masterAccountEditData.soundtracks, soundtrackId];
+        } else {
+            updatedSoundtracks = [...masterAccountEditData.soundtracks].filter(id => id !== soundtrackId);
+        }
+        updateSoundtracks(updatedSoundtracks);
+    }, [masterAccountEditData, updateSoundtracks]);
 
-    /**
-     * FabContainer children
-     */
-    let fabContainerChildNodes: ReactNode;
-    if (!editMode) {
-        fabContainerChildNodes = (
-            <Tooltip key='edit' title='Edit'>
-                <div>
-                    <Fab
-                        color='primary'
-                        onClick={handleEditButtonClick}
-                        disabled={isLoadingIndicatorActive}
-                        children={<EditIcon />}
-                    />
-                </div>
-            </Tooltip>
-        );
-    } else {
-        fabContainerChildNodes = [
-            <Tooltip key='cancel' title='Cancel'>
-                <div>
-                    <Fab
-                        color='default'
-                        onClick={handleCancelButtonClick}
-                        disabled={isLoadingIndicatorActive}
-                        children={<ClearIcon />}
-                    />
-                </div>
-            </Tooltip>,
-            <Tooltip key='save' title='Save'>
-                <div>
-                    <Fab
-                        color='primary'
-                        onClick={handleSaveButtonClick}
-                        disabled={isLoadingIndicatorActive}
-                        children={<SaveIcon />}
-                    />
-                </div>
-            </Tooltip>
-        ];
-    }
+    const handleSaveButtonClick = useCallback(async (): Promise<void> => {
+        setAwaitingRequest(true);
+        try {
+            await persistChanges();
+            setAwaitingRequest(false);
+        } catch (error: any) {
+            // TODO Display error message to user.
+            console.error(error);
+            setAwaitingRequest(false);
+            revertChanges();
+        }
+    }, [persistChanges, revertChanges]);
+
+    const handleRevertButtonClick = useCallback((): void => {
+        revertChanges();
+    }, [revertChanges]);
 
     return (
-        <div className='flex column full-height'>
-            <PageTitle>
-                {editMode ?
-                    'Edit Unlocked Soundtracks' :
-                    'Unlocked Soundtracks'
-                }
-            </PageTitle>
-            <div className='flex overflow-hidden'>
-                <LayoutContentSection
-                    className='py-4 pr-4 flex-fill'
-                    fullHeight
-                    scrollbarTrackBorder
-                >
-                    <div className='flex column full-height'>
-                        <MasterSoundtracksListHeader />
-                        <div className='overflow-auto'>
-                            <MasterSoundtracksList
-                                unlockedSoundtracksSet={unlockedSoundtracksSet}
-                                playingId={playingId}
-                                editMode={editMode}
-                                onPlayButtonClick={handlePlayButtonClick}
-                            />
-                        </div>
-                    </div>
-                </LayoutContentSection>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <RouteDataEditControls
+                title='Unlocked Soundtracks'
+                hasUnsavedData={isDataDirty}
+                onSaveButtonClick={handleSaveButtonClick}
+                onRevertButtonClick={handleRevertButtonClick}
+                disabled={awaitingRequest}
+            />
+            <div className={`${StyleClassPrefix}-main-content`}>
+                <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
+                    <MasterSoundtracksList
+                        unlockedSoundtracks={masterAccountEditData.soundtracks}
+                        playingId={playingId}
+                        onPlayButtonClick={handlePlayButtonClick}
+                        onChange={handleSoundtrackChange}
+                    />
+                </div>
             </div>
-            <FabContainer children={fabContainerChildNodes} />
-        </div>
+        </Box>
     );
 
 });

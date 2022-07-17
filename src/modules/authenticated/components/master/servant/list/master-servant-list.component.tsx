@@ -29,6 +29,7 @@ type Props = {
      * Instance IDs of selected servants.
      */
     selectedServants?: ReadonlySet<number>;
+    showHeader?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
     onEditSelectedServants?: () => void;
@@ -167,17 +168,18 @@ export const MasterServantList = React.memo((props: Props) => {
     const gameServantMap = useGameServantMap();
 
     const {
-        masterServants,
         bondLevels,
-        selectedServants,
         dragDropMode,
-        visibleColumns,
+        masterServants,
         onEditSelectedServants,
         onEditServant,
         onDeleteSelectedServants,
         onDeleteServant,
         onServantContextMenu,
-        onServantSelectionChange
+        onServantSelectionChange,
+        selectedServants,
+        showHeader,
+        visibleColumns
     } = props;
 
     const lastClickIndexRef = useRef<number>();
@@ -391,10 +393,10 @@ export const MasterServantList = React.memo((props: Props) => {
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-list-container`}>
-                <MasterServantListHeader
+                {showHeader && <MasterServantListHeader
                     visibleColumns={visibleColumns}
                     dragDropMode={dragDropMode}
-                />
+                />}
                 <div className={clsx(`${StyleClassPrefix}-list`, dragDropMode && 'drag-drop-mode')}>
                     <DndProvider backend={HTML5Backend}>
                         {masterServants.map(renderMasterServantRow)}

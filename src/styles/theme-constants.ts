@@ -55,6 +55,17 @@ export class ThemeConstants {
     //#endregion
 
 
+    //#region Navigation rail
+
+    /**
+     * The width in column layout, or height in row layout, of the navigation rail
+     * as a factor of the spacing transformation value.
+     */
+    static readonly NavigationRailSizeScale = 14;
+
+    //#endregion
+
+
     //#region Other scaling values
 
     /**

@@ -1,56 +1,113 @@
-import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { CSSProperties, PropsWithChildren, useMemo } from 'react';
 import { Theme } from '@mui/material';
-import clsx from 'clsx';
+import { FilteringStyledOptions } from '@mui/styled-engine';
+import { CSSProperties } from '@mui/styles';
+import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { PropsWithChildren } from 'react';
+import { ThemeConstants } from '../../../styles/theme-constants';
 
 type Props = PropsWithChildren<{
-    borderRight?: boolean;
-    width?: number | string;
+    /**
+     * Displays a right border when `layout` is set to `column`, or a bottom border
+     * when `layout` is set to `row`.
+     */
+    border?: boolean;
+    /**
+     * (optional) Defaults to `column`.
+     */
+    layout?: 'row' | 'column';
 }>;
 
-const DefaultWidth = 56;
+const StyleClassPrefix = 'NavigationRail';
 
-const StyleProps = (theme: SystemTheme) => {
+const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
+    prop !== 'border'
+);
+
+const StyleOptions = {
+    name: StyleClassPrefix,
+    shouldForwardProp,
+    slot: 'root',
+    skipSx: true,
+    skipVariantsResolver: true
+} as MuiStyledOptions & FilteringStyledOptions<Props>;
+
+const StyleProps = (props: Props & { theme: SystemTheme }) => ({
+    display: 'flex',
+    alignItems: 'center'
+} as CSSProperties);
+
+const LayoutStyleProps = (props: Props & { theme: SystemTheme }) => {
+
+    const {
+        layout,
+        theme
+    } = props;
+
+    const { spacing } = theme as Theme;
+
+    if (layout !== 'row') {
+        return {
+            flexDirection: 'column',
+            width: spacing(ThemeConstants.NavigationRailSizeScale),
+            height: '100%',
+            paddingTop: spacing(2),
+            '& >*': {
+                // https://material.io/components/navigation-rail#specs
+                paddingTop: spacing(1)
+            },
+            '& >.MuiDivider-root': {
+                width: '50%',
+                paddingTop: 0,
+                marginTop: spacing(4)
+            }
+        } as CSSProperties;
+    }
+
+    return {
+        width: '100%',
+        height: spacing(ThemeConstants.NavigationRailSizeScale),
+        padding: spacing(0, 2),
+        '& >*': {
+            paddingLeft: spacing(1)
+        },
+        '& >.MuiDivider-root': {
+            display: 'none'
+        }
+    } as CSSProperties;
+    
+};
+
+const BorderStyleProps = (props: Props & { theme: SystemTheme }) => {
+
+    const {
+        border,
+        layout,
+        theme
+    } = props;
+
+    if (!border) {
+        return;
+    }
 
     const { palette } = theme as Theme;
 
-    return {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        height: '100%',
-        pt: 2,
-        '& >*': {
-            // https://material.io/components/navigation-rail#specs
-            py: 1
-        },
-        '& >.MuiDivider-root': {
-            width: '50%',
-            py: 0,
-            my: 4
-        },
-        '&.border-right': {
+    if (layout !== 'row') {
+        return {
             borderRightWidth: 1,
             borderRightStyle: 'solid',
             borderRightColor: palette.divider,
-        }
-    } as SystemStyleObject<SystemTheme>;
+        } as CSSProperties;
+    }
+    
+    return {
+        borderBottomWidth: 1,
+        borderBottomStyle: 'solid',
+        borderBottomColor: palette.divider,
+    } as CSSProperties;
 };
 
-export const NavigationRail = React.memo(({ children, borderRight, width }: Props) => {
-
-    const widthStyle = useMemo((): CSSProperties => ({
-        width: width || DefaultWidth
-    }), [width]);
-
-    return (
-        <Box
-            className={clsx(borderRight && 'border-right')}
-            style={widthStyle}
-            sx={StyleProps}
-        >
-            {children}
-        </Box>
-    );
-
-});
+export const NavigationRail = styled('div', StyleOptions)<Props>(
+    StyleProps,
+    LayoutStyleProps,
+    BorderStyleProps
+);

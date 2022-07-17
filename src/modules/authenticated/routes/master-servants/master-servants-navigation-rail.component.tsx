@@ -6,6 +6,7 @@ import { NavigationRail } from '../../../../components/navigation/navigation-rai
 
 type Props = {
     dragDropMode: boolean;
+    layout: 'row' | 'column';
     onAddServant: () => void;
     onMultiAddServant: () => void;
     onDeleteSelectedServants: () => void;
@@ -20,6 +21,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
 
     const {
         dragDropMode,
+        layout,
         onAddServant,
         onMultiAddServant,
         onDeleteSelectedServants,
@@ -32,7 +34,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
 
     if (dragDropMode) {
         return (
-            <NavigationRail borderRight>
+            <NavigationRail border layout={layout}>
                 <Tooltip key='apply' title='Apply order changes' placement='right'>
                     <div>
                         <IconButton
@@ -57,7 +59,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
     }
 
     return (
-        <NavigationRail borderRight>
+        <NavigationRail border layout={layout}>
             <Tooltip key='add' title='Add servant' placement='right'>
                 <div>
                     <IconButton

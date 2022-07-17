@@ -67,37 +67,50 @@ const StyleProps = (theme: SystemTheme) => {
 
     const {
         breakpoints,
-        palette
+        palette,
+        spacing
     } = theme as Theme;
 
     return {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        [`& .${StyleClassPrefix}-main-content`]: {
+        [`& .${StyleClassPrefix}-lower-layout-container`]: {
             display: 'flex',
-            width: 'calc(100% - 56px)',
-            [`& .${StyleClassPrefix}-list-container`]: {
-                // background: palette.background.paper,
-                flex: 1,
-                overflow: 'hidden',
-                [`& .${MasterServantListStyleClassPrefix}-root`]: {
-                    background: palette.background.paper,
-                    borderRightWidth: 1,
-                    borderRightStyle: 'solid',
-                    borderRightColor: palette.divider,
-                    [`& .${MasterServantListStyleClassPrefix}-list-container`]: {
-                        height: '100%'
+            height: '100%',
+            overflow: 'hidden',
+            [`& .${StyleClassPrefix}-main-content`]: {
+                display: 'flex',
+                width: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`,
+                [`& .${StyleClassPrefix}-list-container`]: {
+                    // background: palette.background.paper,
+                    flex: 1,
+                    overflow: 'hidden',
+                    [`& .${MasterServantListStyleClassPrefix}-root`]: {
+                        background: palette.background.paper,
+                        borderRightWidth: 1,
+                        borderRightStyle: 'solid',
+                        borderRightColor: palette.divider,
+                        [`& .${MasterServantListStyleClassPrefix}-list-container`]: {
+                            height: '100%'
+                        }
                     }
-                }
+                },
+                [`& .${StyleClassPrefix}-info-panel-container`]: {
+                    height: '100%',
+                    boxSizing: 'border-box',
+                    [breakpoints.down('md')]: {
+                        display: 'none'
+                    }
+                },
             },
-            [`& .${StyleClassPrefix}-info-panel-container`]: {
-                height: '100%',
-                boxSizing: 'border-box',
-                [breakpoints.down('md')]: {
-                    display: 'none'
+            [breakpoints.down('sm')]: {
+                flexDirection: 'column',
+                [`& .${StyleClassPrefix}-main-content`]: {
+                    width: '100%',
+                    height: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`
                 }
-            },
+            }
         },
         [`& .${StyleClassPrefix}-unsaved-message`]: {
             color: palette.warning.main
@@ -700,10 +713,11 @@ export const MasterServantsRoute = React.memo(() => {
                 onSaveButtonClick={handleSaveButtonClick}
                 disabled={isLoadingIndicatorActive}
             />
-            <div className='flex overflow-hidden full-height'>
+            <div className={`${StyleClassPrefix}-lower-layout-container`}>
                 <MasterServantsNavigationRail
-                    selectedServantsCount={selectedServants.length}
+                    layout={sm ? 'column' : 'row'}
                     dragDropMode={dragDropMode}
+                    selectedServantsCount={selectedServants.length}
                     onAddServant={handleAddServant}
                     onMultiAddServant={handleMultiAddServant}
                     onDeleteSelectedServants={handleDeleteSelectedServants}
@@ -718,7 +732,7 @@ export const MasterServantsRoute = React.memo(() => {
                             masterServants={dragDropMasterServants || masterServants}
                             bondLevels={bondLevels}
                             selectedServants={selectedInstanceIds}
-                            // showAddServantRow
+                            showHeader={sm}
                             visibleColumns={visibleColumns}
                             dragDropMode={dragDropMode}
                             onServantSelectionChange={setServantSelection}

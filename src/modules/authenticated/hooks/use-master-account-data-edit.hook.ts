@@ -239,8 +239,26 @@ export function useMasterAccountDataEditHook(
         if (itemId === GameItemConstants.QpItemId) {
             updateQp(quantity);
         } else {
-            if (editData.items[itemId] === quantity) {
-                return; // No change
+            let currentQuantity = editData.items[itemId];
+            /*
+             * If the user data doesn't have an entry for the item yet, then it will be
+             * added with an initial value of zero.
+             *
+             * Note that this is only added to the edit data; the user will still have to
+             * save the changes to persist the new entry.
+             *
+             * Also note that if the quantity is being updated to zero, the it will not be
+             * considered a change, and the data will not be marked as dirty from the
+             * update.
+             */
+            if (currentQuantity === undefined) {
+                editData.items = {
+                    ...editData.items,
+                    [itemId]: currentQuantity = 0
+                };
+            }
+            if (currentQuantity === quantity) {
+                return;
             }
             editData.items = {
                 ...editData.items,

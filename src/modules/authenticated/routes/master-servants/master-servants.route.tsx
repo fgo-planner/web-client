@@ -83,17 +83,12 @@ const StyleProps = (theme: SystemTheme) => {
                 display: 'flex',
                 width: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`,
                 [`& .${StyleClassPrefix}-list-container`]: {
-                    // background: palette.background.paper,
                     flex: 1,
                     overflow: 'hidden',
                     [`& .${MasterServantListStyleClassPrefix}-root`]: {
-                        background: palette.background.paper,
                         borderRightWidth: 1,
                         borderRightStyle: 'solid',
-                        borderRightColor: palette.divider,
-                        [`& .${MasterServantListStyleClassPrefix}-list-container`]: {
-                            height: '100%'
-                        }
+                        borderRightColor: palette.divider
                     }
                 },
                 [`& .${StyleClassPrefix}-info-panel-container`]: {
@@ -111,9 +106,6 @@ const StyleProps = (theme: SystemTheme) => {
                     height: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`
                 }
             }
-        },
-        [`& .${StyleClassPrefix}-unsaved-message`]: {
-            color: palette.warning.main
         }
     } as SystemStyleObject<SystemTheme>;
 };

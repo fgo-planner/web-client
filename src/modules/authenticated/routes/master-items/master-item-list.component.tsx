@@ -1,11 +1,12 @@
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { ImmutableArray, ReadonlyRecord, SxPropsFunction } from '../../../../types/internal';
+import { ImmutableArray, ReadonlyRecord } from '../../../../types/internal';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { StyleClassPrefix as MasterItemListRowLabelStyleClassPrefix } from './master-item-list-row-label.component';
 import { MasterItemListRow, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';
+import { Theme } from '@mui/material';
 
 type ItemCategory = {
     key: string;
@@ -57,32 +58,43 @@ const ItemCategories: ImmutableArray<ItemCategory> = [
 
 const StyleClassPrefix = 'MasterItemList';
 
-const StyleProps = (({ breakpoints }: Theme) => ({
-    [`& .${StyleClassPrefix}-item-category`]: {
-        '&:not(:last-child)': {
-            pb: 8
-        }
-    },
-    [`& .${MasterItemListRowStyleClassPrefix}-root`]: {
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        breakpoints,
+        palette
+    } = theme as Theme;
+
+    return {
+        backgroundColor: palette.background.paper,
         display: 'flex',
-        alignContent: 'center',
-        alignItems: 'center',
-        height: 52,
-        pl: 4,
-        pr: 8,
-        py: 0,
-        fontSize: '0.875rem',
-        [`& .${MasterItemListRowLabelStyleClassPrefix}-item-name`]: {
-            px: 4,
-            [breakpoints.only('xs')]: {
-                display: 'none'
-            }
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'auto',
+        [`& .${StyleClassPrefix}-item-category`]: {
+            pb: 8
         },
-        '& .MuiInputBase-input': {
-            width: '8rem'
+        [`& .${MasterItemListRowStyleClassPrefix}-root`]: {
+            display: 'flex',
+            alignContent: 'center',
+            alignItems: 'center',
+            height: 52,
+            pl: 4,
+            pr: 8,
+            py: 0,
+            fontSize: '0.875rem',
+            [`& .${MasterItemListRowLabelStyleClassPrefix}-item-name`]: {
+                px: 4,
+                [breakpoints.down('sm')]: {
+                    display: 'none'
+                }
+            },
+            '& .MuiInputBase-input': {
+                width: '8rem'
+            }
         }
-    }
-} as SystemStyleObject)) as SxPropsFunction;
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const MasterItemList = React.memo((props: Props) => {
 

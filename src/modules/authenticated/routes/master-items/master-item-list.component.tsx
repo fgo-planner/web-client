@@ -1,4 +1,4 @@
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode } from 'react';
 import { GameItemConstants } from '../../../../constants';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
@@ -6,6 +6,7 @@ import { ImmutableArray, ReadonlyRecord } from '../../../../types/internal';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { StyleClassPrefix as MasterItemListRowLabelStyleClassPrefix } from './master-item-list-row-label.component';
 import { MasterItemListRow, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';
+import { Theme } from '@mui/material';
 
 type ItemCategory = {
     key: string;
@@ -14,7 +15,6 @@ type ItemCategory = {
 };
 
 type Props = {
-    editMode: boolean;
     itemQuantities: ReadonlyRecord<number, number>;
     onChange: (itemId: number, quantity: number) => void;
     qp: number;
@@ -58,30 +58,50 @@ const ItemCategories: ImmutableArray<ItemCategory> = [
 
 const StyleClassPrefix = 'MasterItemList';
 
-const StyleProps = {
-    pb: 12,
-    [`& .${StyleClassPrefix}-item-category`]: {
-        pb: 8
-    },
-    [`& .${MasterItemListRowStyleClassPrefix}-root`]: {
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        breakpoints,
+        palette
+    } = theme as Theme;
+
+    return {
+        backgroundColor: palette.background.paper,
         display: 'flex',
-        alignContent: 'center',
-        alignItems: 'center',
-        height: 52,
-        pl: 4,
-        pr: 8,
-        py: 0,
-        fontSize: '0.875rem',
-        [`& .${MasterItemListRowLabelStyleClassPrefix}-item-name`]: {
-            px: 4
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'auto',
+        [`& .${StyleClassPrefix}-item-category`]: {
+            pb: 8
+        },
+        [`& .${MasterItemListRowStyleClassPrefix}-root`]: {
+            display: 'flex',
+            alignContent: 'center',
+            alignItems: 'center',
+            height: 52,
+            pl: 3,
+            pr: 8,
+            py: 0,
+            fontSize: '0.875rem',
+            [`& .${MasterItemListRowLabelStyleClassPrefix}-item-name`]: {
+                px: 4,
+                [breakpoints.down('sm')]: {
+                    display: 'none'
+                }
+            },
+            '& .MuiInputBase-input': {
+                width: '8rem'
+            },
+            [breakpoints.down('sm')]: {
+                pr: 6
+            }
         }
-    }
-} as SystemStyleObject<Theme>;
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const MasterItemList = React.memo((props: Props) => {
 
     const {
-        editMode,
         itemQuantities,
         onChange,
         qp
@@ -104,7 +124,6 @@ export const MasterItemList = React.memo((props: Props) => {
                 key={itemId}
                 gameItem={gameItem}
                 quantity={quantity}
-                editMode={editMode}
                 onChange={onChange}
             />
         );

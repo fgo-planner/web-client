@@ -1,39 +1,113 @@
-import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { CSSProperties, PropsWithChildren, useMemo } from 'react';
+import { Theme } from '@mui/material';
+import { FilteringStyledOptions } from '@mui/styled-engine';
+import { CSSProperties } from '@mui/styles';
+import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { PropsWithChildren } from 'react';
+import { ThemeConstants } from '../../../styles/theme-constants';
 
 type Props = PropsWithChildren<{
-    width?: number | string;
+    /**
+     * Displays a right border when `layout` is set to `column`, or a bottom border
+     * when `layout` is set to `row`.
+     */
+    border?: boolean;
+    /**
+     * (optional) Defaults to `column`.
+     */
+    layout?: 'row' | 'column';
 }>;
 
-const DefaultWidth = 56;
+const StyleClassPrefix = 'NavigationRail';
 
-const StyleProps = {
+const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
+    prop !== 'border'
+);
+
+const StyleOptions = {
+    name: StyleClassPrefix,
+    shouldForwardProp,
+    slot: 'root',
+    skipSx: true,
+    skipVariantsResolver: true
+} as MuiStyledOptions & FilteringStyledOptions<Props>;
+
+const StyleProps = (props: Props & { theme: SystemTheme }) => ({
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    height: '100%',
-    pt: 2,
-    '& >*': {
-        // https://material.io/components/navigation-rail#specs
-        py: 1
-    },
-    '& >.MuiDivider-root': {
-        width: '50%',
-        py: 0,
-        my: 4
+    alignItems: 'center'
+} as CSSProperties);
+
+const LayoutStyleProps = (props: Props & { theme: SystemTheme }) => {
+
+    const {
+        layout,
+        theme
+    } = props;
+
+    const { spacing } = theme as Theme;
+
+    if (layout !== 'row') {
+        return {
+            flexDirection: 'column',
+            width: spacing(ThemeConstants.NavigationRailSizeScale),
+            height: '100%',
+            paddingTop: spacing(2),
+            '& >*': {
+                // https://material.io/components/navigation-rail#specs
+                paddingTop: spacing(1)
+            },
+            '& >.MuiDivider-root': {
+                width: '50%',
+                paddingTop: 0,
+                marginTop: spacing(4)
+            }
+        } as CSSProperties;
     }
-} as SystemStyleObject<Theme>;
 
-export const NavigationRail = React.memo(({ children, width }: Props) => {
+    return {
+        width: '100%',
+        height: spacing(ThemeConstants.NavigationRailSizeScale),
+        padding: spacing(0, 2),
+        '& >*': {
+            paddingLeft: spacing(1)
+        },
+        '& >.MuiDivider-root': {
+            display: 'none'
+        }
+    } as CSSProperties;
+    
+};
 
-    const widthStyle = useMemo((): CSSProperties => ({
-        width: width || DefaultWidth
-    }), [width]);
+const BorderStyleProps = (props: Props & { theme: SystemTheme }) => {
 
-    return (
-        <Box sx={StyleProps} style={widthStyle}>
-            {children}
-        </Box>
-    );
+    const {
+        border,
+        layout,
+        theme
+    } = props;
 
-});
+    if (!border) {
+        return;
+    }
+
+    const { palette } = theme as Theme;
+
+    if (layout !== 'row') {
+        return {
+            borderRightWidth: 1,
+            borderRightStyle: 'solid',
+            borderRightColor: palette.divider,
+        } as CSSProperties;
+    }
+    
+    return {
+        borderBottomWidth: 1,
+        borderBottomStyle: 'solid',
+        borderBottomColor: palette.divider,
+    } as CSSProperties;
+};
+
+export const NavigationRail = styled('div', StyleOptions)<Props>(
+    StyleProps,
+    LayoutStyleProps,
+    BorderStyleProps
+);

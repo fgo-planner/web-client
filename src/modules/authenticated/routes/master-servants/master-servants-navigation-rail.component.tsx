@@ -6,6 +6,7 @@ import { NavigationRail } from '../../../../components/navigation/navigation-rai
 
 type Props = {
     dragDropMode: boolean;
+    layout: 'row' | 'column';
     onAddServant: () => void;
     onMultiAddServant: () => void;
     onDeleteSelectedServants: () => void;
@@ -20,6 +21,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
 
     const {
         dragDropMode,
+        layout,
         onAddServant,
         onMultiAddServant,
         onDeleteSelectedServants,
@@ -32,7 +34,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
 
     if (dragDropMode) {
         return (
-            <NavigationRail>
+            <NavigationRail border layout={layout}>
                 <Tooltip key='apply' title='Apply order changes' placement='right'>
                     <div>
                         <IconButton
@@ -57,7 +59,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
     }
 
     return (
-        <NavigationRail>
+        <NavigationRail border layout={layout}>
             <Tooltip key='add' title='Add servant' placement='right'>
                 <div>
                     <IconButton
@@ -76,15 +78,18 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
                     />
                 </div>
             </Tooltip>
-            <Tooltip key='reorder' title='Reorder servants' placement='right'>
-                <div>
-                    <IconButton
-                        onClick={onDragDropActivate}
-                        children={<ReorderIcon />}
-                        size='large'
-                    />
-                </div>
-            </Tooltip>
+            {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
+            {layout !== 'row' &&
+                <Tooltip key='reorder' title='Reorder servants' placement='right'>
+                    <div>
+                        <IconButton
+                            onClick={onDragDropActivate}
+                            children={<ReorderIcon />}
+                            size='large'
+                        />
+                    </div>
+                </Tooltip>
+            }
             <Tooltip key='edit' title='Edit selected' placement='right'>
                 <div>
                     <IconButton
@@ -117,17 +122,20 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
                     />
                 </div>
             </Tooltip>
-            <Tooltip key='import-export' title='Upload servant data' placement='right'>
-                {/* TODO This needs to open a menu with various import/export options. */}
-                <div>
-                    <IconButton
-                        component={Link}
-                        to='../master/data/import/servants'
-                        children={<ImportExportIcon />}
-                        size='large'
-                    />
-                </div>
-            </Tooltip>
+            {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
+            {layout !== 'row' &&
+                <Tooltip key='import-export' title='Upload servant data' placement='right'>
+                    {/* TODO This needs to open a menu with various import/export options. */}
+                    <div>
+                        <IconButton
+                            component={Link}
+                            to='../master/data/import/servants'
+                            children={<ImportExportIcon />}
+                            size='large'
+                        />
+                    </div>
+                </Tooltip>
+            }
         </NavigationRail>
     );
 

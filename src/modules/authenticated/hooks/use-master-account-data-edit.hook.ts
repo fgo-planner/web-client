@@ -85,23 +85,27 @@ type MasterAccountUpdateFunctions = {
     persistChanges: () => Promise<void>;
 };
 
-type MasterAccountDataEditHookData = {
+type MasterAccountDataEditHookCommon = {
+    isDataDirty: boolean;
+};
+
+type MasterAccountDataEditHookData = MasterAccountDataEditHookCommon & {
     masterAccountEditData: MasterAccountEditData;
 } & MasterAccountUpdateFunctions;
 
-type MasterAccountDataEditHookDataCostumesSubset = {
+type MasterAccountDataEditHookDataCostumesSubset = MasterAccountDataEditHookCommon & {
     masterAccountEditData: Pick<MasterAccountEditData, 'costumes'>;
 } & Pick<MasterAccountUpdateFunctions, 'updateCostumes' | 'revertChanges' | 'persistChanges'>;
 
-type MasterAccountDataEditHookDataItemsSubset = {
+type MasterAccountDataEditHookDataItemsSubset = MasterAccountDataEditHookCommon & {
     masterAccountEditData: Pick<MasterAccountEditData, 'items' | 'qp'>;
 } & Pick<MasterAccountUpdateFunctions, 'updateItem' | 'updateQp' | 'revertChanges' | 'persistChanges'>;
 
-type MasterAccountDataEditHookDataServantsSubset = {
+type MasterAccountDataEditHookDataServantsSubset = MasterAccountDataEditHookCommon & {
     masterAccountEditData: Pick<MasterAccountEditData, 'bondLevels' | 'servants'>;
 } & Pick<MasterAccountUpdateFunctions, 'updateServants' | 'revertChanges' | 'persistChanges'>;
 
-type MasterAccountDataEditHookDataSoundtracksSubset = {
+type MasterAccountDataEditHookDataSoundtracksSubset = MasterAccountDataEditHookCommon & {
     masterAccountEditData: Pick<MasterAccountEditData, 'soundtracks'>;
 } & Pick<MasterAccountUpdateFunctions, 'updateSoundtracks' | 'revertChanges' | 'persistChanges'>;
 
@@ -174,6 +178,7 @@ export function useMasterAccountDataEditHook(
 
     const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
     const [editData, setEditData] = useState<MasterAccountEditData>(getDefaultMasterAccountEditData);
+    const [isDataDirty, setIsDataDirty] = useState<boolean>(false);
 
     /**
      * Reconstruct the include options in a new object using `useMemo` so that it
@@ -197,7 +202,7 @@ export function useMasterAccountDataEditHook(
                 const editData = cloneMasterAccountDataForEdit(masterAccount, includeOptions);
                 setEditData(editData);
                 setMasterAccount(masterAccount);
-                // setIsMasterAccountDirty(false);
+                setIsDataDirty(false);
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
@@ -211,6 +216,7 @@ export function useMasterAccountDataEditHook(
             return;
         }
         editData.costumes = new Set(costumeIds);
+        setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();
     }, [editData, forceUpdate, includeCostumes]);
 
@@ -218,7 +224,11 @@ export function useMasterAccountDataEditHook(
         if (!includeItems) {
             return;
         }
+        if (editData.qp === amount) {
+            return;
+        }
         editData.qp = amount;
+        setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();
     }, [editData, forceUpdate, includeItems]);
 
@@ -229,10 +239,32 @@ export function useMasterAccountDataEditHook(
         if (itemId === GameItemConstants.QpItemId) {
             updateQp(quantity);
         } else {
+            let currentQuantity = editData.items[itemId];
+            /*
+             * If the user data doesn't have an entry for the item yet, then it will be
+             * added with an initial value of zero.
+             *
+             * Note that this is only added to the edit data; the user will still have to
+             * save the changes to persist the new entry.
+             *
+             * Also note that if the quantity is being updated to zero, the it will not be
+             * considered a change, and the data will not be marked as dirty from the
+             * update.
+             */
+            if (currentQuantity === undefined) {
+                editData.items = {
+                    ...editData.items,
+                    [itemId]: currentQuantity = 0
+                };
+            }
+            if (currentQuantity === quantity) {
+                return;
+            }
             editData.items = {
                 ...editData.items,
                 [itemId]: quantity
             };
+            setIsDataDirty(true); // TODO Track changes properly
             forceUpdate();
         }
     }, [editData, forceUpdate, includeItems, updateQp]);
@@ -264,6 +296,7 @@ export function useMasterAccountDataEditHook(
          */
         editData.servants = [...servants, newServant];
         // TODO Also update the unlocked costumes.
+        setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();
     }, [editData, forceUpdate, includeServants]);
 
@@ -305,6 +338,7 @@ export function useMasterAccountDataEditHook(
         // TODO Set dirty...
         editData.servants = updatedServants;
         // TODO Also update the unlocked costumes.
+        setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();
     }, [editData, forceUpdate, includeServants]);
 
@@ -323,21 +357,24 @@ export function useMasterAccountDataEditHook(
         // TODO Set dirty...
         editData.servants = updatedServants;
         // TODO Also remove bond/costume data if the last instance of the servant is removed.
+        setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();
     }, [editData, forceUpdate, includeServants]);
-
-    const revertChanges = useCallback((): void => {
-        const editData = cloneMasterAccountDataForEdit(masterAccount, includeOptions);
-        setEditData(editData);
-    }, [includeOptions, masterAccount]);
 
     const updateSoundtracks = useCallback((soundtrackIds: Iterable<number>): void => {
         if (!includeSoundtracks) {
             return;
         }
         editData.soundtracks = new Set(soundtrackIds);
+        setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();
     }, [editData, forceUpdate, includeSoundtracks]);
+
+    const revertChanges = useCallback((): void => {
+        const editData = cloneMasterAccountDataForEdit(masterAccount, includeOptions);
+        setEditData(editData);
+        setIsDataDirty(false);
+    }, [includeOptions, masterAccount]);
 
     //#endregion
 
@@ -404,6 +441,7 @@ export function useMasterAccountDataEditHook(
     //#endregion
 
     return {
+        isDataDirty,
         masterAccountEditData: editData,
         updateCostumes,
         updateItem,

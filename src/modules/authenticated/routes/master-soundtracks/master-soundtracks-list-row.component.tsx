@@ -1,20 +1,19 @@
 import { GameSoundtrack } from '@fgo-planner/types';
-import { Done as DoneIcon, Pause as PauseIcon, PlayArrow as PlayArrowIcon } from '@mui/icons-material';
+import { Pause as PauseIcon, PlayArrow as PlayArrowIcon } from '@mui/icons-material';
 import { Checkbox, IconButton } from '@mui/material';
-import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
+import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { Immutable } from '../../../../types/internal';
 
 type Props = {
+    onChange: (id: number, value: boolean) => void;
+    onPlayButtonClick?: (soundtrack: GameSoundtrack, action: 'play' | 'pause') => void;
+    playing?: boolean;
     soundtrack: Immutable<GameSoundtrack>;
     unlocked?: boolean;
-    playing?: boolean;
-    editMode?: boolean;
-    onUnlockToggle?: (id: number, value: boolean) => void;
-    onPlayButtonClick?: (soundtrack: GameSoundtrack, action: 'play' | 'pause') => void;
 };
 
 const SoundtrackThumbnailSize = 42;
@@ -24,19 +23,25 @@ export const StyleClassPrefix = 'MasterSoundtracksListRow';
 export const MasterSoundtracksListRow = React.memo((props: Props) => {
 
     const {
-        soundtrack,
-        unlocked,
+        onChange,
+        onPlayButtonClick,
         playing,
-        editMode,
-        onUnlockToggle,
-        onPlayButtonClick
+        soundtrack,
+        unlocked
     } = props;
+
+    const {
+        _id: soundtrackId,
+        material,
+        name,
+        thumbnailUrl
+    } = soundtrack;
 
     const gameItemMap = useGameItemMap();
 
     const handleUnlockCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-        onUnlockToggle && onUnlockToggle(soundtrack._id, event.target.checked);
-    }, [soundtrack._id, onUnlockToggle]);
+        onChange(soundtrackId, event.target.checked);
+    }, [onChange, soundtrackId]);
 
     const handlePlayButtonClick = useCallback(() => {
         if (!onPlayButtonClick) {
@@ -46,29 +51,22 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
         onPlayButtonClick(soundtrack, action);
     }, [soundtrack, playing, onPlayButtonClick]);
 
-    const unlockedStatusNode: ReactNode = useMemo(() => {
-        if (!editMode) {
-            return (
-                <div className={`${StyleClassPrefix}-unlocked-status`}>
-                    {unlocked && <DoneIcon className={`${StyleClassPrefix}-unlocked-icon`} />}
-                </div>
-            );
-        }
-        return (
-            <div className={`${StyleClassPrefix}-unlocked-status`}>
-                {soundtrack.material && <Checkbox
-                    checked={unlocked}
-                    onChange={handleUnlockCheckboxChange}
-                />}
-            </div>
-        );
-    }, [soundtrack, editMode, unlocked, handleUnlockCheckboxChange]);
+    const alwaysUnlocked = !material;
+
+    const unlockedStatusNode: ReactNode = (
+        <div className={`${StyleClassPrefix}-unlocked-status`}>
+            {!alwaysUnlocked && <Checkbox
+                checked={unlocked}
+                onChange={handleUnlockCheckboxChange}
+            />}
+        </div>
+    );
 
     const unlockMaterialNode: ReactNode = useMemo(() => {
-        if (!gameItemMap || !soundtrack.material) {
+        if (!gameItemMap || alwaysUnlocked) {
             return null;
         }
-        const { itemId, quantity } = soundtrack.material;
+        const { itemId, quantity } = material;
         const unlockMaterial = gameItemMap[itemId];
         if (!unlockMaterial) {
             return null;
@@ -76,7 +74,7 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
         return (
             <GameItemQuantity gameItem={unlockMaterial} quantity={quantity} />
         );
-    }, [soundtrack, gameItemMap]);
+    }, [gameItemMap, alwaysUnlocked, material]);
 
     const playButtonNode: ReactNode = useMemo(() => {
         return (
@@ -93,23 +91,25 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
 
     return (
         <StaticListRowContainer
-            key={soundtrack._id}
+            key={soundtrackId}
             className={`${StyleClassPrefix}-root`}
             borderBottom
         >
             {unlockedStatusNode}
             <div className={`${StyleClassPrefix}-thumbnail`}>
                 <img
-                    src={soundtrack.thumbnailUrl}
-                    alt={soundtrack.name}
+                    src={thumbnailUrl}
+                    alt={name}
                     height={SoundtrackThumbnailSize}
-                />
+                    />
             </div>
-            <div className={clsx(`${StyleClassPrefix}-title`, 'truncate')}>
-                {soundtrack.name}
-            </div>
-            {unlockMaterialNode}
             {playButtonNode}
+            <TruncateText className={`${StyleClassPrefix}-title`}>
+                {name}
+            </TruncateText>
+            <div className={`${StyleClassPrefix}-unlock-material`}>
+                {unlockMaterialNode}
+            </div>
         </StaticListRowContainer>
     );
 

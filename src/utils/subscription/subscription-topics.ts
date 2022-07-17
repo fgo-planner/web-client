@@ -1,7 +1,7 @@
 import { MasterAccount, UserPreferences } from '@fgo-planner/types';
 import { MasterAccountList } from '../../types/data';
 import { HttpResponseError, Nullable, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
-import { nullSupplier } from '../function.utils';
+import { Functions } from '../functions';
 import { SubscriptionTopic } from './subscription-topic.class';
 
 export class SubscriptionTopics {
@@ -40,14 +40,14 @@ class User {
 
     /* eslint-disable max-len */
 
-    static readonly CurrentMasterAccountChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccount>>(nullSupplier);
+    static readonly CurrentMasterAccountChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccount>>(Functions.nullSupplier);
 
-    static readonly CurrentUserChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserInfo>>(nullSupplier);
+    static readonly CurrentUserChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserInfo>>(Functions.nullSupplier);
 
     // TODO Wrap UserPreferences with Immutable<>
-    static readonly CurrentUserPreferencesChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserPreferences>>(nullSupplier);
+    static readonly CurrentUserPreferencesChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserPreferences>>(Functions.nullSupplier);
     
-    static readonly MasterAccountListChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccountList>>(nullSupplier);
+    static readonly MasterAccountListChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccountList>>(Functions.nullSupplier);
     
     static readonly Unauthorized = SubscriptionTopic.forReplaySubject<HttpResponseError>();
     

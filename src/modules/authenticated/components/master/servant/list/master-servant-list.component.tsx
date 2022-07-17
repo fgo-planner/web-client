@@ -1,8 +1,11 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Theme } from '@mui/material';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import clsx from 'clsx';
 import React, { MouseEvent, ReactNode, useCallback, useEffect, useRef } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { ReadonlyPartial } from '../../../../../../types/internal';
@@ -11,7 +14,7 @@ import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisible
 import { MasterServantListHeader } from './master-servant-list-header.component';
 import { StyleClassPrefix as MasterServantListRowBondLevelStyleClassPrefix } from './master-servant-list-row-bond-level.component';
 import { StyleClassPrefix as MasterServantListRowFouLevelStyleClassPrefix } from './master-servant-list-row-fou-level.component';
-import { StyleClassPrefix as MasterServantListRowInfoStyleClassPrefix } from './master-servant-list-row-info.component';
+import { StyleClassPrefix as MasterServantListRowLabelStyleClassPrefix } from './master-servant-list-row-label.component';
 import { StyleClassPrefix as MasterServantListRowLevelStyleClassPrefix } from './master-servant-list-row-level.component';
 import { StyleClassPrefix as MasterServantListRowNpLevelStyleClassPrefix } from './master-servant-list-row-np-level.component';
 import { StyleClassPrefix as MasterServantListRowSkillLevelStyleClassPrefix } from './master-servant-list-row-skill-level.component';
@@ -26,6 +29,7 @@ type Props = {
      * Instance IDs of selected servants.
      */
     selectedServants?: ReadonlySet<number>;
+    showHeader?: boolean;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
     onEditSelectedServants?: () => void;
@@ -36,110 +40,126 @@ type Props = {
     onServantSelectionChange?: (instanceIds: Array<number>) => void;
 };
 
-const StyleClassPrefix = 'MasterServantList';
+export const StyleClassPrefix = 'MasterServantList';
 
-const StyleProps = {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    [`& .${StyleClassPrefix}-list-container`]: {
-        overflow: 'auto',
-        [`& .${StyleClassPrefix}-list`]: {
-            [`& .${MasterServantListRowStyleClassPrefix}-root`]: {
-                userSelect: 'none',
-                flex: 1,
-                display: 'flex',
-                alignContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center',
-                height: 52,
-                pl: 4,
-                fontSize: '0.875rem',
-                [`& .${MasterServantListRowInfoStyleClassPrefix}-root`]: {
-                    display: 'flex',
-                    alignItems: 'center',
-                    flex: ColumnWidths.info,
-                    /**
-                     * This fixes text truncation issues inside flex box.
-                     * @see https://css-tricks.com/flexbox-truncated-text/
-                     */
-                    minWidth: 0,
-                    [`& .${MasterServantListRowInfoStyleClassPrefix}-class-icon`]: {
-                        pl: 4
-                    },
-                    [`& .${MasterServantListRowInfoStyleClassPrefix}-rarity`]: {
-                        minWidth: 24,
-                        px: 4
-                    }
-                },
-                [`& .${MasterServantListRowStatsStyleClassPrefix}-root`]: {
-                    flex: ColumnWidths.stats.container,
-                    display: 'flex',
-                    alignItems: 'center',
-                    [`& .${MasterServantListRowNpLevelStyleClassPrefix}-root`]: {
-                        flex: ColumnWidths.stats.npLevel,
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        palette,
+        spacing
+    } = theme as Theme;
+
+    return {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        [`& .${StyleClassPrefix}-list-container`]: {
+            backgroundColor: palette.background.paper,
+            height: '100%',
+            overflow: 'auto',
+            [`& .${StyleClassPrefix}-list`]: {
+                [`& .${MasterServantListRowStyleClassPrefix}-root`]: {
+                    width: 'fit-content',
+                    minWidth: '100%',
+                    [`& .${MasterServantListRowStyleClassPrefix}-content`]: {
+                        userSelect: 'none',
+                        flex: 1,
                         display: 'flex',
+                        alignContent: 'center',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        '& img': {
-                            pr: 1,
-                            width: '18px',
-                            height: '18px'
-                        }
-                    },
-                    [`& .${MasterServantListRowLevelStyleClassPrefix}-root`]: {
-                        flex: ColumnWidths.stats.level,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        '&>.value': {
-                            width: '28px',
-                            textAlign: 'right',
-                            pr: 3
-                        },
-                        '&>img': {
-                            width: '16px',
-                            height: '16px'
-                        },
-                        '&>.ascension': {
-                            width: '16px'
-                        }
-                    },
-                    [`& .${MasterServantListRowFouLevelStyleClassPrefix}-root`]: {
-                        flex: ColumnWidths.stats.fou
-                    },
-                    [`& .${MasterServantListRowSkillLevelStyleClassPrefix}-root`]: {
-                        flex: ColumnWidths.stats.skills,
-                        display: 'flex',
                         textAlign: 'center',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        '&>.value': {
-                            width: '1.25rem'
+                        height: 52,
+                        fontSize: '0.875rem',
+                        [`& .${MasterServantListRowLabelStyleClassPrefix}-root`]: {
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: ColumnWidths.label,
+                            [`& .${MasterServantListRowLabelStyleClassPrefix}-class-icon`]: {
+                                pl: 4
+                            },
+                            [`& .${MasterServantListRowLabelStyleClassPrefix}-rarity`]: {
+                                minWidth: 24,
+                                px: 4
+                            }
                         },
-                    },
-                    [`& .${MasterServantListRowBondLevelStyleClassPrefix}-root`]: {
-                        flex: ColumnWidths.stats.bondLevel,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        '&>.value': {
-                            pl: 1.5,
-                            width: '1.25rem',
-                            textAlign: 'left'
+                        [`& .${MasterServantListRowStatsStyleClassPrefix}-root`]: {
+                            flex: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            [`& .${MasterServantListRowNpLevelStyleClassPrefix}-root`]: {
+                                width: ColumnWidths.stats.npLevel,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                '& img': {
+                                    pr: 1,
+                                    width: '18px',
+                                    height: '18px'
+                                }
+                            },
+                            [`& .${MasterServantListRowLevelStyleClassPrefix}-root`]: {
+                                width: ColumnWidths.stats.level,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                '&>.value': {
+                                    width: '28px',
+                                    textAlign: 'right',
+                                    pr: 3
+                                },
+                                '&>img': {
+                                    width: '16px',
+                                    height: '16px'
+                                },
+                                '&>.ascension': {
+                                    width: '16px'
+                                }
+                            },
+                            [`& .${MasterServantListRowFouLevelStyleClassPrefix}-root`]: {
+                                width: ColumnWidths.stats.fou
+                            },
+                            [`& .${MasterServantListRowSkillLevelStyleClassPrefix}-root`]: {
+                                width: ColumnWidths.stats.skills,
+                                display: 'flex',
+                                textAlign: 'center',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                '&>.value': {
+                                    width: '1.25rem'
+                                },
+                            },
+                            [`& .${MasterServantListRowBondLevelStyleClassPrefix}-root`]: {
+                                width: ColumnWidths.stats.bondLevel,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                '&>.value': {
+                                    pl: 1.5,
+                                    width: '1.25rem',
+                                    textAlign: 'left'
+                                }
+                            }
+                        },
+                        [`& .${MasterServantListRowStyleClassPrefix}-actions`]: {
+                            width: ColumnWidths.actions,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }
                     }
                 },
-                [`& .${MasterServantListRowStyleClassPrefix}-actions`]: {
-                    width: ColumnWidths.actions,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+                '&:not(.drag-drop-mode)': {
+                    [`& .${GameServantThumbnailStyleClassPrefix}-root`]: {
+                        pl: 3
+                    },
+                    '& .sticky-content': {
+                        left: spacing(-3)
+                    }
                 }
             }
         }
-    }
-} as SystemStyleObject<Theme>;
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const MasterServantList = React.memo((props: Props) => {
 
@@ -148,17 +168,18 @@ export const MasterServantList = React.memo((props: Props) => {
     const gameServantMap = useGameServantMap();
 
     const {
-        masterServants,
         bondLevels,
-        selectedServants,
         dragDropMode,
-        visibleColumns,
+        masterServants,
         onEditSelectedServants,
         onEditServant,
         onDeleteSelectedServants,
         onDeleteServant,
         onServantContextMenu,
-        onServantSelectionChange
+        onServantSelectionChange,
+        selectedServants,
+        showHeader,
+        visibleColumns
     } = props;
 
     const lastClickIndexRef = useRef<number>();
@@ -371,12 +392,12 @@ export const MasterServantList = React.memo((props: Props) => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <MasterServantListHeader
-                visibleColumns={visibleColumns}
-                dragDropMode={dragDropMode}
-            />
             <div className={`${StyleClassPrefix}-list-container`}>
-                <div className={`${StyleClassPrefix}-list`}>
+                {showHeader && <MasterServantListHeader
+                    visibleColumns={visibleColumns}
+                    dragDropMode={dragDropMode}
+                />}
+                <div className={clsx(`${StyleClassPrefix}-list`, dragDropMode && 'drag-drop-mode')}>
                     <DndProvider backend={HTML5Backend}>
                         {masterServants.map(renderMasterServantRow)}
                     </DndProvider>

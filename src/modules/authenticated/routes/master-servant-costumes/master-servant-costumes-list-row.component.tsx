@@ -1,11 +1,10 @@
 import { GameServant, GameServantCostume } from '@fgo-planner/types';
-import { Done as DoneIcon } from '@mui/icons-material';
 import { Checkbox } from '@mui/material';
-import clsx from 'clsx';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
 import { GameServantThumbnail } from '../../../../components/game/servant/game-servant-thumbnail.component';
 import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
+import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { Immutable } from '../../../../types/internal';
 
@@ -16,61 +15,49 @@ export type MasterServantCostumeRowData = Immutable<GameServantCostume & {
 
 type Props = {
     costume: MasterServantCostumeRowData;
-    unlocked?: boolean;
-    editMode?: boolean;
+    onChange: (costumeId: number, unlocked: boolean) => void;
     openLinksInNewTab?: boolean;
-    onUnlockToggle?: (id: number, value: boolean) => void;
+    unlocked?: boolean;
 };
 
-const ServantThumbnailSize = 48;
+const ServantThumbnailSize = 52;
 
 export const StyleClassPrefix = 'MasterServantCostumesListRow';
 
 export const MasterServantCostumesListRow = React.memo((props: Props) => {
 
     const {
-        costume,
-        unlocked,
-        editMode,
+        costume: {
+            collectionNo,
+            costumeId,
+            materials,
+            name,
+            servant
+        },
+        onChange,
         openLinksInNewTab,
-        onUnlockToggle
+        unlocked
     } = props;
-
-    const {
-        costumeId,
-        servant,
-        collectionNo,
-        name,
-        materials
-    } = costume;
 
     const gameItemMap = useGameItemMap();
 
-    const handleUnlockCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-        onUnlockToggle && onUnlockToggle(costumeId, event.target.checked);
-    }, [costumeId, onUnlockToggle]);
+    const handleUnlockCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
+        onChange(costumeId, event.target.checked);
+    }, [costumeId, onChange]);
 
-    const unlockedStatusNode: ReactNode = useMemo(() => {
-        if (!editMode) {
-            return (
-                <div className={`${StyleClassPrefix}-unlocked-status`}>
-                    {unlocked && <DoneIcon className={`${StyleClassPrefix}-unlocked-icon`} />}
-                </div>
-            );
-        }
-        const defaultUnlocked = !materials.materials.length;
-        return (
-            <div className={`${StyleClassPrefix}-unlocked-status`}>
-                {!defaultUnlocked && <Checkbox
-                    checked={unlocked}
-                    onChange={handleUnlockCheckboxChange}
-                />}
-            </div>
-        );
-    }, [editMode, handleUnlockCheckboxChange, materials, unlocked]);
+    const alwaysUnlocked = !materials.materials.length;
+
+    const unlockedStatusNode: ReactNode = (
+        <div className={`${StyleClassPrefix}-unlocked-status`}>
+            {!alwaysUnlocked && <Checkbox
+                checked={unlocked}
+                onChange={handleUnlockCheckboxChange}
+            />}
+        </div>
+    );
 
     const unlockMaterialNodes: ReactNode = useMemo(() => {
-        if (!gameItemMap || !materials.materials.length) {
+        if (!gameItemMap || alwaysUnlocked) {
             return null;
         }
         const nodes: ReactNode[] = [];
@@ -85,7 +72,7 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
             );
         }
         return nodes;
-    }, [gameItemMap, materials]);
+    }, [alwaysUnlocked, gameItemMap, materials.materials]);
 
     return (
         <StaticListRowContainer
@@ -105,9 +92,9 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
             <div className={`${StyleClassPrefix}-collection-no`}>
                 {collectionNo}
             </div>
-            <div className={clsx(`${StyleClassPrefix}-name`, 'truncate')}>
+            <TruncateText className={`${StyleClassPrefix}-name`}>
                 {name}
-            </div>
+            </TruncateText>
             <div className={`${StyleClassPrefix}-unlock-materials`}>
                 {unlockMaterialNodes}
             </div>

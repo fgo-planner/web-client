@@ -55,7 +55,6 @@ export const UserThemeEdit = React.memo(({ userTheme, forThemeMode }: Props) => 
                     <UserThemeColor
                         color={userTheme.foregroundColor}
                         label='Foreground'
-                        allowEditAlpha
                     />
                     <UserThemeColor
                         color={userTheme.drawerColor}

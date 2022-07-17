@@ -12,6 +12,7 @@ import { StorageUtils } from '../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { PageMetadataService } from './page-metadata.service';
+import { UserInterfaceService } from './user-interface.service';
 
 type UserThemes = {
     light: ThemeInfo;
@@ -23,6 +24,9 @@ export class ThemeService {
 
     @Inject(PageMetadataService)
     private readonly _pageMetadataService!: PageMetadataService;
+
+    @Inject(UserInterfaceService)
+    private readonly _userInterfaceService!: UserInterfaceService;
 
     private get _onThemeChange() {
         return SubscribablesContainer.get(SubscriptionTopics.UserInterface.ThemeChange);
@@ -37,13 +41,17 @@ export class ThemeService {
 
         const themeInfo = this._getDefaultThemeForMode(this._themeMode);
         console.log('ThemeService constructed', this._themeMode, themeInfo);
-        this._onThemeChange.next(themeInfo);
 
         /*
          * Set timeout here to allow the PageMetadataService to be injected first
-         * before accessing it in the subscription handler.
+         * before accessing it.
          */
         setTimeout(() => {
+            /*
+             * This access the PageMetadataService, so it has to be inside this timeout
+             * function.
+             */
+            this._updateTheme(themeInfo);
             /*
              * This class is meant to last the lifetime of the application; no need to
              * unsubscribe from subscriptions.
@@ -61,8 +69,7 @@ export class ThemeService {
             this._setThemeMode('light');
         }
         const themeInfo = this._currentUserThemes[this._themeMode];
-        this._setThemeColorMeta(themeInfo.themeOptions);
-        this._onThemeChange.next(themeInfo);
+        this._updateTheme(themeInfo);
     }
 
     private _loadThemeModeFromStorage(): ThemeMode {
@@ -89,8 +96,22 @@ export class ThemeService {
     private _handleCurrentUserPreferencesChange(userPreferences: Nullable<UserPreferences>): void {
         this._currentUserThemes = this._loadThemesFromUserPreferences(userPreferences);
         const themeInfo = this._currentUserThemes[this._themeMode];
+        this._updateTheme(themeInfo);
+    }
+
+    private _updateTheme(themeInfo: ThemeInfo): void {
         this._setThemeColorMeta(themeInfo.themeOptions);
+        /*
+         * Temporary disable animations on drawer so that the colors change instantly.
+         */
+        const invocationId = this._userInterfaceService.invokeNavigationDrawerNoAnimations();
         this._onThemeChange.next(themeInfo);
+        /*
+         * Restore animations on drawer.
+         */
+        setTimeout(() => {
+            this._userInterfaceService.waiveNavigationDrawerNoAnimations(invocationId);
+        });
     }
 
     /**

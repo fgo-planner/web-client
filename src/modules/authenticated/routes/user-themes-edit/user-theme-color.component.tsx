@@ -151,7 +151,7 @@ export const UserThemeColor = React.memo((props: Props) => {
         <TextField
             variant='outlined'
             fullWidth
-            label='Color (Hex or RGBA)'
+            label={allowEditAlpha ? 'Color (Hex or RGBA)' : 'Color (Hex or RGB)'}
             type='string'
             value={colorInputValue}
             onChange={handleColorInputFieldChange}

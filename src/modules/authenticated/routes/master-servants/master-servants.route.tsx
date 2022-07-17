@@ -1,28 +1,27 @@
 import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Theme } from '@mui/material';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import clsx from 'clsx';
 import lodash from 'lodash';
-import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
-import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { BottomBarActions } from '../../../../components/navigation/bottom-bar/bottom-bar-actions.component';
-import { BottomBar } from '../../../../components/navigation/bottom-bar/bottom-bar.component';
-import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
-import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { ThemeConstants } from '../../../../styles/theme-constants';
 import { Immutable, MasterServantUpdate, ModalOnCloseReason, Nullable } from '../../../../types/internal';
+import { Functions } from '../../../../utils/functions';
 import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SetUtils } from '../../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
-import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
+import { MasterServantList, StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantContextMenu } from './master-servants-context-menu.component';
 import { MasterServantsEditDialog } from './master-servants-edit-dialog.component';
 import { MasterServantsInfoPanel } from './master-servants-info-panel.component';
@@ -39,8 +38,6 @@ type MasterAccountData = {
     bondLevels: Record<number, MasterServantBondLevel>;
     unlockedCostumes: Array<number>;
 };
-
-const UnsavedChangesMessage = 'The changes you made have not been saved yet. Use the buttons on the right to revert or save the changes.';
 
 const getDefaultServantSelection = (): ServantSelection => ({
     instanceIds: new Set(),
@@ -65,38 +62,57 @@ const cloneMasterAccountData = (account: Nullable<Immutable<MasterAccount>>): Ma
 };
 
 const StyleClassPrefix = 'MasterServants';
+ 
+const StyleProps = (theme: SystemTheme) => {
 
-const StyleProps = (theme: Theme) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    [`& .${StyleClassPrefix}-switch-container`]: {
-        px: 4,
-        mb: -6
-    },
-    [`& .${StyleClassPrefix}-main-content`]: {
+    const {
+        breakpoints,
+        palette,
+        spacing
+    } = theme as Theme;
+
+    return {
         display: 'flex',
-        flex: '1',
-        // width: 'calc(100% - 48px)'
-    },
-    [`& .${StyleClassPrefix}-info-panel-container`]: {
-        width: 320,
+        flexDirection: 'column',
         height: '100%',
-        pr: 4,
-        py: 4,
-        boxSizing: 'border-box',
-        [theme.breakpoints.down('xl')]: {
-            width: 300
+        [`& .${StyleClassPrefix}-lower-layout-container`]: {
+            display: 'flex',
+            height: '100%',
+            overflow: 'hidden',
+            [`& .${StyleClassPrefix}-main-content`]: {
+                display: 'flex',
+                width: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`,
+                [`& .${StyleClassPrefix}-list-container`]: {
+                    flex: 1,
+                    overflow: 'hidden',
+                    [`& .${MasterServantListStyleClassPrefix}-root`]: {
+                        borderRightWidth: 1,
+                        borderRightStyle: 'solid',
+                        borderRightColor: palette.divider
+                    }
+                },
+                [`& .${StyleClassPrefix}-info-panel-container`]: {
+                    height: '100%',
+                    boxSizing: 'border-box',
+                    [breakpoints.down('md')]: {
+                        display: 'none'
+                    }
+                },
+            },
+            [breakpoints.down('sm')]: {
+                flexDirection: 'column',
+                [`& .${StyleClassPrefix}-main-content`]: {
+                    width: '100%',
+                    height: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`
+                }
+            }
         }
-    },
-    [`& .${StyleClassPrefix}-unsaved-message`]: {
-        color: theme.palette.warning.main
-    },
-} as SystemStyleObject<Theme>);
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const MasterServantsRoute = React.memo(() => {
 
-    useNavigationDrawerNoAnimations();
+    // useNavigationDrawerNoAnimations();
 
     const forceUpdate = useForceUpdate();
 
@@ -136,6 +152,11 @@ export const MasterServantsRoute = React.memo(() => {
     const [servantContextMenuPosition, setServantContextMenuPosition] = useState<{ x: number, y: number }>();
 
     /**
+     * Whether the info panel is open (expanded).
+     */
+    const [isInfoPanelOpen, setIsInfoPanelOpen] = useState<boolean>(true);
+
+    /**
      * Whether the multi-add servant dialog is open.
      */
     const [isMultiAddServantDialogOpen, setIsMultiAddServantDialogOpen] = useState<boolean>(false);
@@ -170,20 +191,22 @@ export const MasterServantsRoute = React.memo(() => {
 
     const dragDropMode = !!dragDropMasterServants;
 
-    const [showAppendSkills, setShowAppendSkills] = useState<boolean>(false);
+    // TODO No way to toggle this right now...
+    const [showAppendSkills,] = useState<boolean>(true);
 
-    const { sm, md, lg, xl } = useActiveBreakpoints();
+    const { sm, md } = useActiveBreakpoints();
 
+    // TODO Make this user configurable...
     const visibleColumns = useMemo((): MasterServantListVisibleColumns => ({
-        npLevel: lg,
+        npLevel: sm,
         level: sm,
-        bondLevel: xl,
-        fouHp: lg,
-        fouAtk: lg,
+        bondLevel: sm,
+        fouHp: sm,
+        fouAtk: sm,
         skills: sm,
         appendSkills: sm && showAppendSkills,
         actions: false
-    }), [showAppendSkills, sm, lg, xl]);
+    }), [showAppendSkills, sm]);
 
     /**
      * The selected servants.
@@ -581,6 +604,15 @@ export const MasterServantsRoute = React.memo(() => {
 
     //#region Common event handlers
 
+    const handleToggleInfoPanelOpen = useCallback(() => {
+        setIsInfoPanelOpen(Functions.toggleTruthy);
+    }, []);
+
+    //#endregion
+
+
+    //#region Common event handlers
+
     const handleAddServant = openAddServantDialog;
 
     const handleEditSelectedServants = openEditServantDialog;
@@ -591,10 +623,6 @@ export const MasterServantsRoute = React.memo(() => {
 
 
     //#region Other event handlers
-
-    const handleShowAppendSkillsChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
-        setShowAppendSkills(event.target.checked);
-    }, []);
 
     const handleFormChange = useCallback((): void => {
         const masterAccountData = masterAccountDataRef.current;
@@ -662,38 +690,6 @@ export const MasterServantsRoute = React.memo(() => {
 
     const isMultipleServantsSelected = selectedServants.length > 1;
 
-    /**
-     * Bottom bar node
-     */
-    let bottomBarNode: ReactNode;
-    if (!dragDropMode) {
-        bottomBarNode =(
-            <BottomBar show={isMasterAccountDirty}>
-                <div className={`${StyleClassPrefix}-unsaved-message`}>
-                    {UnsavedChangesMessage}
-                </div>
-                <BottomBarActions>
-                    <Button
-                        variant='contained'
-                        color='secondary'
-                        onClick={handleRevertButtonClick}
-                        disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
-                    >
-                        Revert
-                    </Button>
-                    <Button
-                        variant='contained'
-                        color='primary'
-                        onClick={handleSaveButtonClick}
-                        disabled={!isMasterAccountDirty || isLoadingIndicatorActive}
-                    >
-                        Save
-                    </Button>
-                </BottomBarActions>
-            </BottomBar>
-        );
-    };
-
     const {
         masterServants,
         bondLevels,
@@ -702,27 +698,18 @@ export const MasterServantsRoute = React.memo(() => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <div className='flex justify-space-between align-center'>
-                <PageTitle>Servant Roster</PageTitle>
-                <div className={`${StyleClassPrefix}-switch-container`}>
-                    <FormGroup row>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    name='showAppendSkills'
-                                    checked={showAppendSkills}
-                                    onChange={handleShowAppendSkillsChange}
-                                />
-                            }
-                            label='Append Skills'
-                        />
-                    </FormGroup>
-                </div>
-            </div>
-            <div className='flex overflow-hidden full-height'>
+            <RouteDataEditControls
+                title='Servant Roster'
+                hasUnsavedData={isMasterAccountDirty}
+                onRevertButtonClick={handleRevertButtonClick}
+                onSaveButtonClick={handleSaveButtonClick}
+                disabled={isLoadingIndicatorActive}
+            />
+            <div className={`${StyleClassPrefix}-lower-layout-container`}>
                 <MasterServantsNavigationRail
-                    selectedServantsCount={selectedServants.length}
+                    layout={sm ? 'column' : 'row'}
                     dragDropMode={dragDropMode}
+                    selectedServantsCount={selectedServants.length}
                     onAddServant={handleAddServant}
                     onMultiAddServant={handleMultiAddServant}
                     onDeleteSelectedServants={handleDeleteSelectedServants}
@@ -732,17 +719,12 @@ export const MasterServantsRoute = React.memo(() => {
                     onEditSelectedServants={handleEditSelectedServants}
                 />
                 <div className={`${StyleClassPrefix}-main-content`}>
-                    <LayoutContentSection
-                        className='py-4 pr-4 flex-fill'
-                        autoContentHeight
-                        layout='column'
-                        scrollbarTrackBorder
-                    >
+                    <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <MasterServantList
                             masterServants={dragDropMasterServants || masterServants}
                             bondLevels={bondLevels}
                             selectedServants={selectedInstanceIds}
-                            // showAddServantRow
+                            showHeader={sm}
                             visibleColumns={visibleColumns}
                             dragDropMode={dragDropMode}
                             onServantSelectionChange={setServantSelection}
@@ -751,29 +733,21 @@ export const MasterServantsRoute = React.memo(() => {
                             onEditServant={handleEditServant}
                             onDeleteServant={handleDeleteServant}
                         />
-                    </LayoutContentSection>
-                    {md && <div className={`${StyleClassPrefix}-info-panel-container`}>
-                        <LayoutContentSection
-                            autoContentHeight
-                            fullHeight
-                            layout='column'
-                        >
-                            <MasterServantsInfoPanel
-                                activeServants={selectedServants}
-                                bondLevels={bondLevels}
-                                unlockedCostumes={unlockedCostumes}
-                                showAppendSkills={showAppendSkills}
-                                // editMode={editMode}
-                                onStatsChange={handleFormChange}
-                            />
-                        </LayoutContentSection>
-                    </div>}
+                    </div>
+                    <div className={`${StyleClassPrefix}-info-panel-container`}>
+                        <MasterServantsInfoPanel
+                            keepChildrenMounted  // TODO Change this to false for mobile view, also make it user configurable.
+                            activeServants={selectedServants}
+                            bondLevels={bondLevels}
+                            unlockedCostumes={unlockedCostumes}
+                            // editMode={editMode}
+                            onStatsChange={handleFormChange}  // This currently doesn't do anything
+                            open={isInfoPanelOpen && md}
+                            onOpenToggle={handleToggleInfoPanelOpen}
+                        />
+                    </div>
                 </div>
             </div>
-            <div>
-                {bottomBarNode}
-            </div>
-            {/* <FabContainer children={fabContainerChildNodes} /> */}
             <MasterServantsEditDialog
                 bondLevels={bondLevels}
                 masterServantUpdate={editServantDialogData}

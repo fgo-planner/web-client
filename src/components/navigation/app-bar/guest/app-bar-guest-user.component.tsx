@@ -21,7 +21,7 @@ const StyleProps = {
     px: 4,
     py: 0,
     '& .MuiButton-root': {
-        ml: 3
+        ml: 4
     }
 } as SystemStyleObject;
 

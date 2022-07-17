@@ -1,13 +1,14 @@
-import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { ReactNode, useCallback, useMemo } from 'react';
+import { Theme } from '@mui/material';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import React, { ReactNode, useMemo } from 'react';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
-import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { GameServantList } from '../../../../types/data';
+import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
 import { MasterServantCostumeRowData, MasterServantCostumesListRow, StyleClassPrefix as MasterServantCostumesListRowStyleClassPrefix } from './master-servant-costumes-list-row.component';
 
 type Props = {
-    unlockedCostumesSet: Set<number>;
-    editMode?: boolean;
+    onChange: (costumeId: number, unlocked: boolean) => void;
+    unlockedCostumes: ReadonlySet<number>;
 };
 
 const transformCostumesList = (gameServants: GameServantList): Array<MasterServantCostumeRowData> => {
@@ -28,43 +29,61 @@ const transformCostumesList = (gameServants: GameServantList): Array<MasterServa
 
 const StyleClassPrefix = 'MasterServantCostumesList';
 
-const StyleProps = {
-    pb: 20,
-    [`& .${MasterServantCostumesListRowStyleClassPrefix}-root`]: {
-        height: 52,
-        display: 'flex',
-        alignItems: 'center',
-        fontSize: '0.875rem',
-        '&:not(:hover) .play-icon': {
-            opacity: 0
-        },
-        [`& .${MasterServantCostumesListRowStyleClassPrefix}-unlocked-status`]: {
-            width: 42,
-            px: 2,
-            textAlign: 'center',
-        },
-        [`& .${MasterServantCostumesListRowStyleClassPrefix}-collection-no`]: {
-            width: 64,
-            textAlign: 'center'
-        },
-        [`& .${MasterServantCostumesListRowStyleClassPrefix}-name`]: {
-            flex: '1 1',
-            minWidth: 0
-        },
-        [`& .${MasterServantCostumesListRowStyleClassPrefix}-unlocked-icon`]: {
-            color: 'limegreen'
-        },
-        [`& .${MasterServantCostumesListRowStyleClassPrefix}-unlock-materials`]: {
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        breakpoints,
+        palette,
+        spacing
+    } = theme as Theme;
+
+    return {
+        backgroundColor: palette.background.paper,
+        height: '100%',
+        overflow: 'auto',
+        [`& .${StyleClassPrefix}-list-container`]: {
             display: 'flex',
-            justifyContent: 'flex-end',
-            pr: 24
+            flexDirection: 'column',
+            [`& .${MasterServantCostumesListRowStyleClassPrefix}-root`]: {
+                height: 52,
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: '0.875rem',
+                [`& .${MasterServantCostumesListRowStyleClassPrefix}-unlocked-status`]: {
+                    minWidth: 42,
+                    px: 2,
+                    textAlign: 'center',
+                },
+                [`& .${MasterServantCostumesListRowStyleClassPrefix}-collection-no`]: {
+                    width: 64,
+                    textAlign: 'center'
+                },
+                [`& .${MasterServantCostumesListRowStyleClassPrefix}-name`]: {
+                    flex: '1 1',
+                    minWidth: 0,
+                    [breakpoints.down('sm')]: {
+                        visibility: 'hidden',
+                        maxWidth: spacing(8),  // 32px
+                    }
+                },
+                [`& .${MasterServantCostumesListRowStyleClassPrefix}-unlock-materials`]: {
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    minWidth: spacing(75),  // 300px
+                    pr: 8,
+                    [breakpoints.down('sm')]: {
+                        pr: 6
+                    }
+                }
+            },
+            [breakpoints.down('sm')]: {
+                minWidth: 'fit-content'
+            }
         }
-    }
-} as SystemStyleObject<Theme>;
+    } as SystemStyleObject<SystemTheme>;
+};
 
-export const MasterServantCostumesList = React.memo(({ unlockedCostumesSet, editMode }: Props) => {
-
-    const forceUpdate = useForceUpdate();
+export const MasterServantCostumesList = React.memo(({ onChange, unlockedCostumes }: Props) => {
 
     const gameServantList = useGameServantList();
 
@@ -75,20 +94,6 @@ export const MasterServantCostumesList = React.memo(({ unlockedCostumesSet, edit
         return transformCostumesList(gameServantList);
     }, [gameServantList]);
 
-    const handleUnlockToggle = useCallback((id: number, value: boolean) => {
-        if (value) {
-            if (!unlockedCostumesSet.has(id)) {
-                unlockedCostumesSet.add(id);
-                forceUpdate();
-            }
-        } else {
-            if (unlockedCostumesSet.has(id)) {
-                unlockedCostumesSet.delete(id);
-                forceUpdate();
-            }
-        }
-    }, [forceUpdate, unlockedCostumesSet]);
-
     /*
      * This can be empty during the initial render.
      */
@@ -97,23 +102,25 @@ export const MasterServantCostumesList = React.memo(({ unlockedCostumesSet, edit
     }
 
     const renderCostumeRow = (costume: MasterServantCostumeRowData): ReactNode => {
-        const { costumeId, materials } = costume;
-        const unlocked = unlockedCostumesSet.has(costumeId) || !materials.materials.length;
+        const { costumeId } = costume;
+        const unlocked = unlockedCostumes.has(costumeId);
         return (
             <MasterServantCostumesListRow
                 key={costumeId}
                 costume={costume}
-                editMode={editMode}
                 unlocked={unlocked}
-                onUnlockToggle={handleUnlockToggle}
-                openLinksInNewTab={editMode}
+                onChange={onChange}
+                openLinksInNewTab
             />
         );
     };
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            {costumesList.map(renderCostumeRow)}
+            <div className={`${StyleClassPrefix}-list-container`}>
+                <MasterServantCostumesListHeader />
+                {costumesList.map(renderCostumeRow)}
+            </div>
         </Box>
     );
 

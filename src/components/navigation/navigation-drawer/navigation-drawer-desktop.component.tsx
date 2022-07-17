@@ -28,9 +28,9 @@ const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => {
 };
 
 const StyleOptions = {
-    name: StyleClassPrefix,
-    slot: 'root',
-    shouldForwardProp
+    shouldForwardProp,
+    skipSx: true,
+    skipVariantsResolver: true
 } as MuiStyledOptions & FilteringStyledOptions<Props>;
 
 const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {

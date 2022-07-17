@@ -40,7 +40,7 @@ const StyleProps = ((theme: Theme) => {
             justifyContent: 'start',
             transition: 'none',
             [`& .${StyleClassPrefix}-icon`]: {
-                fontSize: '1.875rem'
+                fontSize: '1.75rem'
             },
             [`& .${StyleClassPrefix}-label`]: {
                 pl: 3,
@@ -53,7 +53,7 @@ const StyleProps = ((theme: Theme) => {
         },
         [`&.${StyleClassPrefix}-condensed`]: {
             [`& .${StyleClassPrefix}-icon`]: {
-                mx: 0.25,
+                mx: 0.5,
                 transition: `margin ${transitions.duration.leavingScreen}ms ${transitions.easing.sharp}`
             },
             [`& .${StyleClassPrefix}-icon, .${StyleClassPrefix}-label`]: {
@@ -170,7 +170,7 @@ export const NavigationDrawerContentItem = React.memo(({ item }: Props) => {
                     onClick={handleClick}
                     href={(item as LinkItem).route}
                 >
-                    <Icon className={`${StyleClassPrefix}-icon`} fontSize='medium' />
+                    <Icon className={`${StyleClassPrefix}-icon`} />
                     {expanded && <div className={`${StyleClassPrefix}-label`}>
                         {label}
                     </div>}

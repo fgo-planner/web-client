@@ -2,11 +2,13 @@ import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
+import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
 import { Immutable, ReadonlyPartial } from '../../../../../../types/internal';
+import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
 import { MasterServantListVisibleColumns } from './master-servant-list-columns';
-import { MasterServantListRowInfo } from './master-servant-list-row-info.component';
+import { MasterServantListRowLabel } from './master-servant-list-row-label.component';
 import { MasterServantListRowStats } from './master-servant-list-row-stats.component';
 
 type Props = {
@@ -78,15 +80,26 @@ export const MasterServantListRow = React.memo((props: Props) => {
         );
     }
 
-    const servantInfoNode: ReactNode = (
-        <MasterServantListRowInfo
+    const artStage = MasterServantUtils.getArtStage(masterServant.ascension);
+
+    const servantThumbnailNode: ReactNode = (
+        <GameServantThumbnail
+            size={52}
             gameServant={gameServant}
-            masterServant={masterServant}
-            openLinksInNewTab
+            stage={artStage}
+            enableLink
+            openLinkInNewTab
+            showOpenInNewTabIndicator
         />
     );
 
-    const servantStatsNode: ReactNode = (
+    const labelNode: ReactNode = (
+        <MasterServantListRowLabel
+            gameServant={gameServant}
+        />
+    );
+
+    const statsNode: ReactNode = (
         <MasterServantListRowStats
             active={active}
             bond={bond}
@@ -106,16 +119,10 @@ export const MasterServantListRow = React.memo((props: Props) => {
         </div>
     );
 
-    const rowContents: ReactNode = (
-        <div className={`${StyleClassPrefix}-root`}>
-            {servantInfoNode}
-            {servantStatsNode}
-            {actionButtonsNode}
-        </div>
-    );
-
     return (
         <DraggableListRowContainer
+            className={`${StyleClassPrefix}-root`}
+            stickyContent={servantThumbnailNode}
             draggableId={masterServant.instanceId}
             index={index}
             borderBottom={!lastRow}
@@ -127,7 +134,11 @@ export const MasterServantListRow = React.memo((props: Props) => {
             onContextMenu={handleContextMenu}
             {...domAttributes}
         >
-            {rowContents}
+            <div className={`${StyleClassPrefix}-content`}>
+                {labelNode}
+                {statsNode}
+                {actionButtonsNode}
+            </div>
         </DraggableListRowContainer>
     );
 

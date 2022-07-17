@@ -78,15 +78,18 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
                     />
                 </div>
             </Tooltip>
-            <Tooltip key='reorder' title='Reorder servants' placement='right'>
-                <div>
-                    <IconButton
-                        onClick={onDragDropActivate}
-                        children={<ReorderIcon />}
-                        size='large'
-                    />
-                </div>
-            </Tooltip>
+            {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
+            {layout !== 'row' &&
+                <Tooltip key='reorder' title='Reorder servants' placement='right'>
+                    <div>
+                        <IconButton
+                            onClick={onDragDropActivate}
+                            children={<ReorderIcon />}
+                            size='large'
+                        />
+                    </div>
+                </Tooltip>
+            }
             <Tooltip key='edit' title='Edit selected' placement='right'>
                 <div>
                     <IconButton
@@ -108,19 +111,19 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
                     />
                 </div>
             </Tooltip>
+            <Divider />
+            <Tooltip key='stats' title='Servant stats' placement='right'>
+                <div>
+                    <IconButton
+                        component={Link}
+                        to='stats'
+                        children={<BarChartIcon />}
+                        size='large'
+                    />
+                </div>
+            </Tooltip>
             {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
-            {layout !== 'row' && <>
-                <Divider />
-                <Tooltip key='stats' title='Servant stats' placement='right'>
-                    <div>
-                        <IconButton
-                            component={Link}
-                            to='stats'
-                            children={<BarChartIcon />}
-                            size='large'
-                        />
-                    </div>
-                </Tooltip>
+            {layout !== 'row' &&
                 <Tooltip key='import-export' title='Upload servant data' placement='right'>
                     {/* TODO This needs to open a menu with various import/export options. */}
                     <div>
@@ -132,7 +135,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
                         />
                     </div>
                 </Tooltip>
-            </>}
+            }
         </NavigationRail>
     );
 

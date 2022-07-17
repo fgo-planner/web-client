@@ -1,9 +1,8 @@
-import { Save, Undo } from '@mui/icons-material';
+import { Save as SaveIcon, Undo as UndoIcon } from '@mui/icons-material';
 import { Button, IconButton, Theme } from '@mui/material';
-import { Box, SystemStyleObject } from '@mui/system';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEventHandler, ReactNode } from 'react';
 import { useActiveBreakpoints } from '../../hooks/user-interface/use-active-breakpoints.hook';
-import { SxPropsFunction } from '../../types/internal';
 import { PageTitle } from '../text/page-title.component';
 import { TruncateText } from '../text/truncate-text.component';
 
@@ -35,12 +34,12 @@ const DefaultUnsavedMessage = 'There are unsaved changes';
 
 const StyleClassPrefix = 'RouteDataEditControls';
 
-const StyleProps = ((theme: Theme) => {
+const StyleProps = (theme: SystemTheme) => {
 
     const {
         breakpoints,
         palette
-    } = theme;
+    } = theme as Theme;
 
     return {
         display: 'flex',
@@ -88,9 +87,8 @@ const StyleProps = ((theme: Theme) => {
                 pr: 3
             }
         }
-    } as SystemStyleObject;
-
-}) as SxPropsFunction;
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const RouteDataEditControls = React.memo((props: Props) => {
 
@@ -132,7 +130,7 @@ export const RouteDataEditControls = React.memo((props: Props) => {
                     onClick={onRevertButtonClick}
                     disabled={disabled || !hasUnsavedData}
                 >
-                    <Undo />
+                    <UndoIcon />
                 </IconButton>
             )
         );
@@ -152,7 +150,7 @@ export const RouteDataEditControls = React.memo((props: Props) => {
                 onClick={onSaveButtonClick}
                 disabled={disabled || !hasUnsavedData}
             >
-                <Save />
+                <SaveIcon />
             </IconButton>
         );
 

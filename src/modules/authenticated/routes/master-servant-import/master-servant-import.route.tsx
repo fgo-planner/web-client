@@ -1,8 +1,7 @@
 import { MasterAccount, MasterServant } from '@fgo-planner/types';
-import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog } from '../../../../components/dialog/alert-dialog.component';
-import { AppBarElevateOnScroll } from '../../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
@@ -178,7 +177,7 @@ const MasterServantImportRoute = React.memo(() => {
                 const masterServant = MasterServantUpdateUtils.convertToMasterServant(instanceId++, parsedUpdate, bondLevels);
                 masterServants.push(masterServant);
             }
-            
+
             if (existingAction === ExistingAction.Append) {
                 update.servants = [
                     ...masterAccount.servants,
@@ -252,14 +251,10 @@ const MasterServantImportRoute = React.memo(() => {
         );
     }, [handleImportStatusDialogAction, importStatus, importStatusDialogOpen]);
 
-    return (
-        <Fragment>
-            <AppBarElevateOnScroll>
-                {mainContentNode}
-            </AppBarElevateOnScroll>
-            {importStatusDialog}
-        </Fragment>
-    );
+    return <>
+        {mainContentNode}
+        {importStatusDialog}
+    </>;
 
 });
 

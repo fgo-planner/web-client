@@ -108,28 +108,31 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
                     />
                 </div>
             </Tooltip>
-            <Divider />
-            <Tooltip key='stats' title='Servant stats' placement='right'>
-                <div>
-                    <IconButton
-                        component={Link}
-                        to='stats'
-                        children={<BarChartIcon />}
-                        size='large'
-                    />
-                </div>
-            </Tooltip>
-            <Tooltip key='import-export' title='Upload servant data' placement='right'>
-                {/* TODO This needs to open a menu with various import/export options. */}
-                <div>
-                    <IconButton
-                        component={Link}
-                        to='../master/data/import/servants'
-                        children={<ImportExportIcon />}
-                        size='large'
-                    />
-                </div>
-            </Tooltip>
+            {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
+            {layout !== 'row' && <>
+                <Divider />
+                <Tooltip key='stats' title='Servant stats' placement='right'>
+                    <div>
+                        <IconButton
+                            component={Link}
+                            to='stats'
+                            children={<BarChartIcon />}
+                            size='large'
+                        />
+                    </div>
+                </Tooltip>
+                <Tooltip key='import-export' title='Upload servant data' placement='right'>
+                    {/* TODO This needs to open a menu with various import/export options. */}
+                    <div>
+                        <IconButton
+                            component={Link}
+                            to='../master/data/import/servants'
+                            children={<ImportExportIcon />}
+                            size='large'
+                        />
+                    </div>
+                </Tooltip>
+            </>}
         </NavigationRail>
     );
 

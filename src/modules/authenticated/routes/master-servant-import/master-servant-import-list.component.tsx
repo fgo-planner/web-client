@@ -1,11 +1,12 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Clear as ClearIcon, Done as DoneIcon } from '@mui/icons-material';
-import { Fab, Tooltip } from '@mui/material';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { Fragment, ReactNode, useCallback, useMemo, useState } from 'react';
-import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutContentSection, StyleClassPrefix as LayoutContentSectionStyleClassPrefix } from '../../../../components/layout/layout-content-section.component';
+import { Check as CheckIcon, Clear as ClearIcon } from '@mui/icons-material';
+import { Button, IconButton, Theme } from '@mui/material';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import clsx from 'clsx';
+import React, { ReactNode, useCallback, useMemo, useState } from 'react';
+import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
+import { ThemeConstants } from '../../../../styles/theme-constants';
 import { MasterServantUpdateIndeterminateValue as IndeterminateValue, ModalOnCloseReason } from '../../../../types/internal';
 import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
@@ -41,27 +42,64 @@ const ServantListVisibleColumns: MasterServantListVisibleColumns = {
 
 const StyleClassPrefix = 'MasterServantImportList';
 
-const StyleProps = (theme: Theme) => ({
-    mb: 20,
-    [`& .${StyleClassPrefix}-helper-text`]: {
-        color: 'text.secondary',
-        minWidth: theme.breakpoints.values.lg,
-        px: 4,
-        pt: 6,
-        pb: 4
-    },
-    [`& .${StyleClassPrefix}-footer-padding`]: {
-        py: 10
-    },
-    [`& .${LayoutContentSectionStyleClassPrefix}-root`]: {
-        p: 4
-    }
-} as SystemStyleObject<Theme>);
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        breakpoints,
+        palette
+    } = theme as Theme;
+
+    return {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        [`& .${StyleClassPrefix}-actions-row`]: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            [`& .${StyleClassPrefix}-message`]: {
+                color: palette.warning.main,
+                px: 4,
+                pt: 6,
+                pb: 4
+            },
+            [`& .${StyleClassPrefix}-actions`]: {
+                display: 'flex',
+                flexWrap: 'nowrap',
+                pr: 4,
+                '&>.MuiButtonBase-root': {
+                    '&:not(:first-of-type)': {
+                        ml: 3,
+                        [breakpoints.down('sm')]: {
+                            ml: 1
+                        }
+                    }
+                },
+                '&>.MuiButton-root': {
+                    width: '5rem'
+                }
+            }
+        },
+        [`& .${StyleClassPrefix}-main-content`]: {
+            display: 'flex',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+            [`& .${StyleClassPrefix}-list-container`]: {
+                flex: 1,
+                overflow: 'hidden'
+            }
+        }
+    } as SystemStyleObject<SystemTheme>;
+};
+
 
 export const MasterServantImportList = React.memo((props: Props) => {
 
     const {
-        parsedData,
+        parsedData: {
+            servantUpdates: parsedMasterServantUpdates
+        },
         hasExistingServants,
         onCancel,
         onSubmit
@@ -69,9 +107,9 @@ export const MasterServantImportList = React.memo((props: Props) => {
 
     const [showExistingDialog, setShowExistingDialog] = useState<boolean>(false);
 
-    const parsedMasterServantUpdates = parsedData.servantUpdates;
+    const { sm } = useActiveBreakpoints();
 
-    const masterServantListData = useMemo((): { 
+    const masterServantListData = useMemo((): {
         masterServants: Array<MasterServant>;
         bondLevels: Record<number, MasterServantBondLevel>;
     } => {
@@ -110,50 +148,65 @@ export const MasterServantImportList = React.memo((props: Props) => {
         }
     }, [onSubmit]);
 
-    const fabContainerNode: ReactNode = (
-        <FabContainer>
-            <Tooltip title='Cancel'>
-                <div>
-                    <Fab
-                        color='default'
-                        onClick={onCancel}
-                        children={<ClearIcon />}
-                    />
-                </div>
-            </Tooltip>
-            <Tooltip title='Confirm'>
-                <div>
-                    <Fab
-                        color='primary'
-                        onClick={handleSubmitButtonClick}
-                        children={<DoneIcon />}
-                    />
-                </div>
-            </Tooltip>
-        </FabContainer>
+    const actionsNode: ReactNode = (
+        <div className={`${StyleClassPrefix}-actions`}>
+            {sm ? <>
+                <Button
+                    variant='outlined'
+                    color='primary'
+                    onClick={onCancel}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={handleSubmitButtonClick}
+                >
+                    Confirm
+                </Button>
+            </> : <>
+                <IconButton
+                    color='primary'
+                    onClick={onCancel}
+                >
+                    <ClearIcon />
+                </IconButton>
+                <IconButton
+                    color='primary'
+                    onClick={handleSubmitButtonClick}
+                >
+                    <CheckIcon />
+                </IconButton>
+            </>}
+        </div>
     );
 
-    return (
-        <Fragment>
-            <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-                <div className={`${StyleClassPrefix}-helper-text`}>
+    return <>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <div className={`${StyleClassPrefix}-actions-row`}>
+                <div className={`${StyleClassPrefix}-message`}>
                     {ParseResultHelperText}
                 </div>
-                <LayoutContentSection>
+                {actionsNode}
+            </div>
+            <div className={`${StyleClassPrefix}-main-content`}>
+                <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                     <MasterServantList
                         masterServants={masterServantListData.masterServants}
                         bondLevels={masterServantListData.bondLevels}
+                        showHeader
                         visibleColumns={ServantListVisibleColumns}
                     />
-                </LayoutContentSection>
-            </Box>
-            {fabContainerNode}
-            <MasterServantImportExistingDialog
-                open={showExistingDialog}
-                confirmButtonColor='primary'
-                onClose={handleExistingDialogAction}
-            />
-        </Fragment>
-    );
+                </div>
+            </div>
+        </Box>
+        {/* {fabContainerNode} */}
+        <MasterServantImportExistingDialog
+            open={showExistingDialog}
+            confirmButtonColor='primary'
+            onClose={handleExistingDialogAction}
+        />
+    </>;
 
 });

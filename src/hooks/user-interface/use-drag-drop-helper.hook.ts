@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { ArrayUtils } from '../../utils/array.utils';
 
-type DragDropListHelperHookResult<T> = {
+type DragDropHelperHookResult<T> = {
     /**
      * Contains a shallow clone of the source data array if drag-drop mode is
      * active; otherwise will be `undefined`. A new array instance will be created
@@ -27,7 +27,7 @@ type DragDropListHelperHookResult<T> = {
     handleDragOrderChange: (sourceId: number, destinationId: number) => void;
 };
 
-export const useDragDropListHelper = <T>(idTransformFunction: (value: T) => number): DragDropListHelperHookResult<T> => {
+export const useDragDropHelper = <T>(getIdFunction: (value: T) => number): DragDropHelperHookResult<T> => {
 
     const [dragDropData, setDragDropData] = useState<Array<T>>();
 
@@ -40,12 +40,12 @@ export const useDragDropListHelper = <T>(idTransformFunction: (value: T) => numb
         const resultContainer: { result?: Array<number> } = {};
         setDragDropData((dragDropData: Array<T> | undefined): undefined => {
             if (dragDropData) {
-                resultContainer.result = dragDropData.map(idTransformFunction);
+                resultContainer.result = dragDropData.map(getIdFunction);
             }
             return undefined;
         });
         return resultContainer.result;
-    }, [idTransformFunction]);
+    }, [getIdFunction]);
 
     const handleDragOrderChange = useCallback((sourceId: number, destinationId: number): void => {
         setDragDropData((dragDropData: Array<T> | undefined): Array<T> | undefined => {
@@ -56,12 +56,12 @@ export const useDragDropListHelper = <T>(idTransformFunction: (value: T) => numb
             if (sourceId === destinationId) {
                 return dragDropData;
             }
-            const sourceIndex = dragDropData.findIndex((value: T) => idTransformFunction(value) === sourceId);
-            const destinationIndex = dragDropData.findIndex((value: T) => idTransformFunction(value) === destinationId);
+            const sourceIndex = dragDropData.findIndex((value: T) => getIdFunction(value) === sourceId);
+            const destinationIndex = dragDropData.findIndex((value: T) => getIdFunction(value) === destinationId);
             const updatedDragDropData = ArrayUtils.moveElement([...dragDropData], sourceIndex, destinationIndex);
             return updatedDragDropData;
         });
-    }, [idTransformFunction]);
+    }, [getIdFunction]);
 
     return {
         dragDropData,

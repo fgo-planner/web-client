@@ -7,8 +7,9 @@ import { RouteDataEditControls } from '../../../../components/control/route-data
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
-import { useDragDropListHelper } from '../../../../hooks/user-interface/use-drag-drop-list-helper.hook';
-import { useMultiSelectListHelper } from '../../../../hooks/user-interface/use-multi-select-list-helper.hook';
+import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
+import { useListSelectHelper } from '../../../../hooks/user-interface/use-multi-select-list-helper.hook';
+import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ExistingMasterServantUpdate, Immutable, MasterServantUpdate, ModalOnCloseReason } from '../../../../types/internal';
 import { Functions } from '../../../../utils/functions';
@@ -77,7 +78,7 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const MasterServantsRoute = React.memo(() => {
 
-    // useNavigationDrawerNoAnimations();
+    useNavigationDrawerNoAnimations();
 
     const gameServantMap = useGameServantMap();
 
@@ -102,7 +103,7 @@ export const MasterServantsRoute = React.memo(() => {
         startDragDrop,
         endDragDrop,
         handleDragOrderChange
-    } = useDragDropListHelper(getInstanceId);
+    } = useDragDropHelper(getInstanceId);
 
     const dragDropMode = !!dragDropData;
 
@@ -125,8 +126,9 @@ export const MasterServantsRoute = React.memo(() => {
         selectAll: selectAllServants,
         selectNone: deselectServants,
         handleItemClick: handleServantClick,
-    } = useMultiSelectListHelper(masterAccountEditData.servants, getInstanceId, {
+    } = useListSelectHelper(masterAccountEditData.servants, getInstanceId, {
         disabled: dragDropMode,
+        multiple: true,
         rightClickBehavior: 'contextmenu',
         onContextMenu: handleServantContextMenuOpen,
     });
@@ -186,14 +188,14 @@ export const MasterServantsRoute = React.memo(() => {
      * Applies the submitted edit to the currently selected servants.
      */
     const applyUpdateToSelectedServants = useCallback((update: ExistingMasterServantUpdate) => {
-        updateServants(selectedServantData.ids, update);
+        updateServants(selectedServantData.selectedIds, update);
     }, [selectedServantData, updateServants]);
 
     /**
      * Deletes the currently selected servants.
      */
     const deleteSelectedServants = useCallback((): void => {
-        deleteServants(selectedServantData.ids);
+        deleteServants(selectedServantData.selectedIds);
     }, [deleteServants, selectedServantData]);
 
     const openAddServantDialog = useCallback((): void => {
@@ -215,7 +217,7 @@ export const MasterServantsRoute = React.memo(() => {
     }, []);
 
     const openEditServantDialog = useCallback((): void => {
-        const { items: selectedServants} = selectedServantData;
+        const { selectedItems: selectedServants } = selectedServantData;
         if (!selectedServants.length) {
             return;
         }
@@ -235,7 +237,7 @@ export const MasterServantsRoute = React.memo(() => {
         if (!gameServantMap) {
             return;
         }
-        const { items: selectedServants} = selectedServantData;
+        const { selectedItems: selectedServants } = selectedServantData;
         if (!selectedServants.length) {
             return;
         }
@@ -382,12 +384,12 @@ export const MasterServantsRoute = React.memo(() => {
         return null;
     }
 
-    const {
-        ids: selectedInstanceIds,
-        items: selectedServants
+    const { 
+        selectedIds: selectedInstanceIds,
+        selectedCount: selectedServantsCount
     } = selectedServantData;
-
-    const isMultipleServantsSelected = selectedServants.length > 1;
+    
+    const isMultipleServantsSelected = selectedServantsCount > 1;
 
     const {
         servants: masterServants,
@@ -408,7 +410,7 @@ export const MasterServantsRoute = React.memo(() => {
                 <MasterServantsNavigationRail
                     layout={sm ? 'column' : 'row'}
                     dragDropMode={dragDropMode}
-                    selectedServantsCount={selectedServants.length}
+                    selectedServantsCount={selectedServantsCount}
                     onAddServant={handleAddServant}
                     onMultiAddServant={handleMultiAddServant}
                     onDeleteSelectedServants={handleDeleteSelectedServants}
@@ -434,8 +436,15 @@ export const MasterServantsRoute = React.memo(() => {
                     </div>
                     <div className={`${StyleClassPrefix}-info-panel-container`}>
                         <MasterServantsInfoPanel
-                            keepChildrenMounted  // TODO Change this to false for mobile view, also make it user configurable.
-                            activeServants={selectedServants}
+                            /**
+                             * TODO Change this to false for mobile view, also make it user configurable.
+                             */ 
+                            keepChildrenMounted
+                            /**
+                             * TODO If closed and not kept mounted, then don't load the selectedItems since
+                             * it is lazy loaded.
+                             */
+                            activeServants={selectedServantData.selectedItems} 
                             bondLevels={bondLevels}
                             unlockedCostumes={costumes}
                             // editMode={editMode}
@@ -468,7 +477,7 @@ export const MasterServantsRoute = React.memo(() => {
             />
             <MasterServantContextMenu
                 position={servantContextMenuPosition}
-                selectedServantsCount={selectedServants.length}
+                selectedServantsCount={selectedServantsCount}
                 onAddServant={handleAddServant}
                 onDeleteSelectedServants={handleDeleteSelectedServants}
                 onEditSelectedServants={handleEditSelectedServants}

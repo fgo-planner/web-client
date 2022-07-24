@@ -96,14 +96,12 @@ const StyleProps = (theme: SystemTheme) => {
     } = theme as Theme;
 
     return {
-        // backgroundColor: palette.background.paper,
         width: spacing(90),  // 360px
         display: 'flex',
         flexDirection: 'column',
         position: 'relative',
         height: '100%',
         [`& .${StyleClassPrefix}-actions-container`]: {
-            // backgroundColor: palette.background.paper,
             display: 'flex',
             flexDirection: 'row-reverse',
             alignItems: 'center',

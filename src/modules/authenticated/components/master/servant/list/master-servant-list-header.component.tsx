@@ -66,9 +66,6 @@ const StyleProps = (theme: SystemTheme) => {
                 [`& .${StyleClassPrefix}-bond-level`]: {
                     width: ColumnWidths.stats.bondLevel
                 }
-            },
-            [`& .${StyleClassPrefix}-actions`]: {
-                width: ColumnWidths.actions
             }
         }
     } as SystemStyleObject<SystemTheme>;
@@ -83,8 +80,7 @@ export const MasterServantListHeader = React.memo(({ dragDropMode, visibleColumn
         fouAtk,
         skills,
         appendSkills,
-        bondLevel,
-        actions
+        bondLevel
     } = visibleColumns || {};
 
     return (
@@ -130,10 +126,6 @@ export const MasterServantListHeader = React.memo(({ dragDropMode, visibleColumn
                             Bond
                         </div>
                     }
-                    {actions &&
-                        <div className={`${StyleClassPrefix}-actions`}>
-                            Actions
-                        </div>}
                 </div>
             </div>
         </Box>

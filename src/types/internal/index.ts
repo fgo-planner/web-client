@@ -20,6 +20,7 @@ export * from './generics/immutable.type';
 export * from './generics/mutable.type';
 export * from './generics/nullable.type';
 export * from './generics/optional.type';
+export * from './generics/readonly-iterable.type';
 export * from './generics/readonly-partial-array.type';
 export * from './generics/readonly-partial.type';
 export * from './generics/readonly-record.type';

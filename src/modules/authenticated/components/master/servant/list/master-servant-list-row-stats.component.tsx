@@ -1,6 +1,6 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import React, { DOMAttributes } from 'react';
-import { ReadonlyPartial } from '../../../../../../types/internal';
+import { Immutable, ReadonlyPartial } from '../../../../../../types/internal';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
 import { MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRowBondLevel } from './master-servant-list-row-bond-level.component';
@@ -12,7 +12,7 @@ import { MasterServantListRowSkillLevel } from './master-servant-list-row-skill-
 type Props = {
     active?: boolean;
     bond: MasterServantBondLevel | undefined;
-    masterServant: MasterServant;
+    masterServant: Immutable<MasterServant>;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
 } & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu'>;
 

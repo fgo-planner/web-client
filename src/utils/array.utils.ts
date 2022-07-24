@@ -1,22 +1,22 @@
 export class ArrayUtils {
 
-    private constructor () {
-        
+    private constructor() {
+
     }
 
     static mapArrayToObject<T, K extends string | number | symbol>(
-        arr: ReadonlyArray<T>, 
+        arr: ReadonlyArray<T>,
         keyFunc: (elem: T) => K
     ): Record<K, T>;
 
     static mapArrayToObject<T, K extends string | number | symbol, V>(
-        arr: ReadonlyArray<T>, 
+        arr: ReadonlyArray<T>,
         keyFunc: (elem: T) => K,
         valueFunc: (elem: T) => V
     ): Record<K, V>;
 
     static mapArrayToObject<T, K extends string | number | symbol, V>(
-        arr: ReadonlyArray<T>, 
+        arr: ReadonlyArray<T>,
         keyFunc: (elem: T) => K,
         valueFunc?: (elem: T) => V
     ): Record<K, T | V> {
@@ -56,18 +56,19 @@ export class ArrayUtils {
      * If the given indices are equal, no operations will take place. If one or
      * more of the indexes are out of bounds, an error is thrown.
      */
-    static moveElement(array: Array<any>, from: number, to: number) {
+    static moveElement<T>(array: Array<T>, from: number, to: number): Array<T> {
         if (from === to) {
-            return;
+            return array;
         }
         ArrayUtils._checkBounds(array, from);
         ArrayUtils._checkBounds(array, to);
 
         const element = array.splice(from, 1)[0];
         array.splice(to, 0, element);
+        return array;
     }
 
-    private static _checkBounds(array: Array<any>, index: number): void {
+    private static _checkBounds<T>(array: Array<T>, index: number): void {
         if (index < 0 || index >= array.length) {
             throw new Error(`Index ${index} is out of bounds`);
         }

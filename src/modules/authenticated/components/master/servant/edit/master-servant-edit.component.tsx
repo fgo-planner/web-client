@@ -94,7 +94,6 @@ export const MasterServantEdit = React.memo((props: Props) => {
             return;
         }
         const gameId = masterServantUpdate.gameId;
-        console.log(gameId);
         if (gameId === IndeterminateValue) {
             setGameServant(undefined);
         } else {

@@ -163,7 +163,7 @@ const MasterServantImportRoute = React.memo(() => {
             /*
              * Merge the parsed servants into the existing servants.
              */
-            MasterServantUpdateUtils.batchApplyFromUpdatePayloads(servants, parsedData.servantUpdates, bondLevels);
+            MasterServantUpdateUtils.batchApplyFromUpdateObjects(servants, parsedData.servantUpdates, bondLevels);
 
             update.servants = servants;
         } else {

@@ -24,7 +24,6 @@ type Props = {
 const ParseResultHelperText = `The following servants were parsed from the given data. They have NOT been imported yet. Please review the
     list and click on the confirm button to finalize the import.`;
 
-// TODO Make this responsive.
 const ServantListVisibleColumns: MasterServantListVisibleColumns = {
     npLevel: true,
     level: true,
@@ -36,8 +35,7 @@ const ServantListVisibleColumns: MasterServantListVisibleColumns = {
      * TODO FGO Manager does not support append skills...change this if importing
      * from a source that does.
      */
-    appendSkills: false,
-    actions: false
+    appendSkills: false
 };
 
 const StyleClassPrefix = 'MasterServantImportList';
@@ -92,7 +90,6 @@ const StyleProps = (theme: SystemTheme) => {
         }
     } as SystemStyleObject<SystemTheme>;
 };
-
 
 export const MasterServantImportList = React.memo((props: Props) => {
 
@@ -201,7 +198,6 @@ export const MasterServantImportList = React.memo((props: Props) => {
                 </div>
             </div>
         </Box>
-        {/* {fabContainerNode} */}
         <MasterServantImportExistingDialog
             open={showExistingDialog}
             confirmButtonColor='primary'

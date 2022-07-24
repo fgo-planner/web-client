@@ -1,6 +1,6 @@
 import { GameServant, MasterServant, MasterServantAscensionLevel } from '@fgo-planner/types';
 import { GameServantConstants } from '../../constants';
-import { Immutable } from '../../types/internal';
+import { Immutable, ImmutableArray } from '../../types/internal';
 import { DateTimeUtils } from '../date-time.utils';
 
 export class MasterServantUtils {
@@ -44,7 +44,7 @@ export class MasterServantUtils {
         };
     }
 
-    static getLastInstanceId(masterServants: ReadonlyArray<MasterServant>): number {
+    static getLastInstanceId(masterServants: ImmutableArray<MasterServant>): number {
         if (!masterServants.length) {
             return 0;
         }

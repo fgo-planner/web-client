@@ -1,5 +1,7 @@
 export class SetUtils {
 
+    private static readonly _EmptySet = new Set<any>() as ReadonlySet<any>;
+
     private constructor () {
         
     }
@@ -14,6 +16,10 @@ export class SetUtils {
             }
         }
         return true;
+    }
+
+    static emptySet<T>(): ReadonlySet<T> {
+        return this._EmptySet;
     }
 
 }

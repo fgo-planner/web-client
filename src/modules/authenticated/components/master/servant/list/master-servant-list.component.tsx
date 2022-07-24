@@ -2,14 +2,12 @@ import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEvent, ReactNode, useCallback, useEffect, useRef } from 'react';
+import React, { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
-import { ReadonlyPartial } from '../../../../../../types/internal';
-import { ArrayUtils } from '../../../../../../utils/array.utils';
+import { Immutable, ImmutableArray, ReadonlyPartial } from '../../../../../../types/internal';
 import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';
 import { StyleClassPrefix as MasterServantListRowBondLevelStyleClassPrefix } from './master-servant-list-row-bond-level.component';
@@ -23,8 +21,9 @@ import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClas
 
 type Props = {
     bondLevels: Record<number, MasterServantBondLevel>;
+    dragDropMasterServants?: Array<Immutable<MasterServant>>;
     dragDropMode?: boolean;
-    masterServants: Array<MasterServant>;
+    masterServants: ImmutableArray<MasterServant>;
     /**
      * Instance IDs of selected servants.
      */
@@ -33,11 +32,9 @@ type Props = {
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
     onEditSelectedServants?: () => void;
-    onEditServant?: (servant: MasterServant) => void;
     onDeleteSelectedServants?: () => void;
-    onDeleteServant?: (servant: MasterServant) => void;
-    onServantContextMenu?: (e: MouseEvent<HTMLDivElement>) => void;
-    onServantSelectionChange?: (instanceIds: Array<number>) => void;
+    onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
+    onServantClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
 };
 
 export const StyleClassPrefix = 'MasterServantList';
@@ -139,12 +136,6 @@ const StyleProps = (theme: SystemTheme) => {
                                     textAlign: 'left'
                                 }
                             }
-                        },
-                        [`& .${MasterServantListRowStyleClassPrefix}-actions`]: {
-                            width: ColumnWidths.actions,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
                         }
                     }
                 },
@@ -163,32 +154,27 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const MasterServantList = React.memo((props: Props) => {
 
-    const forceUpdate = useForceUpdate();
-
     const gameServantMap = useGameServantMap();
 
     const {
         bondLevels,
+        dragDropMasterServants,
         dragDropMode,
         masterServants,
         onEditSelectedServants,
-        onEditServant,
         onDeleteSelectedServants,
-        onDeleteServant,
-        onServantContextMenu,
-        onServantSelectionChange,
+        onDragOrderChange,
+        onServantClick,
         selectedServants,
         showHeader,
         visibleColumns
     } = props;
 
-    const lastClickIndexRef = useRef<number>();
-
     /**
      * Stores the `masterServants` set as a ref to prevent `handleServantClick` from
      * being redefined when the object reference changes.
      */
-    const masterServantsRef = useRef<Array<MasterServant>>(masterServants);
+    const masterServantsRef = useRef<ImmutableArray<MasterServant>>(masterServants);
 
     /**
      * Stores the `selectedServants` set as a ref to prevent `handleServantClick`
@@ -196,13 +182,14 @@ export const MasterServantList = React.memo((props: Props) => {
      */
     const selectedServantsRef = useRef<ReadonlySet<number>>();
 
+    /**
+     * Updates the `masterServantsRef` and `selectedServantsRef` whenever their
+     * respective source data changes.
+     */
     useEffect(() => {
         masterServantsRef.current = masterServants;
-    }, [masterServants]);
-
-    useEffect(() => {
         selectedServantsRef.current = selectedServants;
-    }, [selectedServants]);
+    }, [masterServants, selectedServants]);
 
     /*
      * Adds a listener to invoke the `onDeleteSelectedServants` callback when the
@@ -223,138 +210,6 @@ export const MasterServantList = React.memo((props: Props) => {
     }, [onDeleteSelectedServants]);
 
 
-    //#region Event handlers
-
-    /**
-     * Handles both the left click (onClick) and right (onContextmenu) events from
-     * the servant row.
-     */
-    const handleServantClick = useCallback((e: MouseEvent<HTMLDivElement>, index: number): void => {
-        if (!onServantSelectionChange) {
-            return;
-        }
-
-        /*
-         * Whether the right mouse button (contextmenu) was clicked.
-         */
-        const isRightClick = e.type === 'contextmenu';
-
-        const masterServants = masterServantsRef.current;
-        const selectedServants = selectedServantsRef.current;
-
-        /**
-         * The instance ID of the servant that was clicked.
-         */
-        const clickedInstanceId = masterServants[index].instanceId;
-
-        /**
-         * Array containing the instance IDs of the updated selection.
-         */
-        const updatedSelection: number[] = [];
-
-        if (e.shiftKey) {
-            /*
-             * If the shift modifier key was pressed, then do one of the following:
-             * 
-             * - If a previous click index was recorded, then all all the servants between
-             *   that index and the newly clicked index (inclusive) regardless of whether
-             *   they were already selected or not.
-             * 
-             * - If a previous click was not recorded, then change the selection to just the
-             *   servant that was clicked (same behavior as no modifier keys).
-             *
-             * Note that if both the shift and ctrl keys were pressed, then the shift key
-             * has precedence.
-             */
-            const lastClickIndex = lastClickIndexRef.current;
-            if (lastClickIndex === undefined) {
-                updatedSelection.push(clickedInstanceId);
-            } else {
-                if (selectedServants) {
-                    updatedSelection.push(...selectedServants);
-                }
-                if (lastClickIndex === index) {
-                    updatedSelection.push(clickedInstanceId);
-                } else {
-                    const start = Math.min(lastClickIndex, index);
-                    const end = Math.max(lastClickIndex, index);
-                    for (let i = start; i <= end; i++) {
-                        const { instanceId } = masterServants[i];
-                        updatedSelection.push(instanceId);
-                    }
-                }
-            }
-        } else if (e.ctrlKey) {
-            /*
-             * If the ctrl modifier key was pressed, then do one of the following:
-             *
-             * - If the clicked servant was already selected, then deselect it.
-             *
-             * - If the clicked servant was not selected, then add it to the selection.
-             */
-            let alreadySelected = false;
-            if (selectedServants) {
-                for (const instanceId of selectedServants) {
-                    if (instanceId === clickedInstanceId) {
-                        alreadySelected = true;
-                    } else {
-                        updatedSelection.push(instanceId);
-                    }
-                }
-            }
-            if (!alreadySelected) {
-                updatedSelection.push(clickedInstanceId);
-            }
-        } else if (isRightClick && selectedServants?.has(clickedInstanceId)) {
-            /**
-             * If the right button was clicked, and the clicked servant was already
-             * selected, then dont modify the selection. We want the context menu to apply
-             * to the current select.
-             */
-            updatedSelection.push(...selectedServants);
-        } else {
-            /*
-             * If no modifier keys were pressed, then change the selection to just the
-             * servant that was clicked.
-             */
-            updatedSelection.push(clickedInstanceId);
-        }
-
-        /*
-         * Notify parent component of the selection change.
-         */
-        onServantSelectionChange(updatedSelection);
-
-        /*
-         * Update the last clicked row/servant index.
-         */
-        lastClickIndexRef.current = index;
-
-        /*
-         * If the right button was clicked, then also notify the parent to open the
-         * context menu.
-         */
-        if (isRightClick) {
-            e.preventDefault();
-            onServantContextMenu?.(e);
-        }
-
-    }, [onServantContextMenu, onServantSelectionChange]);
-
-    const onDragOrderChange = useCallback((sourceInstanceId: number, destinationInstanceId: number): void => {
-        console.log(sourceInstanceId, destinationInstanceId);
-        if (sourceInstanceId === destinationInstanceId) {
-            return;
-        }
-        const sourceIndex = masterServants.findIndex(s => s.instanceId === sourceInstanceId);
-        const destinationIndex = masterServants.findIndex(s => s.instanceId === destinationInstanceId);
-        ArrayUtils.moveElement(masterServants, sourceIndex, destinationIndex);
-        forceUpdate();
-    }, [forceUpdate, masterServants]);
-
-    //#endregion
-
-
     //#region Component rendering
 
     /**
@@ -364,7 +219,7 @@ export const MasterServantList = React.memo((props: Props) => {
         return null;
     }
 
-    const renderMasterServantRow = (masterServant: MasterServant, index: number): ReactNode => {
+    const renderMasterServantRow = (masterServant: Immutable<MasterServant>, index: number): ReactNode => {
         const { gameId, instanceId } = masterServant;
         const gameServant = gameServantMap[gameId];
         const bondLevel = bondLevels[gameId];
@@ -377,18 +232,18 @@ export const MasterServantList = React.memo((props: Props) => {
                 gameServant={gameServant}
                 bond={bondLevel}
                 masterServant={masterServant}
-                onEditServant={onEditServant}
-                onDeleteServant={onDeleteServant}
                 visibleColumns={visibleColumns}
                 active={active}
                 dragDropMode={dragDropMode}
                 onDragOrderChange={onDragOrderChange}
-                onClick={handleServantClick}
+                onClick={onServantClick}
                 onDoubleClick={onEditSelectedServants}
-                onContextMenu={handleServantClick}
+                onContextMenu={onServantClick}
             />
         );
     };
+
+    const masterServantsSource = dragDropMasterServants || masterServants;
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
@@ -399,7 +254,7 @@ export const MasterServantList = React.memo((props: Props) => {
                 />}
                 <div className={clsx(`${StyleClassPrefix}-list`, dragDropMode && 'drag-drop-mode')}>
                     <DndProvider backend={HTML5Backend}>
-                        {masterServants.map(renderMasterServantRow)}
+                        {masterServantsSource.map(renderMasterServantRow)}
                     </DndProvider>
                 </div>
             </div>

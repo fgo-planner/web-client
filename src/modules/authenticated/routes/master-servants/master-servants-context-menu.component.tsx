@@ -16,6 +16,13 @@ type Props = {
     selectedServantsCount: number;
 };
 
+/**
+ * For some reason, setting the transition duration zero may result in the
+ * popover being displayed in the top-left corder of the window (0, 0) for a
+ * brief moment when it is opened. Setting the duration to 1 fixes this.
+ */
+const TransitionDuration = 1;
+
 // TODO Move this to a utility class.
 const handleBackdropContextMenu = (e: MouseEvent<HTMLElement>): void => {
     e.preventDefault();
@@ -75,7 +82,7 @@ export const MasterServantContextMenu = React.memo((props: Props) => {
             anchorReference='anchorPosition'
             anchorPosition={anchorPosition}
             BackdropProps={backdropProps}
-            transitionDuration={0}
+            transitionDuration={TransitionDuration}
             onClose={onClose}
         >
             <MenuList dense>

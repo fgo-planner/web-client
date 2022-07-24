@@ -1,6 +1,4 @@
 import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
@@ -18,13 +16,11 @@ type Props = {
     gameServant: Immutable<GameServant> | undefined; // Not optional, but possible to be undefined.
     index: number;
     lastRow?: boolean;
-    masterServant: MasterServant;
+    masterServant: Immutable<MasterServant>;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     onClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
     onContextMenu?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
-    onDeleteServant?: (servant: MasterServant) => void;
     onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
-    onEditServant?: (servant: MasterServant) => void;
 } & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu'>;
 
 const shouldSkipUpdate = (prevProps: Readonly<Props>, nextProps: Readonly<Props>): boolean => {
@@ -51,8 +47,6 @@ export const MasterServantListRow = React.memo((props: Props) => {
         onClick,
         onContextMenu,
         onDragOrderChange,
-        onEditServant,
-        onDeleteServant,
         ...domAttributes
     } = props;
 
@@ -63,14 +57,6 @@ export const MasterServantListRow = React.memo((props: Props) => {
     const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>): void => {
         onContextMenu?.(e, index);
     }, [index, onContextMenu]);
-
-    const handleEditServant = useCallback((): void => {
-        onEditServant?.(masterServant);
-    }, [masterServant, onEditServant]);
-
-    const handleDeleteServant = useCallback((): void => {
-        onDeleteServant?.(masterServant);
-    }, [masterServant, onDeleteServant]);
 
     if (!gameServant) {
         return (
@@ -108,17 +94,6 @@ export const MasterServantListRow = React.memo((props: Props) => {
         />
     );
 
-    const actionButtonsNode: ReactNode = visibleColumns?.actions && (
-        <div className={`${StyleClassPrefix}-actions`}>
-            <IconButton color='primary' onClick={handleEditServant} size='large'>
-                <EditIcon />
-            </IconButton>
-            <IconButton color='secondary' onClick={handleDeleteServant} size='large'>
-                <DeleteIcon />
-            </IconButton>
-        </div>
-    );
-
     return (
         <DraggableListRowContainer
             className={`${StyleClassPrefix}-root`}
@@ -137,7 +112,6 @@ export const MasterServantListRow = React.memo((props: Props) => {
             <div className={`${StyleClassPrefix}-content`}>
                 {labelNode}
                 {statsNode}
-                {actionButtonsNode}
             </div>
         </DraggableListRowContainer>
     );

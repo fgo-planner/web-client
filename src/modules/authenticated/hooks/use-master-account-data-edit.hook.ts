@@ -5,12 +5,15 @@ import { useInjectable } from '../../../hooks/dependency-injection/use-injectabl
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
 import { useForceUpdate } from '../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
-import { Immutable, MasterServantUpdate, Nullable, ReadonlyRecord } from '../../../types/internal';
+import { ExistingMasterServantUpdate, Immutable, ImmutableArray, NewMasterServantUpdate, Nullable, ReadonlyRecord } from '../../../types/internal';
 import { ArrayUtils } from '../../../utils/array.utils';
 import { MasterServantUpdateUtils } from '../../../utils/master/master-servant-update.utils';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
+
+
+//#region Type definitions
 
 type MasterAccountDataEditHookIncludeOptions = {
     includeCostumes?: boolean;
@@ -34,8 +37,86 @@ type MasterAccountEditData = {
      * servants that were edited (tracked by `instanceId`) will also be
      * reconstructed.
      */
-    servants: ReadonlyArray<MasterServant>;
+    servants: ImmutableArray<MasterServant>;
     soundtracks: ReadonlySet<number>;
+};
+
+type IdNumbers = ReadonlyArray<number> | ReadonlySet<number>;
+
+type MasterAccountUpdateFunctions = {
+    updateCostumes: (costumeIds: IdNumbers) => void;
+    updateItem: (itemId: number, quantity: number) => void;
+    updateQp: (amount: number) => void;
+    /**
+     * Add a single servant using the given `NewMasterServantUpdate` object.
+     * 
+     * Calls the `addServants` function internally. 
+     */
+    addServant: (servantData: NewMasterServantUpdate) => void;
+    /**
+     * Batch add servants. Each added servant will be instantiated using the given
+     * `NewMasterServantUpdate` object.
+     */
+    addServants: (servantIds: IdNumbers, servantData: NewMasterServantUpdate) => void;
+    /**
+     * Updates the servants with the corresponding `instanceIds` using the given
+     * `ExistingMasterServantUpdate` object.
+     */
+    updateServants: (instanceIds: IdNumbers, update: ExistingMasterServantUpdate) => void;
+    /**
+     * Updates the servant ordering based on an array of `instanceId` values.
+     * Assumes that the array contains a corresponding `instanceId` value for each
+     * servant. Missing `instanceId` values will result in the corresponding servant
+     * being removed.
+     */
+    updateServantOrder: (instanceIds: ReadonlyArray<number>) => void;
+    /**
+     * Deletes the servants with the corresponding `instanceIds`.
+     */
+    deleteServants: (instanceIds: IdNumbers) => void;
+    updateSoundtracks: (soundtrackIds: IdNumbers) => void;
+    revertChanges: () => void;
+    persistChanges: () => Promise<void>;
+};
+
+/* eslint-disable max-len */
+
+type MasterAccountDataEditHookCommon = {
+    isDataDirty: boolean;
+};
+
+type MasterAccountDataEditHookData = MasterAccountDataEditHookCommon & {
+    masterAccountEditData: MasterAccountEditData;
+} & MasterAccountUpdateFunctions;
+
+type MasterAccountDataEditHookDataCostumesSubset = MasterAccountDataEditHookCommon & {
+    masterAccountEditData: Pick<MasterAccountEditData, 'costumes'>;
+} & Pick<MasterAccountUpdateFunctions, 'updateCostumes' | 'revertChanges' | 'persistChanges'>;
+
+type MasterAccountDataEditHookDataItemsSubset = MasterAccountDataEditHookCommon & {
+    masterAccountEditData: Pick<MasterAccountEditData, 'items' | 'qp'>;
+} & Pick<MasterAccountUpdateFunctions, 'updateItem' | 'updateQp' | 'revertChanges' | 'persistChanges'>;
+
+type MasterAccountDataEditHookDataServantsSubset = MasterAccountDataEditHookCommon & {
+    masterAccountEditData: Pick<MasterAccountEditData, 'bondLevels' | 'servants'>;
+} & Pick<MasterAccountUpdateFunctions, 'addServant' | 'addServants' | 'updateServants' | 'updateServantOrder' | 'deleteServants' | 'revertChanges' | 'persistChanges'>;
+
+type MasterAccountDataEditHookDataSoundtracksSubset = MasterAccountDataEditHookCommon & {
+    masterAccountEditData: Pick<MasterAccountEditData, 'soundtracks'>;
+} & Pick<MasterAccountUpdateFunctions, 'updateSoundtracks' | 'revertChanges' | 'persistChanges'>;
+
+/* eslint-enable max-len */
+
+//#endregion
+
+
+//#region Internal helper/utility functions
+
+const toSet = (idNumbers: IdNumbers): ReadonlySet<number> => {
+    if (idNumbers instanceof Set) {
+        return idNumbers;
+    }
+    return new Set(idNumbers);
 };
 
 const getDefaultMasterAccountEditData = (): MasterAccountEditData => ({
@@ -73,41 +154,10 @@ const cloneMasterAccountDataForEdit = (
     return result;
 };
 
-type MasterAccountUpdateFunctions = {
-    updateCostumes: (costumeIds: Iterable<number>) => void;
-    updateItem: (itemId: number, quantity: number) => void;
-    updateQp: (amount: number) => void;
-    addServant: (data: MasterServantUpdate) => void;
-    updateServants: (instanceIds: Set<number>, data: MasterServantUpdate) => void;
-    deleteServants: (instanceIds: Set<number>) => void;
-    updateSoundtracks: (soundtrackIds: Iterable<number>) => void;
-    revertChanges: () => void;
-    persistChanges: () => Promise<void>;
-};
+//#endregion
 
-type MasterAccountDataEditHookCommon = {
-    isDataDirty: boolean;
-};
 
-type MasterAccountDataEditHookData = MasterAccountDataEditHookCommon & {
-    masterAccountEditData: MasterAccountEditData;
-} & MasterAccountUpdateFunctions;
-
-type MasterAccountDataEditHookDataCostumesSubset = MasterAccountDataEditHookCommon & {
-    masterAccountEditData: Pick<MasterAccountEditData, 'costumes'>;
-} & Pick<MasterAccountUpdateFunctions, 'updateCostumes' | 'revertChanges' | 'persistChanges'>;
-
-type MasterAccountDataEditHookDataItemsSubset = MasterAccountDataEditHookCommon & {
-    masterAccountEditData: Pick<MasterAccountEditData, 'items' | 'qp'>;
-} & Pick<MasterAccountUpdateFunctions, 'updateItem' | 'updateQp' | 'revertChanges' | 'persistChanges'>;
-
-type MasterAccountDataEditHookDataServantsSubset = MasterAccountDataEditHookCommon & {
-    masterAccountEditData: Pick<MasterAccountEditData, 'bondLevels' | 'servants'>;
-} & Pick<MasterAccountUpdateFunctions, 'updateServants' | 'revertChanges' | 'persistChanges'>;
-
-type MasterAccountDataEditHookDataSoundtracksSubset = MasterAccountDataEditHookCommon & {
-    masterAccountEditData: Pick<MasterAccountEditData, 'soundtracks'>;
-} & Pick<MasterAccountUpdateFunctions, 'updateSoundtracks' | 'revertChanges' | 'persistChanges'>;
+//#region Hook function
 
 /**
  * For costumes route.
@@ -176,8 +226,21 @@ export function useMasterAccountDataEditHook(
 
     const masterAccountService = useInjectable(MasterAccountService);
 
+    /**
+     * The original master account data.
+     */
     const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
+
+    /**
+     * The transformed copy of the master account data for editing.
+     */
     const [editData, setEditData] = useState<MasterAccountEditData>(getDefaultMasterAccountEditData);
+
+    /**
+     * Whether the edit data has been modified.
+     * 
+     * TODO Track changes properly
+     */
     const [isDataDirty, setIsDataDirty] = useState<boolean>(false);
 
     /**
@@ -211,7 +274,7 @@ export function useMasterAccountDataEditHook(
 
     //#region Local create, update, delete functions
 
-    const updateCostumes = useCallback((costumeIds: Iterable<number>): void => {
+    const updateCostumes = useCallback((costumeIds: IdNumbers): void => {
         if (!includeCostumes) {
             return;
         }
@@ -269,11 +332,10 @@ export function useMasterAccountDataEditHook(
         }
     }, [editData, forceUpdate, includeItems, updateQp]);
 
-    const addServant = useCallback((update: MasterServantUpdate): void => {
+    const addServants = useCallback((servantIds: IdNumbers, servantData: NewMasterServantUpdate): void => {
         if (!includeServants) {
             return;
         }
-
         const {
             servants,
             bondLevels,
@@ -283,37 +345,51 @@ export function useMasterAccountDataEditHook(
         /**
          * Computed instance ID for the new servant.
          */
-        const instanceId = MasterServantUtils.getLastInstanceId(servants) + 1;
+        let instanceId = MasterServantUtils.getLastInstanceId(servants) + 1;
+
         /**
-         * New instance of a `MasterServant` object. This will be populated with the
-         * data returned by the dialog.
+         * Updated servants array. A new array is constructed for this to conform with
+         * the hook specifications.
          */
-        const newServant = MasterServantUtils.instantiate(instanceId);
-        MasterServantUpdateUtils.applyFromUpdatePayload(newServant, update, bondLevels);
-        /*
-         * Rebuild the array with the new servant included to conform with the context
-         * specifications.
+        const updatedServants = [...servants];
+
+        /**
+         * Construct new instance of a `MasterServant` object for each `servantId` and
+         * add to the updated servants array.
          */
-        editData.servants = [...servants, newServant];
+        for (const servantId of servantIds) {
+            const newServant = MasterServantUtils.instantiate(instanceId++);
+            MasterServantUpdateUtils.applyFromUpdateObject(newServant, servantData, bondLevels);
+            newServant.gameId = servantId;
+
+            updatedServants.push(newServant);
+        };
+
+        editData.servants = updatedServants;
         // TODO Also update the unlocked costumes.
         setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();
     }, [editData, forceUpdate, includeServants]);
 
-    const updateServants = useCallback((instanceIds: Set<number>, update: MasterServantUpdate): void => {
+    const addServant = useCallback((servantData: NewMasterServantUpdate): void => {
+        addServants([servantData.gameId], servantData);
+    }, [addServants]);
+
+    const updateServants = useCallback((instanceIds: IdNumbers, update: ExistingMasterServantUpdate): void => {
         if (!includeServants) {
             return;
         }
-
         const {
             servants,
             bondLevels,
             // unlockedCostumes
         } = editData;
 
+        const instanceIdSet = toSet(instanceIds);
+
         /**
          * Updated servants array. A new array is constructed for this to conform with
-         * the context specifications.
+         * the hook specifications.
          */
         const updatedServants = [];
 
@@ -322,46 +398,75 @@ export function useMasterAccountDataEditHook(
              * If the servant is not an update target, then just add it to the new array and
              * continue.
              */
-            if (!instanceIds.has(servant.instanceId)) {
+            if (!instanceIdSet.has(servant.instanceId)) {
                 updatedServants.push(servant);
                 continue;
             }
             /*
              * Apply the edit to the target servant. The target servant object is
-             * re-constructed to conform with the context specifications.
+             * re-constructed to conform with the hook specifications.
              */
-            const targetServant = { ...servant };
-            MasterServantUpdateUtils.applyFromUpdatePayload(targetServant, update, bondLevels);
-            // TODO Set dirty...
+            const targetServant = MasterServantUtils.clone(servant);
+            MasterServantUpdateUtils.applyFromUpdateObject(targetServant, update, bondLevels);
+            
             updatedServants.push(targetServant);
         }
-        // TODO Set dirty...
+
         editData.servants = updatedServants;
         // TODO Also update the unlocked costumes.
         setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();
     }, [editData, forceUpdate, includeServants]);
 
-    const deleteServants = useCallback((instanceIds: Set<number>): void => {
+    const updateServantOrder = useCallback((instanceIds: ReadonlyArray<number>): void => {
         if (!includeServants) {
             return;
         }
-
         const { servants } = editData;
 
         /**
          * Updated servants array. A new array is constructed for this to conform with
-         * the context specifications.
+         * the hook specifications.
          */
-        const updatedServants = servants.filter(({ instanceId }) => !instanceIds.has(instanceId));
-        // TODO Set dirty...
+        const updatedServants = [];
+
+        /**
+         * TODO This is an n^2 operation, may need some optimizations if servant list
+         * gets too big.
+         */
+        for (const instanceId of instanceIds) {
+            const index = servants.findIndex(servant => servant.instanceId === instanceId);
+            if (index !== -1) {
+                updatedServants.push(servants[index]);
+            }
+        }
+
+        editData.servants = updatedServants;
+        setIsDataDirty(true); // TODO Track changes properly
+        forceUpdate();
+    }, [editData, forceUpdate, includeServants]);
+
+    const deleteServants = useCallback((instanceIds: IdNumbers): void => {
+        if (!includeServants) {
+            return;
+        }
+        const { servants } = editData;
+
+        const instanceIdSet = toSet(instanceIds);
+
+        /**
+         * Updated servants array. A new array is constructed for this to conform with
+         * the hook specifications.
+         */
+        const updatedServants = servants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
+
         editData.servants = updatedServants;
         // TODO Also remove bond/costume data if the last instance of the servant is removed.
         setIsDataDirty(true); // TODO Track changes properly
         forceUpdate();
     }, [editData, forceUpdate, includeServants]);
 
-    const updateSoundtracks = useCallback((soundtrackIds: Iterable<number>): void => {
+    const updateSoundtracks = useCallback((soundtrackIds: IdNumbers): void => {
         if (!includeSoundtracks) {
             return;
         }
@@ -399,7 +504,7 @@ export function useMasterAccountDataEditHook(
         }
         if (includeServants) {
             update.servants = [
-                ...editData.servants
+                ...(editData.servants as Array<MasterServant>)
             ];
             update.bondLevels = {
                 ...editData.bondLevels
@@ -447,7 +552,9 @@ export function useMasterAccountDataEditHook(
         updateItem,
         updateQp,
         addServant,
+        addServants,
         updateServants,
+        updateServantOrder,
         deleteServants,
         updateSoundtracks,
         revertChanges,
@@ -455,3 +562,5 @@ export function useMasterAccountDataEditHook(
     };
 
 }
+
+//#endregion

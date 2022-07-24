@@ -8,7 +8,6 @@ export type MasterServantListVisibleColumns = {
     skills?: boolean;
     appendSkills?: boolean;
     bondLevel?: boolean;
-    actions?: boolean;
 };
 
 const ColumnWidths = {
@@ -19,8 +18,7 @@ const ColumnWidths = {
         fou: 160, // *2 = 30% total
         skills: 160, // *2 = 30% total
         bondLevel: 120
-    },
-    actions: '120px'
+    }
 };
 
 export const MasterServantListColumnWidths = ColumnWidths as Immutable<typeof ColumnWidths>;

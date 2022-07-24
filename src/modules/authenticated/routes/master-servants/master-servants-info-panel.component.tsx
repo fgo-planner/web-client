@@ -12,19 +12,22 @@ import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../types/data';
-import { Immutable } from '../../../../types/internal';
+import { Immutable, ImmutableArray, ReadonlyIterable } from '../../../../types/internal';
 import { ComputationOptions, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 
 type Props = {
-    activeServants: Array<MasterServant>;
+    activeServants: ImmutableArray<MasterServant>;
     bondLevels: Record<number, MasterServantBondLevel>;
     editMode?: boolean;
     keepChildrenMounted?: boolean;
     onOpenToggle: () => void;
+    /**
+     * @deprecated Needs to be reworked
+     */
     onStatsChange?: (data: any) => void;
     open?: boolean;
     statsOptions?: ComputationOptions;
-    unlockedCostumes: Array<number>;
+    unlockedCostumes: ReadonlyIterable<number>;
 };
 
 // const FormId = 'master-servant-info-panel-form';
@@ -260,7 +263,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 const result = PlanComputationUtils.computeServantEnhancementRequirements(
                     servant,
                     activeServant,
-                    unlockedCostumes,
+                    [...unlockedCostumes], // TODO Update computeServantEnhancementRequirements method to accept both Sets and arrays.
                     statsOptions
                 );
                 results.push(result);
@@ -300,7 +303,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
             const result = PlanComputationUtils.computeServantEnhancementRequirements(
                 servant,
                 activeServant,
-                unlockedCostumes,
+                [...unlockedCostumes], // TODO Update computeServantEnhancementRequirements method to accept both Sets and arrays.
                 statsOptions
             );
             setSelectedServantsEnhancementRequirements(result);

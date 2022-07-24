@@ -2,8 +2,8 @@ import { LockOpen } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React from 'react';
+import { HeaderLabel } from '../../../../components/text/header-label.component';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
-import { ThemeConstants } from '../../../../styles/theme-constants';
 
 export const StyleClassPrefix = 'MasterServantCostumesListHeader';
 
@@ -21,9 +21,6 @@ const StyleProps = (theme: SystemTheme) => {
         position: 'sticky',
         top: 0,
         py: 4,
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontWeight: 500,
-        fontSize: '0.9375rem',
         backgroundColor: palette.background.paper,
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
@@ -36,14 +33,14 @@ const StyleProps = (theme: SystemTheme) => {
             px: 2
         },
         [`& .${StyleClassPrefix}-thumbnail`]: {
-            width: 48
+            width: spacing(13)  // 52px
         },
         [`& .${StyleClassPrefix}-collection-no`]: {
-            width: 64,
-            textAlign: 'center'
+            width: 64
         },
         [`& .${StyleClassPrefix}-name`]: {
             flex: '1 1',
+            textAlign: 'left',
             [breakpoints.down('sm')]: {
                 visibility: 'hidden',
                 maxWidth: spacing(8),  // 32px
@@ -63,18 +60,18 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const MasterServantCostumesListHeader = React.memo(() => (
     <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-        <div className={`${StyleClassPrefix}-unlocked-status`}>
+        <HeaderLabel className={`${StyleClassPrefix}-unlocked-status`}>
             <LockOpen fontSize='small' />
-        </div>
+        </HeaderLabel>
         <div className={`${StyleClassPrefix}-thumbnail`} />
-        <div className={`${StyleClassPrefix}-collection-no`}>
+        <HeaderLabel className={`${StyleClassPrefix}-collection-no`}>
             ID
-        </div>
-        <TruncateText className={`${StyleClassPrefix}-name`}>
-            Costume Name
-        </TruncateText>
-        <div className={`${StyleClassPrefix}-unlock-materials`}>
+        </HeaderLabel>
+        <HeaderLabel className={`${StyleClassPrefix}-name`}>
+            <TruncateText>Costume Name</TruncateText>
+        </HeaderLabel>
+        <HeaderLabel className={`${StyleClassPrefix}-unlock-materials`}>
             Unlock Materials
-        </div>
+        </HeaderLabel>
     </Box>
 ));

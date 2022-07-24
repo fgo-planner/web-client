@@ -1,17 +1,27 @@
-import { Typography } from '@mui/material';
-import { SystemStyleObject, Theme } from '@mui/system';
-import React, { PropsWithChildren } from 'react';
-import { ComponentStyleProps } from '../../types/internal';
+import { Theme } from '@mui/material';
+import { CSSProperties } from '@mui/styles';
+import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { ThemeConstants } from '../../styles/theme-constants';
 
-type Props = PropsWithChildren<{}> & Pick<ComponentStyleProps, 'className'>;
+const StyleOptions = {
+    skipSx: true,
+    skipVariantsResolver: true
+} as MuiStyledOptions;
 
-const StyleProps = {
-    px: 6,
-    pt: 4
-} as SystemStyleObject<Theme>;
+const StyleProps = (props: { theme: SystemTheme }) => {
 
-export const PageTitle = React.memo(({ children, className }: Props) => (
-    <Typography variant='h6' className={className} sx={StyleProps}>
-        {children}
-    </Typography>
-));
+    const { spacing } = props.theme as Theme;
+
+    return {
+        fontFamily: ThemeConstants.FontFamilyGoogleSans,
+        fontWeight: 500,
+        fontSize: '1.25rem',
+        lineHeight: 1.6,
+        letterSpacing: '0.0075em',
+        paddingTop: spacing(4),
+        paddingRight: spacing(6),
+        paddingLeft: spacing(6)
+    } as CSSProperties;
+};
+
+export const PageTitle = styled('div', StyleOptions)(StyleProps);

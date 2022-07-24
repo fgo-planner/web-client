@@ -2,6 +2,7 @@ import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React from 'react';
+import { HeaderLabel } from '../../../../../../components/text/header-label.component';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { ReadonlyPartial } from '../../../../../../types/internal';
 import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
@@ -33,10 +34,6 @@ const StyleProps = (theme: SystemTheme) => {
             display: 'flex',
             pl: 3,
             py: 4,
-            fontFamily: ThemeConstants.FontFamilyGoogleSans,
-            fontWeight: 500,
-            textAlign: 'center',
-            fontSize: '0.9375rem',
             '&.drag-drop-mode': {
                 pl: 10
             },
@@ -87,44 +84,44 @@ export const MasterServantListHeader = React.memo(({ dragDropMode, visibleColumn
         <Box className={clsx(`${StyleClassPrefix}-root`, ThemeConstants.ClassScrollbarHidden)} sx={StyleProps}>
             <div className={clsx(`${StyleClassPrefix}-content`, dragDropMode && 'drag-drop-mode')}>
 
-                <div className={`${StyleClassPrefix}-label`}>
+                <HeaderLabel className={`${StyleClassPrefix}-label`}>
                     Servant
-                </div>
+                </HeaderLabel>
                 <div className={`${StyleClassPrefix}-stats`}>
                     {npLevel &&
-                        <div className={`${StyleClassPrefix}-np-level`}>
+                        <HeaderLabel className={`${StyleClassPrefix}-np-level`}>
                             NP
-                        </div>
+                        </HeaderLabel>
                     }
                     {level &&
-                        <div className={`${StyleClassPrefix}-level`}>
+                        <HeaderLabel className={`${StyleClassPrefix}-level`}>
                             Level
-                        </div>
+                        </HeaderLabel>
                     }
                     {fouHp &&
-                        <div className={`${StyleClassPrefix}-fou-hp`}>
+                        <HeaderLabel className={`${StyleClassPrefix}-fou-hp`}>
                             Fou (HP)
-                        </div>
+                        </HeaderLabel>
                     }
                     {fouAtk &&
-                        <div className={`${StyleClassPrefix}-fou-atk`}>
+                        <HeaderLabel className={`${StyleClassPrefix}-fou-atk`}>
                             Fou (ATK)
-                        </div>
+                        </HeaderLabel>
                     }
                     {skills &&
-                        <div className={`${StyleClassPrefix}-skills`}>
+                        <HeaderLabel className={`${StyleClassPrefix}-skills`}>
                             Skills
-                        </div>
+                        </HeaderLabel>
                     }
                     {appendSkills &&
-                        <div className={`${StyleClassPrefix}-append-skills`}>
+                        <HeaderLabel className={`${StyleClassPrefix}-append-skills`}>
                             Append
-                        </div>
+                        </HeaderLabel>
                     }
                     {bondLevel &&
-                        <div className={`${StyleClassPrefix}-bond-level`}>
+                        <HeaderLabel className={`${StyleClassPrefix}-bond-level`}>
                             Bond
-                        </div>
+                        </HeaderLabel>
                     }
                 </div>
             </div>

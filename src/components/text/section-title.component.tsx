@@ -1,19 +1,25 @@
-import { Typography } from '@mui/material';
-import { SystemStyleObject, Theme } from '@mui/system';
-import React, { PropsWithChildren } from 'react';
-import { ComponentStyleProps } from '../../types/internal';
+import { Theme } from '@mui/material';
+import { CSSProperties } from '@mui/styles';
+import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { ThemeConstants } from '../../styles/theme-constants';
 
-type Props = PropsWithChildren<{}> & Pick<ComponentStyleProps, 'className'>;
+const StyleOptions = {
+    skipSx: true,
+    skipVariantsResolver: true
+} as MuiStyledOptions;
 
-const StyleProps = {
-    fontSize: '1.125rem',
-    fontWeight: 'normal',
-    px: 6,
-    py: 4
-} as SystemStyleObject<Theme>;
+const StyleProps = (props: { theme: SystemTheme }) => {
 
-export const SectionTitle = React.memo(({ children, className }: Props) => (
-    <Typography variant='h6' className={className} sx={StyleProps}>
-        {children}
-    </Typography>
-));
+    const { spacing } = props.theme as Theme;
+
+    return {
+        fontFamily: ThemeConstants.FontFamilyGoogleSans,
+        fontWeight: 'normal',
+        fontSize: '1.125rem',
+        lineHeight: 1.6,
+        letterSpacing: '0.0075em',
+        padding: spacing(4, 6)
+    } as CSSProperties;
+};
+
+export const SectionTitle = styled('div', StyleOptions)(StyleProps);

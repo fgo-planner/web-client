@@ -2,8 +2,8 @@ import { LockOpen } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React from 'react';
+import { HeaderLabel } from '../../../../components/text/header-label.component';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
-import { ThemeConstants } from '../../../../styles/theme-constants';
 
 export const StyleClassPrefix = 'MasterSoundtracksListHeader';
 
@@ -21,9 +21,6 @@ const StyleProps = (theme: SystemTheme) => {
         position: 'sticky',
         top: 0,
         py: 4,
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontWeight: 500,
-        fontSize: '0.9375rem',
         backgroundColor: palette.background.paper,
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
@@ -46,7 +43,8 @@ const StyleProps = (theme: SystemTheme) => {
             width: spacing(14)  // 56px
         },
         [`& .${StyleClassPrefix}-title`]: {
-            flex: 1
+            flex: 1,
+            textAlign: 'left'
         },
         [`& .${StyleClassPrefix}-unlock-material`]: {
             minWidth: spacing(30),  // 120px
@@ -61,17 +59,17 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const MasterSoundtracksListHeader = React.memo(() => (
     <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-        <div className={`${StyleClassPrefix}-unlocked-status`}>
+        <HeaderLabel className={`${StyleClassPrefix}-unlocked-status`}>
             <LockOpen fontSize='small' />
-        </div>
+        </HeaderLabel>
         <div className={`${StyleClassPrefix}-thumbnail`} />
-        <div className={`${StyleClassPrefix}-preview`} />
-        <TruncateText className={`${StyleClassPrefix}-title`}>
-            Track Title
-        </TruncateText>
-        <div className={`${StyleClassPrefix}-unlock-material`}>
+        <HeaderLabel className={`${StyleClassPrefix}-preview`} />
+        <HeaderLabel className={`${StyleClassPrefix}-title`}>
+            <TruncateText>Track Title</TruncateText>
+        </HeaderLabel>
+        <HeaderLabel className={`${StyleClassPrefix}-unlock-material`}>
             Unlock Material
-        </div>
+        </HeaderLabel>
     </Box>
 )
 );

@@ -1,7 +1,7 @@
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React from 'react';
-import { ThemeConstants } from '../../../../styles/theme-constants';
+import { HeaderLabel } from '../../../../components/text/header-label.component';
 
 type Props = {
     categoryLabel: string;
@@ -21,9 +21,6 @@ const StyleProps = (theme: SystemTheme) => {
         px: 6,
         pr: 8,
         py: 4,
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontWeight: 500,
-        fontSize: '0.9375rem',
         [breakpoints.down('sm')]: {
             pr: 6
         }
@@ -32,9 +29,7 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const MasterItemListHeader = React.memo(({ categoryLabel, showQuantityLabel }: Props) => (
     <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-        <div>
-            {categoryLabel}
-        </div>
-        {showQuantityLabel && <div>Quantity</div>}
+        <HeaderLabel>{categoryLabel}</HeaderLabel>
+        {showQuantityLabel && <HeaderLabel>Quantity</HeaderLabel>}
     </Box>
 ));

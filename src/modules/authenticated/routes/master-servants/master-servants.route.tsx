@@ -12,7 +12,6 @@ import { useListSelectHelper } from '../../../../hooks/user-interface/use-multi-
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ExistingMasterServantUpdate, Immutable, MasterServantUpdate, ModalOnCloseReason } from '../../../../types/internal';
-import { Functions } from '../../../../utils/functions';
 import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList, StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.component';
@@ -22,6 +21,7 @@ import { MasterServantsEditDialog } from './master-servants-edit-dialog.componen
 import { MasterServantsInfoPanel } from './master-servants-info-panel.component';
 import { MasterServantsMultiAddDialog, MultiAddServantData } from './master-servants-multi-add-dialog.component';
 import { MasterServantsNavigationRail } from './master-servants-navigation-rail.component';
+import { useMasterServantsUserPreferencesHook } from './master-servants-user-preferences.hook';
 
 const getInstanceId = ({ instanceId }: Immutable<MasterServant>): number => {
     return instanceId;
@@ -83,6 +83,7 @@ export const MasterServantsRoute = React.memo(() => {
     const gameServantMap = useGameServantMap();
 
     const {
+        masterAccountId,
         isDataDirty,
         masterAccountEditData,
         // updateCostumes,
@@ -133,12 +134,14 @@ export const MasterServantsRoute = React.memo(() => {
         onContextMenu: handleServantContextMenuOpen,
     });
 
-    const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
+    const {
+        userPreferences: {
+            infoPanelOpen
+        },
+        toggleInfoPanelOpen
+    } = useMasterServantsUserPreferencesHook(masterAccountId);
 
-    /**
-     * Whether the info panel is open (expanded).
-     */
-    const [isInfoPanelOpen, setIsInfoPanelOpen] = useState<boolean>(true);
+    const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
 
     /**
      * Whether the multi-add servant dialog is open.
@@ -303,15 +306,6 @@ export const MasterServantsRoute = React.memo(() => {
 
     //#region Common event handlers
 
-    const handleToggleInfoPanelOpen = useCallback(() => {
-        setIsInfoPanelOpen(Functions.toggleTruthy);
-    }, []);
-
-    //#endregion
-
-
-    //#region Common event handlers
-
     const handleAddServant = openAddServantDialog;
 
     const handleEditSelectedServants = openEditServantDialog;
@@ -448,8 +442,8 @@ export const MasterServantsRoute = React.memo(() => {
                             bondLevels={bondLevels}
                             unlockedCostumes={costumes}
                             // editMode={editMode}
-                            open={isInfoPanelOpen && md}
-                            onOpenToggle={handleToggleInfoPanelOpen}
+                            open={infoPanelOpen && md}
+                            onOpenToggle={toggleInfoPanelOpen}
                         />
                     </div>
                 </div>

@@ -82,6 +82,7 @@ type MasterAccountUpdateFunctions = {
 /* eslint-disable max-len */
 
 type MasterAccountDataEditHookCommon = {
+    masterAccountId?: string;
     isDataDirty: boolean;
 };
 
@@ -546,6 +547,7 @@ export function useMasterAccountDataEditHook(
     //#endregion
 
     return {
+        masterAccountId: masterAccount?._id,
         isDataDirty,
         masterAccountEditData: editData,
         updateCostumes,

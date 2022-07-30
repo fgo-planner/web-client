@@ -1,11 +1,11 @@
-import { Nullable } from '../../types/internal';
+import { Nullable, Supplier } from '../../types/internal';
 import { StorageKey, StorageType, StorageValueType } from './storage-key.class';
 
 export class StorageUtils {
 
     static getItemAsString(storageKey: StorageKey): string | null;
-    static getItemAsString(storageKey: StorageKey, defaultValueSupplier: () => string): string;
-    static getItemAsString(storageKey: StorageKey, defaultValueSupplier?: () => string): string | null {
+    static getItemAsString(storageKey: StorageKey, defaultValueSupplier: Supplier<string>): string;
+    static getItemAsString(storageKey: StorageKey, defaultValueSupplier?: Supplier<string>): string | null {
         const { key, storageType } = storageKey;
         const storage = this._getStorage(storageType);
         let value = storage.getItem(key);
@@ -17,8 +17,8 @@ export class StorageUtils {
     }
 
     static getItem<T extends StorageValueType>(storageKey: StorageKey<T>): T | null;
-    static getItem<T extends StorageValueType>(storageKey: StorageKey<T>, defaultValueSupplier: () => T): T;
-    static getItem<T extends StorageValueType>(storageKey: StorageKey<T>, defaultValueSupplier?: () => T): T | null {
+    static getItem<T extends StorageValueType>(storageKey: StorageKey<T>, defaultValueSupplier: Supplier<T>): T;
+    static getItem<T extends StorageValueType>(storageKey: StorageKey<T>, defaultValueSupplier?: Supplier<T>): T | null {
         const { key, storageType, valueType } = storageKey;
         const storage = this._getStorage(storageType);
         const value = storage.getItem(key);
@@ -80,7 +80,7 @@ export class StorageUtils {
         }
     }
 
-    private static _setDefaultValue<T extends StorageValueType>(key: string, storage: Storage, defaultValueSupplier: () => T): T {
+    private static _setDefaultValue<T extends StorageValueType>(key: string, storage: Storage, defaultValueSupplier: Supplier<T>): T {
         const defaultValue = defaultValueSupplier.apply(this);
         storage.setItem(key, this._asString(defaultValue));
         return defaultValue;

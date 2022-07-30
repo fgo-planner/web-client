@@ -1,4 +1,4 @@
-import { BarChart as BarChartIcon, Clear as ClearIcon, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, GroupAddOutlined, ImportExport as ImportExportIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon } from '@mui/icons-material';
+import { BarChart as BarChartIcon, Clear as ClearIcon, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, FilterAlt as FilterAltIcon, FilterAltOutlined as FilterAltOutlinedIcon, GroupAddOutlined, ImportExport as ImportExportIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
 import { Divider, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { NavigationRail } from '../../../../components/navigation/navigation-rai
 
 type Props = {
     dragDropMode: boolean;
+    filtersEnabled: boolean;
     layout: 'row' | 'column';
     onAddServant: () => void;
     onMultiAddServant: () => void;
@@ -14,6 +15,8 @@ type Props = {
     onDragDropApply: () => void;
     onDragDropCancel: () => void;
     onEditSelectedServants: () => void;
+    onOpenColumnSettings: () => void;
+    onToggleFilters: () => void;
     selectedServantsCount: number;
 };
 
@@ -21,6 +24,7 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
 
     const {
         dragDropMode,
+        filtersEnabled,
         layout,
         onAddServant,
         onMultiAddServant,
@@ -29,6 +33,8 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
         onDragDropApply,
         onDragDropCancel,
         onEditSelectedServants,
+        onOpenColumnSettings,
+        onToggleFilters,
         selectedServantsCount
     } = props;
 
@@ -60,6 +66,29 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
 
     return (
         <NavigationRail border layout={layout}>
+            <Tooltip key='filters' title='Toggle filters' placement='right'>
+                <div>
+                    <IconButton
+                        onClick={onToggleFilters}
+                        children={filtersEnabled ? <FilterAltIcon /> : <FilterAltOutlinedIcon />}
+                        size='large'
+                        color={filtersEnabled ? 'primary' : undefined}
+                    />
+                </div>
+            </Tooltip>
+            {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
+            {layout !== 'row' &&
+                <Tooltip key='columns' title='Column settings' placement='right'>
+                    <div>
+                        <IconButton
+                            onClick={onOpenColumnSettings}
+                            children={<ViewWeekOutlinedIcon />}
+                            size='large'
+                        />
+                    </div>
+                </Tooltip>
+            }
+            <Divider />
             <Tooltip key='add' title='Add servant' placement='right'>
                 <div>
                     <IconButton

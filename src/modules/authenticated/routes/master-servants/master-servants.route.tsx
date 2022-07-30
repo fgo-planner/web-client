@@ -21,7 +21,8 @@ import { MasterServantsEditDialog } from './master-servants-edit-dialog.componen
 import { MasterServantsInfoPanel } from './master-servants-info-panel.component';
 import { MasterServantsMultiAddDialog, MultiAddServantData } from './master-servants-multi-add-dialog.component';
 import { MasterServantsNavigationRail } from './master-servants-navigation-rail.component';
-import { useMasterServantsUserPreferencesHook } from './master-servants-user-preferences.hook';
+import { useMasterServantsRouteUserPreferencesHook } from '../../hooks/use-master-servants-route-user-preferences.hook';
+import { MasterServantsFilterControls } from './master-servants-filter-controls.component';
 
 const getInstanceId = ({ instanceId }: Immutable<MasterServant>): number => {
     return instanceId;
@@ -136,10 +137,14 @@ export const MasterServantsRoute = React.memo(() => {
 
     const {
         userPreferences: {
-            infoPanelOpen
+            filtersEnabled,
+            infoPanelOpen,
+            showUnsummonedServants
         },
-        toggleInfoPanelOpen
-    } = useMasterServantsUserPreferencesHook(masterAccountId);
+        toggleFilters,
+        toggleInfoPanelOpen,
+        toggleShowUnsummonedServants
+    } = useMasterServantsRouteUserPreferencesHook(masterAccountId);
 
     const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
 
@@ -400,10 +405,16 @@ export const MasterServantsRoute = React.memo(() => {
                 onSaveButtonClick={handleSaveButtonClick}
                 disabled={awaitingRequest}
             />
+            <MasterServantsFilterControls
+                filtersEnabled={filtersEnabled}
+                showUnsummonedServants={showUnsummonedServants}
+                onToggleShowUnsummonedServants={toggleShowUnsummonedServants}
+            />
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
                 <MasterServantsNavigationRail
                     layout={sm ? 'column' : 'row'}
                     dragDropMode={dragDropMode}
+                    filtersEnabled={filtersEnabled}
                     selectedServantsCount={selectedServantsCount}
                     onAddServant={handleAddServant}
                     onMultiAddServant={handleMultiAddServant}
@@ -412,6 +423,8 @@ export const MasterServantsRoute = React.memo(() => {
                     onDragDropApply={handleDragDropApply}
                     onDragDropCancel={handleDragDropCancel}
                     onEditSelectedServants={handleEditSelectedServants}
+                    onOpenColumnSettings={() => {}}
+                    onToggleFilters={toggleFilters}
                 />
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>

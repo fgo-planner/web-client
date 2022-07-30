@@ -66,9 +66,9 @@ const LayoutStyleProps = (props: Props & { theme: SystemTheme }) => {
     return {
         width: '100%',
         height: spacing(ThemeConstants.NavigationRailSizeScale),
-        padding: spacing(0, 2),
+        padding: spacing(0, 1),
         '& >*': {
-            paddingLeft: spacing(1)
+            paddingLeft: spacing(0.75)
         },
         '& >.MuiDivider-root': {
             display: 'none'

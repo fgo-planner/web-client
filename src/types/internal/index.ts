@@ -32,6 +32,7 @@ export * from './http/http-response-type.type';
 export * from './modal-on-close-handler.type';
 export * from './modal-on-close-reason.type';
 export * from './page-metadata.type';
+export * from './position-2d.type';
 export * from './props/component-style-props.type';
 export * from './props/dialog-component-props.type';
 export * from './sx-props-function.type';

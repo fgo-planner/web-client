@@ -1,6 +1,7 @@
 import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon } from '@mui/icons-material';
 import { Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover } from '@mui/material';
 import React, { MouseEvent, useCallback, useMemo } from 'react';
+import { Position2D } from '../../../../../types/internal';
 
 type Props = {
     onAddServant: () => void;
@@ -9,10 +10,8 @@ type Props = {
     onDeselectAllServants: () => void;
     onEditSelectedServants: () => void;
     onSelectAllServants: () => void;
-    position?: {
-        x: number
-        y: number
-    };
+    open: boolean;
+    position: Position2D;
     selectedServantsCount: number;
 };
 
@@ -28,7 +27,7 @@ const handleBackdropContextMenu = (e: MouseEvent<HTMLElement>): void => {
     e.preventDefault();
 };
 
-export const MasterServantContextMenu = React.memo((props: Props) => {
+export const MasterServantsListRowContextMenu = React.memo((props: Props) => {
 
     const {
         onAddServant,
@@ -37,6 +36,7 @@ export const MasterServantContextMenu = React.memo((props: Props) => {
         onDeselectAllServants,
         onEditSelectedServants,
         onSelectAllServants,
+        open,
         position,
         selectedServantsCount,
     } = props;
@@ -66,10 +66,10 @@ export const MasterServantContextMenu = React.memo((props: Props) => {
         onDeselectAllServants();
     }, [onClose, onDeselectAllServants]);
 
-    const anchorPosition = useMemo(() => ({
-        top: position?.y || 0,
-        left: position?.x || 0
-    }), [position]);
+    const anchorPosition = useMemo(() => {
+        const [left, top] = position;
+        return { top, left };
+    }, [position]);
 
     const backdropProps = useMemo(() => ({
         onContextMenu: handleBackdropContextMenu,
@@ -78,7 +78,7 @@ export const MasterServantContextMenu = React.memo((props: Props) => {
 
     return (
         <Popover
-            open={!!position}
+            open={open}
             anchorReference='anchorPosition'
             anchorPosition={anchorPosition}
             BackdropProps={backdropProps}

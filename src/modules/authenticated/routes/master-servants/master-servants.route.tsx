@@ -15,14 +15,20 @@ import { ExistingMasterServantUpdate, Immutable, MasterServantUpdate, ModalOnClo
 import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList, StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.component';
-import { useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
-import { MasterServantContextMenu } from './master-servants-context-menu.component';
-import { MasterServantsEditDialog } from './master-servants-edit-dialog.component';
-import { MasterServantsInfoPanel } from './master-servants-info-panel.component';
-import { MasterServantsMultiAddDialog, MultiAddServantData } from './master-servants-multi-add-dialog.component';
-import { MasterServantsNavigationRail } from './master-servants-navigation-rail.component';
-import { useMasterServantsRouteUserPreferencesHook } from '../../hooks/use-master-servants-route-user-preferences.hook';
-import { MasterServantsFilterControls } from './master-servants-filter-controls.component';
+import { MasterAccountDataEditHookOptions, useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
+import { MasterServantsEditDialog } from './components/master-servants-edit-dialog.component';
+import { MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
+import { MasterServantsInfoPanel } from './components/master-servants-info-panel.component';
+import { MasterServantsListRowContextMenu } from './components/master-servants-list-row-context-menu.component';
+import { MasterServantsMultiAddDialog, MultiAddServantData } from './components/master-servants-multi-add-dialog.component';
+import { MasterServantsNavigationRail } from './components/master-servants-navigation-rail.component';
+import { useMasterServantsContextMenuState } from './hooks/use-master-servants-context-menu-state.hook';
+import { useMasterServantsUserPreferencesHook } from './hooks/use-master-servants-user-preferences.hook';
+
+const MasterAccountDataEditOptions: MasterAccountDataEditHookOptions = {
+    includeCostumes: true,
+    includeServants: true
+};
 
 const getInstanceId = ({ instanceId }: Immutable<MasterServant>): number => {
     return instanceId;
@@ -95,10 +101,7 @@ export const MasterServantsRoute = React.memo(() => {
         deleteServants,
         revertChanges,
         persistChanges
-    } = useMasterAccountDataEditHook({
-        includeCostumes: true,
-        includeServants: true
-    });
+    } = useMasterAccountDataEditHook(MasterAccountDataEditOptions);
 
     const {
         dragDropData,
@@ -107,21 +110,21 @@ export const MasterServantsRoute = React.memo(() => {
         handleDragOrderChange
     } = useDragDropHelper(getInstanceId);
 
+    /**
+     * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
+     * rearrange the default ordering of the list. As such, when in drag-drop mode,
+     * the full list in the current default order is visible, regardless of any
+     * filter or visibility settings.
+     */
     const dragDropMode = !!dragDropData;
 
-    /**
-     * The anchor coordinates for the servant context menu.
-     */
-    const [servantContextMenuPosition, setServantContextMenuPosition] = useState<{ x: number, y: number }>();
-
-    const handleServantContextMenuOpen = useCallback((e: MouseEvent<HTMLDivElement>): void => {
-        const { pageX: x, pageY: y } = e;
-        setServantContextMenuPosition({ x, y });
-    }, []);
-
-    const handleServantContextMenuClose = useCallback((): void => {
-        setServantContextMenuPosition(undefined);
-    }, []);
+    const {
+        activeContextMenu,
+        contextMenuPosition,
+        closeContextMenu,
+        openHeaderContextMenu,
+        openRowContextMenu
+    } = useMasterServantsContextMenuState();
 
     const {
         selectedData: selectedServantData,
@@ -132,7 +135,7 @@ export const MasterServantsRoute = React.memo(() => {
         disabled: dragDropMode,
         multiple: true,
         rightClickBehavior: 'contextmenu',
-        onContextMenu: handleServantContextMenuOpen,
+        onContextMenu: openRowContextMenu,
     });
 
     const {
@@ -144,7 +147,7 @@ export const MasterServantsRoute = React.memo(() => {
         toggleFilters,
         toggleInfoPanelOpen,
         toggleShowUnsummonedServants
-    } = useMasterServantsRouteUserPreferencesHook(masterAccountId);
+    } = useMasterServantsUserPreferencesHook(masterAccountId);
 
     const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
 
@@ -383,11 +386,11 @@ export const MasterServantsRoute = React.memo(() => {
         return null;
     }
 
-    const { 
+    const {
         selectedIds: selectedInstanceIds,
         selectedCount: selectedServantsCount
     } = selectedServantData;
-    
+
     const isMultipleServantsSelected = selectedServantsCount > 1;
 
     const {
@@ -407,8 +410,8 @@ export const MasterServantsRoute = React.memo(() => {
             />
             <MasterServantsFilterControls
                 filtersEnabled={filtersEnabled}
-                showUnsummonedServants={showUnsummonedServants}
-                onToggleShowUnsummonedServants={toggleShowUnsummonedServants}
+            // showUnsummonedServants={showUnsummonedServants}
+            // onToggleShowUnsummonedServants={toggleShowUnsummonedServants}
             />
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
                 <MasterServantsNavigationRail
@@ -423,7 +426,7 @@ export const MasterServantsRoute = React.memo(() => {
                     onDragDropApply={handleDragDropApply}
                     onDragDropCancel={handleDragDropCancel}
                     onEditSelectedServants={handleEditSelectedServants}
-                    onOpenColumnSettings={() => {}}
+                    onOpenColumnSettings={() => { }}
                     onToggleFilters={toggleFilters}
                 />
                 <div className={`${StyleClassPrefix}-main-content`}>
@@ -434,6 +437,7 @@ export const MasterServantsRoute = React.memo(() => {
                             selectedServants={selectedInstanceIds}
                             showHeader={sm}
                             visibleColumns={visibleColumns}
+                            // onHeaderClick={}
                             onServantClick={handleServantClick}
                             onEditSelectedServants={handleEditSelectedServants}
                             dragDropMode={dragDropMode}
@@ -445,13 +449,13 @@ export const MasterServantsRoute = React.memo(() => {
                         <MasterServantsInfoPanel
                             /**
                              * TODO Change this to false for mobile view, also make it user configurable.
-                             */ 
+                             */
                             keepChildrenMounted
                             /**
                              * TODO If closed and not kept mounted, then don't load the selectedItems since
                              * it is lazy loaded.
                              */
-                            activeServants={selectedServantData.selectedItems} 
+                            activeServants={selectedServantData.selectedItems}
                             bondLevels={bondLevels}
                             unlockedCostumes={costumes}
                             // editMode={editMode}
@@ -482,15 +486,16 @@ export const MasterServantsRoute = React.memo(() => {
                 confirmButtonLabel='Delete'
                 onClose={handleDeleteServantDialogClose}
             />
-            <MasterServantContextMenu
-                position={servantContextMenuPosition}
+            <MasterServantsListRowContextMenu
+                open={activeContextMenu === 'row'}
+                position={contextMenuPosition}
                 selectedServantsCount={selectedServantsCount}
                 onAddServant={handleAddServant}
                 onDeleteSelectedServants={handleDeleteSelectedServants}
                 onEditSelectedServants={handleEditSelectedServants}
                 onSelectAllServants={handleSelectAllServants}
                 onDeselectAllServants={handleDeselectAllServants}
-                onClose={handleServantContextMenuClose}
+                onClose={closeContextMenu}
             />
         </Box>
     );

@@ -1,12 +1,10 @@
-import { FilterList, PersonOff, PersonOffOutlined as PersonOffOutlinedIcon, Replay } from '@mui/icons-material';
+import { FilterList, Replay } from '@mui/icons-material';
 import { IconButton, TextField, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
 type Props = {
     filtersEnabled: boolean;
-    onToggleShowUnsummonedServants: () => void;
-    showUnsummonedServants: boolean;
 };
 
 const StyleClassPrefix = 'MasterServantsFilterControls';
@@ -15,7 +13,8 @@ const StyleProps = (theme: SystemTheme) => {
 
     const {
         breakpoints,
-        palette
+        palette,
+        spacing
     } = theme as Theme;
 
     return {
@@ -23,19 +22,24 @@ const StyleProps = (theme: SystemTheme) => {
         alignItems: 'center',
         minHeight: '4rem',
         height: '4rem',
-        px: 3,
+        pl: 14,
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         borderBottomColor: palette.divider,
         '& .MuiTextField-root': {
-            mx: 2,
-            width: '16rem',  // 256px
+            width: spacing(64),  // 256px
+            '& .MuiOutlinedInput-root': {
+                backgroundColor: palette.background.paper
+            },
             [breakpoints.down('sm')]: {
-                width: '12rem'  // 192px
+                width: spacing(48)  // 192px
             }
         },
+        '& >div:not(:first-of-type)': {
+            pl: 0.75
+        },
         [breakpoints.down('sm')]: {
-            px: 1
+            pl: 4
         }
     } as SystemStyleObject<SystemTheme>;
 };
@@ -43,9 +47,7 @@ const StyleProps = (theme: SystemTheme) => {
 export const MasterServantsFilterControls = React.memo((props: Props) => {
 
     const {
-        filtersEnabled,
-        onToggleShowUnsummonedServants,
-        showUnsummonedServants
+        filtersEnabled
     } = props;
 
     const [searchText, setSearchText] = useState<string>('');
@@ -94,7 +96,7 @@ export const MasterServantsFilterControls = React.memo((props: Props) => {
                     />
                 </div>
             </Tooltip>
-            <Tooltip key='unsummoned' title='Toggle un-summoned servants' placement='top'>
+            {/* <Tooltip key='unsummoned' title='Toggle un-summoned servants' placement='top'>
                 <div>
                     <IconButton
                         onClick={onToggleShowUnsummonedServants}
@@ -103,7 +105,7 @@ export const MasterServantsFilterControls = React.memo((props: Props) => {
                         color={showUnsummonedServants ? 'primary' : undefined}
                     />
                 </div>
-            </Tooltip>
+            </Tooltip> */}
         </Box>
     );
 

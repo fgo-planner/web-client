@@ -4,16 +4,16 @@ import { IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
-import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
-import { DataPointListItem } from '../../../../components/list/data-point-list-item.component';
-import { GameServantConstants } from '../../../../constants';
-import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
-import { ThemeConstants } from '../../../../styles/theme-constants';
-import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../types/data';
-import { Immutable, ImmutableArray, ReadonlyIterable } from '../../../../types/internal';
-import { ComputationOptions, PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
+import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
+import { GameServantBondIcon } from '../../../../../components/game/servant/game-servant-bond-icon.component';
+import { DataPointListItem } from '../../../../../components/list/data-point-list-item.component';
+import { GameServantConstants } from '../../../../../constants';
+import { useGameItemMap } from '../../../../../hooks/data/use-game-item-map.hook';
+import { useGameServantMap } from '../../../../../hooks/data/use-game-servant-map.hook';
+import { ThemeConstants } from '../../../../../styles/theme-constants';
+import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types/data';
+import { Immutable, ImmutableArray, ReadonlyIterable } from '../../../../../types/internal';
+import { ComputationOptions, PlanComputationUtils } from '../../../../../utils/plan/plan-computation.utils';
 
 type Props = {
     activeServants: ImmutableArray<MasterServant>;

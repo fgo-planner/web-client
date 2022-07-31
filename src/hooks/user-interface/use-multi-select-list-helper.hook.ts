@@ -5,7 +5,7 @@ import { useForceUpdate } from '../utils/use-force-update.hook';
 export type ListSelectHelperHookOptions = {
     disabled?: boolean;
     multiple?: boolean;
-    onContextMenu?: (e: MouseEvent<HTMLDivElement>) => void;
+    onContextMenu?: (e: MouseEvent) => void;
     rightClickBehavior?: 'none' | 'mousedown' | 'contextmenu';
 };
 

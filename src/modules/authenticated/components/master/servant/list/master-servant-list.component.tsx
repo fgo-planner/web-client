@@ -8,7 +8,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { Immutable, ImmutableArray, ReadonlyPartial } from '../../../../../../types/internal';
-import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
+import { MasterServantListColumnName, MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';
 import { StyleClassPrefix as MasterServantListRowBondLevelStyleClassPrefix } from './master-servant-list-row-bond-level.component';
 import { StyleClassPrefix as MasterServantListRowFouLevelStyleClassPrefix } from './master-servant-list-row-fou-level.component';
@@ -34,6 +34,7 @@ type Props = {
     onEditSelectedServants?: () => void;
     onDeleteSelectedServants?: () => void;
     onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
+    onHeaderClick?: (e: MouseEvent<HTMLDivElement>, column: MasterServantListColumnName) => void;
     onServantClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
 };
 

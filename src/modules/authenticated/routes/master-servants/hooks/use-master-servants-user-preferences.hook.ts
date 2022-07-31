@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Immutable } from '../../../types/internal';
-import { StorageKeys } from '../../../utils/storage/storage-keys';
-import { StorageUtils } from '../../../utils/storage/storage.utils';
-import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
+import { Immutable } from '../../../../../types/internal';
+import { StorageKeys } from '../../../../../utils/storage/storage-keys';
+import { StorageUtils } from '../../../../../utils/storage/storage.utils';
+import { SubscribablesContainer } from '../../../../../utils/subscription/subscribables-container';
+import { SubscriptionTopics } from '../../../../../utils/subscription/subscription-topics';
 
 //#region Default values
 
@@ -90,11 +90,11 @@ const writeUserPreferencesToLocalStorage = (userPreferences: MasterServantsUserP
  * are relevant to the master servants route. 
  *
  * This is intended to be used only within the `MasterServants` route component,
- * do not use inside any other components!
+ * do not use inside any other component!
  * 
  * @param masterAccountId The currently active master account's ID.
  */
-export const useMasterServantsRouteUserPreferencesHook = (masterAccountId?: string): MasterServantsUserPreferencesHookResult => {
+export const useMasterServantsUserPreferencesHook = (masterAccountId?: string): MasterServantsUserPreferencesHookResult => {
 
     const [userPreferences, setUserPreferences] = useState<MasterServantsUserPreferences>(getDefaultUserPreferences);
 

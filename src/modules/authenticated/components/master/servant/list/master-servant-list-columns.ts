@@ -1,14 +1,15 @@
 import { Immutable } from '../../../../../../types/internal';
 
-export type MasterServantListVisibleColumns = {
-    npLevel?: boolean;
-    level?: boolean;
-    fouHp?: boolean;
-    fouAtk?: boolean;
-    skills?: boolean;
-    appendSkills?: boolean;
-    bondLevel?: boolean;
-};
+export type MasterServantListColumnName =
+    'npLevel' |
+    'level' |
+    'fouHp' |
+    'fouAtk' |
+    'skills' |
+    'appendSkills' |
+    'bondLevel';
+
+export type MasterServantListVisibleColumns = Partial<Record<MasterServantListColumnName, boolean>>;
 
 const ColumnWidths = {
     label: 300,

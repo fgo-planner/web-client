@@ -75,7 +75,7 @@ const StyleProps = (theme: SystemTheme) => {
                                 pl: 4
                             },
                             [`& .${MasterServantListRowLabelStyleClassPrefix}-rarity`]: {
-                                minWidth: 24,
+                                minWidth: spacing(7),  // 28px
                                 px: 4
                             }
                         },

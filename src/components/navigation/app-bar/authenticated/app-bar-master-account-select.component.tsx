@@ -1,12 +1,11 @@
 import { MasterAccount } from '@fgo-planner/types';
-import { MenuItem, TextField } from '@mui/material';
-import { SystemStyleObject, Theme } from '@mui/system';
-import { ChangeEvent, CSSProperties, PureComponent, ReactNode } from 'react';
-import { Subscription } from 'rxjs';
+import { MenuItem, TextField, Theme } from '@mui/material';
+import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import React, { ChangeEvent, CSSProperties, ReactNode, useCallback, useEffect, useState } from 'react';
+import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { MasterAccountList } from '../../../../types/data';
 import { Immutable, Nullable } from '../../../../types/internal';
-import { InjectablesContainer } from '../../../../utils/dependency-injection/injectables-container';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 
@@ -14,102 +13,89 @@ type Props = {
     masterAccountList: MasterAccountList;
 };
 
-type State = {
-    currentMasterAccountId: string;
+const StyleClassPrefix = 'AppBarMasterAccountSelect';
+
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        palette,
+        spacing
+    } = theme as Theme;
+
+    return {
+        width: spacing(56),  // 224px
+        '& .MuiOutlinedInput-root': {
+            backgroundColor: palette.background.paper
+        }
+    } as SystemStyleObject<SystemTheme>;
 };
 
-const StyleClassPrefix = 'master-account-select';
-
-const styles = {
-    width: 224,
-    bgcolor: 'background.default'
-} as SystemStyleObject<Theme>;
-
-const selectOptionStyles = {
+const SelectOptionStyle = {
     height: 40
 } as CSSProperties;
 
-// TODO Convert this to functional component
-export const AppBarMasterAccountSelect = class extends PureComponent<Props, State> {
+export const AppBarMasterAccountSelect = React.memo(({ masterAccountList }: Props) => {
 
-    // TODO Use the useInjectable hook after converting into functional component.
-    private get _masterAccountService() {
-        return InjectablesContainer.get(MasterAccountService)!;
-    }
+    const masterAccountService = useInjectable(MasterAccountService);
 
-    private _onCurrentMasterAccountChangeSubscription!: Subscription;
+    const [currentMasterAccountId, setCurrentMasterAccountId] = useState<string>('');
 
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            currentMasterAccountId: ''
-        };
-
-        this._renderSelectOption = this._renderSelectOption.bind(this);
-        this._handleInputChange = this._handleInputChange.bind(this);
-    }
-
-    componentDidMount(): void {
-        this._onCurrentMasterAccountChangeSubscription = SubscribablesContainer
+    /**
+     * Master account change subscription.
+     */
+    useEffect(() => {
+        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopics.User.CurrentMasterAccountChange)
-            .subscribe(this._handleCurrentMasterAccountChange.bind(this));
-    }
+            .subscribe((masterAccount: Nullable<MasterAccount>) => {
+                setCurrentMasterAccountId(masterAccount?._id || '');
+            });
 
-    componentWillUnmount(): void {
-        this._onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }
+        return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
+    }, []);
 
-    render(): ReactNode {
-        const { masterAccountList } = this.props;
-        const { currentMasterAccountId } = this.state;
-        // TODO Return a native select if on a mobile device.
-        return (
-            <TextField
-                select
-                variant='outlined'
-                size='small'
-                className={StyleClassPrefix}
-                sx={styles}
-                value={currentMasterAccountId}
-                onChange={this._handleInputChange}
-            >
-                {masterAccountList.map(this._renderSelectOption)}
-            </TextField>
-        );
-    }
+    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
+        const accountId = event.target.value;
+        setCurrentMasterAccountId((currentMasterAccountId: string): string => {
+            if (accountId !== currentMasterAccountId) {
+                /**
+                 * Set timeout is not needed here because the `selectAccount` method is already
+                 * async (?).
+                 */
+                masterAccountService.selectAccount(accountId);
+            }
+            return accountId;
+        });
+    }, [masterAccountService]);
 
-    private _renderSelectOption(account: Immutable<Partial<MasterAccount>>, index: number): ReactNode {
+    const renderSelectOption = (account: Immutable<Partial<MasterAccount>>, index: number): ReactNode => {
         let itemLabel = account.name || `Account ${index + 1}`;
         if (account.friendId) {
             itemLabel += ` (${account.friendId})`;
         }
         return (
             <MenuItem
-                style={selectOptionStyles}
+                style={SelectOptionStyle}
                 value={account._id}
                 key={index}
             >
                 {itemLabel}
             </MenuItem>
         );
-    }
+    };
 
-    private _handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
-        const accountId = event.target.value;
-        if (accountId === this.state.currentMasterAccountId) {
-            return;
-        }
-        this.setState({
-            currentMasterAccountId: accountId
-        });
-        this._masterAccountService.selectAccount(accountId);
-    }
+    // TODO Return a native select if on a mobile device.
+    return (
+        <TextField
+            select
+            variant='outlined'
+            size='small'
+            className={`${StyleClassPrefix}-root`}
+            sx={StyleProps}
+            value={currentMasterAccountId}
+            onChange={handleInputChange}
+        >
+            {masterAccountList.map(renderSelectOption)}
+        </TextField>
+    );
 
-    private _handleCurrentMasterAccountChange(account: Nullable<MasterAccount>): void {
-        const accountId = account?._id || '';
-        this.setState({
-            currentMasterAccountId: accountId
-        });
-    }
-
-};
+});

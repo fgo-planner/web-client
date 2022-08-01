@@ -7,6 +7,9 @@ export class SetUtils {
     }
 
     static isEqual<T>(a: ReadonlySet<T>, b: ReadonlySet<T>): boolean {
+        if (a === b) {
+            return true;
+        }
         if (a.size !== b.size) {
             return false;
         }

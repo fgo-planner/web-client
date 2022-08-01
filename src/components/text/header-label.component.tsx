@@ -12,7 +12,8 @@ const StyleProps = {
     fontWeight: 500,
     fontSize: '0.9375rem',
     textAlign: 'center',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    userSelect: 'none'
 } as CSSProperties;
 
 export const HeaderLabel = styled('div', StyleOptions)(StyleProps);

@@ -1,15 +1,20 @@
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React from 'react';
+import React, { MouseEvent, MouseEventHandler, useCallback, useRef } from 'react';
 import { HeaderLabel } from '../../../../../../components/text/header-label.component';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { ReadonlyPartial } from '../../../../../../types/internal';
-import { MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
+import { SortDirection, SortOptions } from '../../../../../../types/data';
+import { MasterServantColumnProperties, MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
+import { MasterServantListHeaderLabel } from './master-servant-list-header-label.component';
 
 type Props = {
     dragDropMode?: boolean;
-    visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
+    onClick?: MouseEventHandler;
+    onSortChange?: (column?: MasterServantListColumn, direction?: SortDirection) => void;
+    sortEnabled?: boolean;
+    sortOptions?: SortOptions<MasterServantListColumn>;
+    visibleColumns?: Readonly<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
 };
 
@@ -38,37 +43,29 @@ const StyleProps = (theme: SystemTheme) => {
                 pl: 10
             },
             [`& .${StyleClassPrefix}-label`]: {
-                minWidth: ColumnWidths.label + 52
+                display: 'flex',
+                justifyContent: 'center',
+                minWidth: MasterServantColumnProperties.label.width + 52,
+                '&>div': {
+                    cursor: 'pointer'
+                }
             },
             [`& .${StyleClassPrefix}-stats`]: {
-                display: 'flex',
-                [`& .${StyleClassPrefix}-np-level`]: {
-                    width: ColumnWidths.stats.npLevel
-                },
-                [`& .${StyleClassPrefix}-level`]: {
-                    width: ColumnWidths.stats.level
-                },
-                [`& .${StyleClassPrefix}-fou-hp`]: {
-                    width: ColumnWidths.stats.fou
-                },
-                [`& .${StyleClassPrefix}-fou-atk`]: {
-                    width: ColumnWidths.stats.fou
-                },
-                [`& .${StyleClassPrefix}-skills`]: {
-                    width: ColumnWidths.stats.skills
-                },
-                [`& .${StyleClassPrefix}-append-skills`]: {
-                    width: ColumnWidths.stats.skills
-                },
-                [`& .${StyleClassPrefix}-bond-level`]: {
-                    width: ColumnWidths.stats.bondLevel
-                }
+                display: 'flex'
             }
         }
     } as SystemStyleObject<SystemTheme>;
 };
 
-export const MasterServantListHeader = React.memo(({ dragDropMode, visibleColumns }: Props) => {
+export const MasterServantListHeader = React.memo((props: Props) => {
+
+    const {
+        dragDropMode,
+        onClick,
+        onSortChange,
+        sortOptions,
+        visibleColumns = {}
+    } = props;
 
     const {
         npLevel,
@@ -80,50 +77,85 @@ export const MasterServantListHeader = React.memo(({ dragDropMode, visibleColumn
         bondLevel
     } = visibleColumns || {};
 
+    const sortOptionsRef = useRef<SortOptions<MasterServantListColumn>>();
+    sortOptionsRef.current = sortOptions;
+
+    const handleLabelClick = useCallback((e: MouseEvent, column: MasterServantListColumn): void => {
+        if (e.type === 'contextmenu' || !onSortChange) {
+            return;
+        }
+        e.stopPropagation();
+        const sortOptions = sortOptionsRef.current;
+        let direction: SortDirection;
+        if (sortOptions?.sort !== column) {
+            direction = 'desc';
+        } else {
+            direction = sortOptions.direction === 'asc' ? 'desc' : 'asc';
+        }
+        onSortChange(column, direction);
+    }, [onSortChange]);
+
+    const resetSort = useCallback((e: MouseEvent): void => {
+        onSortChange?.();
+    }, [onSortChange]);
+
     return (
         <Box className={clsx(`${StyleClassPrefix}-root`, ThemeConstants.ClassScrollbarHidden)} sx={StyleProps}>
-            <div className={clsx(`${StyleClassPrefix}-content`, dragDropMode && 'drag-drop-mode')}>
-
-                <HeaderLabel className={`${StyleClassPrefix}-label`}>
-                    Servant
-                </HeaderLabel>
-                <div className={`${StyleClassPrefix}-stats`}>
-                    {npLevel &&
-                        <HeaderLabel className={`${StyleClassPrefix}-np-level`}>
-                            NP
-                        </HeaderLabel>
-                    }
-                    {level &&
-                        <HeaderLabel className={`${StyleClassPrefix}-level`}>
-                            Level
-                        </HeaderLabel>
-                    }
-                    {fouHp &&
-                        <HeaderLabel className={`${StyleClassPrefix}-fou-hp`}>
-                            Fou (HP)
-                        </HeaderLabel>
-                    }
-                    {fouAtk &&
-                        <HeaderLabel className={`${StyleClassPrefix}-fou-atk`}>
-                            Fou (ATK)
-                        </HeaderLabel>
-                    }
-                    {skills &&
-                        <HeaderLabel className={`${StyleClassPrefix}-skills`}>
-                            Skills
-                        </HeaderLabel>
-                    }
-                    {appendSkills &&
-                        <HeaderLabel className={`${StyleClassPrefix}-append-skills`}>
-                            Append
-                        </HeaderLabel>
-                    }
-                    {bondLevel &&
-                        <HeaderLabel className={`${StyleClassPrefix}-bond-level`}>
-                            Bond
-                        </HeaderLabel>
-                    }
+            <div className={clsx(`${StyleClassPrefix}-content`, dragDropMode && 'drag-drop-mode')} onContextMenu={onClick}>
+                <div className={`${StyleClassPrefix}-label`}>
+                    <HeaderLabel onClick={resetSort}>
+                        Servant
+                    </HeaderLabel>
                 </div>
+                {npLevel &&
+                    <MasterServantListHeaderLabel
+                        column='npLevel'
+                        sortOptions={sortOptions}
+                        onClick={handleLabelClick}
+                    />
+                }
+                {level &&
+                    <MasterServantListHeaderLabel
+                        column='level'
+                        sortOptions={sortOptions}
+                        onClick={handleLabelClick}
+                    />
+                }
+                {fouHp &&
+                    <MasterServantListHeaderLabel
+                        column='fouHp'
+                        sortOptions={sortOptions}
+                        onClick={handleLabelClick}
+                    />
+                }
+                {fouAtk &&
+                    <MasterServantListHeaderLabel
+                        column='fouAtk'
+                        sortOptions={sortOptions}
+                        onClick={handleLabelClick}
+                    />
+                }
+                {skills &&
+                    <MasterServantListHeaderLabel
+                        column='skills'
+                        sortOptions={sortOptions}
+                        onClick={handleLabelClick}
+                    />
+                }
+                {appendSkills &&
+                    <MasterServantListHeaderLabel
+                        column='appendSkills'
+                        sortOptions={sortOptions}
+                        onClick={handleLabelClick}
+                    />
+                }
+                {bondLevel &&
+                    <MasterServantListHeaderLabel
+                        column='bondLevel'
+                        sortOptions={sortOptions}
+                        onClick={handleLabelClick}
+                    />
+                }
             </div>
         </Box>
     );

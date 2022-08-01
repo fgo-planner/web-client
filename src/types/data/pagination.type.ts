@@ -1,3 +1,5 @@
+import { SortDirection } from '@mui/material';
+
 export type Pagination = {
 
     /**
@@ -18,7 +20,7 @@ export type Pagination = {
     /**
      * The sort direction.
      */
-    direction: 'ASC' | 'DESC';
+    direction: SortDirection;
 
     /**
      * The total number of elements available.

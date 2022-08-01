@@ -20,8 +20,9 @@ type Props = {
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     onClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
     onContextMenu?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
+    onDoubleClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
     onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
-} & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu'>;
+} & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu' | 'onDoubleClick'>;
 
 const shouldSkipUpdate = (prevProps: Readonly<Props>, nextProps: Readonly<Props>): boolean => {
     if (!ObjectUtils.isShallowEquals(prevProps, nextProps)) {
@@ -46,6 +47,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
         visibleColumns,
         onClick,
         onContextMenu,
+        onDoubleClick,
         onDragOrderChange,
         ...domAttributes
     } = props;
@@ -57,6 +59,10 @@ export const MasterServantListRow = React.memo((props: Props) => {
     const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>): void => {
         onContextMenu?.(e, index);
     }, [index, onContextMenu]);
+
+    const handleDoubleClick = useCallback((e: MouseEvent<HTMLDivElement>): void => {
+        onDoubleClick?.(e, index);
+    }, [index, onDoubleClick]);
 
     if (!gameServant) {
         return (
@@ -106,6 +112,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
             dragEnabled={dragDropMode}
             onDragOrderChange={onDragOrderChange}
             onClick={handleClick}
+            onDoubleClick={handleDoubleClick}
             onContextMenu={handleContextMenu}
             {...domAttributes}
         >

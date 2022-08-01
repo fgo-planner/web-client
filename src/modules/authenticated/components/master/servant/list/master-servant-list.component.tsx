@@ -2,13 +2,17 @@ import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEvent, ReactNode, useEffect, useRef } from 'react';
+import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
+import { useListSelectHelper } from '../../../../../../hooks/user-interface/use-list-select-helper.hook';
+import { SortDirection, SortOptions } from '../../../../../../types/data';
 import { Immutable, ImmutableArray, ReadonlyPartial } from '../../../../../../types/internal';
-import { MasterServantListColumnName, MasterServantListColumnWidths as ColumnWidths, MasterServantListVisibleColumns } from './master-servant-list-columns';
+import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
+import { SetUtils } from '../../../../../../utils/set.utils';
+import { MasterServantColumnProperties, MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';
 import { StyleClassPrefix as MasterServantListRowBondLevelStyleClassPrefix } from './master-servant-list-row-bond-level.component';
 import { StyleClassPrefix as MasterServantListRowFouLevelStyleClassPrefix } from './master-servant-list-row-fou-level.component';
@@ -21,21 +25,32 @@ import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClas
 
 type Props = {
     bondLevels: Record<number, MasterServantBondLevel>;
-    dragDropMasterServants?: Array<Immutable<MasterServant>>;
+    /**
+     * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
+     * rearrange the default ordering of the list. As such, when in drag-drop mode,
+     * the list will be displayed without any sorting applied.
+     */
     dragDropMode?: boolean;
+    /**
+     * The list of servants to be displayed. Filtering should be already applied to
+     * the list by the parent component. The only transformation handled by this
+     * component is sorting.
+     */
     masterServants: ImmutableArray<MasterServant>;
     /**
      * Instance IDs of selected servants.
      */
     selectedServants?: ReadonlySet<number>;
     showHeader?: boolean;
+    sortOptions?: SortOptions<MasterServantListColumn>;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
-    onEditSelectedServants?: () => void;
-    onDeleteSelectedServants?: () => void;
     onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
-    onHeaderClick?: (e: MouseEvent<HTMLDivElement>, column: MasterServantListColumnName) => void;
-    onServantClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
+    onHeaderClick?: MouseEventHandler;
+    onRowClick?: MouseEventHandler;
+    onRowDoubleClick?: MouseEventHandler;
+    onSelectionChange?: (selectedServants: ReadonlySet<number>) => void;
+    onSortChange?: (column?: MasterServantListColumn, direction?: SortDirection) => void;
 };
 
 export const StyleClassPrefix = 'MasterServantList';
@@ -71,7 +86,7 @@ const StyleProps = (theme: SystemTheme) => {
                         [`& .${MasterServantListRowLabelStyleClassPrefix}-root`]: {
                             display: 'flex',
                             alignItems: 'center',
-                            width: ColumnWidths.label,
+                            width: MasterServantColumnProperties.label.width,
                             [`& .${MasterServantListRowLabelStyleClassPrefix}-class-icon`]: {
                                 pl: 4
                             },
@@ -85,7 +100,7 @@ const StyleProps = (theme: SystemTheme) => {
                             display: 'flex',
                             alignItems: 'center',
                             [`& .${MasterServantListRowNpLevelStyleClassPrefix}-root`]: {
-                                width: ColumnWidths.stats.npLevel,
+                                width: MasterServantColumnProperties.npLevel.width,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -96,7 +111,7 @@ const StyleProps = (theme: SystemTheme) => {
                                 }
                             },
                             [`& .${MasterServantListRowLevelStyleClassPrefix}-root`]: {
-                                width: ColumnWidths.stats.level,
+                                width: MasterServantColumnProperties.level.width,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -114,10 +129,10 @@ const StyleProps = (theme: SystemTheme) => {
                                 }
                             },
                             [`& .${MasterServantListRowFouLevelStyleClassPrefix}-root`]: {
-                                width: ColumnWidths.stats.fou
+                                width: MasterServantColumnProperties.fouHp.width
                             },
                             [`& .${MasterServantListRowSkillLevelStyleClassPrefix}-root`]: {
-                                width: ColumnWidths.stats.skills,
+                                width: MasterServantColumnProperties.skills.width,
                                 display: 'flex',
                                 textAlign: 'center',
                                 alignItems: 'center',
@@ -127,7 +142,7 @@ const StyleProps = (theme: SystemTheme) => {
                                 },
                             },
                             [`& .${MasterServantListRowBondLevelStyleClassPrefix}-root`]: {
-                                width: ColumnWidths.stats.bondLevel,
+                                width: MasterServantColumnProperties.bondLevel.width,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -159,57 +174,92 @@ export const MasterServantList = React.memo((props: Props) => {
 
     const {
         bondLevels,
-        dragDropMasterServants,
         dragDropMode,
         masterServants,
-        onEditSelectedServants,
-        onDeleteSelectedServants,
         onDragOrderChange,
-        onServantClick,
-        selectedServants,
+        onHeaderClick,
+        onRowClick,
+        onRowDoubleClick,
+        onSelectionChange,
+        onSortChange,
+        selectedServants = SetUtils.emptySet(),
         showHeader,
+        sortOptions,
         visibleColumns
     } = props;
 
-    /**
-     * Stores the `masterServants` set as a ref to prevent `handleServantClick` from
-     * being redefined when the object reference changes.
-     */
-    const masterServantsRef = useRef<ImmutableArray<MasterServant>>(masterServants);
-
-    /**
-     * Stores the `selectedServants` set as a ref to prevent `handleServantClick`
-     * from being redefined when the object reference changes.
-     */
-    const selectedServantsRef = useRef<ReadonlySet<number>>();
-
-    /**
-     * Updates the `masterServantsRef` and `selectedServantsRef` whenever their
-     * respective source data changes.
-     */
-    useEffect(() => {
-        masterServantsRef.current = masterServants;
-        selectedServantsRef.current = selectedServants;
-    }, [masterServants, selectedServants]);
-
-    /*
-     * Adds a listener to invoke the `onDeleteSelectedServants` callback when the
-     * delete key is pressed.
-     */
-    useEffect(() => {
-        if (!onDeleteSelectedServants) {
-            return;
+    const masterServantsSorted = useMemo((): ImmutableArray<MasterServant> => {
+        if (dragDropMode) {
+            return masterServants;
         }
-        const listener = (event: KeyboardEvent): void => {
-            if (event.key !== 'Delete') {
-                return;
+        const sort = sortOptions?.sort;
+        if (!sort) {
+            return masterServants;
+        }
+        const direction = sortOptions.direction;
+        const start = window.performance.now();
+        // TODO Move this to utilities class.
+        const sorted = [...masterServants].sort((a, b): number => {
+            let paramA: number, paramB: number;
+            switch(sort) {
+                case 'npLevel':
+                    paramA = a.np;
+                    paramB = b.np;
+                    break;
+                case 'level':
+                    paramA = a.level;
+                    paramB = b.level;
+                    break;
+                case 'fouHp':
+                    paramA = a.fouHp || -1;
+                    paramB = b.fouHp || -1;
+                    break;
+                case 'fouAtk':
+                    paramA = a.fouAtk || -1;
+                    paramB = b.fouAtk || -1;
+                    break;
+                case 'bondLevel':
+                    paramA = bondLevels[a.gameId] || -1;
+                    paramB = bondLevels[b.gameId] || -1;
+                    break;
+                default:
+                    paramA = a.gameId;
+                    paramB = b.gameId;
             }
-            onDeleteSelectedServants();
-        };
-        window.addEventListener('keydown', listener);
-        return () => window.removeEventListener('keydown', listener);
-    }, [onDeleteSelectedServants]);
+            if (paramA === paramB) {
+                paramA = a.gameId;
+                paramB = b.gameId;
+            }
+            return direction === 'asc' ? paramA - paramB : paramB - paramA;
+        });
+        const end = window.performance.now();
+        console.log(`Sorting by ${sort} ${direction} completed in ${(end - start).toFixed(2)}ms.`);
+        return sorted;
+    }, [bondLevels, dragDropMode, masterServants, sortOptions?.direction, sortOptions?.sort]);
 
+
+    const {
+        selectedIds,
+        handleItemClick
+    } = useListSelectHelper(
+        masterServantsSorted,
+        selectedServants,
+        MasterServantUtils.getInstanceId,
+        {
+            disabled: dragDropMode,
+            multiple: true,
+            rightClickAction: 'contextmenu'
+        }
+    );
+
+    useEffect(() => {
+        onSelectionChange?.(selectedIds);
+    }, [onSelectionChange, selectedIds]);
+
+    const handleRowClick = useCallback((e: MouseEvent, index: number) => {
+        handleItemClick(e, index);
+        onRowClick?.(e);
+    }, [handleItemClick, onRowClick]);
 
     //#region Component rendering
 
@@ -237,25 +287,27 @@ export const MasterServantList = React.memo((props: Props) => {
                 active={active}
                 dragDropMode={dragDropMode}
                 onDragOrderChange={onDragOrderChange}
-                onClick={onServantClick}
-                onDoubleClick={onEditSelectedServants}
-                onContextMenu={onServantClick}
+                onClick={handleRowClick}
+                onContextMenu={handleRowClick}
+                onDoubleClick={onRowDoubleClick}
             />
         );
     };
-
-    const masterServantsSource = dragDropMasterServants || masterServants;
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-list-container`}>
                 {showHeader && <MasterServantListHeader
-                    visibleColumns={visibleColumns}
+                    sortEnabled
                     dragDropMode={dragDropMode}
+                    visibleColumns={visibleColumns}
+                    sortOptions={sortOptions}
+                    onClick={onHeaderClick}
+                    onSortChange={onSortChange}
                 />}
                 <div className={clsx(`${StyleClassPrefix}-list`, dragDropMode && 'drag-drop-mode')}>
                     <DndProvider backend={HTML5Backend}>
-                        {masterServantsSource.map(renderMasterServantRow)}
+                        {masterServantsSorted.map(renderMasterServantRow)}
                     </DndProvider>
                 </div>
             </div>

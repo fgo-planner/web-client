@@ -44,6 +44,10 @@ export class MasterServantUtils {
         };
     }
 
+    static getInstanceId(masterServant: Immutable<MasterServant>): number {
+        return masterServant.instanceId;
+    }
+
     static getLastInstanceId(masterServants: ImmutableArray<MasterServant>): number {
         if (!masterServants.length) {
             return 0;

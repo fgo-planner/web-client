@@ -52,6 +52,7 @@ export const useContextMenuState = function <T extends string = string>(): Conte
 
     const openContextMenu = useCallback((menu: T, positionSource: MouseEvent | Position2D): void => {
         if (!Array.isArray(positionSource)) {
+            positionSource.preventDefault();
             const { pageX, pageY } = positionSource;
             positionSource = [pageX, pageY];
         }

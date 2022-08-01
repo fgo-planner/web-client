@@ -17,4 +17,6 @@ export * from './plan/requirements/plan-enhancement-item-requirements.type';
 export * from './plan/requirements/plan-enhancement-requirements.type';
 export * from './plan/requirements/plan-requirements.type';
 export * from './plan/requirements/plan-servant-requirements.type';
+export * from './sort-direction.type';
+export * from './sort-options.type';
 export * from './user-credentials.type';

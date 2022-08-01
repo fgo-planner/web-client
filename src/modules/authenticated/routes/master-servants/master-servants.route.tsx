@@ -316,7 +316,6 @@ export const MasterServantsRoute = React.memo(() => {
     //#region Servant list event handlers
 
     const handleRowClick = useCallback((e: MouseEvent): void => {
-        // handleServantClick(e, index);
         if (e.type === 'contextmenu') {
             openContextMenu('row', e);
         }
@@ -332,11 +331,16 @@ export const MasterServantsRoute = React.memo(() => {
     }, [openContextMenu]);
 
     const handleSortChange = useCallback((column?: MasterServantListColumn, direction: SortDirection = 'asc'): void => {
+        /**
+         * Deselect servants when changing sort. This is consistent with Google Drive
+         * behavior.
+         */
+        deselectAllServants();
         setSortOptions({
             sort: column,
             direction
         });
-    }, []);
+    }, [deselectAllServants]);
 
     //#endregion
 

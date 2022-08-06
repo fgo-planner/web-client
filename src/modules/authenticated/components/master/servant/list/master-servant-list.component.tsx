@@ -7,7 +7,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { useListSelectHelper } from '../../../../../../hooks/user-interface/use-list-select-helper.hook';
+import { useListSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-list-select-helper-for-mouse-event.hook';
 import { SortDirection, SortOptions } from '../../../../../../types/data';
 import { Immutable, ImmutableArray, ReadonlyPartial } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
@@ -241,7 +241,7 @@ export const MasterServantList = React.memo((props: Props) => {
     const {
         selectedIds,
         handleItemClick
-    } = useListSelectHelper(
+    } = useListSelectHelperForMouseEvent(
         masterServantsSorted,
         selectedServants,
         MasterServantUtils.getInstanceId,

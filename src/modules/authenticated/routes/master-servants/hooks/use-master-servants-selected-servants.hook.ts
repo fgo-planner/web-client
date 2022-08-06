@@ -10,7 +10,7 @@ type SelectedServantsData = {
     servants: ImmutableArray<MasterServant>;  // TODO Add option for ordering
 };
 
-class SelectedServantDataContainer implements SelectedServantsData {
+class SelectedServantsDataContainer implements SelectedServantsData {
 
     selectedServants?: ImmutableArray<MasterServant>;
 
@@ -20,10 +20,18 @@ class SelectedServantDataContainer implements SelectedServantsData {
         return this.selectedInstanceIds;
     }
 
+    /**
+     * Lazy fetches the selected `MasterServant` objects. The servants are returned
+     * in the order as the appear in the `sourceData` array.
+     * 
+     * TODO Add option to order by the `selectedInstanceIds` set.
+     */
     get servants(): ImmutableArray<MasterServant> {
         if (!this.selectedServants) {
             const selectedInstanceIds = this.selectedInstanceIds;
-            this.selectedServants = this.sourceData.filter(({ instanceId }) => selectedInstanceIds.has(instanceId));
+            this.selectedServants = this.sourceData.filter(({ instanceId }) => {
+                return selectedInstanceIds.has(instanceId);
+            });
         }
         return this.selectedServants!;
     }
@@ -44,13 +52,19 @@ type MasterServantsSelectedServantsHootResult = {
     updateSelectedServants: (selectedInstanceIds: ReadonlySet<number>) => void;
 };
 
+/**
+ * Utility hook that manages servant selection on the master servants route.
+ *
+ * TODO Move this under the `hooks` directory of the authenticated module if
+ * other routes need to use it.
+ */
 export const useMasterServantsSelectedServants = (
     sourceData: ImmutableArray<MasterServant>
 ): MasterServantsSelectedServantsHootResult => {
 
     const forceUpdate = useForceUpdate();
 
-    const [selectedServantsData] = useState<SelectedServantDataContainer>(() => new SelectedServantDataContainer(sourceData));
+    const [selectedServantsData] = useState<SelectedServantsDataContainer>(() => new SelectedServantsDataContainer(sourceData));
     
     useEffect(() => {
         selectedServantsData.sourceData = sourceData;

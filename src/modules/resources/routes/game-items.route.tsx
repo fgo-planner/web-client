@@ -1,7 +1,7 @@
 import React from 'react';
+import { StaticListRowContainer } from '../../../components/data-table-list/static-list-row-container.component';
 import { GameItemThumbnail } from '../../../components/game/item/game-item-thumbnail.component';
 import { LayoutContentSection } from '../../../components/layout/layout-content-section.component';
-import { StaticListRowContainer } from '../../../components/list/static-list-row-container.component';
 import { AppBarElevateOnScroll } from '../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { PageTitle } from '../../../components/text/page-title.component';
 import { useGameItemList } from '../../../hooks/data/use-game-item-list.hook';

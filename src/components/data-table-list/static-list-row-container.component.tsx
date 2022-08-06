@@ -2,7 +2,7 @@ import { styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren, ReactNode } from 'react';
 import { ComponentStyleProps } from '../../types/internal';
-import BaseListRowStyle from './list-row-style';
+import BaseListRowStyle from './data-table-list-row-style';
 
 // TODO Add prop for cursor style.
 type Props = PropsWithChildren<{

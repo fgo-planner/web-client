@@ -1,21 +1,24 @@
 import { Plan } from '@fgo-planner/types';
-import { Add as AddIcon } from '@mui/icons-material';
-import { Fab, PaperProps, Tooltip } from '@mui/material';
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PostAddOutlined } from '@mui/icons-material';
+import { Button, IconButton, PaperProps, TextField, Theme } from '@mui/material';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import clsx from 'clsx';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
-import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { AppBarElevateOnScroll } from '../../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
+import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
+import { ThemeConstants } from '../../../../styles/theme-constants';
 import { MasterAccountPlans } from '../../../../types/data';
 import { Immutable, ModalOnCloseReason } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { PlanAddDialog } from './plan-add-dialog';
-import { PlanList } from './plan-list.component';
+import { PlanAddDialog } from './components/plan-add-dialog.component';
+import { PlanListVisibleColumns } from './components/plan-list-columns';
+import { PlanList } from './components/plan-list.component';
+import { PlansNavigationRail } from './components/plans-navigation-rail.component';
 
 const AddPlanDialogPaperProps: PaperProps = {
     style: {
@@ -38,6 +41,79 @@ const generateDeletePlanDialogPrompt = (plan: Immutable<Partial<Plan>> | undefin
     }
 };
 
+const StyleClassPrefix = 'Plans';
+
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        breakpoints,
+        palette,
+        spacing
+    } = theme as Theme;
+
+    return {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        [`& .${StyleClassPrefix}-upper-layout-container`]: {
+            '&>div': {
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: '4rem',
+                height: '4rem',
+                borderBottomWidth: 1,
+                borderBottomStyle: 'solid',
+                borderBottomColor: palette.divider
+            },
+            [`& .${StyleClassPrefix}-title-row`]: {
+                justifyContent: 'space-between',
+                pr: 4,
+                [`& .${StyleClassPrefix}-title`]: {
+                    pb: 4
+                },
+                [breakpoints.down('sm')]: {
+                    pr: 3
+                }
+            },
+            [`& .${StyleClassPrefix}-filter-controls`]: {
+                '& .MuiTextField-root': {
+                    width: spacing(64),  // 256px
+                    ml: 14,
+                    '& .MuiOutlinedInput-root': {
+                        backgroundColor: palette.background.paper
+                    },
+                    [breakpoints.down('sm')]: {
+                        width: spacing(48),  // 192px
+                        ml: 4
+                    }
+                }
+            }
+        },
+        [`& .${StyleClassPrefix}-lower-layout-container`]: {
+            display: 'flex',
+            height: '100%',
+            overflow: 'hidden',
+            [`& .${StyleClassPrefix}-list-container`]: {
+                flex: 1,
+                overflow: 'hidden'
+            },
+            [breakpoints.down('sm')]: {
+                flexDirection: 'column',
+                [`& .${StyleClassPrefix}-main-content`]: {
+                    width: '100%',
+                    height: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`
+                }
+            }
+        }
+    } as SystemStyleObject<SystemTheme>;
+};
+
+// TODO Implement sorting
+// TODO Implement configurable column visibility
+// TODO Implement filter/search
+// TODO Add pagination
+// TODO Maybe add info panel
+
 export const PlansRoute = React.memo(() => {
 
     const {
@@ -49,9 +125,13 @@ export const PlansRoute = React.memo(() => {
     const planService = useInjectable(PlanService);
 
     const [accountPlans, setAccountPlans] = useState<MasterAccountPlans>();
+
     const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
     const [deletePlanDialogOpen, setDeletePlanDialogOpen] = useState<boolean>(false);
     const [deletePlanTarget, setDeletePlanTarget] = useState<Immutable<Partial<Plan>>>();
+
+    // TODO Load/save this from user preferences
+    const [filtersEnabled, setFiltersEnabled] = useState<boolean>(false);
 
     const masterAccountIdRef = useRef<string>();
 
@@ -92,9 +172,18 @@ export const PlansRoute = React.memo(() => {
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, [loadPlansForAccount]);
 
+    const { sm, lg } = useActiveBreakpoints();
+
+    const visibleColumns = useMemo((): PlanListVisibleColumns => ({
+        name: true,
+        created: lg,
+        modified: lg,
+        description: sm
+    }), [lg, sm]);
+
     const deletePlanDialogPrompt = useMemo(() => generateDeletePlanDialogPrompt(deletePlanTarget), [deletePlanTarget]);
 
-    const handleAddPlanButtonClick = useCallback((): void => {
+    const handleAddPlan = useCallback((): void => {
         setAddPlanDialogOpen(true);
     }, []);
 
@@ -123,52 +212,66 @@ export const PlansRoute = React.memo(() => {
         setDeletePlanDialogOpen(false);
     }, [deletePlanTarget?._id, loadPlansForAccount, planService]);
 
-    return (
-        <Fragment>
-            <AppBarElevateOnScroll>
-                <PageTitle>
-                    My Plans
-                </PageTitle>
-                <LayoutContentSection className='p-4'>
-                    {!!accountPlans ?
+    const toggleFilters = useCallback(() => {
+        setFiltersEnabled(filtersEnabled => !filtersEnabled);
+    }, []);
+
+    return <>
+        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            <div className={`${StyleClassPrefix}-upper-layout-container`}>
+                <div className={`${StyleClassPrefix}-title-row`}>
+                    <PageTitle className={`${StyleClassPrefix}-title`}>
+                        My Plans
+                    </PageTitle>
+                    {sm ?
+                        <Button variant='contained' onClick={handleAddPlan}>
+                            Create Plan
+                        </Button> :
+                        <IconButton color='primary' onClick={handleAddPlan}>
+                            <PostAddOutlined />
+                        </IconButton>
+                    }
+                </div>
+                {/* TODO Create a separate component for this */}
+                {filtersEnabled && <div className={`${StyleClassPrefix}-filter-controls`}>
+                    <TextField
+                        variant='outlined'
+                        label='Search'
+                        size='small'
+                    />
+                </div>}
+            </div>
+            <div className={`${StyleClassPrefix}-lower-layout-container`}>
+                <PlansNavigationRail
+                    filtersEnabled={filtersEnabled}
+                    layout={sm ? 'column' : 'row'}
+                    onAddPlan={handleAddPlan}
+                    onToggleFilters={toggleFilters}
+                />
+                <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
+                    {accountPlans &&
                         <PlanList
                             accountPlans={accountPlans}
-                            onDeletePlan={handleDeletePlan}
-                        /> :
-                        <div>
-                            No plans found
-                        </div>
-                    }
-                </LayoutContentSection>
-                <div className='py-10' />
-            </AppBarElevateOnScroll>
-            <PlanAddDialog
-                open={addPlanDialogOpen}
-                PaperProps={AddPlanDialogPaperProps}
-                masterAccountId={masterAccountIdRef.current}
-                onClose={handleAddPlanDialogClose}
-            />
-            <PromptDialog
-                open={deletePlanDialogOpen}
-                title={DeletePlanDialogTitle}
-                prompt={deletePlanDialogPrompt}
-                cancelButtonColor='secondary'
-                confirmButtonColor='primary'
-                confirmButtonLabel='Delete'
-                onClose={handleDeletePlanDialogClose}
-            />
-            <FabContainer>
-                <Tooltip key='add' title='Create new plan'>
-                    <div>
-                        <Fab
-                            color='primary'
-                            onClick={handleAddPlanButtonClick}
-                            disabled={isLoadingIndicatorActive}
-                            children={<AddIcon />}
+                            visibleColumns={visibleColumns}
                         />
-                    </div>
-                </Tooltip>
-            </FabContainer>
-        </Fragment>
-    );
+                    }
+                </div>
+            </div>
+        </Box>
+        <PlanAddDialog
+            open={addPlanDialogOpen}
+            PaperProps={AddPlanDialogPaperProps}
+            masterAccountId={masterAccountIdRef.current}
+            onClose={handleAddPlanDialogClose}
+        />
+        <PromptDialog
+            open={deletePlanDialogOpen}
+            title={DeletePlanDialogTitle}
+            prompt={deletePlanDialogPrompt}
+            cancelButtonColor='secondary'
+            confirmButtonColor='primary'
+            confirmButtonLabel='Delete'
+            onClose={handleDeletePlanDialogClose}
+        />
+    </>;
 });

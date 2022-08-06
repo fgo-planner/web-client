@@ -1,13 +1,15 @@
 import { millisecondsInSecond, secondsInMinute } from 'date-fns';
-import { Immutable } from '../types/internal';
+import { Immutable, Nullable } from '../types/internal';
+import { format } from 'date-fns';
 
 export class DateTimeUtils {
+
+    // static readonly DataTableFormat = 'MMM dd, yyyy hh:mm:ss a';
+    static readonly DataTableFormat = 'yyyy-MM-dd hh:mm:ss a';
 
     private constructor () {
         
     }
-
-    // private static readonly
 
     static cloneDate(date: Date | Immutable<Date> | undefined): Date | undefined {
         return date ? new Date(date as Date) : undefined;
@@ -50,5 +52,16 @@ export class DateTimeUtils {
     static getLocalTimeZone(): string {
         return Intl.DateTimeFormat().resolvedOptions().timeZone;
     }
+
+    //#region Formatting function
+
+    static formatForDataTable(date: Nullable<number | Immutable<Date>>): string {
+        if (date == null) {
+            return '';
+        }
+        return format(date as number | Date, this.DataTableFormat);
+    }
+
+    //#endregion
 
 }

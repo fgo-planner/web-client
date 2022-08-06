@@ -1,7 +1,7 @@
 import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
-import { DraggableListRowContainer } from '../../../../../../components/list/draggable-list-row-container.component';
+import { DraggableListRowContainer } from '../../../../../../components/data-table-list/draggable-list-row-container.component';
 import { Immutable, ReadonlyPartial } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { ObjectUtils } from '../../../../../../utils/object.utils';

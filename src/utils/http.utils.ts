@@ -1,4 +1,5 @@
-import { HttpOptions, HttpResponseError, HttpResponseType, Nullable } from '../types/internal';
+import { EntityWithTimestamps } from '@fgo-planner/types';
+import { Function as Func, HttpOptions, HttpResponseError, HttpResponseType, Nullable } from '../types/internal';
 import { JwtUtils } from './jwt.utils';
 import { SubscribablesContainer } from './subscription/subscribables-container';
 import { SubscriptionTopics } from './subscription/subscription-topics';
@@ -19,8 +20,26 @@ export class HttpUtils {
         
     }
 
-    static async get<T = any>(url: string, options?: HttpOptions): Promise<T> {
-        if (options?.params) {
+    /**
+     * Converts the string values of entity timestamps fields (`createdAt` and
+     * `updatedAt`) received from HTTP calls into `Date` values.
+     */
+    static stringTimestampsToDate(entity: EntityWithTimestamps): void {
+        if (entity.createdAt) {
+            entity.createdAt = new Date(entity.createdAt);
+        }
+        if (entity.updatedAt) {
+            entity.updatedAt = new Date(entity.updatedAt);
+        }
+    }
+
+    static async get<T = any>(url: string): Promise<T>;
+    static async get<T = any>(url: string, options: HttpOptions): Promise<T>;
+    static async get<T = any>(url: string, transformFunc: Func<any, T>): Promise<T>;
+    static async get<T = any>(url: string, options: HttpOptions, transformFunc: Func<any, T>): Promise<T>;
+    static async get<T = any>(url: string, arg1?: HttpOptions | Func<any, T>, arg2?: Func<any, T>): Promise<T> {
+        const { options, transformFunc } = this._parseArgs(arg1, arg2);
+        if (options.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
         }
         const headers = this._appendAuthorizationHeader();
@@ -30,11 +49,16 @@ export class HttpUtils {
             headers
         } as RequestInit;
         const response = await this._fetch(url, init);
-        return this._parseResponseBody(response, options) as any;
+        return this._parseResponseBody<T>(response, options, transformFunc) as any;
     }
 
-    static async post<T = any>(url: string, body: RequestBody, options?: HttpOptions): Promise<T> {
-        if (options?.params) {
+    static async post<T = any>(url: string, body: RequestBody): Promise<T>;
+    static async post<T = any>(url: string, body: RequestBody, options: HttpOptions): Promise<T>;
+    static async post<T = any>(url: string, body: RequestBody, transformFunc: Func<any, T>): Promise<T>;
+    static async post<T = any>(url: string, body: RequestBody, options: HttpOptions, transformFunc: Func<any, T>): Promise<T>;
+    static async post<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | Func<any, T>, arg2?: Func<any, T>): Promise<T> {
+        const { options, transformFunc } = this._parseArgs(arg1, arg2);
+        if (options.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
         }
         const headers = {
@@ -51,11 +75,16 @@ export class HttpUtils {
             headers
         } as RequestInit;
         const response = await this._fetch(url, init);
-        return this._parseResponseBody(response, options) as any;
+        return this._parseResponseBody(response, options, transformFunc) as any;
     }
 
-    static async put<T = any>(url: string, body: RequestBody, options?: HttpOptions): Promise<T> {
-        if (options?.params) {
+    static async put<T = any>(url: string, body: RequestBody): Promise<T>;
+    static async put<T = any>(url: string, body: RequestBody, options: HttpOptions): Promise<T>;
+    static async put<T = any>(url: string, body: RequestBody, transformFunc: Func<any, T>): Promise<T>;
+    static async put<T = any>(url: string, body: RequestBody, options: HttpOptions, transformFunc: Func<any, T>): Promise<T>;
+    static async put<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | Func<any, T>, arg2?: Func<any, T>): Promise<T> {
+        const { options, transformFunc } = this._parseArgs(arg1, arg2);
+        if (options.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
         }
         const headers = {
@@ -72,11 +101,16 @@ export class HttpUtils {
             headers
         } as RequestInit;
         const response = await this._fetch(url, init);
-        return this._parseResponseBody(response, options) as any;
+        return this._parseResponseBody(response, options, transformFunc) as any;
     }
 
-    static async delete<T = any>(url: string, options?: HttpOptions): Promise<T> {
-        if (options?.params) {
+    static async delete<T = any>(url: string): Promise<T>;
+    static async delete<T = any>(url: string, options: HttpOptions): Promise<T>;
+    static async delete<T = any>(url: string, transformFunc: Func<any, T>): Promise<T>;
+    static async delete<T = any>(url: string, options: HttpOptions, transformFunc: Func<any, T>): Promise<T>;
+    static async delete<T = any>(url: string, arg1?: HttpOptions | Func<any, T>, arg2?: Func<any, T>): Promise<T> {
+        const { options, transformFunc } = this._parseArgs(arg1, arg2);
+        if (options.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
         }
         const headers = this._appendAuthorizationHeader();
@@ -86,7 +120,7 @@ export class HttpUtils {
             headers
         } as RequestInit;
         const response = await this._fetch(url, init);
-        return this._parseResponseBody(response, options) as any;
+        return this._parseResponseBody(response, options, transformFunc) as any;
     }
 
     private static _inferContentType(body: RequestBody): string {
@@ -128,7 +162,12 @@ export class HttpUtils {
         }
     }
 
-    private static async _parseResponseBody(response: Response, options: HttpOptions = {}): Promise<string | Record<string, any>> {
+    private static async _parseResponseBody<T>(
+        response: Response, 
+        options: HttpOptions, 
+        transformFunc?: Func<any, T>
+    ): Promise<string | T> {
+
         const contentType = response.headers.get(this._ContentTypeHeader);
         const { responseType, ignoreUnauthorized } = options;
         let inferredResponseType: HttpResponseType;
@@ -146,10 +185,14 @@ export class HttpUtils {
             }
             throw error;
         }
-        return this._getResponseBody(response, inferredResponseType);
+        const body = await this._getResponseBody<T>(response, inferredResponseType);
+        if (!transformFunc) {
+            return body;
+        }
+        return transformFunc(body);
     }
 
-    private static async _getResponseBody(response: Response, responseType: HttpResponseType): Promise<string | Record<string, any>> {
+    private static async _getResponseBody<T = any>(response: Response, responseType: HttpResponseType): Promise<string | T> {
         if (responseType === 'text') {
             return response.text();
         }
@@ -174,6 +217,24 @@ export class HttpUtils {
 
     private static _notifyUnauthorizedError(error: HttpResponseError): void {
         this._onUnauthorized.next(error);
+    }
+
+    private static _parseArgs<T>(
+        arg1?: HttpOptions | Func<any, T>,
+        arg2?: Func<any, T>
+    ): { options: HttpOptions, transformFunc?: Func<any, T> } {
+
+        let options: HttpOptions = {};
+        let transformFunc: Func<any, T> | undefined = undefined;
+        
+        if (typeof arg1 === 'object') {
+            options = arg1;
+            transformFunc = arg2;
+        } else if (typeof arg1 === 'function') {
+            transformFunc = arg1;
+        } 
+
+        return { options, transformFunc };
     }
 
 }

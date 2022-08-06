@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import React, { DOMAttributes, MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { ComponentStyleProps } from '../../types/internal';
-import BaseListRowStyle from './list-row-style';
+import BaseListRowStyle from './data-table-list-row-style';
 import { Theme } from '@mui/material';
 import { CSSProperties } from '@mui/styles';
 

@@ -2,18 +2,19 @@ import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import { SystemStyleObject } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEvent, MouseEventHandler, ReactNode, useMemo } from 'react';
-import { HeaderLabel } from '../../../../../../components/text/header-label.component';
-import { SortOptions } from '../../../../../../types/data';
-import { MasterServantColumnProperties, MasterServantListColumn } from './master-servant-list-columns';
+import React, { CSSProperties, MouseEvent, MouseEventHandler, ReactNode, useMemo } from 'react';
+import { SortOptions } from '../../types/data';
+import { ColumnProperties } from '../../types/internal';
+import { HeaderLabel } from '../text/header-label.component';
 
-type Props = {
-    column: MasterServantListColumn;
-    onClick?: (e: MouseEvent, column: MasterServantListColumn) => void;
-    sortOptions?: SortOptions<MasterServantListColumn>;
+type Props<T extends string> = {
+    column: T;
+    columnProperties: ColumnProperties;
+    onClick?: (e: MouseEvent, column: T) => void;
+    sortOptions?: SortOptions<T>;
 };
 
-export const StyleClassPrefix = 'MasterServantListHeaderLabel';
+export const StyleClassPrefix = 'DataTableListHeaderLabel';
 
 const StyleProps = () => ({
     display: 'flex',
@@ -32,20 +33,18 @@ const StyleProps = () => ({
     }
 } as SystemStyleObject);
 
-// TODO Turn this into generic component
-export const MasterServantListHeaderLabel = React.memo((props: Props) => {
+export const DataTableListHeaderLabel = React.memo(<T extends string>(props: Props<T>) => {
 
     const {
         column,
+        columnProperties: {
+            label,
+            width,
+            sortable
+        },
         onClick,
         sortOptions,
     } = props;
-
-    const {
-        label,
-        width,
-        sortable
-    } = MasterServantColumnProperties[column];
 
     const handleClick = useMemo((): MouseEventHandler | undefined => {
         if (!sortable || !onClick) {
@@ -72,12 +71,14 @@ export const MasterServantListHeaderLabel = React.memo((props: Props) => {
         sortable && 'sortable'
     );
 
+    const style: CSSProperties = width ? { width } : { flex: 1 };
+
     return (
-        <Box className={className} style={{ width }} sx={StyleProps}>
+        <Box className={className} style={style} sx={StyleProps}>
             <HeaderLabel onClick={handleClick}>
                 {label} {sortIcon}
             </HeaderLabel>
         </Box>
     );
 
-});
+}) as <T extends string> (props: Props<T>) => JSX.Element;

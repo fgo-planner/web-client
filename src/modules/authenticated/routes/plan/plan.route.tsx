@@ -82,6 +82,8 @@ const instantiatePlanServant = (
  */
 const clonePlan = (plan: Immutable<Plan>): Plan => {
     const targetDate = DateTimeUtils.cloneDate(plan.targetDate);
+    const createdAt = DateTimeUtils.cloneDate(plan.createdAt);
+    const updatedAt = DateTimeUtils.cloneDate(plan.updatedAt);
     return {
         ...plan,
         targetDate,
@@ -89,7 +91,9 @@ const clonePlan = (plan: Immutable<Plan>): Plan => {
             ...plan.enabled
         },
         servants: plan.servants.map(servant => PlanServantUtils.clone(servant)),
-        upcomingResources: plan.upcomingResources.map(lodash.cloneDeep) as Array<PlanUpcomingResources>
+        upcomingResources: plan.upcomingResources.map(lodash.cloneDeep) as Array<PlanUpcomingResources>,
+        createdAt,
+        updatedAt
     };
 };
 

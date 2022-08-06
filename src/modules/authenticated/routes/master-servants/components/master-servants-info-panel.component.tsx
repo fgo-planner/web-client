@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { GameServantBondIcon } from '../../../../../components/game/servant/game-servant-bond-icon.component';
-import { DataPointListItem } from '../../../../../components/list/data-point-list-item.component';
+import { DataPointListItem } from '../../../../../components/data-point-list/data-point-list-item.component';
 import { GameServantConstants } from '../../../../../constants';
 import { useGameItemMap } from '../../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../../hooks/data/use-game-servant-map.hook';

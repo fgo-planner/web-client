@@ -3,13 +3,13 @@ import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Fo
 import { SystemStyleObject, Theme } from '@mui/system';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
-import { InputFieldContainer } from '../../../../components/input/input-field-container.component';
-import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { PlanService } from '../../../../services/data/plan/plan.service';
-import { DialogComponentProps } from '../../../../types/internal';
-import { FormUtils } from '../../../../utils/form.utils';
+import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
+import { InputFieldContainer } from '../../../../../components/input/input-field-container.component';
+import { useInjectable } from '../../../../../hooks/dependency-injection/use-injectable.hook';
+import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
+import { PlanService } from '../../../../../services/data/plan/plan.service';
+import { DialogComponentProps } from '../../../../../types/internal';
+import { FormUtils } from '../../../../../utils/form.utils';
 
 type Props = {
     masterAccountId: string | undefined;

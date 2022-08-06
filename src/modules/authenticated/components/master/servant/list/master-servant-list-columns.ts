@@ -1,4 +1,4 @@
-import { ImmutableRecord } from '../../../../../../types/internal';
+import { ColumnProperties, ImmutableRecord } from '../../../../../../types/internal';
 
 export type MasterServantListColumn =
     'npLevel' |
@@ -10,13 +10,6 @@ export type MasterServantListColumn =
     'bondLevel';
 
 export type MasterServantListVisibleColumns = Partial<Record<MasterServantListColumn, boolean>>;
-
-type ColumnProperties = {
-    key: string;
-    width: number;
-    label: string;
-    sortable: boolean;
-};
 
 // TODO Convert widths to use theme spacing/rem.
 export const MasterServantColumnProperties = {

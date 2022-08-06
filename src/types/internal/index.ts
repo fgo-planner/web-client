@@ -8,6 +8,7 @@ export * from './dependency-injection/injectable-token.type';
 export * from './dependency-injection/injected-field.type';
 export * from './device/device-info.type';
 export * from './device/device-type.enum';
+export * from './dto/column-properties.type';
 export * from './dto/master-servant-update.type';
 export * from './dto/navigation-drawer-content.type';
 export * from './generics/array-2d.type';

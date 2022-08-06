@@ -1,9 +1,9 @@
 import { GameServant, GameServantCostume } from '@fgo-planner/types';
 import { Checkbox } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
+import { StaticListRowContainer } from '../../../../components/data-table-list/static-list-row-container.component';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
 import { GameServantThumbnail } from '../../../../components/game/servant/game-servant-thumbnail.component';
-import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { Immutable } from '../../../../types/internal';
@@ -76,7 +76,6 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
 
     return (
         <StaticListRowContainer
-            key={costumeId}
             className={`${StyleClassPrefix}-root`}
             borderBottom
         >

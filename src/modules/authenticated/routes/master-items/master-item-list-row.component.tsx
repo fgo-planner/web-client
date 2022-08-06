@@ -2,7 +2,7 @@ import { GameItem } from '@fgo-planner/types';
 import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { useCallback, useRef, useState } from 'react';
 import NumberFormat, { NumberFormatValues, SourceInfo } from 'react-number-format';
-import { StaticListRowContainer } from '../../../../components/list/static-list-row-container.component';
+import { StaticListRowContainer } from '../../../../components/data-table-list/static-list-row-container.component';
 import { GameItemConstants } from '../../../../constants';
 import { Immutable } from '../../../../types/internal';
 import { MathUtils } from '../../../../utils/math.utils';

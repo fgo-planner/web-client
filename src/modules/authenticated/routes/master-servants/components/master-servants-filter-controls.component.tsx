@@ -22,24 +22,22 @@ const StyleProps = (theme: SystemTheme) => {
         alignItems: 'center',
         minHeight: '4rem',
         height: '4rem',
-        pl: 14,
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         borderBottomColor: palette.divider,
         '& .MuiTextField-root': {
             width: spacing(64),  // 256px
+            ml: 14,
             '& .MuiOutlinedInput-root': {
                 backgroundColor: palette.background.paper
             },
             [breakpoints.down('sm')]: {
-                width: spacing(48)  // 192px
+                width: spacing(48),  // 192px
+                ml: 4
             }
         },
         '& >div:not(:first-of-type)': {
             pl: 0.75
-        },
-        [breakpoints.down('sm')]: {
-            pl: 4
         }
     } as SystemStyleObject<SystemTheme>;
 };

@@ -2,11 +2,11 @@ import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, useCallback, useRef } from 'react';
+import { DataTableListHeaderLabel } from '../../../../../../components/data-table-list/data-table-list-header-label.component';
 import { HeaderLabel } from '../../../../../../components/text/header-label.component';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { SortDirection, SortOptions } from '../../../../../../types/data';
 import { MasterServantColumnProperties, MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
-import { MasterServantListHeaderLabel } from './master-servant-list-header-label.component';
 
 type Props = {
     dragDropMode?: boolean;
@@ -108,50 +108,57 @@ export const MasterServantListHeader = React.memo((props: Props) => {
                     </HeaderLabel>
                 </div>
                 {npLevel &&
-                    <MasterServantListHeaderLabel
-                        column='npLevel'
+                    <DataTableListHeaderLabel
+                        column={'npLevel' as MasterServantListColumn}
+                        columnProperties={MasterServantColumnProperties.npLevel}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
                 }
                 {level &&
-                    <MasterServantListHeaderLabel
+                    <DataTableListHeaderLabel
                         column='level'
+                        columnProperties={MasterServantColumnProperties.level}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
                 }
                 {fouHp &&
-                    <MasterServantListHeaderLabel
+                    <DataTableListHeaderLabel
                         column='fouHp'
+                        columnProperties={MasterServantColumnProperties.fouHp}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
                 }
                 {fouAtk &&
-                    <MasterServantListHeaderLabel
+                    <DataTableListHeaderLabel
                         column='fouAtk'
+                        columnProperties={MasterServantColumnProperties.fouAtk}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
                 }
                 {skills &&
-                    <MasterServantListHeaderLabel
+                    <DataTableListHeaderLabel
                         column='skills'
+                        columnProperties={MasterServantColumnProperties.skills}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
                 }
                 {appendSkills &&
-                    <MasterServantListHeaderLabel
+                    <DataTableListHeaderLabel
                         column='appendSkills'
+                        columnProperties={MasterServantColumnProperties.appendSkills}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
                 }
                 {bondLevel &&
-                    <MasterServantListHeaderLabel
+                    <DataTableListHeaderLabel
                         column='bondLevel'
+                        columnProperties={MasterServantColumnProperties.bondLevel}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />

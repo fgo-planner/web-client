@@ -68,6 +68,7 @@ export class MasterAccountService {
 
     async updateAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
         const updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount);
+        // TODO Convert date strings to date objects.
         this._onCurrentMasterAccountChange.next(this._currentMasterAccount = updated);
         return updated;
     }
@@ -95,6 +96,7 @@ export class MasterAccountService {
         // TODO Ensure that the selected account is in the accounts list.
         try {
             this._currentMasterAccount = await this.getAccount(accountId);
+            // TODO Convert date strings to date objects.
             this._onCurrentMasterAccountChange.next(this._currentMasterAccount);
             this._writeCurrentAccountToSessionStorage();
             return this._currentMasterAccount;

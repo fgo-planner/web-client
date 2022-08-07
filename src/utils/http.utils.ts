@@ -1,10 +1,13 @@
 import { EntityWithTimestamps } from '@fgo-planner/types';
-import { Function as Func, HttpOptions, HttpResponseError, HttpResponseType, Nullable } from '../types/internal';
+import { Function, HttpOptions, HttpResponseError, HttpResponseType, Nullable } from '../types/internal';
 import { JwtUtils } from './jwt.utils';
 import { SubscribablesContainer } from './subscription/subscribables-container';
 import { SubscriptionTopics } from './subscription/subscription-topics';
 
 type RequestBody = string | Record<string, unknown>;
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type TransformFunc<T> = Function<any, T>;
 
 export class HttpUtils {
 
@@ -35,9 +38,9 @@ export class HttpUtils {
 
     static async get<T = any>(url: string): Promise<T>;
     static async get<T = any>(url: string, options: HttpOptions): Promise<T>;
-    static async get<T = any>(url: string, transformFunc: Func<any, T>): Promise<T>;
-    static async get<T = any>(url: string, options: HttpOptions, transformFunc: Func<any, T>): Promise<T>;
-    static async get<T = any>(url: string, arg1?: HttpOptions | Func<any, T>, arg2?: Func<any, T>): Promise<T> {
+    static async get<T = any>(url: string, transformFunc: TransformFunc<T>): Promise<T>;
+    static async get<T = any>(url: string, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
+    static async get<T = any>(url: string, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
         const { options, transformFunc } = this._parseArgs(arg1, arg2);
         if (options.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
@@ -54,9 +57,9 @@ export class HttpUtils {
 
     static async post<T = any>(url: string, body: RequestBody): Promise<T>;
     static async post<T = any>(url: string, body: RequestBody, options: HttpOptions): Promise<T>;
-    static async post<T = any>(url: string, body: RequestBody, transformFunc: Func<any, T>): Promise<T>;
-    static async post<T = any>(url: string, body: RequestBody, options: HttpOptions, transformFunc: Func<any, T>): Promise<T>;
-    static async post<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | Func<any, T>, arg2?: Func<any, T>): Promise<T> {
+    static async post<T = any>(url: string, body: RequestBody, transformFunc: TransformFunc<T>): Promise<T>;
+    static async post<T = any>(url: string, body: RequestBody, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
+    static async post<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
         const { options, transformFunc } = this._parseArgs(arg1, arg2);
         if (options.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
@@ -80,9 +83,9 @@ export class HttpUtils {
 
     static async put<T = any>(url: string, body: RequestBody): Promise<T>;
     static async put<T = any>(url: string, body: RequestBody, options: HttpOptions): Promise<T>;
-    static async put<T = any>(url: string, body: RequestBody, transformFunc: Func<any, T>): Promise<T>;
-    static async put<T = any>(url: string, body: RequestBody, options: HttpOptions, transformFunc: Func<any, T>): Promise<T>;
-    static async put<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | Func<any, T>, arg2?: Func<any, T>): Promise<T> {
+    static async put<T = any>(url: string, body: RequestBody, transformFunc: TransformFunc<T>): Promise<T>;
+    static async put<T = any>(url: string, body: RequestBody, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
+    static async put<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
         const { options, transformFunc } = this._parseArgs(arg1, arg2);
         if (options.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
@@ -106,9 +109,9 @@ export class HttpUtils {
 
     static async delete<T = any>(url: string): Promise<T>;
     static async delete<T = any>(url: string, options: HttpOptions): Promise<T>;
-    static async delete<T = any>(url: string, transformFunc: Func<any, T>): Promise<T>;
-    static async delete<T = any>(url: string, options: HttpOptions, transformFunc: Func<any, T>): Promise<T>;
-    static async delete<T = any>(url: string, arg1?: HttpOptions | Func<any, T>, arg2?: Func<any, T>): Promise<T> {
+    static async delete<T = any>(url: string, transformFunc: TransformFunc<T>): Promise<T>;
+    static async delete<T = any>(url: string, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
+    static async delete<T = any>(url: string, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
         const { options, transformFunc } = this._parseArgs(arg1, arg2);
         if (options.params) {
             url += `&${this._generateUrlParamsString(options.params)}`;
@@ -165,7 +168,7 @@ export class HttpUtils {
     private static async _parseResponseBody<T>(
         response: Response, 
         options: HttpOptions, 
-        transformFunc?: Func<any, T>
+        transformFunc?: TransformFunc<T>
     ): Promise<string | T> {
 
         const contentType = response.headers.get(this._ContentTypeHeader);
@@ -220,12 +223,12 @@ export class HttpUtils {
     }
 
     private static _parseArgs<T>(
-        arg1?: HttpOptions | Func<any, T>,
-        arg2?: Func<any, T>
-    ): { options: HttpOptions, transformFunc?: Func<any, T> } {
+        arg1?: HttpOptions | TransformFunc<T>,
+        arg2?: TransformFunc<T>
+    ): { options: HttpOptions, transformFunc?: TransformFunc<T> } {
 
         let options: HttpOptions = {};
-        let transformFunc: Func<any, T> | undefined = undefined;
+        let transformFunc: TransformFunc<T> | undefined = undefined;
         
         if (typeof arg1 === 'object') {
             options = arg1;

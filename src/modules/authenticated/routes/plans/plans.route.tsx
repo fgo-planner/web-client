@@ -3,7 +3,8 @@ import { PostAddOutlined } from '@mui/icons-material';
 import { Button, IconButton, PaperProps, TextField, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -11,8 +12,8 @@ import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-activ
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { MasterAccountPlans } from '../../../../types/data';
-import { Immutable, ModalOnCloseReason } from '../../../../types/internal';
+import { MasterAccountPlans, PlanGroupLite, PlanLite, PlanType } from '../../../../types/data';
+import { ModalOnCloseReason } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { PlanAddDialog } from './components/plan-add-dialog.component';
@@ -26,13 +27,10 @@ const AddPlanDialogPaperProps: PaperProps = {
     }
 };
 
-const DeletePlanDialogTitle = 'Delete Plan?';
+const DeleteTargetDialogTitle = 'Delete Plan?';
 
-const generateDeletePlanDialogPrompt = (plan: Immutable<Partial<Plan>> | undefined): string => {
-    if (!plan) {
-        return '';
-    }
-    const { name } = plan;
+const generateDeleteTargetDialogPrompt = (target: PlanLite | PlanGroupLite): string => {
+    const { name } = target;
     let prompt = 'Are you sure you want to delete';
     if (name) {
         return `${prompt} '${name}'?`;
@@ -112,7 +110,10 @@ const StyleProps = (theme: SystemTheme) => {
 // TODO Implement configurable column visibility
 // TODO Implement filter/search
 // TODO Add pagination
+// TODO Implement plan grouping (maybe display each group as a folder that can be navigated into).
 // TODO Maybe add info panel
+// TODO Maybe implement drag-drop
+// TODO Implement multi-select
 
 export const PlansRoute = React.memo(() => {
 
@@ -122,13 +123,18 @@ export const PlansRoute = React.memo(() => {
         isLoadingIndicatorActive
     } = useLoadingIndicator();
 
+    const navigate = useNavigate();
+
     const planService = useInjectable(PlanService);
 
     const [accountPlans, setAccountPlans] = useState<MasterAccountPlans>();
 
+    const [selectedId, setSelectedId] = useState<string>();
+    const selectedRef = useRef<{ type: PlanType; target: PlanLite | PlanGroupLite; }>();
+
     const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
-    const [deletePlanDialogOpen, setDeletePlanDialogOpen] = useState<boolean>(false);
-    const [deletePlanTarget, setDeletePlanTarget] = useState<Immutable<Partial<Plan>>>();
+
+    const [deleteTargetDialogPrompt, setDeleteTargetDialogPrompt] = useState<string>();
 
     // TODO Load/save this from user preferences
     const [filtersEnabled, setFiltersEnabled] = useState<boolean>(false);
@@ -142,9 +148,10 @@ export const PlansRoute = React.memo(() => {
         }
         invokeLoadingIndicator();
 
+        setSelectedId(undefined);
+        selectedRef.current = undefined;
         setAddPlanDialogOpen(false);
-        setDeletePlanDialogOpen(false);
-        setDeletePlanTarget(undefined);
+        setDeleteTargetDialogPrompt(undefined);
 
         try {
             const accountPlans = await planService.getForAccount(masterAccountId);
@@ -181,8 +188,6 @@ export const PlansRoute = React.memo(() => {
         description: sm
     }), [lg, sm]);
 
-    const deletePlanDialogPrompt = useMemo(() => generateDeletePlanDialogPrompt(deletePlanTarget), [deletePlanTarget]);
-
     const handleAddPlan = useCallback((): void => {
         setAddPlanDialogOpen(true);
     }, []);
@@ -194,27 +199,75 @@ export const PlansRoute = React.memo(() => {
         }
     }, [loadPlansForAccount]);
 
-    const handleDeletePlan = useCallback((plan: Immutable<Partial<Plan>>): void => {
-        setDeletePlanTarget(plan);
-        setDeletePlanDialogOpen(true);
+    const handleOpenEditTargetDialog = useCallback((): void => {
+        if (!selectedRef.current) {
+            return;
+        }
+        // TODO Implement this
     }, []);
 
-    const handleDeletePlanDialogClose = useCallback(async (event: any, reason: ModalOnCloseReason): Promise<void> => {
+    const handleOpenDeleteTargetDialog = useCallback((): void => {
+        if (!accountPlans || !selectedId) {
+            return;
+        }
+        // TODO Include planGroups
+        const plan = accountPlans.plans.find(plan => plan._id === selectedId);
+        if (!plan) {
+            console.warn(`Could not find plan id=${selectedId}`);
+            return;
+        }
+        const prompt = generateDeleteTargetDialogPrompt(plan);
+        setDeleteTargetDialogPrompt(prompt);
+    }, [accountPlans, selectedId]);
+
+    const handleDeleteTargetDialogClose = useCallback(async (event: any, reason: ModalOnCloseReason): Promise<void> => {
+        if (!selectedId) {
+            return;
+        }
         if (reason === 'submit') {
             try {
-                await planService.deletePlan(deletePlanTarget?._id!!);
+                await planService.deletePlan(selectedId);
                 loadPlansForAccount();
             } catch (e) {
                 console.error(e);
             }
         }
-        setDeletePlanTarget(undefined);
-        setDeletePlanDialogOpen(false);
-    }, [deletePlanTarget?._id, loadPlansForAccount, planService]);
+        setDeleteTargetDialogPrompt(undefined);
+    }, [loadPlansForAccount, planService, selectedId]);
 
+    // TODO move this to user preferences hook
     const toggleFilters = useCallback(() => {
         setFiltersEnabled(filtersEnabled => !filtersEnabled);
     }, []);
+
+
+    //#region Plan list event handlers
+
+    const handleRowClick = useCallback((e: MouseEvent): void => {
+        if (e.type === 'contextmenu') {
+            // TODO Open context menu
+        }
+    }, []);
+
+    const handleRowDoubleClick = useCallback((): void => {
+        if (!selectedRef.current || selectedRef.current.type === 'group') {
+            return;
+        }
+        const planId = selectedRef.current.target._id!;
+        navigate(planId);
+    }, [navigate]);
+
+    const handleSelectionChange = useCallback((target: PlanLite | PlanGroupLite | undefined, type: PlanType): void => {
+        if (!target) {
+            selectedRef.current = undefined;
+        } else {
+            selectedRef.current = { type, target };
+        }
+        setSelectedId(target?._id);
+    }, []);
+
+    //#endregion
+
 
     return <>
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
@@ -245,7 +298,10 @@ export const PlansRoute = React.memo(() => {
                 <PlansNavigationRail
                     filtersEnabled={filtersEnabled}
                     layout={sm ? 'column' : 'row'}
+                    hasSelection={!!selectedRef.current}
                     onAddPlan={handleAddPlan}
+                    onEditSelectedPlan={handleOpenEditTargetDialog}
+                    onDeleteSelectedPlan={handleOpenDeleteTargetDialog}
                     onToggleFilters={toggleFilters}
                 />
                 <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
@@ -253,6 +309,10 @@ export const PlansRoute = React.memo(() => {
                         <PlanList
                             accountPlans={accountPlans}
                             visibleColumns={visibleColumns}
+                            selectedId={selectedId}
+                            onRowClick={handleRowClick}
+                            onRowDoubleClick={handleRowDoubleClick}
+                            onSelectionChange={handleSelectionChange}
                         />
                     }
                 </div>
@@ -265,13 +325,13 @@ export const PlansRoute = React.memo(() => {
             onClose={handleAddPlanDialogClose}
         />
         <PromptDialog
-            open={deletePlanDialogOpen}
-            title={DeletePlanDialogTitle}
-            prompt={deletePlanDialogPrompt}
+            open={!!deleteTargetDialogPrompt}
+            title={DeleteTargetDialogTitle}
+            prompt={deleteTargetDialogPrompt}
             cancelButtonColor='secondary'
             confirmButtonColor='primary'
             confirmButtonLabel='Delete'
-            onClose={handleDeletePlanDialogClose}
+            onClose={handleDeleteTargetDialogClose}
         />
     </>;
 });

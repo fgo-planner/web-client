@@ -1,9 +1,7 @@
-import { Plan } from '@fgo-planner/types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { MouseEventHandler, ReactNode } from 'react';
-import { MasterAccountPlans, SortDirection } from '../../../../../types/data';
-import { Immutable } from '../../../../../types/internal';
+import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
+import { MasterAccountPlans, PlanGroupLite, PlanLite, PlanType, SortDirection } from '../../../../../types/data';
 import { PlanColumnProperties, PlanListColumn, PlanListVisibleColumns } from './plan-list-columns';
 import { PlanListHeader } from './plan-list-header.component';
 import { PlanListRow, StyleClassPrefix as PlanListRowStyleClassPrefix } from './plan-list-row.component';
@@ -11,10 +9,11 @@ import { PlanListRow, StyleClassPrefix as PlanListRowStyleClassPrefix } from './
 type Props = {
     accountPlans: MasterAccountPlans;
     onHeaderClick?: MouseEventHandler;
-    onRowClick?: MouseEventHandler;
-    onRowDoubleClick?: MouseEventHandler;
-    onSelectionChange?: (selectedServants: ReadonlySet<number>) => void;
+    onRowClick: MouseEventHandler;
+    onRowDoubleClick: MouseEventHandler;
+    onSelectionChange: (target: PlanLite | PlanGroupLite | undefined, type: PlanType) => void;
     onSortChange?: (column?: PlanListColumn, direction?: SortDirection) => void;
+    selectedId?: string;
     visibleColumns: Readonly<PlanListVisibleColumns>;
 };
 
@@ -76,16 +75,37 @@ const StyleProps = (theme: SystemTheme) => {
 export const PlanList = React.memo((props: Props) => {
 
     const {
-        accountPlans,
+        accountPlans: {
+            // TODO Also do something with planGroups
+            plans
+        },
+        onRowClick,
+        onRowDoubleClick,
+        onSelectionChange,
+        selectedId,
         visibleColumns
     } = props;
 
-    const renderPlanRow = (plan: Immutable<Plan>): ReactNode => {
+    const handlePlanRowClick = useCallback((e: MouseEvent, plan: PlanLite) => {
+        onSelectionChange(plan, 'plan');
+        onRowClick(e);
+    }, [onRowClick, onSelectionChange]);
+    
+    const handlePlanGroupRowClick = useCallback((e: MouseEvent, plan: PlanGroupLite) => {
+        onSelectionChange(plan, 'group');
+        onRowClick(e);
+    }, [onRowClick, onSelectionChange]);
+
+    const renderPlanRow = (plan: PlanLite): ReactNode => {
         return (
             <PlanListRow
                 key={plan._id}
                 plan={plan}
+                active={plan._id === selectedId}
                 visibleColumns={visibleColumns}
+                onClick={handlePlanRowClick}
+                onContextMenu={handlePlanRowClick}
+                onDoubleClick={onRowDoubleClick}
             />
         );
     };
@@ -95,7 +115,7 @@ export const PlanList = React.memo((props: Props) => {
             <div className={`${StyleClassPrefix}-list-container`}>
                 <PlanListHeader visibleColumns={visibleColumns} />
                 {/* TODO Render plan groups */}
-                {accountPlans.plans.map(renderPlanRow)}
+                {plans.map(renderPlanRow)}
             </div>
         </Box>
     );

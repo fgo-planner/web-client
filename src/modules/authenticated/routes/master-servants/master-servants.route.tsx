@@ -474,7 +474,7 @@ export const MasterServantsRoute = React.memo(() => {
                         <MasterServantList
                             masterServants={dragDropData || masterServants}
                             bondLevels={bondLevels}
-                            selectedServants={selectedInstanceIds}
+                            selectedInstanceIds={selectedInstanceIds}
                             showHeader={sm}
                             visibleColumns={visibleColumns}
                             dragDropMode={dragDropMode}

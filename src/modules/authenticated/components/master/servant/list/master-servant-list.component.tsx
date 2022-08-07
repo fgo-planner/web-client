@@ -7,7 +7,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { useListSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-list-select-helper-for-mouse-event.hook';
+import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { SortDirection, SortOptions } from '../../../../../../types/data';
 import { Immutable, ImmutableArray, ReadonlyPartial } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
@@ -40,7 +40,7 @@ type Props = {
     /**
      * Instance IDs of selected servants.
      */
-    selectedServants?: ReadonlySet<number>;
+    selectedInstanceIds?: ReadonlySet<number>;
     showHeader?: boolean;
     sortOptions?: SortOptions<MasterServantListColumn>;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
@@ -49,7 +49,7 @@ type Props = {
     onHeaderClick?: MouseEventHandler;
     onRowClick?: MouseEventHandler;
     onRowDoubleClick?: MouseEventHandler;
-    onSelectionChange?: (selectedServants: ReadonlySet<number>) => void;
+    onSelectionChange?: (selectedInstanceIds: ReadonlySet<number>) => void;
     onSortChange?: (column?: MasterServantListColumn, direction?: SortDirection) => void;
 };
 
@@ -182,7 +182,7 @@ export const MasterServantList = React.memo((props: Props) => {
         onRowDoubleClick,
         onSelectionChange,
         onSortChange,
-        selectedServants = SetUtils.emptySet(),
+        selectedInstanceIds = SetUtils.emptySet(),
         showHeader,
         sortOptions,
         visibleColumns
@@ -241,13 +241,12 @@ export const MasterServantList = React.memo((props: Props) => {
     const {
         selectedIds,
         handleItemClick
-    } = useListSelectHelperForMouseEvent(
+    } = useMultiSelectHelperForMouseEvent(
         masterServantsSorted,
-        selectedServants,
+        selectedInstanceIds,
         MasterServantUtils.getInstanceId,
         {
             disabled: dragDropMode,
-            multiple: true,
             rightClickAction: 'contextmenu'
         }
     );
@@ -274,7 +273,7 @@ export const MasterServantList = React.memo((props: Props) => {
         const { gameId, instanceId } = masterServant;
         const gameServant = gameServantMap[gameId];
         const bondLevel = bondLevels[gameId];
-        const active = selectedServants?.has(instanceId);
+        const active = selectedInstanceIds?.has(instanceId);
 
         return (
             <MasterServantListRow

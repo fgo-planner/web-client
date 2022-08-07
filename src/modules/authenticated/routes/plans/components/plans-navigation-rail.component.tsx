@@ -5,26 +5,26 @@ import { NavigationRail } from '../../../../../components/navigation/navigation-
 
 type Props = {
     filtersEnabled: boolean;
+    hasSelection: boolean;
     layout: 'row' | 'column';
     onAddPlan: () => void;
-    onDeleteSelectedPlan?: () => void;
+    onDeleteSelectedPlan: () => void;
     onEditSelectedPlan?: () => void;
     onOpenColumnSettings?: () => void;
     onToggleFilters: () => void;
-    selectedPlansCount?: number;
 };
 
 export const PlansNavigationRail = React.memo((props: Props) => {
 
     const {
         filtersEnabled,
+        hasSelection,
         layout,
         onAddPlan,
         onDeleteSelectedPlan,
         onEditSelectedPlan,
         onOpenColumnSettings,
-        onToggleFilters,
-        selectedPlansCount
+        onToggleFilters
     } = props;
 
     return (
@@ -70,7 +70,7 @@ export const PlansNavigationRail = React.memo((props: Props) => {
                         onClick={onEditSelectedPlan}
                         children={<DriveFileRenameOutlineIcon />}
                         size='large'
-                        disabled={!selectedPlansCount}
+                        disabled={!hasSelection}
                     />
                 </div>
             </Tooltip>
@@ -81,7 +81,7 @@ export const PlansNavigationRail = React.memo((props: Props) => {
                         onClick={onDeleteSelectedPlan}
                         children={<DeleteForeverOutlinedIcon />}
                         size='large'
-                        disabled={!selectedPlansCount}
+                        disabled={!hasSelection}
                     />
                 </div>
             </Tooltip>

@@ -1,19 +1,19 @@
 import { MouseEvent, useCallback } from 'react';
 import { ListSelectAction } from './list-select-action.type';
-import { ListSelectHelperHookOptions, useListSelectHelper } from './use-list-select-helper.hook';
+import { MultiSelectHelperHookOptions, useMultiSelectHelper } from './use-multi-select-helper.hook';
 
 type RightClickAction =
     'none' | 
     'left-click' | 
     'contextmenu';
 
-export type ListSelectHelperForMouseEventHookOptions = {
+export type MultiSelectHelperForMouseEventHookOptions = {
     rightClickAction?: RightClickAction;
-} & ListSelectHelperHookOptions;
+} & MultiSelectHelperHookOptions;
 
-type ListSelectHelperForMouseEventHookResult = {
+type MultiSelectHelperForMouseEventHookResult<ID> = {
     handleItemClick: (e: MouseEvent, index: number) => void;
-    selectedIds: ReadonlySet<number>;
+    selectedIds: ReadonlySet<ID>;
 };
 
 /**
@@ -49,16 +49,16 @@ const mapMouseEventToListSelectAction = (e: MouseEvent, rightClickAction: RightC
 
 /**
  * Utility hook that handles `MouseEvent` inputs on a list and keeps track of
- * which items are selected based on the events. Uses the `useListSelectHelper`
+ * which items are selected based on the events. Uses the `useMultiSelectHelper`
  * hook internally. Performs automatic conversion of `MouseEvent` inputs to
  * `ListSelectAction`. 
  */
-export const useListSelectHelperForMouseEvent = <T>(
+export function useMultiSelectHelperForMouseEvent<T, ID = number>(
     sourceData: ReadonlyArray<T>,
-    selectedIds: ReadonlySet<number>,
-    getIdFunction: (value: T) => number,
-    options: ListSelectHelperForMouseEventHookOptions = {}
-): ListSelectHelperForMouseEventHookResult => {
+    selectedIds: ReadonlySet<ID>,
+    getIdFunction: (value: T) => ID,
+    options: MultiSelectHelperForMouseEventHookOptions = {}
+): MultiSelectHelperForMouseEventHookResult<ID> {
 
     const {
         rightClickAction = 'none',
@@ -68,7 +68,7 @@ export const useListSelectHelperForMouseEvent = <T>(
     const {
         handleItemAction,
         selectedIds: selectedIdsResult
-    } = useListSelectHelper(
+    } = useMultiSelectHelper<T, ID>(
         sourceData,
         selectedIds,
         getIdFunction,

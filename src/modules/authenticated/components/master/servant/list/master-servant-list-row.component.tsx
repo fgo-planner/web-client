@@ -18,9 +18,9 @@ type Props = {
     lastRow?: boolean;
     masterServant: Immutable<MasterServant>;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
-    onClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
-    onContextMenu?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
-    onDoubleClick?: (e: MouseEvent<HTMLDivElement>, index: number) => void;
+    onClick?: (e: MouseEvent, index: number) => void;
+    onContextMenu?: (e: MouseEvent, index: number) => void;
+    onDoubleClick?: (e: MouseEvent, index: number) => void;
     onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
 } & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu' | 'onDoubleClick'>;
 
@@ -52,15 +52,15 @@ export const MasterServantListRow = React.memo((props: Props) => {
         ...domAttributes
     } = props;
 
-    const handleClick = useCallback((e: MouseEvent<HTMLDivElement>): void => {
+    const handleClick = useCallback((e: MouseEvent): void => {
         onClick?.(e, index);
     }, [index, onClick]);
 
-    const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>): void => {
+    const handleContextMenu = useCallback((e: MouseEvent): void => {
         onContextMenu?.(e, index);
     }, [index, onContextMenu]);
 
-    const handleDoubleClick = useCallback((e: MouseEvent<HTMLDivElement>): void => {
+    const handleDoubleClick = useCallback((e: MouseEvent): void => {
         onDoubleClick?.(e, index);
     }, [index, onDoubleClick]);
 

@@ -23,18 +23,7 @@ export class HttpUtils {
         
     }
 
-    /**
-     * Converts the string values of entity timestamps fields (`createdAt` and
-     * `updatedAt`) received from HTTP calls into `Date` values.
-     */
-    static stringTimestampsToDate(entity: EntityWithTimestamps): void {
-        if (entity.createdAt) {
-            entity.createdAt = new Date(entity.createdAt);
-        }
-        if (entity.updatedAt) {
-            entity.updatedAt = new Date(entity.updatedAt);
-        }
-    }
+    //#region HTTP request methods
 
     static async get<T = any>(url: string): Promise<T>;
     static async get<T = any>(url: string, options: HttpOptions): Promise<T>;
@@ -240,4 +229,46 @@ export class HttpUtils {
         return { options, transformFunc };
     }
 
+    //#endregion
+
+
+    //#region HTTP response methods
+    
+    /**
+     * Converts the string values of response entity timestamps fields (`createdAt`
+     * and `updatedAt`) into `Date` values.
+     */
+    static stringTimestampsToDate<T extends EntityWithTimestamps<ID>, ID>(entity: T): T;
+    /**
+     * Converts the string values of response entity timestamps fields (`createdAt`
+     * and `updatedAt`) into `Date` values.
+     */
+    static stringTimestampsToDate<T extends EntityWithTimestamps<ID>, ID>(entities: Array<T>): Array<T>;
+    static stringTimestampsToDate<T extends EntityWithTimestamps<ID>, ID>(entity: T | Array<T>): T | Array<T> {
+        if (Array.isArray(entity)) {
+            entity.forEach(this._stringTimestampsToDate);
+            return entity;
+        } else {
+            return this._stringTimestampsToDate(entity);
+        }
+    }
+    
+    private static _stringTimestampsToDate<T extends EntityWithTimestamps<ID>, ID>(entity: T): T {
+        if (entity.createdAt) {
+            entity.createdAt = new Date(entity.createdAt);
+        }
+        if (entity.updatedAt) {
+            entity.updatedAt = new Date(entity.updatedAt);
+        }
+        return entity;
+    }
+
+    //#endregion
+
 }
+
+//#region Bind static functions
+
+HttpUtils.stringTimestampsToDate = HttpUtils.stringTimestampsToDate.bind(HttpUtils);
+
+//#endregion

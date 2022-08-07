@@ -1,4 +1,4 @@
-import { MasterAccount } from '@fgo-planner/types';
+import { BasicMasterAccount } from '@fgo-planner/types';
 import { DeleteForever as DeleteForeverIcon } from '@mui/icons-material';
 import { alpha, IconButton, Link as MuiLink, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
@@ -10,7 +10,7 @@ import { Immutable } from '../../../../types/internal';
 
 type Props = {
     masterAccountList: MasterAccountListType;
-    onDeleteAccount: (masterAccount: Immutable<Partial<MasterAccount>>) => void;
+    onDeleteAccount: (masterAccount: Immutable<BasicMasterAccount>) => void;
 };
 
 export const StyleClassPrefix = 'MasterAccountList';

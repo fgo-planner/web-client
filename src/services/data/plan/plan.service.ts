@@ -9,27 +9,27 @@ export class PlanService {
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user/planner`;
 
     async addPlan(plan: Partial<Plan>): Promise<Plan> {
-        return Http.put<Plan>(`${this._BaseUrl}/plan`, plan, this._planTransform);
+        return Http.put<Plan>(`${this._BaseUrl}/plan`, plan, this._transformPlan);
     }
 
     async addPlanGroup(planGroup: Partial<PlanGroup>): Promise<PlanGroup> {
-        return Http.put<PlanGroup>(`${this._BaseUrl}/group`, planGroup, this._planGroupTransform);
+        return Http.put<PlanGroup>(`${this._BaseUrl}/group`, planGroup, this._transformPlanGroup);
     }
 
     async getPlan(id: string): Promise<Plan> {
-        return Http.get<Plan>(`${this._BaseUrl}/plan/${id}`, this._planTransform);
+        return Http.get<Plan>(`${this._BaseUrl}/plan/${id}`, this._transformPlan);
     }
 
     async getPlanGroup(id: string): Promise<PlanGroup> {
-        return Http.get<PlanGroup>(`${this._BaseUrl}/group/${id}`, this._planGroupTransform);
+        return Http.get<PlanGroup>(`${this._BaseUrl}/group/${id}`, this._transformPlanGroup);
     }
 
     async updatePlan(plan: Partial<Plan>): Promise<Plan> {
-        return await Http.post<Plan>(`${this._BaseUrl}/plan`, plan, this._planTransform);
+        return await Http.post<Plan>(`${this._BaseUrl}/plan`, plan, this._transformPlan);
     }
 
     async updatePlanGroup(planGroup: Partial<PlanGroup>): Promise<PlanGroup> {
-        return Http.post<PlanGroup>(`${this._BaseUrl}/group`, planGroup, this._planGroupTransform);
+        return Http.post<PlanGroup>(`${this._BaseUrl}/group`, planGroup, this._transformPlanGroup);
     }
 
     async deletePlan(id: string): Promise<boolean> {
@@ -41,29 +41,28 @@ export class PlanService {
     }
 
     async getForAccount(accountId: string): Promise<MasterAccountPlans> {
-        return Http.get<MasterAccountPlans>(`${this._BaseUrl}/account/${accountId}`, this._accountPlansTransform.bind(this));
+        return Http.get<MasterAccountPlans>(`${this._BaseUrl}/account/${accountId}`, this._transformAccountPlans.bind(this));
     }
 
-    private _planGroupTransform(planGroup: PlanGroup): PlanGroup {
+    private _transformPlanGroup(planGroup: PlanGroup): PlanGroup {
         // TODO Also add add timestamps to PlanGroup
-        // Http.stringTimestampsToDate(plan);
+        // return Http.stringTimestampsToDate(plan);
         return planGroup;
     }
 
-    private _planTransform(plan: Plan): Plan {
+    private _transformPlan(plan: Plan): Plan {
         if (plan.targetDate) {
             plan.targetDate = new Date(plan.targetDate);
         }
-        Http.stringTimestampsToDate(plan);
-        return plan;
+        return Http.stringTimestampsToDate(plan);
     }
 
-    private _accountPlansTransform(accountPlans: any): MasterAccountPlans {
+    private _transformAccountPlans(accountPlans: any): MasterAccountPlans {
         for (const planGroup of accountPlans.planGroups) {
-            this._planGroupTransform(planGroup);
+            this._transformPlanGroup(planGroup);
         }
         for (const plan of accountPlans.plans) {
-            this._planTransform(plan);
+            this._transformPlan(plan);
         }
         return accountPlans;
     }

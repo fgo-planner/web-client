@@ -1,4 +1,4 @@
-import { MasterAccount } from '@fgo-planner/types';
+import { BasicMasterAccount } from '@fgo-planner/types';
 import { Add as AddIcon } from '@mui/icons-material';
 import { Fab, PaperProps, Tooltip } from '@mui/material';
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
@@ -24,10 +24,7 @@ const AddAccountDialogPaperProps: PaperProps = {
 
 const DeleteAccountDialogTitle = 'Delete Account?';
 
-const generateDeleteAccountDialogPrompt = (masterAccount: Immutable<Partial<MasterAccount>>): string => {
-    if (!masterAccount) {
-        return '';
-    }
+const generateDeleteAccountDialogPrompt = (masterAccount: Immutable<BasicMasterAccount>): string => {
     const { name, friendId } = masterAccount;
     let prompt = 'Are you sure you want to delete the account';
     if (name) {
@@ -47,7 +44,7 @@ export const MasterAccountsRoute = React.memo(() => {
     const [masterAccountList, setMasterAccountList] = useState<Nullable<MasterAccountListType>>();
     const [addAccountDialogOpen, setAddAccountDialogOpen] = useState<boolean>(false);
     const [deleteAccountDialogOpen, setDeleteAccountDialogOpen] = useState<boolean>(false);
-    const [deleteAccountTarget, setDeleteAccountTarget] = useState<Immutable<Partial<MasterAccount>>>();
+    const [deleteAccountTarget, setDeleteAccountTarget] = useState<Immutable<BasicMasterAccount>>();
 
     /*
      * Master account list change subscription.
@@ -75,7 +72,7 @@ export const MasterAccountsRoute = React.memo(() => {
         setAddAccountDialogOpen(false);
     }, []);
 
-    const handleDeleteAccount = useCallback((masterAccount: Immutable<Partial<MasterAccount>>): void => {
+    const handleDeleteAccount = useCallback((masterAccount: Immutable<BasicMasterAccount>): void => {
         setDeleteAccountTarget(masterAccount);
         setDeleteAccountDialogOpen(true);
     }, []);

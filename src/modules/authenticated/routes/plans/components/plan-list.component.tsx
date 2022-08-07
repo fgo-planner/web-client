@@ -1,7 +1,9 @@
+import { BasicPlan, BasicPlanGroup } from '@fgo-planner/types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
-import { MasterAccountPlans, PlanGroupLite, PlanLite, PlanType, SortDirection } from '../../../../../types/data';
+import { MasterAccountPlans, PlanType, SortDirection } from '../../../../../types/data';
+import { Immutable } from '../../../../../types/internal';
 import { PlanColumnProperties, PlanListColumn, PlanListVisibleColumns } from './plan-list-columns';
 import { PlanListHeader } from './plan-list-header.component';
 import { PlanListRow, StyleClassPrefix as PlanListRowStyleClassPrefix } from './plan-list-row.component';
@@ -11,7 +13,7 @@ type Props = {
     onHeaderClick?: MouseEventHandler;
     onRowClick: MouseEventHandler;
     onRowDoubleClick: MouseEventHandler;
-    onSelectionChange: (target: PlanLite | PlanGroupLite | undefined, type: PlanType) => void;
+    onSelectionChange: (target: Immutable<BasicPlan | BasicPlanGroup> | undefined, type: PlanType) => void;
     onSortChange?: (column?: PlanListColumn, direction?: SortDirection) => void;
     selectedId?: string;
     visibleColumns: Readonly<PlanListVisibleColumns>;
@@ -86,17 +88,17 @@ export const PlanList = React.memo((props: Props) => {
         visibleColumns
     } = props;
 
-    const handlePlanRowClick = useCallback((e: MouseEvent, plan: PlanLite) => {
+    const handlePlanRowClick = useCallback((e: MouseEvent, plan: Immutable<BasicPlan>) => {
         onSelectionChange(plan, 'plan');
         onRowClick(e);
     }, [onRowClick, onSelectionChange]);
     
-    const handlePlanGroupRowClick = useCallback((e: MouseEvent, plan: PlanGroupLite) => {
+    const handlePlanGroupRowClick = useCallback((e: MouseEvent, plan: Immutable<BasicPlanGroup>) => {
         onSelectionChange(plan, 'group');
         onRowClick(e);
     }, [onRowClick, onSelectionChange]);
 
-    const renderPlanRow = (plan: PlanLite): ReactNode => {
+    const renderPlanRow = (plan: Immutable<BasicPlan>): ReactNode => {
         return (
             <PlanListRow
                 key={plan._id}

@@ -1,4 +1,4 @@
-import { Plan } from '@fgo-planner/types';
+import { BasicPlan } from '@fgo-planner/types';
 import { Link as MuiLink } from '@mui/material';
 import React, { MouseEvent, useCallback } from 'react';
 import { Link } from 'react-router-dom';
@@ -11,10 +11,10 @@ import { PlanListVisibleColumns } from './plan-list-columns';
 
 type Props = {
     active: boolean;
-    onClick: (e: MouseEvent, plan: Immutable<Partial<Plan>>) => void;
-    onContextMenu: (e: MouseEvent, plan: Immutable<Partial<Plan>>) => void;
-    onDoubleClick: (e: MouseEvent, plan: Immutable<Partial<Plan>>) => void;
-    plan: Immutable<Partial<Plan>>;
+    onClick: (e: MouseEvent, plan: Immutable<BasicPlan>) => void;
+    onContextMenu: (e: MouseEvent, plan: Immutable<BasicPlan>) => void;
+    onDoubleClick: (e: MouseEvent, plan: Immutable<BasicPlan>) => void;
+    plan: Immutable<BasicPlan>;
     visibleColumns: Readonly<PlanListVisibleColumns>;
 };
 

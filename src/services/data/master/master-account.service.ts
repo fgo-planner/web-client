@@ -1,8 +1,8 @@
-import { MasterAccount } from '@fgo-planner/types';
+import { BasicMasterAccount, MasterAccount } from '@fgo-planner/types';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { MasterAccountList } from '../../../types/data';
 import { Nullable, UserInfo } from '../../../types/internal';
-import { HttpUtils as Http } from '../../../utils/http.utils';
+import { HttpUtils as Http, HttpUtils } from '../../../utils/http.utils';
 import { StorageKeys } from '../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
@@ -47,7 +47,7 @@ export class MasterAccountService {
     }
 
     async addAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
-        const account = await Http.put<MasterAccount>(`${this._BaseUrl}`, masterAccount);
+        const account = await Http.put<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
         await this._updateMasterAccountList(); // Reload account list
         this._autoSelectAccount();
         return account;
@@ -63,18 +63,18 @@ export class MasterAccountService {
     }
 
     async getAccount(id: string): Promise<MasterAccount> {
-        return Http.get<MasterAccount>(`${this._BaseUrl}/${id}`);
+        return Http.get<MasterAccount>(`${this._BaseUrl}/${id}`, Http.stringTimestampsToDate);
     }
 
     async updateAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
-        const updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount);
+        const updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
         // TODO Convert date strings to date objects.
         this._onCurrentMasterAccountChange.next(this._currentMasterAccount = updated);
         return updated;
     }
 
-    async deleteAccount(id: string): Promise<MasterAccount> {
-        const deleted = await Http.delete<MasterAccount>(`${this._BaseUrl}/${id}`);
+    async deleteAccount(id: string): Promise<boolean> {
+        const deleted = await Http.delete<boolean>(`${this._BaseUrl}/${id}`);
         await this._updateMasterAccountList(); // Reload account list
         this._autoSelectAccount();
         return deleted;
@@ -163,7 +163,10 @@ export class MasterAccountService {
      * pushing it to the subject.
      */
     private async _updateMasterAccountList(): Promise<void> {
-        this._masterAccountList = await Http.get<Partial<MasterAccount>[]>(`${this._BaseUrl}/current-user`);
+        this._masterAccountList = await Http.get<Array<BasicMasterAccount>>(
+            `${this._BaseUrl}/current-user`, 
+            HttpUtils.stringTimestampsToDate
+        );
         this._onMasterAccountListChange.next(this._masterAccountList);
     }
 

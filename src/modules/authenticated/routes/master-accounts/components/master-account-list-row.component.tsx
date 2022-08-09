@@ -1,8 +1,6 @@
 import { BasicMasterAccount } from '@fgo-planner/types';
-import { Link as MuiLink } from '@mui/material';
 import React, { MouseEvent, useCallback } from 'react';
 import NumberFormat from 'react-number-format';
-import { Link } from 'react-router-dom';
 import { StaticListRowContainer } from '../../../../../components/data-table-list/static-list-row-container.component';
 import { TruncateText } from '../../../../../components/text/truncate-text.component';
 import { Immutable } from '../../../../../types/internal';
@@ -61,9 +59,7 @@ export const MasterAccountListRow = React.memo((props: Props) => {
             onDoubleClick={handleDoubleClick}
         >
             <TruncateText className={`${StyleClassPrefix}-name`}>
-                <MuiLink component={Link} to={`${account._id}`} underline='none'>
-                    {account.name || <i>{`Account ${index + 1}`}</i>}
-                </MuiLink>
+                {account.name || <i>{`Account ${index + 1}`}</i>}
             </TruncateText>
             {friendId && <TruncateText className={`${StyleClassPrefix}-friend-id`}>
                 {!account.friendId ? '\u2013' :

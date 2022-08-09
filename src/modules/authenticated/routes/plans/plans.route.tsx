@@ -114,6 +114,7 @@ const StyleProps = (theme: SystemTheme) => {
 // TODO Maybe add info panel
 // TODO Maybe implement drag-drop
 // TODO Implement multi-select
+// TODO Add context menus
 
 export const PlansRoute = React.memo(() => {
 

@@ -2,7 +2,7 @@ import { Avatar } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { BasicUser } from '../../../../services/data/user/user.service';
-import { MasterAccountList as MasterAccountListType } from '../../../../types/data';
+import { BasicMasterAccounts } from '../../../../types/data';
 import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
@@ -39,7 +39,7 @@ const StyleProps = {
  */
 export const AppBarAuthenticatedUser = React.memo(({ currentUser }: Props) => {
 
-    const [masterAccountList, setMasterAccountList] = useState<Nullable<MasterAccountListType>>();
+    const [masterAccountList, setMasterAccountList] = useState<Nullable<BasicMasterAccounts>>();
     const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState<Element | null>(null);
 
     /*

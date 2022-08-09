@@ -1,5 +1,6 @@
-import { CircularProgress, Theme, useMediaQuery } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import React, { CSSProperties, useMemo } from 'react';
+import { useActiveBreakpoints } from '../../hooks/user-interface/use-active-breakpoints.hook';
 
 type Props = {
     visible?: boolean;
@@ -8,13 +9,19 @@ type Props = {
 
 const CircularProgressThickness = 3.7;
 
+/**
+ * MuiDialogs are 1300 by default, the loading indicator should be rendered
+ * above dialogs in most cases.
+ */
+const DefaultZIndex = 1337;
+
 const styles = {
     root: {
         display: 'flex',
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        position: 'fixed',
+        position: 'absolute',
         top: 0
     } as CSSProperties,
     progressContainer: {
@@ -22,16 +29,17 @@ const styles = {
     } as CSSProperties
 };
 
+// TODO Un-hardcode values
+
 export const LoadingIndicator = React.memo(({ visible, zIndex }: Props) => {
 
-    // TODO Change this to use useActiveBreakpoints hook instead.
-    const breakpointSm = useMediaQuery((theme: Theme) => theme.breakpoints.only('sm'));
-    const breakpointXs = useMediaQuery((theme: Theme) => theme.breakpoints.only('xs'));
-    const indicatorSize = breakpointXs ? 120 : breakpointSm ? 150 : 160;
-    
+    // TODO Move these to sx prop
+    const { sm, md } = useActiveBreakpoints();
+    const indicatorSize = md ? 160 : sm ? 150 : 120;
+
     const rootStyle = useMemo(() => ({
         ...styles.root,
-        zIndex: zIndex ?? 1
+        zIndex: zIndex ?? DefaultZIndex
     }), [zIndex]);
     
     if (visible === false) {

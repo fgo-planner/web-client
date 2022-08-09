@@ -1,5 +1,5 @@
 import { MasterAccount, UserPreferences } from '@fgo-planner/types';
-import { MasterAccountList } from '../../types/data';
+import { BasicMasterAccounts } from '../../types/data';
 import { HttpResponseError, Nullable, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
 import { Functions } from '../functions';
 import { SubscriptionTopic } from './subscription-topic.class';
@@ -47,7 +47,7 @@ class User {
     // TODO Wrap UserPreferences with Immutable<>
     static readonly CurrentUserPreferencesChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserPreferences>>(Functions.nullSupplier);
     
-    static readonly MasterAccountListChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccountList>>(Functions.nullSupplier);
+    static readonly MasterAccountListChange = SubscriptionTopic.forBehaviorSubject<Nullable<BasicMasterAccounts>>(Functions.nullSupplier);
     
     static readonly Unauthorized = SubscriptionTopic.forReplaySubject<HttpResponseError>();
     

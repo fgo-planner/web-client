@@ -4,13 +4,13 @@ import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, ReactNode, useCallback, useEffect, useState } from 'react';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { MasterAccountList } from '../../../../types/data';
+import { BasicMasterAccounts } from '../../../../types/data';
 import { Immutable, Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 
 type Props = {
-    masterAccountList: MasterAccountList;
+    masterAccountList: BasicMasterAccounts;
 };
 
 const StyleClassPrefix = 'AppBarMasterAccountSelect';

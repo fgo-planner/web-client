@@ -1,14 +1,15 @@
+import { MasterAccount } from '@fgo-planner/types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import React, { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react';
-import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
+import React, { ChangeEvent, FormEvent, useCallback, useRef, useState } from 'react';
 import { useAutoResizeDialog } from '../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { DialogComponentProps } from '../../../types/internal';
 import { DialogCloseButton } from '../../dialog/dialog-close-button.component';
 import { InputFieldContainer } from '../../input/input-field-container.component';
 
-type Props = DialogComponentProps;
+type Props = {
+    errorMessage?: string;
+} & DialogComponentProps<Partial<MasterAccount>>;
 
 type Form = {
     name: string;
@@ -26,7 +27,15 @@ const defaultFormValues = (): Form => {
 
 export const MasterAccountAddDialog = React.memo((props: Props) => {
 
-    const { onClose } = props;
+    const {
+        errorMessage,
+        onClose
+    } = props;
+
+    /**
+     * Contains cache of the dialog contents.
+     */
+    const dialogContentsRef = useRef<JSX.Element>();
 
     const {
         fullScreen,
@@ -34,16 +43,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
         actionButtonVariant
     } = useAutoResizeDialog(props);
 
-    const masterAccountService = useInjectable(MasterAccountService);
-
     const [formValues, setFormValues] = useState<Form>(defaultFormValues());
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [errorMessage, setErrorMessage] = useState<string>();
-    const [isMounted, setIsMounted] = useState<boolean>(true);
-
-    useEffect(() => {
-        return () => setIsMounted(false);
-    }, []);
 
     const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = event.target;
@@ -55,39 +55,30 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
 
     const submit = useCallback(async (event: FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
-        setIsSubmitting(true);
-        setErrorMessage(undefined);
-        try {
-            const { name, friendId } = formValues;
-            await masterAccountService.addAccount({ name, friendId });
-
-            // Only update the state if the component is still mounted.
-            if (isMounted) {
-                setFormValues(defaultFormValues());
-                setIsSubmitting(false);
-            }
-
-            onClose({}, 'submit');
-        } catch (e: any) {
-            setIsSubmitting(false);
-            setErrorMessage(e.message || String(e));
-        }
-    }, [formValues, isMounted, masterAccountService, onClose]);
+        // setIsSubmitting(true);
+        const { name, friendId } = formValues;
+        onClose({}, 'submit', { name, friendId });
+    }, [formValues, onClose]);
 
     const cancel = useCallback((): void => {
         setFormValues(defaultFormValues());
         onClose({}, 'cancel');
     }, [onClose]);
 
-    return (
-        <Dialog {...props} fullScreen={fullScreen}>
+    /*
+     * Only re-render the dialog contents if the dialog is open. This allows the
+     * dialog to keep displaying the same contents while it is undergoing its exit
+     * transition, even if the props were changed by the parent component.
+     */
+    if (!dialogContentsRef.current || props.open) {
+        dialogContentsRef.current = (
             <Typography component={'div'}>
                 <DialogTitle>
                     Add Master Account
                     {closeIconEnabled && <DialogCloseButton onClick={cancel} />}
                 </DialogTitle>
                 <DialogContent>
-                    <div>
+                    <div style={{ width: 360, color: 'red' }}>
                         {errorMessage}
                     </div>
                     {/* FIXME Inline sx prop */}
@@ -132,12 +123,17 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
                         color='primary'
                         form={FormId}
                         type='submit'
-                        disabled={isSubmitting}
                     >
                         Add
                     </Button>
                 </DialogActions>
             </Typography>
+        );
+    }
+
+    return (
+        <Dialog {...props} fullScreen={fullScreen}>
+            {dialogContentsRef.current}
         </Dialog>
     );
 });

@@ -1,23 +1,22 @@
 import { BasicMasterAccount, MasterAccount } from '@fgo-planner/types';
+import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { MasterAccountList } from '../../../types/data';
+import { BasicMasterAccounts } from '../../../types/data';
 import { Nullable, UserInfo } from '../../../types/internal';
 import { HttpUtils as Http, HttpUtils } from '../../../utils/http.utils';
 import { StorageKeys } from '../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
+import { UserInterfaceService } from '../../user-interface/user-interface.service';
 
 @Injectable
 export class MasterAccountService {
 
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user/master-account`;
 
-    /**
-     * Key used for storing and retrieving the current master account ID from
-     * session storage.
-     */
-    private readonly _CurrentAccountIdKey = 'current-master-account-id';
+    @Inject(UserInterfaceService)
+    private readonly _userInterfaceService!: UserInterfaceService;
 
     private _currentMasterAccount: Nullable<MasterAccount>;
 
@@ -26,7 +25,7 @@ export class MasterAccountService {
      * the list do not contain the entire master account data; only the _id, name,
      * and friendId fields are present.
      */
-    private _masterAccountList: Nullable<MasterAccountList>;
+    private _masterAccountList: Nullable<BasicMasterAccounts>;
 
     private get _onCurrentMasterAccountChange() {
         return SubscribablesContainer.get(SubscriptionTopics.User.CurrentMasterAccountChange);
@@ -37,23 +36,35 @@ export class MasterAccountService {
     }
 
     constructor() {
-        /*
+        /**
+         * Set timeout before subscribing to let the dependencies inject first.
+         *
          * This class is meant to last the lifetime of the application; no need to
          * unsubscribe from subscriptions.
          */
-        SubscribablesContainer
-            .get(SubscriptionTopics.User.CurrentUserChange)
-            .subscribe(this._handleCurrentUserChange.bind(this));
+        setTimeout(() => {
+            SubscribablesContainer
+                .get(SubscriptionTopics.User.CurrentUserChange)
+                .subscribe(this._handleCurrentUserChange.bind(this));
+        });
     }
 
     async addAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
-        const account = await Http.put<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
-        await this._updateMasterAccountList(); // Reload account list
+        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        let account: MasterAccount;
+        try {
+            account = await Http.put<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
+            await this._updateMasterAccountList(); // Reload account list
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+        } catch (e: any) {
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+            throw e;
+        }
         this._autoSelectAccount();
         return account;
     }
 
-    async getAccountsForCurrentUser(): Promise<MasterAccountList> {
+    async getAccountsForCurrentUser(): Promise<BasicMasterAccounts> {
         await this._updateMasterAccountList();
         if (!this._masterAccountList) {
             // Is this case possible?
@@ -63,19 +74,43 @@ export class MasterAccountService {
     }
 
     async getAccount(id: string): Promise<MasterAccount> {
-        return Http.get<MasterAccount>(`${this._BaseUrl}/${id}`, Http.stringTimestampsToDate);
+        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        let account: MasterAccount;
+        try {
+            account = await Http.get<MasterAccount>(`${this._BaseUrl}/${id}`, Http.stringTimestampsToDate);
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+        } catch (e: any) {
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+            throw e;
+        }
+        return account;
     }
 
     async updateAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
-        const updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
-        // TODO Convert date strings to date objects.
+        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        let updated: MasterAccount;
+        try {
+            updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+        }  catch (e: any) {
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+            throw e;
+        }
         this._onCurrentMasterAccountChange.next(this._currentMasterAccount = updated);
         return updated;
     }
 
     async deleteAccount(id: string): Promise<boolean> {
-        const deleted = await Http.delete<boolean>(`${this._BaseUrl}/${id}`);
-        await this._updateMasterAccountList(); // Reload account list
+        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        let deleted: boolean;
+        try {
+            deleted = await Http.delete<boolean>(`${this._BaseUrl}/${id}`);
+            await this._updateMasterAccountList(); // Reload account list
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+        } catch (e: any) {
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+            throw e;
+        }
         this._autoSelectAccount();
         return deleted;
     }
@@ -134,7 +169,7 @@ export class MasterAccountService {
          * If there was an account ID session storage, and it is present in the account
          * list, then select it.
          */
-        currentMasterAccountId = sessionStorage.getItem(this._CurrentAccountIdKey);
+        currentMasterAccountId = StorageUtils.getItemAsString(StorageKeys.User.CurrentMasterAccountId);
         if (currentMasterAccountId && this._masterAccountListContainsId(currentMasterAccountId)) {
             this.selectAccount(currentMasterAccountId);
             return;
@@ -163,10 +198,17 @@ export class MasterAccountService {
      * pushing it to the subject.
      */
     private async _updateMasterAccountList(): Promise<void> {
-        this._masterAccountList = await Http.get<Array<BasicMasterAccount>>(
-            `${this._BaseUrl}/current-user`, 
-            HttpUtils.stringTimestampsToDate
-        );
+        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        try {
+            this._masterAccountList = await Http.get<Array<BasicMasterAccount>>(
+                `${this._BaseUrl}/current-user`,
+                HttpUtils.stringTimestampsToDate
+            );
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+        } catch (e: any) {
+            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+            throw e;
+        }
         this._onMasterAccountListChange.next(this._masterAccountList);
     }
 

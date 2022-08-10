@@ -450,14 +450,14 @@ export const MasterServantsRoute = React.memo(() => {
             />
             <MasterServantsFilterControls
                 filtersEnabled={filtersEnabled}
-            // showUnsummonedServants={showUnsummonedServants}
-            // onToggleShowUnsummonedServants={toggleShowUnsummonedServants}
+
             />
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
                 <MasterServantsNavigationRail
                     layout={sm ? 'column' : 'row'}
                     dragDropMode={dragDropMode}
                     filtersEnabled={filtersEnabled}
+                    showUnsummonedServants={showUnsummonedServants}
                     selectedServantsCount={selectedServantsCount}
                     onAddServant={handleAddServant}
                     onMultiAddServant={handleMultiAddServant}
@@ -468,6 +468,7 @@ export const MasterServantsRoute = React.memo(() => {
                     onEditSelectedServants={handleEditSelectedServants}
                     onOpenColumnSettings={() => { }}
                     onToggleFilters={toggleFilters}
+                    onToggleShowUnsummonedServants={toggleShowUnsummonedServants}
                 />
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
@@ -479,6 +480,7 @@ export const MasterServantsRoute = React.memo(() => {
                             visibleColumns={visibleColumns}
                             dragDropMode={dragDropMode}
                             sortOptions={sortOptions}
+                            showUnsummonedServants={showUnsummonedServants}
                             onDragOrderChange={handleDragOrderChange}
                             onHeaderClick={handleHeaderClick}
                             onRowClick={handleRowClick}

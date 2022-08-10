@@ -42,6 +42,7 @@ type Props = {
      */
     selectedInstanceIds?: ReadonlySet<number>;
     showHeader?: boolean;
+    showUnsummonedServants?: boolean; // TODO Combine this with the rest of filters.
     sortOptions?: SortOptions<MasterServantListColumn>;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
@@ -184,22 +185,30 @@ export const MasterServantList = React.memo((props: Props) => {
         onSortChange,
         selectedInstanceIds = SetUtils.emptySet(),
         showHeader,
+        showUnsummonedServants,
         sortOptions,
         visibleColumns
     } = props;
 
-    const masterServantsSorted = useMemo((): ImmutableArray<MasterServant> => {
+    const masterServantsProcessed = useMemo((): ImmutableArray<MasterServant> => {
         if (dragDropMode) {
             return masterServants;
         }
+        let result = masterServants;
+        if (!showUnsummonedServants) {
+            const start1 = window.performance.now();
+            result = result.filter(({ summoned }) => summoned);
+            const end1 = window.performance.now();
+            console.log(`Filtering completed in ${(end1 - start1).toFixed(2)}ms.`);
+        }
         const sort = sortOptions?.sort;
         if (!sort) {
-            return masterServants;
+            return result;
         }
         const direction = sortOptions.direction;
-        const start = window.performance.now();
+        const start2 = window.performance.now();
         // TODO Move this to utilities class.
-        const sorted = [...masterServants].sort((a, b): number => {
+        result = [...result].sort((a, b): number => {
             let paramA: number, paramB: number;
             switch(sort) {
                 case 'npLevel':
@@ -232,17 +241,17 @@ export const MasterServantList = React.memo((props: Props) => {
             }
             return direction === 'asc' ? paramA - paramB : paramB - paramA;
         });
-        const end = window.performance.now();
-        console.log(`Sorting by ${sort} ${direction} completed in ${(end - start).toFixed(2)}ms.`);
-        return sorted;
-    }, [bondLevels, dragDropMode, masterServants, sortOptions?.direction, sortOptions?.sort]);
+        const end2 = window.performance.now();
+        console.log(`Sorting by ${sort} ${direction} completed in ${(end2 - start2).toFixed(2)}ms.`);
+        return result;
+    }, [bondLevels, dragDropMode, masterServants, showUnsummonedServants, sortOptions?.direction, sortOptions?.sort]);
 
 
     const {
         selectedIds,
         handleItemClick
     } = useMultiSelectHelperForMouseEvent(
-        masterServantsSorted,
+        masterServantsProcessed,
         selectedInstanceIds,
         MasterServantUtils.getInstanceId,
         {
@@ -306,7 +315,7 @@ export const MasterServantList = React.memo((props: Props) => {
                 />}
                 <div className={clsx(`${StyleClassPrefix}-list`, dragDropMode && 'drag-drop-mode')}>
                     <DndProvider backend={HTML5Backend}>
-                        {masterServantsSorted.map(renderMasterServantRow)}
+                        {masterServantsProcessed.map(renderMasterServantRow)}
                     </DndProvider>
                 </div>
             </div>

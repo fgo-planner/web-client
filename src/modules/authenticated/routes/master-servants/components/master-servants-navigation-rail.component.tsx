@@ -1,8 +1,9 @@
-import { BarChart as BarChartIcon, Clear as ClearIcon, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, FilterAlt as FilterAltIcon, FilterAltOutlined as FilterAltOutlinedIcon, GroupAddOutlined, ImportExport as ImportExportIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
+import { BarChart as BarChartIcon, Clear as ClearIcon, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, FilterAlt as FilterAltIcon, FilterAltOutlined as FilterAltOutlinedIcon, GroupAddOutlined, ImportExport as ImportExportIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, PersonOff, Reorder as ReorderIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
 import { Divider, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavigationRail } from '../../../../../components/navigation/navigation-rail/navigation-rail.component';
+import { PersonOffOutlined as PersonOffOutlinedIcon } from '@mui/icons-material';
 
 type Props = {
     dragDropMode: boolean;
@@ -17,6 +18,8 @@ type Props = {
     onEditSelectedServants: () => void;
     onOpenColumnSettings: () => void;
     onToggleFilters: () => void;
+    onToggleShowUnsummonedServants: () => void;
+    showUnsummonedServants: boolean;
     selectedServantsCount: number;
 };
 
@@ -35,6 +38,8 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
         onEditSelectedServants,
         onOpenColumnSettings,
         onToggleFilters,
+        onToggleShowUnsummonedServants,
+        showUnsummonedServants,
         selectedServantsCount
     } = props;
 
@@ -73,6 +78,17 @@ export const MasterServantsNavigationRail = React.memo((props: Props) => {
                         children={filtersEnabled ? <FilterAltIcon /> : <FilterAltOutlinedIcon />}
                         size='large'
                         color={filtersEnabled ? 'primary' : undefined}
+                    />
+                </div>
+            </Tooltip>
+            {/* TODO Move this to display and/or filter settings. */}
+            <Tooltip key='unsummoned' title='Toggle unsummoned servants' placement='right'>
+                <div>
+                    <IconButton
+                        onClick={onToggleShowUnsummonedServants}
+                        children={showUnsummonedServants ? <PersonOff /> : <PersonOffOutlinedIcon />}
+                        size='large'
+                        color={showUnsummonedServants ? 'primary' : undefined}
                     />
                 </div>
             </Tooltip>

@@ -364,7 +364,6 @@ export const PlanRoute = React.memo(() => {
         openEditServantDialog(planServant);
     }, [openEditServantDialog]);
 
-
     const handleAddServantButtonClick = useCallback((): void => {
         openEditServantDialog();
     }, [openEditServantDialog]);
@@ -406,6 +405,18 @@ export const PlanRoute = React.memo(() => {
         computePlanRequirements();
         // updateSelectedServants();
     }, [closeEditServantDialog, computePlanRequirements, editServantTarget]);
+
+    /**
+     * TODO This is temporary...will need some changes (delete prompt dialog, etc.)
+     */
+    const handleDeleteServant = useCallback((planServant: Immutable<PlanServant>): void => {
+        const plan = planRef.current!; // Not possible to be null here.
+        const planServants = plan.servants;
+        plan.servants = planServants.filter(servant => servant !== planServant); // Forces child list to re-render
+
+        setDirty(true);
+        computePlanRequirements();
+    }, [computePlanRequirements]);
 
     //#endregion
 
@@ -491,6 +502,7 @@ export const PlanRoute = React.memo(() => {
                             plan={_plan}
                             planRequirements={planRequirementsRef.current!}
                             options={tableOptions}
+                            onDeleteServant={handleDeleteServant}
                             onEditServant={handleEditServant}
                         />
                     </div>

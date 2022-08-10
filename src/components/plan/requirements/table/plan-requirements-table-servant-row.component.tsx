@@ -1,5 +1,5 @@
 import { GameServant, MasterServant, PlanServant } from '@fgo-planner/types';
-import { Edit as EditIcon } from '@mui/icons-material';
+import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, Edit as EditIcon } from '@mui/icons-material';
 import { Box, IconButton, Theme } from '@mui/material';
 import { useTheme } from '@mui/system';
 import React, { ReactNode, useCallback } from 'react';
@@ -16,7 +16,14 @@ type Props = {
     borderTop?: boolean;
     gameServant: Immutable<GameServant>;
     masterServant: Immutable<MasterServant>;
+    /**
+     * @deprecated Remove edit button from servant row
+     */
     onEditServant?: (planServant: Immutable<PlanServant>) => void;
+    /**
+     * @deprecated Remove delete button from servant row
+     */
+    onDeleteServant?: (planServant: Immutable<PlanServant>) => void;
     options: PlanRequirementsTableOptionsInternal;
     planServant: Immutable<PlanServant>;
     servantRequirements: PlanServantRequirements;
@@ -29,6 +36,7 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
         borderTop,
         gameServant,
         masterServant,
+        onDeleteServant,
         onEditServant,
         options,
         planServant,
@@ -45,6 +53,10 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
     const handleEditClick = useCallback(() => {
         onEditServant?.(planServant);
     }, [onEditServant, planServant]);
+
+    const handleDeleteClick = useCallback(() => {
+        onDeleteServant?.(planServant);
+    }, [onDeleteServant, planServant]);
 
     //#endregion
 
@@ -71,6 +83,9 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
             <div>
                 <IconButton onClick={handleEditClick}>
                     <EditIcon />
+                </IconButton>
+                <IconButton color='error' onClick={handleDeleteClick}>
+                    <DeleteForeverOutlinedIcon />
                 </IconButton>
             </div>
         </Box>

@@ -1,5 +1,4 @@
 import { MasterAccount, Plan, PlanServant } from '@fgo-planner/types';
-import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { GameItemConstants } from '../../../../constants';
@@ -15,7 +14,14 @@ import { PlanRequirementsTableServantRow } from './plan-requirements-table-serva
 
 type Props = {
     masterAccount: Immutable<MasterAccount>;
+    /**
+     * @deprecated Remove edit button from servant row
+     */
     onEditServant?: (planServant: Immutable<PlanServant>) => void;
+    /**
+     * @deprecated Remove delete button from servant row
+     */
+    onDeleteServant?: (planServant: Immutable<PlanServant>) => void;
     options: PlanRequirementsTableOptions;
     plan: Plan;
     planRequirements: PlanRequirements;
@@ -63,35 +69,24 @@ const getDisplayedItems = (
 
 export const StyleClassPrefix = 'PlanRequirementsTable';
 
-const StyleProps = (theme: SystemTheme) => {
-    
-    const {
-        palette,
-        spacing
-    } = theme as Theme;
-
-    return {
-        display: 'flex',
-        flexDirection: 'column',
+const StyleProps = () => ({
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    overflow: 'auto',
+    [`& .${StyleClassPrefix}-table-container`]: {
         height: '100%',
         overflow: 'auto',
-        [`& .${StyleClassPrefix}-table-container`]: {
-            height: '100%',
-            overflow: 'auto',
-            /**
-             * PlanRequirementsTableHeader component
-             */
-            [`& .${PlanRequirementsTableHeaderStyleClassPrefix}-root`]: {
-                position: 'sticky',
-                top: 0,
-                zIndex: 3
-            },
-            /**
-             * PlanRequirementsTableFooter component
-             */
+        /**
+         * PlanRequirementsTableHeader component
+         */
+        [`& .${PlanRequirementsTableHeaderStyleClassPrefix}-root`]: {
+            position: 'sticky',
+            top: 0,
+            zIndex: 3
         }
-    } as SystemStyleObject<SystemTheme>;
-};
+    }
+} as SystemStyleObject<SystemTheme>);
 
 export const PlanRequirementsTable = React.memo((props: Props) => {
 
@@ -100,6 +95,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     const {
         masterAccount,
         onEditServant,
+        onDeleteServant,
         options,
         plan,
         planRequirements
@@ -156,6 +152,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 servantRequirements={servantRequirements}
                 options={internalTableOptions}
                 onEditServant={onEditServant}
+                onDeleteServant={onDeleteServant}
                 // TODO Add right click (context) handler
             />
         );

@@ -1,22 +1,22 @@
 import { MasterAccount, MasterServant, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/types';
-import { Add as AddIcon, Clear as ClearIcon, FormatSize as FormatSizeIcon, HideImageOutlined as HideImageOutlinedIcon, Save as SaveIcon } from '@mui/icons-material';
-import { Fab, IconButton, Tooltip } from '@mui/material';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Add as AddIcon, FormatSize as FormatSizeIcon, HideImageOutlined as HideImageOutlinedIcon } from '@mui/icons-material';
+import { IconButton, Theme, Tooltip } from '@mui/material';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import clsx from 'clsx';
 import lodash from 'lodash';
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
-import { FabContainer } from '../../../../components/fab/fab-container.component';
-import { LayoutContentSection, StyleClassPrefix as LayoutContentSectionStyleClassPrefix } from '../../../../components/layout/layout-content-section.component';
+import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
 import { PlanRequirementsTableOptions } from '../../../../components/plan/requirements/table/plan-requirements-table-options.type';
 import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/plan-requirements-table.component';
-import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
+import { ThemeConstants } from '../../../../styles/theme-constants';
 import { PlanRequirements } from '../../../../types/data';
 import { Immutable, ImmutableArray, Nullable } from '../../../../types/internal';
 import { DateTimeUtils } from '../../../../utils/date-time.utils';
@@ -99,38 +99,51 @@ const clonePlan = (plan: Immutable<Plan>): Plan => {
 
 const StyleClassPrefix = 'Plan';
 
-const StyleProps = (theme: Theme) => ({
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    [`& .${StyleClassPrefix}-switch-container`]: {
-        px: 4,
-        mb: -6
-    },
-    [`& .${StyleClassPrefix}-main-content`]: {
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        breakpoints,
+        palette,
+        spacing
+    } = theme as Theme;
+
+    return {
         display: 'flex',
-        flex: '1',
-        width: 'calc(100% - 48px)',
-        [`& .${LayoutContentSectionStyleClassPrefix}-root`]: {
+        flexDirection: 'column',
+        height: '100%',
+        [`& .${StyleClassPrefix}-upper-layout-container`]: {
+
+        },
+        [`& .${StyleClassPrefix}-lower-layout-container`]: {
             display: 'flex',
-            flex: 1,
-            height: 'fit-content',
-            maxHeight: '100%',
-            pr: 4,
-            py: 4
+            height: '100%',
+            overflow: 'hidden',
+            [`& .${StyleClassPrefix}-main-content`]: {
+                display: 'flex',
+                width: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`,
+                [`& .${StyleClassPrefix}-table-container`]: {
+                    flex: 1,
+                    overflow: 'hidden',
+                    // [`& .${MasterServantListStyleClassPrefix}-root`]: {
+                    //     borderRightWidth: 1,
+                    //     borderRightStyle: 'solid',
+                    //     borderRightColor: palette.divider
+                    // }
+                },
+                [`& .${StyleClassPrefix}-info-panel-container`]: {
+                    width: 320,
+                    height: 'calc(100% - 84px)',
+                    pr: 4,
+                    py: 4,
+                    boxSizing: 'border-box',
+                    [breakpoints.down('xl')]: {
+                        width: 300
+                    }
+                }
+            }
         }
-    },
-    [`& .${StyleClassPrefix}-info-panel-container`]: {
-        width: 320,
-        height: 'calc(100% - 84px)',
-        pr: 4,
-        py: 4,
-        boxSizing: 'border-box',
-        [theme.breakpoints.down('xl')]: {
-            width: 300
-        }
-    }
-} as SystemStyleObject<Theme>);
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const PlanRoute = React.memo(() => {
 
@@ -458,45 +471,21 @@ export const PlanRoute = React.memo(() => {
         </Tooltip>,
     ];
 
-    /**
-     * FabContainer children
-     */
-    const fabContainerChildNodes: ReactNode = [
-        <Tooltip key='revert' title='Revert changes'>
-            <div>
-                <Fab
-                    color='default'
-                    onClick={handleRevertButtonClick}
-                    disabled={!dirty || isLoadingIndicatorActive}
-                    children={<ClearIcon />}
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key='save' title='Save changes'>
-            <div>
-                <Fab
-                    color='primary'
-                    onClick={handleSaveButtonClick}
-                    disabled={!dirty || isLoadingIndicatorActive}
-                    children={<SaveIcon />}
-                />
-            </div>
-        </Tooltip>
-    ];
-
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <div className='flex justify-space-between align-center'>
-                <PageTitle children={_plan.name} />
-                {/* TODO Add button to edit plan details */}
+            <div className={`${StyleClassPrefix}-upper-layout-container`}>
+                <RouteDataEditControls
+                    title={_plan.name}
+                    hasUnsavedData={dirty}
+                    onRevertButtonClick={handleRevertButtonClick}
+                    onSaveButtonClick={handleSaveButtonClick}
+                    disabled={isLoadingIndicatorActive}
+                />
             </div>
-            <div className='flex overflow-hidden full-height'>
-                <NavigationRail children={navigationRailChildNodes} />
+            <div className={`${StyleClassPrefix}-lower-layout-container`}>
+                <NavigationRail children={navigationRailChildNodes} border />
                 <div className={`${StyleClassPrefix}-main-content`}>
-                    <LayoutContentSection
-                        autoContentHeight
-                        scrollbarTrackBorder
-                    >
+                    <div className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <PlanRequirementsTable
                             masterAccount={masterAccount}
                             plan={_plan}
@@ -504,10 +493,9 @@ export const PlanRoute = React.memo(() => {
                             options={tableOptions}
                             onEditServant={handleEditServant}
                         />
-                    </LayoutContentSection>
+                    </div>
                 </div>
             </div>
-            <FabContainer children={fabContainerChildNodes} />
             <PlanServantEditDialog
                 dialogTitle={`${!editServantTargetRef.current ? 'Add' : 'Edit'} Servant`}
                 submitButtonLabel='Done'

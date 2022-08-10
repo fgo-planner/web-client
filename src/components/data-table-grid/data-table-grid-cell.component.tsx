@@ -1,5 +1,7 @@
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { styled } from '@mui/system';
+import { styled, Theme as SystemTheme } from '@mui/system';
+import { CSSProperties } from '@mui/styles';
+import { Theme } from '@mui/material';
 
 type Props = {
     backgroundColor?: string;
@@ -8,7 +10,7 @@ type Props = {
     size: number;
 };
 
-const StyleClassPrefix = 'PlanRequirementsTableCell';
+const StyleClassPrefix = 'DataTableGridCell';
 
 const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
     prop !== 'backgroundColor' &&
@@ -25,7 +27,8 @@ const StyleOptions = {
     shouldForwardProp
 } as FilteringStyledOptions<Props>;
 
-export const PlanRequirementsTableCell = styled('div', StyleOptions)<Props>(props => {
+const StyleProps = (props: Props & { theme: SystemTheme }) => {
+
     const {
         backgroundColor,
         bold,
@@ -34,18 +37,23 @@ export const PlanRequirementsTableCell = styled('div', StyleOptions)<Props>(prop
         theme
     } = props;
 
+    const { palette } = theme as Theme;
+
     return {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         width: size,
         height: size,
+        boxSizing: 'border-box',
         backgroundColor,
         color,
         fontSize: Math.ceil(size / 3) + 2,
         fontWeight: bold ? 500 : undefined,
-        borderLeftWidth: 1,
-        borderLeftStyle: 'solid',
-        borderLeftColor: theme.palette.divider,
-    };
-});
+        borderRightWidth: 1,
+        borderRightStyle: 'solid',
+        borderRightColor: palette.divider
+    } as CSSProperties;
+};
+
+export const DataTableGridCell = styled('div', StyleOptions)<Props>(StyleProps);

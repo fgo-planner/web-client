@@ -49,6 +49,9 @@ const StyleProps = (theme: SystemTheme) => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        [`& .${StyleClassPrefix}-upper-layout-container`]: {
+
+        },
         [`& .${StyleClassPrefix}-lower-layout-container`]: {
             display: 'flex',
             height: '100%',
@@ -441,17 +444,18 @@ export const MasterServantsRoute = React.memo(() => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            <RouteDataEditControls
-                title='Servant Roster'
-                hasUnsavedData={isDataDirty}
-                onRevertButtonClick={handleRevertButtonClick}
-                onSaveButtonClick={handleSaveButtonClick}
-                disabled={awaitingRequest}
-            />
-            <MasterServantsFilterControls
-                filtersEnabled={filtersEnabled}
-
-            />
+            <div className={`${StyleClassPrefix}-upper-layout-container`}>
+                <RouteDataEditControls
+                    title='Servant Roster'
+                    hasUnsavedData={isDataDirty}
+                    onRevertButtonClick={handleRevertButtonClick}
+                    onSaveButtonClick={handleSaveButtonClick}
+                    disabled={awaitingRequest}
+                />
+                <MasterServantsFilterControls
+                    filtersEnabled={filtersEnabled}
+                />
+            </div>
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
                 <MasterServantsNavigationRail
                     layout={sm ? 'column' : 'row'}

@@ -222,7 +222,7 @@ export class PlanComputationUtils {
              * Compute the options based on a merge of the plan and servant options.
              */
             const servantOptions = this._parseComputationOptions(planServant);
-            options = this._mergeComputationOptions(options, servantOptions);
+            const mergedOptions = this._mergeComputationOptions(options, servantOptions);
             /*
              * Compute the debt for the servant for the current plan.
              */
@@ -232,7 +232,7 @@ export class PlanComputationUtils {
                 masterServant,
                 planServant,
                 // masterAccountData,
-                options
+                mergedOptions
             );
 
             if (!servantComputationResult) {

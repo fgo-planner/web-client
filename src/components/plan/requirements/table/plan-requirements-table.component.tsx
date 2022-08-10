@@ -166,6 +166,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 />
                 {planServants.map(renderServantRow)}
                 <PlanRequirementsTableFooter
+                    masterAccount={masterAccount}
                     planRequirements={planRequirements}
                     options={internalTableOptions}
                 />

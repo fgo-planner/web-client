@@ -22,7 +22,7 @@ type DragDropHelperHookResult<T> = {
     endDragDrop: () => Array<number> | undefined;
     /**
      * Handles the drag order change event from `react-dnd`. This should be
-     * passed to the `DraggableListRowContainer` or similar component.
+     * passed to the `DataTableListDraggableRow` or similar component.
      */
     handleDragOrderChange: (sourceId: number, destinationId: number) => void;
 };

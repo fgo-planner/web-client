@@ -2,7 +2,7 @@ import { Box, Tooltip } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import NumberFormat from 'react-number-format';
-import { StaticListRowContainer } from '../../../../components/data-table-list/static-list-row-container.component';
+import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
 import { GameItemConstants } from '../../../../constants';
 import { ThemeConstants } from '../../../../styles/theme-constants';
@@ -138,7 +138,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
         const { inventory, used, cost, debt } = stat;
 
         return (
-            <StaticListRowContainer key={itemId} borderBottom={index !== ItemIds.length - 1}>
+            <DataTableListStaticRow key={itemId} borderBottom={index !== ItemIds.length - 1}>
                 <div className={`${StyleClassPrefix}-data-row`}>
                     <div className={`${StyleClassPrefix}-label-cell`}>
                         <GameItemThumbnail
@@ -188,7 +188,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
                         />
                     </div>
                 </div>
-            </StaticListRowContainer>
+            </DataTableListStaticRow>
         );
     };
 

@@ -1,7 +1,7 @@
 import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
-import { DraggableListRowContainer } from '../../../../../../components/data-table-list/draggable-list-row-container.component';
+import { DataTableListDraggableRow } from '../../../../../../components/data-table-list/data-table-list-draggable-row.component';
 import { Immutable, ReadonlyPartial } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
@@ -101,13 +101,14 @@ export const MasterServantListRow = React.memo((props: Props) => {
     );
 
     return (
-        <DraggableListRowContainer
-            className={`${StyleClassPrefix}-root`}
-            stickyContent={servantThumbnailNode}
+        <DataTableListDraggableRow
+            styleClassPrefix={StyleClassPrefix}
+            skipStyle
             draggableId={masterServant.instanceId}
             index={index}
             borderBottom={!lastRow}
             active={active}
+            stickyContent={servantThumbnailNode}
             dragHandleVisible={dragDropMode}
             dragEnabled={dragDropMode}
             onDragOrderChange={onDragOrderChange}
@@ -120,7 +121,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
                 {labelNode}
                 {statsNode}
             </div>
-        </DraggableListRowContainer>
+        </DataTableListDraggableRow>
     );
 
 }, shouldSkipUpdate);

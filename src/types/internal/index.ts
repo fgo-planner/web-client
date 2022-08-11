@@ -36,6 +36,7 @@ export * from './page-metadata.type';
 export * from './position-2d.type';
 export * from './props/component-style-props.type';
 export * from './props/dialog-component-props.type';
+export * from './props/styled-function-props.type';
 export * from './sx-props-function.type';
 export * from './text-field-change-event.type';
 export * from './theme-info.type';

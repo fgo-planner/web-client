@@ -1,12 +1,12 @@
 import { DragIndicator as DragIndicatorIcon, SvgIconComponent } from '@mui/icons-material';
-import { styled, Theme as SystemTheme } from '@mui/system';
+import { FilteringStyledOptions } from '@mui/styled-engine';
+import { styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { ComponentStyleProps } from '../../types/internal';
-import BaseListRowStyle from './data-table-list-row-style';
-import { Theme } from '@mui/material';
-import { CSSProperties } from '@mui/styles';
+import { ComponentStyleProps, StyledFunctionProps } from '../../types/internal';
+import { DataTableListBaseRowStyle } from './data-table-list-base-row.style';
+import { DataTableListDraggableRowStyle, StyleClassPrefix } from './data-table-list-draggable-row.style';
 
 // TODO Add prop for cursor style.
 type Props = PropsWithChildren<{
@@ -20,8 +20,10 @@ type Props = PropsWithChildren<{
     index: number;
     onDragOrderChange?: (sourceId: number, destinationId: number) => void;
     // TODO Add option(s) to hide/disable drag handle.
+    skipStyle?: boolean;
     stickyContent?: ReactNode;
-}> & ComponentStyleProps & DOMAttributes<HTMLDivElement>;
+    styleClassPrefix?: string;
+}> & Pick<ComponentStyleProps, 'className' | 'style'> & DOMAttributes<HTMLDivElement>;
 
 type DragItem = {
     id: number;
@@ -37,43 +39,23 @@ const DragType = 'row';
 
 const DefaultDragHandleIcon = DragIndicatorIcon;
 
-const DraggableProps = (props: { theme: SystemTheme }) => {
-
-    const {
-        palette,
-        spacing
-    } = props.theme as Theme;
-
-    return {
-        '&.draggable': {
-            display: 'flex',
-            alignItems: 'center'
-        },
-        '&.dragging': {
-            borderBottom: `1px solid ${palette.divider}`,
-        },
-        '& .sticky-content': {
-            display: 'flex',
-            alignItems: 'center',
-            '& .drag-handle': {
-                cursor: 'grab',
-                margin: spacing(0, 2),
-                opacity: 0.5,
-                '&.disabled': {
-                    cursor: 'initial',
-                    color: palette.text.disabled
-                }
-            }
-        }
-    } as CSSProperties;
-};
-
-const RootComponent = styled('div')(
-    BaseListRowStyle,
-    DraggableProps
+const shouldForwardProp = (prop: PropertyKey): prop is keyof StyledFunctionProps => (
+    prop !== 'classPrefix' &&
+    prop !== 'forRoot'
 );
 
-export const DraggableListRowContainer = React.memo((props: Props) => {
+const StyledOptions = {
+    skipSx: true,
+    skipVariantsResolver: true,
+    shouldForwardProp
+} as FilteringStyledOptions<StyledFunctionProps>;
+
+const RootComponent = styled('div', StyledOptions)<StyledFunctionProps>(
+    DataTableListBaseRowStyle,
+    DataTableListDraggableRowStyle
+);
+
+export const DataTableListDraggableRow = React.memo((props: Props) => {
 
     const {
         active,
@@ -85,7 +67,9 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
         dragHandleVisible,
         index,
         onDragOrderChange,
+        skipStyle,
         stickyContent,
+        styleClassPrefix = StyleClassPrefix,
         children,
         className,
         ...domAttributes
@@ -138,7 +122,7 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
         }
         if (!dragEnabled) {
             return (
-                <div className={clsx('drag-handle', 'disabled')}>
+                <div className={clsx(`${styleClassPrefix}-drag-handle`, 'disabled')}>
                     <DragHandleIcon />
                 </div>
             );
@@ -146,7 +130,7 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
         return (
             <div
                 ref={connectDrag}
-                className='drag-handle'
+                className={`${styleClassPrefix}-drag-handle`}
                 onClick={handleDragHandleClick}
             >
                 <DragHandleIcon />
@@ -154,28 +138,46 @@ export const DraggableListRowContainer = React.memo((props: Props) => {
         );
     };
 
-    const classNames = clsx(
-        className,
-        'row',
-        'draggable',
-        isDragging && 'dragging',
-        active && 'active',
-        borderTop && 'border-top',
-        borderBottom && 'border-bottom'
+    const stickyContentNode: ReactNode = (
+        <div className={`${styleClassPrefix}-sticky-content`}>
+            {renderDragHandle()}
+            {stickyContent}
+        </div>
     );
 
+    const classNames = clsx(
+        className,
+        `${styleClassPrefix}-root`,
+        `${styleClassPrefix}-draggable`,
+        isDragging && `${styleClassPrefix}-dragging`,
+        active && `${styleClassPrefix}-active`,
+        borderTop && `${styleClassPrefix}-border-top`,
+        borderBottom && `${styleClassPrefix}-border-bottom`
+    );
+
+    if (skipStyle) {
+        return (
+            <div
+                ref={dragRef}
+                // data-handler-id={draggableId}
+                className={classNames}
+                {...domAttributes}
+            >
+                {stickyContentNode}
+                {children}
+            </div>
+        );
+    }
 
     return (
         <RootComponent
             ref={dragRef}
             // data-handler-id={draggableId}
             className={classNames}
+            classPrefix={styleClassPrefix}
             {...domAttributes}
         >
-            <div className='sticky-content'>
-                {renderDragHandle()}
-                {stickyContent}
-            </div>
+            {stickyContentNode}
             {children}
         </RootComponent>
     );

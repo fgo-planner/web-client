@@ -1,27 +1,19 @@
 import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
-import { Theme } from '@mui/material';
-import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { SortDirection, SortOptions } from '../../../../../../types/data';
 import { Immutable, ImmutableArray, ReadonlyPartial } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { SetUtils } from '../../../../../../utils/set.utils';
-import { MasterServantColumnProperties, MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
+import { MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';
-import { StyleClassPrefix as MasterServantListRowBondLevelStyleClassPrefix } from './master-servant-list-row-bond-level.component';
-import { StyleClassPrefix as MasterServantListRowFouLevelStyleClassPrefix } from './master-servant-list-row-fou-level.component';
-import { StyleClassPrefix as MasterServantListRowLabelStyleClassPrefix } from './master-servant-list-row-label.component';
-import { StyleClassPrefix as MasterServantListRowLevelStyleClassPrefix } from './master-servant-list-row-level.component';
-import { StyleClassPrefix as MasterServantListRowNpLevelStyleClassPrefix } from './master-servant-list-row-np-level.component';
-import { StyleClassPrefix as MasterServantListRowSkillLevelStyleClassPrefix } from './master-servant-list-row-skill-level.component';
-import { StyleClassPrefix as MasterServantListRowStatsStyleClassPrefix } from './master-servant-list-row-stats.component';
-import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './master-servant-list-row.component';
+import { MasterServantListRow } from './master-servant-list-row.component';
+import { MasterServantListStyle, StyleClassPrefix } from './master-servant-list.style';
 
 type Props = {
     bondLevels: Record<number, MasterServantBondLevel>;
@@ -54,120 +46,12 @@ type Props = {
     onSortChange?: (column?: MasterServantListColumn, direction?: SortDirection) => void;
 };
 
-export const StyleClassPrefix = 'MasterServantList';
+const StyledOptions = {
+    skipSx: true,
+    skipVariantsResolver: true
+} as MuiStyledOptions;
 
-const StyleProps = (theme: SystemTheme) => {
-
-    const {
-        palette,
-        spacing
-    } = theme as Theme;
-
-    return {
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        [`& .${StyleClassPrefix}-list-container`]: {
-            backgroundColor: palette.background.paper,
-            height: '100%',
-            overflow: 'auto',
-            [`& .${StyleClassPrefix}-list`]: {
-                [`& .${MasterServantListRowStyleClassPrefix}-root`]: {
-                    width: 'fit-content',
-                    minWidth: '100%',
-                    [`& .${MasterServantListRowStyleClassPrefix}-content`]: {
-                        userSelect: 'none',
-                        flex: 1,
-                        display: 'flex',
-                        alignContent: 'center',
-                        alignItems: 'center',
-                        textAlign: 'center',
-                        height: 52,
-                        fontSize: '0.875rem',
-                        [`& .${MasterServantListRowLabelStyleClassPrefix}-root`]: {
-                            display: 'flex',
-                            alignItems: 'center',
-                            width: MasterServantColumnProperties.label.width,
-                            [`& .${MasterServantListRowLabelStyleClassPrefix}-class-icon`]: {
-                                pl: 4
-                            },
-                            [`& .${MasterServantListRowLabelStyleClassPrefix}-rarity`]: {
-                                minWidth: spacing(7),  // 28px
-                                px: 4
-                            }
-                        },
-                        [`& .${MasterServantListRowStatsStyleClassPrefix}-root`]: {
-                            flex: 1,
-                            display: 'flex',
-                            alignItems: 'center',
-                            [`& .${MasterServantListRowNpLevelStyleClassPrefix}-root`]: {
-                                width: MasterServantColumnProperties.npLevel.width,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                '& img': {
-                                    pr: 1,
-                                    width: '18px',
-                                    height: '18px'
-                                }
-                            },
-                            [`& .${MasterServantListRowLevelStyleClassPrefix}-root`]: {
-                                width: MasterServantColumnProperties.level.width,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                '&>.value': {
-                                    width: '28px',
-                                    textAlign: 'right',
-                                    pr: 3
-                                },
-                                '&>img': {
-                                    width: '16px',
-                                    height: '16px'
-                                },
-                                '&>.ascension': {
-                                    width: '16px'
-                                }
-                            },
-                            [`& .${MasterServantListRowFouLevelStyleClassPrefix}-root`]: {
-                                width: MasterServantColumnProperties.fouHp.width
-                            },
-                            [`& .${MasterServantListRowSkillLevelStyleClassPrefix}-root`]: {
-                                width: MasterServantColumnProperties.skills.width,
-                                display: 'flex',
-                                textAlign: 'center',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                '&>.value': {
-                                    width: '1.25rem'
-                                },
-                            },
-                            [`& .${MasterServantListRowBondLevelStyleClassPrefix}-root`]: {
-                                width: MasterServantColumnProperties.bondLevel.width,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                '&>.value': {
-                                    pl: 1.5,
-                                    width: '1.25rem',
-                                    textAlign: 'left'
-                                }
-                            }
-                        }
-                    }
-                },
-                '&:not(.drag-drop-mode)': {
-                    [`& .${GameServantThumbnailStyleClassPrefix}-root`]: {
-                        pl: 3
-                    },
-                    '& .sticky-content': {
-                        left: spacing(-3)
-                    }
-                }
-            }
-        }
-    } as SystemStyleObject<SystemTheme>;
-};
+const RootComponent = styled('div', StyledOptions)(MasterServantListStyle);
 
 export const MasterServantList = React.memo((props: Props) => {
 
@@ -303,7 +187,7 @@ export const MasterServantList = React.memo((props: Props) => {
     };
 
     return (
-        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+        <RootComponent className={`${StyleClassPrefix}-root`}>
             <div className={`${StyleClassPrefix}-list-container`}>
                 {showHeader && <MasterServantListHeader
                     sortEnabled
@@ -319,7 +203,7 @@ export const MasterServantList = React.memo((props: Props) => {
                     </DndProvider>
                 </div>
             </div>
-        </Box>
+        </RootComponent>
     );
 
     //#endregion

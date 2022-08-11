@@ -2,7 +2,7 @@ import { GameItem } from '@fgo-planner/types';
 import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { useCallback, useRef, useState } from 'react';
 import NumberFormat, { NumberFormatValues, SourceInfo } from 'react-number-format';
-import { StaticListRowContainer } from '../../../../components/data-table-list/static-list-row-container.component';
+import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { GameItemConstants } from '../../../../constants';
 import { Immutable } from '../../../../types/internal';
 import { MathUtils } from '../../../../utils/math.utils';
@@ -78,7 +78,7 @@ export const MasterItemListRow = React.memo((props: Props) => {
     );
 
     return (
-        <StaticListRowContainer
+        <DataTableListStaticRow
             className={`${StyleClassPrefix}-root`}
             onClick={handleRowClick}
             active={active}
@@ -89,7 +89,7 @@ export const MasterItemListRow = React.memo((props: Props) => {
             <div>
                 {itemQuantityInputNode}
             </div>
-        </StaticListRowContainer>
+        </DataTableListStaticRow>
     );
 
 });

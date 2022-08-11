@@ -1,5 +1,5 @@
 import React from 'react';
-import { StaticListRowContainer } from '../../../components/data-table-list/static-list-row-container.component';
+import { DataTableListStaticRow } from '../../../components/data-table-list/data-table-list-static-row.component';
 import { GameItemThumbnail } from '../../../components/game/item/game-item-thumbnail.component';
 import { LayoutContentSection } from '../../../components/layout/layout-content-section.component';
 import { AppBarElevateOnScroll } from '../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
@@ -17,7 +17,7 @@ export const GameItemsRoute = React.memo(() => {
             <PageTitle>Item List</PageTitle>
             <LayoutContentSection className='m-4'>
                 {gameItems?.map((gameItem, index) => (
-                    <StaticListRowContainer key={index} borderTop={!!index}>
+                    <DataTableListStaticRow key={index} borderTop={!!index}>
                         <div className='flex align-center'>
                             <GameItemThumbnail
                                 gameItem={gameItem}
@@ -29,7 +29,7 @@ export const GameItemsRoute = React.memo(() => {
                                 {gameItem.name}
                             </div>
                         </div>
-                    </StaticListRowContainer>
+                    </DataTableListStaticRow>
                 ))}
             </LayoutContentSection>
         </AppBarElevateOnScroll>

@@ -1,7 +1,7 @@
 import { BasicMasterAccount } from '@fgo-planner/types';
 import React, { MouseEvent, useCallback } from 'react';
 import NumberFormat from 'react-number-format';
-import { StaticListRowContainer } from '../../../../../components/data-table-list/static-list-row-container.component';
+import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';
 import { TruncateText } from '../../../../../components/text/truncate-text.component';
 import { Immutable } from '../../../../../types/internal';
 import { DateTimeUtils } from '../../../../../utils/date-time.utils';
@@ -50,7 +50,7 @@ export const MasterAccountListRow = React.memo((props: Props) => {
     }, [onDoubleClick, account]);
 
     return (
-        <StaticListRowContainer
+        <DataTableListStaticRow
             className={`${StyleClassPrefix}-root`}
             borderBottom
             active={active}
@@ -76,7 +76,7 @@ export const MasterAccountListRow = React.memo((props: Props) => {
             {modified && <div className={`${StyleClassPrefix}-modified`}>
                 {DateTimeUtils.formatForDataTable(account.updatedAt)}
             </div>}
-        </StaticListRowContainer>
+        </DataTableListStaticRow>
     );
 
 });

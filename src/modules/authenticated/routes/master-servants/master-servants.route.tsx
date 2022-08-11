@@ -15,7 +15,8 @@ import { ExistingMasterServantUpdate, MasterServantUpdate, ModalOnCloseReason } 
 import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
-import { MasterServantList, StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.component';
+import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
+import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
 import { MasterAccountDataEditHookOptions, useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterServantsEditDialog } from './components/master-servants-edit-dialog.component';
 import { MasterServantsFilterControls } from './components/master-servants-filter-controls.component';

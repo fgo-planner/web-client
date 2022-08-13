@@ -3,12 +3,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameItemConstants } from '../../../constants';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
-import { useForceUpdate } from '../../../hooks/utils/use-force-update.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { ExistingMasterServantUpdate, Immutable, ImmutableArray, NewMasterServantUpdate, Nullable, ReadonlyRecord } from '../../../types/internal';
 import { ArrayUtils } from '../../../utils/array.utils';
+import { MapUtils } from '../../../utils/map.utils';
 import { MasterServantUpdateUtils } from '../../../utils/master/master-servant-update.utils';
 import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
+import { ObjectUtils } from '../../../utils/object.utils';
+import { SetUtils } from '../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 
@@ -25,6 +27,40 @@ type MasterAccountDataEditHookIncludeOptions = {
 export type MasterAccountDataEditHookOptions = {
     showAlertOnDirtyUnmount?: boolean;
 } & MasterAccountDataEditHookIncludeOptions;
+
+/**
+ * For internal use only by the hook. Keeps track of the master account data
+ * that have been modified.
+ */
+type MasterAccountEditDirtyData = {
+    bondLevels: boolean;
+    costumes: boolean;
+    items: Set<number>;
+    qp: boolean;
+    servants: Set<number>;
+    /**
+     * This will be `true` if the order of the servants have changed or if any
+     * servants have been added or removed.
+     */
+    servantOrder: boolean;
+    soundtracks: boolean;
+};
+
+/**
+ * Contains unmodified master data, slightly restructured for more efficient
+ * comparison against current edit data to determine what has been modified.
+ */
+type MasterAccountEditReferenceData = {
+    bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
+    costumes: ReadonlySet<number>;
+    items: ReadonlyRecord<number, number>;
+    qp: number;
+    /**
+     * Use a `Map` for this to maintain order of insertion.
+     */
+    servants: ReadonlyMap<number, Immutable<MasterServant>>;
+    soundtracks: ReadonlySet<number>;
+};
 
 type MasterAccountEditData = {
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
@@ -113,6 +149,13 @@ type MasterAccountDataEditHookDataSoundtracksSubset = MasterAccountDataEditHookC
 
 //#region Internal helper/utility functions
 
+const toArray = (idNumbers: IdNumbers): ReadonlyArray<number> => {
+    if (Array.isArray(idNumbers)) {
+        return idNumbers;
+    }
+    return [...idNumbers];
+};
+
 const toSet = (idNumbers: IdNumbers): ReadonlySet<number> => {
     if (idNumbers instanceof Set) {
         return idNumbers;
@@ -122,11 +165,11 @@ const toSet = (idNumbers: IdNumbers): ReadonlySet<number> => {
 
 const getDefaultMasterAccountEditData = (): MasterAccountEditData => ({
     bondLevels: {},
-    costumes: new Set<number>(),
+    costumes: SetUtils.emptySet(),
     items: {},
     qp: 0,
     servants: [],
-    soundtracks: new Set<number>()
+    soundtracks: SetUtils.emptySet()
 });
 
 const cloneMasterAccountDataForEdit = (
@@ -141,8 +184,11 @@ const cloneMasterAccountDataForEdit = (
         result.costumes = new Set(masterAccount.costumes);
     }
     if (options.includeItems) {
-        const items = masterAccount.resources.items;
-        result.items = ArrayUtils.mapArrayToObject(items, item => item.itemId, item => item.quantity);
+        result.items = ArrayUtils.mapArrayToObject(
+            masterAccount.resources.items,
+            item => item.itemId,
+            item => item.quantity
+        );
         result.qp = masterAccount.resources.qp;
     }
     if (options.includeServants) {
@@ -153,6 +199,96 @@ const cloneMasterAccountDataForEdit = (
         result.soundtracks = new Set(masterAccount.soundtracks);
     }
     return result;
+};
+
+const getDefaultMasterAccountReferenceData = (): MasterAccountEditReferenceData => ({
+    bondLevels: {},
+    costumes: SetUtils.emptySet(),
+    items: {},
+    qp: 0,
+    servants: MapUtils.emptyMap(),
+    soundtracks: SetUtils.emptySet()
+});
+
+const cloneMasterAccountDataForReference = (
+    masterAccount: Nullable<Immutable<MasterAccount>>,
+    options: MasterAccountDataEditHookIncludeOptions
+): Readonly<MasterAccountEditReferenceData> => {
+    const result = getDefaultMasterAccountReferenceData();
+    if (!masterAccount) {
+        return result;
+    }
+    if (options.includeCostumes) {
+        result.costumes = new Set(masterAccount.costumes);
+    }
+    if (options.includeItems) {
+        result.items = ArrayUtils.mapArrayToObject(
+            masterAccount.resources.items,
+            item => item.itemId,
+            item => item.quantity
+        );
+        result.qp = masterAccount.resources.qp;
+    }
+    if (options.includeServants) {
+        result.bondLevels = masterAccount.bondLevels;
+        result.servants = ArrayUtils.mapArrayToMap(
+            masterAccount.servants,
+            MasterServantUtils.getInstanceId,
+            MasterServantUtils.clone
+        );
+    }
+    if (options.includeSoundtracks) {
+        result.soundtracks = new Set(masterAccount.soundtracks);
+    }
+    return result;
+};
+
+const getDefaultMasterAccountEditDirtyData = (): MasterAccountEditDirtyData => ({
+    bondLevels: false,
+    costumes: false,
+    items: new Set(),
+    qp: false,
+    servants: new Set(),
+    servantOrder: false,
+    soundtracks: false
+});
+
+const isDataDirty = (dirtyData: MasterAccountEditDirtyData): boolean => (
+    !!(
+        dirtyData.bondLevels ||
+        dirtyData.costumes ||
+        dirtyData.items.size ||
+        dirtyData.qp ||
+        dirtyData.servants.size ||
+        dirtyData.servantOrder ||
+        dirtyData.soundtracks
+    )
+);
+
+const isServantsChanged = (
+    reference: Immutable<MasterServant> | undefined,
+    servant: Immutable<MasterServant>
+): boolean => {
+    if (!reference) {
+        return true;
+    }
+    return !MasterServantUtils.isEqual(reference, servant);
+};
+const isServantsOrderChanged = (
+    reference: ReadonlyMap<number, Immutable<MasterServant>>,
+    servants: Array<Immutable<MasterServant>>
+): boolean => {
+    if (reference.size !== servants.length) {
+        return true;
+    }
+    const referenceInstanceIds = reference.keys();
+    let index = 0; 
+    for (const referenceInstanceId of referenceInstanceIds) {
+        if (referenceInstanceId !== servants[index++].instanceId) {
+            return true;
+        }
+    }
+    return false;
 };
 
 //#endregion
@@ -221,8 +357,6 @@ export function useMasterAccountDataEditHook(
     }: MasterAccountDataEditHookOptions = {}
 ): MasterAccountDataEditHookData {
 
-    const forceUpdate = useForceUpdate();
-
     const { invokeLoadingIndicator, resetLoadingIndicator } = useLoadingIndicator();
 
     const masterAccountService = useInjectable(MasterAccountService);
@@ -238,11 +372,16 @@ export function useMasterAccountDataEditHook(
     const [editData, setEditData] = useState<MasterAccountEditData>(getDefaultMasterAccountEditData);
 
     /**
-     * Whether the edit data has been modified.
-     * 
-     * TODO Track changes properly
+     * Another transformed copy of the master account data, for use as a reference
+     * in determining whether data has been changed. This set of data will not be
+     * modified.
      */
-    const [isDataDirty, setIsDataDirty] = useState<boolean>(false);
+    const [referenceData, setReferenceData] = useState<Readonly<MasterAccountEditReferenceData>>(getDefaultMasterAccountReferenceData);
+
+    /**
+     * Tracks touched/dirty data.
+     */
+    const [dirtyData, setDirtyData] = useState<MasterAccountEditDirtyData>(getDefaultMasterAccountEditDirtyData);
 
     /**
      * Reconstruct the include options in a new object using `useMemo` so that it
@@ -256,7 +395,7 @@ export function useMasterAccountDataEditHook(
         includeSoundtracks
     }), [includeCostumes, includeItems, includeServants, includeSoundtracks]);
 
-    /*
+    /**
      * Master account change subscription.
      */
     useEffect(() => {
@@ -264,9 +403,11 @@ export function useMasterAccountDataEditHook(
             .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(masterAccount => {
                 const editData = cloneMasterAccountDataForEdit(masterAccount, includeOptions);
+                const referenceData = cloneMasterAccountDataForReference(masterAccount, includeOptions);
                 setEditData(editData);
+                setReferenceData(referenceData);
+                setDirtyData(getDefaultMasterAccountEditDirtyData());
                 setMasterAccount(masterAccount);
-                setIsDataDirty(false);
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
@@ -279,10 +420,17 @@ export function useMasterAccountDataEditHook(
         if (!includeCostumes) {
             return;
         }
+        /**
+         * Construct a new `Set` here instead of using `toSet` to remove the possibility
+         * the passed `costumeIds` (if it is a `Set`) from being modified externally.
+         */
         editData.costumes = new Set(costumeIds);
-        setIsDataDirty(true); // TODO Track changes properly
-        forceUpdate();
-    }, [editData, forceUpdate, includeCostumes]);
+        const isDirty = !SetUtils.isEqual(editData.costumes, referenceData.costumes);
+        setDirtyData(dirtyData => ({
+            ...dirtyData,
+            costumes: isDirty
+        }));
+    }, [editData, referenceData.costumes, includeCostumes]);
 
     const updateQp = useCallback((amount: number): void => {
         if (!includeItems) {
@@ -292,9 +440,12 @@ export function useMasterAccountDataEditHook(
             return;
         }
         editData.qp = amount;
-        setIsDataDirty(true); // TODO Track changes properly
-        forceUpdate();
-    }, [editData, forceUpdate, includeItems]);
+        const isDirty = amount !== referenceData.qp;
+        setDirtyData(dirtyData => ({
+            ...dirtyData,
+            qp: isDirty
+        }));
+    }, [editData, referenceData.qp, includeItems]);
 
     const updateItem = useCallback((itemId: number, quantity: number): void => {
         if (!includeItems) {
@@ -302,75 +453,98 @@ export function useMasterAccountDataEditHook(
         }
         if (itemId === GameItemConstants.QpItemId) {
             updateQp(quantity);
-        } else {
-            let currentQuantity = editData.items[itemId];
-            /*
-             * If the user data doesn't have an entry for the item yet, then it will be
-             * added with an initial value of zero.
-             *
-             * Note that this is only added to the edit data; the user will still have to
-             * save the changes to persist the new entry.
-             *
-             * Also note that if the quantity is being updated to zero, the it will not be
-             * considered a change, and the data will not be marked as dirty from the
-             * update.
-             */
-            if (currentQuantity === undefined) {
-                editData.items = {
-                    ...editData.items,
-                    [itemId]: currentQuantity = 0
-                };
-            }
-            if (currentQuantity === quantity) {
-                return;
-            }
+            return;
+        }
+        let currentQuantity = editData.items[itemId];
+        /**
+         * If the user data doesn't have an entry for the item yet, then it will be
+         * added with an initial value of zero.
+         *
+         * Note that this is only added to the edit data; the user will still have to
+         * save the changes to persist the new entry.
+         *
+         * Also note that if the quantity is being updated to zero, the it will not be
+         * considered a change, and the data will not be marked as dirty from the
+         * update.
+         */
+        if (currentQuantity === undefined) {
             editData.items = {
                 ...editData.items,
-                [itemId]: quantity
+                [itemId]: currentQuantity = 0
             };
-            setIsDataDirty(true); // TODO Track changes properly
-            forceUpdate();
         }
-    }, [editData, forceUpdate, includeItems, updateQp]);
+        if (currentQuantity === quantity) {
+            return;
+        }
+        editData.items = {
+            ...editData.items,
+            [itemId]: quantity
+        };
+        const isDirty = quantity !== (referenceData.items[itemId] || 0);
+        setDirtyData(dirtyData => {
+            const dirtyItems = dirtyData.items;
+            if (isDirty) {
+                dirtyItems.add(itemId);
+            } else {
+                dirtyItems.delete(itemId);
+            }
+            return { ...dirtyData };
+        });
+    }, [editData, referenceData.items, includeItems, updateQp]);
 
     const addServants = useCallback((servantIds: IdNumbers, servantData: NewMasterServantUpdate): void => {
         if (!includeServants) {
             return;
         }
         const {
-            servants,
-            bondLevels,
+            servants: currentServants,
+            bondLevels: currentBondLevels,
             // unlockedCostumes
         } = editData;
 
         /**
          * Computed instance ID for the new servant.
          */
-        let instanceId = MasterServantUtils.getLastInstanceId(servants) + 1;
-
+        let instanceId = MasterServantUtils.getLastInstanceId(currentServants) + 1;
         /**
-         * Updated servants array. A new array is constructed for this to conform with
-         * the hook specifications.
+         * New object for the bond level data. A new object is constructed for this to
+         * conform with the hook specifications.
          */
-        const updatedServants = [...servants];
-
+        const bondLevels = { ...currentBondLevels };
         /**
          * Construct new instance of a `MasterServant` object for each `servantId` and
-         * add to the updated servants array.
+         * add to an array.
          */
-        for (const servantId of servantIds) {
+        const newServants = toArray(servantIds).map(servantId => {
             const newServant = MasterServantUtils.instantiate(instanceId++);
             MasterServantUpdateUtils.applyFromUpdateObject(newServant, servantData, bondLevels);
             newServant.gameId = servantId;
 
-            updatedServants.push(newServant);
-        };
+            return newServant;
+        });
+        /**
+         * Updated servants array. A new array is constructed for this to conform
+         * with the hook specifications.
+         */
+        const servants = [...currentServants, ...newServants];
 
-        editData.servants = updatedServants;
+        editData.servants = servants;
+        editData.bondLevels = bondLevels;
         // TODO Also update the unlocked costumes.
-        setIsDataDirty(true); // TODO Track changes properly
-        forceUpdate();
-    }, [editData, forceUpdate, includeServants]);
+
+        const isBondLevelsDirty = !ObjectUtils.isShallowEquals(referenceData.bondLevels, bondLevels);
+        setDirtyData(dirtyData => {
+            const dirtyServants = dirtyData.servants;
+            for (const { instanceId } of newServants) {
+                dirtyServants.add(instanceId);
+            }
+            return {
+                ...dirtyData,
+                servantOrder: true,
+                bondLevels: isBondLevelsDirty
+            };
+        });
+    }, [editData, includeServants, referenceData.bondLevels]);
 
     const addServant = useCallback((servantData: NewMasterServantUpdate): void => {
         addServants([servantData.gameId], servantData);
@@ -381,26 +555,36 @@ export function useMasterAccountDataEditHook(
             return;
         }
         const {
-            servants,
-            bondLevels,
+            servants: currentServants,
+            bondLevels: currentBondLevels,
             // unlockedCostumes
         } = editData;
 
         const instanceIdSet = toSet(instanceIds);
 
         /**
-         * Updated servants array. A new array is constructed for this to conform with
-         * the hook specifications.
+         * New array for the servants data. A new array is constructed for this to
+         * conform with the hook specifications.
          */
-        const updatedServants = [];
+        const servants = [];
+        /**
+         * New object for the bond level data. A new object is constructed for this to
+         * conform with the hook specifications.
+         */
+        const bondLevels = { ...currentBondLevels };
+        /**
+         * Keeps track of the dirty states of the updated servants.
+         */
+        const isDirties: Record<number, boolean> = {};
 
-        for (const servant of servants) {
-            /*
-             * If the servant is not an update target, then just add it to the new array and
+        for (const servant of currentServants) {
+            const {instanceId} = servant;
+            /**
+             * If the servant is not an update target, then just push to new array and
              * continue.
              */
-            if (!instanceIdSet.has(servant.instanceId)) {
-                updatedServants.push(servant);
+            if (!instanceIdSet.has(instanceId)) {
+                servants.push(servant);
                 continue;
             }
             /*
@@ -409,49 +593,73 @@ export function useMasterAccountDataEditHook(
              */
             const targetServant = MasterServantUtils.clone(servant);
             MasterServantUpdateUtils.applyFromUpdateObject(targetServant, update, bondLevels);
-            
-            updatedServants.push(targetServant);
+
+            const referenceServant = referenceData.servants.get(instanceId);
+            const isDirty = isServantsChanged(referenceServant, targetServant);
+            isDirties[instanceId] = isDirty;
+
+            servants.push(targetServant);
         }
 
-        editData.servants = updatedServants;
+        editData.servants = servants;
+        editData.bondLevels = bondLevels;
         // TODO Also update the unlocked costumes.
-        setIsDataDirty(true); // TODO Track changes properly
-        forceUpdate();
-    }, [editData, forceUpdate, includeServants]);
+
+        const isBondLevelsDirty = !ObjectUtils.isShallowEquals(referenceData.bondLevels, bondLevels);
+        setDirtyData(dirtyData => {
+            const dirtyServants = dirtyData.servants;
+            for (const [key, isDirty] of Object.entries(isDirties)) {
+                const instanceId = Number(key);
+                if (isDirty) {
+                    dirtyServants.add(instanceId);
+                } else {
+                    dirtyServants.delete(instanceId);
+                }
+            }
+            return {
+                ...dirtyData,
+                bondLevels: isBondLevelsDirty
+            };
+        });
+    }, [includeServants, editData, referenceData.bondLevels, referenceData.servants]);
 
     const updateServantOrder = useCallback((instanceIds: ReadonlyArray<number>): void => {
         if (!includeServants) {
             return;
         }
-        const { servants } = editData;
+        const { servants: currentServants } = editData;
 
         /**
-         * Updated servants array. A new array is constructed for this to conform with
-         * the hook specifications.
+         * New array for the servants data. A new array is constructed for this to
+         * conform with the hook specifications.
          */
-        const updatedServants = [];
+        const servants = [];
 
         /**
          * TODO This is an n^2 operation, may need some optimizations if servant list
          * gets too big.
          */
         for (const instanceId of instanceIds) {
-            const index = servants.findIndex(servant => servant.instanceId === instanceId);
+            const index = currentServants.findIndex(servant => servant.instanceId === instanceId);
             if (index !== -1) {
-                updatedServants.push(servants[index]);
+                servants.push(currentServants[index]);
             }
         }
 
-        editData.servants = updatedServants;
-        setIsDataDirty(true); // TODO Track changes properly
-        forceUpdate();
-    }, [editData, forceUpdate, includeServants]);
+        editData.servants = servants;
+
+        const isOrderDirty = isServantsOrderChanged(referenceData.servants, servants);
+        setDirtyData(dirtyData => ({
+            ...dirtyData,
+            servantOrder: isOrderDirty
+        }));
+    }, [editData, referenceData.servants, includeServants]);
 
     const deleteServants = useCallback((instanceIds: IdNumbers): void => {
         if (!includeServants) {
             return;
         }
-        const { servants } = editData;
+        const { servants: currentServants } = editData;
 
         const instanceIdSet = toSet(instanceIds);
 
@@ -459,27 +667,54 @@ export function useMasterAccountDataEditHook(
          * Updated servants array. A new array is constructed for this to conform with
          * the hook specifications.
          */
-        const updatedServants = servants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
+        const servants = currentServants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
 
-        editData.servants = updatedServants;
+        editData.servants = servants;
         // TODO Also remove bond/costume data if the last instance of the servant is removed.
-        setIsDataDirty(true); // TODO Track changes properly
-        forceUpdate();
-    }, [editData, forceUpdate, includeServants]);
+
+        const referenceServants = referenceData.servants;
+        const isOrderDirty = isServantsOrderChanged(referenceServants, servants);
+        setDirtyData(dirtyData => {
+            const dirtyServants = dirtyData.servants;
+            for (const instanceId of instanceIds) {
+                /**
+                 * If the reference data doesn't contain a servant with this `instanceId`, that
+                 * means it was newly added. In this case, removing the servant should also
+                 * reset its dirty state.
+                 */
+                if (!referenceServants.has(instanceId)) {
+                    dirtyServants.delete(instanceId);
+                } else {
+                    dirtyServants.add(instanceId);
+                }
+            }
+            return {
+                ...dirtyData,
+                servantOrder: isOrderDirty
+            };
+        });
+    }, [editData, referenceData.servants, includeServants]);
 
     const updateSoundtracks = useCallback((soundtrackIds: IdNumbers): void => {
         if (!includeSoundtracks) {
             return;
         }
+        /**
+         * Construct a new `Set` here instead of using `toSet` to remove the possibility
+         * the passed `soundtrackIds` (if it is a `Set`) from being modified externally.
+         */
         editData.soundtracks = new Set(soundtrackIds);
-        setIsDataDirty(true); // TODO Track changes properly
-        forceUpdate();
-    }, [editData, forceUpdate, includeSoundtracks]);
+        const isDirty = !SetUtils.isEqual(editData.soundtracks, referenceData.soundtracks);
+        setDirtyData(dirtyData => ({
+            ...dirtyData,
+            soundtracks: isDirty
+        }));
+    }, [editData, referenceData.soundtracks, includeSoundtracks]);
 
     const revertChanges = useCallback((): void => {
         const editData = cloneMasterAccountDataForEdit(masterAccount, includeOptions);
         setEditData(editData);
-        setIsDataDirty(false);
+        setDirtyData(getDefaultMasterAccountEditDirtyData());
     }, [includeOptions, masterAccount]);
 
     //#endregion
@@ -492,11 +727,16 @@ export function useMasterAccountDataEditHook(
             return;
         }
         invokeLoadingIndicator();
-        // TODO Only update dirty data types
         const update: Partial<MasterAccount> = {
             _id: masterAccount._id
         };
-        if (includeItems) {
+        /**
+         * Unfortunately, partial update is only supported at the root level, so if only
+         * one nested data point is update, the entire root level object has to be
+         * included. For example, if only the `qp` value was update, the rest of the
+         * `resources` object will still have to be included in the update.
+         */
+        if (includeItems && (dirtyData.items.size || dirtyData.qp)) {
             update.resources = {
                 ...masterAccount.resources,
                 items: Object.entries(editData.items).map(([itemId, quantity]) => ({ itemId: Number(itemId), quantity })),
@@ -504,19 +744,23 @@ export function useMasterAccountDataEditHook(
             };
         }
         if (includeServants) {
-            update.servants = [
-                ...(editData.servants as Array<MasterServant>)
-            ];
-            update.bondLevels = {
-                ...editData.bondLevels
-            };
+            if (dirtyData.servants.size || dirtyData.servantOrder) {
+                update.servants = [
+                    ...(editData.servants as Array<MasterServant>)
+                ];
+            }
+            if (dirtyData.bondLevels) {
+                update.bondLevels = {
+                    ...editData.bondLevels
+                };
+            }
         }
-        if (includeCostumes) {
+        if (includeCostumes && dirtyData.costumes) {
             update.costumes = [
                 ...editData.costumes
             ];
         }
-        if (includeSoundtracks) {
+        if (includeSoundtracks && dirtyData.soundtracks) {
             update.soundtracks = [
                 ...editData.soundtracks
             ];
@@ -534,6 +778,7 @@ export function useMasterAccountDataEditHook(
         }
     }, [
         editData,
+        dirtyData,
         includeCostumes,
         includeItems,
         includeServants,
@@ -548,7 +793,7 @@ export function useMasterAccountDataEditHook(
 
     return {
         masterAccountId: masterAccount?._id,
-        isDataDirty,
+        isDataDirty: isDataDirty(dirtyData),
         masterAccountEditData: editData,
         updateCostumes,
         updateItem,

@@ -7,7 +7,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { SortDirection, SortOptions } from '../../../../../../types/data';
-import { Immutable, ImmutableArray, ReadonlyPartial } from '../../../../../../types/internal';
+import { Immutable, ImmutableArray, ReadonlyPartial, ReadonlyRecord } from '../../../../../../types/internal';
 import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
 import { SetUtils } from '../../../../../../utils/set.utils';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
@@ -16,7 +16,7 @@ import { MasterServantListRow } from './master-servant-list-row.component';
 import { MasterServantListStyle, StyleClassPrefix } from './master-servant-list.style';
 
 type Props = {
-    bondLevels: Record<number, MasterServantBondLevel>;
+    bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
      * rearrange the default ordering of the list. As such, when in drag-drop mode,

@@ -1,5 +1,7 @@
 export class MapUtils {
 
+    private static readonly _EmptyMap = new Map<any, any>() as ReadonlyMap<any, any>;
+
     private constructor () {
         
     }
@@ -17,6 +19,10 @@ export class MapUtils {
         }
         map.set(key, value);
         return value;
+    }
+
+    static emptyMap<K, V>(): ReadonlyMap<K, V> {
+        return this._EmptyMap;
     }
 
 }

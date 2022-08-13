@@ -32,6 +32,34 @@ export class ArrayUtils {
         return result;
     }
 
+    static mapArrayToMap<T, K extends string | number | symbol>(
+        arr: ReadonlyArray<T>,
+        keyFunc: (elem: T) => K
+    ): Map<K, T>;
+
+    static mapArrayToMap<T, K extends string | number | symbol, V>(
+        arr: ReadonlyArray<T>,
+        keyFunc: (elem: T) => K,
+        valueFunc: (elem: T) => V
+    ): Map<K, V>;
+
+    static mapArrayToMap<T, K extends string | number | symbol, V>(
+        arr: ReadonlyArray<T>,
+        keyFunc: (elem: T) => K,
+        valueFunc?: (elem: T) => V
+    ): Map<K, T | V> {
+        const result = new Map<K, V | T>();
+        for (const elem of arr) {
+            const key = keyFunc(elem);
+            if (valueFunc) {
+                result.set(key, valueFunc(elem));
+            } else {
+                result.set(key, elem);
+            }
+        }
+        return result;
+    }
+
     /**
      * Swaps two elements of the given array at the given indexes. The original
      * array is modified in-place.

@@ -228,7 +228,7 @@ export class MasterServantUpdateUtils {
      */
     static convertToMasterServant(
         instanceId: number,
-        masterServantUpdate: MasterServantUpdate,
+        masterServantUpdate: Immutable<MasterServantUpdate>,
         bondLevels: Record<number, MasterServantBondLevel>,
         // unlockedCostumes: Array<number>
     ): MasterServant {
@@ -244,21 +244,21 @@ export class MasterServantUpdateUtils {
 
     static applyFromUpdateObject(
         masterServant: MasterServant,
-        masterServantUpdate: MasterServantUpdate,
+        masterServantUpdate: Immutable<MasterServantUpdate>,
         bondLevels: Record<number, MasterServantBondLevel>,
         // unlockedCostumes: Array<number>
     ): void;
 
     static applyFromUpdateObject(
         masterServants: Array<MasterServant>,
-        masterServantUpdate: MasterServantUpdate,
+        masterServantUpdate: Immutable<MasterServantUpdate>,
         bondLevels: Record<number, MasterServantBondLevel>,
         // unlockedCostumes: Array<number>
     ): void;
 
     static applyFromUpdateObject(
         target: Array<MasterServant> | MasterServant,
-        masterServantUpdate: MasterServantUpdate,
+        masterServantUpdate: Immutable<MasterServantUpdate>,
         bondLevels: Record<number, MasterServantBondLevel>,
         // unlockedCostumes: Array<number>
     ): void {
@@ -273,7 +273,7 @@ export class MasterServantUpdateUtils {
 
     private static _applyFromUpdateObject(
         target: MasterServant,
-        masterServantUpdate: MasterServantUpdate,
+        masterServantUpdate: Immutable<MasterServantUpdate>,
         bondLevels: Record<number, MasterServantBondLevel>,
         // unlockedCostumes: Array<number>
     ): void {

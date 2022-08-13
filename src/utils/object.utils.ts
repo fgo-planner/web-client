@@ -1,3 +1,5 @@
+import { ReadonlyRecord } from '../types/internal';
+
 export class ObjectUtils {
 
     private constructor () {
@@ -18,7 +20,7 @@ export class ObjectUtils {
         return obj[key] = value;
     }
 
-    static isShallowEquals(a: Record<string, any>, b: Record<string, any>): boolean {
+    static isShallowEquals(a: ReadonlyRecord<string, any>, b: ReadonlyRecord<string, any>): boolean {
         for (const key of Object.keys(a)) {
             if (!(key in b) || a[key] !== b[key]) {
                 return false;

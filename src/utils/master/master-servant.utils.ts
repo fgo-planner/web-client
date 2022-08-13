@@ -153,4 +153,25 @@ export class MasterServantUtils {
         return GameServantConstants.MinLevel;
     }
 
+    /**
+     * Compares two `MasterServants` object to determine their equality. Assumes
+     * that their `instanceId` and `gameId` fields are already equal; this method
+     * will ignore both fields in the comparison.
+     */
+    static isEqual(a: Immutable<MasterServant>, b: Immutable<MasterServant>): boolean {
+        return a.summoned === b.summoned &&
+            (a.summonDate as Date)?.getTime() === (b.summonDate as Date)?.getTime() &&
+            a.np === b.np &&
+            a.level === b.level &&
+            a.ascension === b.ascension &&
+            a.fouAtk === b.fouAtk &&
+            a.fouHp === b.fouHp &&
+            a.skills[1] === b.skills[1] &&
+            a.skills[2] === b.skills[2] &&
+            a.skills[3] === b.skills[3] &&
+            a.appendSkills[1] === b.appendSkills[1] &&
+            a.appendSkills[2] === b.appendSkills[2] &&
+            a.appendSkills[3] === b.appendSkills[3];
+    }
+
 }

@@ -4,12 +4,15 @@ import { StorageKeys } from '../../../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../../utils/subscription/subscription-topics';
+import { MasterServantEditTab } from '../../../components/master/servant/edit/master-servant-edit.component';
 
 //#region Default values
 
 const FiltersEnabledDefault = false;
 
 const InfoPanelOpenDefault = true;
+
+const ServantEditDialogActiveTabDefault = 'general';
 
 const ShowUnsummonedServantsDefault = true;
 
@@ -22,6 +25,7 @@ const ShowUnsummonedServantsDefault = true;
 type MasterServantsLocalUserPreferences = {
     filtersEnabled: boolean;
     infoPanelOpen: boolean;
+    servantEditDialogActiveTab: MasterServantEditTab;
     showUnsummonedServants: boolean;
 };
 
@@ -35,6 +39,7 @@ export type MasterServantsUserPreferencesHookResult = {
      */
     userPreferences: Immutable<MasterServantsUserPreferences>;
 
+    setServantEditDialogActiveTab: (tab: MasterServantEditTab) => void;
     toggleFilters: () => void;
     toggleInfoPanelOpen: () => void;
     toggleShowUnsummonedServants: () => void;
@@ -50,6 +55,7 @@ const StorageKey = StorageKeys.LocalUserPreference.Route.MasterServants;
 const getDefaultLocalUserPreferences = (): MasterServantsLocalUserPreferences => ({
     filtersEnabled: FiltersEnabledDefault,
     infoPanelOpen: InfoPanelOpenDefault,
+    servantEditDialogActiveTab: ServantEditDialogActiveTabDefault,
     showUnsummonedServants: ShowUnsummonedServantsDefault
 });
 
@@ -59,12 +65,16 @@ const getDefaultUserPreferences = (): MasterServantsUserPreferences => ({
 
 const readUserPreferencesFromLocalStorage = (): MasterServantsUserPreferences => {
     try {
-        const localStorageData = StorageUtils.getItem<MasterServantsLocalUserPreferences>(StorageKey, getDefaultLocalUserPreferences);
+        const localStorageData = StorageUtils.getItem<Partial<MasterServantsLocalUserPreferences>>(
+            StorageKey, 
+            getDefaultLocalUserPreferences
+        );
         // const accountSpecificData = getLocalStorageAccountSpecificData(localStorageData, masterAccountId);
         return {
-            filtersEnabled: !!localStorageData.filtersEnabled,
-            infoPanelOpen: !!localStorageData.infoPanelOpen,
-            showUnsummonedServants: !!localStorageData.showUnsummonedServants
+            filtersEnabled: localStorageData.filtersEnabled ?? FiltersEnabledDefault,
+            infoPanelOpen: localStorageData.infoPanelOpen ?? InfoPanelOpenDefault,
+            servantEditDialogActiveTab: localStorageData.servantEditDialogActiveTab || ServantEditDialogActiveTabDefault,
+            showUnsummonedServants: localStorageData.showUnsummonedServants ?? ShowUnsummonedServantsDefault
         };
     } catch (e) {
         console.error(`Error reading ${StorageKey.key} value from local storage, using default value.`);
@@ -73,12 +83,7 @@ const readUserPreferencesFromLocalStorage = (): MasterServantsUserPreferences =>
 };
 
 const writeUserPreferencesToLocalStorage = (userPreferences: MasterServantsUserPreferences): MasterServantsUserPreferences => {
-
-    const {
-        ...updatedLocalStorageData
-    } = userPreferences;
-
-    StorageUtils.setItem<MasterServantsLocalUserPreferences>(StorageKey, updatedLocalStorageData);
+    StorageUtils.setItem<MasterServantsLocalUserPreferences>(StorageKey, userPreferences);
     return userPreferences;
 };
 
@@ -118,38 +123,45 @@ export const useMasterServantsUserPreferencesHook = (masterAccountId?: string): 
         setUserPreferences(userPreferences);
     }, []);
 
+    const setServantEditDialogActiveTab = useCallback((tab: MasterServantEditTab): void => {
+        setUserPreferences(userPreferences => {
+            return writeUserPreferencesToLocalStorage({
+                ...userPreferences,
+                servantEditDialogActiveTab: tab
+            });
+        });
+    }, []);
+
     const toggleFilters = useCallback((): void => {
-        setUserPreferences((userPreferences: MasterServantsUserPreferences) => {
-            const updatedUserPreferences = {
+        setUserPreferences(userPreferences => {
+            return writeUserPreferencesToLocalStorage({
                 ...userPreferences,
                 filtersEnabled: !userPreferences.filtersEnabled
-            };
-            return writeUserPreferencesToLocalStorage(updatedUserPreferences);
+            });
         });
     }, []);
 
     const toggleInfoPanelOpen = useCallback((): void => {
-        setUserPreferences((userPreferences: MasterServantsUserPreferences) => {
-            const updatedUserPreferences = {
+        setUserPreferences(userPreferences => {
+            return writeUserPreferencesToLocalStorage({
                 ...userPreferences,
                 infoPanelOpen: !userPreferences.infoPanelOpen
-            };
-            return writeUserPreferencesToLocalStorage(updatedUserPreferences);
+            });
         });
     }, []);
 
     const toggleShowUnsummonedServants = useCallback((): void => {
-        setUserPreferences((userPreferences: MasterServantsUserPreferences) => {
-            const updatedUserPreferences = {
+        setUserPreferences(userPreferences => {
+            return writeUserPreferencesToLocalStorage({
                 ...userPreferences,
                 showUnsummonedServants: !userPreferences.showUnsummonedServants
-            };
-            return writeUserPreferencesToLocalStorage(updatedUserPreferences);
+            });
         });
     }, []);
 
     return {
         userPreferences,
+        setServantEditDialogActiveTab,
         toggleFilters,
         toggleInfoPanelOpen,
         toggleShowUnsummonedServants

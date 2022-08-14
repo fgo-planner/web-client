@@ -4,9 +4,10 @@ import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { DialogComponentProps, MasterServantUpdate, ReadonlyRecord } from '../../../../../types/internal';
-import { MasterServantEdit } from '../../../components/master/servant/edit/master-servant-edit.component';
+import { MasterServantEdit, MasterServantEditTab } from '../../../components/master/servant/edit/master-servant-edit.component';
 
 type Props = {
+    activeTab: MasterServantEditTab;
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     /**
      * Whether multiple servants are being edited. In this mode, various parameters
@@ -20,7 +21,7 @@ type Props = {
      * If this is `undefined`, then the dialog will remain closed.
      */
     masterServantUpdate?: MasterServantUpdate;
-    showAppendSkills?: boolean;
+    onTabChange: (tab: MasterServantEditTab) => void;
 } & Omit<DialogComponentProps<MasterServantUpdate>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';
@@ -43,10 +44,11 @@ const DialogPaperProps = {
 export const MasterServantsEditDialog = React.memo((props: Props) => {
 
     const {
+        activeTab,
         bondLevels,
         isMultipleServantsSelected,
         masterServantUpdate,
-        showAppendSkills,
+        onTabChange,
         onClose,
         ...dialogProps
     } = props;
@@ -109,7 +111,9 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
                         bondLevels={bondLevels}
                         masterServantUpdate={masterServantUpdate!}
                         multiEditMode={multiEditMode}
-                        showAppendSkills={showAppendSkills}
+                        showAppendSkills
+                        activeTab={activeTab}
+                        onTabChange={onTabChange}
                     />
                 </DialogContent>
                 <DialogActions>

@@ -11,7 +11,10 @@ import { MasterServantEditCostumesTabContent } from './master-servant-edit-costu
 import { MasterServantEditEnhancementsTabContent } from './master-servant-edit-enhancements-tab-content.component';
 import { MasterServantEditGeneralTabContent } from './master-servant-edit-general-tab-content.component';
 
+export type MasterServantEditTab = 'general' | 'enhancements' | 'costumes';
+
 type Props = {
+    activeTab: MasterServantEditTab;
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     /**
      * The update payload for editing. This will be modified directly, so provide a
@@ -23,11 +26,12 @@ type Props = {
      * will not be available for edit.
      */
     multiEditMode?: boolean;
+    onTabChange: (tab: MasterServantEditTab) => void;
     readonly?: boolean;
     showAppendSkills?: boolean;
 };
 
-type TabId = 'general' | 'enhancements' | 'costumes';
+const DefaultTab = 'general';
 
 export const StyleClassPrefix = 'PlanServantEdit';
 
@@ -70,9 +74,11 @@ export const MasterServantEdit = React.memo((props: Props) => {
     const gameServantMap = useGameServantMap();
 
     const {
+        activeTab = DefaultTab,
         bondLevels,
         masterServantUpdate,
         multiEditMode,
+        onTabChange,
         readonly,
         showAppendSkills
     } = props;
@@ -83,9 +89,7 @@ export const MasterServantEdit = React.memo((props: Props) => {
 
     const [gameServant, setGameServant] = useState<Immutable<GameServant>>();
 
-    const [activeTab, setActiveTab] = useState<TabId>(isNewServant ? 'general' : 'enhancements');
-
-    /*
+    /**
      * Updates the `gameServant` state when there are changes to the target
      * servant's `gameId`.
      */
@@ -129,9 +133,9 @@ export const MasterServantEdit = React.memo((props: Props) => {
         setGameServant(gameServant);
     }, [bondLevels, gameServantMap, servantSelectDisabled, masterServantUpdate]);
 
-    const handleActiveTabChange = useCallback((_: SyntheticEvent, value: TabId) => {
-        setActiveTab(value);
-    }, []);
+    const handleActiveTabChange = useCallback((_: SyntheticEvent, value: MasterServantEditTab) => {
+        onTabChange(value);
+    }, [onTabChange]);
 
     //#endregion
     

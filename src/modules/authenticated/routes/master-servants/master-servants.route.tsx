@@ -127,8 +127,10 @@ export const MasterServantsRoute = React.memo(() => {
         userPreferences: {
             filtersEnabled,
             infoPanelOpen,
+            servantEditDialogActiveTab,
             showUnsummonedServants
         },
+        setServantEditDialogActiveTab,
         toggleFilters,
         toggleInfoPanelOpen,
         toggleShowUnsummonedServants
@@ -518,7 +520,8 @@ export const MasterServantsRoute = React.memo(() => {
                 bondLevels={bondLevels}
                 masterServantUpdate={editServantDialogData}
                 isMultipleServantsSelected={isMultipleServantsSelected}
-                showAppendSkills={showAppendSkills}
+                activeTab={servantEditDialogActiveTab}
+                onTabChange={setServantEditDialogActiveTab}
                 onClose={handleEditServantDialogClose}
             />
             <MasterServantsMultiAddDialog

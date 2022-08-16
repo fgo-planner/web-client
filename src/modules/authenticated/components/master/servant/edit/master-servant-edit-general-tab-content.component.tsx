@@ -200,8 +200,6 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
                 <InputFieldContainer>
                     {npField}
                 </InputFieldContainer>
-            </div>
-            <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
                     {bondField}
                 </InputFieldContainer>

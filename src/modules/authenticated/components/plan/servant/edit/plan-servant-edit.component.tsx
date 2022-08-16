@@ -36,9 +36,11 @@ const StyleProps = (theme: Theme) => ({
         mt: -6
     },
     [`& .${StyleClassPrefix}-tabs-content-container`]: {
+        height: '26.25rem',  // 420px
         mx: 2,
         px: 4,
         pt: 8,
+        boxSizing: 'border-box',
         borderWidth: 1,
         borderStyle: 'solid',
         borderColor: alpha(theme.palette.text.primary, 0.23),

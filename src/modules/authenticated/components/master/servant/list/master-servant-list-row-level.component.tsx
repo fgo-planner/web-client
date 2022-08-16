@@ -9,11 +9,13 @@ type Props = {
 
 export const StyleClassPrefix = 'MasterServantListRowLevel';
 
-/*
- * No need to wrap this component in React.memo since the `masterServant` prop
- * will always change when changes are made to a servant. 
+/**
+ * Wrapping this component in React.memo is unnecessary since the
+ * `masterServant` prop will always change when changes are made to a servant. 
  */
-
+/** 
+ *
+ */
 export const MasterServantListRowLevel = ({ masterServant }: Props) => {
 
     const { 

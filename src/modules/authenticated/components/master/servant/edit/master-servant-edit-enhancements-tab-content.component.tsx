@@ -4,8 +4,11 @@ import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { ServantAscensionInputField } from '../../../../../../components/input/servant/servant-ascension-input-field.component';
 import { ServantFouInputField } from '../../../../../../components/input/servant/servant-fou-input-field.component';
+import { ServantFouQuickToggleButtons } from '../../../../../../components/input/servant/servant-fou-quick-toggle-buttons.component';
 import { ServantLevelInputField } from '../../../../../../components/input/servant/servant-level-input-field.component';
+import { ServantLevelQuickToggleButtons } from '../../../../../../components/input/servant/servant-level-quick-toggle-buttons.component';
 import { ServantSkillInputField } from '../../../../../../components/input/servant/servant-skill-input-field.component';
+import { ServantSkillQuickToggleButtons } from '../../../../../../components/input/servant/servant-skill-quick-toggle-buttons.component';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 import { Immutable, MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../../../types/internal';
 
@@ -122,6 +125,40 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
         pushStatsChange();
         forceUpdate();
     }, [forceUpdate, pushStatsChange]);
+
+    const handleLevelQuickToggleClick = useCallback((level: number, ascension: MasterServantAscensionLevel): void => {
+        if (masterServantUpdate.ascension === ascension && masterServantUpdate.level === level) {
+            return;
+        }
+        handleLevelAscensionInputChange(
+            'TODO The the name param should no longer be needed',
+            String(level),
+            String(ascension),
+            true
+        );
+    }, [handleLevelAscensionInputChange, masterServantUpdate]);
+
+    const handleFouQuickToggleClick = useCallback((value: number): void => {
+        if (masterServantUpdate.fouHp === value && masterServantUpdate.fouAtk === value) {
+            return;
+        }
+        masterServantUpdate.fouHp = value;
+        masterServantUpdate.fouAtk = value;
+        pushStatsChange();
+        forceUpdate();
+    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
+
+    const handleSkillQuickToggleClick = useCallback((value: MasterServantSkillLevel | undefined, stat: 'skills' | 'appendSkills'): void => {
+        const skillSet = masterServantUpdate[stat];
+        if (skillSet[1] === value && skillSet[2] === value && skillSet[3] === value) {
+            return;
+        }
+        skillSet[1] = value;
+        skillSet[2] = value;
+        skillSet[3] = value;
+        pushStatsChange();
+        forceUpdate();
+    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
     //#endregion
 
@@ -291,6 +328,13 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
                 <InputFieldContainer>
                     {ascensionField}
                 </InputFieldContainer>
+                <ServantLevelQuickToggleButtons
+                    className={`${StyleClassPrefix}-toggle-button-group`}
+                    maxNaturalLevel={gameServant?.maxLevel || 90}
+                    onClick={handleLevelQuickToggleClick}
+                    ignoreTabNavigation
+                    disabled={readonly || multiEditMode}
+                />
             </div>
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
@@ -299,6 +343,12 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
                 <InputFieldContainer>
                     {fouAtkField}
                 </InputFieldContainer>
+                <ServantFouQuickToggleButtons
+                    className={`${StyleClassPrefix}-toggle-button-group`}
+                    onClick={handleFouQuickToggleClick}
+                    ignoreTabNavigation
+                    disabled={readonly}
+                />
             </div>
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
@@ -310,6 +360,16 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
                 <InputFieldContainer>
                     {skill3Field}
                 </InputFieldContainer>
+                <ServantSkillQuickToggleButtons
+                    className={`${StyleClassPrefix}-toggle-button-group`}
+                    skillSet='skills'
+                    leftToggleTarget={1}
+                    centerToggleTarget={9}
+                    rightToggleTarget={10}
+                    ignoreTabNavigation
+                    onClick={handleSkillQuickToggleClick}
+                    disabled={readonly}
+                />
             </div>
             {showAppendSkills && (
                 <div className={`${StyleClassPrefix}-input-field-group`}>
@@ -322,6 +382,16 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
                     <InputFieldContainer>
                         {appendSkill3Field}
                     </InputFieldContainer>
+                    <ServantSkillQuickToggleButtons
+                        className={`${StyleClassPrefix}-toggle-button-group`}
+                        skillSet='appendSkills'
+                        leftToggleTarget={0}
+                        centerToggleTarget={1}
+                        rightToggleTarget={9}
+                        ignoreTabNavigation
+                        onClick={handleSkillQuickToggleClick}
+                        disabled={readonly}
+                    />
                 </div>
             )}
         </Box>

@@ -25,6 +25,7 @@ export * from './generics/readonly-iterable.type';
 export * from './generics/readonly-partial-array.type';
 export * from './generics/readonly-partial.type';
 export * from './generics/readonly-record.type';
+export * from './generics/tuple.type';
 export * from './generics/type.type';
 export * from './generics/writable.type';
 export * from './http/http-options.type';

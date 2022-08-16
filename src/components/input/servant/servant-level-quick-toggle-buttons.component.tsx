@@ -1,24 +1,21 @@
 import { MasterServantAscensionLevel } from '@fgo-planner/types';
-import { LooksOneOutlined as LooksOneOutlinedIcon } from '@mui/icons-material';
+import { WineBarOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';
 import { ComponentStyleProps } from '../../../types/internal';
-import { NinetyOutlinedIcon, OneHundredOutlinedIcon } from '../../icons';
+import { IconButtonText } from '../../text/icon-button-text.component';
 import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
 
 type Props = {
     disabled?: boolean;
     ignoreTabNavigation?: boolean;
-    onClick?: (level: number, ascension: MasterServantAscensionLevel) => void;
     /**
      * The servant's natural max level.
      */
-    servantMaxLevel: number;
+    maxNaturalLevel: number;
+    onClick: (level: number, ascension: MasterServantAscensionLevel) => void;
 } & Pick<ComponentStyleProps, 'className'>;
-
-// const MaxLevel = GameServantConstants.MaxLevel;
-const MaxLevel = 100;
 
 const StyleClassPrefix = 'ServantLevelQuickToggleButtons';
 
@@ -31,9 +28,21 @@ export const ServantLevelQuickToggleButtons = React.memo((props: Props) => {
         disabled,
         ignoreTabNavigation,
         onClick,
-        servantMaxLevel,
+        maxNaturalLevel,
         className
     } = props;
+
+    const handleLeftButtonClick = useCallback((): void => {
+        onClick(GameServantConstants.MinLevel, GameServantConstants.MinAscensionLevel);
+    }, [onClick]);
+
+    const handleCenterButtonClick = useCallback((): void => {
+        onClick(maxNaturalLevel, GameServantConstants.MaxAscensionLevel);
+    }, [onClick, maxNaturalLevel]);
+
+    const handleRightButtonClick = useCallback((): void => {
+        onClick(100, GameServantConstants.MaxAscensionLevel);
+    }, [onClick]);
 
     return (
         <ServantEnhancementQuickToggleButtons
@@ -42,19 +51,19 @@ export const ServantLevelQuickToggleButtons = React.memo((props: Props) => {
             disabled={disabled}
 
             // Left button
-            leftButtonIcon={<LooksOneOutlinedIcon />}
+            leftButtonIcon={<IconButtonText children={1} />}
             leftButtonTooltip={`Set level to ${GameServantConstants.MinLevel}`}
-            onLeftButtonClick={() => onClick?.(GameServantConstants.MinLevel, GameServantConstants.MinAscensionLevel)}
+            onLeftButtonClick={handleLeftButtonClick}
 
             // Center button
-            centerButtonIcon={<NinetyOutlinedIcon />}
-            centerButtonTooltip={`Set level to ${servantMaxLevel}`}
-            onCenterButtonClick={() => onClick?.(servantMaxLevel, GameServantConstants.MaxAscensionLevel)}
+            centerButtonIcon={<IconButtonText children={maxNaturalLevel} />}
+            centerButtonTooltip={`Set level to ${maxNaturalLevel}`}
+            onCenterButtonClick={handleCenterButtonClick}
 
             // Right button
-            rightButtonIcon={<OneHundredOutlinedIcon />}
-            rightButtonTooltip={`Set level to ${MaxLevel}`}
-            onRightButtonClick={() => onClick?.(MaxLevel, GameServantConstants.MaxAscensionLevel)}
+            rightButtonIcon={<WineBarOutlined />}
+            rightButtonTooltip={'Set level to 100'}
+            onRightButtonClick={handleRightButtonClick}
         />
     );
 

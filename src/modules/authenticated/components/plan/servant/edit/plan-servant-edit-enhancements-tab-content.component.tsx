@@ -368,7 +368,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                 </InputFieldContainer>
                 <ServantLevelQuickToggleButtons
                     className={`${StyleClassPrefix}-toggle-button-group`}
-                    servantMaxLevel={gameServant.maxLevel}
+                    maxNaturalLevel={gameServant.maxLevel}
                     onClick={handleLevelQuickToggleClick}
                     ignoreTabNavigation
                     disabled={disabled}
@@ -408,8 +408,11 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                 <ServantSkillQuickToggleButtons
                     className={`${StyleClassPrefix}-toggle-button-group`}
                     skillSet='skills'
-                    onClick={handleSkillQuickToggleClick}
+                    leftToggleTarget={1}
+                    centerToggleTarget={9}
+                    rightToggleTarget={10}
                     ignoreTabNavigation
+                    onClick={handleSkillQuickToggleClick}
                     disabled={disabled}
                 />
             </div>
@@ -430,9 +433,11 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                     <ServantSkillQuickToggleButtons
                         className={`${StyleClassPrefix}-toggle-button-group`}
                         skillSet='appendSkills'
-                        onClick={handleSkillQuickToggleClick}
-                        useClearValuesButton
+                        leftToggleTarget={1}
+                        centerToggleTarget={9}
+                        rightToggleTarget={10}
                         ignoreTabNavigation
+                        onClick={handleSkillQuickToggleClick}
                         disabled={disabled}
                     />
                 </div>

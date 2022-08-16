@@ -1,42 +1,70 @@
 import { MasterServantSkillLevel } from '@fgo-planner/types';
-import { IndeterminateCheckBoxOutlined as IndeterminateCheckBoxOutlinedIcon, LooksOneOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
-import React from 'react';
-import { GameServantConstants } from '../../../constants';
+import React, { MouseEventHandler, ReactNode } from 'react';
 import { ComponentStyleProps } from '../../../types/internal';
-import { NineOutlinedIcon, TenOutlinedIcon } from '../../icons';
+import { IconButtonText } from '../../text/icon-button-text.component';
 import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
 
 type SkillSet = 'skills' | 'appendSkills';
 
+type ToggleTarget = 0 | MasterServantSkillLevel;
+
 type Props = {
+    centerToggleTarget: ToggleTarget;
     disabled?: boolean;
     ignoreTabNavigation?: boolean;
-    onClick?: (value: MasterServantSkillLevel | undefined, skillSet: SkillSet) => void;
+    leftToggleTarget: ToggleTarget;
+    onClick: (value: MasterServantSkillLevel | undefined, skillSet: SkillSet) => void;
+    rightToggleTarget: ToggleTarget;
     skillSet: SkillSet;
-    /**
-     * Whether to show the button that clear all values instead of the button that
-     * sets all values to 1.
-     */
-    useClearValuesButton?: boolean;
 } & Pick<ComponentStyleProps, 'className'>;
+
+const renderButtonIcon = (target: ToggleTarget): ReactNode => {
+    const text = target === 0 ? '\u2013' : target;
+    const textDecoration = target === 10 ? 'overline' : 'none';
+    return (
+        <IconButtonText textDecoration={textDecoration}>
+            {text}
+        </IconButtonText>
+    );
+};
+
+const renderTooltipTitle = (target: ToggleTarget): string => {
+    if (target === 0) {
+        return 'Clear all';
+    }
+    return `Set all to ${target}`;
+};
 
 const StyleClassPrefix = 'ServantSkillQuickToggleButtons';
 
 /**
- * Buttons for quickly toggling a servant's skill levels to all 1's, 9's, or
- * 10's.
+ * The usage of `useMemo`, `useCallback`, etc. hooks in this component are
+ * unnecessary because this is is never re-rendered (due to prop values never
+ * changing).
+ */
+
+/**
+ * Buttons for quickly toggling a servant's skill/append levels to the specified
+ * target values.
  */
 export const ServantSkillQuickToggleButtons = React.memo((props: Props) => {
 
     const {
+        centerToggleTarget,
         disabled,
         ignoreTabNavigation,
+        leftToggleTarget,
         onClick,
+        rightToggleTarget,
         skillSet,
-        useClearValuesButton,
         className
     } = props;
+
+
+    const createClickHandler = (target: ToggleTarget): MouseEventHandler => {
+        return () => onClick(target || undefined, skillSet);
+    };
 
     return (
         <ServantEnhancementQuickToggleButtons
@@ -45,19 +73,19 @@ export const ServantSkillQuickToggleButtons = React.memo((props: Props) => {
             disabled={disabled}
 
             // Left button
-            leftButtonIcon={useClearValuesButton ? <IndeterminateCheckBoxOutlinedIcon /> : <LooksOneOutlined />}
-            leftButtonTooltip={useClearValuesButton ? 'Clear all' : `Set all to ${GameServantConstants.MinSkillLevel}`}
-            onLeftButtonClick={() => onClick?.(useClearValuesButton ? undefined : GameServantConstants.MinSkillLevel, skillSet)}
+            leftButtonIcon={renderButtonIcon(leftToggleTarget)}
+            leftButtonTooltip={renderTooltipTitle(leftToggleTarget)}
+            onLeftButtonClick={createClickHandler(leftToggleTarget)}
 
             // Center button
-            centerButtonIcon={<NineOutlinedIcon />}
-            centerButtonTooltip='Set all to 9'
-            onCenterButtonClick={() => onClick?.(9, skillSet)}
+            centerButtonIcon={renderButtonIcon(centerToggleTarget)}
+            centerButtonTooltip={renderTooltipTitle(centerToggleTarget)}
+            onCenterButtonClick={createClickHandler(centerToggleTarget)}
 
             // Right button
-            rightButtonIcon={<TenOutlinedIcon />}
-            rightButtonTooltip={`Set all to ${GameServantConstants.MaxSkillLevel}`}
-            onRightButtonClick={() => onClick?.(GameServantConstants.MaxSkillLevel, skillSet)}
+            rightButtonIcon={renderButtonIcon(rightToggleTarget)}
+            rightButtonTooltip={renderTooltipTitle(rightToggleTarget)}
+            onRightButtonClick={createClickHandler(rightToggleTarget)}
         />
     );
 

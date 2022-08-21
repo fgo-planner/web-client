@@ -1,5 +1,5 @@
 {
-  "name": "fgo-planner-web-client",
+  "name": "@fgo-planner/web-client",
   "description": "Web browser client for the FGO Planner project.",
   "version": "0.1.0",
   "private": true,
@@ -13,7 +13,7 @@
     "@date-io/date-fns": "^2.13.1",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@fgo-planner/types": "file:local_modules/types",
+    "@fgo-planner/types": "0.0.1",
     "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.8.0",
     "@mui/styles": "^5.8.0",
@@ -70,7 +70,6 @@
     "util": "^0.12.4"
   },
   "scripts": {
-    "postinstall": "cd node_modules/@fgo-planner/types && npm run build-ts",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",

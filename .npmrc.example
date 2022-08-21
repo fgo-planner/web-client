@@ -1,0 +1,7 @@
+# Make a copy of this file in the same directory and rename it to `.npmrc`.
+
+# Replace TOKEN with your personal access token to install GitHub packages.
+//npm.pkg.github.com/:_authToken=TOKEN
+
+# Do not change this line.
+@fgo-planner:registry=https://npm.pkg.github.com

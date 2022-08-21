@@ -1,6 +1,6 @@
+import { UserWebClientTheme } from '@fgo-planner/types';
 import { Button } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
-import { UserWebClientTheme } from '../../../../../local_modules/types/lib';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { SectionTitle } from '../../../../components/text/section-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';

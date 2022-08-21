@@ -1,9 +1,9 @@
+import { UserPreferences, UserWebClientTheme } from '@fgo-planner/types';
 import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
 import _ from 'lodash';
 import React, { Fragment, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserPreferences, UserWebClientTheme } from '../../../../../local_modules/types/lib';
 import { FabContainer } from '../../../../components/fab/fab-container.component';
 import { AppBarElevateOnScroll } from '../../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { PageTitle } from '../../../../components/text/page-title.component';

@@ -1,3 +1,0 @@
-[submodule "local_modules"]
-	path = local_modules
-	url = https://github.com/alvinquach/fgo-planner-shared-modules.git

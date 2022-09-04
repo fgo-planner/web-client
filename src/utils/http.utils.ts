@@ -1,4 +1,4 @@
-import { EntityWithTimestamps } from '@fgo-planner/types';
+import { EntityWithTimestamps } from '@fgo-planner/data-types';
 import { Function, HttpOptions, HttpResponseError, HttpResponseType, Nullable } from '../types/internal';
 import { JwtUtils } from './jwt.utils';
 import { SubscribablesContainer } from './subscription/subscribables-container';

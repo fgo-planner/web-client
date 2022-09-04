@@ -1,4 +1,4 @@
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
 import { Check as CheckIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { Button, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';

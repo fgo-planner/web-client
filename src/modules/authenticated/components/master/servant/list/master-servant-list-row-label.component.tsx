@@ -1,4 +1,4 @@
-import { GameServant } from '@fgo-planner/types';
+import { GameServant } from '@fgo-planner/data-types';
 import React from 'react';
 import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
 import { Immutable } from '../../../../../../types/internal';

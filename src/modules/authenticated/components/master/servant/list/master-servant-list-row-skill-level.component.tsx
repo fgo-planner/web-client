@@ -1,4 +1,4 @@
-import { MasterServant } from '@fgo-planner/types';
+import { MasterServant } from '@fgo-planner/data-types';
 import React from 'react';
 
 type Props = MasterServant['skills'] | MasterServant['appendSkills'];

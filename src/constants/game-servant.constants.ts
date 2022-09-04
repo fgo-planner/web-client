@@ -1,4 +1,4 @@
-import { GameServantClass, GameServantRarity, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/types';
+import { GameServantClass, GameServantRarity, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/data-types';
 import { ReadonlyRecord } from '../types/internal';
 
 export class GameServantConstants {

@@ -1,4 +1,4 @@
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';

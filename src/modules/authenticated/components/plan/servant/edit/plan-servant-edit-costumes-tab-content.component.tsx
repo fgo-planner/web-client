@@ -1,4 +1,4 @@
-import { GameServant } from '@fgo-planner/types';
+import { GameServant } from '@fgo-planner/data-types';
 import React from 'react';
 import { Immutable } from '../../../../../../types/internal';
 

@@ -1,4 +1,4 @@
-import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GameItemConstants } from '../../../constants';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';

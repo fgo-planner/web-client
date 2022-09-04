@@ -1,4 +1,4 @@
-import { GameServant, GameServantClass, GameServantRarity } from '@fgo-planner/types';
+import { GameServant, GameServantClass, GameServantRarity } from '@fgo-planner/data-types';
 import { GameServantConstants } from '../../constants';
 import { GameServantClassSimplified, GameServantList } from '../../types/data';
 import { Immutable } from '../../types/internal';

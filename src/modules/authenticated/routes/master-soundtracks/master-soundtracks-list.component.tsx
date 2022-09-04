@@ -1,4 +1,4 @@
-import { GameSoundtrack } from '@fgo-planner/types';
+import { GameSoundtrack } from '@fgo-planner/data-types';
 import { Theme } from '@mui/material';
 import { alpha, Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';

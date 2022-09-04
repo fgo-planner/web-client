@@ -1,4 +1,4 @@
-import { BasicPlan } from '@fgo-planner/types';
+import { BasicPlan } from '@fgo-planner/data-types';
 import { Link as MuiLink } from '@mui/material';
 import React, { MouseEvent, useCallback } from 'react';
 import { Link } from 'react-router-dom';

@@ -1,4 +1,4 @@
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/types';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/data-types';
 import { GameItemConstants } from '../../../../constants';
 import { GameServantMap, GameSoundtrackList } from '../../../../types/data';
 import { Immutable } from '../../../../types/internal';

@@ -1,4 +1,4 @@
-import { BasicPlan, BasicPlanGroup, Plan } from '@fgo-planner/types';
+import { BasicPlan, BasicPlanGroup, Plan } from '@fgo-planner/data-types';
 import { PostAddOutlined } from '@mui/icons-material';
 import { Button, IconButton, PaperProps, TextField, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';

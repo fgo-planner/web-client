@@ -1,4 +1,4 @@
-import { GameServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { GameServant, MasterServantBondLevel } from '@fgo-planner/data-types';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';

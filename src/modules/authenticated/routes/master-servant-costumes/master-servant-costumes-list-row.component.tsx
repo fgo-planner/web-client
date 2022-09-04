@@ -1,4 +1,4 @@
-import { GameServant, GameServantCostume } from '@fgo-planner/types';
+import { GameServant, GameServantCostume } from '@fgo-planner/data-types';
 import { Checkbox } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';

@@ -1,4 +1,4 @@
-import { GameServantClass, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { GameServantClass, MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import { IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';

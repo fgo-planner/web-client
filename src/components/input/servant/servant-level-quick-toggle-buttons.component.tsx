@@ -1,4 +1,4 @@
-import { MasterServantAscensionLevel } from '@fgo-planner/types';
+import { MasterServantAscensionLevel } from '@fgo-planner/data-types';
 import { WineBarOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';

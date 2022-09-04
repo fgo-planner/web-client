@@ -1,4 +1,4 @@
-import { MasterServantBondLevel } from '@fgo-planner/types';
+import { MasterServantBondLevel } from '@fgo-planner/data-types';
 import { GameServantConstants } from '../../constants';
 import { ReadonlyRecord } from '../../types/internal';
 import { MasterServantUpdateUtils } from './master-servant-update.utils';

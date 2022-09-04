@@ -1,4 +1,4 @@
-import { MasterAccount, Plan, PlanServant } from '@fgo-planner/types';
+import { MasterAccount, Plan, PlanServant } from '@fgo-planner/data-types';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { GameItemConstants } from '../../../../constants';

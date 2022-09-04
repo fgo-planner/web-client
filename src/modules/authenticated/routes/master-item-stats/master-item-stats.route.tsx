@@ -1,4 +1,4 @@
-import { MasterAccount } from '@fgo-planner/types';
+import { MasterAccount } from '@fgo-planner/data-types';
 import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';

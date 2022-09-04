@@ -1,4 +1,4 @@
-import { RgbaColor } from '@fgo-planner/types';
+import { RgbaColor } from '@fgo-planner/data-types';
 import { Menu, PopoverOrigin } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';

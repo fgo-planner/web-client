@@ -1,4 +1,4 @@
-import { GameItem } from '@fgo-planner/types';
+import { GameItem } from '@fgo-planner/data-types';
 import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { useCallback, useRef, useState } from 'react';
 import NumberFormat, { NumberFormatValues, SourceInfo } from 'react-number-format';

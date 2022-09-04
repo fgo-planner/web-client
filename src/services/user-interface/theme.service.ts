@@ -1,4 +1,4 @@
-import { UserPreferences, UserWebClientTheme } from '@fgo-planner/types';
+import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-types';
 import { SimplePaletteColorOptions, ThemeOptions } from '@mui/material/styles';
 import { colord } from 'colord';
 import { AssetConstants } from '../../constants';

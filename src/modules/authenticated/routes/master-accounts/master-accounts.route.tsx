@@ -1,4 +1,4 @@
-import { BasicMasterAccount, MasterAccount } from '@fgo-planner/types';
+import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-types';
 import { GroupAdd as GroupAddIcon } from '@mui/icons-material';
 import { Box, Button, IconButton, PaperProps, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';

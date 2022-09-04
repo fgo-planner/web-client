@@ -1,4 +1,4 @@
-import { PlanServantEnhancements } from '@fgo-planner/types';
+import { PlanServantEnhancements } from '@fgo-planner/data-types';
 import { PlanEnhancementRequirements } from './plan-enhancement-requirements.type';
 
 /**

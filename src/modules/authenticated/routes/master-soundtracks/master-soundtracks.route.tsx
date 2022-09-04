@@ -1,4 +1,4 @@
-import { GameSoundtrack } from '@fgo-planner/types';
+import { GameSoundtrack } from '@fgo-planner/data-types';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useState } from 'react';

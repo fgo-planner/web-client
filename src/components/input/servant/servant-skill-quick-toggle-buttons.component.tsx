@@ -1,4 +1,4 @@
-import { MasterServantSkillLevel } from '@fgo-planner/types';
+import { MasterServantSkillLevel } from '@fgo-planner/data-types';
 import clsx from 'clsx';
 import React, { MouseEventHandler, ReactNode } from 'react';
 import { ComponentStyleProps } from '../../../types/internal';

@@ -1,4 +1,4 @@
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
 import React, { DOMAttributes } from 'react';
 import { Immutable, ReadonlyPartial } from '../../../../../../types/internal';
 import { ObjectUtils } from '../../../../../../utils/object.utils';

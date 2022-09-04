@@ -1,4 +1,4 @@
-import { MasterServant } from '@fgo-planner/types';
+import { MasterServant } from '@fgo-planner/data-types';
 import { PersonOffOutlined as PersonOffOutlinedIcon } from '@mui/icons-material';
 import { AssetConstants } from '../../../../../../constants';
 import { Immutable } from '../../../../../../types/internal';

@@ -1,4 +1,4 @@
-import { MasterServantBondLevel } from '@fgo-planner/types';
+import { MasterServantBondLevel } from '@fgo-planner/data-types';
 import React from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 import { Nullable } from '../../../../../../types/internal';

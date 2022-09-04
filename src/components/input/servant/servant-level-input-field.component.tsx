@@ -1,4 +1,4 @@
-import { GameServant } from '@fgo-planner/types';
+import { GameServant } from '@fgo-planner/data-types';
 import { BaseTextFieldProps, InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
 import { GameServantConstants } from '../../../constants';

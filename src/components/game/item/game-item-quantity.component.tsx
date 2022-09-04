@@ -1,6 +1,6 @@
 
 
-import { GameItem } from '@fgo-planner/types';
+import { GameItem } from '@fgo-planner/data-types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { Immutable } from '../../../types/internal';

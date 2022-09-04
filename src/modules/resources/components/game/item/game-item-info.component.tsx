@@ -1,4 +1,4 @@
-import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/types';
+import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/data-types';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { LoadingIndicator } from '../../../../../components/utils/loading-indicator.component';

@@ -1,4 +1,4 @@
-import { BasicMasterAccount, MasterAccount } from '@fgo-planner/types';
+import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-types';
 import { MenuItem, TextField, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, ReactNode, useCallback, useEffect, useState } from 'react';

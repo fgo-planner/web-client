@@ -1,4 +1,4 @@
-import { MasterServant } from '@fgo-planner/types';
+import { MasterServant } from '@fgo-planner/data-types';
 import { useCallback, useEffect, useState } from 'react';
 import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
 import { ImmutableArray } from '../../../../../types/internal';

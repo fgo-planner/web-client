@@ -1,4 +1,4 @@
-import { GameServantRarity } from '@fgo-planner/types';
+import { GameServantRarity } from '@fgo-planner/data-types';
 import { Replay as ReplayIcon } from '@mui/icons-material';
 import { Checkbox, IconButton, ListItemText, MenuItem, MenuProps, TextField, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';

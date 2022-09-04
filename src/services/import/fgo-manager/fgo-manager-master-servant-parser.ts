@@ -1,4 +1,4 @@
-import { GameServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/types';
+import { GameServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/data-types';
 import { Options } from 'csv-parse';
 import { parse } from 'csv-parse/sync';
 import { parse as parseDate } from 'date-fns';

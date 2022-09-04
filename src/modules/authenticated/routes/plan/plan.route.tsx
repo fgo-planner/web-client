@@ -1,4 +1,4 @@
-import { MasterAccount, MasterServant, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/types';
+import { MasterAccount, MasterServant, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-types';
 import { Add as AddIcon, FormatSize as FormatSizeIcon, HideImageOutlined as HideImageOutlinedIcon } from '@mui/icons-material';
 import { IconButton, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';

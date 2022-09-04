@@ -1,4 +1,4 @@
-import { Plan } from '@fgo-planner/types';
+import { Plan } from '@fgo-planner/data-types';
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import { Formik, FormikConfig, FormikProps } from 'formik';

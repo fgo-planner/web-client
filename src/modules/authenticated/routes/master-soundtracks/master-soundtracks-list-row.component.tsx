@@ -1,4 +1,4 @@
-import { GameSoundtrack } from '@fgo-planner/types';
+import { GameSoundtrack } from '@fgo-planner/data-types';
 import { Pause as PauseIcon, PlayArrow as PlayArrowIcon } from '@mui/icons-material';
 import { Checkbox, IconButton } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';

@@ -1,4 +1,4 @@
-import { MasterAccount } from '@fgo-planner/types';
+import { MasterAccount } from '@fgo-planner/data-types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';

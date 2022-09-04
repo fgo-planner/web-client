@@ -1,4 +1,4 @@
-import { BasicPlan, BasicPlanGroup } from '@fgo-planner/types';
+import { BasicPlan, BasicPlanGroup } from '@fgo-planner/data-types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';

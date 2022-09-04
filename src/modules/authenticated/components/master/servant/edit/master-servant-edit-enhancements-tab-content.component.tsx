@@ -1,4 +1,4 @@
-import { GameServant, MasterServantAscensionLevel, MasterServantSkillLevel } from '@fgo-planner/types';
+import { GameServant, MasterServantAscensionLevel, MasterServantSkillLevel } from '@fgo-planner/data-types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';

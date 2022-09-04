@@ -1,4 +1,4 @@
-import { GameServant } from '@fgo-planner/types';
+import { GameServant } from '@fgo-planner/data-types';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import { Avatar, AvatarProps } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';

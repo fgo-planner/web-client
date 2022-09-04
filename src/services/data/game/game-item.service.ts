@@ -1,4 +1,4 @@
-import { GameItem } from '@fgo-planner/types';
+import { GameItem } from '@fgo-planner/data-types';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { GameItemList, GameItemMap, Page, Pagination } from '../../../types/data';

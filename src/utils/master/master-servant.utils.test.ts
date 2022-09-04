@@ -1,4 +1,4 @@
-import { MasterServant } from '@fgo-planner/types';
+import { MasterServant } from '@fgo-planner/data-types';
 import { GameServantConstants } from '../../constants';
 import { Rarity1TestServant, Rarity2TestServant, Rarity5TestServant } from '../../test-data/game-servant-test-data.test';
 import { MasterServantUtils } from './master-servant.utils';

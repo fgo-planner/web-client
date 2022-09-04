@@ -1,4 +1,4 @@
-import { GameItem } from '@fgo-planner/types';
+import { GameItem } from '@fgo-planner/data-types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';
 import { Link } from 'react-router-dom';

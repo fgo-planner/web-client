@@ -1,4 +1,4 @@
-import { GameServantClass, GameServantRarity } from '@fgo-planner/types';
+import { GameServantClass, GameServantRarity } from '@fgo-planner/data-types';
 import { Tooltip, TooltipProps } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';

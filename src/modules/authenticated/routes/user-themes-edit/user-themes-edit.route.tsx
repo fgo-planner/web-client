@@ -1,4 +1,4 @@
-import { UserPreferences, UserWebClientTheme } from '@fgo-planner/types';
+import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-types';
 import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
 import _ from 'lodash';

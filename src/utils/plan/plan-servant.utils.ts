@@ -1,4 +1,4 @@
-import { GameServant, MasterServant, MasterServantAscensionLevel, PlanServant, PlanServantEnhancements } from '@fgo-planner/types';
+import { GameServant, MasterServant, MasterServantAscensionLevel, PlanServant, PlanServantEnhancements } from '@fgo-planner/data-types';
 import { Immutable, ImmutableArray } from '../../types/internal';
 import { MasterServantUtils } from '../master/master-servant.utils';
 

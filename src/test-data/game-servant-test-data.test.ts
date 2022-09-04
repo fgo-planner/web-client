@@ -1,4 +1,4 @@
-import { GameServant, GameServantAttribute, GameServantCardType, GameServantClass, GameServantGender, GameServantNoblePhantasmTarget } from '@fgo-planner/types';
+import { GameServant, GameServantAttribute, GameServantCardType, GameServantClass, GameServantGender, GameServantNoblePhantasmTarget } from '@fgo-planner/data-types';
 import { Immutable } from '../types/internal';
 
 export const Rarity1TestServant: Immutable<GameServant> = {

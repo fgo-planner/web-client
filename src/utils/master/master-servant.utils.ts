@@ -1,4 +1,4 @@
-import { GameServant, MasterServant, MasterServantAscensionLevel } from '@fgo-planner/types';
+import { GameServant, MasterServant, MasterServantAscensionLevel } from '@fgo-planner/data-types';
 import { GameServantConstants } from '../../constants';
 import { Immutable, ImmutableArray } from '../../types/internal';
 import { DateTimeUtils } from '../date-time.utils';

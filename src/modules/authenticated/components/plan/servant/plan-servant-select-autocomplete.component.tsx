@@ -1,4 +1,4 @@
-import { GameServant, MasterServant } from '@fgo-planner/types';
+import { GameServant, MasterServant } from '@fgo-planner/data-types';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';

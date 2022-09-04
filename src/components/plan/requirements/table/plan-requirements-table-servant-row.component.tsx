@@ -1,4 +1,4 @@
-import { GameServant, MasterServant, PlanServant } from '@fgo-planner/types';
+import { GameServant, MasterServant, PlanServant } from '@fgo-planner/data-types';
 import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, Edit as EditIcon } from '@mui/icons-material';
 import { Box, IconButton, Theme } from '@mui/material';
 import { useTheme } from '@mui/system';

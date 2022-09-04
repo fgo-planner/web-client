@@ -1,4 +1,4 @@
-import { User, UserPreferences } from '@fgo-planner/types';
+import { User, UserPreferences } from '@fgo-planner/data-types';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { Nullable, UserInfo } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';

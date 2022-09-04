@@ -1,4 +1,4 @@
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
 import { GameServantConstants } from '../../constants';
 import { MasterServantUpdate, ExistingMasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue, NewMasterServantUpdate, ReadonlyRecord, ReadonlyIterable, Immutable, ImmutableArray } from '../../types/internal';
 import { MasterServantUtils } from './master-servant.utils';

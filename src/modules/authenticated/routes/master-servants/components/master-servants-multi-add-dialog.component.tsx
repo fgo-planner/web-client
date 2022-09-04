@@ -1,4 +1,4 @@
-import { MasterServant } from '@fgo-planner/types';
+import { MasterServant } from '@fgo-planner/data-types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormGroup, InputLabel, PaperProps, Select, Switch, Typography } from '@mui/material';
 import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useRef, useState } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';

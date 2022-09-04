@@ -1,4 +1,4 @@
-import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/types';
+import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { DataTableListDraggableRow } from '../../../../../../components/data-table-list/data-table-list-draggable-row.component';

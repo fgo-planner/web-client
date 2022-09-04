@@ -1,4 +1,4 @@
-import { GameItem } from '@fgo-planner/types';
+import { GameItem } from '@fgo-planner/data-types';
 import React from 'react';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
 import { Immutable } from '../../../../types/internal';

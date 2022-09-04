@@ -1,4 +1,4 @@
-import { MasterAccount } from '@fgo-planner/types';
+import { MasterAccount } from '@fgo-planner/data-types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { ChangeEvent, FormEvent, useCallback, useRef, useState } from 'react';

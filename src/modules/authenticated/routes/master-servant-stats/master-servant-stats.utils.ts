@@ -1,4 +1,4 @@
-import { GameServant, GameServantClass, GameServantRarity, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/types';
+import { GameServant, GameServantClass, GameServantRarity, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/data-types';
 import { GameServantConstants } from '../../../../constants';
 import { GameServantClassSimplified, GameServantMap } from '../../../../types/data';
 import { Immutable, Nullable } from '../../../../types/internal';

@@ -1,4 +1,5 @@
-import { InjectableDefinition, InjectableToken, InjectedFieldParams, Type } from '../../types/internal';
+import { Type } from '@fgo-planner/common-types';
+import { InjectableDefinition, InjectableToken, InjectedFieldParams } from '../../types/internal';
 
 export class InjectablesContainer {
 

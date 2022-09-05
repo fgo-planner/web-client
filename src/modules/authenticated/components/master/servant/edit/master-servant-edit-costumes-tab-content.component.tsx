@@ -1,6 +1,7 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { GameServant } from '@fgo-planner/data-types';
 import React from 'react';
-import { Immutable, MasterServantUpdate } from '../../../../../../types/internal';
+import { MasterServantUpdate } from '../../../../../../types/internal';
 
 type Props = {
     /**

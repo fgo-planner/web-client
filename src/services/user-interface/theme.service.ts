@@ -1,3 +1,4 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-types';
 import { SimplePaletteColorOptions, ThemeOptions } from '@mui/material/styles';
 import { colord } from 'colord';
@@ -6,7 +7,7 @@ import { Inject } from '../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import defaultDarkTheme from '../../styles/theme-default-dark';
 import defaultLightTheme from '../../styles/theme-default-light';
-import { Nullable, ThemeInfo, ThemeMode } from '../../types/internal';
+import { ThemeInfo, ThemeMode } from '../../types/internal';
 import { StorageKeys } from '../../utils/storage/storage-keys';
 import { StorageUtils } from '../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';

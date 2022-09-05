@@ -1,3 +1,4 @@
+import { MasterServantUtils } from '@fgo-planner/data-utils';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -13,7 +14,6 @@ import { ThemeConstants } from '../../../../styles/theme-constants';
 import { SortDirection, SortOptions } from '../../../../types/data';
 import { ExistingMasterServantUpdate, MasterServantUpdate, ModalOnCloseReason } from '../../../../types/internal';
 import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
-import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';

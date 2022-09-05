@@ -1,7 +1,7 @@
+import { Immutable, ImmutableArray } from '@fgo-planner/common-types';
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantSkillLevel, Plan, PlanServant } from '@fgo-planner/data-types';
-import { GameServantConstants } from '../../constants';
+import { GameServantConstants } from '@fgo-planner/data-constants';
 import { GameServantMap, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types/data';
-import { Immutable, ImmutableArray } from '../../types/internal';
 import { ArrayUtils } from '../array.utils';
 import { ObjectUtils } from '../object.utils';
 import { PlanServantUtils } from './plan-servant.utils';

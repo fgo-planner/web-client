@@ -4,7 +4,7 @@ import { Checkbox, IconButton, ListItemText, MenuItem, MenuProps, TextField, Too
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../components/input/input-field-container.component';
-import { GameServantConstants } from '../../../../constants';
+import { GameServantConstants } from '@fgo-planner/data-constants';
 import { GameServantClassSimplified } from '../../../../types/data';
 import { TextFieldChangeEvent } from '../../../../types/internal';
 import { MasterServantStatsFilterOptions, MasterServantStatsGroupBy } from './master-servant-stats.utils';

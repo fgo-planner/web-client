@@ -1,5 +1,5 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { useCallback, useEffect, useState } from 'react';
-import { Immutable } from '../../../../../types/internal';
 import { StorageKeys } from '../../../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/subscribables-container';

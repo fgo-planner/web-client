@@ -1,7 +1,7 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { useEffect, useState } from 'react';
 import { GameSoundtrackService } from '../../services/data/game/game-soundtrack.service';
 import { GameSoundtrackList } from '../../types/data';
-import { Nullable } from '../../types/internal';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 /**

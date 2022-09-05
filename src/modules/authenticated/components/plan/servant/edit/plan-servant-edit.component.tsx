@@ -1,10 +1,10 @@
+import { Immutable, ImmutableArray } from '@fgo-planner/common-types';
 import { GameServant, MasterServant, PlanServant } from '@fgo-planner/data-types';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { Immutable, ImmutableArray } from '../../../../../../types/internal';
 import { PlanServantUtils } from '../../../../../../utils/plan/plan-servant.utils';
 import { PlanServantSelectAutocomplete } from '../plan-servant-select-autocomplete.component';
 import { PlanServantEditCostumesTabContent } from './plan-servant-edit-costumes-tab-content.component';

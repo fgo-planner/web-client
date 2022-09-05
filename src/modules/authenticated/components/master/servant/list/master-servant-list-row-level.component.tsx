@@ -1,7 +1,6 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { MasterServant } from '@fgo-planner/data-types';
-import React from 'react';
 import { AssetConstants } from '../../../../../../constants';
-import { Immutable } from '../../../../../../types/internal';
 
 type Props = {
     masterServant: Immutable<MasterServant>;

@@ -1,9 +1,10 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { Avatar } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { BasicUser } from '../../../../services/data/user/user.service';
 import { BasicMasterAccounts } from '../../../../types/data';
-import { ModalOnCloseReason, Nullable } from '../../../../types/internal';
+import { ModalOnCloseReason } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { AppBarMasterAccountAddButton } from './app-bar-master-account-add-button.component';

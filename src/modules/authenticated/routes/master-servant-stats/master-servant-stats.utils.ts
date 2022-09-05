@@ -1,7 +1,7 @@
+import { Immutable, Nullable } from '@fgo-planner/common-types';
+import { GameServantConstants } from '@fgo-planner/data-constants';
 import { GameServant, GameServantClass, GameServantRarity, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/data-types';
-import { GameServantConstants } from '../../../../constants';
 import { GameServantClassSimplified, GameServantMap } from '../../../../types/data';
-import { Immutable, Nullable } from '../../../../types/internal';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 
 type MasterServantStatGroupedByRarity = {

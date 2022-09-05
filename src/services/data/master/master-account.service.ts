@@ -1,8 +1,9 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-types';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { BasicMasterAccounts } from '../../../types/data';
-import { Nullable, UserInfo } from '../../../types/internal';
+import { UserInfo } from '../../../types/internal';
 import { HttpUtils as Http, HttpUtils } from '../../../utils/http.utils';
 import { StorageKeys } from '../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../utils/storage/storage.utils';

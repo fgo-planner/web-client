@@ -1,9 +1,10 @@
+import { ReadonlyRecord } from '@fgo-planner/common-types';
 import { MasterServantBondLevel } from '@fgo-planner/data-types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
 import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps, MasterServantUpdate, ReadonlyRecord } from '../../../../../types/internal';
+import { DialogComponentProps, MasterServantUpdate } from '../../../../../types/internal';
 import { MasterServantEdit, MasterServantEditTab } from '../../../components/master/servant/edit/master-servant-edit.component';
 
 type Props = {

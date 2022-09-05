@@ -1,9 +1,9 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { BasicMasterAccount } from '@fgo-planner/data-types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, ReactNode } from 'react';
 import { BasicMasterAccounts } from '../../../../../types/data';
-import { Immutable } from '../../../../../types/internal';
 import { MasterAccountColumnProperties, MasterAccountListVisibleColumns } from './master-account-list-columns';
 import { MasterAccountListHeader } from './master-account-list-header.component';
 import { MasterAccountListRow, StyleClassPrefix as MasterAccountListRowStyleClassPrefix } from './master-account-list-row.component';

@@ -1,4 +1,4 @@
-import { ReadonlyRecord } from '../types/internal';
+import { ReadonlyRecord } from '@fgo-planner/common-types';
 
 export class ObjectUtils {
 

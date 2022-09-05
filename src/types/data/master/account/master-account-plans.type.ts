@@ -1,5 +1,5 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { BasicPlan, BasicPlanGroup } from '@fgo-planner/data-types';
-import { Immutable } from '../../../internal';
 
 export type PlanType = 'plan' | 'group';
 

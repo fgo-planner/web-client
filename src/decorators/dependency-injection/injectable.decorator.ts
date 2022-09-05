@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import { InjectedField, Type } from '../../types/internal';
+import { Type } from '@fgo-planner/common-types';
+import { InjectedField } from '../../types/internal';
 import { InjectablesContainer } from '../../utils/dependency-injection/injectables-container';
 import { InjectableMetadataKey } from './inject.decorator';
 

@@ -1,3 +1,4 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { GameServant, MasterServantAscensionLevel, MasterServantSkillLevel } from '@fgo-planner/data-types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback } from 'react';
@@ -10,7 +11,7 @@ import { ServantLevelQuickToggleButtons } from '../../../../../../components/inp
 import { ServantSkillInputField } from '../../../../../../components/input/servant/servant-skill-input-field.component';
 import { ServantSkillQuickToggleButtons } from '../../../../../../components/input/servant/servant-skill-quick-toggle-buttons.component';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
-import { Immutable, MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../../../types/internal';
+import { MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../../../types/internal';
 
 type Props = {
     /**

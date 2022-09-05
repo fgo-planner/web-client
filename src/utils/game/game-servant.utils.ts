@@ -1,7 +1,7 @@
+import { Immutable } from '@fgo-planner/common-types';
+import { GameServantConstants } from '@fgo-planner/data-constants';
 import { GameServant, GameServantClass, GameServantRarity } from '@fgo-planner/data-types';
-import { GameServantConstants } from '../../constants';
 import { GameServantClassSimplified, GameServantList } from '../../types/data';
-import { Immutable } from '../../types/internal';
 
 export class GameServantUtils {
 

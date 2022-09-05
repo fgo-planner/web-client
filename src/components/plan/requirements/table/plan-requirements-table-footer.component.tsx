@@ -1,9 +1,9 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { MasterAccount } from '@fgo-planner/data-types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { PlanRequirements } from '../../../../types/data';
-import { Immutable } from '../../../../types/internal';
 import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';

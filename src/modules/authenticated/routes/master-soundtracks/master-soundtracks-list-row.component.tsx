@@ -1,3 +1,4 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { GameSoundtrack } from '@fgo-planner/data-types';
 import { Pause as PauseIcon, PlayArrow as PlayArrowIcon } from '@mui/icons-material';
 import { Checkbox, IconButton } from '@mui/material';
@@ -6,7 +7,6 @@ import { DataTableListStaticRow } from '../../../../components/data-table-list/d
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { Immutable } from '../../../../types/internal';
 
 type Props = {
     onChange: (id: number, value: boolean) => void;

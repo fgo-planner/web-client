@@ -1,4 +1,4 @@
-import { Supplier } from '../../types/internal';
+import { Supplier } from '@fgo-planner/common-types';
 
 export class SubscriptionTopic<T = any> {
 

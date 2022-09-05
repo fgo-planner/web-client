@@ -1,3 +1,4 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { MasterAccount } from '@fgo-planner/data-types';
 import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
@@ -9,7 +10,6 @@ import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
-import { Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterItemStatsFilter } from './master-item-stats-filter.component';

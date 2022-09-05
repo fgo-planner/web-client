@@ -1,7 +1,7 @@
 import React, { ReactNode, useMemo } from 'react';
 import NumberFormat from 'react-number-format';
 import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
-import { GameServantConstants } from '../../../../constants';
+import { GameServantConstants } from '@fgo-planner/data-constants';
 import { MasterServantStatPanelData, MasterServantStatPanelRow, MasterServantStatsExpandablePanel } from './master-servant-stats-expandable-panel.component';
 import { MasterServantStats } from './master-servant-stats.utils';
 

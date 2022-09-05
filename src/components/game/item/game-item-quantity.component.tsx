@@ -1,9 +1,9 @@
 
 
+import { Immutable } from '@fgo-planner/common-types';
 import { GameItem } from '@fgo-planner/data-types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
-import { Immutable } from '../../../types/internal';
 import { GameItemThumbnail } from './game-item-thumbnail.component';
 
 type Props = {

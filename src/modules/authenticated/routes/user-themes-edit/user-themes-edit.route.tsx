@@ -1,3 +1,4 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-types';
 import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
@@ -11,7 +12,7 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { UserService } from '../../../../services/data/user/user.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
-import { Nullable, ThemeMode } from '../../../../types/internal';
+import { ThemeMode } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { UserThemeEdit } from './user-theme-edit.component';

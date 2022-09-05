@@ -1,3 +1,4 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { MasterAccount } from '@fgo-planner/data-types';
 import { BusinessCenter as BusinessCenterIcon, BusinessCenterOutlined as BusinessCenterOutlinedIcon, CalendarMonth as CalendarMonthIcon, CalendarMonthOutlined as CalendarMonthOutlinedIcon, Category as CategoryIcon, CategoryOutlined as CategoryOutlinedIcon, Dashboard as DashboardIcon, DashboardOutlined as DashboardOutlinedIcon, Group as GroupIcon, GroupOutlined as GroupOutlinedIcon, Home as HomeIcon, HomeOutlined as HomeOutlinedIcon, Login as LoginIcon, Logout as LogoutIcon, MusicNote as MusicNoteIcon, MusicNoteOutlined as MusicNoteOutlinedIcon, PeopleAlt as PeopleAltIcon, PeopleAltOutlined as PeopleAltOutlinedIcon, Stadium as StadiumIcon, StadiumOutlined as StadiumOutlinedIcon, TheaterComedy as TheaterComedyIcon, TheaterComedyOutlined as TheaterComedyOutlinedIcon } from '@mui/icons-material';
 import { Theme } from '@mui/material';
@@ -8,7 +9,7 @@ import { useInjectable } from '../../../hooks/dependency-injection/use-injectabl
 import { AuthenticationService } from '../../../services/authentication/authentication.service';
 import { UserInterfaceService } from '../../../services/user-interface/user-interface.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { NavigationDrawerContent as Content, NavigationDrawerSection as Section, Nullable, SxPropsFunction } from '../../../types/internal';
+import { NavigationDrawerContent as Content, NavigationDrawerSection as Section, SxPropsFunction } from '../../../types/internal';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 import { NavigationDrawerDesktop } from './navigation-drawer-desktop.component';

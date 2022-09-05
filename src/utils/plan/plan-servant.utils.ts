@@ -1,6 +1,6 @@
+import { Immutable, ImmutableArray } from '@fgo-planner/common-types';
 import { GameServant, MasterServant, MasterServantAscensionLevel, PlanServant, PlanServantEnhancements } from '@fgo-planner/data-types';
-import { Immutable, ImmutableArray } from '../../types/internal';
-import { MasterServantUtils } from '../master/master-servant.utils';
+import { MasterServantUtils } from '@fgo-planner/data-utils';
 
 export class PlanServantUtils {
 

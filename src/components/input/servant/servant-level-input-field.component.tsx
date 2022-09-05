@@ -1,10 +1,10 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { GameServant } from '@fgo-planner/data-types';
+import { MasterServantUtils } from '@fgo-planner/data-utils';
 import { BaseTextFieldProps, InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
-import { GameServantConstants } from '../../../constants';
-import { Immutable } from '../../../types/internal';
+import { GameServantConstants } from '@fgo-planner/data-constants';
 import { FormUtils } from '../../../utils/form.utils';
-import { MasterServantUtils } from '../../../utils/master/master-servant.utils';
 
 type Props = {
     allowEmpty?: boolean;

@@ -1,4 +1,9 @@
-import { MasterAccount, MasterServant } from '@fgo-planner/data-types';
+import { Array2D, Immutable, ImmutableRecord, Nullable, ReadonlyRecord } from '@fgo-planner/common-types';
+import { GameServant, MasterAccount, MasterServant } from '@fgo-planner/data-types';
+import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { FgoManagerParsers } from '@fgo-planner/transform-external';
+import { Options } from 'csv-parse';
+import { parse } from 'csv-parse/sync';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog } from '../../../../components/dialog/alert-dialog.component';
@@ -6,16 +11,15 @@ import { useGameServantList } from '../../../../hooks/data/use-game-servant-list
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { FgoManagerMasterServantParser } from '../../../../services/import/fgo-manager/fgo-manager-master-servant-parser';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
-import { MasterServantUpdateIndeterminateValue as IndeterminateValue, Nullable, ReadonlyRecord } from '../../../../types/internal';
+import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../types/internal';
 import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
-import { MasterServantUtils } from '../../../../utils/master/master-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
 import { MasterServantImportFileInput } from './master-servant-import-file-input';
 import { MasterServantImportList } from './master-servant-import-list.component';
+import { TempLogger } from '../../../../utils/temp-logger';
 
 console.log('MasterServantImportRoute loaded');
 
@@ -40,6 +44,12 @@ const ImportStatusMessages = {
     'importFail': ImportFailMessage,
     'importSuccess': ImportSuccessMessage
 } as ReadonlyRecord<ImportStatus, string>;
+
+// TODO Move this to a CSV parsing utility
+const CsvParseOptions: Options = {
+    delimiter: ',',
+    skipEmptyLines: true
+};
 
 // TODO Split into smaller components
 const MasterServantImportRoute = React.memo(() => {
@@ -95,9 +105,28 @@ const MasterServantImportRoute = React.memo(() => {
         setImportStatusDialogOpen(true);
     }, [importStatus]);
 
-    const parseData = useCallback((data: string): void => {
-        data = data.trim();
-        if (!data) {
+    const gameServantNameMap = useMemo((): ImmutableRecord<string, GameServant> | undefined => {
+        if (!gameServantList) {
+            return undefined;
+        }
+        const result: Record<string, Immutable<GameServant>> = {};
+        for (const servant of gameServantList) {
+            const name = servant.metadata.fgoManagerName;
+            if (!name) {
+                continue;
+            }
+            result[name] = servant;
+        }
+        return result;
+    }, [gameServantList]);
+
+    const parseData = useCallback((csvContents: string): void => {
+        if (!gameServantNameMap) {
+            return;
+        }
+
+        csvContents = csvContents.trim();
+        if (!csvContents) {
             return setImportStatus('parseFail');
         }
 
@@ -106,8 +135,15 @@ const MasterServantImportRoute = React.memo(() => {
 
         // Set timeout to allow the loading indicator to be rendered first.
         setTimeout(async () => {
-            const parser = new FgoManagerMasterServantParser(data, gameServantList || []);
-            const parsedData = parser.parse();
+            const data: Array2D<string> = parse(csvContents, CsvParseOptions);
+            const logger = new TempLogger();
+            const servantUpdates = FgoManagerParsers.parseRosterSheet(data, gameServantNameMap, logger);
+            // TODO Redo this
+            const parsedData: MasterServantParserResult = {
+                servantUpdates,
+                warnings: [],
+                errors: []
+            };
             if (!parsedData.servantUpdates.length) {
                 setImportStatus('parseFail');
             } else {
@@ -117,7 +153,7 @@ const MasterServantImportRoute = React.memo(() => {
             resetLoadingIndicator();
         });
 
-    }, [gameServantList, invokeLoadingIndicator, resetLoadingIndicator]);
+    }, [gameServantNameMap, invokeLoadingIndicator, resetLoadingIndicator]);
 
     const cancelImport = useCallback((): void => {
         setParsedData(undefined);

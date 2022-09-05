@@ -1,3 +1,4 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { BasicPlan } from '@fgo-planner/data-types';
 import { Link as MuiLink } from '@mui/material';
 import React, { MouseEvent, useCallback } from 'react';
@@ -5,8 +6,7 @@ import { Link } from 'react-router-dom';
 import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';
 import { TruncateText } from '../../../../../components/text/truncate-text.component';
 import { PlanConstants } from '../../../../../constants';
-import { Immutable } from '../../../../../types/internal';
-import { DateTimeUtils } from '../../../../../utils/date-time.utils';
+import { DateTimeFormatUtils } from '../../../../../utils/date-time-format.utils';
 import { PlanListVisibleColumns } from './plan-list-columns';
 
 type Props = {
@@ -64,10 +64,10 @@ export const PlanListRow = React.memo((props: Props) => {
                 </MuiLink>
             </TruncateText>
             {created && <div className={`${StyleClassPrefix}-created`}>
-                {DateTimeUtils.formatForDataTable(plan.createdAt)}
+                {DateTimeFormatUtils.formatForDataTable(plan.createdAt)}
             </div>}
             {modified && <div className={`${StyleClassPrefix}-modified`}>
-                {DateTimeUtils.formatForDataTable(plan.updatedAt)}
+                {DateTimeFormatUtils.formatForDataTable(plan.updatedAt)}
             </div>}
             {description && <TruncateText className={`${StyleClassPrefix}-description`}>
                 {plan.description || '-'}

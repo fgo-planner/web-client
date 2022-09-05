@@ -1,6 +1,6 @@
+import { MasterServantUtils } from '@fgo-planner/data-utils';
 import { FormikErrors, FormikTouched } from 'formik';
 import lodash from 'lodash';
-import { MasterServantUtils } from './master/master-servant.utils';
 
 export class FormUtils {
 

@@ -1,10 +1,11 @@
+import { ImmutableArray } from '@fgo-planner/common-types';
 import { MasterServant } from '@fgo-planner/data-types';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormGroup, InputLabel, PaperProps, Select, Switch, Typography } from '@mui/material';
 import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useRef, useState } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useGameServantList } from '../../../../../hooks/data/use-game-servant-list.hook';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps, ImmutableArray } from '../../../../../types/internal';
+import { DialogComponentProps } from '../../../../../types/internal';
 
 export type MultiAddServantData = {
     gameIds: Array<number>,

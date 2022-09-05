@@ -1,11 +1,11 @@
+import { Immutable } from '@fgo-planner/common-types';
+import { MathUtils } from '@fgo-planner/common-utils';
+import { GameItemConstants } from '@fgo-planner/data-constants';
 import { GameItem } from '@fgo-planner/data-types';
 import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { useCallback, useRef, useState } from 'react';
 import NumberFormat, { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
-import { GameItemConstants } from '../../../../constants';
-import { Immutable } from '../../../../types/internal';
-import { MathUtils } from '../../../../utils/math.utils';
 import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 
 type Props = {

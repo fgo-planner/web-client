@@ -1,8 +1,8 @@
+import { Immutable, Nullable } from '@fgo-planner/common-types';
 import { GameServant } from '@fgo-planner/data-types';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { GameServantList, GameServantMap, Page, Pagination } from '../../../types/data';
-import { Immutable, Nullable } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { UserInterfaceService } from '../../user-interface/user-interface.service';
 

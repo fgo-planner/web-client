@@ -1,3 +1,4 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { GameServant } from '@fgo-planner/data-types';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import { Avatar, AvatarProps } from '@mui/material';
@@ -8,7 +9,6 @@ import clsx from 'clsx';
 import React, { MouseEventHandler, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../../constants';
-import { Immutable } from '../../../types/internal';
 
 type Props = {
     costumeId?: number;

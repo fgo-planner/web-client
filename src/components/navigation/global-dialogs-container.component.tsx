@@ -1,9 +1,10 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { PaperProps } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
 import { UserInterfaceService } from '../../services/user-interface/user-interface.service';
-import { Nullable, UserInfo } from '../../types/internal';
+import { UserInfo } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { LoginDialog } from '../login/login-dialog.component';

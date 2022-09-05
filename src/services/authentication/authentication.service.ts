@@ -1,5 +1,6 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { UserCredentials } from '../../types/data';
-import { Nullable, UserInfo } from '../../types/internal';
+import { UserInfo } from '../../types/internal';
 
 export abstract class AuthenticationService {
 

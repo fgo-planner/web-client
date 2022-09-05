@@ -1,10 +1,11 @@
+import { ReadonlyRecord } from '@fgo-planner/common-types';
 import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, SelectProps, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, MouseEvent, useCallback, useState } from 'react';
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
 import { InputFieldContainer , StyleClassPrefix as InputFieldContainerStyleClassPrefix} from '../../../../components/input/input-field-container.component';
 import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps, ReadonlyRecord } from '../../../../types/internal';
+import { DialogComponentProps } from '../../../../types/internal';
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
 
 type RenderedProps = {

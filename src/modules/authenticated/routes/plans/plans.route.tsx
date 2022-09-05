@@ -1,3 +1,4 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { BasicPlan, BasicPlanGroup, Plan } from '@fgo-planner/data-types';
 import { PostAddOutlined } from '@mui/icons-material';
 import { Button, IconButton, PaperProps, TextField, Theme } from '@mui/material';
@@ -13,7 +14,7 @@ import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loadin
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { MasterAccountPlans, PlanType } from '../../../../types/data';
-import { Immutable, ModalOnCloseReason } from '../../../../types/internal';
+import { ModalOnCloseReason } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { PlanAddDialog } from './components/plan-add-dialog.component';

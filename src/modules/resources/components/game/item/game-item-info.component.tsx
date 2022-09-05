@@ -1,10 +1,10 @@
+import { Immutable, ImmutableRecord, Nullable } from '@fgo-planner/common-types';
 import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/data-types';
-import React, { Fragment, PureComponent, ReactNode } from 'react';
+import { Fragment, PureComponent, ReactNode } from 'react';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { LoadingIndicator } from '../../../../../components/utils/loading-indicator.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
 import { GameServantService } from '../../../../../services/data/game/game-servant.service';
-import { Immutable, ImmutableRecord, Nullable } from '../../../../../types/internal';
 import { InjectablesContainer } from '../../../../../utils/dependency-injection/injectables-container';
 import { GameItemNotFound } from './game-item-not-found.component';
 

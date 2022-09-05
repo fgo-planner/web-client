@@ -1,3 +1,4 @@
+import { Immutable, Nullable } from '@fgo-planner/common-types';
 import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-types';
 import { MenuItem, TextField, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -5,7 +6,6 @@ import React, { ChangeEvent, CSSProperties, ReactNode, useCallback, useEffect, u
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { BasicMasterAccounts } from '../../../../types/data';
-import { Immutable, Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 

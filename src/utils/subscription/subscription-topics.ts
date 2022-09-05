@@ -1,6 +1,7 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { MasterAccount, UserPreferences } from '@fgo-planner/data-types';
 import { BasicMasterAccounts } from '../../types/data';
-import { HttpResponseError, Nullable, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
+import { HttpResponseError, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
 import { Functions } from '../functions';
 import { SubscriptionTopic } from './subscription-topic.class';
 

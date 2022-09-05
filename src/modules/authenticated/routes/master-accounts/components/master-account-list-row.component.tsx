@@ -1,10 +1,10 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { BasicMasterAccount } from '@fgo-planner/data-types';
 import React, { MouseEvent, useCallback } from 'react';
 import NumberFormat from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';
 import { TruncateText } from '../../../../../components/text/truncate-text.component';
-import { Immutable } from '../../../../../types/internal';
-import { DateTimeUtils } from '../../../../../utils/date-time.utils';
+import { DateTimeFormatUtils } from '../../../../../utils/date-time-format.utils';
 import { MasterAccountListVisibleColumns } from './master-account-list-columns';
 
 type Props = {
@@ -71,10 +71,10 @@ export const MasterAccountListRow = React.memo((props: Props) => {
                 }
             </TruncateText>}
             {created && <div className={`${StyleClassPrefix}-created`}>
-                {DateTimeUtils.formatForDataTable(account.createdAt)}
+                {DateTimeFormatUtils.formatForDataTable(account.createdAt)}
             </div>}
             {modified && <div className={`${StyleClassPrefix}-modified`}>
-                {DateTimeUtils.formatForDataTable(account.updatedAt)}
+                {DateTimeFormatUtils.formatForDataTable(account.updatedAt)}
             </div>}
         </DataTableListStaticRow>
     );

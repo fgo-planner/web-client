@@ -1,9 +1,9 @@
 import { GameServant, MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
+import { MasterServantUtils } from '@fgo-planner/data-utils';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
-import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
 import { DataTableListDraggableRow } from '../../../../../../components/data-table-list/data-table-list-draggable-row.component';
-import { Immutable, ReadonlyPartial } from '../../../../../../types/internal';
-import { MasterServantUtils } from '../../../../../../utils/master/master-servant.utils';
+import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
+import { Immutable, ReadonlyPartial } from '@fgo-planner/common-types';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
 import { MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRowLabel } from './master-servant-list-row-label.component';

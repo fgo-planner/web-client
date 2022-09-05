@@ -1,3 +1,4 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { GameServant, GameServantCostume } from '@fgo-planner/data-types';
 import { Checkbox } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
@@ -6,7 +7,6 @@ import { GameItemQuantity } from '../../../../components/game/item/game-item-qua
 import { GameServantThumbnail } from '../../../../components/game/servant/game-servant-thumbnail.component';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { Immutable } from '../../../../types/internal';
 
 export type MasterServantCostumeRowData = Immutable<GameServantCostume & {
     costumeId: number;

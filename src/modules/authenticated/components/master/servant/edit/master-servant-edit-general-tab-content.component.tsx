@@ -1,3 +1,4 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { GameServant, MasterServantBondLevel, MasterServantNoblePhantasmLevel } from '@fgo-planner/data-types';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback } from 'react';
@@ -7,7 +8,7 @@ import { MasterServantNpLevelInputField } from '../../../../../../components/inp
 import { MasterServantSummonDateInputField } from '../../../../../../components/input/servant/master/master-servant-summon-date-input-field.component';
 import { MasterServantSummonedCheckbox } from '../../../../../../components/input/servant/master/master-servant-summoned-checkbox.component';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
-import { Immutable, MasterServantUpdate, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../../../types/internal';
+import { MasterServantUpdate, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../../../types/internal';
 
 type Props = {
     /**

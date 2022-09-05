@@ -1,4 +1,5 @@
-import { ColumnProperties, ImmutableRecord } from '../../../../../types/internal';
+import { ImmutableRecord } from '@fgo-planner/common-types';
+import { ColumnProperties } from '../../../../../types/internal';
 
 export type MasterAccountListColumn =
     'name' |

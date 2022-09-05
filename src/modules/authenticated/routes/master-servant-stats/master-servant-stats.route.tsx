@@ -1,3 +1,4 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { MasterAccount } from '@fgo-planner/data-types';
 import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
@@ -11,7 +12,6 @@ import { NavigationRail } from '../../../../components/navigation/navigation-rai
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { Nullable } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantStatsFilter, MasterServantStatsFilterResult } from './master-servant-stats-filter.component';

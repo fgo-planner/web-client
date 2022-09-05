@@ -1,5 +1,5 @@
+import { Supplier } from '@fgo-planner/common-types';
 import { createContext } from 'react';
-import { Supplier } from '../types/internal';
 
 export type NavigationDrawerContextProps = {
     animationsDisabled: boolean;

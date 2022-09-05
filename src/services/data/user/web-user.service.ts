@@ -1,6 +1,7 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { User, UserPreferences } from '@fgo-planner/data-types';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { Nullable, UserInfo } from '../../../types/internal';
+import { UserInfo } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';

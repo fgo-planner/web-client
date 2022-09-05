@@ -1,7 +1,7 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { MasterServant } from '@fgo-planner/data-types';
 import { PersonOffOutlined as PersonOffOutlinedIcon } from '@mui/icons-material';
 import { AssetConstants } from '../../../../../../constants';
-import { Immutable } from '../../../../../../types/internal';
 
 type Props = {
     masterServant: Immutable<MasterServant>;

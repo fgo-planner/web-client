@@ -1,5 +1,5 @@
+import { Nullable } from '@fgo-planner/common-types';
 import { User, UserPreferences } from '@fgo-planner/data-types';
-import { Nullable } from '../../../types/internal';
 
 export type BasicUser = Pick<User, '_id' | 'username' | 'email'>;
 

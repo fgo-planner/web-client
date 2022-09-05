@@ -1,8 +1,8 @@
+import { Immutable, Nullable } from '@fgo-planner/common-types';
 import { MasterAccount } from '@fgo-planner/data-types';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
 import { AppBarElevateOnScroll } from '../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
-import { Immutable, Nullable } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { HomeLinkSection } from './home-link-section.component';

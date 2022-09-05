@@ -1,3 +1,4 @@
+import { ReadonlyPartial } from '@fgo-planner/common-types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -5,7 +6,6 @@ import React, { MouseEvent, MouseEventHandler, useCallback, useRef } from 'react
 import { DataTableListHeaderLabel } from '../../../../../components/data-table-list/data-table-list-header-label.component';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
 import { SortDirection, SortOptions } from '../../../../../types/data';
-import { ReadonlyPartial } from '../../../../../types/internal';
 import { MasterAccountColumnProperties, MasterAccountListColumn, MasterAccountListVisibleColumns } from './master-account-list-columns';
 
 type Props = {

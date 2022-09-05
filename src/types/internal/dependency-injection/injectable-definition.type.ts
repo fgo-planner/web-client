@@ -1,4 +1,4 @@
-import { AbstractType, Type } from '..';
+import { AbstractType, Type } from '@fgo-planner/common-types';
 
 export type InjectableDefinition<T = any> =
     /**

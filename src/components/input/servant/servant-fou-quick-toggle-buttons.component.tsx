@@ -1,7 +1,7 @@
 /* eslint-disable no-unreachable */
 import clsx from 'clsx';
 import React from 'react';
-import { GameServantConstants } from '../../../constants';
+import { GameServantConstants } from '@fgo-planner/data-constants';
 import { ComponentStyleProps } from '../../../types/internal';
 import { IconButtonText } from '../../text/icon-button-text.component';
 import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';

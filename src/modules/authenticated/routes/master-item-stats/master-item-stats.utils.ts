@@ -1,7 +1,7 @@
+import { Immutable } from '@fgo-planner/common-types';
+import { GameItemConstants } from '@fgo-planner/data-constants';
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/data-types';
-import { GameItemConstants } from '../../../../constants';
 import { GameServantMap, GameSoundtrackList } from '../../../../types/data';
-import { Immutable } from '../../../../types/internal';
 import { ObjectUtils } from '../../../../utils/object.utils';
 
 export type MasterItemStat = {

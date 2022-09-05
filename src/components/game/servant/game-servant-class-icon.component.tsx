@@ -2,8 +2,10 @@ import { GameServantClass, GameServantRarity } from '@fgo-planner/data-types';
 import { Tooltip, TooltipProps } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';
-import { AssetConstants, GameServantConstants } from '../../../constants';
-import { ComponentStyleProps, ReadonlyRecord } from '../../../types/internal';
+import { GameServantConstants } from '@fgo-planner/data-constants';
+import { ComponentStyleProps } from '../../../types/internal';
+import { AssetConstants } from '../../../constants';
+import { ReadonlyRecord } from '@fgo-planner/common-types';
 
 type ClassIconName = GameServantClass | 'Extra' | 'All';
 

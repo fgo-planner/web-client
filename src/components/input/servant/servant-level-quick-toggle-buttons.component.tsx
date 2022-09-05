@@ -2,7 +2,7 @@ import { MasterServantAscensionLevel } from '@fgo-planner/data-types';
 import { WineBarOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
-import { GameServantConstants } from '../../../constants';
+import { GameServantConstants } from '@fgo-planner/data-constants';
 import { ComponentStyleProps } from '../../../types/internal';
 import { IconButtonText } from '../../text/icon-button-text.component';
 import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';

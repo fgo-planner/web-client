@@ -1,9 +1,9 @@
+import { Immutable } from '@fgo-planner/common-types';
 import { BasicPlan, BasicPlanGroup } from '@fgo-planner/data-types';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
 import { MasterAccountPlans, PlanType, SortDirection } from '../../../../../types/data';
-import { Immutable } from '../../../../../types/internal';
 import { PlanColumnProperties, PlanListColumn, PlanListVisibleColumns } from './plan-list-columns';
 import { PlanListHeader } from './plan-list-header.component';
 import { PlanListRow, StyleClassPrefix as PlanListRowStyleClassPrefix } from './plan-list-row.component';

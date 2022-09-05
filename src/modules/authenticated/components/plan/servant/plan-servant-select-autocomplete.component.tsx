@@ -1,10 +1,10 @@
+import { Immutable, ImmutableArray } from '@fgo-planner/common-types';
 import { GameServant, MasterServant } from '@fgo-planner/data-types';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
 import { GameServantClassIcon } from '../../../../../components/game/servant/game-servant-class-icon.component';
 import { useGameServantMap } from '../../../../../hooks/data/use-game-servant-map.hook';
-import { Immutable, ImmutableArray } from '../../../../../types/internal';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
 type Props = {

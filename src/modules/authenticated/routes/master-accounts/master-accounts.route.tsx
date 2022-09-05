@@ -1,3 +1,4 @@
+import { Immutable, Nullable } from '@fgo-planner/common-types';
 import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-types';
 import { GroupAdd as GroupAddIcon } from '@mui/icons-material';
 import { Box, Button, IconButton, PaperProps, Theme } from '@mui/material';
@@ -12,7 +13,7 @@ import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-activ
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { BasicMasterAccounts } from '../../../../types/data';
-import { Immutable, ModalOnCloseReason, Nullable } from '../../../../types/internal';
+import { ModalOnCloseReason } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterAccountListVisibleColumns } from './components/master-account-list-columns';

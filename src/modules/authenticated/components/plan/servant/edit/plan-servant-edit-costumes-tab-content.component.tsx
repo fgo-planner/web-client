@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameServant } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameServant } from '@fgo-planner/data-core';
 import React from 'react';
 
 type Props = {

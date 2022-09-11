@@ -1,5 +1,5 @@
-import { Immutable, Nullable } from '@fgo-planner/common-types';
-import { MasterAccount } from '@fgo-planner/data-types';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { MasterAccount } from '@fgo-planner/data-core';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
 import { AppBarElevateOnScroll } from '../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';

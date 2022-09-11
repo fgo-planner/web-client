@@ -1,6 +1,6 @@
+import { GameServantConstants } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
-import { GameServantConstants } from '@fgo-planner/data-constants';
 import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../types/internal';
 
 type SkillSet = 'skills' | 'appendSkills';

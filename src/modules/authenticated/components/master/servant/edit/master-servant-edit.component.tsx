@@ -1,6 +1,5 @@
-import { Immutable, ReadonlyRecord } from '@fgo-planner/common-types';
-import { GameServant, MasterServantBondLevel } from '@fgo-planner/data-types';
-import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';

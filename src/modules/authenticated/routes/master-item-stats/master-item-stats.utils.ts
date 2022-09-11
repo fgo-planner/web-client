@@ -1,6 +1,6 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameItemConstants } from '@fgo-planner/data-constants';
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameItemConstants } from '@fgo-planner/data-core';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/data-core';
 import { GameServantMap, GameSoundtrackList } from '../../../../types/data';
 import { ObjectUtils } from '../../../../utils/object.utils';
 

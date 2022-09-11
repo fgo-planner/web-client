@@ -1,4 +1,4 @@
-import { Nullable } from '@fgo-planner/common-types';
+import { Nullable } from '@fgo-planner/common-core';
 import { Avatar } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { MouseEvent, useCallback, useEffect, useState } from 'react';

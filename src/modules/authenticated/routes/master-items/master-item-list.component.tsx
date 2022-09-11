@@ -1,5 +1,5 @@
-import { ImmutableArray, ReadonlyRecord } from '@fgo-planner/common-types';
-import { GameItemConstants } from '@fgo-planner/data-constants';
+import { ImmutableArray, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameItemConstants } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode } from 'react';

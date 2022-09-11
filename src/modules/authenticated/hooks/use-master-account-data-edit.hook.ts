@@ -1,7 +1,7 @@
-import { Immutable, ImmutableArray, Nullable, ReadonlyRecord } from '@fgo-planner/common-types';
-import { GameItemConstants } from '@fgo-planner/data-constants';
-import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
-import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { Immutable, ImmutableArray, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameItemConstants } from '@fgo-planner/data-core';
+import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
+import { MasterServantUtils } from '@fgo-planner/data-core';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';

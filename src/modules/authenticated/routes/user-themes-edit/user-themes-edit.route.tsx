@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-types';
-import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-types';
+import { Nullable } from '@fgo-planner/common-core';
+import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-core';
 import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
 import _ from 'lodash';

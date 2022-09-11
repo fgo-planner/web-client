@@ -1,4 +1,4 @@
-import { Immutable, Nullable } from '@fgo-planner/common-types';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { format } from 'date-fns';
 
 export class DateTimeFormatUtils {

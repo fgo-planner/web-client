@@ -1,6 +1,5 @@
-import { Immutable, ImmutableArray, ReadonlyPartial, ReadonlyRecord } from '@fgo-planner/common-types';
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
-import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { Immutable, ImmutableArray, ReadonlyPartial, ReadonlyRecord } from '@fgo-planner/common-core';
+import { MasterServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';

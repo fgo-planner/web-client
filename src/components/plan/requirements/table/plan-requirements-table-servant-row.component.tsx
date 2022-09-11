@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameServant, MasterServant, PlanServant } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameServant, MasterServant, PlanServant } from '@fgo-planner/data-core';
 import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, Edit as EditIcon } from '@mui/icons-material';
 import { Box, IconButton, Theme } from '@mui/material';
 import { useTheme } from '@mui/system';

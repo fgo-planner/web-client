@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameServant, GameServantCostume } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameServant, GameServantCostume } from '@fgo-planner/data-core';
 import { Checkbox } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';

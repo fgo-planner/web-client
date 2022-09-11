@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-types';
-import { MasterAccount } from '@fgo-planner/data-types';
+import { Nullable } from '@fgo-planner/common-core';
+import { MasterAccount } from '@fgo-planner/data-core';
 import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';

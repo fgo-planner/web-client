@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { MasterServant } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { MasterServant } from '@fgo-planner/data-core';
 import { AssetConstants } from '../../../../../../constants';
 
 type Props = {

@@ -1,4 +1,4 @@
-import { Nullable } from '@fgo-planner/common-types';
+import { Nullable } from '@fgo-planner/common-core';
 import { PaperProps } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';

@@ -1,4 +1,4 @@
-import { Nullable, Supplier } from '@fgo-planner/common-types';
+import { Nullable, Supplier } from '@fgo-planner/common-core';
 import { StorageKey, StorageType, StorageValueType } from './storage-key.class';
 
 export class StorageUtils {

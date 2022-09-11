@@ -1,7 +1,5 @@
-import { Immutable, ImmutableArray, ReadonlyIterable, ReadonlyRecord } from '@fgo-planner/common-types';
-import { GameServantConstants } from '@fgo-planner/data-constants';
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
-import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { Immutable, ImmutableArray, ReadonlyIterable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameServantConstants, MasterServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
 import { ExistingMasterServantUpdate, MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue, NewMasterServantUpdate } from '../../types/internal';
 
 export class MasterServantUpdateUtils {

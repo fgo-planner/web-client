@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameServant } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameServant } from '@fgo-planner/data-core';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCallback, useMemo } from 'react';

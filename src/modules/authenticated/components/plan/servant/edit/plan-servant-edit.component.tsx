@@ -1,5 +1,5 @@
-import { Immutable, ImmutableArray } from '@fgo-planner/common-types';
-import { GameServant, MasterServant, PlanServant } from '@fgo-planner/data-types';
+import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
+import { GameServant, MasterServant, PlanServant } from '@fgo-planner/data-core';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';

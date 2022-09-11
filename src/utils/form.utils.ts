@@ -1,4 +1,4 @@
-import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { MasterServantUtils } from '@fgo-planner/data-core';
 import { FormikErrors, FormikTouched } from 'formik';
 import lodash from 'lodash';
 

@@ -1,4 +1,4 @@
-import { MasterServant, PlanServantEnhancements } from '@fgo-planner/data-types';
+import { MasterServant, PlanServantEnhancements } from '@fgo-planner/data-core';
 
 export class PlanValidationUtils {
 

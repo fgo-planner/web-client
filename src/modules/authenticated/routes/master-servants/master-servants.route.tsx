@@ -1,4 +1,4 @@
-import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { MasterServantUtils } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';

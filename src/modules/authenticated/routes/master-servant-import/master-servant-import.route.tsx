@@ -1,7 +1,6 @@
-import { Array2D, Immutable, ImmutableRecord, Nullable, ReadonlyRecord } from '@fgo-planner/common-types';
-import { GameServant, MasterAccount, MasterServant } from '@fgo-planner/data-types';
-import { MasterServantUtils } from '@fgo-planner/data-utils';
-import { FgoManagerParsers } from '@fgo-planner/transform-external';
+import { Array2D, Immutable, ImmutableRecord, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameServant, MasterAccount, MasterServant, MasterServantUtils } from '@fgo-planner/data-core';
+import { FgoManagerParsers, TransformLogger } from '@fgo-planner/transform-core';
 import { Options } from 'csv-parse';
 import { parse } from 'csv-parse/sync';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
@@ -19,7 +18,6 @@ import { SubscriptionTopics } from '../../../../utils/subscription/subscription-
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
 import { MasterServantImportFileInput } from './master-servant-import-file-input';
 import { MasterServantImportList } from './master-servant-import-list.component';
-import { TempLogger } from '../../../../utils/temp-logger';
 
 console.log('MasterServantImportRoute loaded');
 
@@ -136,7 +134,7 @@ const MasterServantImportRoute = React.memo(() => {
         // Set timeout to allow the loading indicator to be rendered first.
         setTimeout(async () => {
             const data: Array2D<string> = parse(csvContents, CsvParseOptions);
-            const logger = new TempLogger();
+            const logger = new TransformLogger();
             const servantUpdates = FgoManagerParsers.parseRosterSheet(data, gameServantNameMap, logger);
             // TODO Redo this
             const parsedData: MasterServantParserResult = {

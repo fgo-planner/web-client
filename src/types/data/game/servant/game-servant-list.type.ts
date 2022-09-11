@@ -1,4 +1,4 @@
-import { ImmutableArray } from '@fgo-planner/common-types';
-import { GameServant } from '@fgo-planner/data-types';
+import { ImmutableArray } from '@fgo-planner/common-core';
+import { GameServant } from '@fgo-planner/data-core';
 
 export type GameServantList = ImmutableArray<GameServant>;

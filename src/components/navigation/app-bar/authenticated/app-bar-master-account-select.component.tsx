@@ -1,5 +1,5 @@
-import { Immutable, Nullable } from '@fgo-planner/common-types';
-import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-types';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-core';
 import { MenuItem, TextField, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, ReactNode, useCallback, useEffect, useState } from 'react';

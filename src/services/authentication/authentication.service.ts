@@ -1,4 +1,4 @@
-import { Nullable } from '@fgo-planner/common-types';
+import { Nullable } from '@fgo-planner/common-core';
 import { UserCredentials } from '../../types/data';
 import { UserInfo } from '../../types/internal';
 

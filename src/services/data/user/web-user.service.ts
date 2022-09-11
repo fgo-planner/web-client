@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-types';
-import { User, UserPreferences } from '@fgo-planner/data-types';
+import { Nullable } from '@fgo-planner/common-core';
+import { User, UserPreferences } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { UserInfo } from '../../../types/internal';
 import { HttpUtils as Http } from '../../../utils/http.utils';

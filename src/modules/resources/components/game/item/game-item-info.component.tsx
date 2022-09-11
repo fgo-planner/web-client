@@ -1,5 +1,5 @@
-import { Immutable, ImmutableRecord, Nullable } from '@fgo-planner/common-types';
-import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/data-types';
+import { Immutable, ImmutableRecord, Nullable } from '@fgo-planner/common-core';
+import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/data-core';
 import { Fragment, PureComponent, ReactNode } from 'react';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { LoadingIndicator } from '../../../../../components/utils/loading-indicator.component';

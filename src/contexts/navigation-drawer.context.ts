@@ -1,4 +1,4 @@
-import { Supplier } from '@fgo-planner/common-types';
+import { Supplier } from '@fgo-planner/common-core';
 import { createContext } from 'react';
 
 export type NavigationDrawerContextProps = {

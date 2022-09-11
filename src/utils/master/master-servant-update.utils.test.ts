@@ -1,6 +1,5 @@
-import { ReadonlyRecord } from '@fgo-planner/common-types';
-import { MasterServantBondLevel } from '@fgo-planner/data-types';
-import { GameServantConstants } from '@fgo-planner/data-constants';
+import { ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameServantConstants, MasterServantBondLevel } from '@fgo-planner/data-core';
 import { MasterServantUpdateUtils } from './master-servant-update.utils';
 
 describe('MasterServantUtils.instantiate', () => {

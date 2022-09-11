@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameItem } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameItem } from '@fgo-planner/data-core';
 import React from 'react';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
 

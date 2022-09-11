@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { BasicPlan, BasicPlanGroup } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { BasicPlan, BasicPlanGroup } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';

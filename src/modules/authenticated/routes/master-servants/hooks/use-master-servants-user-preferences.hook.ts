@@ -1,4 +1,4 @@
-import { Immutable } from '@fgo-planner/common-types';
+import { Immutable } from '@fgo-planner/common-core';
 import { useCallback, useEffect, useState } from 'react';
 import { StorageKeys } from '../../../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../../../utils/storage/storage.utils';

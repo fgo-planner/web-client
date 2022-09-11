@@ -1,4 +1,4 @@
-import { ImmutableRecord } from '@fgo-planner/common-types';
+import { ImmutableRecord } from '@fgo-planner/common-core';
 import { ColumnProperties } from '../../../../../types/internal';
 
 export type PlanListColumn =

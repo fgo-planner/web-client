@@ -1,6 +1,5 @@
-import { Immutable, ImmutableArray, ReadonlyIterable } from '@fgo-planner/common-types';
-import { GameServantConstants } from '@fgo-planner/data-constants';
-import { GameServantClass, MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
+import { Immutable, ImmutableArray, ReadonlyIterable } from '@fgo-planner/common-core';
+import { GameServantClass, GameServantConstants, MasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import { IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';

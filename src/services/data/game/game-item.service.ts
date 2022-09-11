@@ -1,5 +1,5 @@
-import { Immutable, Nullable } from '@fgo-planner/common-types';
-import { GameItem } from '@fgo-planner/data-types';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { GameItem } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { GameItemList, GameItemMap, Page, Pagination } from '../../../types/data';

@@ -1,6 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameItemConstants } from '@fgo-planner/data-constants';
-import { MasterAccount, Plan, PlanServant } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameItemConstants, MasterAccount, Plan, PlanServant } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';

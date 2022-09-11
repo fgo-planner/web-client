@@ -1,9 +1,7 @@
-import { GameServant } from '@fgo-planner/data-types';
-import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameServant, GameServantConstants, MasterServantUtils } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
 import React, { useCallback } from 'react';
-import { GameServantConstants } from '@fgo-planner/data-constants';
-import { Immutable } from '@fgo-planner/common-types';
 
 type Props = {
     allowEmpty?: boolean;

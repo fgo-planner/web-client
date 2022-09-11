@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameSoundtrack } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameSoundtrack } from '@fgo-planner/data-core';
 import { Pause as PauseIcon, PlayArrow as PlayArrowIcon } from '@mui/icons-material';
 import { Checkbox, IconButton } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';

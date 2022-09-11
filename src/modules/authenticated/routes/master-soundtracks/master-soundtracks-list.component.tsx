@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-types';
-import { GameSoundtrack } from '@fgo-planner/data-types';
+import { Nullable } from '@fgo-planner/common-core';
+import { GameSoundtrack } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { alpha, Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';

@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-types';
-import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-types';
+import { Nullable } from '@fgo-planner/common-core';
+import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-core';
 import { SimplePaletteColorOptions, ThemeOptions } from '@mui/material/styles';
 import { colord } from 'colord';
 import { AssetConstants } from '../../constants';

@@ -1,9 +1,7 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameServant } from '@fgo-planner/data-types';
-import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameServant, GameServantConstants, MasterServantUtils } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
-import { GameServantConstants } from '@fgo-planner/data-constants';
 import { FormUtils } from '../../../utils/form.utils';
 
 type Props = {

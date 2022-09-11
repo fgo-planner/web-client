@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-types';
-import { MasterAccount, UserPreferences } from '@fgo-planner/data-types';
+import { Nullable } from '@fgo-planner/common-core';
+import { MasterAccount, UserPreferences } from '@fgo-planner/data-core';
 import { BasicMasterAccounts } from '../../types/data';
 import { HttpResponseError, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
 import { Functions } from '../functions';

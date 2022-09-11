@@ -1,6 +1,6 @@
+import { GameServantConstants } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback } from 'react';
-import { GameServantConstants } from '@fgo-planner/data-constants';
 import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../types/internal';
 import { FormUtils } from '../../../utils/form.utils';
 

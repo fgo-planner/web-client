@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { BasicMasterAccount } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { BasicMasterAccount } from '@fgo-planner/data-core';
 import React, { MouseEvent, useCallback } from 'react';
 import NumberFormat from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';

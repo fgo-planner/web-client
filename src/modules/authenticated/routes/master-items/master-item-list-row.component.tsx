@@ -1,7 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { MathUtils } from '@fgo-planner/common-utils';
-import { GameItemConstants } from '@fgo-planner/data-constants';
-import { GameItem } from '@fgo-planner/data-types';
+import { Immutable, MathUtils } from '@fgo-planner/common-core';
+import { GameItem, GameItemConstants } from '@fgo-planner/data-core';
 import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { useCallback, useRef, useState } from 'react';
 import NumberFormat, { NumberFormatValues, SourceInfo } from 'react-number-format';

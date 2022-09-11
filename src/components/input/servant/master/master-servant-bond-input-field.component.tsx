@@ -1,6 +1,6 @@
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
-import { GameServantConstants } from '@fgo-planner/data-constants';
+import { GameServantConstants } from '@fgo-planner/data-core';
 import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../types/internal';
 
 type Props = {

@@ -1,4 +1,4 @@
-import { ReadonlyPartial } from '@fgo-planner/common-types';
+import { ReadonlyPartial } from '@fgo-planner/common-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';

@@ -1,5 +1,5 @@
-import { ReadonlyRecord } from '@fgo-planner/common-types';
-import { MasterServantBondLevel } from '@fgo-planner/data-types';
+import { ReadonlyRecord } from '@fgo-planner/common-core';
+import { MasterServantBondLevel } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
 import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';

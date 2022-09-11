@@ -1,5 +1,5 @@
-import { Immutable, Nullable } from '@fgo-planner/common-types';
-import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-types';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-core';
 import { GroupAdd as GroupAddIcon } from '@mui/icons-material';
 import { Box, Button, IconButton, PaperProps, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';

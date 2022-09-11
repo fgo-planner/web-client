@@ -1,5 +1,5 @@
-import { Immutable } from '@fgo-planner/common-types';
-import { GameServant } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameServant } from '@fgo-planner/data-core';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import { Avatar, AvatarProps } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';

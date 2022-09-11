@@ -1,4 +1,4 @@
-import { ReadonlyRecord } from '@fgo-planner/common-types';
+import { ReadonlyRecord } from '@fgo-planner/common-core';
 import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, SelectProps, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, MouseEvent, useCallback, useState } from 'react';

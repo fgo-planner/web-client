@@ -1,4 +1,4 @@
-import { Plan, PlanGroup } from '@fgo-planner/data-types';
+import { Plan, PlanGroup } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { MasterAccountPlans } from '../../../types/data';
 import { HttpUtils as Http } from '../../../utils/http.utils';

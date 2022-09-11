@@ -1,4 +1,4 @@
-import { MasterServantBondLevel } from '@fgo-planner/data-types';
+import { MasterServantBondLevel } from '@fgo-planner/data-core';
 import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../../constants';
 

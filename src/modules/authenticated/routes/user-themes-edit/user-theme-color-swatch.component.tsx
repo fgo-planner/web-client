@@ -1,4 +1,4 @@
-import { RgbaColor } from '@fgo-planner/data-types';
+import { RgbaColor } from '@fgo-planner/data-core';
 import { Colorize as ColorizeIcon } from '@mui/icons-material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import { colord, RgbColor } from 'colord';

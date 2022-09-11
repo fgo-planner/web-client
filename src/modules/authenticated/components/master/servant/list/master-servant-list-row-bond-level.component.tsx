@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-types';
-import { MasterServantBondLevel } from '@fgo-planner/data-types';
+import { Nullable } from '@fgo-planner/common-core';
+import { MasterServantBondLevel } from '@fgo-planner/data-core';
 import React from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 

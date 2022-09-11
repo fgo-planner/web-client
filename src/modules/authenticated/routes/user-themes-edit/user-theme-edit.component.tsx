@@ -1,4 +1,4 @@
-import { UserWebClientTheme } from '@fgo-planner/data-types';
+import { UserWebClientTheme } from '@fgo-planner/data-core';
 import { Button } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';

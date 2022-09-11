@@ -1,4 +1,4 @@
-import { Nullable } from '@fgo-planner/common-types';
+import { Nullable } from '@fgo-planner/common-core';
 import { useEffect, useState } from 'react';
 import { GameSoundtrackService } from '../../services/data/game/game-soundtrack.service';
 import { GameSoundtrackList } from '../../types/data';

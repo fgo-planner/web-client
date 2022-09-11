@@ -1,6 +1,5 @@
-import { ImmutableArray } from '@fgo-planner/common-types';
-import { MasterServant } from '@fgo-planner/data-types';
-import { MasterServantUtils } from '@fgo-planner/data-utils';
+import { ImmutableArray } from '@fgo-planner/common-core';
+import { MasterServant, MasterServantUtils } from '@fgo-planner/data-core';
 import { useCallback, useEffect, useState } from 'react';
 import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
 import { SetUtils } from '../../../../../utils/set.utils';

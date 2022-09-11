@@ -1,4 +1,4 @@
-import { Nullable } from '@fgo-planner/common-types';
+import { Nullable } from '@fgo-planner/common-core';
 import { HttpResponseType } from './http-response-type.type';
 
 export type HttpOptions = {

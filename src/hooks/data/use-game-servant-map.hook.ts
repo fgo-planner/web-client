@@ -1,4 +1,4 @@
-import { Nullable } from '@fgo-planner/common-types';
+import { Nullable } from '@fgo-planner/common-core';
 import { useEffect, useState } from 'react';
 import { GameServantService } from '../../services/data/game/game-servant.service';
 import { GameServantMap } from '../../types/data';

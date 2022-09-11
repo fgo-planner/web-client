@@ -4,7 +4,7 @@ import React, { ReactNode, useMemo } from 'react';
 import NumberFormat from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
-import { GameItemConstants } from '@fgo-planner/data-constants';
+import { GameItemConstants } from '@fgo-planner/data-core';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { GameItemMap } from '../../../../types/data';
 import { MasterItemStats, MasterItemStatsFilterOptions } from './master-item-stats.utils';

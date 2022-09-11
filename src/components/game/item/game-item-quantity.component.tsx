@@ -1,7 +1,7 @@
 
 
-import { Immutable } from '@fgo-planner/common-types';
-import { GameItem } from '@fgo-planner/data-types';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameItem } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { GameItemThumbnail } from './game-item-thumbnail.component';

@@ -1,4 +1,4 @@
-import { DateTimeUtils } from '@fgo-planner/common-utils';
+import { DateTimeUtils } from '@fgo-planner/common-core';
 import { BaseTextFieldProps, TextField, TextFieldProps } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';

@@ -1,5 +1,5 @@
-import { Immutable, ReadonlyPartial } from '@fgo-planner/common-types';
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-types';
+import { Immutable, ReadonlyPartial } from '@fgo-planner/common-core';
+import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
 import React, { DOMAttributes } from 'react';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
 import { MasterServantListVisibleColumns } from './master-servant-list-columns';

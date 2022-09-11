@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-types';
-import { RgbaColor } from '@fgo-planner/data-types';
+import { Nullable } from '@fgo-planner/common-core';
+import { RgbaColor } from '@fgo-planner/data-core';
 import { Menu, PopoverOrigin } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';

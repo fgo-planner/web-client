@@ -1,5 +1,5 @@
-import { Immutable, ReadonlyPartial } from '@fgo-planner/common-core';
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
+import { ReadonlyPartial } from '@fgo-planner/common-core';
+import { ImmutableMasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
 import React, { DOMAttributes } from 'react';
 import { ObjectUtils } from '../../../../../../utils/object.utils';
 import { MasterServantListVisibleColumns } from './master-servant-list-columns';
@@ -12,7 +12,7 @@ import { MasterServantListRowSkillLevel } from './master-servant-list-row-skill-
 type Props = {
     active?: boolean;
     bond: MasterServantBondLevel | undefined;
-    masterServant: Immutable<MasterServant>;
+    masterServant: ImmutableMasterServant;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
 } & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu'>;
 

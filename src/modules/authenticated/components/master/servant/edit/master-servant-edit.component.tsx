@@ -1,11 +1,10 @@
 import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, MasterServantBondLevel, MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUtils } from '@fgo-planner/data-core';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../../../types/internal';
 import { MasterServantSelectAutocomplete } from '../master-servant-select-autocomplete.component';
 import { MasterServantEditCostumesTabContent } from './master-servant-edit-costumes-tab-content.component';
 import { MasterServantEditEnhancementsTabContent } from './master-servant-edit-enhancements-tab-content.component';

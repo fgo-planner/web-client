@@ -1,9 +1,8 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { MasterServant } from '@fgo-planner/data-core';
+import { ImmutableMasterServant } from '@fgo-planner/data-core';
 import { AssetConstants } from '../../../../../../constants';
 
 type Props = {
-    masterServant: Immutable<MasterServant>;
+    masterServant: ImmutableMasterServant;
 };
 
 export const StyleClassPrefix = 'MasterServantListRowLevel';

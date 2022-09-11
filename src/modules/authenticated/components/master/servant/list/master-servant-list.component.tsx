@@ -1,5 +1,5 @@
-import { Immutable, ImmutableArray, ReadonlyPartial, ReadonlyRecord } from '@fgo-planner/common-core';
-import { MasterServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
+import { ReadonlyPartial, ReadonlyRecord } from '@fgo-planner/common-core';
+import { ImmutableMasterServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';
@@ -27,7 +27,7 @@ type Props = {
      * the list by the parent component. The only transformation handled by this
      * component is sorting.
      */
-    masterServants: ImmutableArray<MasterServant>;
+    masterServants: ReadonlyArray<ImmutableMasterServant>;
     /**
      * Instance IDs of selected servants.
      */
@@ -73,7 +73,7 @@ export const MasterServantList = React.memo((props: Props) => {
         visibleColumns
     } = props;
 
-    const masterServantsProcessed = useMemo((): ImmutableArray<MasterServant> => {
+    const masterServantsProcessed = useMemo((): ReadonlyArray<ImmutableMasterServant> => {
         if (dragDropMode) {
             return masterServants;
         }
@@ -161,7 +161,7 @@ export const MasterServantList = React.memo((props: Props) => {
         return null;
     }
 
-    const renderMasterServantRow = (masterServant: Immutable<MasterServant>, index: number): ReactNode => {
+    const renderMasterServantRow = (masterServant: ImmutableMasterServant, index: number): ReactNode => {
         const { gameId, instanceId } = masterServant;
         const gameServant = gameServantMap[gameId];
         const bondLevel = bondLevels[gameId];

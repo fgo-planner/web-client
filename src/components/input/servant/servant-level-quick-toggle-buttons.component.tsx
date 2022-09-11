@@ -1,4 +1,4 @@
-import { GameServantConstants, MasterServantAscensionLevel } from '@fgo-planner/data-core';
+import { MasterServantAscensionLevel, MasterServantConstants } from '@fgo-planner/data-core';
 import { WineBarOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
@@ -32,15 +32,15 @@ export const ServantLevelQuickToggleButtons = React.memo((props: Props) => {
     } = props;
 
     const handleLeftButtonClick = useCallback((): void => {
-        onClick(GameServantConstants.MinLevel, GameServantConstants.MinAscensionLevel);
+        onClick(MasterServantConstants.MinLevel, MasterServantConstants.MinAscensionLevel);
     }, [onClick]);
 
     const handleCenterButtonClick = useCallback((): void => {
-        onClick(maxNaturalLevel, GameServantConstants.MaxAscensionLevel);
+        onClick(maxNaturalLevel, MasterServantConstants.MaxAscensionLevel);
     }, [onClick, maxNaturalLevel]);
 
     const handleRightButtonClick = useCallback((): void => {
-        onClick(100, GameServantConstants.MaxAscensionLevel);
+        onClick(100, MasterServantConstants.MaxAscensionLevel);
     }, [onClick]);
 
     return (
@@ -51,7 +51,7 @@ export const ServantLevelQuickToggleButtons = React.memo((props: Props) => {
 
             // Left button
             leftButtonIcon={<IconButtonText children={1} />}
-            leftButtonTooltip={`Set level to ${GameServantConstants.MinLevel}`}
+            leftButtonTooltip={`Set level to ${MasterServantConstants.MinLevel}`}
             onLeftButtonClick={handleLeftButtonClick}
 
             // Center button

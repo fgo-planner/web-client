@@ -1,4 +1,4 @@
-import { MasterServantUtils } from '@fgo-planner/data-core';
+import { ExistingMasterServantUpdate, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -12,8 +12,7 @@ import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-dro
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { SortDirection, SortOptions } from '../../../../types/data';
-import { ExistingMasterServantUpdate, MasterServantUpdate, ModalOnCloseReason } from '../../../../types/internal';
-import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
+import { ModalOnCloseReason } from '../../../../types/internal';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
@@ -219,7 +218,7 @@ export const MasterServantsRoute = React.memo(() => {
             costumes
         } = masterAccountEditData;
 
-        const editServantDialogData = MasterServantUpdateUtils.instantiateForNewServant(bondLevels, costumes);
+        const editServantDialogData = MasterServantUpdateUtils.createNew(bondLevels, costumes);
         setEditServantDialogData(editServantDialogData);
         setIsMultiAddServantDialogOpen(false);
         setDeleteServantDialogData(undefined);
@@ -242,7 +241,7 @@ export const MasterServantsRoute = React.memo(() => {
             costumes
         } = masterAccountEditData;
 
-        const editServantDialogData = MasterServantUpdateUtils.convertToUpdateObject(selectedServants, bondLevels, costumes);
+        const editServantDialogData = MasterServantUpdateUtils.createFromExisting(selectedServants, bondLevels, costumes);
         setEditServantDialogData(editServantDialogData);
         setIsMultiAddServantDialogOpen(false);
         setDeleteServantDialogData(undefined);
@@ -392,7 +391,7 @@ export const MasterServantsRoute = React.memo(() => {
 
     const handleMultiAddServantDialogClose = useCallback((event: any, reason: any, data?: MultiAddServantData): void => {
         if (data && data.gameIds.length) {
-            const servantData = MasterServantUpdateUtils.instantiateForNewServant();
+            const servantData = MasterServantUpdateUtils.createNew();
             servantData.summoned = data.summoned;
             addServants(data.gameIds, servantData);
         }

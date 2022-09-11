@@ -1,7 +1,6 @@
-import { GameServantConstants } from '@fgo-planner/data-core';
+import { MasterServantConstants, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback } from 'react';
-import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../types/internal';
 import { FormUtils } from '../../../utils/form.utils';
 
 type FouStat = 'fouHp' | 'fouAtk';
@@ -32,7 +31,7 @@ const IndeterminateDisplayText = '?';
  */
 const getFouInputStepSize = (value: string | undefined): number => {
     const numberValue = Number(value);
-    if (!numberValue || numberValue <= GameServantConstants.MaxFou / 2) {
+    if (!numberValue || numberValue <= MasterServantConstants.MaxFou / 2) {
         return 10;
     }
     return 20;
@@ -123,8 +122,8 @@ export const ServantFouInputField = React.memo((props: Props) => {
             type='number'
             inputProps={{
                 step: getFouInputStepSize(value),
-                min: GameServantConstants.MinFou,
-                max: GameServantConstants.MaxFou,
+                min: MasterServantConstants.MinFou,
+                max: MasterServantConstants.MaxFou,
                 onKeyPress: handleIndeterminateInput
             }}
             value={value}

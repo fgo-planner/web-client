@@ -1,5 +1,5 @@
 import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant, MasterServant, MasterServantAscensionLevel, MasterServantUtils, PlanServant, PlanServantEnhancements } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, MasterServant, MasterServantAscensionLevel, MasterServantUtils, PlanServant, PlanServantEnhancements } from '@fgo-planner/data-core';
 
 export class PlanServantUtils {
 
@@ -78,7 +78,7 @@ export class PlanServantUtils {
      * Updates the current enhancements of the given `PlanServant` with the data
      * from the given `MasterServant`. Does not populate the `costumes` field.
      */
-    static updateCurrentEnhancements(planServant: PlanServant, masterServant: Immutable<MasterServant>): void {
+    static updateCurrentEnhancements(planServant: PlanServant, masterServant: ImmutableMasterServant): void {
         this.updateEnhancements(planServant.current, masterServant);
     }
 
@@ -88,7 +88,7 @@ export class PlanServantUtils {
      */
     static updateEnhancements(
         enhancements: PlanServantEnhancements,
-        masterServant: Immutable<MasterServant>
+        masterServant: ImmutableMasterServant
     ): void;
     /**
      * Updates the target `PlanServantEnhancements` with the values from the source
@@ -103,7 +103,7 @@ export class PlanServantUtils {
      */
     static updateEnhancements(
         target: PlanServantEnhancements,
-        source: Immutable<MasterServant> | Immutable<PlanServantEnhancements>
+        source: ImmutableMasterServant | Immutable<PlanServantEnhancements>
     ): void {
         target.level = source.level;
         target.ascension = source.ascension;
@@ -122,8 +122,8 @@ export class PlanServantUtils {
      */
     static findAvailableServants(
         planServants: ImmutableArray<PlanServant>,
-        masterServants: ImmutableArray<MasterServant>
-    ): Array<Immutable<MasterServant>> {
+        masterServants: ReadonlyArray<ImmutableMasterServant>
+    ): Array<ImmutableMasterServant> {
         const planInstanceIds = new Set<number>();
         for (const { instanceId } of planServants) {
             planInstanceIds.add(instanceId);

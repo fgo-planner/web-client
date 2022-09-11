@@ -1,5 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { BasicPlan, BasicPlanGroup, Plan } from '@fgo-planner/data-core';
+import { ImmutableBasicPlan, ImmutableBasicPlanGroup, Plan } from '@fgo-planner/data-core';
 import { PostAddOutlined } from '@mui/icons-material';
 import { Button, IconButton, PaperProps, TextField, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -13,7 +12,7 @@ import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-activ
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { MasterAccountPlans, PlanType } from '../../../../types/data';
+import { BasicPlans, PlanType } from '../../../../types/data';
 import { ModalOnCloseReason } from '../../../../types/internal';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
@@ -30,7 +29,7 @@ const AddPlanDialogPaperProps: PaperProps = {
 
 const DeleteTargetDialogTitle = 'Delete Plan?';
 
-const generateDeleteTargetDialogPrompt = (target: Immutable<BasicPlan | BasicPlanGroup>): string => {
+const generateDeleteTargetDialogPrompt = (target: ImmutableBasicPlan | ImmutableBasicPlanGroup): string => {
     const { name } = target;
     let prompt = 'Are you sure you want to delete';
     if (name) {
@@ -129,10 +128,10 @@ export const PlansRoute = React.memo(() => {
 
     const planService = useInjectable(PlanService);
 
-    const [accountPlans, setAccountPlans] = useState<MasterAccountPlans>();
+    const [accountPlans, setAccountPlans] = useState<BasicPlans>();
 
     const [selectedId, setSelectedId] = useState<string>();
-    const selectedRef = useRef<{ type: PlanType; target: Immutable<BasicPlan | BasicPlanGroup>; }>();
+    const selectedRef = useRef<{ type: PlanType; target: ImmutableBasicPlan | ImmutableBasicPlanGroup; }>();
 
     const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
 
@@ -259,7 +258,7 @@ export const PlansRoute = React.memo(() => {
         navigate(planId);
     }, [navigate]);
 
-    const handleSelectionChange = useCallback((target: Immutable<BasicPlan | BasicPlanGroup> | undefined, type: PlanType): void => {
+    const handleSelectionChange = useCallback((target: ImmutableBasicPlan | ImmutableBasicPlanGroup | undefined, type: PlanType): void => {
         if (!target) {
             selectedRef.current = undefined;
         } else {

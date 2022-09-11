@@ -1,7 +1,6 @@
-import { GameServantConstants } from '@fgo-planner/data-core';
+import { MasterServantConstants, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
-import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../types/internal';
 
 type SkillSet = 'skills' | 'appendSkills';
 
@@ -69,7 +68,7 @@ export const ServantSkillInputField = React.memo((props: Props) => {
             >
                 {multiEditMode && <option key={IndeterminateValue} value={IndeterminateValue}>{IndeterminateDisplayText}</option>}
                 {allowEmpty && <option value=''>{'\u2014'}</option>}
-                {GameServantConstants.SkillLevels.map(value => (
+                {MasterServantConstants.SkillLevels.map(value => (
                     <option key={value} value={value}>
                         {value}
                     </option>

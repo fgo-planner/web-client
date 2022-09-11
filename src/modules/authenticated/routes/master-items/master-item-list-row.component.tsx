@@ -1,5 +1,5 @@
 import { Immutable, MathUtils } from '@fgo-planner/common-core';
-import { GameItem, GameItemConstants } from '@fgo-planner/data-core';
+import { GameItem, MasterItemConstants } from '@fgo-planner/data-core';
 import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { useCallback, useRef, useState } from 'react';
 import NumberFormat, { NumberFormatValues, SourceInfo } from 'react-number-format';
@@ -16,7 +16,7 @@ const QuantityInputProps: InputBaseComponentProps = {
     type: 'tel',
     step: 1,
     min: 0,
-    max: GameItemConstants.MaxItemQuantity,
+    max: MasterItemConstants.MaxQuantity,
 };
 
 const isQuantityValueAllowed = ({floatValue}: NumberFormatValues): boolean => {
@@ -42,7 +42,7 @@ export const MasterItemListRow = React.memo((props: Props) => {
 
     const handleItemQuantityChange = useCallback((values: NumberFormatValues, sourceInfo: SourceInfo): void => {
         const value = Math.floor(values.floatValue || 0);
-        const quantity = MathUtils.clamp(value, 0, GameItemConstants.MaxItemQuantity);
+        const quantity = MathUtils.clamp(value, 0, MasterItemConstants.MaxQuantity);
         onChange(gameItem._id, quantity);
     }, [gameItem._id, onChange]);
 

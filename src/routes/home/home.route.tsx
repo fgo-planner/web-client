@@ -1,5 +1,5 @@
-import { Immutable, Nullable } from '@fgo-planner/common-core';
-import { MasterAccount } from '@fgo-planner/data-core';
+import { Nullable } from '@fgo-planner/common-core';
+import { ImmutableMasterAccount } from '@fgo-planner/data-core';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
 import { AppBarElevateOnScroll } from '../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
@@ -18,7 +18,7 @@ const StyleClassPrefix = 'Home';
 
 export const HomeRoute = React.memo(() => {
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
 
     /*
      * Master account change subscription.

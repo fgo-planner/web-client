@@ -1,5 +1,5 @@
 import { DateTimeUtils, Immutable, ImmutableArray, Nullable } from '@fgo-planner/common-core';
-import { MasterAccount, MasterServant, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
+import { ImmutableMasterAccount, ImmutableMasterServant, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
 import { Add as AddIcon, FormatSize as FormatSizeIcon, HideImageOutlined as HideImageOutlinedIcon } from '@mui/icons-material';
 import { IconButton, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -57,7 +57,7 @@ const PathMatchPattern: PathPattern = {
  */
 const instantiatePlanServant = (
     planServants: ImmutableArray<PlanServant>,
-    masterServants: ImmutableArray<MasterServant>
+    masterServants: ReadonlyArray<ImmutableMasterServant>
 ): PlanServant => {
     /**
      * Servants that have not been added to the plan yet.
@@ -162,7 +162,7 @@ export const PlanRoute = React.memo(() => {
 
     const gameServantMap = useGameServantMap();
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
     
     /**
      * The plan data loaded from the backend. This should not be modified or used

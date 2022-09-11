@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameItemConstants, MasterAccount, Plan, PlanServant } from '@fgo-planner/data-core';
+import { GameItemConstants, ImmutableMasterAccount, Plan, PlanServant } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
@@ -12,7 +12,7 @@ import { PlanRequirementsTableOptions } from './plan-requirements-table-options.
 import { PlanRequirementsTableServantRow } from './plan-requirements-table-servant-row.component';
 
 type Props = {
-    masterAccount: Immutable<MasterAccount>;
+    masterAccount: ImmutableMasterAccount;
     /**
      * @deprecated Remove edit button from servant row
      */

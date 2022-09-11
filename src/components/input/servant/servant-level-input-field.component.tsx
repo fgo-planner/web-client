@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, GameServantConstants, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, MasterServantConstants, MasterServantUtils } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
 import { FormUtils } from '../../../utils/form.utils';
@@ -28,13 +28,13 @@ const IndeterminateDisplayText = '?';
 
 const InputProps = {
     step: 1,
-    min: GameServantConstants.MinLevel,
-    max: GameServantConstants.MaxLevel
+    min: MasterServantConstants.MinLevel,
+    max: MasterServantConstants.MaxLevel
 } as InputBaseComponentProps;
 
 const transformLevelValue = (value: string): number => {
-    const level = FormUtils.convertToInteger(value, GameServantConstants.MinLevel, GameServantConstants.MaxLevel);
-    return level || GameServantConstants.MinLevel;
+    const level = FormUtils.convertToInteger(value, MasterServantConstants.MinLevel, MasterServantConstants.MaxLevel);
+    return level || MasterServantConstants.MinLevel;
 };
 
 /**

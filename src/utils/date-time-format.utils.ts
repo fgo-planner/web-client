@@ -1,5 +1,7 @@
-import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { Nullable, ReadonlyDate } from '@fgo-planner/common-core';
 import { format } from 'date-fns';
+
+type AnyDate = Date | ReadonlyDate;
 
 export class DateTimeFormatUtils {
 
@@ -10,7 +12,7 @@ export class DateTimeFormatUtils {
         
     }
 
-    static formatForDataTable(date: Nullable<number | Immutable<Date>>): string {
+    static formatForDataTable(date: Nullable<AnyDate | number>): string {
         if (date == null) {
             return '';
         }

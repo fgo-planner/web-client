@@ -1,6 +1,6 @@
 import { Plan, PlanGroup } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { MasterAccountPlans } from '../../../types/data';
+import { BasicPlans } from '../../../types/data';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 
 @Injectable
@@ -40,8 +40,8 @@ export class PlanService {
         return Http.delete<boolean>(`${this._BaseUrl}/group/${id}`);
     }
 
-    async getForAccount(accountId: string): Promise<MasterAccountPlans> {
-        return Http.get<MasterAccountPlans>(`${this._BaseUrl}/account/${accountId}`, this._transformAccountPlans.bind(this));
+    async getForAccount(accountId: string): Promise<BasicPlans> {
+        return Http.get<BasicPlans>(`${this._BaseUrl}/account/${accountId}`, this._transformAccountPlans.bind(this));
     }
 
     private _transformPlanGroup(planGroup: PlanGroup): PlanGroup {
@@ -57,7 +57,7 @@ export class PlanService {
         return Http.stringTimestampsToDate(plan);
     }
 
-    private _transformAccountPlans(accountPlans: any): MasterAccountPlans {
+    private _transformAccountPlans(accountPlans: any): BasicPlans {
         for (const planGroup of accountPlans.planGroups) {
             this._transformPlanGroup(planGroup);
         }

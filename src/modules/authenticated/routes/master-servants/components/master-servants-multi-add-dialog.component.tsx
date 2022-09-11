@@ -1,5 +1,4 @@
-import { ImmutableArray } from '@fgo-planner/common-core';
-import { MasterServant } from '@fgo-planner/data-core';
+import { ImmutableMasterServant } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormGroup, InputLabel, PaperProps, Select, Switch, Typography } from '@mui/material';
 import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useRef, useState } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
@@ -13,7 +12,7 @@ export type MultiAddServantData = {
 };
 
 type Props = {
-    masterServants: ImmutableArray<MasterServant>;
+    masterServants: ReadonlyArray<ImmutableMasterServant>;
 } & Omit<DialogComponentProps<MultiAddServantData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';

@@ -1,5 +1,5 @@
 import { Immutable, ReadonlyPartial } from '@fgo-planner/common-core';
-import { GameServant, MasterServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { DataTableListDraggableRow } from '../../../../../../components/data-table-list/data-table-list-draggable-row.component';
 import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
@@ -15,7 +15,7 @@ type Props = {
     gameServant: Immutable<GameServant> | undefined; // Not optional, but possible to be undefined.
     index: number;
     lastRow?: boolean;
-    masterServant: Immutable<MasterServant>;
+    masterServant: ImmutableMasterServant;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     onClick?: (e: MouseEvent, index: number) => void;
     onContextMenu?: (e: MouseEvent, index: number) => void;

@@ -1,4 +1,4 @@
-import { NewMasterServantUpdate } from '../../types/internal';
+import { NewMasterServantUpdate } from '@fgo-planner/data-core';
 
 /**
  * @deprecated

@@ -9,13 +9,12 @@
     ]
   },
   "dependencies": {
-    "@babel/preset-env": "^7.15.6",
     "@date-io/date-fns": "^2.13.1",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
-    "@fgo-planner/common-core": "^0.0.1",
-    "@fgo-planner/data-core": "^0.0.2",
-    "@fgo-planner/transform-core": "^0.0.1",
+    "@fgo-planner/common-core": "^0.0.3",
+    "@fgo-planner/data-core": "^0.1.2",
+    "@fgo-planner/transform-core": "^0.0.2",
     "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.8.0",
     "@mui/styles": "^5.8.0",
@@ -50,6 +49,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.15.6",
     "@types/jest": "^27.4.1",
     "@types/jsonwebtoken": "^8.5.5",
     "@types/lodash": "^4.14.178",

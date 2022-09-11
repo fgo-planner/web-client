@@ -1,5 +1,5 @@
-import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant, GameServantConstants, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantSkillLevel, Plan, PlanServant } from '@fgo-planner/data-core';
+import { Immutable, ImmutableArray, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, MasterServantAscensionLevel, MasterServantConstants, MasterServantSkillLevel, Plan, PlanServant } from '@fgo-planner/data-core';
 import { GameServantMap, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types/data';
 import { ArrayUtils } from '../array.utils';
 import { ObjectUtils } from '../object.utils';
@@ -35,17 +35,17 @@ type ServantEnhancements = Immutable<{
 /**
  * Simplified version of `MasterAccount` for internal use.
  */
-type MasterAccountData = Immutable<{
+type MasterAccountData = Readonly<{
     /**
      * Map of item quantities held by the master account, where the key is the
      * `itemId` and the value is the quantity.
      */
-    items: Record<number, number>;
+    items: ReadonlyRecord<number, number>;
     /**
      * Map of servants in the master account, where the key is the `instanceId` and
      * the value is the `MasterServant`
      */
-    servants: Record<number, MasterServant>;
+    servants: ReadonlyRecord<number, ImmutableMasterServant>;
     costumes: ReadonlySet<number>;
     qp: number;
 }>;
@@ -66,16 +66,16 @@ export class PlanComputationUtils {
 
     private static get _defaultTargetEnhancements(): Immutable<ServantEnhancements> {
         return {
-            ascension: GameServantConstants.MaxAscensionLevel,
+            ascension: MasterServantConstants.MaxAscensionLevel,
             skills: {
-                1: GameServantConstants.MaxSkillLevel,
-                2: GameServantConstants.MaxSkillLevel,
-                3: GameServantConstants.MaxSkillLevel
+                1: MasterServantConstants.MaxSkillLevel,
+                2: MasterServantConstants.MaxSkillLevel,
+                3: MasterServantConstants.MaxSkillLevel
             },
             appendSkills: {
-                1: GameServantConstants.MaxSkillLevel,
-                2: GameServantConstants.MaxSkillLevel,
-                3: GameServantConstants.MaxSkillLevel,
+                1: MasterServantConstants.MaxSkillLevel,
+                2: MasterServantConstants.MaxSkillLevel,
+                3: MasterServantConstants.MaxSkillLevel,
             }
         };
     };
@@ -133,7 +133,7 @@ export class PlanComputationUtils {
      */
     static computePlanRequirements(
         gameServantMap: GameServantMap,
-        masterAccount: Immutable<MasterAccount>,
+        masterAccount: ImmutableMasterAccount,
         targetPlan: Immutable<Plan>,
         previousPlans?: ImmutableArray<Plan>,
         optionsOverride?: ComputationOptions
@@ -260,7 +260,7 @@ export class PlanComputationUtils {
     private static _computePlanServantRequirements(
         result: PlanRequirements,
         gameServant: Immutable<GameServant>,
-        masterServant: Immutable<MasterServant>,
+        masterServant: ImmutableMasterServant,
         planServant: Immutable<PlanServant>,
         // masterAccountData: MasterAccountData,
         options: ComputationOptions
@@ -307,7 +307,7 @@ export class PlanComputationUtils {
         return [planServantRequirements, enhancementRequirements];
     }
 
-    private static _preProcessMasterAccount(masterAccount: Immutable<MasterAccount>): MasterAccountData {
+    private static _preProcessMasterAccount(masterAccount: ImmutableMasterAccount): MasterAccountData {
         const servants = ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
         const items = ArrayUtils.mapArrayToObject(masterAccount.resources.items, item => item.itemId, item => item.quantity);
         const costumes = new Set(masterAccount.costumes);
@@ -437,7 +437,7 @@ export class PlanComputationUtils {
 
         for (const [key, skill] of Object.entries(skillMaterials)) {
             const skillLevel = Number(key);
-            if (excludeLores && skillLevel === (GameServantConstants.MaxSkillLevel - 1)) {
+            if (excludeLores && skillLevel === (MasterServantConstants.MaxSkillLevel - 1)) {
                 continue;
             }
             /*

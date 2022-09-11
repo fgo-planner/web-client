@@ -1,15 +1,11 @@
-import { Immutable, ImmutableArray, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameItemConstants } from '@fgo-planner/data-core';
-import { MasterAccount, MasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
-import { MasterServantUtils } from '@fgo-planner/data-core';
+import { Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, MasterAccount, MasterServant, MasterServantBondLevel, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdate } from '@fgo-planner/data-core';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
-import { ExistingMasterServantUpdate, NewMasterServantUpdate } from '../../../types/internal';
 import { ArrayUtils } from '../../../utils/array.utils';
 import { MapUtils } from '../../../utils/map.utils';
-import { MasterServantUpdateUtils } from '../../../utils/master/master-servant-update.utils';
 import { ObjectUtils } from '../../../utils/object.utils';
 import { SetUtils } from '../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
@@ -59,7 +55,7 @@ type MasterAccountEditReferenceData = {
     /**
      * Use a `Map` for this to maintain order of insertion.
      */
-    servants: ReadonlyMap<number, Immutable<MasterServant>>;
+    servants: ReadonlyMap<number, ImmutableMasterServant>;
     soundtracks: ReadonlySet<number>;
 };
 
@@ -74,7 +70,7 @@ type MasterAccountEditData = {
      * servants that were edited (tracked by `instanceId`) will also be
      * reconstructed.
      */
-    servants: ImmutableArray<MasterServant>;
+    servants: ReadonlyArray<ImmutableMasterServant>;
     soundtracks: ReadonlySet<number>;
 };
 
@@ -174,7 +170,7 @@ const getDefaultMasterAccountEditData = (): MasterAccountEditData => ({
 });
 
 const cloneMasterAccountDataForEdit = (
-    masterAccount: Nullable<Immutable<MasterAccount>>,
+    masterAccount: Nullable<ImmutableMasterAccount>,
     options: MasterAccountDataEditHookIncludeOptions
 ): MasterAccountEditData => {
     const result = getDefaultMasterAccountEditData();
@@ -212,7 +208,7 @@ const getDefaultMasterAccountReferenceData = (): MasterAccountEditReferenceData 
 });
 
 const cloneMasterAccountDataForReference = (
-    masterAccount: Nullable<Immutable<MasterAccount>>,
+    masterAccount: Nullable<ImmutableMasterAccount>,
     options: MasterAccountDataEditHookIncludeOptions
 ): Readonly<MasterAccountEditReferenceData> => {
     const result = getDefaultMasterAccountReferenceData();
@@ -267,8 +263,8 @@ const isDataDirty = (dirtyData: MasterAccountEditDirtyData): boolean => (
 );
 
 const isServantsChanged = (
-    reference: Immutable<MasterServant> | undefined,
-    servant: Immutable<MasterServant>
+    reference: ImmutableMasterServant | undefined,
+    servant: ImmutableMasterServant
 ): boolean => {
     if (!reference) {
         return true;
@@ -276,8 +272,8 @@ const isServantsChanged = (
     return !MasterServantUtils.isEqual(reference, servant);
 };
 const isServantsOrderChanged = (
-    reference: ReadonlyMap<number, Immutable<MasterServant>>,
-    servants: Array<Immutable<MasterServant>>
+    reference: ReadonlyMap<number, ImmutableMasterServant>,
+    servants: Array<ImmutableMasterServant>
 ): boolean => {
     if (reference.size !== servants.length) {
         return true;
@@ -365,7 +361,7 @@ export function useMasterAccountDataEditHook(
     /**
      * The original master account data.
      */
-    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
 
     /**
      * The transformed copy of the master account data for editing.
@@ -517,8 +513,8 @@ export function useMasterAccountDataEditHook(
          * add to an array.
          */
         const newServants = toArray(servantIds).map(servantId => {
-            const newServant = MasterServantUtils.instantiate(instanceId++);
-            MasterServantUpdateUtils.applyFromUpdateObject(newServant, servantData, bondLevels);
+            const newServant = MasterServantUtils.create(instanceId++);
+            MasterServantUpdateUtils.applyToMasterServant(servantData, newServant, bondLevels);
             newServant.gameId = servantId;
 
             return newServant;
@@ -593,7 +589,7 @@ export function useMasterAccountDataEditHook(
              * re-constructed to conform with the hook specifications.
              */
             const targetServant = MasterServantUtils.clone(servant);
-            MasterServantUpdateUtils.applyFromUpdateObject(targetServant, update, bondLevels);
+            MasterServantUpdateUtils.applyToMasterServant(update, targetServant, bondLevels);
 
             const referenceServant = referenceData.servants.get(instanceId);
             const isDirty = isServantsChanged(referenceServant, targetServant);

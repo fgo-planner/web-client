@@ -1,5 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { BasicMasterAccount } from '@fgo-planner/data-core';
+import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
 import React, { MouseEvent, useCallback } from 'react';
 import NumberFormat from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';
@@ -8,12 +7,12 @@ import { DateTimeFormatUtils } from '../../../../../utils/date-time-format.utils
 import { MasterAccountListVisibleColumns } from './master-account-list-columns';
 
 type Props = {
-    account: Immutable<BasicMasterAccount>;
+    account: ImmutableBasicMasterAccount;
     active: boolean;
     index: number;
-    onClick: (e: MouseEvent, account: Immutable<BasicMasterAccount>) => void;
-    onContextMenu: (e: MouseEvent, account: Immutable<BasicMasterAccount>) => void;
-    onDoubleClick: (e: MouseEvent, account: Immutable<BasicMasterAccount>) => void;
+    onClick: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
+    onContextMenu: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
+    onDoubleClick: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
     visibleColumns: Readonly<MasterAccountListVisibleColumns>;
 };
 

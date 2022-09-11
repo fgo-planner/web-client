@@ -9,7 +9,6 @@ export * from './dependency-injection/injected-field.type';
 export * from './device/device-info.type';
 export * from './device/device-type.enum';
 export * from './dto/column-properties.type';
-export * from './dto/master-servant-update.type';
 export * from './dto/navigation-drawer-content.type';
 export * from './http/http-options.type';
 export * from './http/http-response-error.type';

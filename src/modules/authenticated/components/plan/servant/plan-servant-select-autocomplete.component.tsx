@@ -1,5 +1,5 @@
-import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant, MasterServant } from '@fgo-planner/data-core';
+import { Immutable } from '@fgo-planner/common-core';
+import { GameServant, ImmutableMasterServant } from '@fgo-planner/data-core';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
@@ -8,21 +8,21 @@ import { useGameServantMap } from '../../../../../hooks/data/use-game-servant-ma
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
 type Props = {
-    availableServants?: ImmutableArray<MasterServant>;
+    availableServants?: ReadonlyArray<ImmutableMasterServant>;
     disabled?: boolean;
-    onChange?: (event: ChangeEvent<{}>, value: Immutable<MasterServant>) => void;
+    onChange?: (event: ChangeEvent<{}>, value: ImmutableMasterServant) => void;
     /**
      * The `MasterServant` instance that corresponds to the currently selected
      * option.
      */
-    selectedServant?: Immutable<MasterServant>;
+    selectedServant?: ImmutableMasterServant;
     size?: 'small' | 'medium';
 };
 
-type ServantOption = Immutable<{
+type ServantOption = Readonly<{
     label: string;
-    gameServant: GameServant;
-    masterServant: MasterServant;
+    gameServant: Immutable<GameServant>;
+    masterServant: ImmutableMasterServant;
 }>;
 
 const optionStyles = {
@@ -42,7 +42,7 @@ const optionStyles = {
     } as SystemStyleObject<Theme>
 };
 
-const generateServantOption = (gameServant: Immutable<GameServant>, masterServant: Immutable<MasterServant>): ServantOption => {
+const generateServantOption = (gameServant: Immutable<GameServant>, masterServant: ImmutableMasterServant): ServantOption => {
     const label = gameServant.metadata?.displayName || gameServant.name || String(gameServant._id);
     return {
         label,

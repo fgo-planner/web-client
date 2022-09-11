@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, MasterServant, PlanServant } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, PlanServant } from '@fgo-planner/data-core';
 import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, Edit as EditIcon } from '@mui/icons-material';
 import { Box, IconButton, Theme } from '@mui/material';
 import { useTheme } from '@mui/system';
@@ -15,7 +15,7 @@ type Props = {
     borderBottom?: boolean;
     borderTop?: boolean;
     gameServant: Immutable<GameServant>;
-    masterServant: Immutable<MasterServant>;
+    masterServant: ImmutableMasterServant;
     /**
      * @deprecated Remove edit button from servant row
      */

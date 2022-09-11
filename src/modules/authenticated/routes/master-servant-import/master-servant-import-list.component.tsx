@@ -1,4 +1,4 @@
-import { MasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
+import { MasterServant, MasterServantBondLevel, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils } from '@fgo-planner/data-core';
 import { Check as CheckIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { Button, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -7,8 +7,7 @@ import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { MasterServantUpdateIndeterminateValue as IndeterminateValue, ModalOnCloseReason } from '../../../../types/internal';
-import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
+import { ModalOnCloseReason } from '../../../../types/internal';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantImportExistingDialog } from './master-servant-import-existing-dialog.component';
@@ -118,7 +117,7 @@ export const MasterServantImportList = React.memo((props: Props) => {
             if (bondLevel !== undefined && bondLevel !== IndeterminateValue) {
                 bondLevels[parsedUpdate.gameId] = bondLevel;
             }
-            const masterServant = MasterServantUpdateUtils.convertToMasterServant(instanceId++, parsedUpdate, bondLevels);
+            const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedUpdate, bondLevels);
             masterServants.push(masterServant);
         }
         return { masterServants, bondLevels };

@@ -1,5 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { MasterAccount } from '@fgo-planner/data-core';
+import { ImmutableMasterAccount } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
@@ -9,7 +8,7 @@ import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.c
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
 
 type Props = {
-    masterAccount: Immutable<MasterAccount>;
+    masterAccount: ImmutableMasterAccount;
     options: PlanRequirementsTableOptionsInternal;
     planRequirements: PlanRequirements;
 };

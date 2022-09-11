@@ -1,5 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { BasicPlan } from '@fgo-planner/data-core';
+import { ImmutableBasicPlan } from '@fgo-planner/data-core';
 import { Link as MuiLink } from '@mui/material';
 import React, { MouseEvent, useCallback } from 'react';
 import { Link } from 'react-router-dom';
@@ -11,10 +10,10 @@ import { PlanListVisibleColumns } from './plan-list-columns';
 
 type Props = {
     active: boolean;
-    onClick: (e: MouseEvent, plan: Immutable<BasicPlan>) => void;
-    onContextMenu: (e: MouseEvent, plan: Immutable<BasicPlan>) => void;
-    onDoubleClick: (e: MouseEvent, plan: Immutable<BasicPlan>) => void;
-    plan: Immutable<BasicPlan>;
+    onClick: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
+    onContextMenu: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
+    onDoubleClick: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
+    plan: ImmutableBasicPlan;
     visibleColumns: Readonly<PlanListVisibleColumns>;
 };
 

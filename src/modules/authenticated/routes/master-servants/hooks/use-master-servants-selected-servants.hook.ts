@@ -1,17 +1,16 @@
-import { ImmutableArray } from '@fgo-planner/common-core';
-import { MasterServant, MasterServantUtils } from '@fgo-planner/data-core';
+import { ImmutableMasterServant, MasterServantUtils } from '@fgo-planner/data-core';
 import { useCallback, useEffect, useState } from 'react';
 import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
 import { SetUtils } from '../../../../../utils/set.utils';
 
 type SelectedServantsData = {
     instanceIds: ReadonlySet<number>;
-    servants: ImmutableArray<MasterServant>;  // TODO Add option for ordering
+    servants: ReadonlyArray<ImmutableMasterServant>  // TODO Add option for ordering
 };
 
 class SelectedServantsDataContainer implements SelectedServantsData {
 
-    selectedServants?: ImmutableArray<MasterServant>;
+    selectedServants?: ReadonlyArray<ImmutableMasterServant>;
 
     selectedInstanceIds: ReadonlySet<number> = SetUtils.emptySet();
 
@@ -25,7 +24,7 @@ class SelectedServantsDataContainer implements SelectedServantsData {
      * 
      * TODO Add option to order by the `selectedInstanceIds` set.
      */
-    get servants(): ImmutableArray<MasterServant> {
+    get servants(): ReadonlyArray<ImmutableMasterServant> {
         if (!this.selectedServants) {
             const selectedInstanceIds = this.selectedInstanceIds;
             this.selectedServants = this.sourceData.filter(({ instanceId }) => {
@@ -35,7 +34,7 @@ class SelectedServantsDataContainer implements SelectedServantsData {
         return this.selectedServants!;
     }
 
-    constructor(public sourceData: ImmutableArray<MasterServant>) {
+    constructor(public sourceData: ReadonlyArray<ImmutableMasterServant>) {
 
     }
 
@@ -58,7 +57,7 @@ type MasterServantsSelectedServantsHootResult = {
  * other routes need to use it.
  */
 export const useMasterServantsSelectedServants = (
-    sourceData: ImmutableArray<MasterServant>
+    sourceData: ReadonlyArray<ImmutableMasterServant>
 ): MasterServantsSelectedServantsHootResult => {
 
     const forceUpdate = useForceUpdate();

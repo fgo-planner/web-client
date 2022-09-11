@@ -1,5 +1,5 @@
 import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant, MasterServant, PlanServant } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, PlanServant } from '@fgo-planner/data-core';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
@@ -11,7 +11,7 @@ import { PlanServantEditCostumesTabContent } from './plan-servant-edit-costumes-
 import { PlanServantEditEnhancementsTabContent } from './plan-servant-edit-enhancements-tab-content.component';
 
 type Props = {
-    masterServants: ImmutableArray<MasterServant>;
+    masterServants: ReadonlyArray<ImmutableMasterServant>;
     onChange?: (planServant: PlanServant) => void;
     /**
      * The planned servant to edit. This will be modified directly, so provide a
@@ -81,10 +81,10 @@ export const PlanServantEdit = React.memo((props: Props) => {
     /**
      * The servants available for the servant select.
      */
-    const [availableServants, setAvailableServants] = useState<ImmutableArray<MasterServant>>([]);
+    const [availableServants, setAvailableServants] = useState<ReadonlyArray<ImmutableMasterServant>>([]);
 
     const [gameServant, setGameServant] = useState<Immutable<GameServant>>();
-    const [masterServant, setMasterServant] = useState<Immutable<MasterServant>>();
+    const [masterServant, setMasterServant] = useState<ImmutableMasterServant>();
 
     const [activeTab, setActiveTab] = useState<TabId>('target');
 
@@ -123,7 +123,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
     
     //#region Input event handlers
 
-    const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: Immutable<MasterServant>): void => {
+    const handleSelectedServantChange = useCallback((event: ChangeEvent<{}>, value: ImmutableMasterServant): void => {
         if (!gameServantMap || servantSelectDisabled) {
             return;
         }

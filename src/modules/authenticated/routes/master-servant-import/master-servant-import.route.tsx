@@ -1,5 +1,5 @@
 import { Array2D, Immutable, ImmutableRecord, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, MasterAccount, MasterServant, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, MasterAccount, MasterServant, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { FgoManagerParsers, TransformLogger } from '@fgo-planner/transform-core';
 import { Options } from 'csv-parse';
 import { parse } from 'csv-parse/sync';
@@ -11,8 +11,6 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
-import { MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../types/internal';
-import { MasterServantUpdateUtils } from '../../../../utils/master/master-servant-update.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
@@ -197,7 +195,7 @@ const MasterServantImportRoute = React.memo(() => {
             /*
              * Merge the parsed servants into the existing servants.
              */
-            MasterServantUpdateUtils.batchApplyFromUpdateObjects(servants, parsedData.servantUpdates, bondLevels);
+            MasterServantUpdateUtils.batchApplyToMasterServants(parsedData.servantUpdates, servants, bondLevels);
 
             update.servants = servants;
         } else {
@@ -208,7 +206,7 @@ const MasterServantImportRoute = React.memo(() => {
             let instanceId = MasterServantUtils.getLastInstanceId(masterAccount.servants) + 1;
             const masterServants = [] as Array<MasterServant>;
             for (const parsedUpdate of parsedData.servantUpdates) {
-                const masterServant = MasterServantUpdateUtils.convertToMasterServant(instanceId++, parsedUpdate, bondLevels);
+                const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedUpdate, bondLevels);
                 masterServants.push(masterServant);
             }
 

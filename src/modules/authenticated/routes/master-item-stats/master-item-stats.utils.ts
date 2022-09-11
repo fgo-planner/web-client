@@ -1,6 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameItemConstants } from '@fgo-planner/data-core';
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, MasterAccount, MasterServant } from '@fgo-planner/data-core';
+import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, MasterServant } from '@fgo-planner/data-core';
 import { GameServantMap, GameSoundtrackList } from '../../../../types/data';
 import { ObjectUtils } from '../../../../utils/object.utils';
 
@@ -29,7 +28,7 @@ export class MasterItemStatsUtils {
     static generateStats(
         gameServantMap: GameServantMap,
         gameSoundtrackList: GameSoundtrackList,
-        masterAccount: Immutable<MasterAccount>,
+        masterAccount: ImmutableMasterAccount,
         filter: MasterItemStatsFilterOptions
     ): MasterItemStats {
 
@@ -94,7 +93,7 @@ export class MasterItemStatsUtils {
         return stats;
     }
 
-    private static _populateInventory(stats: Record<number, MasterItemStat>, { resources }: Immutable<MasterAccount>): void {
+    private static _populateInventory(stats: Record<number, MasterItemStat>, { resources }: ImmutableMasterAccount): void {
         const { items, qp } = resources;
         for (const masterItem of items) {
             const stat = this._instantiateItemStat();
@@ -109,7 +108,7 @@ export class MasterItemStatsUtils {
     private static _updateForServant(
         stats: Record<number, MasterItemStat>,
         servant: Immutable<GameServant>,
-        masterServant: Immutable<MasterServant>,
+        masterServant: ImmutableMasterServant,
         includeAppendSkills: boolean,
         unlockedCostumes: Set<number>,
         includeCostumes: boolean,

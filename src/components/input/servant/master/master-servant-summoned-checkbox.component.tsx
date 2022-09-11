@@ -1,7 +1,7 @@
+import { MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { MouseEvent, useCallback } from 'react';
-import { MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '../../../../types/internal';
 
 type Props = {
     disabled?: boolean;

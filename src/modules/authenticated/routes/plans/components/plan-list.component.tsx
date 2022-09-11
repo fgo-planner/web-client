@@ -1,19 +1,18 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { BasicPlan, BasicPlanGroup } from '@fgo-planner/data-core';
+import { ImmutableBasicPlan, ImmutableBasicPlanGroup } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
-import { MasterAccountPlans, PlanType, SortDirection } from '../../../../../types/data';
+import { BasicPlans, PlanType, SortDirection } from '../../../../../types/data';
 import { PlanColumnProperties, PlanListColumn, PlanListVisibleColumns } from './plan-list-columns';
 import { PlanListHeader } from './plan-list-header.component';
 import { PlanListRow, StyleClassPrefix as PlanListRowStyleClassPrefix } from './plan-list-row.component';
 
 type Props = {
-    accountPlans: MasterAccountPlans;
+    accountPlans: BasicPlans;
     onHeaderClick?: MouseEventHandler;
     onRowClick: MouseEventHandler;
     onRowDoubleClick: MouseEventHandler;
-    onSelectionChange: (target: Immutable<BasicPlan | BasicPlanGroup> | undefined, type: PlanType) => void;
+    onSelectionChange: (target: ImmutableBasicPlan | ImmutableBasicPlanGroup | undefined, type: PlanType) => void;
     onSortChange?: (column?: PlanListColumn, direction?: SortDirection) => void;
     selectedId?: string;
     visibleColumns: Readonly<PlanListVisibleColumns>;
@@ -88,17 +87,17 @@ export const PlanList = React.memo((props: Props) => {
         visibleColumns
     } = props;
 
-    const handlePlanRowClick = useCallback((e: MouseEvent, plan: Immutable<BasicPlan>) => {
+    const handlePlanRowClick = useCallback((e: MouseEvent, plan: ImmutableBasicPlan) => {
         onSelectionChange(plan, 'plan');
         onRowClick(e);
     }, [onRowClick, onSelectionChange]);
     
-    const handlePlanGroupRowClick = useCallback((e: MouseEvent, plan: Immutable<BasicPlanGroup>) => {
+    const handlePlanGroupRowClick = useCallback((e: MouseEvent, plan: ImmutableBasicPlanGroup) => {
         onSelectionChange(plan, 'group');
         onRowClick(e);
     }, [onRowClick, onSelectionChange]);
 
-    const renderPlanRow = (plan: Immutable<BasicPlan>): ReactNode => {
+    const renderPlanRow = (plan: ImmutableBasicPlan): ReactNode => {
         return (
             <PlanListRow
                 key={plan._id}

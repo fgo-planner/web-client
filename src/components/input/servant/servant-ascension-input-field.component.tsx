@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, GameServantConstants, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, MasterServantConstants, MasterServantUtils } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
 import React, { useCallback } from 'react';
 
@@ -90,7 +90,7 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
                 disabled={disabled}
             >
                 {allowEmpty && <option value=''>{'\u2014'}</option>}
-                {GameServantConstants.AscensionLevels.map(value => (
+                {MasterServantConstants.AscensionLevels.map(value => (
                     <option key={value} value={value}>
                         {value}
                     </option>

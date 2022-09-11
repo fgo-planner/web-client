@@ -1,5 +1,5 @@
-import { Immutable, Nullable } from '@fgo-planner/common-core';
-import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-core';
+import { Nullable } from '@fgo-planner/common-core';
+import { ImmutableBasicMasterAccount, MasterAccount } from '@fgo-planner/data-core';
 import { GroupAdd as GroupAddIcon } from '@mui/icons-material';
 import { Box, Button, IconButton, PaperProps, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -28,7 +28,7 @@ const AddAccountDialogPaperProps: PaperProps = {
 
 const DeleteAccountDialogTitle = 'Delete Account?';
 
-const generateDeleteAccountDialogPrompt = (masterAccount: Immutable<BasicMasterAccount>): string => {
+const generateDeleteAccountDialogPrompt = (masterAccount: ImmutableBasicMasterAccount): string => {
     const { name, friendId } = masterAccount;
     let prompt = 'Are you sure you want to delete the account';
     if (name) {
@@ -119,7 +119,7 @@ export const MasterAccountsRoute = React.memo(() => {
 
     const [masterAccountList, setMasterAccountList] = useState<Nullable<BasicMasterAccounts>>();
 
-    const [selectedAccount, setSelectedAccount] = useState<Immutable<BasicMasterAccount>>();
+    const [selectedAccount, setSelectedAccount] = useState<ImmutableBasicMasterAccount>();
 
     const [addAccountDialogOpen, setAddAccountDialogOpen] = useState<boolean>(false);
     const [addAccountDialogError, setAddAccountDialogError] = useState<string>();
@@ -207,7 +207,7 @@ export const MasterAccountsRoute = React.memo(() => {
 
     //#region Account list event handlers
 
-    const handleRowClick = useCallback((e: MouseEvent, account: Immutable<BasicMasterAccount>): void => {
+    const handleRowClick = useCallback((e: MouseEvent, account: ImmutableBasicMasterAccount): void => {
         if (e.type === 'contextmenu') {
             // TODO Open context menu
             return;

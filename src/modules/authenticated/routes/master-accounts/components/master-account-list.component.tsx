@@ -1,5 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { BasicMasterAccount } from '@fgo-planner/data-core';
+import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, ReactNode } from 'react';
@@ -10,8 +9,8 @@ import { MasterAccountListRow, StyleClassPrefix as MasterAccountListRowStyleClas
 
 type Props = {
     masterAccountList: BasicMasterAccounts;
-    onRowClick: (e: MouseEvent, account: Immutable<BasicMasterAccount>) => void;
-    onRowDoubleClick: (e: MouseEvent, account: Immutable<BasicMasterAccount>) => void;
+    onRowClick: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
+    onRowDoubleClick: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
     selectedId?: string;
     visibleColumns: Readonly<MasterAccountListVisibleColumns>;
 };
@@ -82,7 +81,7 @@ export const MasterAccountList = React.memo((props: Props) => {
         visibleColumns
     } = props;
 
-    const renderAccountRow = (account: Immutable<BasicMasterAccount>, index: number): ReactNode => {
+    const renderAccountRow = (account: ImmutableBasicMasterAccount, index: number): ReactNode => {
         return (
             <MasterAccountListRow
                 key={account._id}

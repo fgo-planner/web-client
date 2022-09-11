@@ -1,5 +1,5 @@
 import { ImmutableArray } from '@fgo-planner/common-core';
-import { MasterServant, PlanServant } from '@fgo-planner/data-core';
+import { ImmutableMasterServant, PlanServant } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
 import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
@@ -13,7 +13,7 @@ export type DialogData = {
 
 type Props = {
     dialogTitle?: string;
-    masterServants: ImmutableArray<MasterServant>;
+    masterServants: ReadonlyArray<ImmutableMasterServant>;
     /**
      * The planned servant to edit. This will be modified directly, so provide a
      * clone if modification to the original object is not desired.

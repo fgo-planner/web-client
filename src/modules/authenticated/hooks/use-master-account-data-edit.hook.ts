@@ -51,6 +51,7 @@ type MasterAccountEditReferenceData = {
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     costumes: ReadonlySet<number>;
     items: ReadonlyRecord<number, number>;
+    lastServantInstanceId: number;
     qp: number;
     /**
      * Use a `Map` for this to maintain order of insertion.
@@ -63,6 +64,11 @@ type MasterAccountEditData = {
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
     costumes: ReadonlySet<number>;
     items: ReadonlyRecord<number, number>;
+    /**
+     * This value will always be kept up-to-date during servant add and delete
+     * operations.
+     */
+    lastServantInstanceId: number;
     qp: number;
     /**
      * Any edits to a servant (including bond levels and unlocked costumes) will
@@ -163,6 +169,7 @@ const toSet = (idNumbers: IdNumbers): ReadonlySet<number> => {
 const getDefaultMasterAccountEditData = (): MasterAccountEditData => ({
     bondLevels: {},
     costumes: SetUtils.emptySet(),
+    lastServantInstanceId: 0,
     items: {},
     qp: 0,
     servants: [],
@@ -191,6 +198,7 @@ const cloneMasterAccountDataForEdit = (
     if (options.includeServants) {
         result.bondLevels = { ...masterAccount.bondLevels };
         result.servants = masterAccount.servants.map(MasterServantUtils.clone);
+        result.lastServantInstanceId = masterAccount.lastServantInstanceId;
     }
     if (options.includeSoundtracks) {
         result.soundtracks = new Set(masterAccount.soundtracks);
@@ -202,6 +210,7 @@ const getDefaultMasterAccountReferenceData = (): MasterAccountEditReferenceData 
     bondLevels: {},
     costumes: SetUtils.emptySet(),
     items: {},
+    lastServantInstanceId: 0,
     qp: 0,
     servants: MapUtils.emptyMap(),
     soundtracks: SetUtils.emptySet()
@@ -233,6 +242,7 @@ const cloneMasterAccountDataForReference = (
             MasterServantUtils.getInstanceId,
             MasterServantUtils.clone
         );
+        result.lastServantInstanceId = masterAccount.lastServantInstanceId;
     }
     if (options.includeSoundtracks) {
         result.soundtracks = new Set(masterAccount.soundtracks);
@@ -271,6 +281,7 @@ const isServantsChanged = (
     }
     return !MasterServantUtils.isEqual(reference, servant);
 };
+
 const isServantsOrderChanged = (
     reference: ReadonlyMap<number, ImmutableMasterServant>,
     servants: Array<ImmutableMasterServant>
@@ -499,10 +510,7 @@ export function useMasterAccountDataEditHook(
             // unlockedCostumes
         } = editData;
 
-        /**
-         * Computed instance ID for the new servant.
-         */
-        let instanceId = MasterServantUtils.getLastInstanceId(currentServants) + 1;
+        let lastServantInstanceId = editData.lastServantInstanceId;
         /**
          * New object for the bond level data. A new object is constructed for this to
          * conform with the hook specifications.
@@ -512,8 +520,9 @@ export function useMasterAccountDataEditHook(
          * Construct new instance of a `MasterServant` object for each `servantId` and
          * add to an array.
          */
+        /** */
         const newServants = toArray(servantIds).map(servantId => {
-            const newServant = MasterServantUtils.create(instanceId++);
+            const newServant = MasterServantUtils.create(++lastServantInstanceId);
             MasterServantUpdateUtils.applyToMasterServant(servantData, newServant, bondLevels);
             newServant.gameId = servantId;
 
@@ -526,6 +535,7 @@ export function useMasterAccountDataEditHook(
         const servants = [...currentServants, ...newServants];
 
         editData.servants = servants;
+        editData.lastServantInstanceId = lastServantInstanceId;
         editData.bondLevels = bondLevels;
         // TODO Also update the unlocked costumes.
 
@@ -584,10 +594,11 @@ export function useMasterAccountDataEditHook(
                 servants.push(servant);
                 continue;
             }
-            /*
+            /**
              * Apply the edit to the target servant. The target servant object is
              * re-constructed to conform with the hook specifications.
              */
+            /** */
             const targetServant = MasterServantUtils.clone(servant);
             MasterServantUpdateUtils.applyToMasterServant(update, targetServant, bondLevels);
 
@@ -666,8 +677,30 @@ export function useMasterAccountDataEditHook(
          */
         const servants = currentServants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
 
-        editData.servants = servants;
+        /**
+         * If the last servant in terms of `instanceId` was deleted during this
+         * operation, but was also added during the same edit session (not yet
+         * persisted), then the it should not count towards the updated
+         * `lastServantInstanceId` value.
+         *
+         * If this is the case, we decrement the updated `lastServantInstanceId` value
+         * until it is no longer of a servant that was deleted during this operation, or
+         * if it no longer greater than the reference value (the updated value should
+         * never be less than the reference value).
+         */
+        /** */
+        let lastServantInstanceId = editData.lastServantInstanceId;
+        while (lastServantInstanceId > referenceData.lastServantInstanceId) {
+            if (!instanceIdSet.has(lastServantInstanceId)) {
+                break;
+            }
+            lastServantInstanceId--;
+        }
+            
         // TODO Also remove bond/costume data if the last instance of the servant is removed.
+        
+        editData.servants = servants;
+        editData.lastServantInstanceId = lastServantInstanceId;
 
         const referenceServants = referenceData.servants;
         const isOrderDirty = isServantsOrderChanged(referenceServants, servants);
@@ -690,7 +723,7 @@ export function useMasterAccountDataEditHook(
                 servantOrder: isOrderDirty
             };
         });
-    }, [editData, referenceData.servants, includeServants]);
+    }, [editData, referenceData, includeServants]);
 
     const updateSoundtracks = useCallback((soundtrackIds: IdNumbers): void => {
         if (!includeSoundtracks) {
@@ -745,6 +778,7 @@ export function useMasterAccountDataEditHook(
                 update.servants = [
                     ...(editData.servants as Array<MasterServant>)
                 ];
+                update.lastServantInstanceId = editData.lastServantInstanceId;
             }
             if (dirtyData.bondLevels) {
                 update.bondLevels = {

@@ -67,7 +67,7 @@ const MasterServantImportRoute = React.memo(() => {
     const [importStatus, setImportStatus] = useState<ImportStatus>('none');
     const [importStatusDialogOpen, setImportStatusDialogOpen] = useState<boolean>(false);
 
-    /*
+    /**
      * Master account change subscription.
      */
     useEffect(() => {
@@ -78,11 +78,11 @@ const MasterServantImportRoute = React.memo(() => {
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, []);
 
-    /*
+    /**
      * Turns off the loading indicator if the parsed data has changed.
      */
     useEffect(() => {
-        /*
+        /**
          * Allow the loading indicator to spin for half more second before hiding it.
          */
         setTimeout(() => {
@@ -90,7 +90,7 @@ const MasterServantImportRoute = React.memo(() => {
         }, 500);
     }, [parsedData, resetLoadingIndicator]);
 
-    /*
+    /**
      * Automatically opens the dialog when the status changes to anything other
      * than `none`.
      */
@@ -163,7 +163,7 @@ const MasterServantImportRoute = React.memo(() => {
         invokeLoadingIndicator();
 
         const bondLevels = { ...masterAccount.bondLevels };
-        /*
+        /**
          * Existing bond levels are always merged with imported data, regardless of the
          * selected action.
          */
@@ -183,27 +183,33 @@ const MasterServantImportRoute = React.memo(() => {
             bondLevels
         };
 
-        /*
+        const startInstanceId = masterAccount.lastServantInstanceId + 1;
+
+        /**
          * Generate the servant update data depending on the selected action.
          */
         if (existingAction === ExistingAction.Update) {
-            /*
+            /**
              * Clone the existing servants, just in case the update fails.
              */
+            /** */
             const servants = masterAccount.servants.map(servant => MasterServantUtils.clone(servant));
-
-            /*
+            /**
              * Merge the parsed servants into the existing servants.
              */
-            MasterServantUpdateUtils.batchApplyToMasterServants(parsedData.servantUpdates, servants, bondLevels);
+            /** */
+            const lastServantInstanceId = MasterServantUpdateUtils.batchApplyToMasterServants(
+                parsedData.servantUpdates,
+                servants,
+                startInstanceId,
+                bondLevels
+            );
 
             update.servants = servants;
+            update.lastServantInstanceId = lastServantInstanceId;
+
         } else {
-            /*
-             * The `instanceId` needs to continue off from the old list, for both the
-             * `Append` and `Overwrite` actions.
-             */
-            let instanceId = MasterServantUtils.getLastInstanceId(masterAccount.servants) + 1;
+            let instanceId = startInstanceId;
             const masterServants = [] as Array<MasterServant>;
             for (const parsedUpdate of parsedData.servantUpdates) {
                 const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedUpdate, bondLevels);
@@ -218,6 +224,8 @@ const MasterServantImportRoute = React.memo(() => {
             } else {
                 update.servants = masterServants;
             }
+
+            update.lastServantInstanceId = instanceId;
         }
 
         try {
@@ -246,7 +254,7 @@ const MasterServantImportRoute = React.memo(() => {
     }, [navigate, importStatus]);
 
     const mainContentNode = useMemo((): ReactNode => {
-        /*
+        /**
          * If data has been successfully parsed, then show the parsed servant list.
          */
         if (parsedData && parsedData.servantUpdates.length) {
@@ -259,7 +267,7 @@ const MasterServantImportRoute = React.memo(() => {
                 />
             );
         }
-        /*
+        /**
          * Otherwise, keep showing the file input.
          */
         return (

@@ -62,6 +62,8 @@ class LocalUserPreferenceRoute {
 
     private static readonly _Prefix = PrefixLocalUserPreferenceRoute;
 
+    static readonly MasterItemStats = StorageKey.forObjectValue(`${this._Prefix}MasterItemStats`, 'local');
+
     static readonly MasterServants = StorageKey.forObjectValue(`${this._Prefix}MasterServants`, 'local');
 
     private constructor() {

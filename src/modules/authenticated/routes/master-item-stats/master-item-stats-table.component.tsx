@@ -1,6 +1,6 @@
 import { GameItemConstants } from '@fgo-planner/data-core';
-import { Box, Tooltip } from '@mui/material';
-import { SystemStyleObject, Theme } from '@mui/system';
+import { Box, Theme, Tooltip } from '@mui/material';
+import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import NumberFormat from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
@@ -51,45 +51,64 @@ const ItemIds = [
 
 const StyleClassPrefix = 'MasterItemStatsTable';
 
-const StyleProps = {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    [`& .${StyleClassPrefix}-header`]: {
+const StyleProps = (theme: SystemTheme) => {
+
+    const {
+        breakpoints,
+        palette,
+        spacing
+    } = theme as Theme;
+
+    return {
+        backgroundColor: palette.background.paper,
         display: 'flex',
-        pr: 2,
-        pl: 4,
-        py: 4,
-        fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontWeight: 500,
-        fontSize: '0.875rem',
-        justifyContent: 'flex-end',
-        borderBottomWidth: 1,
-        borderBottomStyle: 'solid',
-        borderBottomColor: 'divider'
-    },
-    [`& .${StyleClassPrefix}-scroll-container`]: {
-        overflow: 'auto'
-    },
-    [`& .${StyleClassPrefix}-data-row`]: {
-        display: 'flex',
-        alignContent: 'center',
-        alignItems: 'center',
-        height: 52,
-        pl: 4,
-        fontSize: '0.875rem'
-    },
-    [`& .${StyleClassPrefix}-label-cell`]: {
-        display: 'flex',
-        alignContent: 'center',
-        alignItems: 'center',
-        width: '25%'
-    },
-    [`& .${StyleClassPrefix}-data-cell`]: {
-        textAlign: 'center',
-        width: '15%'
-    }
-} as SystemStyleObject<Theme>;
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'auto',
+        [`& .${StyleClassPrefix}-header`]: {
+            display: 'flex',
+            minWidth: 'fit-content',
+            pl: 4,
+            py: 4,
+            fontFamily: ThemeConstants.FontFamilyGoogleSans,
+            fontWeight: 500,
+            fontSize: '0.875rem',
+            borderBottomWidth: 1,
+            borderBottomStyle: 'solid',
+            borderBottomColor: 'divider',
+        },
+        [`& .${StyleClassPrefix}-scroll-container`]: {
+            minWidth: 'fit-content'
+        },
+        [`& .${StyleClassPrefix}-data-row`]: {
+            display: 'flex',
+            alignContent: 'center',
+            alignItems: 'center',
+            height: 52,
+            pl: 4,
+            fontSize: '0.875rem',
+        },
+        [`& .${StyleClassPrefix}-label-cell`]: {
+            display: 'flex',
+            alignContent: 'center',
+            alignItems: 'center',
+            minWidth: spacing(64), // 256px
+            [breakpoints.down('lg')]: {
+                minWidth: spacing(56)  // 224px
+            },
+        },
+        [`& .${StyleClassPrefix}-data-cell`]: {
+            textAlign: 'center',
+            minWidth: spacing(56), // 224px
+            [breakpoints.down('xl')]: {
+                minWidth: spacing(42)  // 168px
+            },
+            [breakpoints.down('lg')]: {
+                minWidth: spacing(36)  // 160px
+            }
+        }
+    } as SystemStyleObject<Theme>;
+};
 
 export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: Props) => {
 
@@ -195,6 +214,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-header`}>
+                <div className={`${StyleClassPrefix}-label-cell`} />
                 <Tooltip title={costColumnTooltip} placement='top'>
                     <div className={`${StyleClassPrefix}-data-cell`}>Total Needed</div>
                 </Tooltip>

@@ -1,13 +1,9 @@
-import { Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, MasterAccount, MasterServant, MasterServantBondLevel, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdate } from '@fgo-planner/data-core';
+import { ArrayUtils, MapUtils, Nullable, ObjectUtils, ReadonlyRecord, SetUtils } from '@fgo-planner/common-core';
+import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, MasterAccountUpdate, MasterServant, MasterServantBondLevel, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdate } from '@fgo-planner/data-core';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
-import { ArrayUtils } from '../../../utils/array.utils';
-import { MapUtils } from '../../../utils/map.utils';
-import { ObjectUtils } from '../../../utils/object.utils';
-import { SetUtils } from '../../../utils/set.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 
@@ -757,7 +753,7 @@ export function useMasterAccountDataEditHook(
             return;
         }
         invokeLoadingIndicator();
-        const update: Partial<MasterAccount> = {
+        const update: MasterAccountUpdate = {
             _id: masterAccount._id
         };
         /**

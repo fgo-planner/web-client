@@ -1,5 +1,5 @@
 import { ReadonlyRecord } from '@fgo-planner/common-core';
-import { MasterServantBondLevel, MasterServantUpdate } from '@fgo-planner/data-core';
+import { ExistingMasterServantUpdateType, MasterServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
 import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
@@ -82,7 +82,7 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
             return '';
         }
         // TODO Un-hardcode the strings.
-        if (masterServantUpdate.isNewServant) {
+        if (masterServantUpdate.type === NewMasterServantUpdateType) {
             return 'Add Servant';
         } else if (isMultipleServantsSelected)  {
             return 'Edit Servants';
@@ -93,7 +93,7 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
 
     const open = !!masterServantUpdate;
 
-    const multiEditMode = isMultipleServantsSelected && !masterServantUpdate?.isNewServant;
+    const multiEditMode = isMultipleServantsSelected && masterServantUpdate?.type === ExistingMasterServantUpdateType;
 
     /*
      * Only re-render the dialog contents if the dialog is open. This allows the

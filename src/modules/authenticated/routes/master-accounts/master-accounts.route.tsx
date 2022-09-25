@@ -1,5 +1,5 @@
 import { Nullable } from '@fgo-planner/common-core';
-import { ImmutableBasicMasterAccount, MasterAccount } from '@fgo-planner/data-core';
+import { BasicMasterAccount, ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
 import { GroupAdd as GroupAddIcon } from '@mui/icons-material';
 import { Box, Button, IconButton, PaperProps, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -169,7 +169,7 @@ export const MasterAccountsRoute = React.memo(() => {
     }, []);
 
     // eslint-disable-next-line max-len
-    const handleAddAccountDialogClose = useCallback(async (_: any, __: ModalOnCloseReason, data?: Partial<MasterAccount>): Promise<void> => {
+    const handleAddAccountDialogClose = useCallback(async (_event: any, _reason: ModalOnCloseReason, data?: Partial<BasicMasterAccount>): Promise<void> => {
         if (data) {
             try {
                 await masterAccountService.addAccount(data);

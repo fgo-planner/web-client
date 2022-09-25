@@ -1,6 +1,6 @@
 import { Array2D, Immutable, ImmutableRecord, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, MasterAccount, MasterServant, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
-import { FgoManagerParsers, TransformLogger } from '@fgo-planner/transform-core';
+import { GameServant, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
+import { FgoManagerDataImport, MasterAccountImportData } from '@fgo-planner/transform-core';
 import { Options } from 'csv-parse';
 import { parse } from 'csv-parse/sync';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
@@ -10,7 +10,6 @@ import { useGameServantList } from '../../../../hooks/data/use-game-servant-list
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
-import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
@@ -63,7 +62,7 @@ const MasterServantImportRoute = React.memo(() => {
     const gameServantList = useGameServantList();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
-    const [parsedData, setParsedData] = useState<MasterServantParserResult>();
+    const [parsedData, setParsedData] = useState<MasterAccountImportData>();
     const [importStatus, setImportStatus] = useState<ImportStatus>('none');
     const [importStatusDialogOpen, setImportStatusDialogOpen] = useState<boolean>(false);
 
@@ -126,21 +125,18 @@ const MasterServantImportRoute = React.memo(() => {
             return setImportStatus('parseFail');
         }
 
-        // Activate the loading indicator before parsing.
+        /**
+         * Activate the loading indicator before parsing.
+         */
         invokeLoadingIndicator();
 
-        // Set timeout to allow the loading indicator to be rendered first.
-        setTimeout(async () => {
+        /**
+         * Set timeout to allow the loading indicator to be rendered first.
+         */
+        setTimeout(() => {
             const data: Array2D<string> = parse(csvContents, CsvParseOptions);
-            const logger = new TransformLogger();
-            const servantUpdates = FgoManagerParsers.parseRosterSheet(data, gameServantNameMap, logger);
-            // TODO Redo this
-            const parsedData: MasterServantParserResult = {
-                servantUpdates,
-                warnings: [],
-                errors: []
-            };
-            if (!parsedData.servantUpdates.length) {
+            const parsedData = FgoManagerDataImport.transformRosterSheetToMasterAccountImportData(data, gameServantNameMap);
+            if (!parsedData.servants?.length) {
                 setImportStatus('parseFail');
             } else {
                 setImportStatus('parseSuccess');
@@ -157,7 +153,7 @@ const MasterServantImportRoute = React.memo(() => {
     }, []);
 
     const finalizeImport = useCallback(async (existingAction = ExistingAction.Overwrite): Promise<void> => {
-        if (!masterAccount || !parsedData) {
+        if (!masterAccount || !parsedData?.servants) {
             return;
         }
         invokeLoadingIndicator();
@@ -167,7 +163,7 @@ const MasterServantImportRoute = React.memo(() => {
          * Existing bond levels are always merged with imported data, regardless of the
          * selected action.
          */
-        for (const { gameId, bondLevel } of parsedData.servantUpdates) {
+        for (const { gameId, bondLevel } of parsedData.servants) {
             if (bondLevel === undefined) {
                 delete bondLevels[gameId];
             } else if (bondLevel !== IndeterminateValue) {
@@ -178,7 +174,7 @@ const MasterServantImportRoute = React.memo(() => {
         /**
          * The update payload.
          */
-        const update: Partial<MasterAccount> = {
+        const update: MasterAccountUpdate = {
             _id: masterAccount._id,
             bondLevels
         };
@@ -199,7 +195,7 @@ const MasterServantImportRoute = React.memo(() => {
              */
             /** */
             const lastServantInstanceId = MasterServantUpdateUtils.batchApplyToMasterServants(
-                parsedData.servantUpdates,
+                parsedData.servants,
                 servants,
                 startInstanceId,
                 bondLevels
@@ -211,7 +207,7 @@ const MasterServantImportRoute = React.memo(() => {
         } else {
             let instanceId = startInstanceId;
             const masterServants = [] as Array<MasterServant>;
-            for (const parsedUpdate of parsedData.servantUpdates) {
+            for (const parsedUpdate of parsedData.servants) {
                 const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedUpdate, bondLevels);
                 masterServants.push(masterServant);
             }
@@ -257,10 +253,10 @@ const MasterServantImportRoute = React.memo(() => {
         /**
          * If data has been successfully parsed, then show the parsed servant list.
          */
-        if (parsedData && parsedData.servantUpdates.length) {
+        if (parsedData?.servants?.length) {
             return (
                 <MasterServantImportList
-                    parsedData={parsedData}
+                    parsedServants={parsedData.servants}
                     hasExistingServants={!!masterAccount?.servants.length}
                     onSubmit={finalizeImport}
                     onCancel={cancelImport}

@@ -1,4 +1,4 @@
-import { MasterAccount } from '@fgo-planner/data-core';
+import { BasicMasterAccount } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { ChangeEvent, FormEvent, useCallback, useRef, useState } from 'react';
@@ -9,7 +9,7 @@ import { InputFieldContainer } from '../../input/input-field-container.component
 
 type Props = {
     errorMessage?: string;
-} & DialogComponentProps<Partial<MasterAccount>>;
+} & DialogComponentProps<Partial<BasicMasterAccount>>;
 
 type Form = {
     name: string;

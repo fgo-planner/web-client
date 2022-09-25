@@ -1,7 +1,6 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
 import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, MasterServant, MasterServantConstants } from '@fgo-planner/data-core';
 import { GameServantMap, GameSoundtrackList } from '../../../../types/data';
-import { ObjectUtils } from '../../../../utils/object.utils';
 
 export type MasterItemStat = {
     inventory: number;

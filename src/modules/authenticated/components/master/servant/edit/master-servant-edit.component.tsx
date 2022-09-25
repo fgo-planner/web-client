@@ -1,5 +1,5 @@
 import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, MasterServantBondLevel, MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, MasterServantBondLevel, MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUtils, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
@@ -84,9 +84,9 @@ export const MasterServantEdit = React.memo((props: Props) => {
         showAppendSkills
     } = props;
 
-    const { isNewServant } = masterServantUpdate;
+    const { type } = masterServantUpdate;
 
-    const servantSelectDisabled = readonly || multiEditMode || !isNewServant;
+    const servantSelectDisabled = readonly || multiEditMode || type !== NewMasterServantUpdateType;
 
     const [gameServant, setGameServant] = useState<Immutable<GameServant>>();
 

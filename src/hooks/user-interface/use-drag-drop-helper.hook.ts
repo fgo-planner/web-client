@@ -1,5 +1,5 @@
+import { ArrayUtils } from '@fgo-planner/common-core';
 import { useCallback, useState } from 'react';
-import { ArrayUtils } from '../../utils/array.utils';
 
 type DragDropHelperHookResult<T> = {
     /**

@@ -1,4 +1,4 @@
-import { ExistingMasterServantUpdate, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
+import { ExistingMasterServantUpdate, ExistingMasterServantUpdateType, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -400,18 +400,21 @@ export const MasterServantsRoute = React.memo(() => {
 
     const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: MasterServantUpdate): void => {
         setEditServantDialogData(undefined);
-        /*
+        /**
          * Close the dialog without taking any further action if the changes were
          * cancelled (if `data` is undefined, then the changes were cancelled).
          */
         if (!data) {
             return;
         }
-        if (data.isNewServant) {
+        if (data.type === NewMasterServantUpdateType) {
             addServant(data);
-        } else {
+        } else if (data.type === ExistingMasterServantUpdateType) {
             applyUpdateToSelectedServants(data);
         }
+        /**
+         * Should not be possible for update type to be `Imported` here.
+         */
     }, [addServant, applyUpdateToSelectedServants]);
 
     const handleDeleteServantDialogClose = useCallback((event: MouseEvent, reason: ModalOnCloseReason): any => {

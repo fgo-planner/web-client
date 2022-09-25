@@ -1,11 +1,10 @@
-import { MasterServant, MasterServantBondLevel, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils } from '@fgo-planner/data-core';
+import { ImportedMasterServantUpdate, MasterServant, MasterServantBondLevel, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils } from '@fgo-planner/data-core';
 import { Check as CheckIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { Button, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
-import { MasterServantParserResult } from '../../../../services/import/master-servant-parser-result.type';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ModalOnCloseReason } from '../../../../types/internal';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
@@ -14,10 +13,10 @@ import { MasterServantImportExistingDialog } from './master-servant-import-exist
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
 
 type Props = {
-    parsedData: MasterServantParserResult;
     hasExistingServants: boolean;
     onCancel: () => void;
     onSubmit: (existingAction?: ExistingAction) => void;
+    parsedServants: Array<ImportedMasterServantUpdate>;
 };
 
 const ParseResultHelperText = `The following servants were parsed from the given data. They have NOT been imported yet. Please review the
@@ -93,12 +92,10 @@ const StyleProps = (theme: SystemTheme) => {
 export const MasterServantImportList = React.memo((props: Props) => {
 
     const {
-        parsedData: {
-            servantUpdates: parsedMasterServantUpdates
-        },
         hasExistingServants,
         onCancel,
-        onSubmit
+        onSubmit,
+        parsedServants
     } = props;
 
     const [showExistingDialog, setShowExistingDialog] = useState<boolean>(false);
@@ -112,16 +109,16 @@ export const MasterServantImportList = React.memo((props: Props) => {
         const masterServants = [] as Array<MasterServant>;
         const bondLevels = {} as Record<number, MasterServantBondLevel>;
         let instanceId = 0;
-        for (const parsedUpdate of parsedMasterServantUpdates) {
-            const bondLevel = parsedUpdate.bondLevel;
+        for (const parsedServant of parsedServants) {
+            const bondLevel = parsedServant.bondLevel;
             if (bondLevel !== undefined && bondLevel !== IndeterminateValue) {
-                bondLevels[parsedUpdate.gameId] = bondLevel;
+                bondLevels[parsedServant.gameId] = bondLevel;
             }
-            const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedUpdate, bondLevels);
+            const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedServant, bondLevels);
             masterServants.push(masterServant);
         }
         return { masterServants, bondLevels };
-    }, [parsedMasterServantUpdates]);
+    }, [parsedServants]);
 
     const handleSubmitButtonClick = useCallback((): void => {
         /*

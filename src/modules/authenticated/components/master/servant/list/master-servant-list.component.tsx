@@ -1,4 +1,4 @@
-import { ReadonlyPartial, ReadonlyRecord } from '@fgo-planner/common-core';
+import { ReadonlyPartial, ReadonlyRecord, SetUtils } from '@fgo-planner/common-core';
 import { ImmutableMasterServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
@@ -8,7 +8,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { SortDirection, SortOptions } from '../../../../../../types/data';
-import { SetUtils } from '../../../../../../utils/set.utils';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';
 import { MasterServantListRow } from './master-servant-list-row.component';

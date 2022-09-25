@@ -1,5 +1,5 @@
 import { Nullable } from '@fgo-planner/common-core';
-import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-core';
+import { BasicMasterAccount, MasterAccount, MasterAccountUpdate } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { BasicMasterAccounts } from '../../../types/data';
@@ -87,7 +87,7 @@ export class MasterAccountService {
         return account;
     }
 
-    async updateAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
+    async updateAccount(masterAccount: MasterAccountUpdate): Promise<MasterAccount> {
         const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
         let updated: MasterAccount;
         try {

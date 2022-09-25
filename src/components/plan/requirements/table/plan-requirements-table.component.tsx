@@ -1,10 +1,9 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { ArrayUtils, Immutable } from '@fgo-planner/common-core';
 import { GameItemConstants, ImmutableMasterAccount, Plan, PlanServant } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { PlanRequirements } from '../../../../types/data';
-import { ArrayUtils } from '../../../../utils/array.utils';
 import { PlanRequirementsTableFooter } from './plan-requirements-table-footer.component';
 import { PlanRequirementsTableHeader, StyleClassPrefix as PlanRequirementsTableHeaderStyleClassPrefix } from './plan-requirements-table-header.component';
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';

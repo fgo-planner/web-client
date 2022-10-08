@@ -1,5 +1,5 @@
 import { Nullable } from '@fgo-planner/common-core';
-import { BasicMasterAccount, MasterAccount, MasterAccountUpdate } from '@fgo-planner/data-core';
+import { MasterAccount, MasterAccountUpdate } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { BasicMasterAccounts } from '../../../types/data';
@@ -66,12 +66,12 @@ export class MasterAccountService {
     }
 
     async getAccountsForCurrentUser(): Promise<BasicMasterAccounts> {
-        await this._updateMasterAccountList();
-        if (!this._masterAccountList) {
-            // Is this case possible?
-            return [];
-        }
-        return this._masterAccountList;
+        /**
+         * We do not want to invoke loading indicator here since this will periodically
+         * be called by the `FixedIntervalMasterAccountChangeListenerService` in the
+         * background.
+         */
+        return Http.get<BasicMasterAccounts>(`${this._BaseUrl}/current-user`, HttpUtils.stringTimestampsToDate);
     }
 
     async getAccount(id: string): Promise<MasterAccount> {
@@ -93,7 +93,7 @@ export class MasterAccountService {
         try {
             updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
             this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-        }  catch (e: any) {
+        } catch (e: any) {
             this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             throw e;
         }
@@ -132,7 +132,6 @@ export class MasterAccountService {
         // TODO Ensure that the selected account is in the accounts list.
         try {
             this._currentMasterAccount = await this.getAccount(accountId);
-            // TODO Convert date strings to date objects.
             this._onCurrentMasterAccountChange.next(this._currentMasterAccount);
             this._writeCurrentAccountToSessionStorage();
             return this._currentMasterAccount;
@@ -201,10 +200,7 @@ export class MasterAccountService {
     private async _updateMasterAccountList(): Promise<void> {
         const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
         try {
-            this._masterAccountList = await Http.get<Array<BasicMasterAccount>>(
-                `${this._BaseUrl}/current-user`,
-                HttpUtils.stringTimestampsToDate
-            );
+            this._masterAccountList = await this.getAccountsForCurrentUser();
             this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
         } catch (e: any) {
             this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);

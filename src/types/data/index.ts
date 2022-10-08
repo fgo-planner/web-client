@@ -10,6 +10,7 @@ export * from './game/servant/game-servant-list.type';
 export * from './game/servant/game-servant-map.type';
 export * from './game/soundtrack/game-soundtrack-list.type';
 export * from './master/account/basic-master-accounts.type';
+export * from './master/account/master-account-changes.type';
 export * from './page.type';
 export * from './pagination.type';
 export * from './plan/basic-plans.type';

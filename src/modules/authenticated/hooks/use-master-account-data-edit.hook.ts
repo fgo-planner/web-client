@@ -417,6 +417,19 @@ export function useMasterAccountDataEditHook(
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, [includeOptions]);
 
+    /**
+     * Master account available changes subscription.
+     */
+    useEffect(() => {
+        const onMasterAccountChangesAvailableSubscription = SubscribablesContainer
+            .get(SubscriptionTopics.User.MasterAccountChangesAvailable)
+            .subscribe(masterAccountChanges => {
+                // TODO Implement this
+            });
+
+        return () => onMasterAccountChangesAvailableSubscription.unsubscribe();
+    }, [includeOptions]);
+
 
     //#region Local create, update, delete functions
 

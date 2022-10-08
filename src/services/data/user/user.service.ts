@@ -5,6 +5,8 @@ export type BasicUser = Pick<User, '_id' | 'username' | 'email'>;
 
 export abstract class UserService {
 
+    protected _currentBasicUser: Nullable<BasicUser>;
+
     protected _currentUserPreferences: Nullable<UserPreferences>;
 
     abstract register(data: { username: string, password: string, email?: string, friendId?: string }): Promise<User>;
@@ -15,6 +17,6 @@ export abstract class UserService {
 
     abstract updateUserPreferences(userPreferences: Partial<UserPreferences>): Promise<UserPreferences>;
 
-    abstract getCurrentUser(): Promise<BasicUser>;
+    abstract getCurrentUser(): Promise<Nullable<BasicUser>>;
 
 }

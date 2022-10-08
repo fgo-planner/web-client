@@ -81,7 +81,7 @@ export const AppBar = React.memo(() => {
                 if (userInfo) {
                     // TODO Handle error
                     const currentUser = await userService.getCurrentUser();
-                    setCurrentUser(currentUser);
+                    setCurrentUser(currentUser || undefined);
                 } else {
                     setCurrentUser(undefined);
                 }

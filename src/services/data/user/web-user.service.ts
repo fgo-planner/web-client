@@ -50,17 +50,23 @@ export class WebUserService extends UserService {
         return updated;
     }
 
-    async getCurrentUser(): Promise<BasicUser> {
+    async getCurrentUser(): Promise<Nullable<BasicUser>> {
+        return this._currentBasicUser;
+    }
+
+    private async _getCurrentUser(): Promise<BasicUser> {
         const url = `${this._BaseUrl}/current-user`;
         return Http.get<BasicUser>(url);
     }
 
     private async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
         if (!userInfo) {
+            this._currentBasicUser = null;
             this._onCurrentUserPreferencesChange.next(this._currentUserPreferences = null);
             return;
         }
         try {
+            this._currentBasicUser = await this._getCurrentUser();
             this._currentUserPreferences = await this.getUserPreferences();
             this._onCurrentUserPreferencesChange.next(this._currentUserPreferences);
         } catch (e: any) {

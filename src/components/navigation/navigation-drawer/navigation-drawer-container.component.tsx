@@ -117,7 +117,7 @@ const StyleProps = (({ spacing }: Theme) => ({
     display: 'flex',
     height: '100%',
     '& .MuiDrawer-root>.MuiPaper-root': {
-        /*
+        /**
          * Condensed app bar scaling is not needed because these rules only apply to
          * desktop screen widths, where condensed app bar is never displayed.
          */
@@ -148,7 +148,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
 
-    /*
+    /**
      * User change subscription.
      */
     useEffect(() => {
@@ -161,7 +161,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
         return () => onCurrentUserChangeSubscription.unsubscribe();
     }, []);
 
-    /*
+    /**
      * Master account change subscription.
      */
     useEffect(() => {
@@ -206,19 +206,20 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
         open
     }), [animationsDisabled, handleDrawerClose, mobileView, open]);
 
+    const hasActiveMasterAccount = !!masterAccount;
     const content = useMemo((): Content => {
         const sections = [] as Array<Section>;
-        /*
+        /**
          * Add master account routes only if there is an active master account.
          */
-        if (masterAccount) {
+        if (hasActiveMasterAccount) {
             sections.push(MasterAccountRoutesSection);
         }
-        /*
+        /**
          * Add resources route regardless if whether user is logged in.
          */
         sections.push(ResourceRoutesSection);
-        /*
+        /**
          * Add login/logout button depending on whether user is logged in.
          */
         if (isLoggedIn) {
@@ -247,12 +248,12 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
                 ]
             });
         }
-        /*
+        /**
          * Add home button to the top of the list.
          */
         sections.unshift(HomeButtonSection);
         return { sections };
-    }, [authenticationService, isLoggedIn, masterAccount, userInterfaceService]);
+    }, [authenticationService, hasActiveMasterAccount, isLoggedIn, userInterfaceService]);
 
     const drawerNode = mobileView ?
         <NavigationDrawerMobile content={content} /> :

@@ -12,6 +12,10 @@ export class WebUserService extends UserService {
 
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user`;
 
+    private _currentUserInfo: Nullable<UserInfo>;
+
+    private _currentBasicUserPromise: Nullable<Promise<BasicUser>>;
+
     private get _onCurrentUserPreferencesChange() {
         return SubscribablesContainer.get(SubscriptionTopics.User.CurrentUserPreferencesChange);
     }
@@ -19,7 +23,7 @@ export class WebUserService extends UserService {
     constructor() {
         super();
 
-        /*
+        /**
          * This class is meant to last the lifetime of the application; no need to
          * unsubscribe from subscriptions.
          */
@@ -51,15 +55,29 @@ export class WebUserService extends UserService {
     }
 
     async getCurrentUser(): Promise<Nullable<BasicUser>> {
+        if (!this._currentUserInfo) {
+            return null;
+        }
+        if (!this._currentBasicUser) {
+            return this._getCurrentUser();
+        }
         return this._currentBasicUser;
     }
 
     private async _getCurrentUser(): Promise<BasicUser> {
-        const url = `${this._BaseUrl}/current-user`;
-        return Http.get<BasicUser>(url);
+        if (this._currentBasicUserPromise) {
+            return this._currentBasicUserPromise;
+        }
+        const basicUserPromise = Http.get<BasicUser>(`${this._BaseUrl}/current-user`)
+            .then(basicUser => {
+                this._currentBasicUserPromise = null;
+                return basicUser;
+            });
+        return this._currentBasicUserPromise = basicUserPromise;
     }
 
     private async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
+        this._currentUserInfo = userInfo;
         if (!userInfo) {
             this._currentBasicUser = null;
             this._onCurrentUserPreferencesChange.next(this._currentUserPreferences = null);

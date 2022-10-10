@@ -71,7 +71,7 @@ export const AppBar = React.memo(() => {
     const [currentUser, setCurrentUser] = useState<BasicUser>();
     const [elevated, setElevated] = useState<boolean>(false);
 
-    /*
+    /**
      * Current user change subscription.
      */
     useEffect(() => {
@@ -90,7 +90,7 @@ export const AppBar = React.memo(() => {
         return () => onCurrentUserChangeSubscription.unsubscribe();
     }, [userService]);
 
-    /*
+    /**
      * App bar elevation change subscription.
      */
     useEffect(() => {

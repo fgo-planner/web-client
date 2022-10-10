@@ -9,7 +9,7 @@ import { StorageKeys } from '../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
-import { UserInterfaceService } from '../../user-interface/user-interface.service';
+import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
 
 @Injectable
 export class MasterAccountService {
@@ -51,15 +51,13 @@ export class MasterAccountService {
     }
 
     async addAccount(masterAccount: Partial<MasterAccount>): Promise<MasterAccount> {
-        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
         let account: MasterAccount;
         try {
             account = await Http.put<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
             await this._updateMasterAccountList(); // Reload account list
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-        } catch (e: any) {
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-            throw e;
+        } finally {
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
         }
         this._autoSelectAccount();
         return account;
@@ -68,49 +66,43 @@ export class MasterAccountService {
     async getAccountsForCurrentUser(): Promise<BasicMasterAccounts> {
         /**
          * We do not want to invoke loading indicator here since this will periodically
-         * be called by the `FixedIntervalMasterAccountChangeListenerService` in the
+         * be called by the `FixedIntervalMasterAccountChangeListener` in the
          * background.
          */
         return Http.get<BasicMasterAccounts>(`${this._BaseUrl}/current-user`, HttpUtils.stringTimestampsToDate);
     }
 
     async getAccount(id: string): Promise<MasterAccount> {
-        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
         let account: MasterAccount;
         try {
             account = await Http.get<MasterAccount>(`${this._BaseUrl}/${id}`, Http.stringTimestampsToDate);
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-        } catch (e: any) {
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-            throw e;
+        } finally  {
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
         }
         return account;
     }
 
     async updateAccount(masterAccount: MasterAccountUpdate): Promise<MasterAccount> {
-        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
         let updated: MasterAccount;
         try {
             updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-        } catch (e: any) {
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-            throw e;
+        } finally {
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
         }
         this._onCurrentMasterAccountChange.next(this._currentMasterAccount = updated);
         return updated;
     }
 
     async deleteAccount(id: string): Promise<boolean> {
-        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
         let deleted: boolean;
         try {
             deleted = await Http.delete<boolean>(`${this._BaseUrl}/${id}`);
             await this._updateMasterAccountList(); // Reload account list
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-        } catch (e: any) {
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-            throw e;
+        } finally {
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
         }
         this._autoSelectAccount();
         return deleted;
@@ -198,12 +190,12 @@ export class MasterAccountService {
      * pushing it to the subject.
      */
     private async _updateMasterAccountList(): Promise<void> {
-        const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
         try {
             this._masterAccountList = await this.getAccountsForCurrentUser();
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
         } catch (e: any) {
-            this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
             throw e;
         }
         this._onMasterAccountListChange.next(this._masterAccountList);

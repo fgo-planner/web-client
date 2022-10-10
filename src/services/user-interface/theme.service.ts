@@ -13,7 +13,7 @@ import { StorageUtils } from '../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { PageMetadataService } from './page-metadata.service';
-import { UserInterfaceService } from './user-interface.service';
+import { LockableFeature, UserInterfaceService } from './user-interface.service';
 
 type UserThemes = {
     light: ThemeInfo;
@@ -102,17 +102,15 @@ export class ThemeService {
 
     private _updateTheme(themeInfo: ThemeInfo): void {
         this._setThemeColorMeta(themeInfo.themeOptions);
-        /*
+        /**
          * Temporary disable animations on drawer so that the colors change instantly.
          */
-        const invocationId = this._userInterfaceService.invokeNavigationDrawerNoAnimations();
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.NavigationDrawerNoAnimations);
         this._onThemeChange.next(themeInfo);
-        /*
-         * Restore animations on drawer.
+        /**
+         * Restore animations on drawer asynchronously.
          */
-        setTimeout(() => {
-            this._userInterfaceService.waiveNavigationDrawerNoAnimations(invocationId);
-        });
+        this._userInterfaceService.releaseLock(LockableFeature.NavigationDrawerNoAnimations, lockId, true);
     }
 
     /**

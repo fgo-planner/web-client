@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { UserInterfaceService } from '../../services/user-interface/user-interface.service';
+import { useCallback, useEffect, useState } from 'react';
+import { LockableFeature, UserInterfaceService } from '../../services/user-interface/user-interface.service';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 type LoadingIndicatorHookResult = {
@@ -9,7 +9,7 @@ type LoadingIndicatorHookResult = {
      * 
      * Guaranteed to be stable between rerenders.
      */
-    invokeLoadingIndicator: () => string;
+    invokeLoadingIndicator: () => void;
     /**
      * Resets the active loading indicator for the component. If there is not an
      * active loading indicator for the component, then this will not do anything.
@@ -30,34 +30,35 @@ export const useLoadingIndicator = (): LoadingIndicatorHookResult => {
 
     const userInterfaceService = useInjectable(UserInterfaceService);
 
-    const [, setLoadingIndicatorId] = useState<string>();
+    const [lockId, setLockId] = useState<string>();
 
-    const loadingIndicatorIdRef = useRef<string>();
-
-    const invokeLoadingIndicator = useCallback((): string => {
-        let loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (!loadingIndicatorId) {
-            loadingIndicatorId = userInterfaceService.invokeLoadingIndicator();
-        }
-        setLoadingIndicatorId(loadingIndicatorIdRef.current = loadingIndicatorId);
-        return loadingIndicatorId;
+    const invokeLoadingIndicator = useCallback((): void => {
+        setLockId(lockId => {
+            if (!lockId) {
+                // TODO Does this need to be called asynchronously as well?
+                lockId = userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+            }
+            return lockId;
+        });
     }, [userInterfaceService]);
 
     const resetLoadingIndicator = useCallback((): void => {
-        const loadingIndicatorId = loadingIndicatorIdRef.current;
-        if (loadingIndicatorId) {
-            userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
-            setLoadingIndicatorId(loadingIndicatorIdRef.current = undefined);
-        }
+        setLockId(lockId => {
+            if (lockId) {
+                userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId, true);
+                lockId = undefined;
+            }
+            return lockId;
+        });
     }, [userInterfaceService]);
 
-    /*
+    /**
      * Resets the loading indicator for the component if it is still active when the
      * component is unmounted.
      */
     useEffect(() => resetLoadingIndicator, [resetLoadingIndicator]);
 
-    const isLoadingIndicatorActive = !!loadingIndicatorIdRef.current;
+    const isLoadingIndicatorActive = !!lockId;
 
     return {
         invokeLoadingIndicator,

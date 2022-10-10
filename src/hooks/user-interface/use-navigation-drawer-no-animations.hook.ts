@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { UserInterfaceService } from '../../services/user-interface/user-interface.service';
+import { LockableFeature, UserInterfaceService } from '../../services/user-interface/user-interface.service';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 /**
@@ -11,9 +11,9 @@ export const useNavigationDrawerNoAnimations = (): void => {
     const userInterfaceService = useInjectable(UserInterfaceService);
 
     useEffect(() => {
-        const invocationId = userInterfaceService.invokeNavigationDrawerNoAnimations();
+        const lockId = userInterfaceService.requestLock(LockableFeature.NavigationDrawerNoAnimations);
 
-        return () => userInterfaceService.waiveNavigationDrawerNoAnimations(invocationId);
+        return () => userInterfaceService.releaseLock(LockableFeature.NavigationDrawerNoAnimations, lockId);
     }, [userInterfaceService]);
 
 };

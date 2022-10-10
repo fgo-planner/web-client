@@ -4,7 +4,7 @@ import { Inject } from '../../../decorators/dependency-injection/inject.decorato
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { GameServantList, GameServantMap, Page, Pagination } from '../../../types/data';
 import { HttpUtils as Http } from '../../../utils/http.utils';
-import { UserInterfaceService } from '../../user-interface/user-interface.service';
+import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
 
 @Injectable
 export class GameServantService {
@@ -39,19 +39,19 @@ export class GameServantService {
             return this._servantsCache;
         }
         if (!this._servantsCachePromise) {
-            const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
+            const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
             /*
              * TODO Currently, every servant is retrieved and cached with this call. This
              * may need to modify the caching system for servants so that servants are 
              * retrieved and cached only when needed.
              */
-            this._servantsCachePromise = Http.get<GameServant[]>(`${this._BaseUrl}`);
+            this._servantsCachePromise = Http.get<Array<GameServant>>(`${this._BaseUrl}`);
             this._servantsCachePromise.then(cache => {
                 this._onServantsCacheLoaded(cache);
-                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             }).catch(error => {
                 this._onServantsCacheLoadError(error);
-                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+            }).finally(() => {
+                this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
             });
         }
         return this._servantsCachePromise;

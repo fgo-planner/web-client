@@ -4,7 +4,7 @@ import { Inject } from '../../../decorators/dependency-injection/inject.decorato
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { GameSoundtrackList, Page, Pagination } from '../../../types/data';
 import { HttpUtils as Http } from '../../../utils/http.utils';
-import { UserInterfaceService } from '../../user-interface/user-interface.service';
+import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
 
 @Injectable
 export class GameSoundtrackService {
@@ -37,14 +37,14 @@ export class GameSoundtrackService {
             return this._soundtracksCache;
         }
         if (!this._soundtracksCachePromise) {
-            const loadingIndicatorId = this._userInterfaceService.invokeLoadingIndicator();
-            this._soundtracksCachePromise = Http.get<GameSoundtrack[]>(`${this._BaseUrl}`);
+            const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+            this._soundtracksCachePromise = Http.get<Array<GameSoundtrack>>(`${this._BaseUrl}`);
             this._soundtracksCachePromise.then(cache => {
                 this._onSoundtracksCacheLoaded(cache);
-                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
             }).catch(error => {
                 this._onSoundtracksCacheLoadError(error);
-                this._userInterfaceService.waiveLoadingIndicator(loadingIndicatorId);
+            }).finally(() => {
+                this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
             });
         }
         return this._soundtracksCachePromise;

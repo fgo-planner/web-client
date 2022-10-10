@@ -3,8 +3,8 @@ import { GameServant, ImmutableMasterServant, MasterServant, MasterServantAscens
 
 export class PlanServantUtils {
 
-    private constructor () {
-        
+    private constructor() {
+
     }
 
     /**
@@ -37,10 +37,15 @@ export class PlanServantUtils {
      * Returns a deep clone of the given `PlanServant` object.
      */
     static clone(planServant: Immutable<PlanServant>): PlanServant {
-        const { current, target } = planServant;
+        const {
+            current,
+            enabled,
+            target
+        } = planServant;
 
         return {
             ...planServant,
+            enabled: { ...enabled },
             current: this.cloneEnhancements(current),
             target: this.cloneEnhancements(target)
         };

@@ -1,5 +1,5 @@
 import { DateTimeUtils, Immutable, ImmutableArray, Nullable } from '@fgo-planner/common-core';
-import { ImmutableMasterAccount, ImmutableMasterServant, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
+import { ImmutableMasterAccount, ImmutableMasterServant, ImmutablePlan, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
 import { Add as AddIcon, FormatSize as FormatSizeIcon, HideImageOutlined as HideImageOutlinedIcon } from '@mui/icons-material';
 import { IconButton, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -66,7 +66,7 @@ const instantiatePlanServant = (
     if (!availableServants.length) {
         throw new Error('No more servants available');
     }
-    /*
+    /**
      * Instantiate using first available servant.
      */
     const masterServant = availableServants[0];
@@ -79,7 +79,7 @@ const instantiatePlanServant = (
 /**
  * Returns cloned servant data from the given plan.
  */
-const clonePlan = (plan: Immutable<Plan>): Plan => {
+const clonePlan = (plan: ImmutablePlan): Plan => {
     const targetDate = DateTimeUtils.cloneDate(plan.targetDate);
     const createdAt = DateTimeUtils.cloneDate(plan.createdAt);
     const updatedAt = DateTimeUtils.cloneDate(plan.updatedAt);
@@ -168,7 +168,7 @@ export const PlanRoute = React.memo(() => {
      * The plan data loaded from the backend. This should not be modified or used
      * anywhere in this route, except when reverting changes. Use `planRef` instead.
      */
-    const [plan, setPlan] = useState<Immutable<Plan>>();
+    const [plan, setPlan] = useState<ImmutablePlan>();
     /**
      * Contains a clone of the currently loaded `Plan` object.
      *
@@ -206,7 +206,7 @@ export const PlanRoute = React.memo(() => {
     const planRequirementsRef = useRef<PlanRequirements>();
 
     const computePlanRequirements = useCallback(() => {
-        /*
+        /**
          * We don't have to actually check if `plan` is undefined here, because if
          * `planRef.current` is undefined then so is `plan` (and vice versa), so we only
          * have to check one of the two. However, we need to trigger a this hook when
@@ -223,7 +223,7 @@ export const PlanRoute = React.memo(() => {
             // TODO Add previous plans
         );
         planRequirementsRef.current = planRequirements;
-        /*
+        /**
          * Force update is needed here because if the plan loads in after the other data
          * (servant map and master account data), then the component wont be re-rendered
          * after requirements are computed.
@@ -231,7 +231,7 @@ export const PlanRoute = React.memo(() => {
         forceUpdate();
     }, [forceUpdate, gameServantMap, masterAccount, plan]);
 
-    /*
+    /**
      * Initial load of plan data.
      */
     useEffect(() => {
@@ -250,7 +250,7 @@ export const PlanRoute = React.memo(() => {
         }
     }, [invokeLoadingIndicator, planId, planService, resetLoadingIndicator]);
 
-    /*
+    /**
      * Master account change subscription.
      */
     useEffect(() => {
@@ -282,7 +282,7 @@ export const PlanRoute = React.memo(() => {
         setDeleteServantDialogOpen(false);
 
         try {
-            /*
+            /**
              * Use the entire plan as the update request payload. 
              */
             const updatedPlan = await planService.updatePlan(planRef.current!);
@@ -336,15 +336,16 @@ export const PlanRoute = React.memo(() => {
 
     const openEditServantDialog = useCallback((planServant?: Immutable<PlanServant>): void => {
         if (!planServant) {
-            /*
+            /**
              * Adding a planned servant.
              */
+            /** */
             const plan = planRef.current!;
             const editServantTarget = instantiatePlanServant(plan.servants, masterAccount!.servants);
             editServantTargetRef.current = undefined;
             setEditServantTarget(editServantTarget);
         } else {
-            /*
+            /**
              * Editing a planned servant.
              */
             editServantTargetRef.current = planServant;
@@ -368,7 +369,7 @@ export const PlanRoute = React.memo(() => {
     }, [openEditServantDialog]);
 
     const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: PlanServantEditDialogData): void => {
-        /*
+        /**
          * Close the dialog without taking any further action if the changes were
          * cancelled (if `data` is undefined, then the changes were cancelled).
          */
@@ -379,7 +380,7 @@ export const PlanRoute = React.memo(() => {
         const plan = planRef.current!; // Not possible to be null here.
         const planServants = plan.servants;
 
-        /*
+        /**
          * If a new servant is being added, then `editServantTargetRef.current` will be
          * undefined. Conversely, if an existing servant is being edited, then
          * `editServantTargetRef.current` should be defined.
@@ -387,10 +388,12 @@ export const PlanRoute = React.memo(() => {
         if (!editServantTargetRef.current) {
             planServants.push(data.planServant);
         } else {
-            // TODO Compare objects and just close dialog if there are no changes.
-            /*
+            /**
+             * TODO Compare objects and just close dialog if there are no changes.
+             * 
              * Re-build the servant object to force its row to re-render.
              */
+            /** */
             const index = planServants.indexOf(editServantTargetRef.current as PlanServant);
             if (index !== -1) {
                 planServants[index] = { ...editServantTarget! };

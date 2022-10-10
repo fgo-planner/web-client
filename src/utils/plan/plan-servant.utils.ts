@@ -21,37 +21,13 @@ export class PlanServantUtils {
                 costumes: true
             },
             current: {
-                level: null,
-                ascension: null,
-                fouAtk: null,
-                fouHp: null,
-                skills: {
-                    1: null,
-                    2: null,
-                    3: null
-                },
-                appendSkills: {
-                    1: null,
-                    2: null,
-                    3: null
-                },
+                skills: {},
+                appendSkills: {},
                 costumes: []
             },
             target: {
-                level: null,
-                ascension: null,
-                fouAtk: null,
-                fouHp: null,
-                skills: {
-                    1: null,
-                    2: null,
-                    3: null
-                },
-                appendSkills: {
-                    1: null,
-                    2: null,
-                    3: null
-                },
+                skills: {},
+                appendSkills: {},
                 costumes: []
             }
         };
@@ -131,14 +107,14 @@ export class PlanServantUtils {
     ): void {
         target.level = source.level;
         target.ascension = source.ascension;
-        target.fouHp = source.fouHp ?? null;
-        target.fouAtk = source.fouAtk ?? null;
+        target.fouHp = source.fouHp;
+        target.fouAtk = source.fouAtk;
         target.skills[1] = source.skills[1];
-        target.skills[2] = source.skills[2] ?? null;
-        target.skills[3] = source.skills[3] ?? null;
-        target.appendSkills[1] = source.appendSkills[1] ?? null;
-        target.appendSkills[2] = source.appendSkills[2] ?? null;
-        target.appendSkills[3] = source.appendSkills[3] ?? null;
+        target.skills[2] = source.skills[2];
+        target.skills[3] = source.skills[3];
+        target.appendSkills[1] = source.appendSkills[1];
+        target.appendSkills[2] = source.appendSkills[2];
+        target.appendSkills[3] = source.appendSkills[3];
     }
 
     /**

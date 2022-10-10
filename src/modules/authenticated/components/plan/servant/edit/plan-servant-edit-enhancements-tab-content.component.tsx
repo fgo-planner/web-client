@@ -112,7 +112,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         forceUpdate();
     }, [forceUpdate, planServant, pushStatsChange]);
 
-    const handleLevelAscensionInputChange = useCallback((name: string, level: string, ascension: string, pushChanges = false): void => {
+    const handleLevelAscensionInputChange = useCallback((_name: string, level: string, ascension: string, pushChanges = false): void => {
         enhancements.level = Number(level);
         enhancements.ascension = Number(ascension) as MasterServantAscensionLevel;
         if (pushChanges) {
@@ -121,8 +121,8 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         forceUpdate();
     }, [enhancements, forceUpdate, pushStatsChange]);
 
-    const handleSkillInputChange = useCallback((_: any, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
-        enhancements[skillSet][slot] = value ? Number(value) as MasterServantSkillLevel : null;
+    const handleSkillInputChange = useCallback((_name: any, set: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
+        enhancements[set][slot] = value ? Number(value) as MasterServantSkillLevel : undefined;
         if (pushChanges) {
             pushStatsChange();
         }
@@ -130,7 +130,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     }, [enhancements, forceUpdate, pushStatsChange]);
 
     const handleFouInputChange = useCallback((_: string, stat: FouStat, value: string): void => {
-        enhancements[stat] = value ? Number(value) : null;
+        enhancements[stat] = value ? Number(value) : undefined;
         forceUpdate();
     }, [enhancements, forceUpdate]);
 
@@ -163,12 +163,13 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
 
     const handleSkillQuickToggleClick = useCallback((value: MasterServantSkillLevel | null, stat: 'skills' | 'appendSkills'): void => {
         const skillSet = enhancements[stat];
-        if (skillSet[1] === value && skillSet[2] === value && skillSet[3] === value) {
+        const skillLevel = value ?? undefined;
+        if (skillSet[1] === skillLevel && skillSet[2] === skillLevel && skillSet[3] === skillLevel) {
             return;
         }
-        skillSet[1] = value;
-        skillSet[2] = value;
-        skillSet[3] = value;
+        skillSet[1] = skillLevel;
+        skillSet[2] = skillLevel;
+        skillSet[3] = skillLevel;
         pushStatsChange();
         forceUpdate();
     }, [enhancements, forceUpdate, pushStatsChange]);

@@ -1,6 +1,6 @@
 import { MasterServantConstants } from '@fgo-planner/data-core';
 import React, { ReactNode, useMemo } from 'react';
-import NumberFormat from 'react-number-format';
+import { NumericFormat } from 'react-number-format';
 import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
 import { MasterServantStatPanelData, MasterServantStatPanelRow, MasterServantStatsExpandablePanel } from './master-servant-stats-expandable-panel.component';
 import { MasterServantStats } from './master-servant-stats.utils';
@@ -46,7 +46,7 @@ const DoubleMaxFouLabel = '1000/1000 Servants';
 const DoubleMaxGoldFouLabel = '2000/2000 Servants';
 
 const applyFormatOneDecimal = (value: number): ReactNode => (
-    <NumberFormat
+    <NumericFormat
         value={value}
         decimalScale={1}
         fixedDecimalScale
@@ -55,7 +55,7 @@ const applyFormatOneDecimal = (value: number): ReactNode => (
 );
 
 const applyFormatThreeDecimals = (value: number): ReactNode => (
-    <NumberFormat
+    <NumericFormat
         value={value}
         decimalScale={3}
         fixedDecimalScale

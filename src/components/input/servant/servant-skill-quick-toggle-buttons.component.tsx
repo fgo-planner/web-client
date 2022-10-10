@@ -14,7 +14,7 @@ type Props = {
     disabled?: boolean;
     ignoreTabNavigation?: boolean;
     leftToggleTarget: ToggleTarget;
-    onClick: (value: MasterServantSkillLevel | undefined, skillSet: SkillSet) => void;
+    onClick: (value: MasterServantSkillLevel | null, skillSet: SkillSet) => void;
     rightToggleTarget: ToggleTarget;
     skillSet: SkillSet;
 } & Pick<ComponentStyleProps, 'className'>;
@@ -63,7 +63,7 @@ export const ServantSkillQuickToggleButtons = React.memo((props: Props) => {
 
 
     const createClickHandler = (target: ToggleTarget): MouseEventHandler => {
-        return () => onClick(target || undefined, skillSet);
+        return () => onClick(target || null, skillSet);
     };
 
     return (

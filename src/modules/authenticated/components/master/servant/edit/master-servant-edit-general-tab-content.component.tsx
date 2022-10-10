@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantUpdate, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
+import { GameServant, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantUpdate, MasterServantUpdateBoolean, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateNumber } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
@@ -78,11 +78,9 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
 
     const handleBondInputChange = useCallback((_: string, value: string, pushChanges = false): void => {
         if (!value) {
-            masterServantUpdate.bondLevel = undefined;
-        } else if (value === IndeterminateValue) {
-            masterServantUpdate.bondLevel = IndeterminateValue;
+            masterServantUpdate.bondLevel = null;
         } else {
-            masterServantUpdate.bondLevel = Number(value) as MasterServantBondLevel;
+            masterServantUpdate.bondLevel = Number(value) as MasterServantUpdateNumber<MasterServantBondLevel>;
         }
         if (pushChanges) {
             pushStatsChange();
@@ -90,19 +88,15 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
         forceUpdate();
     }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
-    const handleNpInputChange = useCallback((_: string, value: string, pushChanges = false): void => {
-        if (value === IndeterminateValue) {
-            masterServantUpdate.np = IndeterminateValue;
-        } else {
-            masterServantUpdate.np = Number(value) as MasterServantNoblePhantasmLevel;
-        }
+    const handleNpInputChange = useCallback((_name: string, value: string, pushChanges = false): void => {
+        masterServantUpdate.np = Number(value) as MasterServantUpdateNumber<MasterServantNoblePhantasmLevel>;
         if (pushChanges) {
             pushStatsChange();
         }
         forceUpdate();
     }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
-    const handleSummonedCheckboxChange = useCallback((_: string, value: boolean | Indeterminate, pushChanges = false): void => {
+    const handleSummonedCheckboxChange = useCallback((_name: string, value: MasterServantUpdateBoolean, pushChanges = false): void => {
         masterServantUpdate.summoned = value;
         if (pushChanges) {
             pushStatsChange();
@@ -110,7 +104,7 @@ export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
         forceUpdate();
     }, [forceUpdate, masterServantUpdate, pushStatsChange]);
 
-    const handleSummonDateInputChange = useCallback((_: string, value: number | undefined | Indeterminate, pushChanges = false): void => {
+    const handleSummonDateInputChange = useCallback((_name: string, value: number | Indeterminate | null , pushChanges = false): void => {
         masterServantUpdate.summonDate = value;
         if (pushChanges) {
             pushStatsChange();

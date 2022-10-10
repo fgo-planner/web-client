@@ -1,6 +1,6 @@
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { CSSProperties } from '@mui/styles';
-import { styled } from '@mui/system';
+import { CSSInterpolation, styled } from '@mui/system';
+import { CSSProperties } from 'react';
 import { ThemeConstants } from '../../styles/theme-constants';
 import { StyledFunctionThemeProp } from '../../types/internal';
 
@@ -29,6 +29,6 @@ const StyledProps = ({ textDecoration }: Props & StyledFunctionThemeProp) => ({
     fontSize: '1.125rem',
     fontWeight: 600,
     textDecoration
-} as CSSProperties);
+} as CSSInterpolation);
 
 export const IconButtonText = styled('div', StyledOptions)<Props>(StyledProps);

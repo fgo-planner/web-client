@@ -1,6 +1,5 @@
-import { Theme } from '@mui/material';
+import { Theme, CSSInterpolation } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { CSSProperties } from '@mui/styles';
 import { alpha, styled, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren, ReactNode } from 'react';
@@ -58,7 +57,7 @@ const StyleProps = (props: Props & { theme: SystemTheme }) => {
             borderRightStyle: 'solid',
             borderRightColor: palette.divider
         }
-    } as CSSProperties;
+    } as CSSInterpolation;
 };
 
 const RootComponent = styled('div', StyleOptions)<Props>(StyleProps);

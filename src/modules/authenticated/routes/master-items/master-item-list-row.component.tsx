@@ -2,7 +2,7 @@ import { Immutable, MathUtils } from '@fgo-planner/common-core';
 import { GameItem, GameItemConstants, MasterAccountConstants, MasterItemConstants } from '@fgo-planner/data-core';
 import { InputBaseComponentProps, TextField } from '@mui/material';
 import React, { useCallback, useRef, useState } from 'react';
-import NumberFormat, { NumberFormatValues, SourceInfo } from 'react-number-format';
+import { NumberFormatValues, NumericFormat, SourceInfo } from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { MasterItemListRowLabel } from './master-item-list-row-label.component';
 
@@ -64,7 +64,7 @@ export const MasterItemListRow = React.memo((props: Props) => {
     }, []);
 
     const itemQuantityInputNode = (
-        <NumberFormat
+        <NumericFormat
             customInput={TextField}
             inputRef={itemQuantityInputRef}
             variant='outlined'
@@ -72,7 +72,7 @@ export const MasterItemListRow = React.memo((props: Props) => {
             inputProps={QuantityInputProps}
             value={String(quantity)}
             thousandSeparator
-            isNumericString
+            valueIsNumericString
             isAllowed={isQuantityValueAllowed}
             onValueChange={handleItemQuantityChange}
             onFocus={handleItemQuantityFocus}

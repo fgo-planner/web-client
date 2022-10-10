@@ -68,7 +68,7 @@ export const ServantFouInputField = React.memo((props: Props) => {
         const { name, value: inputValue } = event.target;
         let transformedValue: string;
         if (multiEditMode && inputValue === IndeterminateDisplayText) {
-            transformedValue = IndeterminateValue;
+            transformedValue = String(IndeterminateValue);
         } else {
             transformedValue = String(FormUtils.transformInputToFouValue(inputValue) ?? '');
         }
@@ -89,14 +89,14 @@ export const ServantFouInputField = React.memo((props: Props) => {
         if (!multiEditMode || event.key !== '?') {
             return;
         }
-        onChange(name, stat, IndeterminateValue);
+        onChange(name, stat, String(IndeterminateValue));
         /*
          * Prevent the onChange event from firing again.
          */
         event.preventDefault();
     }, [multiEditMode, name, onChange, stat]);
 
-    if (multiEditMode && value === IndeterminateValue) {
+    if (multiEditMode && value === String(IndeterminateValue)) {
         return (
             <TextField
                 variant={variant}

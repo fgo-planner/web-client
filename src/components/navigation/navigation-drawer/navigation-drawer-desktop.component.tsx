@@ -1,9 +1,8 @@
 import { Theme } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { CSSProperties } from '@mui/styles';
-import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { useContext } from 'react';
+import React, { CSSProperties, useContext } from 'react';
 import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { NavigationDrawerContent as Content } from '../../../types/internal';
@@ -55,7 +54,7 @@ const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
             overflowX: 'hidden',
             overflowY: 'auto'
         }
-    } as CSSProperties;
+    } as CSSInterpolation;
 };
 
 const CondensedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
@@ -77,7 +76,7 @@ const CondensedStyleProps = (props: RootComponentProps & { theme: SystemTheme })
         properties.transition = `${transitions.duration.leavingScreen}ms ${transitions.easing.sharp}`;
     }
 
-    return properties;
+    return properties as CSSInterpolation;
 };
 
 const ExpandedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
@@ -106,7 +105,7 @@ const ExpandedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) 
         properties.transition = `${transitions.duration.enteringScreen}ms ${transitions.easing.easeOut}`;
     }
 
-    return properties;
+    return properties as CSSInterpolation;
 };
 
 const RootComponent = styled('div', StyleOptions)<RootComponentProps>(

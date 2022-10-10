@@ -111,7 +111,7 @@ export const MasterServantImportList = React.memo((props: Props) => {
         let instanceId = 0;
         for (const parsedServant of parsedServants) {
             const bondLevel = parsedServant.bondLevel;
-            if (bondLevel !== undefined && bondLevel !== IndeterminateValue) {
+            if (bondLevel != null && bondLevel !== IndeterminateValue) {
                 bondLevels[parsedServant.gameId] = bondLevel;
             }
             const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedServant, bondLevels);

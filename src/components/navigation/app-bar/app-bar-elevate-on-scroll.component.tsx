@@ -1,5 +1,4 @@
-import { CSSProperties } from '@mui/styles';
-import { styled } from '@mui/system';
+import { CSSInterpolation, styled } from '@mui/system';
 import React, { DOMAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { LockableFeature, UserInterfaceService } from '../../../services/user-interface/user-interface.service';
@@ -13,7 +12,7 @@ type Props = PropsWithChildren<{}> & ComponentStyleProps & DOMAttributes<HTMLDiv
 const RootComponent = styled('div')<{}>(() => ({
     overflow: 'auto',
     height: '100%'
-} as CSSProperties));
+} as CSSInterpolation));
 
 /**
  * Utility component that automatically sets the app bar's elevation state based

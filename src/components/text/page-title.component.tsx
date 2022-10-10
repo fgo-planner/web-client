@@ -1,6 +1,5 @@
 import { Theme } from '@mui/material';
-import { CSSProperties } from '@mui/styles';
-import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import { ThemeConstants } from '../../styles/theme-constants';
 
 const StyleOptions = {
@@ -21,7 +20,7 @@ const StyleProps = (props: { theme: SystemTheme }) => {
         paddingTop: spacing(4),
         paddingRight: spacing(6),
         paddingLeft: spacing(6)
-    } as CSSProperties;
+    } as CSSInterpolation;
 };
 
 export const PageTitle = styled('div', StyleOptions)(StyleProps);

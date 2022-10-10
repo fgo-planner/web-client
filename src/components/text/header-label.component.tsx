@@ -1,5 +1,4 @@
-import { CSSProperties } from '@mui/styles';
-import { MuiStyledOptions, styled } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled } from '@mui/system';
 import { ThemeConstants } from '../../styles/theme-constants';
 
 const StyleOptions = {
@@ -14,6 +13,6 @@ const StyleProps = {
     textAlign: 'center',
     overflow: 'hidden',
     userSelect: 'none'
-} as CSSProperties;
+} as CSSInterpolation;
 
 export const HeaderLabel = styled('div', StyleOptions)(StyleProps);

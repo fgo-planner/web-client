@@ -1,7 +1,6 @@
 import { Theme } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { CSSProperties } from '@mui/styles';
-import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import { PropsWithChildren } from 'react';
 import { ThemeConstants } from '../../../styles/theme-constants';
 
@@ -34,7 +33,7 @@ const StyleOptions = {
 const StyleProps = (props: Props & { theme: SystemTheme }) => ({
     display: 'flex',
     alignItems: 'center'
-} as CSSProperties);
+} as CSSInterpolation);
 
 const LayoutStyleProps = (props: Props & { theme: SystemTheme }) => {
 
@@ -60,7 +59,7 @@ const LayoutStyleProps = (props: Props & { theme: SystemTheme }) => {
                 paddingTop: 0,
                 marginTop: spacing(4)
             }
-        } as CSSProperties;
+        } as CSSInterpolation;
     }
 
     return {
@@ -73,7 +72,7 @@ const LayoutStyleProps = (props: Props & { theme: SystemTheme }) => {
         '& >.MuiDivider-root': {
             display: 'none'
         }
-    } as CSSProperties;
+    } as CSSInterpolation;
     
 };
 
@@ -96,14 +95,14 @@ const BorderStyleProps = (props: Props & { theme: SystemTheme }) => {
             borderRightWidth: 1,
             borderRightStyle: 'solid',
             borderRightColor: palette.divider,
-        } as CSSProperties;
+        } as CSSInterpolation;
     }
     
     return {
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         borderBottomColor: palette.divider,
-    } as CSSProperties;
+    } as CSSInterpolation;
 };
 
 export const NavigationRail = styled('div', StyleOptions)<Props>(

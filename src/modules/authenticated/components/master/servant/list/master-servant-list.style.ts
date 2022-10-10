@@ -1,5 +1,4 @@
-import { Theme } from '@mui/material';
-import { CSSProperties } from '@mui/styles';
+import { CSSInterpolation, Theme } from '@mui/material';
 import { DataTableListBaseRowStyle } from '../../../../../../components/data-table-list/data-table-list-base-row.style';
 import { DataTableListDraggableRowStyle } from '../../../../../../components/data-table-list/data-table-list-draggable-row.style';
 import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
@@ -20,7 +19,7 @@ export const StyleClassPrefix = 'MasterServantList';
  * For optimization purposes this entire style function contains style
  * properties for all of the `MasterServantList` children components.
  */
-export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Array<CSSProperties> => {
+export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Array<CSSInterpolation> => {
 
     const {
         palette,
@@ -131,7 +130,7 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                 }
             }
         }
-    } as CSSProperties;
+    } as CSSInterpolation;
 
     const rowStyledProps = {
         classPrefix: MasterServantListRowStyleClassPrefix,

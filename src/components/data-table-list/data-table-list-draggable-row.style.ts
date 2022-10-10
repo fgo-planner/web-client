@@ -1,5 +1,4 @@
-import { Theme } from '@mui/material';
-import { CSSProperties } from '@mui/styles';
+import { CSSInterpolation, Theme } from '@mui/material';
 import { StyledFunctionPropsWithTheme } from '../../types/internal';
 
 export const StyleClassPrefix = 'DataTableListDraggableRow';
@@ -39,7 +38,7 @@ export const DataTableListDraggableRowStyle = (props: StyledFunctionPropsWithThe
                 }
             }
         }
-    } as CSSProperties;
+    } as CSSInterpolation;
 
     if (forRoot) {
         return style;
@@ -47,6 +46,6 @@ export const DataTableListDraggableRowStyle = (props: StyledFunctionPropsWithThe
 
     return {
         [`& .${classPrefix}-root`]: style
-    } as CSSProperties;
+    } as CSSInterpolation;
 
 };

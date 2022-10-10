@@ -1,7 +1,6 @@
-import { FilteringStyledOptions } from '@mui/styled-engine';
-import { styled, Theme as SystemTheme } from '@mui/system';
-import { CSSProperties } from '@mui/styles';
 import { Theme } from '@mui/material';
+import { FilteringStyledOptions } from '@mui/styled-engine';
+import { CSSInterpolation, styled, Theme as SystemTheme } from '@mui/system';
 
 type Props = {
     backgroundColor?: string;
@@ -53,7 +52,7 @@ const StyleProps = (props: Props & { theme: SystemTheme }) => {
         borderRightWidth: 1,
         borderRightStyle: 'solid',
         borderRightColor: palette.divider
-    } as CSSProperties;
+    } as CSSInterpolation;
 };
 
 export const DataTableGridCell = styled('div', StyleOptions)<Props>(StyleProps);

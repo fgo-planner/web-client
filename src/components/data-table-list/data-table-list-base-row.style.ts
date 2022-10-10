@@ -1,6 +1,5 @@
 import { Theme } from '@mui/material';
-import { CSSProperties } from '@mui/styles';
-import { alpha } from '@mui/system';
+import { alpha, CSSInterpolation } from '@mui/system';
 import { StyledFunctionPropsWithTheme } from '../../types/internal';
 
 export const DefaultStyleClassPrefix = 'DataTableListRow';
@@ -44,7 +43,7 @@ export const DataTableListBaseRowStyle = (props: StyledFunctionPropsWithTheme) =
             left: 0,
             zIndex: 1  // 1 should be enough for now
         }
-    } as CSSProperties;
+    } as CSSInterpolation;
 
     if (forRoot) {
         return style;
@@ -52,6 +51,6 @@ export const DataTableListBaseRowStyle = (props: StyledFunctionPropsWithTheme) =
 
     return {
         [`& .${classPrefix}-root`]: style
-    } as CSSProperties;
+    } as CSSInterpolation;
 
 };

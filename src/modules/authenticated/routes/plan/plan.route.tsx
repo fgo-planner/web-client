@@ -4,7 +4,7 @@ import { Add as AddIcon, FormatSize as FormatSizeIcon, HideImageOutlined as Hide
 import { IconButton, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import lodash from 'lodash';
+import lodash from 'lodash-es';
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';

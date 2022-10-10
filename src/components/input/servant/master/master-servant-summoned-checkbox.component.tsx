@@ -1,4 +1,4 @@
-import { MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
+import { MasterServantUpdateBoolean, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { MouseEvent, useCallback } from 'react';
@@ -8,8 +8,8 @@ type Props = {
     label?: string;
     multiEditMode?: boolean;
     name: string;
-    onChange: (name: string, value: boolean | Indeterminate, pushChanges: boolean) => void;
-    value: boolean | Indeterminate;
+    onChange: (name: string, value: MasterServantUpdateBoolean, pushChanges: boolean) => void;
+    value: MasterServantUpdateBoolean;
 };
 
 const DefaultLabel = 'Servant is summoned';
@@ -39,23 +39,23 @@ export const MasterServantSummonedCheckbox = React.memo((props: Props) => {
 
     const handleClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         /**
-         * The next value in the cycle. The possible values depends on the whether
-         * `multiEditMode` is `true` or not:
+         * Find the next value in the cycle. The possible values depends on the value of `multiEditMode`:
+         * 
+         * `multiEditMode` is truthy: `false` -> `true` -> `IndeterminateValue`
          *
-         * If `true`, the possible values are: `false` -> `true` -> `IndeterminateValue`.
-         *
-         * Else, the possible values are: `false` -> `true`.
+         * `multiEditMode` is falsy: `false` -> `true`
          */
-        let nextValue: boolean | Indeterminate;
+        /** */
+        let nextValue: MasterServantUpdateBoolean;
         switch (value) {
-            case IndeterminateValue:
-                nextValue = multiEditMode ? false : true;
+            case MasterServantUpdateBoolean.True:
+                nextValue = multiEditMode ? MasterServantUpdateBoolean.Indeterminate : MasterServantUpdateBoolean.False;
                 break;
-            case false:
-                nextValue = true;
+            case MasterServantUpdateBoolean.False:
+                nextValue = MasterServantUpdateBoolean.True;
                 break;
-            case true:
-                nextValue = multiEditMode ? IndeterminateValue : false;
+            default:
+                nextValue = multiEditMode ? MasterServantUpdateBoolean.False : MasterServantUpdateBoolean.True;
                 break;
         }
         onChange(name, nextValue, true);

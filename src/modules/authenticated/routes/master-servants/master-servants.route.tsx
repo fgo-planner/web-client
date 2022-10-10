@@ -392,7 +392,7 @@ export const MasterServantsRoute = React.memo(() => {
     const handleMultiAddServantDialogClose = useCallback((event: any, reason: any, data?: MultiAddServantData): void => {
         if (data && data.gameIds.length) {
             const servantData = MasterServantUpdateUtils.createNew();
-            servantData.summoned = data.summoned;
+            servantData.summoned = MasterServantUpdateUtils.convertBoolean(data.summoned);
             addServants(data.gameIds, servantData);
         }
         setIsMultiAddServantDialogOpen(false);

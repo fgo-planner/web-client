@@ -3,8 +3,7 @@ import { GameServant } from '@fgo-planner/data-core';
 import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
 import { Avatar, AvatarProps } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { CSSProperties } from '@mui/styles';
-import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEventHandler, useMemo } from 'react';
 import { Link } from 'react-router-dom';
@@ -67,7 +66,7 @@ const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
                 filter: 'grayscale(1.0) contrast(0.69) brightness(0.69)'
             }
         }
-    } as CSSProperties;
+    } as CSSInterpolation;
 };
 
 const NewTabIndicatorStyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
@@ -103,7 +102,7 @@ const NewTabIndicatorStyleProps = (props: RootComponentProps & { theme: SystemTh
                 display: 'flex'
             }
         }
-    } as CSSProperties;
+    } as CSSInterpolation;
 };
 
 const RootComponent = styled('div', ContainerStyleOptions)<RootComponentProps>(

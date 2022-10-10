@@ -1,4 +1,4 @@
-import { ArrayUtils, Immutable, ImmutableArray, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
+import { ArrayUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, MasterServantAscensionLevel, MasterServantConstants, MasterServantSkillLevel, Plan, PlanServant } from '@fgo-planner/data-core';
 import { GameServantMap, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types/data';
 import { PlanServantUtils } from './plan-servant.utils';
@@ -19,13 +19,13 @@ export type ComputationOptions = {
 //#region Internal type definitions
 
 type SkillEnhancements = Readonly<{
-    1?: MasterServantSkillLevel;
-    2?: MasterServantSkillLevel;
-    3?: MasterServantSkillLevel;
+    1?: Nullable<MasterServantSkillLevel>;
+    2?: Nullable<MasterServantSkillLevel>;
+    3?: Nullable<MasterServantSkillLevel>;
 }>;
 
 type ServantEnhancements = Immutable<{
-    ascension?: MasterServantAscensionLevel;
+    ascension?: Nullable<MasterServantAscensionLevel>;
     skills: SkillEnhancements;
     appendSkills: SkillEnhancements;
 }>;
@@ -381,7 +381,7 @@ export class PlanComputationUtils {
         }
 
         const targetAscension = targetEnhancements.ascension;
-        if (includeAscensions && targetAscension !== undefined) {
+        if (includeAscensions && targetAscension != null) {
             if (gameServant.ascensionMaterials) {
                 for (const [key, ascension] of Object.entries(gameServant.ascensionMaterials)) {
                     const ascensionLevel = Number(key);

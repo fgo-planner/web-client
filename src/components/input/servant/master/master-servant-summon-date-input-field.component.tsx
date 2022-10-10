@@ -14,15 +14,13 @@ type Props = {
      */
     name: string;
     onBlur?: (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
-    onChange: (name: string, value: number | undefined | Indeterminate, pushChanges: boolean) => void;
+    onChange: (name: string, value: number | Indeterminate | null, pushChanges: boolean) => void;
     /**
      * The servant's summoning date in number of milliseconds since the ECMAScript
      * epoch. This is expected to be truncated such that the UTC hours and lower
      * units are all zero.
-     *
-     * Can be `undefined`, but is not optional.
      */
-    value: number | undefined | Indeterminate;
+    value: number | Indeterminate | null;
     variant?: BaseTextFieldProps['variant'];
 };
 
@@ -43,8 +41,8 @@ const IndeterminateDisplayText = '?';
  * Transforms the given date value into a value that can be used by the date
  * picker component.
  */
-const transformDateValueForInput = (value: number | undefined | Indeterminate): Date | null => {
-    if (value === undefined || value === IndeterminateValue) {
+const transformDateValueForInput = (value: number | Indeterminate | null): Date | null => {
+    if (value == null || value === IndeterminateValue) {
         return null;
     }
     /*
@@ -57,9 +55,9 @@ const transformDateValueForInput = (value: number | undefined | Indeterminate): 
     return DateTimeUtils.utcToZonedTime(date);
 };
 
-const transformDateFromPicker = (date: Date | null): number | undefined => {
+const transformDateFromPicker = (date: Date | null): number | null => {
     if (!date || isNaN(date.getTime())) {
-        return undefined;
+        return null;
     }
     /**
      * The date picker gives date in the local time zone and includes times values
@@ -118,7 +116,7 @@ export const MasterServantSummonDateInputField = React.memo((props: Props) => {
          * undefined to allow the user to continue typing normally.
          */
         if (isIndeterminate) {
-            onChange(name, undefined, true);
+            onChange(name, null, true);
         }
     }, [isIndeterminate, name, onChange]);
 
@@ -138,7 +136,7 @@ export const MasterServantSummonDateInputField = React.memo((props: Props) => {
     }, [multiEditMode, name, onChange]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        let transformedValue: number | undefined | Indeterminate;
+        let transformedValue: number | Indeterminate | null;
         if (isIndeterminate) {
             transformedValue = IndeterminateValue;
         } else {

@@ -122,7 +122,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     }, [enhancements, forceUpdate, pushStatsChange]);
 
     const handleSkillInputChange = useCallback((_: any, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
-        enhancements[skillSet][slot] = value ? Number(value) as MasterServantSkillLevel : undefined;
+        enhancements[skillSet][slot] = value ? Number(value) as MasterServantSkillLevel : null;
         if (pushChanges) {
             pushStatsChange();
         }
@@ -130,7 +130,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     }, [enhancements, forceUpdate, pushStatsChange]);
 
     const handleFouInputChange = useCallback((_: string, stat: FouStat, value: string): void => {
-        enhancements[stat] = value ? Number(value) : undefined;
+        enhancements[stat] = value ? Number(value) : null;
         forceUpdate();
     }, [enhancements, forceUpdate]);
 
@@ -161,7 +161,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         forceUpdate();
     }, [enhancements, forceUpdate, pushStatsChange]);
 
-    const handleSkillQuickToggleClick = useCallback((value: MasterServantSkillLevel | undefined, stat: 'skills' | 'appendSkills'): void => {
+    const handleSkillQuickToggleClick = useCallback((value: MasterServantSkillLevel | null, stat: 'skills' | 'appendSkills'): void => {
         const skillSet = enhancements[stat];
         if (skillSet[1] === value && skillSet[2] === value && skillSet[3] === value) {
             return;

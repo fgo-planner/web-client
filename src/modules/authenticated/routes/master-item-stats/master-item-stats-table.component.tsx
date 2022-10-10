@@ -2,7 +2,7 @@ import { GameItemConstants } from '@fgo-planner/data-core';
 import { Box, Theme, Tooltip } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
-import NumberFormat from 'react-number-format';
+import { NumericFormat } from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
 import { ThemeConstants } from '../../../../styles/theme-constants';
@@ -172,35 +172,35 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
                         </div>
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
-                        <NumberFormat
+                        <NumericFormat
                             thousandSeparator
                             displayType='text'
                             value={cost}
                         />
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
-                        <NumberFormat
+                        <NumericFormat
                             thousandSeparator
                             displayType='text'
                             value={used}
                         />
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
-                        <NumberFormat
+                        <NumericFormat
                             thousandSeparator
                             displayType='text'
                             value={inventory}
                         />
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
-                        <NumberFormat
+                        <NumericFormat
                             thousandSeparator
                             displayType='text'
                             value={debt}
                         />
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
-                        <NumberFormat
+                        <NumericFormat
                             thousandSeparator
                             displayType='text'
                             value={Math.max(0, debt - inventory)}

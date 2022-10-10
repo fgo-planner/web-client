@@ -1,6 +1,5 @@
 import { Theme } from '@mui/material';
-import { CSSProperties } from '@mui/styles';
-import { MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import { ThemeConstants } from '../../styles/theme-constants';
 
 const StyleOptions = {
@@ -19,7 +18,7 @@ const StyleProps = (props: { theme: SystemTheme }) => {
         lineHeight: 1.6,
         letterSpacing: '0.0075em',
         padding: spacing(4, 6)
-    } as CSSProperties;
+    } as CSSInterpolation;
 };
 
 export const SectionTitle = styled('div', StyleOptions)(StyleProps);

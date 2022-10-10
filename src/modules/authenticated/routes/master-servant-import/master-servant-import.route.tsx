@@ -164,7 +164,7 @@ const MasterServantImportRoute = React.memo(() => {
          * selected action.
          */
         for (const { gameId, bondLevel } of parsedData.servants) {
-            if (bondLevel === undefined) {
+            if (bondLevel == null) {
                 delete bondLevels[gameId];
             } else if (bondLevel !== IndeterminateValue) {
                 bondLevels[gameId] = bondLevel;

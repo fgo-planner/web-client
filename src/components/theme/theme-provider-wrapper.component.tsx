@@ -14,20 +14,13 @@ type Props = PropsWithChildren<{}>;
  * augmented by MUI.
  */
 const augmentAdditionalColors = (theme: Theme): void => {
-
     const palette = theme.palette as Palette;
 
-    const {
-        augmentColor,
-        drawer,
-        mode
-    } = palette;
+    const { augmentColor, drawer } = palette;
 
     if (drawer) {
         palette.drawer = augmentColor({ name: 'drawer', color: drawer });
     }
-
-    console.log(mode, theme); // TODO Remove this
 };
 
 /**

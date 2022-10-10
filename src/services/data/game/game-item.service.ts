@@ -30,11 +30,6 @@ export class GameItemService {
      */
     async getItems(): Promise<GameItemList> {
         if (this._itemsCache) {
-            /*
-             * TODO Currently, the same instance of the cache array is returned every time
-             * this method is called. This may need to be changed so that a deep copy of the
-             * array is returned instead.
-             */
             return this._itemsCache;
         }
         if (!this._itemsCachePromise) {
@@ -56,11 +51,6 @@ export class GameItemService {
      * then returns null/undefined.
      */
     getItemsSync(): Nullable<GameItemList> {
-        /*
-         * TODO Currently, the same instance of the cache array is returned every time
-         * this method is called. This may need to be changed so that a deep copy of the
-         * array is returned instead.
-         */
         return this._itemsCache;
     }
 

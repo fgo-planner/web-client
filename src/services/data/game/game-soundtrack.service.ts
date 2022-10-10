@@ -29,11 +29,6 @@ export class GameSoundtrackService {
      */
     async getSoundtracks(): Promise<GameSoundtrackList> {
         if (this._soundtracksCache) {
-            /*
-             * TODO Currently, the same instance of the cache array is returned every time
-             * this method is called. This may need to be changed so that a deep copy of the
-             * array is returned instead.
-             */
             return this._soundtracksCache;
         }
         if (!this._soundtracksCachePromise) {
@@ -55,11 +50,6 @@ export class GameSoundtrackService {
      * then returns null/undefined.
      */
     getSoundtracksSync(): Nullable<GameSoundtrackList> {
-        /*
-         * TODO Currently, the same instance of the cache array is returned every time
-         * this method is called. This may need to be changed so that a deep copy of the
-         * array is returned instead.
-         */
         return this._soundtracksCache;
     }
 

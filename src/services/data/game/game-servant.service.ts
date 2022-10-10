@@ -31,16 +31,11 @@ export class GameServantService {
      */
     async getServants(): Promise<GameServantList> {
         if (this._servantsCache) {
-            /*
-             * TODO Currently, the same instance of the cache array is returned every time
-             * this method is called. This may need to be changed so that a deep copy of the
-             * array is returned instead.
-             */
             return this._servantsCache;
         }
         if (!this._servantsCachePromise) {
             const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
-            /*
+            /**
              * TODO Currently, every servant is retrieved and cached with this call. This
              * may need to modify the caching system for servants so that servants are 
              * retrieved and cached only when needed.
@@ -62,11 +57,6 @@ export class GameServantService {
      * then returns null/undefined.
      */
     getServantsSync(): Nullable<GameServantList> {
-        /*
-         * TODO Currently, the same instance of the cache array is returned every time
-         * this method is called. This may need to be changed so that a deep copy of the
-         * array is returned instead.
-         */
         return this._servantsCache;
     }
 

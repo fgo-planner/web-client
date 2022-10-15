@@ -1,7 +1,7 @@
 import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
-import React, { MouseEvent, useCallback } from 'react';
-import { NumericFormat } from 'react-number-format';
+import React from 'react';
 import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';
+import { MasterAccountFriendId } from '../../../../../components/master/account/master-account-friend-id.component';
 import { TruncateText } from '../../../../../components/text/truncate-text.component';
 import { DateTimeFormatUtils } from '../../../../../utils/date-time-format.utils';
 import { MasterAccountListVisibleColumns } from './master-account-list-columns';
@@ -61,13 +61,10 @@ export const MasterAccountListRow = React.memo((props: Props) => {
                 {account.name || <i>{`Account ${index + 1}`}</i>}
             </TruncateText>
             {friendId && <TruncateText className={`${StyleClassPrefix}-friend-id`}>
-                {!account.friendId ? '\u2013' :
-                    <NumericFormat
-                        thousandSeparator
-                        displayType='text'
-                        value={account.friendId}
-                    />
-                }
+                <MasterAccountFriendId
+                    masterAccount={account}
+                    defaultValue={'\u2013'}
+                />
             </TruncateText>}
             {created && <div className={`${StyleClassPrefix}-created`}>
                 {DateTimeFormatUtils.formatForDataTable(account.createdAt)}

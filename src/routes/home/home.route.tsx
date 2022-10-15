@@ -2,8 +2,8 @@ import { Nullable } from '@fgo-planner/common-core';
 import { ImmutableMasterAccount } from '@fgo-planner/data-core';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
+import { MasterAccountFriendId } from '../../components/master/account/master-account-friend-id.component';
 import { AppBarElevateOnScroll } from '../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
-import { MasterAccountUtils } from '../../utils/master/master-account.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { HomeLinkSection } from './home-link-section.component';
@@ -69,12 +69,15 @@ export const HomeRoute = React.memo(() => {
         let label: ReactNode = null;
         if (masterAccount) {
             if (masterAccount.name) {
-                label = <i> - {masterAccount.name}</i>;
+                label = masterAccount.name;
             } else if (masterAccount.friendId) {
-                label = <i> - {MasterAccountUtils.formatFriendId(masterAccount)}</i>;
+                label = <MasterAccountFriendId masterAccount={masterAccount} />;
             }
         }
-        return <>Master Account {label}</>;
+        if (label) {
+            return <>Master Account - {label}</>;
+        }
+        return <>Master Account</>;
     }, [masterAccount]);
 
     /**

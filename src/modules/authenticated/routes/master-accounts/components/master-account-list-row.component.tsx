@@ -1,5 +1,6 @@
 import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';
 import { MasterAccountFriendId } from '../../../../../components/master/account/master-account-friend-id.component';
 import { TruncateText } from '../../../../../components/text/truncate-text.component';
@@ -8,25 +9,17 @@ import { MasterAccountListVisibleColumns } from './master-account-list-columns';
 
 type Props = {
     account: ImmutableBasicMasterAccount;
-    active: boolean;
     index: number;
-    onClick: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
-    onContextMenu: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
-    onDoubleClick: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
     visibleColumns: Readonly<MasterAccountListVisibleColumns>;
 };
 
-export const StyleClassPrefix = 'PlanListRow';
+export const StyleClassPrefix = 'MasterAccountListRow';
 
 export const MasterAccountListRow = React.memo((props: Props) => {
 
     const {
         account,
-        active,
         index,
-        onClick,
-        onContextMenu,
-        onDoubleClick,
         visibleColumns
     } = props;
 
@@ -36,29 +29,12 @@ export const MasterAccountListRow = React.memo((props: Props) => {
         friendId
     } = visibleColumns;
 
-    const handleClick = useCallback((e: MouseEvent): void => {
-        onClick(e, account);
-    }, [onClick, account]);
-
-    const handleContextMenu = useCallback((e: MouseEvent): void => {
-        onContextMenu(e, account);
-    }, [onContextMenu, account]);
-
-    const handleDoubleClick = useCallback((e: MouseEvent): void => {
-        onDoubleClick(e, account);
-    }, [onDoubleClick, account]);
-
     return (
-        <DataTableListStaticRow
-            className={`${StyleClassPrefix}-root`}
-            borderBottom
-            active={active}
-            onClick={handleClick}
-            onContextMenu={handleContextMenu}
-            onDoubleClick={handleDoubleClick}
-        >
+        <DataTableListStaticRow className={`${StyleClassPrefix}-root`} borderBottom>
             <TruncateText className={`${StyleClassPrefix}-name`}>
-                {account.name || <i>{`Account ${index + 1}`}</i>}
+                <Link to={`../master/settings?account-id=${account._id}`}>
+                    {account.name || <i>{`Account ${index + 1}`}</i>}
+                </Link>
             </TruncateText>
             {friendId && <TruncateText className={`${StyleClassPrefix}-friend-id`}>
                 <MasterAccountFriendId

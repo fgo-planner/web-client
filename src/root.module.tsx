@@ -19,42 +19,48 @@ import { useNavigationDrawerNoAnimations } from './hooks/user-interface/use-navi
 
 console.log('RootModule loaded');
 
-/*
-Planned navigation outline:
+/*================= Navigation Outline =================
 
-→ Root
+→ Root (module)
     ↳ Home
     ↳ Login, Create Account, Recover Password, etc.
     ↳ Error Pages
-    ↳ Resources (module)
+    ↳ Resources (module, lazy-loaded)
         ↳ Servants
         ↳ Items
         ↳ Events
-    ↳ Authenticated (module)
-        ↳ User Profile
-        ↳ Master Accounts
+    ↳ Authenticated (module, lazy-loaded)
+        ↳ User Account
+            ↳ User Settings
+            ↳ Master Accounts
+        ↳ Master Account
+            ↳ Settings
             ↳ Dashboard
-            ↳ Planner
-            ↳ Servants
-            ↳ Items
+            ↳ Planner/Plans
+                ↳ Plan
+            ↳ Servant Roster
+                ↳ Stats
+            ↳ Inventory
+                ↳ Stats
             ↳ Costumes
             ↳ Soundtracks
-            ↳ Data Import/Export (lazy loaded)
-        ↳ Friends
+            ↳ Data Import/Export (lazy-loaded)
+        ↳ Friends (TODO)
             ↳ Items
             ↳ Servants
             ↳ Planner
-    ↳ Shared (module, hidden)
+    ↳ Shared (TODO, module, lazy-loaded, hidden)
         ↳ Items
         ↳ Servants
         ↳ Planner
-*/
+
+======================================================*/
 
 const ResourcesModule = React.lazy(() => import('./modules/resources/resources.module'));
 
 const AuthenticatedModule = React.lazy(() => import('./modules/authenticated/authenticated.module'));
 
-const ModuleRoutes = [
+const RootModuleRoutes = [
     {
         path: '/',
         element: <HomeRoute />
@@ -119,7 +125,7 @@ export const RootModule = React.memo(() => {
         }
     }, [backgroundMusicService]);
 
-    const activeRouteElement = useRoutes(ModuleRoutes);
+    const activeRouteElement = useRoutes(RootModuleRoutes);
 
     /**
      * Device info as parsed from the user agent string.

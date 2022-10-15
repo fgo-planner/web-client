@@ -1,11 +1,10 @@
 import { Nullable } from '@fgo-planner/common-core';
-import { BasicMasterAccount, ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
+import { BasicMasterAccount } from '@fgo-planner/data-core';
 import { GroupAdd as GroupAddIcon } from '@mui/icons-material';
 import { Box, Button, IconButton, PaperProps, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MasterAccountAddDialog } from '../../../../components/master/account/master-account-add-dialog.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -18,27 +17,11 @@ import { SubscribablesContainer } from '../../../../utils/subscription/subscriba
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterAccountListVisibleColumns } from './components/master-account-list-columns';
 import { MasterAccountList } from './components/master-account-list.component';
-import { MasterAccountsNavigationRail } from './components/master-accounts-navigation-rail.component';
 
 const AddAccountDialogPaperProps: PaperProps = {
     style: {
         minWidth: 360
     }
-};
-
-const DeleteAccountDialogTitle = 'Delete Account?';
-
-const generateDeleteAccountDialogPrompt = (masterAccount: ImmutableBasicMasterAccount): string => {
-    const { name, friendId } = masterAccount;
-    let prompt = 'Are you sure you want to delete the account';
-    if (name) {
-        prompt += ` '${name}'`;
-    }
-    if (friendId) {
-        prompt += ` with friend ID ${friendId}`;
-        // TODO Format friend ID with thousands separator
-    }
-    return prompt + '?';
 };
 
 const StyleClassPrefix = 'MasterAccounts';
@@ -119,32 +102,8 @@ export const MasterAccountsRoute = React.memo(() => {
 
     const [masterAccountList, setMasterAccountList] = useState<Nullable<BasicMasterAccounts>>();
 
-    const [selectedAccount, setSelectedAccount] = useState<ImmutableBasicMasterAccount>();
-
     const [addAccountDialogOpen, setAddAccountDialogOpen] = useState<boolean>(false);
     const [addAccountDialogError, setAddAccountDialogError] = useState<string>();
-
-    /**
-     * The prompt for the delete account dialog. The dialog will be set to an `open`
-     * state if this is not `undefined`.
-     */
-    const [deleteAccountDialogPrompt, setDeleteAccountDialogPrompt] = useState<string>();
-
-    /**
-     * Subscription handler for the `MasterAccountListChange` topic.
-     *
-     * Sets the `masterAccountList` state and updates the `selectedAccount` object
-     * reference if needed.
-     */
-    const updateMasterAccountList = useCallback((masterAccountList: Nullable<BasicMasterAccounts>): void => {
-        setSelectedAccount(selectedAccount => {
-            if (!selectedAccount || !masterAccountList?.length) {
-                return undefined;
-            }
-            return masterAccountList.find(account => selectedAccount._id === account._id);
-        });
-        setMasterAccountList(masterAccountList);
-    }, []);
 
     /**
      * Master account list change subscription.
@@ -152,10 +111,10 @@ export const MasterAccountsRoute = React.memo(() => {
     useEffect(() => {
         const onMasterAccountListChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopics.User.MasterAccountListChange)
-            .subscribe(updateMasterAccountList);
+            .subscribe(setMasterAccountList);
 
         return () => onMasterAccountListChangeSubscription.unsubscribe();
-    }, [updateMasterAccountList]);
+    }, []);
 
     const visibleColumns = useMemo((): MasterAccountListVisibleColumns => ({
         name: true,
@@ -182,46 +141,6 @@ export const MasterAccountsRoute = React.memo(() => {
         setAddAccountDialogError(undefined);
     }, [masterAccountService]);
 
-    const openDeleteAccountDialog = useCallback((): void => {
-        if (!selectedAccount) {
-            return;
-        }
-        const prompt = generateDeleteAccountDialogPrompt(selectedAccount);
-        setDeleteAccountDialogPrompt(prompt);
-    }, [selectedAccount]);
-
-    const handleDeleteAccountDialogClose = useCallback((_: any, reason: ModalOnCloseReason): void => {
-        if (reason === 'submit') {
-            if (!selectedAccount) {
-                return;
-            }
-            try {
-                masterAccountService.deleteAccount(selectedAccount._id);
-            } catch (e) {
-                console.error(e);
-            }
-        }
-        setDeleteAccountDialogPrompt(undefined);
-    }, [masterAccountService, selectedAccount]);
-    
-
-    //#region Account list event handlers
-
-    const handleRowClick = useCallback((e: MouseEvent, account: ImmutableBasicMasterAccount): void => {
-        if (e.type === 'contextmenu') {
-            // TODO Open context menu
-            return;
-        }
-        setSelectedAccount(account);
-    }, []);
-
-    const handleRowDoubleClick = useCallback((): void => {
-        // TODO Open dialog for editing
-    }, []);
-
-    //#endregion
-
-
     return <>
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-upper-layout-container`}>
@@ -240,20 +159,11 @@ export const MasterAccountsRoute = React.memo(() => {
                 </div>
             </div>
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
-                <MasterAccountsNavigationRail
-                    layout={sm ? 'column' : 'row'}
-                    hasSelection={!!selectedAccount}
-                    onAddMasterAccount={openAddAccountDialog}
-                    onDeleteSelectedMasterAccount={openDeleteAccountDialog}
-                />
                 <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                     {masterAccountList &&
                         <MasterAccountList
                             masterAccountList={masterAccountList}
                             visibleColumns={visibleColumns}
-                            selectedId={selectedAccount?._id}
-                            onRowClick={handleRowClick}
-                            onRowDoubleClick={handleRowDoubleClick}
                         />
                     }
                 </div>
@@ -264,15 +174,6 @@ export const MasterAccountsRoute = React.memo(() => {
             open={addAccountDialogOpen}
             errorMessage={addAccountDialogError}
             onClose={handleAddAccountDialogClose}
-        />
-        <PromptDialog
-            open={!!deleteAccountDialogPrompt}
-            title={DeleteAccountDialogTitle}
-            prompt={deleteAccountDialogPrompt}
-            cancelButtonColor='secondary'
-            confirmButtonColor='primary'
-            confirmButtonLabel='Delete'
-            onClose={handleDeleteAccountDialogClose}
         />
     </>;
 

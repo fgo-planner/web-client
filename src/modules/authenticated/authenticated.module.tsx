@@ -8,6 +8,7 @@ import { MasterItemsRoute } from './routes/master-items/master-items.route';
 import { MasterServantCostumesRoute } from './routes/master-servant-costumes/master-servant-costumes.route';
 import { MasterServantStatsRoute } from './routes/master-servant-stats/master-servant-stats.route';
 import { MasterServantsRoute } from './routes/master-servants/master-servants.route';
+import { MasterSettingsRoute } from './routes/master-settings/master-settings.route';
 import { MasterSoundtracksRoute } from './routes/master-soundtracks/master-soundtracks.route';
 import { PlanRoute } from './routes/plan/plan.route';
 import { PlansRoute } from './routes/plans/plans.route';
@@ -22,7 +23,7 @@ const MasterServantImportRoute = React.lazy(() => import('./routes/master-servan
 const ModuleRoutes = [
     {
         path: '/',
-        element: <Navigate to='./master' />
+        element: <Navigate to='./master/dashboard' />
     },
     {
         path: '/profile',
@@ -42,6 +43,14 @@ const ModuleRoutes = [
     },
     {
         path: '/master',
+        element: <Navigate to='./dashboard' />
+    },
+    {
+        path: '/master/settings',
+        element: <MasterSettingsRoute />
+    },
+    {
+        path: '/master/dashboard',
         element: <MasterAccountHomeRoute />
     },
     {

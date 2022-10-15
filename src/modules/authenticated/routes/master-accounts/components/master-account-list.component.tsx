@@ -1,7 +1,7 @@
 import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { MouseEvent, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { BasicMasterAccounts } from '../../../../../types/data';
 import { MasterAccountColumnProperties, MasterAccountListVisibleColumns } from './master-account-list-columns';
 import { MasterAccountListHeader } from './master-account-list-header.component';
@@ -9,9 +9,6 @@ import { MasterAccountListRow, StyleClassPrefix as MasterAccountListRowStyleClas
 
 type Props = {
     masterAccountList: BasicMasterAccounts;
-    onRowClick: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
-    onRowDoubleClick: (e: MouseEvent, account: ImmutableBasicMasterAccount) => void;
-    selectedId?: string;
     visibleColumns: Readonly<MasterAccountListVisibleColumns>;
 };
 
@@ -48,6 +45,10 @@ const StyleProps = (theme: SystemTheme) => {
                     width: MasterAccountColumnProperties.name.width,
                     textAlign: 'left',
                     fontWeight: 500,
+                    '& a': {
+                        color: palette.primary.main,
+                        textDecoration: 'none'
+                    },
                     [breakpoints.down('sm')]: {
                         flex: 1,
                         width: 'initial !important',
@@ -75,9 +76,6 @@ export const MasterAccountList = React.memo((props: Props) => {
 
     const {
         masterAccountList,
-        onRowClick,
-        onRowDoubleClick,
-        selectedId,
         visibleColumns
     } = props;
 
@@ -87,11 +85,7 @@ export const MasterAccountList = React.memo((props: Props) => {
                 key={account._id}
                 index={index}
                 account={account}
-                active={selectedId === account._id}
                 visibleColumns={visibleColumns}
-                onClick={onRowClick}
-                onContextMenu={onRowClick}
-                onDoubleClick={onRowDoubleClick}
             />
         );
     };

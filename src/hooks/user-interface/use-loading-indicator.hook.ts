@@ -35,8 +35,7 @@ export const useLoadingIndicator = (): LoadingIndicatorHookResult => {
     const invokeLoadingIndicator = useCallback((): void => {
         setLockId(lockId => {
             if (!lockId) {
-                // TODO Does this need to be called asynchronously as well?
-                lockId = userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+                lockId = userInterfaceService.requestLock(LockableFeature.LoadingIndicator, true);
             }
             return lockId;
         });

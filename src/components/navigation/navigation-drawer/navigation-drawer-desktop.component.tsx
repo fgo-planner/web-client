@@ -99,6 +99,9 @@ const ExpandedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) 
     const properties = {
         background: palette.background.paper,
         width: spacing(ThemeConstants.NavigationDrawerExpandedWidthScale),
+        borderRightWidth: 1,
+        borderRightStyle: 'solid',
+        borderRightColor: palette.divider
     } as CSSProperties;
 
     if (!animationsDisabled) {

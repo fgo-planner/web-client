@@ -15,6 +15,7 @@ import { RegistrationRoute } from './routes/registration.route';
 import { BackgroundMusicService } from './services/audio/background-music.service';
 import { DeviceInfo, DeviceType } from './types/internal';
 import { UAParser } from 'ua-parser-js';
+import { useNavigationDrawerNoAnimations } from './hooks/user-interface/use-navigation-drawer-no-animations.hook';
 
 console.log('RootModule loaded');
 
@@ -98,6 +99,15 @@ const ModuleRoutes = [
 ] as Array<RouteObject>;
 
 export const RootModule = React.memo(() => {
+
+    /**
+     * Disables drawer animations for the entire app.
+     *
+     * TODO This is temporary... either selectively disable animation for routes, or
+     * make it configurable via environment variable or user setting, or permanently
+     * remove the animations altogether.
+     */
+    useNavigationDrawerNoAnimations();
 
     const backgroundMusicService = useInjectable(BackgroundMusicService);
 

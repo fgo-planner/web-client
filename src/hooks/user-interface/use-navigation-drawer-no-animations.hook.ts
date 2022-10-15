@@ -11,7 +11,12 @@ export const useNavigationDrawerNoAnimations = (): void => {
     const userInterfaceService = useInjectable(UserInterfaceService);
 
     useEffect(() => {
-        const lockId = userInterfaceService.requestLock(LockableFeature.NavigationDrawerNoAnimations);
+        /**
+         * This needs to be called asynchronously due to potential race condition with
+         * the `ThemeService` releasing the lock.
+         */
+        /** */
+        const lockId = userInterfaceService.requestLock(LockableFeature.NavigationDrawerNoAnimations, true);
 
         return () => userInterfaceService.releaseLock(LockableFeature.NavigationDrawerNoAnimations, lockId);
     }, [userInterfaceService]);

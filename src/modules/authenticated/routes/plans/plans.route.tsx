@@ -275,7 +275,7 @@ export const PlansRoute = React.memo(() => {
             <div className={`${StyleClassPrefix}-upper-layout-container`}>
                 <div className={`${StyleClassPrefix}-title-row`}>
                     <PageTitle className={`${StyleClassPrefix}-title`}>
-                        My Plans
+                        Plans
                     </PageTitle>
                     {sm ?
                         <Button variant='contained' onClick={handleAddPlan}>

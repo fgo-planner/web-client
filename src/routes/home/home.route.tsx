@@ -3,6 +3,7 @@ import { ImmutableMasterAccount } from '@fgo-planner/data-core';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
 import { AppBarElevateOnScroll } from '../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
+import { MasterAccountUtils } from '../../utils/master/master-account.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { HomeLinkSection } from './home-link-section.component';
@@ -64,35 +65,47 @@ export const HomeRoute = React.memo(() => {
         ];
     }, []);
 
+    const masterAccountLabel = useMemo((): ReactNode => {
+        let label: ReactNode = null;
+        if (masterAccount) {
+            if (masterAccount.name) {
+                label = <i> - {masterAccount.name}</i>;
+            } else if (masterAccount.friendId) {
+                label = <i> - {MasterAccountUtils.formatFriendId(masterAccount)}</i>;
+            }
+        }
+        return <>Master Account {label}</>;
+    }, [masterAccount]);
+
     /**
      * Links specific to the currently selected master account. Only displayed when
      * the user is logged in and they have a master account.
      */
     const masterAccountLinksNode = useMemo((): ReactNode => {
         return (
-            <HomeLinkSection title='Master Account'>
+            <HomeLinkSection title={masterAccountLabel}>
                 <HomeLink
                     title='Dashboard'
                     to='user/master'
                     imageUrl='https://static.atlasacademy.io/JP/Faces/f_93026000.png'
                 />
                 <HomeLink
-                    title='My Servants'
+                    title='Servant Roster'
                     to='user/master/servants'
                     imageUrl='https://static.atlasacademy.io/JP/Faces/f_93049300.png'
                 />
                 <HomeLink
-                    title='My Inventory'
+                    title='Inventory'
                     to='user/master/items'
                     imageUrl='https://static.atlasacademy.io/JP/Faces/f_98073400.png'
                 />
                 <HomeLink
-                    title='My Costumes'
+                    title='Costumes'
                     to='user/master/costumes'
                     imageUrl='https://static.atlasacademy.io/JP/Faces/f_93048800.png'
                 />
                 <HomeLink
-                    title='My Soundtracks'
+                    title='Soundtracks'
                     to='user/master/soundtracks'
                     imageUrl='https://static.atlasacademy.io/JP/Faces/f_98057800.png'
                 />
@@ -103,7 +116,7 @@ export const HomeRoute = React.memo(() => {
                 />
             </HomeLinkSection>
         );
-    }, []);
+    }, [masterAccountLabel]);
 
     const userAccountLinksNode = useMemo((): ReactNode => {
         return (
@@ -114,7 +127,7 @@ export const HomeRoute = React.memo(() => {
                     imageUrl='https://static.atlasacademy.io/JP/Faces/f_93043800.png'
                 />
                 <HomeLink
-                    title='Settings'
+                    title='User Settings'
                     to='user/settings'
                     imageUrl='https://static.atlasacademy.io/JP/Faces/f_93009400.png'
                 />

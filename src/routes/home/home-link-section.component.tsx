@@ -1,9 +1,9 @@
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, ReactNode } from 'react';
 import { PageTitle } from '../../components/text/page-title.component';
 
 type Props = PropsWithChildren<{
-    title?: string;
+    title?: ReactNode;
 }>;
 
 const StyleClassPrefix = 'HomeLinkSection';

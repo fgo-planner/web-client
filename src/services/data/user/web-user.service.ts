@@ -69,9 +69,13 @@ export class WebUserService extends UserService {
             return this._currentBasicUserPromise;
         }
         const basicUserPromise = Http.get<BasicUser>(`${this._BaseUrl}/current-user`)
-            .then(basicUser => {
+            .finally(() => {
+                /**
+                 * Must set `_currentBasicUserPromise` back to null regardless if the promise
+                 * resolved successfully or with error. Otherwise the next call will return the
+                 * old promise instead of making a new request.
+                 */
                 this._currentBasicUserPromise = null;
-                return basicUser;
             });
         return this._currentBasicUserPromise = basicUserPromise;
     }

@@ -1,3 +1,4 @@
+import { Nullable } from '@fgo-planner/common-core';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
@@ -68,7 +69,7 @@ export const AppBar = React.memo(() => {
     const userInterfaceService = useInjectable(UserInterfaceService);
     const userService = useInjectable(UserService);
 
-    const [currentUser, setCurrentUser] = useState<BasicUser>();
+    const [currentUser, setCurrentUser] = useState<Nullable<BasicUser>>();
     const [elevated, setElevated] = useState<boolean>(false);
 
     /**
@@ -79,11 +80,14 @@ export const AppBar = React.memo(() => {
             .get(SubscriptionTopics.User.CurrentUserChange)
             .subscribe(async (userInfo) => {
                 if (userInfo) {
-                    // TODO Handle error
-                    const currentUser = await userService.getCurrentUser();
-                    setCurrentUser(currentUser || undefined);
+                    try {
+                        const currentUser = await userService.getCurrentUser();
+                        setCurrentUser(currentUser);
+                    } catch {
+                        setCurrentUser(null);
+                    }
                 } else {
-                    setCurrentUser(undefined);
+                    setCurrentUser(null);
                 }
             });
 

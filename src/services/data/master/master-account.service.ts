@@ -38,6 +38,14 @@ export class MasterAccountService {
 
     constructor() {
         /**
+         * Updates the active master account ID in local storage every time the app
+         * instance is focused.
+         */
+        window.addEventListener('focus', () => {
+            this._writeCurrentAccountToStorage(true, false);
+        });
+
+        /**
          * Set timeout before subscribing to let the dependencies inject first.
          *
          * This class is meant to last the lifetime of the application; no need to
@@ -115,7 +123,7 @@ export class MasterAccountService {
     async selectAccount(accountId: Nullable<string>): Promise<Nullable<MasterAccount>> {
         if (!accountId) {
             this._onCurrentMasterAccountChange.next(this._currentMasterAccount = null);
-            this._writeCurrentAccountToSessionStorage();
+            this._writeCurrentAccountToStorage(true, true);
             return null;
         }
         if (this._currentMasterAccount?._id === accountId) {
@@ -125,7 +133,7 @@ export class MasterAccountService {
         try {
             this._currentMasterAccount = await this.getAccount(accountId);
             this._onCurrentMasterAccountChange.next(this._currentMasterAccount);
-            this._writeCurrentAccountToSessionStorage();
+            this._writeCurrentAccountToStorage(true, true);
             return this._currentMasterAccount;
         } catch (e) {
             console.error(e);
@@ -140,7 +148,7 @@ export class MasterAccountService {
      * selected. Otherwise, the currently selected account will be set to null.
      */
     private _autoSelectAccount(): void {
-        /*
+        /**
          * If there are no accounts present, then set the current account to null.
          */
         if (!this._masterAccountList?.length) {
@@ -148,20 +156,21 @@ export class MasterAccountService {
             return;
         }
 
-        /*
+        /**
          * If an account was already selected, and it is present in the account list,
          * then don't do anything.
          */
+        /** */
         let currentMasterAccountId: Nullable<string> = this._currentMasterAccount?._id;
         if (currentMasterAccountId && this._masterAccountListContainsId(currentMasterAccountId)) {
             return;
         }
 
-        /*
-         * If there was an account ID session storage, and it is present in the account
+        /**
+         * If there was an account ID in storage, and it is present in the account
          * list, then select it.
          */
-        currentMasterAccountId = StorageUtils.getItemAsString(StorageKeys.User.CurrentMasterAccountId);
+        currentMasterAccountId = this._readCurrentAccountFromStorage();
         if (currentMasterAccountId && this._masterAccountListContainsId(currentMasterAccountId)) {
             this.selectAccount(currentMasterAccountId);
             return;
@@ -169,7 +178,7 @@ export class MasterAccountService {
 
         // TODO Use localStorage to retain selected account when opening new windows/tabs.
 
-        /*
+        /**
          * Default to the first account in the list.
          */
         this.selectAccount(this._masterAccountList[0]._id);
@@ -211,9 +220,41 @@ export class MasterAccountService {
         this._autoSelectAccount();
     }
 
-    private _writeCurrentAccountToSessionStorage(): void {
+    /**
+     * Reads the current account ID from storage. Attempts to read from session
+     * storage first, and falls back to local storage if not available. Returns
+     * `null` if not found in either storage scopes.
+     *
+     * Also writes the ID to session storage if it was present in local storage but
+     * not session storage.
+     */
+    private _readCurrentAccountFromStorage(): string | null {
+        let result = StorageUtils.getItemAsString(StorageKeys.User.ActiveMasterAccountId);
+        if (result) {
+            return result;
+        }
+        result = StorageUtils.getItemAsString(StorageKeys.User.LastMasterAccountId);
+        if (result) {
+            this._writeCurrentAccountToStorage(false, true);
+        }
+        return result;
+    }
+
+    /**
+     * Writes the current account ID to storage.
+     * 
+     * @param local Whether to write the ID to local storage.
+     * 
+     * @param session Whether to write the ID to session storage.
+     */
+    private _writeCurrentAccountToStorage(local: boolean, session: boolean): void {
         const accountId = this._currentMasterAccount?._id;
-        StorageUtils.setItem(StorageKeys.User.CurrentMasterAccountId, accountId);
+        if (local) {
+            StorageUtils.setItem(StorageKeys.User.LastMasterAccountId, accountId);
+        }
+        if (session) {
+            StorageUtils.setItem(StorageKeys.User.ActiveMasterAccountId, accountId);
+        }
     }
 
 }

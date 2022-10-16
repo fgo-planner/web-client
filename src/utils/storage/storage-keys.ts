@@ -27,14 +27,27 @@ class User {
     private static readonly _Prefix = PrefixUser;
 
     /**
-     * The local storage key where the user's access token is stored.
+     * Contains the user's access token.
+     * 
+     * Local scope
      */
     static readonly AccessToken = StorageKey.forStringValue(`${this._Prefix}AccessToken`, 'local');
 
     /**
-     * The session storage key where the current master account ID is stored.
+     * Contains the ID of the active master account for the current tab.
+     * 
+     * Session scope
      */
-    static readonly CurrentMasterAccountId = StorageKey.forStringValue(`${this._Prefix}CurrentMasterAccountId`, 'session');
+    static readonly ActiveMasterAccountId = StorageKey.forStringValue(`${this._Prefix}ActiveMasterAccountId`, 'session');
+
+    /**
+     * Contains the ID of the master account that was active in the last focused
+     * instance of the app. In addition to updating when an account is selected,
+     * this should be updated every time an instance of the app is focused.
+     * 
+     * Local scope
+     */
+    static readonly LastMasterAccountId = StorageKey.forStringValue(`${this._Prefix}LastMasterAccountId`, 'local');
 
     private constructor() {
 

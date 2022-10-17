@@ -52,7 +52,8 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
     const inventoryQuantityMap = useMemo((): Record<number, number> => {
         const result: Record<number, number> = {};
-        for (const { itemId, quantity } of masterAccount.resources.items) {
+        for (const [key, quantity] of Object.entries(masterAccount.resources.items)) {
+            const itemId = Number(key);
             result[itemId] = quantity;
         }
         return result;

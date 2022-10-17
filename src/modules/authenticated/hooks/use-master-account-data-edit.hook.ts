@@ -184,11 +184,7 @@ const cloneMasterAccountDataForEdit = (
         result.costumes = new Set(masterAccount.costumes);
     }
     if (options.includeItems) {
-        result.items = ArrayUtils.mapArrayToObject(
-            masterAccount.resources.items,
-            item => item.itemId,
-            item => item.quantity
-        );
+        result.items = { ...masterAccount.resources.items };
         result.qp = masterAccount.resources.qp;
     }
     if (options.includeServants) {
@@ -224,11 +220,7 @@ const cloneMasterAccountDataForReference = (
         result.costumes = new Set(masterAccount.costumes);
     }
     if (options.includeItems) {
-        result.items = ArrayUtils.mapArrayToObject(
-            masterAccount.resources.items,
-            item => item.itemId,
-            item => item.quantity
-        );
+        result.items = { ...masterAccount.resources.items };
         result.qp = masterAccount.resources.qp;
     }
     if (options.includeServants) {
@@ -778,7 +770,9 @@ export function useMasterAccountDataEditHook(
         if (includeItems && (dirtyData.items.size || dirtyData.qp)) {
             update.resources = {
                 ...masterAccount.resources,
-                items: Object.entries(editData.items).map(([itemId, quantity]) => ({ itemId: Number(itemId), quantity })),
+                items: {
+                    ...editData.items
+                },
                 qp: editData.qp
             };
         }
@@ -807,14 +801,8 @@ export function useMasterAccountDataEditHook(
         }
         try {
             await masterAccountService.updateAccount(update);
+        } finally {
             resetLoadingIndicator();
-        } catch (error: any) {
-            resetLoadingIndicator();
-            /*
-             * Re-throw the error here. It is up to the component that calls the function to
-             * determine how to handle the error.
-             */
-            throw error;
         }
     }, [
         editData,

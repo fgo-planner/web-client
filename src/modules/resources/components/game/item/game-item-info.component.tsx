@@ -165,18 +165,17 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
             return 0;
         }
         let sum = 0;
-        for (const level of Object.keys(enhancements)) {
-            const enhancement: GameServantEnhancement = (enhancements as any)[level];
+        for (const enhancement of Object.values(enhancements)) {
             sum += this._computeEnhancementUsage(enhancement, itemId);
         }
         return sum;
     }
 
-    private _computeEnhancementUsage(enhancement: GameServantEnhancement, itemId: number): number {
+    private _computeEnhancementUsage({ materials }: GameServantEnhancement, itemId: number): number {
         let sum = 0;
-        for (const material of enhancement.materials) {
-            if (material.itemId === itemId) {
-                sum += material.quantity;
+        for (const [key, quantity] of Object.entries(materials)) {
+            if (Number(key) === itemId) {
+                sum += quantity;
             }
         }
         return sum;

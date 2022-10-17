@@ -155,7 +155,7 @@ export class PlanComputationUtils {
          */
         const options = optionsOverride || this._parseComputationOptions(targetPlan);
 
-        /*
+        /**
          * Run computations for previous plans in the group first.
          */
         previousPlans?.forEach(plan => {
@@ -167,7 +167,7 @@ export class PlanComputationUtils {
                 options
             );
         });
-        /*
+        /**
          * Finally, run computations for the target plan.
          */
         this._computePlanRequirements(
@@ -195,34 +195,38 @@ export class PlanComputationUtils {
     ): void {
 
         for (const planServant of plan.servants) {
-            /*
+            /**
              * Skip the servant if it is not enabled.
              */
             if (!planServant.enabled.servant) {
                 continue;
             }
-            /*
+            /**
              * Retrieve the master servant data from the map.
              */
+            /** */
             const masterServant = masterAccountData.servants[planServant.instanceId];
             if (!masterServant) {
                 continue;
             }
-            /*
+            /**
              * Retrieve the game servant data from the map.
              */
+            /** */
             const gameServant = gameServantMap[masterServant.gameId];
             if (!gameServant) {
                 continue;
             }
-            /*
+            /**
              * Compute the options based on a merge of the plan and servant options.
              */
+            /** */
             const servantOptions = this._parseComputationOptions(planServant);
             const mergedOptions = this._mergeComputationOptions(options, servantOptions);
-            /*
+            /**
              * Compute the debt for the servant for the current plan.
              */
+            /** */
             const servantComputationResult = this._computePlanServantRequirements(
                 result,
                 gameServant,
@@ -237,9 +241,10 @@ export class PlanComputationUtils {
             }
 
             const [planServantRequirements, enhancementRequirements] = servantComputationResult;
-            /*
+            /**
              * Update the result with the computed data.
              */
+            /** */
             let planEnhancementRequirements: EnhancementRequirements;
             if (isTargetPlan) {
                 this.addEnhancementRequirements(planServantRequirements.requirements, enhancementRequirements);
@@ -269,19 +274,19 @@ export class PlanComputationUtils {
 
         let planServantRequirements = resultServants[instanceId];
         if (!planServantRequirements) {
-            /*
+            /**
              * If the plan servant does not yet exist in the result, then instantiate it and
              * add it to the result.
              */
             planServantRequirements = this._instantiatePlanServantRequirements(planServant);
             resultServants[instanceId] = planServantRequirements;
-            /*
+            /**
              * Make sure that the current enhancement values match those from the master
              * servant.
              */
             PlanServantUtils.updateEnhancements(planServantRequirements.current, masterServant);
         } else {
-            /*
+            /**
              * If the plan servant was already in the result, then it was from a previous
              * plan in the group. This means the for the current plan, the previous target
              * enhancements should be the new current, and the target values from the plan
@@ -307,7 +312,7 @@ export class PlanComputationUtils {
 
     private static _preProcessMasterAccount(masterAccount: ImmutableMasterAccount): MasterAccountData {
         const servants = ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
-        const items = ArrayUtils.mapArrayToObject(masterAccount.resources.items, item => item.itemId, item => item.quantity);
+        const items = masterAccount.resources.items;
         const costumes = new Set(masterAccount.costumes);
         const qp = masterAccount.resources.qp;
 
@@ -402,7 +407,7 @@ export class PlanComputationUtils {
         if (includeCostumes) {
             for (const [key, costume] of Object.entries(gameServant.costumes)) {
                 const costumeId = Number(key);
-                /*
+                /**
                  * Skip if the costume is already unlocked, or if it is not targeted. If the
                  * targetCostumes set is undefined, then all costumes are target by default.
                  */
@@ -438,16 +443,17 @@ export class PlanComputationUtils {
             if (excludeLores && skillLevel === (MasterServantConstants.MaxSkillLevel - 1)) {
                 continue;
             }
-            /*
+            /**
              * The number of skills that need to be upgraded to this level. A skill does not
              * need to be upgraded if it is already at least this level, or if this level beyond
              * the targeted level.
              */
+            /** */
             const skillUpgradeCount =
                 (currentSkill1 > skillLevel || skillLevel >= targetSkill1 ? 0 : 1) +
                 (currentSkill2 > skillLevel || skillLevel >= targetSkill2 ? 0 : 1) +
                 (currentSkill3 > skillLevel || skillLevel >= targetSkill3 ? 0 : 1);
-            /*
+            /**
              * Skip if all three skills do not need enhancement at this level.
              */
             if (skillUpgradeCount === 0) {
@@ -460,19 +466,20 @@ export class PlanComputationUtils {
     private static _updateEnhancementRequirementResult(
         result: EnhancementRequirements,
         enhancement: Immutable<GameServantEnhancement>,
-        key: keyof EnhancementItemRequirements,
+        propertyKey: keyof EnhancementItemRequirements,
         enhancementCount = 1
     ): void {
-        /*
+        /**
          * Update material count.
          */
-        for (const { itemId, quantity } of enhancement.materials) {
+        for (const [key, quantity] of Object.entries(enhancement.materials)) {
+            const itemId = Number(key);
             const itemCount = ObjectUtils.getOrDefault(result.items, itemId, this._instantiateEnhancementItemRequirements);
             const total = quantity * enhancementCount;
-            itemCount[key] += total;
+            itemCount[propertyKey] += total;
             itemCount.total += total;
         }
-        /*
+        /**
          * Also update QP count.
          */
         result.qp += enhancement.qp * enhancementCount;

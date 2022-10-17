@@ -3,6 +3,8 @@
  * response payloads.
  */
 
+export * from './game/item/game-item-category-map.type';
+export * from './game/item/game-item-category.enum';
 export * from './game/item/game-item-list.type';
 export * from './game/item/game-item-map.type';
 export * from './game/servant/game-servant-class-simplified.type';

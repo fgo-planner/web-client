@@ -2,7 +2,7 @@ import { Nullable } from '@fgo-planner/common-core';
 import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-core';
 import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
 import { Fab, Tooltip } from '@mui/material';
-import _ from 'lodash';
+import _ from 'lodash-es';
 import React, { Fragment, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/fab-container.component';

@@ -82,13 +82,11 @@ export class MasterAccountService {
 
     async getAccount(id: string): Promise<MasterAccount> {
         const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
-        let account: MasterAccount;
         try {
-            account = await Http.get<MasterAccount>(`${this._BaseUrl}/${id}`, Http.stringTimestampsToDate);
+            return await Http.get<MasterAccount>(`${this._BaseUrl}/${id}`, Http.stringTimestampsToDate);
         } finally  {
             this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
         }
-        return account;
     }
 
     async updateAccount(masterAccount: MasterAccountUpdate): Promise<MasterAccount> {
@@ -96,6 +94,7 @@ export class MasterAccountService {
         let updated: MasterAccount;
         try {
             updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount, Http.stringTimestampsToDate);
+            await this._updateMasterAccountList(); // Reload account list
         } finally {
             this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
         }
@@ -199,14 +198,7 @@ export class MasterAccountService {
      * pushing it to the subject.
      */
     private async _updateMasterAccountList(): Promise<void> {
-        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
-        try {
-            this._masterAccountList = await this.getAccountsForCurrentUser();
-            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
-        } catch (e: any) {
-            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
-            throw e;
-        }
+        this._masterAccountList = await this.getAccountsForCurrentUser();
         this._onMasterAccountListChange.next(this._masterAccountList);
     }
 
@@ -216,7 +208,15 @@ export class MasterAccountService {
             this._onMasterAccountListChange.next(this._masterAccountList = null);
             return;
         }
-        await this._updateMasterAccountList();
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+        try {
+            await this._updateMasterAccountList();
+        } catch (e: any) {
+            console.error(e);
+            return;
+        } finally {
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
+        }
         this._autoSelectAccount();
     }
 

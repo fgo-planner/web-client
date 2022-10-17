@@ -2,6 +2,7 @@ import { Immutable } from '@fgo-planner/common-core';
 import { GameSoundtrack } from '@fgo-planner/data-core';
 import { Pause as PauseIcon, PlayArrow as PlayArrowIcon } from '@mui/icons-material';
 import { Checkbox, IconButton } from '@mui/material';
+import { isEmpty } from 'lodash-es';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
@@ -51,7 +52,7 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
         onPlayButtonClick(soundtrack, action);
     }, [soundtrack, playing, onPlayButtonClick]);
 
-    const alwaysUnlocked = !material;
+    const alwaysUnlocked = isEmpty(material);
 
     const unlockedStatusNode: ReactNode = (
         <div className={`${StyleClassPrefix}-unlocked-status`}>
@@ -66,7 +67,11 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
         if (!gameItemMap || alwaysUnlocked) {
             return null;
         }
-        const { itemId, quantity } = material;
+        /**
+         * There should be exactly one item.
+         */
+        const [key, quantity] = Object.entries(material)[0];
+        const itemId = Number(key);
         const unlockMaterial = gameItemMap[itemId];
         if (!unlockMaterial) {
             return null;
@@ -74,7 +79,7 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
         return (
             <GameItemQuantity gameItem={unlockMaterial} quantity={quantity} />
         );
-    }, [gameItemMap, alwaysUnlocked, material]);
+    }, [alwaysUnlocked, gameItemMap, material]);
 
     const playButtonNode: ReactNode = useMemo(() => {
         return (
@@ -101,7 +106,7 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
                     src={thumbnailUrl}
                     alt={name}
                     height={SoundtrackThumbnailSize}
-                    />
+                />
             </div>
             {playButtonNode}
             <TruncateText className={`${StyleClassPrefix}-title`}>

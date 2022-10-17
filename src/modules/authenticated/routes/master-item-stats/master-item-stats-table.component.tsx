@@ -5,8 +5,9 @@ import React, { ReactNode, useMemo } from 'react';
 import { NumericFormat } from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
+import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { GameItemMap } from '../../../../types/data';
+import { GameItemCategory, GameItemMap } from '../../../../types/data';
 import { MasterItemStats, MasterItemStatsFilterOptions } from './master-item-stats.utils';
 
 type Props = {
@@ -38,16 +39,6 @@ const DebtColumnTooltipInclSoundtracks = `${DebtColumnTooltip} and soundtracks u
 const DebtColumnTooltipInclUnsummonedAndSoundtracks = `${DebtColumnTooltipInclUnsummoned}, and soundtracks unlocks`;
 
 const DifferenceColumnTooltip = 'Additional amount that needs to be acquired in order to fullfil the \'Remaining Needed\' column';
-
-const ItemIds = [
-    ...GameItemConstants.SkillGems,
-    ...GameItemConstants.BronzeEnhancementMaterials,
-    ...GameItemConstants.SilverEnhancementMaterials,
-    ...GameItemConstants.GoldEnhancementMaterials,
-    ...GameItemConstants.AscensionStatues,
-    ...GameItemConstants.OtherEnhancementMaterials,
-    5
-];
 
 const StyleClassPrefix = 'MasterItemStatsTable';
 
@@ -110,9 +101,34 @@ const StyleProps = (theme: SystemTheme) => {
     } as SystemStyleObject<Theme>;
 };
 
-export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: Props) => {
+export const MasterItemStatsTable = React.memo((props: Props) => {
 
-    const { includeUnsummonedServants, includeSoundtracks } = filter;
+    const gameItemCategoryMap = useGameItemCategoryMap();
+
+    const {
+        stats,
+        gameItemMap,
+        filter: {
+            includeUnsummonedServants,
+            includeSoundtracks
+        }
+    } = props;
+
+    const itemIds = useMemo(() => {
+        if (!gameItemCategoryMap) {
+            return [];
+        }
+        return [
+            ...gameItemCategoryMap[GameItemCategory.SkillGems],
+            ...gameItemCategoryMap[GameItemCategory.BronzeEnhancementMaterials],
+            ...gameItemCategoryMap[GameItemCategory.SilverEnhancementMaterials],
+            ...gameItemCategoryMap[GameItemCategory.GoldEnhancementMaterials],
+            ...gameItemCategoryMap[GameItemCategory.AscensionStatues],
+            GameItemConstants.LoreItemId,
+            GameItemConstants.GrailItemId,
+            GameItemConstants.QpItemId
+        ];
+    }, [gameItemCategoryMap]);
 
     const costColumnTooltip = useMemo(() => {
         if (!includeUnsummonedServants && !includeSoundtracks) {
@@ -157,7 +173,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
         const { inventory, used, cost, debt } = stat;
 
         return (
-            <DataTableListStaticRow key={itemId} borderBottom={index !== ItemIds.length - 1}>
+            <DataTableListStaticRow key={itemId} borderBottom={index !== itemIds.length - 1}>
                 <div className={`${StyleClassPrefix}-data-row`}>
                     <div className={`${StyleClassPrefix}-label-cell`}>
                         <GameItemThumbnail
@@ -232,7 +248,7 @@ export const MasterItemStatsTable = React.memo(({ stats, gameItemMap, filter }: 
                 </Tooltip>
             </div>
             <div className={`${StyleClassPrefix}-scroll-container`}>
-                {ItemIds.map(renderItem)}
+                {itemIds.map(renderItem)}
             </div>
         </Box>
     );

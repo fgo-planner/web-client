@@ -1,6 +1,7 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { GameServant, GameServantCostume } from '@fgo-planner/data-core';
 import { Checkbox } from '@mui/material';
+import { isEmpty } from 'lodash-es';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
@@ -45,7 +46,7 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
         onChange(costumeId, event.target.checked);
     }, [costumeId, onChange]);
 
-    const alwaysUnlocked = !materials.materials.length;
+    const alwaysUnlocked = isEmpty(materials.materials);
 
     const unlockedStatusNode: ReactNode = (
         <div className={`${StyleClassPrefix}-unlocked-status`}>
@@ -56,13 +57,13 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
         </div>
     );
 
-    const unlockMaterialNodes: ReactNode = useMemo(() => {
+    const unlockMaterialNodes: ReactNode = useMemo((): ReactNode => {
         if (!gameItemMap || alwaysUnlocked) {
             return null;
         }
-        const nodes: ReactNode[] = [];
-        for (const material of materials.materials) {
-            const { itemId, quantity } = material;
+        const nodes: Array<JSX.Element> = [];
+        for (const [key, quantity] of Object.entries(materials.materials)) {
+            const itemId = Number(key);
             const unlockMaterial = gameItemMap[itemId];
             if (!unlockMaterial) {
                 continue;

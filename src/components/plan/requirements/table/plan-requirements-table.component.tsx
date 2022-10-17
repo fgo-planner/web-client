@@ -2,8 +2,9 @@ import { ArrayUtils, Immutable } from '@fgo-planner/common-core';
 import { GameItemConstants, ImmutableMasterAccount, Plan, PlanServant } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
+import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
-import { PlanRequirements } from '../../../../types/data';
+import { GameItemCategory, GameItemCategoryMap, PlanRequirements } from '../../../../types/data';
 import { PlanRequirementsTableFooter } from './plan-requirements-table-footer.component';
 import { PlanRequirementsTableHeader, StyleClassPrefix as PlanRequirementsTableHeaderStyleClassPrefix } from './plan-requirements-table-header.component';
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
@@ -29,28 +30,30 @@ const CellSizeCondensed = 42;
 const CellSizeNormal = 52;
 
 const getDisplayedItems = (
+    gameItemCategoryMap: GameItemCategoryMap,
     planRequirements: Immutable<PlanRequirements>,
     itemDisplayOptions: PlanRequirementsTableOptions['displayItems']
 ): Array<number> => {
-    /*
+    /** 
      * Build default list of item IDs based on display options.
      */
+    /** */
     const defaultItems = [
-        ...GameItemConstants.BronzeEnhancementMaterials,
-        ...GameItemConstants.SilverEnhancementMaterials,
-        ...GameItemConstants.GoldEnhancementMaterials
+        ...gameItemCategoryMap[GameItemCategory.BronzeEnhancementMaterials],
+        ...gameItemCategoryMap[GameItemCategory.SilverEnhancementMaterials],
+        ...gameItemCategoryMap[GameItemCategory.GoldEnhancementMaterials]
     ];
     if (itemDisplayOptions.statues) {
-        defaultItems.push(...GameItemConstants.AscensionStatues);
+        defaultItems.push(...gameItemCategoryMap[GameItemCategory.AscensionStatues]);
     }
     if (itemDisplayOptions.grails) {
-        defaultItems.push(7999); // TODO Un-hardcode this
+        defaultItems.push(GameItemConstants.GrailItemId);
     }
     if (itemDisplayOptions.gems) {
-        defaultItems.push(...GameItemConstants.SkillGems);
+        defaultItems.push(...gameItemCategoryMap[GameItemCategory.SkillGems]);
     }
     if (itemDisplayOptions.lores) {
-        defaultItems.push(6999); // TODO Un-hardcode this
+        defaultItems.push(GameItemConstants.LoreItemId);
     }
     /*
      * If unused items are being displayed, then just return the default item IDs.
@@ -90,6 +93,8 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
 
     const gameServantMap = useGameServantMap();
 
+    const gameItemCategoryMap = useGameItemCategoryMap();
+
     const {
         masterAccount,
         onEditServant,
@@ -104,8 +109,15 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     }, [masterAccount]);
 
     const displayedItems = useMemo((): Array<number> => {
-        return getDisplayedItems(planRequirements, options.displayItems);
-    }, [planRequirements, options.displayItems]);
+        if (!gameItemCategoryMap) {
+            return [];
+        }
+        return getDisplayedItems(
+            gameItemCategoryMap,
+            planRequirements,
+            options.displayItems
+        );
+    }, [gameItemCategoryMap, planRequirements, options.displayItems]);
 
     const internalTableOptions = useMemo((): PlanRequirementsTableOptionsInternal => {
         const layout = options.layout;

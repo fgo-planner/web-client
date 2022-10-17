@@ -1,5 +1,6 @@
 import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
 import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, MasterServant, MasterServantConstants } from '@fgo-planner/data-core';
+import { isEmpty } from 'lodash-es';
 import { GameServantMap, GameSoundtrackList } from '../../../../types/data';
 
 export type MasterItemStat = {
@@ -91,10 +92,11 @@ function generateStats(
 
 function _populateInventory(stats: Record<number, MasterItemStat>, { resources }: ImmutableMasterAccount): void {
     const { items, qp } = resources;
-    for (const masterItem of items) {
+    for (const [key, quantity] of Object.entries(items)) {
+        const itemId = Number(key);
         const stat = _instantiateItemStat();
-        stat.inventory = masterItem.quantity;
-        stats[masterItem.itemId] = stat;
+        stat.inventory = quantity;
+        stats[itemId] = stat;
     }
     const stat = _instantiateItemStat();
     stat.inventory = qp;
@@ -192,7 +194,8 @@ function _updateForServantEnhancement(
     excludeDebt = false
 ): void {
 
-    for (const { itemId, quantity } of enhancement.materials) {
+    for (const [key, quantity] of Object.entries(enhancement.materials)) {
+        const itemId = Number(key);
         const stat = ObjectUtils.getOrDefault(stats, itemId, _instantiateItemStat);
         const cost = quantity * maxEnhancementCount;
         const used = enhancementCount * quantity;
@@ -226,12 +229,17 @@ function _updateForSoundtracks(
 ): void {
 
     for (const { _id, material } of gameSoundtrackList) {
-        if (!material) {
+        if (isEmpty(material)) {
             continue;
         }
+        /**
+         * There should be exactly one item.
+         */
+        const [key, quantity] = Object.entries(material)[0];
+        const itemId = Number(key);
         const summoned = unlockedSoundtracks.has(_id);
-        const stat = stats[material.itemId];
-        const cost = material.quantity;
+        const stat = stats[itemId];
+        const cost = quantity;
         stat.cost += cost;
         if (!summoned) {
             stat.debt += cost;

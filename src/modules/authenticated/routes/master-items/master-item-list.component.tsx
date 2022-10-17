@@ -1,9 +1,11 @@
-import { ImmutableArray, ReadonlyRecord } from '@fgo-planner/common-core';
+import { ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameItemConstants } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
+import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
+import { GameItemCategory } from '../../../../types/data';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { StyleClassPrefix as MasterItemListRowLabelStyleClassPrefix } from './master-item-list-row-label.component';
 import { MasterItemListRow, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';
@@ -19,42 +21,6 @@ type Props = {
     onChange: (itemId: number, quantity: number) => void;
     qp: number;
 };
-
-const ItemCategories: ImmutableArray<ItemCategory> = [
-    {
-        key: 'skill-gems',
-        label: 'Skill Gems',
-        itemIds: GameItemConstants.SkillGems
-    },
-    {
-        key: 'bronze-mats',
-        label: 'Bronze Materials',
-        itemIds: GameItemConstants.BronzeEnhancementMaterials
-    },
-    {
-        key: 'silver-mats',
-        label: 'Silver Materials',
-        itemIds: GameItemConstants.SilverEnhancementMaterials
-    },
-    {
-        key: 'gold-mats',
-        label: 'Gold Materials',
-        itemIds: GameItemConstants.GoldEnhancementMaterials
-    },
-    {
-        key: 'statues',
-        label: 'Ascension Statues',
-        itemIds: GameItemConstants.AscensionStatues
-    },
-    {
-        key: 'other',
-        label: 'Other Materials',
-        itemIds: [
-            ...GameItemConstants.OtherEnhancementMaterials,
-            GameItemConstants.QpItemId
-        ]
-    },
-];
 
 const StyleClassPrefix = 'MasterItemList';
 
@@ -101,13 +67,57 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const MasterItemList = React.memo((props: Props) => {
 
+    const gameItemMap = useGameItemMap();
+
+    const gameItemCategoryMap = useGameItemCategoryMap();
+
     const {
         itemQuantities,
         onChange,
         qp
     } = props;
 
-    const gameItemMap = useGameItemMap();
+    const itemCategories = useMemo((): Array<ItemCategory> => {
+        if (!gameItemCategoryMap) {
+            return [];
+        }
+        return [
+            {
+                key: 'skill-gems',
+                label: 'Skill Gems',
+                itemIds: [...gameItemCategoryMap[GameItemCategory.SkillGems]]
+            },
+            {
+                key: 'bronze-mats',
+                label: 'Bronze Materials',
+                itemIds: [...gameItemCategoryMap[GameItemCategory.BronzeEnhancementMaterials]]
+            },
+            {
+                key: 'silver-mats',
+                label: 'Silver Materials',
+                itemIds: [...gameItemCategoryMap[GameItemCategory.SilverEnhancementMaterials]]
+            },
+            {
+                key: 'gold-mats',
+                label: 'Gold Materials',
+                itemIds: [...gameItemCategoryMap[GameItemCategory.GoldEnhancementMaterials]]
+            },
+            {
+                key: 'statues',
+                label: 'Ascension Statues',
+                itemIds: [...gameItemCategoryMap[GameItemCategory.AscensionStatues]]
+            },
+            {
+                key: 'other',
+                label: 'Other Materials',
+                itemIds: [
+                    GameItemConstants.LoreItemId,
+                    GameItemConstants.GrailItemId,
+                    GameItemConstants.QpItemId
+                ]
+            },
+        ];
+    }, [gameItemCategoryMap]);
 
     if (!gameItemMap) {
         return null;
@@ -140,7 +150,7 @@ export const MasterItemList = React.memo((props: Props) => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            {ItemCategories.map(renderItemCategory)}
+            {itemCategories.map(renderItemCategory)}
         </Box>
     );
 

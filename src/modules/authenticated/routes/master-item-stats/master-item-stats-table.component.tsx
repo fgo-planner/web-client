@@ -125,7 +125,6 @@ export const MasterItemStatsTable = React.memo((props: Props) => {
             ...gameItemCategoryMap[GameItemCategory.GoldEnhancementMaterials],
             ...gameItemCategoryMap[GameItemCategory.AscensionStatues],
             GameItemConstants.LoreItemId,
-            GameItemConstants.GrailItemId,
             GameItemConstants.QpItemId
         ];
     }, [gameItemCategoryMap]);

@@ -3,16 +3,26 @@ import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
 import React, { Fragment, PureComponent, ReactNode } from 'react';
 import { ModalOnCloseReason } from '../../../../types/internal';
 import { MasterAccountAddDialog } from '../../../master/account/master-account-add-dialog.component';
+import { InjectablesContainer } from '../../../../utils/dependency-injection/injectables-container';
+import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { BasicMasterAccount } from '@fgo-planner/data-core';
 
 type Props = {
 
 };
 
 type State = {
+    dialogError?: string;
     dialogOpen: boolean;
 };
 
+// TODO Convert this to functional component
 export const AppBarMasterAccountAddButton = class extends PureComponent<Props, State> {
+
+    // TODO Use the useInjectable hook after converting into functional component.
+    private get _masterAccountService() {
+        return InjectablesContainer.get(MasterAccountService)!;
+    }
 
     constructor(props: Props) {
         super(props);
@@ -26,7 +36,10 @@ export const AppBarMasterAccountAddButton = class extends PureComponent<Props, S
     }
 
     render(): ReactNode {
-        const { dialogOpen } = this.state;
+        const {
+            dialogError,
+            dialogOpen
+        } = this.state;
         return (
             <Fragment>
                 <Button
@@ -44,6 +57,7 @@ export const AppBarMasterAccountAddButton = class extends PureComponent<Props, S
                     PaperProps={{ style: { minWidth: 360 } }}
                     showCloseIcon='never'
                     open={dialogOpen}
+                    errorMessage={dialogError}
                     onClose={this._handleDialogClose}
                 />
             </Fragment>
@@ -56,14 +70,16 @@ export const AppBarMasterAccountAddButton = class extends PureComponent<Props, S
         });
     }
 
-    private _handleDialogClose(event: any, reason: ModalOnCloseReason): void {
-        /*
-         * If the dialog was closed due to successful submit, then don't do anything
-         * because this component most like has already been unmounted. Otherwise,
-         * update the state.
-         */
-        if (reason === 'submit') {
-            return;
+    private async _handleDialogClose(_event: any, _reason: ModalOnCloseReason, data?: Partial<BasicMasterAccount>): Promise<void> {
+        if (data) {
+            try {
+                await this._masterAccountService.addAccount(data);
+            } catch (e: any) {
+                this.setState({
+                    dialogError: e.message || String(e)
+                });
+                return;
+            }
         }
         this.setState({
             dialogOpen: false

@@ -29,7 +29,9 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
 
     const {
         errorMessage,
-        onClose
+        onClose,
+        showCloseIcon,
+        ...dialogProps
     } = props;
 
     /**
@@ -65,7 +67,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
         onClose({}, 'cancel');
     }, [onClose]);
 
-    /*
+    /**
      * Only re-render the dialog contents if the dialog is open. This allows the
      * dialog to keep displaying the same contents while it is undergoing its exit
      * transition, even if the props were changed by the parent component.
@@ -132,7 +134,7 @@ export const MasterAccountAddDialog = React.memo((props: Props) => {
     }
 
     return (
-        <Dialog {...props} fullScreen={fullScreen}>
+        <Dialog {...dialogProps} fullScreen={fullScreen}>
             {dialogContentsRef.current}
         </Dialog>
     );

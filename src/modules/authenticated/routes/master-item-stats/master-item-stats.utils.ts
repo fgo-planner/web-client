@@ -211,7 +211,7 @@ function _updateForServantEnhancement(
      * QP stats
      */
     const quantity = enhancement.qp;
-    const stat = stats[GameItemConstants.QpItemId];
+    const stat = ObjectUtils.getOrDefault(stats, GameItemConstants.QpItemId, _instantiateItemStat);
     const cost = quantity * maxEnhancementCount;
     const used = enhancementCount * quantity;
     stat.cost += cost;
@@ -238,7 +238,7 @@ function _updateForSoundtracks(
         const [key, quantity] = Object.entries(material)[0];
         const itemId = Number(key);
         const summoned = unlockedSoundtracks.has(_id);
-        const stat = stats[itemId];
+        const stat = ObjectUtils.getOrDefault(stats, itemId, _instantiateItemStat);
         const cost = quantity;
         stat.cost += cost;
         if (!summoned) {

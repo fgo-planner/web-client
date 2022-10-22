@@ -126,11 +126,6 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
             {menuHeaderNode}
             <Divider />
             <AppBarActionMenuItem
-                label='Profile'
-                icon={AccountCircleIcon}
-                to='/user/profile'
-            />
-            <AppBarActionMenuItem
                 label='Settings'
                 icon={SettingsIcon}
                 to='/user/settings'

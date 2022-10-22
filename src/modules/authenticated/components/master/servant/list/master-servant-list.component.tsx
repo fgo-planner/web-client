@@ -8,6 +8,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { SortDirection, SortOptions } from '../../../../../../types/data';
+import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';
 import { MasterServantListRow } from './master-servant-list-row.component';
@@ -34,6 +35,7 @@ type Props = {
     showHeader?: boolean;
     showUnsummonedServants?: boolean; // TODO Combine this with the rest of filters.
     sortOptions?: SortOptions<MasterServantListColumn>;
+    textFilter?: string; // TODO Combine this with the rest of filters.
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
     viewLayout?: any; // TODO Make use of this
     onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
@@ -69,6 +71,7 @@ export const MasterServantList = React.memo((props: Props) => {
         showHeader,
         showUnsummonedServants,
         sortOptions,
+        textFilter,
         visibleColumns
     } = props;
 
@@ -77,12 +80,16 @@ export const MasterServantList = React.memo((props: Props) => {
             return masterServants;
         }
         let result = masterServants;
+        const start1 = window.performance.now();
+        // TODO Rework the filtering logic
         if (!showUnsummonedServants) {
-            const start1 = window.performance.now();
             result = result.filter(({ summoned }) => summoned);
-            const end1 = window.performance.now();
-            console.log(`Filtering completed in ${(end1 - start1).toFixed(2)}ms.`);
         }
+        if (textFilter && gameServantMap) {
+            result = GameServantUtils.filterServants(textFilter, [...result], ({ gameId }) => gameServantMap[gameId]);
+        }
+        const end1 = window.performance.now();
+        console.log(`Filtering completed in ${(end1 - start1).toFixed(2)}ms.`);
         const sort = sortOptions?.sort;
         if (!sort) {
             return result;
@@ -92,7 +99,7 @@ export const MasterServantList = React.memo((props: Props) => {
         // TODO Move this to utilities class.
         result = [...result].sort((a, b): number => {
             let paramA: number, paramB: number;
-            switch(sort) {
+            switch (sort) {
                 case 'npLevel':
                     paramA = a.np;
                     paramB = b.np;
@@ -130,8 +137,16 @@ export const MasterServantList = React.memo((props: Props) => {
         const end2 = window.performance.now();
         console.log(`Sorting by ${sort} ${direction} completed in ${(end2 - start2).toFixed(2)}ms.`);
         return result;
-    }, [bondLevels, dragDropMode, masterServants, showUnsummonedServants, sortOptions?.direction, sortOptions?.sort]);
-
+    }, [
+        bondLevels,
+        dragDropMode,
+        gameServantMap,
+        masterServants,
+        showUnsummonedServants,
+        sortOptions?.direction,
+        sortOptions?.sort,
+        textFilter
+    ]);
 
     const {
         selectedIds,

@@ -18,7 +18,7 @@ import { MasterServantList } from '../../components/master/servant/list/master-s
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
 import { MasterAccountDataEditHookOptions, useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterServantsEditDialog } from './components/master-servants-edit-dialog.component';
-import { MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
+import { MasterServantsFilter, MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
 import { MasterServantsInfoPanel } from './components/master-servants-info-panel.component';
 import { MasterServantsListRowContextMenu } from './components/master-servants-list-row-context-menu.component';
 import { MasterServantsMultiAddDialog, MultiAddServantData } from './components/master-servants-multi-add-dialog.component';
@@ -178,6 +178,8 @@ export const MasterServantsRoute = React.memo(() => {
      * is undefined).
      */
     const [deleteServantDialogData, setDeleteServantDialogData] = useState<ReactNode>();
+
+    const [servantFilter, setServantFilter] = useState<MasterServantsFilter>();
 
     // TODO No way to toggle this right now...
     const [showAppendSkills,] = useState<boolean>(true);
@@ -390,7 +392,7 @@ export const MasterServantsRoute = React.memo(() => {
 
     const handleRevertButtonClick = revertChanges;
 
-    const handleMultiAddServantDialogClose = useCallback((event: any, reason: any, data?: MultiAddServantData): void => {
+    const handleMultiAddServantDialogClose = useCallback((_event: any, _reason: any, data?: MultiAddServantData): void => {
         if (data && data.gameIds.length) {
             const servantData = MasterServantUpdateUtils.createNew();
             servantData.summoned = MasterServantUpdateUtils.convertBoolean(data.summoned);
@@ -399,7 +401,7 @@ export const MasterServantsRoute = React.memo(() => {
         setIsMultiAddServantDialogOpen(false);
     }, [addServants]);
 
-    const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: MasterServantUpdate): void => {
+    const handleEditServantDialogClose = useCallback((_event: any, _reason: any, data?: MasterServantUpdate): void => {
         setEditServantDialogData(undefined);
         /**
          * Close the dialog without taking any further action if the changes were
@@ -418,19 +420,23 @@ export const MasterServantsRoute = React.memo(() => {
          */
     }, [addServant, applyUpdateToSelectedServants]);
 
-    const handleDeleteServantDialogClose = useCallback((event: MouseEvent, reason: ModalOnCloseReason): any => {
+    const handleDeleteServantDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): any => {
         if (reason === 'submit') {
             deleteSelectedServants();
         }
         setDeleteServantDialogData(undefined);
     }, [deleteSelectedServants]);
 
+    // const handleFilterChange = useCallback((filter: MasterServantsFilter): void => {
+    //     setServantFilter(filter);
+    // }, []);
+
     //#endregion
 
 
     //#region Component rendering
 
-    /*
+    /**
      * This can be undefined during the initial render.
      */
     if (!gameServantMap) {
@@ -460,6 +466,7 @@ export const MasterServantsRoute = React.memo(() => {
                 />
                 <MasterServantsFilterControls
                     filtersEnabled={filtersEnabled}
+                    onFilterChange={setServantFilter}
                 />
             </div>
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
@@ -491,6 +498,7 @@ export const MasterServantsRoute = React.memo(() => {
                             dragDropMode={dragDropMode}
                             sortOptions={sortOptions}
                             showUnsummonedServants={showUnsummonedServants}
+                            textFilter={servantFilter?.searchText}
                             onDragOrderChange={handleDragOrderChange}
                             onHeaderClick={handleHeaderClick}
                             onRowClick={handleRowClick}

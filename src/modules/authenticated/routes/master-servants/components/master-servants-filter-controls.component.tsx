@@ -3,8 +3,13 @@ import { IconButton, TextField, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
+export type MasterServantsFilter = {
+    searchText: string;
+};
+
 type Props = {
     filtersEnabled: boolean;
+    onFilterChange: (filter: MasterServantsFilter) => void
 };
 
 const StyleClassPrefix = 'MasterServantsFilterControls';
@@ -45,7 +50,8 @@ const StyleProps = (theme: SystemTheme) => {
 export const MasterServantsFilterControls = React.memo((props: Props) => {
 
     const {
-        filtersEnabled
+        filtersEnabled,
+        onFilterChange
     } = props;
 
     const [searchText, setSearchText] = useState<string>('');
@@ -55,6 +61,12 @@ export const MasterServantsFilterControls = React.memo((props: Props) => {
             setSearchText('');
         }
     }, [filtersEnabled]);
+
+    useEffect(() => {
+        onFilterChange({
+            searchText
+        });
+    }, [onFilterChange, searchText]);
 
     const handleSearchTextChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
         if (!filtersEnabled) {
@@ -69,6 +81,7 @@ export const MasterServantsFilterControls = React.memo((props: Props) => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+            {/* TODO Add debounce */}
             <TextField
                 variant='outlined'
                 label='Search'

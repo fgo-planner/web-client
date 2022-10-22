@@ -3,6 +3,7 @@ import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/data
 import { Fragment, PureComponent, ReactNode } from 'react';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { LoadingIndicator } from '../../../../../components/utils/loading-indicator.component';
+import { UnderConstruction } from '../../../../../components/utils/under-construction.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
 import { GameServantService } from '../../../../../services/data/game/game-servant.service';
 import { InjectablesContainer } from '../../../../../utils/dependency-injection/injectables-container';
@@ -71,13 +72,12 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
         if (!item) {
             return <GameItemNotFound itemId={this.props.itemId} />;
         }
-        return (
-            <Fragment>
-                <div>{item._id}</div>
-                <div>{item.name}</div>
-                {this._renderUsage()}
-            </Fragment>
-        );
+        return <>
+            <div>{item._id}</div>
+            <div>{item.name}</div>
+            {this._renderUsage()}
+            <UnderConstruction />
+        </>;
     }
 
     private _renderUsage(): ReactNode {
@@ -86,26 +86,24 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
             return null;
         }
         const { servants, total } = itemUsage;
-        return (
-            <Fragment>
-                <GameItemThumbnail gameItem={item} />
-                <div className='p-2'>
-                    <div>Ascensions: {total.ascensions}</div>
-                    <div>Per Skill (Total): {total.skills} ({total.skills * 3})</div>
-                    <div>Costumes: {total.costumes}</div>
-                    <div>Total: {total.ascensions + total.skills * 3 + total.costumes}</div>
-                </div>
-                <div>
-                    {servants.map((servant, index) => (
-                        <div key={index} className='flex px-2 py-1'>
-                            <div>{servant.servant.name}</div>
-                            <div className='px-2' />
-                            <div>{servant.ascensions}, {servant.skills}({servant.skills * 3}), {servant.costumes}</div>
-                        </div>
-                    ))}
-                </div>
-            </Fragment>
-        );
+        return <>
+            <GameItemThumbnail gameItem={item} />
+            <div className='p-2'>
+                <div>Ascensions: {total.ascensions}</div>
+                <div>Per Skill (Total): {total.skills} ({total.skills * 3})</div>
+                <div>Costumes: {total.costumes}</div>
+                <div>Total: {total.ascensions + total.skills * 3 + total.costumes}</div>
+            </div>
+            <div>
+                {servants.map((servant, index) => (
+                    <div key={index} className='flex px-2 py-1'>
+                        <div>{servant.servant.name}</div>
+                        <div className='px-2' />
+                        <div>{servant.ascensions}, {servant.skills}({servant.skills * 3}), {servant.costumes}</div>
+                    </div>
+                ))}
+            </div>
+        </>;
     }
 
     private _loadItem(itemId: number): void {

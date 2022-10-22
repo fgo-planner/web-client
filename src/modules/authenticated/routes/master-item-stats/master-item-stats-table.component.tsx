@@ -58,6 +58,9 @@ const StyleProps = (theme: SystemTheme) => {
         overflow: 'auto',
         [`& .${StyleClassPrefix}-header`]: {
             display: 'flex',
+            position: 'sticky',
+            top: 0,
+            backgroundColor: palette.background.paper,
             minWidth: 'fit-content',
             pl: 4,
             py: 4,
@@ -67,6 +70,7 @@ const StyleProps = (theme: SystemTheme) => {
             borderBottomWidth: 1,
             borderBottomStyle: 'solid',
             borderBottomColor: 'divider',
+            zIndex: 2
         },
         [`& .${StyleClassPrefix}-scroll-container`]: {
             minWidth: 'fit-content'

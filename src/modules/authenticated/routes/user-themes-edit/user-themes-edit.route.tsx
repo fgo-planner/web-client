@@ -83,13 +83,12 @@ export const UserThemesEditRoute = React.memo(() => {
 
         try {
             await userService.updateUserPreferences(update);
-            resetLoadingIndicator();
-            navigate('/user/settings');
+            setTimeout(() => navigate('/user/settings'));
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);
-            resetLoadingIndicator();
         }
+        resetLoadingIndicator();
 
     }, [darkTheme, invokeLoadingIndicator, lightTheme, navigate, resetLoadingIndicator, userService]);
 

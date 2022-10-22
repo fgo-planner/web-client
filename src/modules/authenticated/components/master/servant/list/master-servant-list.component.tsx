@@ -113,6 +113,10 @@ export const MasterServantList = React.memo((props: Props) => {
                     paramA = bondLevels[a.gameId] || -1;
                     paramB = bondLevels[b.gameId] || -1;
                     break;
+                case 'summonDate':
+                    paramA = a.summonDate?.getTime() || -1;
+                    paramB = b.summonDate?.getTime() || -1;
+                    break;
                 default:
                     paramA = a.gameId;
                     paramB = b.gameId;

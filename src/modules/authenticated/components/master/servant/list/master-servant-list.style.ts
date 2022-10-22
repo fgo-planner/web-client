@@ -11,6 +11,7 @@ import { StyleClassPrefix as MasterServantListRowLevelStyleClassPrefix } from '.
 import { StyleClassPrefix as MasterServantListRowNpLevelStyleClassPrefix } from './master-servant-list-row-np-level.component';
 import { StyleClassPrefix as MasterServantListRowSkillLevelStyleClassPrefix } from './master-servant-list-row-skill-level.component';
 import { StyleClassPrefix as MasterServantListRowStatsStyleClassPrefix } from './master-servant-list-row-stats.component';
+import { StyleClassPrefix as MasterServantListRowSummonDateStyleClassPrefix } from './master-servant-list-row-summon-date.component';
 import { StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './master-servant-list-row.component';
 
 export const StyleClassPrefix = 'MasterServantList';
@@ -116,7 +117,10 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                                     width: '1.25rem',
                                     textAlign: 'left'
                                 }
-                            }
+                            },
+                            [`& .${MasterServantListRowSummonDateStyleClassPrefix}-root`]: {
+                                width: MasterServantColumnProperties.summonDate.width
+                            },
                         }
                     }
                 },

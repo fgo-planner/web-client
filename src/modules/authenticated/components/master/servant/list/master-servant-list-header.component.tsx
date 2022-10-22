@@ -74,7 +74,8 @@ export const MasterServantListHeader = React.memo((props: Props) => {
         fouAtk,
         skills,
         appendSkills,
-        bondLevel
+        bondLevel,
+        summonDate
     } = visibleColumns || {};
 
     const sortOptionsRef = useRef<SortOptions<MasterServantListColumn>>();
@@ -159,6 +160,14 @@ export const MasterServantListHeader = React.memo((props: Props) => {
                     <DataTableListHeaderLabel
                         column='bondLevel'
                         columnProperties={MasterServantColumnProperties.bondLevel}
+                        sortOptions={sortOptions}
+                        onClick={handleLabelClick}
+                    />
+                }
+                {summonDate &&
+                    <DataTableListHeaderLabel
+                        column='summonDate'
+                        columnProperties={MasterServantColumnProperties.summonDate}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />

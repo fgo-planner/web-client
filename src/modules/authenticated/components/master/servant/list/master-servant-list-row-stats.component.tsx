@@ -7,6 +7,7 @@ import { MasterServantListRowFouLevel } from './master-servant-list-row-fou-leve
 import { MasterServantListRowLevel } from './master-servant-list-row-level.component';
 import { MasterServantListRowNpLevel } from './master-servant-list-row-np-level.component';
 import { MasterServantListRowSkillLevel } from './master-servant-list-row-skill-level.component';
+import { MasterServantListRowSummonDate } from './master-servant-list-row-summon-date.component';
 
 type Props = {
     active?: boolean;
@@ -40,7 +41,8 @@ export const MasterServantListRowStats = React.memo((props: Props) => {
         fouAtk,
         skills,
         appendSkills,
-        bondLevel
+        bondLevel,
+        summonDate
     } = visibleColumns || {};
 
     return (
@@ -52,6 +54,7 @@ export const MasterServantListRowStats = React.memo((props: Props) => {
             {skills && <MasterServantListRowSkillLevel {...masterServant.skills} />}
             {appendSkills && <MasterServantListRowSkillLevel {...masterServant.appendSkills} />}
             {bondLevel && <MasterServantListRowBondLevel bondLevel={bond} />}
+            {summonDate && <MasterServantListRowSummonDate date={masterServant.summonDate} />}
         </div>
     );
 

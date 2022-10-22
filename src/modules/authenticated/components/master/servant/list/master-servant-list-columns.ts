@@ -8,7 +8,8 @@ export type MasterServantListColumn =
     'fouAtk' |
     'skills' |
     'appendSkills' |
-    'bondLevel';
+    'bondLevel' |
+    'summonDate';
 
 export type MasterServantListVisibleColumns = Partial<Record<MasterServantListColumn, boolean>>;
 
@@ -60,6 +61,12 @@ export const MasterServantColumnProperties = {
         key: 'bond',
         width: 120,
         label: 'Bond',
+        sortable: true
+    },
+    summonDate: {
+        key: 'summonDate',
+        width: 160,
+        label: 'Summon Date',
         sortable: true
     }
 } as ImmutableRecord<MasterServantListColumn | 'label', ColumnProperties>;

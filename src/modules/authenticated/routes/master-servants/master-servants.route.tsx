@@ -192,7 +192,8 @@ export const MasterServantsRoute = React.memo(() => {
         fouHp: sm,
         fouAtk: sm,
         skills: sm,
-        appendSkills: sm && showAppendSkills
+        appendSkills: sm && showAppendSkills,
+        summonDate: sm
     }), [showAppendSkills, sm]);
 
 

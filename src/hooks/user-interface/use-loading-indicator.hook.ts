@@ -35,7 +35,7 @@ export const useLoadingIndicator = (): LoadingIndicatorHookResult => {
     const invokeLoadingIndicator = useCallback((): void => {
         setLockId(lockId => {
             if (!lockId) {
-                lockId = userInterfaceService.requestLock(LockableFeature.LoadingIndicator, true);
+                lockId = userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
             }
             return lockId;
         });
@@ -44,7 +44,7 @@ export const useLoadingIndicator = (): LoadingIndicatorHookResult => {
     const resetLoadingIndicator = useCallback((): void => {
         setLockId(lockId => {
             if (lockId) {
-                userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId, true);
+                userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
                 lockId = undefined;
             }
             return lockId;

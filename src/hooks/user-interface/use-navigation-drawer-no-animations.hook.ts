@@ -16,7 +16,7 @@ export const useNavigationDrawerNoAnimations = (): void => {
          * the `ThemeService` releasing the lock.
          */
         /** */
-        const lockId = userInterfaceService.requestLock(LockableFeature.NavigationDrawerNoAnimations, true);
+        const lockId = userInterfaceService.requestLock(LockableFeature.NavigationDrawerNoAnimations);
 
         return () => userInterfaceService.releaseLock(LockableFeature.NavigationDrawerNoAnimations, lockId);
     }, [userInterfaceService]);

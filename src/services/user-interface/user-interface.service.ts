@@ -46,42 +46,30 @@ export class UserInterfaceService {
     }
 
     /**
-     * @param async (optional) Whether to push the update to the subject
-     * asynchronously. Set to true if encountering the following error:
-     *
-     * Cannot update a component while rendering a different component...
-     *
-     * Defaults to `false`.
-     *
      * @returns A unique ID that can be used to release the lock.
      */
-    requestLock(feature: LockableFeature, async = false): string {
+    requestLock(feature: LockableFeature): string {
         const lockId = this._generateLockId();
         const lockIdSet = MapUtils.getOrDefault(this._LockIdSets, feature, () => new Set());
         lockIdSet.add(lockId);
         if (!this._LockableFeaturesStates.get(feature)) {
             this._LockableFeaturesStates.set(feature, true);
             const subject = this._getSubjectForLockableFeature(feature);
-            this._publishChange(subject, true, async);
+            this._pushChange(subject, true);
         }
         return lockId;
     }
 
     /**
-     * @param async (optional) Whether to push the update to the subject
-     * asynchronously. Set to true if encountering the following error:
-     *
-     * Cannot update a component while rendering a different component...
-     *
      * Defaults to `false`.
      */
-    releaseLock(feature: LockableFeature, lockId: string, async = false): void {
+    releaseLock(feature: LockableFeature, lockId: string): void {
         const lockIdSet = this._LockIdSets.get(feature);
         lockIdSet?.delete(lockId);
         if (!lockIdSet?.size) {
             this._LockableFeaturesStates.set(feature, false);
             const subject = this._getSubjectForLockableFeature(feature);
-            this._publishChange(subject, false, async);
+            this._pushChange(subject, false);
         }
     }
 
@@ -117,12 +105,14 @@ export class UserInterfaceService {
         }
     }
 
-    private _publishChange(subject: Subject<boolean>, value: boolean, async: boolean): void {
-        if (async) {
-            setTimeout(() => subject.next(value));
-        } else {
-            subject.next(value);
-        }
+    /**
+     * Push a value to a subject asynchronously.
+     * 
+     * @param subject The subject to push to.
+     * @param value The value to push
+     */
+    private _pushChange(subject: Subject<boolean>, value: boolean): void {
+        setTimeout(() => subject.next(value));
     }
 
     private _generateLockId(): string {

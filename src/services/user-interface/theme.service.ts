@@ -110,7 +110,7 @@ export class ThemeService {
         /**
          * Restore animations on drawer asynchronously.
          */
-        this._userInterfaceService.releaseLock(LockableFeature.NavigationDrawerNoAnimations, lockId, true);
+        this._userInterfaceService.releaseLock(LockableFeature.NavigationDrawerNoAnimations, lockId);
     }
 
     /**

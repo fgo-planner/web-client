@@ -42,7 +42,7 @@ export const AppBarElevateOnScroll = React.memo((props: Props) => {
         return () => {
             setLockId(lockId => {
                 if (lockId) {
-                    userInterfaceService.releaseLock(LockableFeature.AppBarElevate, lockId, true);
+                    userInterfaceService.releaseLock(LockableFeature.AppBarElevate, lockId);
                 }
                 return lockId;
             });

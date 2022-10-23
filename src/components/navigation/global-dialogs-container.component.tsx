@@ -1,12 +1,10 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { PaperProps } from '@mui/material';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
-import { UserInterfaceService } from '../../services/user-interface/user-interface.service';
-import { UserInfo } from '../../types/internal';
+import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { GlobalDialog, GlobalDialogOpenAction, ModalOnCloseReason, NavigationBlockerDialogOpenAction, UserInfo } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
+import { PromptDialog } from '../dialog/prompt-dialog.component';
 import { LoginDialog } from '../login/login-dialog.component';
 
 const LoginDialogPaperProps: PaperProps = {
@@ -15,31 +13,21 @@ const LoginDialogPaperProps: PaperProps = {
     }
 };
 
-const LoginDialogDisabledPathsRegex = new RegExp('login|register|forgot-password');
-
 /**
- * Whether to redirect the user to the login page instead of open the login
- * dialog, based on current location. This special behavior currently applies to
- * the following routes:
- * - /login
- * - /register
- * - /forgot-password
+ * Clean up
  */
-const shouldRedirectToLoginRoute = (pathname: string): boolean => {
-    return LoginDialogDisabledPathsRegex.test(pathname);
+const closeActiveDialogAction = (activeDialogAction?: GlobalDialogOpenAction): undefined => {
+    activeDialogAction?.onClose();
+    return undefined;
 };
 
 export const GlobalDialogs = React.memo(() => {
 
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    const userInterfaceService = useInjectable(UserInterfaceService);
-
     const [user, setUser] = useState<Nullable<UserInfo>>();
-    const [loginDialogOpen, setLoginDialogOpen] = useState<boolean>(false);
 
-    /*
+    const [activeDialogAction, setActiveDialogAction] = useState<GlobalDialogOpenAction>();
+
+    /**
      * User change subscription.
      */
     useEffect(() => {
@@ -50,39 +38,97 @@ export const GlobalDialogs = React.memo(() => {
         return () => onCurrentUserChangeSubscription.unsubscribe();
     }, []);
 
-    /*
-     * Login dialog open state change subscription
+    /**
+     * Dialog action subscriptions.
      */
     useEffect(() => {
         const onLoginDialogOpenChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopics.UserInterface.LoginDialogOpenChange)
-            .subscribe((open: boolean): void => {
-                if (!open) {
-                    return setLoginDialogOpen(false);
-                }
-                if (shouldRedirectToLoginRoute(location.pathname)) {
-                    navigate('/login');
-                    userInterfaceService.setLoginDialogOpen(false);
-                } else {
-                    setLoginDialogOpen(true);
-                }
-            });
+            .get(SubscriptionTopics.UserInterface.GlobalDialogAction)
+            .subscribe(setActiveDialogAction);
 
         return () => onLoginDialogOpenChangeSubscription.unsubscribe();
-    }, [location.pathname, navigate, userInterfaceService]);
+    }, []);
 
-    const handleLoginDialogClose = useCallback((): void => {
-        userInterfaceService.setLoginDialogOpen(false);
-    }, [userInterfaceService]);
+    
+    //#region Login dialog
+    
+    const handleLoginDialogClose = useCallback((_event: any, _reason: ModalOnCloseReason): void => {
+        setActiveDialogAction(closeActiveDialogAction);
+    }, []);
+    
+    const loginDialog: ReactNode = useMemo((): ReactNode => {
+        /**
+         * Don't render the login dialog if the user is already logged in.
+         */
+        if (user) {
+            return null;
+        }
+        
+        const open = activeDialogAction?.dialog === GlobalDialog.Login;
+        return (
+            <LoginDialog
+                PaperProps={LoginDialogPaperProps}
+                open={open}
+                onClose={handleLoginDialogClose}
+            />
+        );
+    }, [activeDialogAction, handleLoginDialogClose, user]);
 
-    const loginDialog: ReactNode = !user && <LoginDialog
-        PaperProps={LoginDialogPaperProps}
-        open={loginDialogOpen}
-        onClose={handleLoginDialogClose}
-    />;
+    //#endregion
+
+
+    //#region Navigation blocker dialog
+
+    const handleNavigationBlockerDialogClose = useCallback((_event: any, reason: ModalOnCloseReason): void => {
+        setActiveDialogAction(activeDialogAction => {
+            if (!activeDialogAction) {
+                return undefined;
+            }
+            const { options } = activeDialogAction as NavigationBlockerDialogOpenAction;
+            if (reason === 'submit') {
+                options.onConfirm();
+            } else {
+                options.onCancel();
+            }
+            return closeActiveDialogAction(activeDialogAction);
+        });
+    }, []);
+
+    const navigationBlockerDialog: ReactNode = useMemo((): ReactNode => {
+        let open = false;
+        let prompt: ReactNode;
+        let title: string | undefined;
+        let cancelButtonLabel: string | undefined;
+        let confirmButtonLabel: string | undefined;
+
+        if (activeDialogAction?.dialog === GlobalDialog.NavigationBlocker) {
+            const options = activeDialogAction.options;
+            prompt = options.prompt;
+            title = options.title;
+            cancelButtonLabel =options.cancelButtonLabel;
+            confirmButtonLabel =options.confirmButtonLabel;
+            open = true;
+        }
+
+        return (
+            <PromptDialog
+                PaperProps={LoginDialogPaperProps}
+                open={open}
+                title={title}
+                prompt={prompt}
+                cancelButtonLabel={cancelButtonLabel}
+                confirmButtonLabel={confirmButtonLabel}
+                onClose={handleNavigationBlockerDialogClose}
+            />
+        );
+    }, [activeDialogAction, handleNavigationBlockerDialogClose]);
+
+    //#endregion
+
 
     return <>
         {loginDialog}
+        {navigationBlockerDialog}
     </>;
 
 });

@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
 import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
@@ -11,6 +11,28 @@ import { DialogCloseButton } from '../dialog/dialog-close-button.component';
 import { LoginForm, StyleClassPrefix as LoginFormStyleClassPrefix } from './login-form.component';
 
 type Props = DialogComponentProps;
+
+const LoginPath = 'login';
+
+const LoginDialogDisabledPaths: ReadonlyArray<string> = [
+    LoginPath,
+    'register',
+    'forgot-password'
+];
+
+const LoginDialogDisabledPathsRegex = new RegExp(LoginDialogDisabledPaths.join('|'));
+
+/**
+ * Whether to redirect the user to the login page instead of opening the login
+ * dialog, based on current location. This special behavior currently applies to
+ * the following routes:
+ * - /login
+ * - /register
+ * - /forgot-password
+ */
+const shouldRedirectToLoginRoute = (pathname: string): boolean => {
+    return LoginDialogDisabledPathsRegex.test(pathname);
+};
 
 const FormId = 'login-dialog-form';
 
@@ -40,14 +62,19 @@ const StyleProps = {
 
 export const LoginDialog = React.memo((props: Props) => {
 
-    const {
-        showCloseIcon,
-        onClose,
-        ...dialogProps
-    } = props;
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const authenticationService = useInjectable(AuthenticationService);
 
+    const {
+        onClose,
+        open,
+        showCloseIcon,
+        ...dialogProps
+    } = props;
+
+    const [openOverride, setOpenOverride] = useState<boolean>(open);
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -55,6 +82,35 @@ export const LoginDialog = React.memo((props: Props) => {
     useEffect(() => {
         return () => setIsMounted(false);
     }, []);
+
+    useEffect(() => {
+        setOpenOverride(prevState => {
+            /**
+             * If the `open` state was changed to `true`, then check if the user needs to be
+             * redirected to the login path based on the current location. Only proceed with
+             * opening the dialog if redirect is not needed.
+             */
+            if (open && !prevState) {
+                const pathname = location.pathname;
+                if (shouldRedirectToLoginRoute(pathname)) {
+                    /**
+                     * Only navigate to the login path if the user is not already there. Otherwise,
+                     * redundant states will be pushed to the history.
+                     */
+                    if (!pathname.includes(LoginPath)) {
+                        navigate(`/${LoginPath}`);
+                    }
+                    /**
+                     * Invoke the `onClose` callback even though the dialog was not opened to notify
+                     * the `UserInterfaceService`
+                     */
+                    onClose({}, 'cancel');
+                    return false;
+                }
+            }
+            return open;
+        });
+    }, [location.pathname, navigate, onClose, open]);
 
     const {
         fullScreen,
@@ -66,7 +122,7 @@ export const LoginDialog = React.memo((props: Props) => {
         setErrorMessage(undefined);
         try {
             await authenticationService.login(values);
-            /*
+            /**
              * Only update the state if the component is still mounted.
              */
             if (isMounted) {
@@ -79,8 +135,8 @@ export const LoginDialog = React.memo((props: Props) => {
         }
     }, [authenticationService, isMounted, onClose]);
 
-    const cancel = useCallback((event: any): void => {
-        onClose(event, 'cancel');
+    const cancel = useCallback((): void => {
+        onClose({}, 'cancel');
     }, [onClose]);
 
     return (
@@ -88,6 +144,7 @@ export const LoginDialog = React.memo((props: Props) => {
             {...dialogProps}
             className={`${StyleClassPrefix}-root`}
             sx={StyleProps}
+            open={openOverride}
             fullScreen={fullScreen}
             onClose={onClose}
         >

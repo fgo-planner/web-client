@@ -1,6 +1,7 @@
 import { MapUtils } from '@fgo-planner/common-core';
 import { Subject } from 'rxjs';
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
+import { GlobalDialog, NavigationBlockerDialogOptions } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 
@@ -21,9 +22,9 @@ export class UserInterfaceService {
 
     private readonly _LockableFeaturesStates = new Map<LockableFeature, boolean>();
 
-    private _navigationDrawerOpen = false;
+    private readonly _GlobalDialogOpenStates = new Map<GlobalDialog, boolean>();
 
-    private _loginDialogOpen = false;
+    private _navigationDrawerOpen = false;
 
     private get _onLoadingIndicatorActiveChange() {
         return SubscribablesContainer.get(SubscriptionTopics.UserInterface.LoadingIndicatorActiveChange);
@@ -41,8 +42,8 @@ export class UserInterfaceService {
         return SubscribablesContainer.get(SubscriptionTopics.UserInterface.NavigationDrawerNoAnimationsChange);
     }
 
-    private get _onLoginDialogOpenChange() {
-        return SubscribablesContainer.get(SubscriptionTopics.UserInterface.LoginDialogOpenChange);
+    private get _onGlobalDialogAction() {
+        return SubscribablesContainer.get(SubscriptionTopics.UserInterface.GlobalDialogAction);
     }
 
     /**
@@ -72,6 +73,21 @@ export class UserInterfaceService {
             this._pushChange(subject, false);
         }
     }
+    
+    private _getSubjectForLockableFeature(feature: LockableFeature): Subject<boolean> {
+        switch (feature) {
+            case LockableFeature.AppBarElevate:
+                return this._onAppBarElevatedChange;
+            case LockableFeature.LoadingIndicator:
+                return this._onLoadingIndicatorActiveChange;
+            case LockableFeature.NavigationDrawerNoAnimations:
+                return this._onNavigationDrawerNoAnimationsChange;
+        }
+    }
+
+    private _generateLockId(): string {
+        return String(new Date().getTime());
+    }
 
     setNavigationDrawerOpen(open: boolean): void {
         if (this._navigationDrawerOpen === open) {
@@ -86,23 +102,52 @@ export class UserInterfaceService {
         this._onNavigationDrawerOpenChange.next(this._navigationDrawerOpen);
     }
 
-    setLoginDialogOpen(open: boolean): void {
-        if (this._loginDialogOpen === open) {
-            return;
+    /**
+     * Requests to open the login dialog.
+     */
+    openLoginDialog(): boolean {
+        const dialog = GlobalDialog.Login;
+        if (!this._canGlobalDialogBeOpened(dialog)) {
+            return false;
         }
-        this._loginDialogOpen = open;
-        this._onLoginDialogOpenChange.next(open);
+        this._GlobalDialogOpenStates.set(dialog, true);
+        const onClose = this._generateGlobalDialogOnCloseHandler(dialog);
+        this._pushChange(this._onGlobalDialogAction, {
+            dialog,
+            onClose
+        });
+        return true;
     }
 
-    private _getSubjectForLockableFeature(feature: LockableFeature): Subject<boolean> {
-        switch(feature) {
-            case LockableFeature.AppBarElevate:
-                return this._onAppBarElevatedChange;
-            case LockableFeature.LoadingIndicator:
-                return this._onLoadingIndicatorActiveChange;
-            case LockableFeature.NavigationDrawerNoAnimations:
-                return this._onNavigationDrawerNoAnimationsChange;
+    /**
+     * Requests to open the navigation blocker dialog.
+     */
+    openNavigationBlockerDialog(options: NavigationBlockerDialogOptions): boolean {
+        const dialog = GlobalDialog.NavigationBlocker;
+        if (!this._canGlobalDialogBeOpened(dialog)) {
+            return false;
         }
+        this._GlobalDialogOpenStates.set(dialog, true);
+        const onClose = this._generateGlobalDialogOnCloseHandler(dialog);
+        this._pushChange(this._onGlobalDialogAction, {
+            dialog,
+            onClose,
+            options
+        });
+        return true;
+    }
+
+    private _canGlobalDialogBeOpened(dialog: GlobalDialog): boolean {
+        for (const state of this._GlobalDialogOpenStates.values()) {
+            if (state) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private _generateGlobalDialogOnCloseHandler(dialog: GlobalDialog): () => void {
+        return () => this._GlobalDialogOpenStates.set(dialog, false);
     }
 
     /**
@@ -111,12 +156,8 @@ export class UserInterfaceService {
      * @param subject The subject to push to.
      * @param value The value to push
      */
-    private _pushChange(subject: Subject<boolean>, value: boolean): void {
+    private _pushChange<T>(subject: Subject<T>, value: T): void {
         setTimeout(() => subject.next(value));
-    }
-
-    private _generateLockId(): string {
-        return String(new Date().getTime());
     }
 
 }

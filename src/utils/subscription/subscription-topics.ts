@@ -1,7 +1,7 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { MasterAccount, UserPreferences } from '@fgo-planner/data-core';
 import { BasicMasterAccounts, MasterAccountChanges } from '../../types/data';
-import { HttpResponseError, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
+import { GlobalDialogOpenAction, HttpResponseError, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
 import { Functions } from '../functions';
 import { SubscriptionTopic } from './subscription-topic.class';
 
@@ -66,9 +66,9 @@ class UserInterface {
 
     static readonly AppBarElevatedChange = SubscriptionTopic.forReplaySubject<boolean>();
 
-    static readonly LoadingIndicatorActiveChange = SubscriptionTopic.forReplaySubject<boolean>();
+    static readonly GlobalDialogAction = SubscriptionTopic.forReplaySubject<GlobalDialogOpenAction>();
 
-    static readonly LoginDialogOpenChange = SubscriptionTopic.forReplaySubject<boolean>();
+    static readonly LoadingIndicatorActiveChange = SubscriptionTopic.forReplaySubject<boolean>();
 
     static readonly MetadataChange = SubscriptionTopic.forReplaySubject<PageMetadata>();
 

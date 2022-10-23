@@ -3,6 +3,7 @@ import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount,
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
+import { useBlockNavigation } from '../../../hooks/utils/use-block-navigation.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
@@ -10,16 +11,12 @@ import { SubscriptionTopics } from '../../../utils/subscription/subscription-top
 
 //#region Type definitions
 
-type MasterAccountDataEditHookIncludeOptions = {
+export type MasterAccountDataEditHookOptions = {
     includeCostumes?: boolean;
     includeItems?: boolean;
     includeServants?: boolean;
     includeSoundtracks?: boolean;
 };
-
-export type MasterAccountDataEditHookOptions = {
-    showAlertOnDirtyUnmount?: boolean;
-} & MasterAccountDataEditHookIncludeOptions;
 
 /**
  * For internal use only by the hook. Keeps track of the master account data
@@ -174,7 +171,7 @@ const getDefaultMasterAccountEditData = (): MasterAccountEditData => ({
 
 const cloneMasterAccountDataForEdit = (
     masterAccount: Nullable<ImmutableMasterAccount>,
-    options: MasterAccountDataEditHookIncludeOptions
+    options: MasterAccountDataEditHookOptions
 ): MasterAccountEditData => {
     const result = getDefaultMasterAccountEditData();
     if (!masterAccount) {
@@ -210,7 +207,7 @@ const getDefaultMasterAccountReferenceData = (): MasterAccountEditReferenceData 
 
 const cloneMasterAccountDataForReference = (
     masterAccount: Nullable<ImmutableMasterAccount>,
-    options: MasterAccountDataEditHookIncludeOptions
+    options: MasterAccountDataEditHookOptions
 ): Readonly<MasterAccountEditReferenceData> => {
     const result = getDefaultMasterAccountReferenceData();
     if (!masterAccount) {
@@ -248,7 +245,7 @@ const getDefaultMasterAccountEditDirtyData = (): MasterAccountEditDirtyData => (
     soundtracks: false
 });
 
-const isDataDirty = (dirtyData: MasterAccountEditDirtyData): boolean => (
+const hasDirtyData = (dirtyData: MasterAccountEditDirtyData): boolean => (
     !!(
         dirtyData.bondLevels ||
         dirtyData.costumes ||
@@ -345,7 +342,6 @@ export function useMasterAccountDataEditHook(
 
 export function useMasterAccountDataEditHook(
     {
-        showAlertOnDirtyUnmount,
         includeCostumes,
         includeItems,
         includeServants,
@@ -380,11 +376,21 @@ export function useMasterAccountDataEditHook(
     const [dirtyData, setDirtyData] = useState<MasterAccountEditDirtyData>(getDefaultMasterAccountEditDirtyData);
 
     /**
+     * Whether the tracked data is dirty.
+     */
+    const isDataDirty = hasDirtyData(dirtyData);
+
+    /**
+     * Prevent user from navigating away if data is dirty.
+     */
+    useBlockNavigation(isDataDirty);
+
+    /**
      * Reconstruct the include options in a new object using `useMemo` so that it
      * doesn't inadvertently trigger recomputation of hooks even if the options
      * haven't changed.
      */
-    const includeOptions = useMemo((): MasterAccountDataEditHookIncludeOptions => ({
+    const includeOptions = useMemo((): MasterAccountDataEditHookOptions => ({
         includeCostumes,
         includeItems,
         includeServants,
@@ -821,7 +827,7 @@ export function useMasterAccountDataEditHook(
 
     return {
         masterAccountId: masterAccount?._id,
-        isDataDirty: isDataDirty(dirtyData),
+        isDataDirty,
         masterAccountEditData: editData,
         updateCostumes,
         updateItem,

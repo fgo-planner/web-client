@@ -65,7 +65,7 @@ export const AppBarGuestUser = React.memo(() => {
     }, [backgroundMusicService, isBackgroundMusicPlaying]);
 
     const handleLoginButtonClick = useCallback((): void => {
-        userInterfaceService.setLoginDialogOpen(true);
+        userInterfaceService.openLoginDialog();
     }, [userInterfaceService]);
 
     return (

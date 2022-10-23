@@ -3,7 +3,7 @@ import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount,
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
-import { useBlockNavigation } from '../../../hooks/utils/use-block-navigation.hook';
+import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
@@ -139,6 +139,20 @@ type MasterAccountDataEditHookDataSoundtracksSubset = MasterAccountDataEditHookC
 } & Pick<MasterAccountUpdateFunctions, 'updateSoundtracks' | 'revertChanges' | 'persistChanges'>;
 
 /* eslint-enable max-len */
+
+//#endregion
+
+
+//#region Constants
+
+const BlockNavigationPrompt = 'There are unsaved changes. Are you sure you want to discard all changes and leave the page?';
+
+const BlockNavigationConfirmButtonText = 'Discard';
+
+const BlockNavigationHookOptions: UseBlockNavigationOptions = {
+    confirmButtonLabel: BlockNavigationConfirmButtonText,
+    prompt: BlockNavigationPrompt
+};
 
 //#endregion
 
@@ -383,7 +397,7 @@ export function useMasterAccountDataEditHook(
     /**
      * Prevent user from navigating away if data is dirty.
      */
-    useBlockNavigation(isDataDirty);
+    useBlockNavigation(isDataDirty, BlockNavigationHookOptions);
 
     /**
      * Reconstruct the include options in a new object using `useMemo` so that it

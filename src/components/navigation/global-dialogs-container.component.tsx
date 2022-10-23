@@ -13,6 +13,13 @@ const LoginDialogPaperProps: PaperProps = {
     }
 };
 
+const NavigationBlockerDialogPaperProps: PaperProps = {
+    style: {
+        minWidth: 360,
+        maxWidth: 600
+    }
+};
+
 /**
  * Clean up
  */
@@ -112,7 +119,7 @@ export const GlobalDialogs = React.memo(() => {
 
         return (
             <PromptDialog
-                PaperProps={LoginDialogPaperProps}
+                PaperProps={NavigationBlockerDialogPaperProps}
                 open={open}
                 title={title}
                 prompt={prompt}

@@ -74,6 +74,13 @@ export function useBlockNavigation(enabled: boolean, options: UseBlockNavigation
             return;
         }
 
+        /**
+         * WARNING The `navigator.block` method was removed in the newer versions of
+         * `react-router-dom`. Do not upgrade unless there is an alternative solution on
+         * hand.
+         */
+
+        /** */
         const unblock = navigator.block((transition: Transition): void => {
             const targetPathName = transition.location.pathname;
             /**

@@ -250,7 +250,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
                         icon: LoginIcon,
                         label: 'Log In',
                         route: '/login',
-                        onClick: () => userInterfaceService.setLoginDialogOpen(true)
+                        onClick: () => userInterfaceService.openLoginDialog()
                     }
                 ]
             });

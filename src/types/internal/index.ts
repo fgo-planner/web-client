@@ -10,6 +10,8 @@ export * from './device/device-info.type';
 export * from './device/device-type.enum';
 export * from './dto/column-properties.type';
 export * from './dto/navigation-drawer-content.type';
+export * from './global-dialogs/global-dialog-open-action.type';
+export * from './global-dialogs/global-dialog.enum';
 export * from './http/http-options.type';
 export * from './http/http-response-error.type';
 export * from './http/http-response-type.type';

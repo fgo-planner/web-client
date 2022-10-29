@@ -42,7 +42,7 @@ const MasterAccountRoutesSection: Section = {
             icon: DashboardOutlinedIcon,
             activeIcon: DashboardIcon,
             label: 'Dashboard',
-            route: '/user/master',
+            route: '/user/master/dashboard',
             exact: true
         },
         {

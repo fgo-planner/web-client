@@ -1,6 +1,6 @@
 import { ArrayUtils, MapUtils, Nullable, ObjectUtils, ReadonlyRecord, SetUtils } from '@fgo-planner/common-core';
 import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, MasterAccountUpdate, MasterServant, MasterServantBondLevel, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdate } from '@fgo-planner/data-core';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
 import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
@@ -77,8 +77,8 @@ type IdNumbers = ReadonlyArray<number> | ReadonlySet<number>;
 
 type MasterAccountUpdateFunctions = {
     updateCostumes: (costumeIds: IdNumbers) => void;
-    updateItem: (itemId: number, quantity: number) => void;
-    updateQp: (amount: number) => void;
+    updateItem: (itemId: number, action: SetStateAction<number>) => void;
+    updateQp: (action: SetStateAction<number>) => void;
     /**
      * Add a single servant using the given `NewMasterServantUpdate` object.
      * 
@@ -171,6 +171,13 @@ const toSet = (idNumbers: IdNumbers): ReadonlySet<number> => {
         return idNumbers;
     }
     return new Set(idNumbers);
+};
+
+const getUpdatedValue = <T extends number | string | object>(action: SetStateAction<T>, previousValue: T): T => {
+    if (typeof action === 'function') {
+        return action(previousValue);
+    }
+    return action;
 };
 
 const getDefaultMasterAccountEditData = (): MasterAccountEditData => ({
@@ -461,10 +468,11 @@ export function useMasterAccountDataEditHook(
         }));
     }, [editData, referenceData.costumes, includeCostumes]);
 
-    const updateQp = useCallback((amount: number): void => {
+    const updateQp = useCallback((action: SetStateAction<number>): void => {
         if (!includeItems) {
             return;
         }
+        const amount = getUpdatedValue(action, editData.qp);
         if (editData.qp === amount) {
             return;
         }
@@ -476,12 +484,12 @@ export function useMasterAccountDataEditHook(
         }));
     }, [editData, referenceData.qp, includeItems]);
 
-    const updateItem = useCallback((itemId: number, quantity: number): void => {
+    const updateItem = useCallback((itemId: number, action: SetStateAction<number>): void => {
         if (!includeItems) {
             return;
         }
         if (itemId === GameItemConstants.QpItemId) {
-            updateQp(quantity);
+            updateQp(action);
             return;
         }
         let currentQuantity = editData.items[itemId];
@@ -502,6 +510,7 @@ export function useMasterAccountDataEditHook(
                 [itemId]: currentQuantity = 0
             };
         }
+        const quantity = getUpdatedValue(action, currentQuantity);
         if (currentQuantity === quantity) {
             return;
         }

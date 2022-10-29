@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';
 import { MasterAccountFriendId } from '../../../../../components/master/account/master-account-friend-id.component';
 import { TruncateText } from '../../../../../components/text/truncate-text.component';
-import { DateTimeFormatUtils } from '../../../../../utils/date-time-format.utils';
+import { DateTimeFormatUtils } from '../../../../../utils/format/date-time-format.utils';
 import { MasterAccountListVisibleColumns } from './master-account-list-columns';
 
 type Props = {

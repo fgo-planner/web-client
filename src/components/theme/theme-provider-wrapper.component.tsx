@@ -1,8 +1,8 @@
 import { createTheme, Palette, Theme, ThemeProvider, Typography } from '@mui/material';
-import { StyledEngineProvider, SystemStyleObject } from '@mui/system';
+import { StyledEngineProvider } from '@mui/system';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
-import { ThemeConstants } from '../../styles/theme-constants';
-import { SxPropsFunction, ThemeInfo } from '../../types/internal';
+import { ScrollbarStyleProps } from '../../styles/scrollbar-style-props';
+import { ThemeInfo } from '../../types/internal';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { ThemeBackground } from './theme-background.component';
@@ -22,41 +22,6 @@ const augmentAdditionalColors = (theme: Theme): void => {
         palette.drawer = augmentColor({ name: 'drawer', color: drawer });
     }
 };
-
-/**
- * Replaces the default scrollbar styles with the theme based scrollbars for
- * the children nodes.
- */
-const ScrollbarStyleProps = (({ palette, spacing }: Theme) => ({
-    '& *::-webkit-scrollbar': {
-        width: spacing(ThemeConstants.ScrollbarWidthScale),
-        height: spacing(ThemeConstants.ScrollbarWidthScale)
-    },
-    '& *::-webkit-scrollbar-corner': {
-        backgroundColor: palette.background.paper,
-    },
-    '& *::-webkit-scrollbar-thumb': {
-        backgroundColor: palette.primary.main,
-        borderRadius: spacing(ThemeConstants.ScrollbarWidthScale / 2)
-    },
-    [`& .${ThemeConstants.ClassScrollbarTrackBorder}`]: {
-        '& *::-webkit-scrollbar-track': {
-            borderTopWidth: 1,
-            borderTopStyle: 'solid',
-            borderTopColor: palette.divider,
-            borderLeftWidth: 1,
-            borderLeftStyle: 'solid',
-            borderLeftColor: palette.divider,
-        }
-    },
-    [`& .${ThemeConstants.ClassScrollbarHidden}`]: {
-        '&::-webkit-scrollbar': {
-            display: 'none'
-        },
-        msOverflowStyle: 'none',
-        scrollbarWidth: 'none'
-    }
-} as SystemStyleObject)) as SxPropsFunction;
 
 /**
  * Utility component for listening for theme changes from the `ThemeService` and

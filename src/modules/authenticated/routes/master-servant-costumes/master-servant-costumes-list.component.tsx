@@ -1,30 +1,15 @@
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode } from 'react';
+import { useGameServantCostumeList } from '../../../../hooks/data/use-game-servant-costume-list.hook';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
-import { GameServantList } from '../../../../types/data';
+import { GameServantCostumeListData } from '../../../../types/data';
 import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
-import { MasterServantCostumeRowData, MasterServantCostumesListRow, StyleClassPrefix as MasterServantCostumesListRowStyleClassPrefix } from './master-servant-costumes-list-row.component';
+import { MasterServantCostumesListRow, StyleClassPrefix as MasterServantCostumesListRowStyleClassPrefix } from './master-servant-costumes-list-row.component';
 
 type Props = {
     onChange: (costumeId: number, unlocked: boolean) => void;
     unlockedCostumes: ReadonlySet<number>;
-};
-
-const transformCostumesList = (gameServants: GameServantList): Array<MasterServantCostumeRowData> => {
-    const result: MasterServantCostumeRowData[] = [];
-    for (const servant of gameServants) {
-        const { costumes } = servant;
-        for (const [id, costume] of Object.entries(costumes)) {
-            result.push({
-                costumeId: Number(id),
-                servant,
-                ...costume
-            });
-        }
-    }
-    result.sort((a, b) => a.collectionNo - b.collectionNo);
-    return result;
 };
 
 const StyleClassPrefix = 'MasterServantCostumesList';
@@ -87,12 +72,7 @@ export const MasterServantCostumesList = React.memo(({ onChange, unlockedCostume
 
     const gameServantList = useGameServantList();
 
-    const costumesList = useMemo(() => {
-        if (!gameServantList) {
-            return [];
-        }
-        return transformCostumesList(gameServantList);
-    }, [gameServantList]);
+    const costumesList = useGameServantCostumeList(gameServantList);
 
     /*
      * This can be empty during the initial render.
@@ -101,13 +81,13 @@ export const MasterServantCostumesList = React.memo(({ onChange, unlockedCostume
         return null;
     }
 
-    const renderCostumeRow = (costume: MasterServantCostumeRowData): ReactNode => {
-        const { costumeId } = costume;
+    const renderCostumeRow = (costumeData: GameServantCostumeListData): ReactNode => {
+        const { costumeId } = costumeData;
         const unlocked = unlockedCostumes.has(costumeId);
         return (
             <MasterServantCostumesListRow
                 key={costumeId}
-                costume={costume}
+                costumeData={costumeData}
                 unlocked={unlocked}
                 onChange={onChange}
                 openLinksInNewTab

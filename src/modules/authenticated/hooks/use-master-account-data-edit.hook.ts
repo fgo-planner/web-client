@@ -537,7 +537,7 @@ export function useMasterAccountDataEditHook(
         const {
             servants: currentServants,
             bondLevels: currentBondLevels,
-            // unlockedCostumes
+            costumes: currentCostumes
         } = editData;
 
         let lastServantInstanceId = editData.lastServantInstanceId;
@@ -547,13 +547,18 @@ export function useMasterAccountDataEditHook(
          */
         const bondLevels = { ...currentBondLevels };
         /**
+         * New object for the unlocked costumes data. A new set is constructed for
+         * this to conform with the hook specifications.
+         */
+        const costumes = new Set(currentCostumes);
+        /**
          * Construct new instance of a `MasterServant` object for each `servantId` and
          * add to an array.
          */
         /** */
         const newServants = toArray(servantIds).map(servantId => {
             const newServant = MasterServantUtils.create(++lastServantInstanceId);
-            MasterServantUpdateUtils.applyToMasterServant(servantData, newServant, bondLevels);
+            MasterServantUpdateUtils.applyToMasterServant(servantData, newServant, bondLevels, costumes);
             newServant.gameId = servantId;
 
             return newServant;
@@ -567,9 +572,10 @@ export function useMasterAccountDataEditHook(
         editData.servants = servants;
         editData.lastServantInstanceId = lastServantInstanceId;
         editData.bondLevels = bondLevels;
-        // TODO Also update the unlocked costumes.
+        editData.costumes = costumes;
 
         const isBondLevelsDirty = !ObjectUtils.isShallowEquals(referenceData.bondLevels, bondLevels);
+        const isCostumesDirty = !SetUtils.isEqual(referenceData.costumes, costumes);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
             for (const { instanceId } of newServants) {
@@ -578,10 +584,11 @@ export function useMasterAccountDataEditHook(
             return {
                 ...dirtyData,
                 servantOrder: true,
-                bondLevels: isBondLevelsDirty
+                bondLevels: isBondLevelsDirty,
+                costumes: isCostumesDirty
             };
         });
-    }, [editData, includeServants, referenceData.bondLevels]);
+    }, [editData, includeServants, referenceData]);
 
     const addServant = useCallback((servantData: NewMasterServantUpdate): void => {
         addServants([servantData.gameId], servantData);
@@ -594,7 +601,7 @@ export function useMasterAccountDataEditHook(
         const {
             servants: currentServants,
             bondLevels: currentBondLevels,
-            // unlockedCostumes
+            costumes: currentCostumes
         } = editData;
 
         const instanceIdSet = toSet(instanceIds);
@@ -609,6 +616,11 @@ export function useMasterAccountDataEditHook(
          * conform with the hook specifications.
          */
         const bondLevels = { ...currentBondLevels };
+        /**
+         * New object for the unlocked costumes data. A new set is constructed for
+         * this to conform with the hook specifications.
+         */
+        const costumes = new Set(currentCostumes);
         /**
          * Keeps track of the dirty states of the updated servants.
          */
@@ -630,7 +642,7 @@ export function useMasterAccountDataEditHook(
              */
             /** */
             const targetServant = MasterServantUtils.clone(servant);
-            MasterServantUpdateUtils.applyToMasterServant(update, targetServant, bondLevels);
+            MasterServantUpdateUtils.applyToMasterServant(update, targetServant, bondLevels, costumes);
 
             const referenceServant = referenceData.servants.get(instanceId);
             const isDirty = isServantsChanged(referenceServant, targetServant);
@@ -641,9 +653,10 @@ export function useMasterAccountDataEditHook(
 
         editData.servants = servants;
         editData.bondLevels = bondLevels;
-        // TODO Also update the unlocked costumes.
+        editData.costumes = costumes;
 
         const isBondLevelsDirty = !ObjectUtils.isShallowEquals(referenceData.bondLevels, bondLevels);
+        const isCostumesDirty = !SetUtils.isEqual(referenceData.costumes, costumes);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
             for (const [key, isDirty] of Object.entries(isDirties)) {
@@ -656,10 +669,11 @@ export function useMasterAccountDataEditHook(
             }
             return {
                 ...dirtyData,
-                bondLevels: isBondLevelsDirty
+                bondLevels: isBondLevelsDirty,
+                costumes: isCostumesDirty
             };
         });
-    }, [includeServants, editData, referenceData.bondLevels, referenceData.servants]);
+    }, [editData, includeServants, referenceData]);
 
     const updateServantOrder = useCallback((instanceIds: ReadonlyArray<number>): void => {
         if (!includeServants) {

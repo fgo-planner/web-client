@@ -4,7 +4,7 @@ import { StorageKeys } from '../../../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../../utils/subscription/subscription-topics';
-import { MasterServantEditTab } from '../../../components/master/servant/edit/master-servant-edit.component';
+import { MasterServantEditTab } from '../../../components/master/servant/edit-dialog/master-servant-edit-dialog-content.component';
 
 //#region Default values
 

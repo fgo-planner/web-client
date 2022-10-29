@@ -1,5 +1,3 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, GameServantCostume } from '@fgo-planner/data-core';
 import { Checkbox } from '@mui/material';
 import { isEmpty } from 'lodash-es';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
@@ -8,14 +6,10 @@ import { GameItemQuantity } from '../../../../components/game/item/game-item-qua
 import { GameServantThumbnail } from '../../../../components/game/servant/game-servant-thumbnail.component';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-
-export type MasterServantCostumeRowData = Immutable<GameServantCostume & {
-    costumeId: number;
-    servant: GameServant;
-}>;
+import { GameServantCostumeListData } from '../../../../types/data';
 
 type Props = {
-    costume: MasterServantCostumeRowData;
+    costumeData: GameServantCostumeListData;
     onChange: (costumeId: number, unlocked: boolean) => void;
     openLinksInNewTab?: boolean;
     unlocked?: boolean;
@@ -28,11 +22,13 @@ export const StyleClassPrefix = 'MasterServantCostumesListRow';
 export const MasterServantCostumesListRow = React.memo((props: Props) => {
 
     const {
-        costume: {
-            collectionNo,
+        costumeData: {
+            costume: {
+                collectionNo,
+                materials,
+                name
+            },
             costumeId,
-            materials,
-            name,
             servant
         },
         onChange,

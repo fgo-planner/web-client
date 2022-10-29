@@ -1,6 +1,6 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { GameServant, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantUpdate, MasterServantUpdateBoolean, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateNumber } from '@fgo-planner/data-core';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { MasterServantBondInputField } from '../../../../../../components/input/servant/master/master-servant-bond-input-field.component';
@@ -22,14 +22,18 @@ type Props = {
      */
     masterServantUpdate: MasterServantUpdate;
     multiEditMode?: boolean;
-    onChange: (update: MasterServantUpdate) => void;
     readonly?: boolean;
     showAppendSkills?: boolean;
 };
 
-const StyleClassPrefix = 'MasterServantEditGeneralTabContent';
+const StyleClassPrefix = 'MasterServantEditDialogGeneralTabContent';
 
-const StyleProps = (theme: Theme) => ({
+const StyleProps = (theme: SystemTheme) => ({
+    overflowY: 'auto',
+    height: '100%',
+    boxSizing: 'border-box',
+    px: 6,
+    pt: 8,
     [`& .${StyleClassPrefix}-toggle-button-group`]: {
         width: 128,
         height: 56,
@@ -52,71 +56,49 @@ const StyleProps = (theme: Theme) => ({
             }
         }
     }
-} as SystemStyleObject<Theme>);
+} as SystemStyleObject<SystemTheme>);
 
-export const MasterServantEditGeneralTabContent = React.memo((props: Props) => {
+export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props) => {
 
     const forceUpdate = useForceUpdate();
 
     const {
         masterServantUpdate,
         multiEditMode,
-        onChange,
         readonly
     } = props;
-
-    /**
-     * Notifies the parent component of stats change by invoking the `onChange`
-     * callback function.
-     */
-    const pushStatsChange = useCallback((): void => {
-        onChange?.(masterServantUpdate);
-    }, [onChange, masterServantUpdate]);
 
 
     //#region Input event handlers
 
-    const handleBondInputChange = useCallback((_: string, value: string, pushChanges = false): void => {
+    const handleBondInputChange = useCallback((_: string, value: string): void => {
         if (!value) {
             masterServantUpdate.bondLevel = null;
         } else {
             masterServantUpdate.bondLevel = Number(value) as MasterServantUpdateNumber<MasterServantBondLevel>;
         }
-        if (pushChanges) {
-            pushStatsChange();
-        }
         forceUpdate();
-    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate]);
 
-    const handleNpInputChange = useCallback((_name: string, value: string, pushChanges = false): void => {
+    const handleNpInputChange = useCallback((_name: string, value: string): void => {
         masterServantUpdate.np = Number(value) as MasterServantUpdateNumber<MasterServantNoblePhantasmLevel>;
-        if (pushChanges) {
-            pushStatsChange();
-        }
         forceUpdate();
-    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate]);
 
-    const handleSummonedCheckboxChange = useCallback((_name: string, value: MasterServantUpdateBoolean, pushChanges = false): void => {
+    const handleSummonedCheckboxChange = useCallback((_name: string, value: MasterServantUpdateBoolean): void => {
         masterServantUpdate.summoned = value;
-        if (pushChanges) {
-            pushStatsChange();
-        }
         forceUpdate();
-    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate]);
 
-    const handleSummonDateInputChange = useCallback((_name: string, value: number | Indeterminate | null , pushChanges = false): void => {
+    const handleSummonDateInputChange = useCallback((_name: string, value: number | Indeterminate | null ): void => {
         masterServantUpdate.summonDate = value;
-        if (pushChanges) {
-            pushStatsChange();
-        }
         forceUpdate();
-    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate]);
 
 
     const handleInputBlurEvent = useCallback((): void => {
-        pushStatsChange();
         forceUpdate();
-    }, [forceUpdate, pushStatsChange]);
+    }, [forceUpdate]);
 
     //#endregion
 

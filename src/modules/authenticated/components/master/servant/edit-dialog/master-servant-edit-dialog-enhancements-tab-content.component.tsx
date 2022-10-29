@@ -1,6 +1,6 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { GameServant, MasterServantAscensionLevel, MasterServantSkillLevel, MasterServantUpdate, MasterServantUpdateNumber } from '@fgo-planner/data-core';
-import { Box, SystemStyleObject, Theme } from '@mui/system';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { ServantAscensionInputField } from '../../../../../../components/input/servant/servant-ascension-input-field.component';
@@ -25,7 +25,6 @@ type Props = {
      */
     masterServantUpdate: MasterServantUpdate;
     multiEditMode?: boolean;
-    onChange: (update: MasterServantUpdate) => void;
     readonly?: boolean;
     showAppendSkills?: boolean;
 };
@@ -36,9 +35,14 @@ type SkillSlot = 1 | 2 | 3;
 
 type FouStat = 'fouHp' | 'fouAtk';
 
-const StyleClassPrefix = 'MasterServantEditEnhancementsTabContent';
+const StyleClassPrefix = 'MasterServantEditDialogEnhancementsTabContent';
 
-const StyleProps = (theme: Theme) => ({
+const StyleProps = (theme: SystemTheme) => ({
+    overflowY: 'auto',
+    height: '100%',
+    boxSizing: 'border-box',
+    px: 6,
+    pt: 8,
     [`& .${StyleClassPrefix}-toggle-button-group`]: {
         width: 128,
         height: 56,
@@ -61,9 +65,9 @@ const StyleProps = (theme: Theme) => ({
             }
         }
     }
-} as SystemStyleObject<Theme>);
+} as SystemStyleObject<SystemTheme>);
 
-export const MasterServantEditEnhancementsTabContent = React.memo((props: Props) => {
+export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: Props) => {
 
     const forceUpdate = useForceUpdate();
 
@@ -71,43 +75,28 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
         gameServant,
         masterServantUpdate,
         multiEditMode,
-        onChange,
         readonly,
         showAppendSkills
     } = props;
 
-    /**
-     * Notifies the parent component of stats change by invoking the `onChange`
-     * callback function.
-     */
-    const pushStatsChange = useCallback((): void => {
-        onChange?.(masterServantUpdate);
-    }, [onChange, masterServantUpdate]);
-
 
     //#region Input event handlers
 
-    const handleLevelAscensionInputChange = useCallback((_: any, level: string, ascension: string, pushChanges = false): void => {
+    const handleLevelAscensionInputChange = useCallback((_: any, level: string, ascension: string): void => {
         masterServantUpdate.level = Number(level);
         masterServantUpdate.ascension = Number(ascension) as MasterServantAscensionLevel;
-        if (pushChanges) {
-            pushStatsChange();
-        }
         forceUpdate();
-    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate]);
 
-    const handleSkillInputChange = useCallback((_: any, skillSet: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
+    const handleSkillInputChange = useCallback((_: any, skillSet: SkillSet, slot: SkillSlot, value: string): void => {
         if (!value) {
             masterServantUpdate[skillSet][slot] = null;
         } else {
             const skillLevel = Number(value) as MasterServantUpdateNumber<MasterServantSkillLevel>;
             masterServantUpdate[skillSet][slot] = skillLevel;
         }
-        if (pushChanges) {
-            pushStatsChange();
-        }
         forceUpdate();
-    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate]);
 
     const handleFouInputChange = useCallback((_: string, stat: FouStat, value: string): void => {
         if (!value) {
@@ -119,9 +108,8 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
     }, [forceUpdate, masterServantUpdate]);
 
     const handleInputBlurEvent = useCallback((): void => {
-        pushStatsChange();
         forceUpdate();
-    }, [forceUpdate, pushStatsChange]);
+    }, [forceUpdate]);
 
     const handleLevelQuickToggleClick = useCallback((level: number, ascension: MasterServantAscensionLevel): void => {
         if (masterServantUpdate.ascension === ascension && masterServantUpdate.level === level) {
@@ -131,7 +119,6 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
             'TODO The the name param should no longer be needed',
             String(level),
             String(ascension),
-            true
         );
     }, [handleLevelAscensionInputChange, masterServantUpdate]);
 
@@ -141,9 +128,8 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
         }
         masterServantUpdate.fouHp = value;
         masterServantUpdate.fouAtk = value;
-        pushStatsChange();
         forceUpdate();
-    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate]);
 
     const handleSkillQuickToggleClick = useCallback((value: MasterServantSkillLevel | null, stat: 'skills' | 'appendSkills'): void => {
         const skillSet = masterServantUpdate[stat];
@@ -153,9 +139,8 @@ export const MasterServantEditEnhancementsTabContent = React.memo((props: Props)
         skillSet[1] = value;
         skillSet[2] = value;
         skillSet[3] = value;
-        pushStatsChange();
         forceUpdate();
-    }, [forceUpdate, masterServantUpdate, pushStatsChange]);
+    }, [forceUpdate, masterServantUpdate]);
 
     //#endregion
 

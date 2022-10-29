@@ -1,20 +1,17 @@
 import { ReadonlyRecord } from '@fgo-planner/common-core';
-import { ExistingMasterServantUpdateType, MasterServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
+import { ImmutableMasterServant, MasterServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
+import { Button, Dialog, DialogActions, DialogTitle, PaperProps, SxProps, Typography } from '@mui/material';
+import { Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
-import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
-import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../../../../types/internal';
-import { MasterServantEdit, MasterServantEditTab } from '../../../components/master/servant/edit/master-servant-edit.component';
+import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
+import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
+import { ScrollbarStyleProps } from '../../../../../../styles/scrollbar-style-props';
+import { DialogComponentProps } from '../../../../../../types/internal';
+import { MasterServantEditDialogContent, MasterServantEditTab } from './master-servant-edit-dialog-content.component';
 
 type Props = {
     activeTab: MasterServantEditTab;
     bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
-    /**
-     * Whether multiple servants are being edited. In this mode, various parameters
-     * will not be available for edit.
-     */
-    isMultipleServantsSelected?: boolean;
     /**
      * The update payload for editing. This will be modified directly, so provide a
      * clone if modification to the original object is not desired.
@@ -23,6 +20,21 @@ type Props = {
      */
     masterServantUpdate?: MasterServantUpdate;
     onTabChange: (tab: MasterServantEditTab) => void;
+    /**
+     * Array containing the `MasterServant` objects being edited.
+     *
+     * If a single servant is being edited, this array should contain exactly one
+     * `MasterServant`, whose `gameId` value matches that of the given
+     * `masterServantUpdate`.
+     *
+     * If multiple servants are being edited, this array should contain all the
+     * target `MasterServant`, and `masterServantUpdate.gameId` should be set to the
+     * indeterminate value.
+     *
+     * If inactive (`masterServantUpdate` is `undefined`), this should be set to an
+     * empty array to avoid unnecessary re-renders while the dialog is closed.
+     */
+    targetMasterServants: ReadonlyArray<ImmutableMasterServant>;
 } & Omit<DialogComponentProps<MasterServantUpdate>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';
@@ -30,27 +42,37 @@ const SubmitButtonLabel = 'Done';
 
 const DialogWidth = 600;
 
-const DialogPaperProps = {
-    style: {
+const DialogPaperStyleProps = [
+    ScrollbarStyleProps,
+    {
         width: DialogWidth,
         maxWidth: DialogWidth,
-        margin: 0
+        margin: 0,
+        '>.MuiTypography-root': {
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+        }
     }
+] as SxProps<SystemTheme>;
+
+const DialogPaperProps = {
+    sx: DialogPaperStyleProps
 } as PaperProps;
 
-/**
+/*
  * Dialog for adding single master servants, as well as single and bulk editing
- * existing master servants. Specific to the master-servants route.
+ * existing master servants.
  */
-export const MasterServantsEditDialog = React.memo((props: Props) => {
+export const MasterServantEditDialog = React.memo((props: Props) => {
 
     const {
         activeTab,
         bondLevels,
-        isMultipleServantsSelected,
         masterServantUpdate,
         onTabChange,
         onClose,
+        targetMasterServants,
         ...dialogProps
     } = props;
 
@@ -77,6 +99,8 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
         onClose(event, reason);
     }, [onClose]);
 
+    const multiEditMode = targetMasterServants.length > 1;
+
     const dialogTitle = useMemo((): string => {
         if (!masterServantUpdate) {
             return '';
@@ -84,18 +108,16 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
         // TODO Un-hardcode the strings.
         if (masterServantUpdate.type === NewMasterServantUpdateType) {
             return 'Add Servant';
-        } else if (isMultipleServantsSelected)  {
+        } else if (multiEditMode)  {
             return 'Edit Servants';
         } else {
             return 'Edit Servant';
         }
-    }, [isMultipleServantsSelected, masterServantUpdate]);
+    }, [masterServantUpdate, multiEditMode]);
 
     const open = !!masterServantUpdate;
 
-    const multiEditMode = isMultipleServantsSelected && masterServantUpdate?.type === ExistingMasterServantUpdateType;
-
-    /*
+    /**
      * Only re-render the dialog contents if the dialog is open. This allows the
      * dialog to keep displaying the same contents while it is undergoing its exit
      * transition, even if the props were changed by the parent component.
@@ -107,16 +129,14 @@ export const MasterServantsEditDialog = React.memo((props: Props) => {
                     {dialogTitle}
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
-                <DialogContent>
-                    <MasterServantEdit
-                        bondLevels={bondLevels}
-                        masterServantUpdate={masterServantUpdate!}
-                        multiEditMode={multiEditMode}
-                        showAppendSkills
-                        activeTab={activeTab}
-                        onTabChange={onTabChange}
-                    />
-                </DialogContent>
+                <MasterServantEditDialogContent
+                    bondLevels={bondLevels}
+                    masterServantUpdate={masterServantUpdate!}
+                    targetMasterServants={targetMasterServants}
+                    showAppendSkills
+                    activeTab={activeTab}
+                    onTabChange={onTabChange}
+                />
                 <DialogActions>
                     <Button
                         variant={actionButtonVariant}

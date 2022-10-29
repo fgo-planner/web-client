@@ -1,6 +1,6 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
-import { MasterAccountUtils } from '../../../utils/master/master-account.utils';
+import { NumberFormatUtils } from '../../../utils/format/number-format-utils';
 
 type Props = {
     defaultValue?: string;
@@ -23,5 +23,5 @@ export const MasterAccountFriendId: React.FC<Props> = (props: Props) => {
         return <>{defaultValue}</>;
     }
 
-    return <>{MasterAccountUtils.formatFriendId(masterAccount, defaultValue)}</>;
+    return <>{NumberFormatUtils.formatFriendId(masterAccount.friendId, defaultValue)}</>;
 };

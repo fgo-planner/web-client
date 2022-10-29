@@ -1,6 +1,6 @@
 import { ReadonlyDate } from '@fgo-planner/common-core';
 import React from 'react';
-import { DateTimeFormatUtils } from '../../../../../../utils/date-time-format.utils';
+import { DateTimeFormatUtils } from '../../../../../../utils/format/date-time-format.utils';
 
 type Props = {
     date?: ReadonlyDate; 

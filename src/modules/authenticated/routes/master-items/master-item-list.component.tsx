@@ -2,7 +2,7 @@ import { ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameItemConstants } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, SetStateAction, useMemo } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { GameItemCategory } from '../../../../types/data';
@@ -18,7 +18,7 @@ type ItemCategory = {
 
 type Props = {
     itemQuantities: ReadonlyRecord<number, number>;
-    onChange: (itemId: number, quantity: number) => void;
+    onChange: (itemId: number, quantity: SetStateAction<number>) => void;
     qp: number;
 };
 

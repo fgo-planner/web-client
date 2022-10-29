@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';
 import { TruncateText } from '../../../../../components/text/truncate-text.component';
 import { PlanConstants } from '../../../../../constants';
-import { DateTimeFormatUtils } from '../../../../../utils/date-time-format.utils';
+import { DateTimeFormatUtils } from '../../../../../utils/format/date-time-format.utils';
 import { PlanListVisibleColumns } from './plan-list-columns';
 
 type Props = {

@@ -8,7 +8,7 @@ export class DateTimeFormatUtils {
     // static readonly DataTableFormat = 'MMM dd, yyyy hh:mm:ss a';
     static readonly DataTableFormat = 'yyyy-MM-dd hh:mm:ss a';
 
-    static readonly SummonDateFormat = 'yyyy/MM/dd';
+    static readonly SummonDateFormat = 'yyyy-MM-dd';
 
     private constructor () {
         

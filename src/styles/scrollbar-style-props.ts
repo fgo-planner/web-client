@@ -18,7 +18,7 @@ export const ScrollbarStyleProps = (({ palette, spacing }: Theme) => ({
         borderRadius: spacing(ThemeConstants.ScrollbarWidthScale / 2)
     },
     [`& .${ThemeConstants.ClassScrollbarTrackBorder}`]: {
-        '& *::-webkit-scrollbar-track': {
+        '&::-webkit-scrollbar-track, *::-webkit-scrollbar-track': {
             borderTopWidth: 1,
             borderTopStyle: 'solid',
             borderTopColor: palette.divider,

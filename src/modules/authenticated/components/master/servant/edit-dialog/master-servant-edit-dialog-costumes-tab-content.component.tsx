@@ -1,8 +1,10 @@
 import { ImmutableArray, SetUtils } from '@fgo-planner/common-core';
 import { GameServant, MasterServantUpdate, MasterServantUpdateBoolean } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import clsx from 'clsx';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ServantCostumeSelectList } from '../../../../../../components/input/servant/costume/servant-costume-select-list.component';
+import { ThemeConstants } from '../../../../../../styles/theme-constants';
 
 type Props = {
     gameServants: ImmutableArray<GameServant>;
@@ -68,8 +70,13 @@ export const MasterServantEditDialogCostumesTabContent = React.memo((props: Prop
         });
     }, [unlockedCostumes]);
 
+    const classNames = clsx(
+        `${StyleClassPrefix}-root`,
+        ThemeConstants.ClassScrollbarTrackBorder
+    );
+
     return (
-        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+        <Box className={classNames} sx={StyleProps}>
             <ServantCostumeSelectList
                 gameServants={gameServants}
                 selectedCostumeIds={selectedCostumeIds}

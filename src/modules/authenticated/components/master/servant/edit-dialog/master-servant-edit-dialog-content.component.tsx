@@ -2,11 +2,9 @@ import { Immutable, ImmutableArray, ReadonlyRecord } from '@fgo-planner/common-c
 import { GameServant, ImmutableMasterServant, MasterServantBondLevel, MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUtils, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { alpha, DialogContent, Tab, Tabs, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import clsx from 'clsx';
 import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { ThemeConstants } from '../../../../../../styles/theme-constants';
 import { MasterServantSelectAutocomplete } from '../master-servant-select-autocomplete.component';
 import { MasterServantEditDialogCostumesTabContent } from './master-servant-edit-dialog-costumes-tab-content.component';
 import { MasterServantEditDialogEnhancementsTabContent } from './master-servant-edit-dialog-enhancements-tab-content.component';
@@ -206,13 +204,8 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
         );
     }
 
-    const classNames = clsx(
-        `${StyleClassPrefix}-root`,
-        ThemeConstants.ClassScrollbarTrackBorder
-    );
-
     return (
-        <DialogContent className={classNames} sx={StyleProps} >
+        <DialogContent className={`${StyleClassPrefix}-root`} sx={StyleProps} >
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
                     <MasterServantSelectAutocomplete

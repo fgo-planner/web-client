@@ -45,12 +45,13 @@ const transformDateValueForInput = (value: number | Indeterminate | null): Date 
     if (value == null || value === IndeterminateValue) {
         return null;
     }
-    /*
+    /**
      * The given value is expected to be relative to UTC time zone, while the date
      * picker uses local time zone. We need to convert the given value to local time
-     * zone to avoid wrong day being shown in the input field ude to timezone
+     * zone to avoid wrong date being shown in the input field due to timezone
      * differences.
      */
+    /** */
     const date = new Date(value);
     return DateTimeUtils.utcToZonedTime(date);
 };
@@ -61,9 +62,10 @@ const transformDateFromPicker = (date: Date | null): number | null => {
     }
     /**
      * The date picker gives date in the local time zone and includes times values
-     * (hours, minutes, etc.). We need to truncate the time values and set convert
-     * the date to UTC.
+     * (hours, minutes, etc.). We need to truncate the time values and convert the
+     * date to UTC.
      */
+    /** */
     const truncated = DateTimeUtils.truncateToDate(date);
     return DateTimeUtils.zonedToUtcTime(truncated).getTime();
 };

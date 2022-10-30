@@ -1,4 +1,4 @@
-import { Nullable, ReadonlyDate } from '@fgo-planner/common-core';
+import { DateTimeUtils, Nullable, ReadonlyDate } from '@fgo-planner/common-core';
 import { format } from 'date-fns';
 
 type AnyDate = Date | ReadonlyDate;
@@ -25,7 +25,13 @@ export class DateTimeFormatUtils {
         if (date == null) {
             return '';
         }
-        return format(date as number | Date, this.SummonDateFormat);
+        /**
+         * The given value is expected to be relative to UTC time zone. We need to
+         * convert the given value to local time zone to avoid returning the wrong date
+         * due to timezone differences.
+         */
+        const zonedDate = DateTimeUtils.utcToZonedTime(date);
+        return format(zonedDate, this.SummonDateFormat);
     }
 
 }

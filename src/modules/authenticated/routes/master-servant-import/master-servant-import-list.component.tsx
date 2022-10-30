@@ -23,6 +23,7 @@ const ParseResultHelperText = `The following servants were parsed from the given
     list and click on the confirm button to finalize the import.`;
 
 const ServantListVisibleColumns: MasterServantListVisibleColumns = {
+    summonDate: true,
     npLevel: true,
     level: true,
     bondLevel: true,

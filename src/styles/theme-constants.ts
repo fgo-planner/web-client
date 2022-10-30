@@ -82,6 +82,17 @@ export class ThemeConstants {
     //#endregion
 
 
+    //#region Alpha values
+
+    static readonly ActiveAlpha = 0.07;
+
+    static readonly ActiveHoverAlpha = 0.12;
+
+    static readonly HoverAlpha = 0.07;
+
+    //#endregion
+
+
     //#region Style property value
 
     static readonly FontFamilyGoogleSans = 'Google Sans, Roboto, sans-serif';

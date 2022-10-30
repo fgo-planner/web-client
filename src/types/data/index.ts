@@ -8,6 +8,7 @@ export * from './game/item/game-item-category.enum';
 export * from './game/item/game-item-list.type';
 export * from './game/item/game-item-map.type';
 export * from './game/servant/game-servant-class-simplified.type';
+export * from './game/servant/game-servant-costume-list.type';
 export * from './game/servant/game-servant-list.type';
 export * from './game/servant/game-servant-map.type';
 export * from './game/soundtrack/game-soundtrack-list.type';

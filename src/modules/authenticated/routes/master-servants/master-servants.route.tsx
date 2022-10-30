@@ -13,11 +13,11 @@ import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interfac
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { SortDirection, SortOptions } from '../../../../types/data';
 import { ModalOnCloseReason } from '../../../../types/internal';
+import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
 import { MasterAccountDataEditHookOptions, useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
-import { MasterServantsEditDialog } from './components/master-servants-edit-dialog.component';
 import { MasterServantsFilter, MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
 import { MasterServantsInfoPanel } from './components/master-servants-info-panel.component';
 import { MasterServantsListRowContextMenu } from './components/master-servants-list-row-context-menu.component';
@@ -527,10 +527,10 @@ export const MasterServantsRoute = React.memo(() => {
                     </div>
                 </div>
             </div>
-            <MasterServantsEditDialog
+            <MasterServantEditDialog
                 bondLevels={bondLevels}
                 masterServantUpdate={editServantDialogData}
-                isMultipleServantsSelected={isMultipleServantsSelected}
+                targetMasterServants={selectedServantsData.servants}
                 activeTab={servantEditDialogActiveTab}
                 onTabChange={setServantEditDialogActiveTab}
                 onClose={handleEditServantDialogClose}

@@ -1,5 +1,6 @@
 import { Theme } from '@mui/material';
 import { alpha, CSSInterpolation } from '@mui/system';
+import { ThemeConstants } from '../../styles/theme-constants';
 import { StyledFunctionPropsWithTheme } from '../../types/internal';
 
 export const DefaultStyleClassPrefix = 'DataTableListRow';
@@ -19,12 +20,12 @@ export const DataTableListBaseRowStyle = (props: StyledFunctionPropsWithTheme) =
 
     const style = {
         '&:hover': {
-            backgroundColor: alpha(palette.text.primary, 0.07)
+            backgroundColor: alpha(palette.text.primary, ThemeConstants.HoverAlpha)
         },
         [`&.${classPrefix}-active`]: {
-            backgroundColor: `${alpha(palette.primary.main, 0.07)} !important`,
+            backgroundColor: `${alpha(palette.primary.main, ThemeConstants.ActiveAlpha)} !important`,
             '&:hover': {
-                backgroundColor: `${alpha(palette.primary.main, 0.12)} !important`,
+                backgroundColor: `${alpha(palette.primary.main, ThemeConstants.ActiveHoverAlpha)} !important`
             }
         },
         [`&.${classPrefix}-border-top`]: {

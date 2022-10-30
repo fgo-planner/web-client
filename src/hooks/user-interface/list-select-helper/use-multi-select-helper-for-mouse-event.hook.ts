@@ -9,11 +9,15 @@ type RightClickAction =
 
 export type MultiSelectHelperForMouseEventHookOptions = {
     rightClickAction?: RightClickAction;
+    preventOverride?: boolean;
 } & MultiSelectHelperHookOptions;
 
 type MultiSelectHelperForMouseEventHookResult<ID> = {
     handleItemClick: (e: MouseEvent, index: number) => void;
-    selectedIds: ReadonlySet<ID>;
+    /**
+     * Readonly set of the selected IDs.
+     */
+    selectionResult: ReadonlySet<ID>;
 };
 
 /**
@@ -23,13 +27,19 @@ type MultiSelectHelperForMouseEventHookResult<ID> = {
  * - Shift => `continuous`
  * - Ctrl => `invert-target`
  * - Right click with `contextmenu` action => `append-target`
- * - Anything else => `override`
+ * - Anything else when `preventOverride` is `true` => `invert-target`
+ * - Anything else when `preventOverride` is `false` => `override`
  * 
  * Note that if both the shift and ctrl keys were pressed, then the shift key
  * has precedence.
  */
-const mapMouseEventToListSelectAction = (e: MouseEvent, rightClickAction: RightClickAction): ListSelectAction | null => {
-    const isRightClick = e.type === 'contextmenu';
+const mapMouseEventToListSelectAction = (
+    event: MouseEvent, 
+    rightClickAction: RightClickAction, 
+    preventOverride: boolean
+): ListSelectAction | null => {
+
+    const isRightClick = event.type === 'contextmenu';
     if (isRightClick) {
         if (rightClickAction === 'none') {
             return null;
@@ -38,10 +48,10 @@ const mapMouseEventToListSelectAction = (e: MouseEvent, rightClickAction: RightC
             return 'append-target';
         }
     }
-    if (e.shiftKey) {
+    if (event.shiftKey) {
         return 'continuous';
     }
-    if (e.ctrlKey) {
+    if (event.ctrlKey || preventOverride) {
         return 'invert-target';
     }
     return 'override';
@@ -62,12 +72,13 @@ export function useMultiSelectHelperForMouseEvent<T, ID = number>(
 
     const {
         rightClickAction = 'none',
+        preventOverride = false,
         ...delegatedOptions
     } = options;
 
     const {
         handleItemAction,
-        selectedIds: selectedIdsResult
+        selectionResult
     } = useMultiSelectHelper<T, ID>(
         sourceData,
         selectedIds,
@@ -76,15 +87,15 @@ export function useMultiSelectHelperForMouseEvent<T, ID = number>(
     );
 
     const handleItemClick = useCallback((e: MouseEvent, index: number): void => {
-        const action = mapMouseEventToListSelectAction(e, rightClickAction);
+        const action = mapMouseEventToListSelectAction(e, rightClickAction, preventOverride);
         if (!action) {
             return;
         }
         handleItemAction(action, index);
-    }, [handleItemAction, rightClickAction]);
+    }, [handleItemAction, preventOverride, rightClickAction]);
 
     return {
-        selectedIds: selectedIdsResult,
+        selectionResult,
         handleItemClick
     };
 

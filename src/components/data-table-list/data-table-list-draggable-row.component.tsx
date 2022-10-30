@@ -2,9 +2,10 @@ import { DragIndicator as DragIndicatorIcon, SvgIconComponent } from '@mui/icons
 import { FilteringStyledOptions } from '@mui/styled-engine';
 import { styled } from '@mui/system';
 import clsx from 'clsx';
-import React, { DOMAttributes, MouseEvent, PropsWithChildren, ReactNode, useCallback, useMemo, useRef } from 'react';
+import React, { DOMAttributes, PropsWithChildren, ReactNode, useCallback, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { ComponentStyleProps, StyledFunctionProps } from '../../types/internal';
+import { EventHandlers } from '../../utils/event-handlers';
 import { DataTableListBaseRowStyle } from './data-table-list-base-row.style';
 import { DataTableListDraggableRowStyle, StyleClassPrefix } from './data-table-list-draggable-row.style';
 
@@ -30,10 +31,7 @@ type DragItem = {
     index: number;
 };
 
-// TODO Move this to a utilities file.
-const handleDragHandleClick = (e: MouseEvent<HTMLDivElement>): void => {
-    e.stopPropagation();
-};
+const handleDragHandleClick = EventHandlers.stopPropagation;
 
 const DragType = 'row';
 

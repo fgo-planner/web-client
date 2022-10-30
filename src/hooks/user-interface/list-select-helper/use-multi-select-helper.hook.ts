@@ -12,7 +12,10 @@ export type MultiSelectHelperHookOptions = {
 
 type MultiSelectHelperHookResult<ID> = {
     handleItemAction: (action: ListSelectAction, index: number) => void;
-    selectedIds: ReadonlySet<ID>;
+    /**
+     * Readonly set of the selected IDs.
+     */
+    selectionResult: ReadonlySet<ID>;
 };
 
 /**
@@ -34,7 +37,7 @@ export function useMultiSelectHelper<T, ID = number>(
 
     const previousTargetIdRef = useRef<ID>();
 
-    const selectedIdsRef = useRef<ReadonlySet<ID>>(SetUtils.emptySet());
+    const selectedIdsRef = useRef<ReadonlySet<ID>>(selectedIds);
 
     /**
      * Updates the `selectedDataContainer` whenever the input params change.
@@ -181,7 +184,7 @@ export function useMultiSelectHelper<T, ID = number>(
 
     return {
         handleItemAction,
-        selectedIds: selectedIdsRef.current
+        selectionResult: selectedIdsRef.current
     };
 
 };

@@ -1,5 +1,5 @@
-import { ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant, MasterServantUpdate, MasterServantUpdateBoolean, MasterServantUpdateUtils } from '@fgo-planner/data-core';
+import { ImmutableArray, SetUtils } from '@fgo-planner/common-core';
+import { GameServant, MasterServantUpdate, MasterServantUpdateBoolean } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ServantCostumeSelectList } from '../../../../../../components/input/servant/costume/servant-costume-select-list.component';
@@ -45,15 +45,27 @@ export const MasterServantEditDialogCostumesTabContent = React.memo((props: Prop
         }
     } = props;
 
-    const [selectedCostumeIds, setSelectedCostumeIds] = useState<Set<number>>(() => transformUnlockedCostumes(unlockedCostumes));
+    const [selectedCostumeIds, setSelectedCostumeIds] = useState<ReadonlySet<number>>(() => transformUnlockedCostumes(unlockedCostumes));
 
     useEffect((): void => {
         setSelectedCostumeIds(transformUnlockedCostumes(unlockedCostumes));
     }, [unlockedCostumes]);
 
-    const handleChange = useCallback((costumeId: number, selected: boolean): void => {
-        unlockedCostumes.set(costumeId, MasterServantUpdateUtils.convertBoolean(selected));
-        setSelectedCostumeIds(transformUnlockedCostumes(unlockedCostumes));
+    const handleSelectionChange = useCallback((selectedCostumeIds: ReadonlySet<number>): void => {
+        setSelectedCostumeIds(prevSelectedCostumeIds => {
+            if (SetUtils.isEqual(prevSelectedCostumeIds, selectedCostumeIds)) {
+                return prevSelectedCostumeIds;
+            }
+            for (const costumeId of selectedCostumeIds) {
+                unlockedCostumes.set(costumeId, MasterServantUpdateBoolean.True);
+            }
+            for (const costumeId of unlockedCostumes.keys()) {
+                if (!selectedCostumeIds.has(costumeId)) {
+                    unlockedCostumes.set(costumeId, MasterServantUpdateBoolean.False);
+                }
+            }
+            return selectedCostumeIds;
+        });
     }, [unlockedCostumes]);
 
     return (
@@ -61,7 +73,7 @@ export const MasterServantEditDialogCostumesTabContent = React.memo((props: Prop
             <ServantCostumeSelectList
                 gameServants={gameServants}
                 selectedCostumeIds={selectedCostumeIds}
-                onChange={handleChange}
+                onSelectionChange={handleSelectionChange}
             />
         </Box>
     );

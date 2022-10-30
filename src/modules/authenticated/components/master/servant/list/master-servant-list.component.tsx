@@ -149,7 +149,7 @@ export const MasterServantList = React.memo((props: Props) => {
     ]);
 
     const {
-        selectedIds,
+        selectionResult,
         handleItemClick
     } = useMultiSelectHelperForMouseEvent(
         masterServantsProcessed,
@@ -162,8 +162,8 @@ export const MasterServantList = React.memo((props: Props) => {
     );
 
     useEffect(() => {
-        onSelectionChange?.(selectedIds);
-    }, [onSelectionChange, selectedIds]);
+        onSelectionChange?.(selectionResult);
+    }, [onSelectionChange, selectionResult]);
 
     const handleRowClick = useCallback((e: MouseEvent, index: number) => {
         handleItemClick(e, index);

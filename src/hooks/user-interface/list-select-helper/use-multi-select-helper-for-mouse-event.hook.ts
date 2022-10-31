@@ -7,10 +7,10 @@ type RightClickAction =
     'left-click' | 
     'contextmenu';
 
-export type MultiSelectHelperForMouseEventHookOptions = {
+export type MultiSelectHelperForMouseEventHookOptions<ID> = {
     rightClickAction?: RightClickAction;
     preventOverride?: boolean;
-} & MultiSelectHelperHookOptions;
+} & MultiSelectHelperHookOptions<ID>;
 
 type MultiSelectHelperForMouseEventHookResult<ID> = {
     handleItemClick: (e: MouseEvent, index: number) => void;
@@ -67,7 +67,7 @@ export function useMultiSelectHelperForMouseEvent<T, ID = number>(
     sourceData: ReadonlyArray<T>,
     selectedIds: ReadonlySet<ID>,
     getIdFunction: (value: T) => ID,
-    options: MultiSelectHelperForMouseEventHookOptions = {}
+    options: MultiSelectHelperForMouseEventHookOptions<ID> = {}
 ): MultiSelectHelperForMouseEventHookResult<ID> {
 
     const {

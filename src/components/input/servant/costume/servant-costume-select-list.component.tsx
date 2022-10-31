@@ -29,22 +29,22 @@ const StyleProps = (theme: SystemTheme) => {
     const { palette } = theme as Theme;
 
     return {
-        cursor: 'pointer',
         [`& .${StyleClassPrefix}-not-available-message`]: {
             textAlign: 'center',
             color: palette.text.disabled,
             // fontStyle: 'italic',
-            pt: 8
+            pt: 8,
+            px: 4
         },
         [`& .${ServantCostumeSelectListRowStyleClassPrefix}-root`]: {
+            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            pl: 1,
             borderBottomWidth: 1,
             borderBottomStyle: 'solid',
             borderBottomColor: palette.divider,
-            [`& .${ServantCostumeSelectListRowStyleClassPrefix}-thumbnail`]: {
-                ml: 1
+            [`& .${ServantCostumeSelectListRowStyleClassPrefix}-checkbox`]: {
+                px: 1
             },
             [`& .${ServantCostumeSelectListRowStyleClassPrefix}-name`]: {
                 fontSize: '0.875rem',
@@ -58,6 +58,10 @@ const StyleProps = (theme: SystemTheme) => {
                 '&:hover': {
                     backgroundColor: alpha(palette.primary.main, ThemeConstants.ActiveHoverAlpha)
                 },
+            },
+            [`&.${ServantCostumeSelectListRowStyleClassPrefix}-disabled`]: {
+                cursor: 'default',
+                backgroundColor: 'unset'
             },
             '&>.MuiButton-root:not(:last-of-type)': {
                 mr: 4
@@ -75,7 +79,10 @@ export const ServantCostumeSelectList = React.memo((props: Props) => {
         selectedCostumeIds
     } = props;
 
-    const costumeList = useGameServantCostumeList(gameServants);
+    const {
+        costumeList,
+        alwaysUnlockedIds
+    } = useGameServantCostumeList(gameServants);
 
     const {
         selectionResult,
@@ -85,6 +92,7 @@ export const ServantCostumeSelectList = React.memo((props: Props) => {
         selectedCostumeIds,
         getCostumeId,
         {
+            disabledIds: alwaysUnlockedIds,
             rightClickAction: 'none',
             preventOverride: true
         }
@@ -96,14 +104,18 @@ export const ServantCostumeSelectList = React.memo((props: Props) => {
 
     const renderRow = (costumeData: GameServantCostumeListData, index: number): ReactNode => {
         const { costumeId } = costumeData;
+        const alwaysUnlocked = alwaysUnlockedIds.has(costumeId);
+        const selected = selectedCostumeIds.has(costumeId);
+        const disabled = !!disabledCostumeIds?.has(costumeId);
         return (
             <ServantCostumeSelectListRow
                 key={costumeId}
                 index={index}
                 costumeData={costumeData}
                 onClick={handleItemClick}
-                selected={selectedCostumeIds.has(costumeId)}
-                disabled={disabledCostumeIds?.has(costumeId) || false}
+                alwaysSelected={alwaysUnlocked}
+                selected={selected}
+                disabled={disabled}
             />
         );
     };

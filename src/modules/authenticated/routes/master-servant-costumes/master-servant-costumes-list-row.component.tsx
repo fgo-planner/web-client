@@ -1,5 +1,4 @@
 import { Checkbox } from '@mui/material';
-import { isEmpty } from 'lodash-es';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
@@ -9,6 +8,7 @@ import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { GameServantCostumeListData } from '../../../../types/data';
 
 type Props = {
+    alwaysUnlocked: boolean;
     costumeData: GameServantCostumeListData;
     onChange: (costumeId: number, unlocked: boolean) => void;
     openLinksInNewTab?: boolean;
@@ -22,6 +22,7 @@ export const StyleClassPrefix = 'MasterServantCostumesListRow';
 export const MasterServantCostumesListRow = React.memo((props: Props) => {
 
     const {
+        alwaysUnlocked,
         costumeData: {
             costume: {
                 collectionNo,
@@ -41,8 +42,6 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
     const handleUnlockCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
         onChange(costumeId, event.target.checked);
     }, [costumeId, onChange]);
-
-    const alwaysUnlocked = isEmpty(materials.materials);
 
     const unlockedStatusNode: ReactNode = (
         <div className={`${StyleClassPrefix}-unlocked-status`}>

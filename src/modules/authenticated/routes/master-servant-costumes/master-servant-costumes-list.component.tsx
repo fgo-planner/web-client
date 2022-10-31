@@ -72,23 +72,28 @@ export const MasterServantCostumesList = React.memo(({ onChange, unlockedCostume
 
     const gameServantList = useGameServantList();
 
-    const costumesList = useGameServantCostumeList(gameServantList);
+    const {
+        costumeList,
+        alwaysUnlockedIds
+    } = useGameServantCostumeList(gameServantList);
 
     /*
      * This can be empty during the initial render.
      */
-    if (!costumesList.length) {
+    if (!costumeList.length) {
         return null;
     }
 
     const renderCostumeRow = (costumeData: GameServantCostumeListData): ReactNode => {
         const { costumeId } = costumeData;
         const unlocked = unlockedCostumes.has(costumeId);
+        const alwaysUnlocked = alwaysUnlockedIds.has(costumeId);
         return (
             <MasterServantCostumesListRow
                 key={costumeId}
                 costumeData={costumeData}
                 unlocked={unlocked}
+                alwaysUnlocked={alwaysUnlocked}
                 onChange={onChange}
                 openLinksInNewTab
             />
@@ -99,7 +104,7 @@ export const MasterServantCostumesList = React.memo(({ onChange, unlockedCostume
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-list-container`}>
                 <MasterServantCostumesListHeader />
-                {costumesList.map(renderCostumeRow)}
+                {costumeList.map(renderCostumeRow)}
             </div>
         </Box>
     );

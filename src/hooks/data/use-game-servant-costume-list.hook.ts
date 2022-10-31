@@ -1,7 +1,21 @@
-import { ImmutableArray, Nullable } from '@fgo-planner/common-core';
+import { ImmutableArray, Nullable, SetUtils } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
+import { isEmpty } from 'lodash-es';
 import { useMemo } from 'react';
 import { GameServantCostumeList, GameServantCostumeListData } from '../../types/data';
+
+export type UseGameServantCostumeListResult = {
+    alwaysUnlockedIds: ReadonlySet<number>,
+    costumeList: GameServantCostumeList
+};
+
+const collectionNoComparator = (a: GameServantCostumeListData, b: GameServantCostumeListData): number => {
+    return a.costume.collectionNo - b.costume.collectionNo;
+};
+
+const alwaysUnlockedFilter = (costume: GameServantCostumeListData): boolean => {
+    return isEmpty(costume.costume.materials.materials);
+};
 
 const transformCostumesList = (gameServants: ImmutableArray<GameServant>): Array<GameServantCostumeListData> => {
     const result: Array<GameServantCostumeListData> = [];
@@ -15,15 +29,32 @@ const transformCostumesList = (gameServants: ImmutableArray<GameServant>): Array
             });
         }
     }
-    result.sort((a, b) => a.costume.collectionNo - b.costume.collectionNo);
+    result.sort(collectionNoComparator);
     return result;
 };
 
-export const useGameServantCostumeList = (gameServants: Nullable<ImmutableArray<GameServant>>): GameServantCostumeList => {
-    return useMemo((): GameServantCostumeList => {
+export const useGameServantCostumeList = (gameServants: Nullable<ImmutableArray<GameServant>>): UseGameServantCostumeListResult => {
+
+    const costumeList = useMemo((): GameServantCostumeList => {
         if (!gameServants) {
             return [];
         }
         return transformCostumesList(gameServants);
     }, [gameServants]);
+
+    const alwaysUnlockedIds = useMemo((): ReadonlySet<number> => {
+        if (!costumeList.length) {
+            return SetUtils.emptySet();
+        }
+        const result = costumeList
+            .filter(alwaysUnlockedFilter)
+            .map(costume => costume.costumeId);
+        return new Set(result);
+    }, [costumeList]);
+
+    return {
+        alwaysUnlockedIds,
+        costumeList,
+    };
+
 };

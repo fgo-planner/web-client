@@ -3,11 +3,15 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useForceUpdate } from '../../utils/use-force-update.hook';
 import { ListSelectAction } from './list-select-action.type';
 
-export type MultiSelectHelperHookOptions = {
+export type MultiSelectHelperHookOptions<ID> = {
     /**
      * Whether selection functionality is disabled.
      */
     disabled?: boolean;
+    /**
+     * Set of IDs that may be present in the list but are not selectable.
+     */
+    disabledIds?: ReadonlySet<ID>;
 };
 
 type MultiSelectHelperHookResult<ID> = {
@@ -19,6 +23,19 @@ type MultiSelectHelperHookResult<ID> = {
 };
 
 /**
+ * Removes all the unselectable IDs from the given set.
+ */
+const removeUnselectableIds = <ID>(selectedIds: Set<ID>, disabledIds?: ReadonlySet<ID>): void => {
+    if (!disabledIds) {
+        return;
+    }
+    // TODO Move this to SetUtils
+    for (const unselectableId of disabledIds) {
+        selectedIds.delete(unselectableId);
+    }
+};
+
+/**
  * Utility hook that handles the select actions on a list and keeps track of
  * which items are selected based on the events.
  */
@@ -26,12 +43,15 @@ export function useMultiSelectHelper<T, ID = number>(
     sourceData: ReadonlyArray<T>,
     selectedIds: ReadonlySet<ID>,
     getIdFunction: (value: T) => ID,
-    options: MultiSelectHelperHookOptions = {}
+    options: MultiSelectHelperHookOptions<ID> = {}
 ): MultiSelectHelperHookResult<ID> {
 
     const forceUpdate = useForceUpdate();
 
-    const { disabled } = options;
+    const { 
+        disabled,
+        disabledIds
+    } = options;
 
     const sourceDataRef = useRef<ReadonlyArray<T>>(sourceData);
 
@@ -73,9 +93,10 @@ export function useMultiSelectHelper<T, ID = number>(
                 updatedSelectedItems.push(item);
             }
         }
+        removeUnselectableIds(updatedSelectedIds, disabledIds);
         selectedIdsRef.current = updatedSelectedIds;
         forceUpdate();
-    }, [disabled, sourceData, getIdFunction, forceUpdate, selectedIds]);
+    }, [disabled, sourceData, getIdFunction, forceUpdate, selectedIds, disabledIds]);
 
     const handleItemAction = useCallback((action: ListSelectAction, index: number): void => {
         if (disabled) {
@@ -176,11 +197,12 @@ export function useMultiSelectHelper<T, ID = number>(
         /**
          * Update the `selectedIdsRef` and `selectedItems`.
          */
-        const updatedSelectionIdSet = new Set(updatedSelectionIds);
-        selectedIdsRef.current = updatedSelectionIdSet;
+        const updatedSelectedIds = new Set(updatedSelectionIds);
+        removeUnselectableIds(updatedSelectedIds, disabledIds);
+        selectedIdsRef.current = updatedSelectedIds;
 
         forceUpdate();
-    }, [disabled, forceUpdate, getIdFunction]);
+    }, [disabled, forceUpdate, getIdFunction, disabledIds]);
 
     return {
         handleItemAction,

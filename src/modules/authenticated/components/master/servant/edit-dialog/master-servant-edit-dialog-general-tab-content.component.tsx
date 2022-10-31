@@ -34,11 +34,6 @@ const StyleProps = (theme: SystemTheme) => ({
     boxSizing: 'border-box',
     px: 6,
     pt: 8,
-    [`& .${StyleClassPrefix}-toggle-button-group`]: {
-        width: 128,
-        height: 56,
-        ml: 2
-    },
     [`& .${StyleClassPrefix}-input-field-group`]: {
         display: 'flex',
         flexWrap: 'nowrap',

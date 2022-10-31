@@ -46,7 +46,10 @@ const StyleProps = (theme: SystemTheme) => ({
     [`& .${StyleClassPrefix}-toggle-button-group`]: {
         width: 128,
         height: 56,
-        ml: 2
+        ml: 2,
+        [theme.breakpoints.down('sm')]: {
+            display: 'none'
+        }
     },
     [`& .${StyleClassPrefix}-input-field-group`]: {
         display: 'flex',

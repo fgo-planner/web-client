@@ -6,6 +6,7 @@ import { GameServantThumbnail } from '../../../game/servant/game-servant-thumbna
 import { TruncateText } from '../../../text/truncate-text.component';
 
 type Props = {
+    alwaysSelected?: boolean;
     costumeData: GameServantCostumeListData;
     disabled: boolean;
     index: number;
@@ -20,6 +21,7 @@ export const StyleClassPrefix = 'ServantCostumeSelectListRow';
 export const ServantCostumeSelectListRow = React.memo((props: Props) => {
 
     const {
+        alwaysSelected,
         costumeData: {
             costume,
             costumeId,
@@ -35,20 +37,26 @@ export const ServantCostumeSelectListRow = React.memo((props: Props) => {
     selectedRef.current = selected;
 
     const handleClick = useCallback((event: MouseEvent): void => {
+        if (disabled || alwaysSelected) {
+            return;
+        }
         onClick(event, index);
-    }, [index, onClick]);
+    }, [alwaysSelected, disabled, index, onClick]);
 
     const classNames = clsx(
         `${StyleClassPrefix}-root`,
-        selected && `${StyleClassPrefix}-active`
+        selected && `${StyleClassPrefix}-active`,
+        (disabled || alwaysSelected) && `${StyleClassPrefix}-disabled`
     );
 
     return (
         <div className={classNames} onClick={handleClick}>
-            <Checkbox
-                checked={selected || disabled}
-                disabled={disabled}
-            />
+            <div className={`${StyleClassPrefix}-checkbox`}>
+                <Checkbox
+                    checked={selected || alwaysSelected}
+                    disabled={disabled || alwaysSelected}
+                />
+            </div>
             <div className={`${StyleClassPrefix}-thumbnail`}>
                 <GameServantThumbnail
                     variant='square'

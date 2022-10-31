@@ -3,6 +3,7 @@ import { MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateI
 import { BaseTextFieldProps, TextField, TextFieldProps } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import clsx from 'clsx';
 import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useRef } from 'react';
 
 type Props = {
@@ -69,6 +70,8 @@ const transformDateFromPicker = (date: Date | null): number | null => {
     const truncated = DateTimeUtils.truncateToDate(date);
     return DateTimeUtils.zonedToUtcTime(truncated).getTime();
 };
+
+const StyleClassPrefix = 'MasterServantSummonDateInputField';
 
 /**
  * Input field for a servant's summon date. This is currently only applicable to
@@ -169,6 +172,7 @@ export const MasterServantSummonDateInputField = React.memo((props: Props) => {
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DesktopDatePicker
+                className={clsx(`${StyleClassPrefix}-root`, 'full-width')}
                 label={label || DefaultLabel}
                 inputFormat={DateFormat}
                 mask={DateFormatMask}

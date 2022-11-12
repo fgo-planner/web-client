@@ -120,8 +120,7 @@ export const PlansRoute = React.memo(() => {
 
     const {
         invokeLoadingIndicator,
-        resetLoadingIndicator,
-        isLoadingIndicatorActive
+        resetLoadingIndicator
     } = useLoadingIndicator();
 
     const navigate = useNavigate();

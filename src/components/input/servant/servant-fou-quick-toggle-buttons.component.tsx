@@ -1,5 +1,4 @@
-/* eslint-disable no-unreachable */
-import { MasterServantConstants } from '@fgo-planner/data-core';
+import { InstantiatedServantConstants } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React from 'react';
 import { ComponentStyleProps } from '../../../types/internal';
@@ -41,8 +40,8 @@ export const ServantFouQuickToggleButtons = React.memo((props: Props) => {
 
             // Left button
             leftButtonIcon={<IconButtonText children={0} />}
-            leftButtonTooltip={`Set both to ${MasterServantConstants.MinFou}`}
-            onLeftButtonClick={() => onClick(MasterServantConstants.MinFou)}
+            leftButtonTooltip={`Set both to ${InstantiatedServantConstants.MinFou}`}
+            onLeftButtonClick={() => onClick(InstantiatedServantConstants.MinFou)}
 
             // Center button
             centerButtonIcon={<IconButtonText children='1k' />}
@@ -51,8 +50,8 @@ export const ServantFouQuickToggleButtons = React.memo((props: Props) => {
 
             // Right button
             rightButtonIcon={<IconButtonText textDecoration='overline' children='2k' />}
-            rightButtonTooltip={`Set both to ${MasterServantConstants.MaxFou}`}
-            onRightButtonClick={() => onClick(MasterServantConstants.MaxFou)}
+            rightButtonTooltip={`Set both to ${InstantiatedServantConstants.MaxFou}`}
+            onRightButtonClick={() => onClick(InstantiatedServantConstants.MaxFou)}
         />
     );
 

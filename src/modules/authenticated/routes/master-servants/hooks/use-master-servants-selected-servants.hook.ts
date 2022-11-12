@@ -1,5 +1,5 @@
-import { SetUtils } from '@fgo-planner/common-core';
-import { ImmutableMasterServant, MasterServantUtils } from '@fgo-planner/data-core';
+import { CollectionUtils } from '@fgo-planner/common-core';
+import { ImmutableMasterServant, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { useCallback, useEffect, useState } from 'react';
 import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
 
@@ -12,7 +12,7 @@ class SelectedServantsDataContainer implements SelectedServantsData {
 
     selectedServants?: ReadonlyArray<ImmutableMasterServant>;
 
-    selectedInstanceIds: ReadonlySet<number> = SetUtils.emptySet();
+    selectedInstanceIds: ReadonlySet<number> = CollectionUtils.emptySet();
 
     get instanceIds(): ReadonlySet<number> {
         return this.selectedInstanceIds;
@@ -70,7 +70,7 @@ export const useMasterServantsSelectedServants = (
     }, [selectedServantsData, sourceData]);
 
     const updateSelectedServants = useCallback((selectedInstanceIds: ReadonlySet<number>): void => {
-        if (SetUtils.isEqual(selectedInstanceIds, selectedServantsData.selectedInstanceIds)) {
+        if (CollectionUtils.isSetsEqual(selectedInstanceIds, selectedServantsData.selectedInstanceIds)) {
             return;
         }
         selectedServantsData.selectedInstanceIds = selectedInstanceIds;
@@ -79,12 +79,12 @@ export const useMasterServantsSelectedServants = (
     }, [forceUpdate, selectedServantsData]);
 
     const selectAllServants = useCallback((): void => {
-        const allInstanceIds = selectedServantsData.sourceData.map(MasterServantUtils.getInstanceId);
+        const allInstanceIds = selectedServantsData.sourceData.map(InstantiatedServantUtils.getInstanceId);
         updateSelectedServants(new Set(allInstanceIds));
     }, [selectedServantsData, updateSelectedServants]);
 
     const deselectAllServants = useCallback((): void => {
-        updateSelectedServants(SetUtils.emptySet());
+        updateSelectedServants(CollectionUtils.emptySet());
     }, [updateSelectedServants]);
 
     return {

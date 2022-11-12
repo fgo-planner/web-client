@@ -1,4 +1,4 @@
-import { ImportedMasterServantUpdate, MasterServant, MasterServantBondLevel, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils } from '@fgo-planner/data-core';
+import { ImportedMasterServantUpdate, MasterServant, InstantiatedServantBondLevel, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils } from '@fgo-planner/data-core';
 import { Check as CheckIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { Button, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -105,10 +105,10 @@ export const MasterServantImportList = React.memo((props: Props) => {
 
     const masterServantListData = useMemo((): {
         masterServants: Array<MasterServant>;
-        bondLevels: Record<number, MasterServantBondLevel>;
+        bondLevels: Record<number, InstantiatedServantBondLevel>;
     } => {
         const masterServants = [] as Array<MasterServant>;
-        const bondLevels = {} as Record<number, MasterServantBondLevel>;
+        const bondLevels = {} as Record<number, InstantiatedServantBondLevel>;
         let instanceId = 0;
         for (const parsedServant of parsedServants) {
             const bondLevel = parsedServant.bondLevel;

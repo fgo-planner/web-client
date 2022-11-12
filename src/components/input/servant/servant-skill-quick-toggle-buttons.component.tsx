@@ -1,4 +1,4 @@
-import { MasterServantSkillLevel } from '@fgo-planner/data-core';
+import { InstantiatedServantSkillLevel } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { MouseEventHandler, ReactNode } from 'react';
 import { ComponentStyleProps } from '../../../types/internal';
@@ -7,14 +7,14 @@ import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quic
 
 type SkillSet = 'skills' | 'appendSkills';
 
-type ToggleTarget = 0 | MasterServantSkillLevel;
+type ToggleTarget = 0 | InstantiatedServantSkillLevel;
 
 type Props = {
     centerToggleTarget: ToggleTarget;
     disabled?: boolean;
     ignoreTabNavigation?: boolean;
     leftToggleTarget: ToggleTarget;
-    onClick: (value: MasterServantSkillLevel | null, skillSet: SkillSet) => void;
+    onClick: (value: InstantiatedServantSkillLevel | null, skillSet: SkillSet) => void;
     rightToggleTarget: ToggleTarget;
     skillSet: SkillSet;
 } & Pick<ComponentStyleProps, 'className'>;

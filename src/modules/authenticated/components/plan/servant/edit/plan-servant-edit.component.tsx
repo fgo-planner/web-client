@@ -1,11 +1,10 @@
 import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, PlanServant } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, PlanServant, PlanServantUtils } from '@fgo-planner/data-core';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
-import { PlanServantUtils } from '../../../../../../utils/plan/plan-servant.utils';
 import { PlanServantSelectAutocomplete } from '../plan-servant-select-autocomplete.component';
 import { PlanServantEditCostumesTabContent } from './plan-servant-edit-costumes-tab-content.component';
 import { PlanServantEditEnhancementsTabContent } from './plan-servant-edit-enhancements-tab-content.component';
@@ -22,7 +21,7 @@ type Props = {
     readonly?: boolean;
     servantSelectDisabled?: boolean;
     showAppendSkills?: boolean;
-    unlockedCostumes: ReadonlyArray<number>;
+    targetCostumes: ReadonlyArray<number>;
 };
 
 type TabId = 'current' | 'target' | 'costumes';
@@ -75,7 +74,8 @@ export const PlanServantEdit = React.memo((props: Props) => {
         planServants,
         readonly,
         servantSelectDisabled,
-        showAppendSkills
+        showAppendSkills,
+        targetCostumes
     } = props;
 
     /**
@@ -116,8 +116,10 @@ export const PlanServantEdit = React.memo((props: Props) => {
         if (!gameServantMap) {
             return;
         }
-        const availableServants = PlanServantUtils.findAvailableServants(planServants, masterServants);
-        setAvailableServants(availableServants);
+        // FIXME Pass this as a prop instead.
+
+        // const availableServants = PlanServantUtils.findAvailableServants(planServants, masterServants);
+        // setAvailableServants(availableServants);
     }, [gameServantMap, masterServants, planServants]);
 
     
@@ -128,8 +130,8 @@ export const PlanServantEdit = React.memo((props: Props) => {
             return;
         }
         const { gameId, instanceId } = value;
-        PlanServantUtils.updateEnhancements(planServant.current, value);
         planServant.instanceId = instanceId;
+        // FIXME Need to keep track of the current master servant.
         setMasterServant(value);
         if (gameServant?._id !== gameId) {
             setGameServant(gameServantMap[gameId]);
@@ -159,13 +161,12 @@ export const PlanServantEdit = React.memo((props: Props) => {
         tabsContentNode = (
             <PlanServantEditCostumesTabContent
                 gameServant={gameServant}
-                unlockedCostumes={planServant.current.costumes}
+                targetCostumes={targetCostumes}
             />
         );
     } else {
         tabsContentNode = (
             <PlanServantEditEnhancementsTabContent
-                enhancementSet={activeTab}
                 planServant={planServant}
                 gameServant={gameServant}
                 showAppendSkills={showAppendSkills}

@@ -1,5 +1,5 @@
 import { DateTimeUtils } from '@fgo-planner/common-core';
-import { MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateIndeterminate as Indeterminate, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, TextField, TextFieldProps } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';

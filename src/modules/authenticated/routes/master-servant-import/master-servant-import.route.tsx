@@ -1,5 +1,5 @@
 import { Array2D, Immutable, ImmutableRecord, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { FgoManagerDataImport, MasterAccountImportData } from '@fgo-planner/transform-core';
 import { Options } from 'csv-parse';
 import { parse } from 'csv-parse/sync';

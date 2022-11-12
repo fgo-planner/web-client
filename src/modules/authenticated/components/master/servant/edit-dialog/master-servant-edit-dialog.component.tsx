@@ -1,5 +1,5 @@
 import { ReadonlyRecord } from '@fgo-planner/common-core';
-import { ImmutableMasterServant, MasterServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
+import { ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogTitle, PaperProps, SxProps, Typography } from '@mui/material';
 import { Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
@@ -11,7 +11,7 @@ import { MasterServantEditDialogContent, MasterServantEditTab } from './master-s
 
 type Props = {
     activeTab: MasterServantEditTab;
-    bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
+    bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
     /**
      * The update payload for editing. This will be modified directly, so provide a
      * clone if modification to the original object is not desired.

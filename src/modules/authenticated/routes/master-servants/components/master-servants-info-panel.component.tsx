@@ -1,5 +1,5 @@
 import { ReadonlyIterable } from '@fgo-planner/common-core';
-import { GameServantClass, GameServantConstants, ImmutableMasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
+import { GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import { IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -16,7 +16,7 @@ import { ComputationOptions, PlanComputationUtils } from '../../../../../utils/p
 
 type Props = {
     activeServants: ReadonlyArray<ImmutableMasterServant>;
-    bondLevels: Record<number, MasterServantBondLevel>;
+    bondLevels: Record<number, InstantiatedServantBondLevel>;
     editMode?: boolean;
     keepChildrenMounted?: boolean;
     onOpenToggle: () => void;
@@ -64,7 +64,7 @@ const renderNpLevel = (activeServant: ImmutableMasterServant): string | number =
     return summoned ? npLevel : 'Not summoned';
 };
 
-const renderBondLevel = (bond?: MasterServantBondLevel): JSX.Element => {
+const renderBondLevel = (bond?: InstantiatedServantBondLevel): JSX.Element => {
     if (bond == null) {
         return (
             <div className={`${StyleClassPrefix}-bond-level-stat`}>

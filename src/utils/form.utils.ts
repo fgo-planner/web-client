@@ -1,4 +1,4 @@
-import { MasterServantUtils } from '@fgo-planner/data-core';
+import { InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { FormikErrors, FormikTouched } from 'formik';
 import lodash from 'lodash-es';
 
@@ -68,7 +68,7 @@ export class FormUtils {
             return undefined;
         }
         const value = Number(input);
-        return MasterServantUtils.roundToNearestValidFouValue(value);
+        return InstantiatedServantUtils.roundToNearestValidFouValue(value);
     }
 
     static assignValue<T>(object: NonNullable<T>, path: string, value: string | number | undefined): T {

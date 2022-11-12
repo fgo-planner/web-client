@@ -1,5 +1,5 @@
-import { ReadonlyPartial, ReadonlyRecord, SetUtils } from '@fgo-planner/common-core';
-import { ImmutableMasterServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
+import { CollectionUtils, ReadonlyPartial, ReadonlyRecord } from '@fgo-planner/common-core';
+import { ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';
@@ -15,7 +15,7 @@ import { MasterServantListRow } from './master-servant-list-row.component';
 import { MasterServantListStyle, StyleClassPrefix } from './master-servant-list.style';
 
 type Props = {
-    bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
+    bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
     /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
      * rearrange the default ordering of the list. As such, when in drag-drop mode,
@@ -67,7 +67,7 @@ export const MasterServantList = React.memo((props: Props) => {
         onRowDoubleClick,
         onSelectionChange,
         onSortChange,
-        selectedInstanceIds = SetUtils.emptySet(),
+        selectedInstanceIds = CollectionUtils.emptySet(),
         showHeader,
         showUnsummonedServants,
         sortOptions,
@@ -154,7 +154,7 @@ export const MasterServantList = React.memo((props: Props) => {
     } = useMultiSelectHelperForMouseEvent(
         masterServantsProcessed,
         selectedInstanceIds,
-        MasterServantUtils.getInstanceId,
+        InstantiatedServantUtils.getInstanceId,
         {
             disabled: dragDropMode,
             rightClickAction: 'contextmenu'

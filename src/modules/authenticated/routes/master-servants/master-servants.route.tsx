@@ -1,4 +1,4 @@
-import { ExistingMasterServantUpdate, ExistingMasterServantUpdateType, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdateType } from '@fgo-planner/data-core';
+import { ExistingMasterServantUpdate, ExistingMasterServantUpdateType, ImmutableMasterServant, MasterServantUpdate, MasterServantUpdateUtils, NewMasterServantUpdateType, InstantiatedServantUpdateUtils, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -17,7 +17,7 @@ import { MasterServantEditDialog } from '../../components/master/servant/edit-di
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
-import { MasterAccountDataEditHookOptions, useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
+import { useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterServantsFilter, MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
 import { MasterServantsInfoPanel } from './components/master-servants-info-panel.component';
 import { MasterServantsListRowContextMenu } from './components/master-servants-list-row-context-menu.component';
@@ -29,11 +29,6 @@ import { useMasterServantsUserPreferencesHook } from './hooks/use-master-servant
 type MasterServantsContextMenu = 
     'header' |
     'row';
-
-const MasterAccountDataEditOptions: MasterAccountDataEditHookOptions = {
-    includeCostumes: true,
-    includeServants: true
-};
 
 const StyleClassPrefix = 'MasterServants';
 
@@ -94,10 +89,8 @@ export const MasterServantsRoute = React.memo(() => {
     const gameServantMap = useGameServantMap();
 
     const {
-        masterAccountId,
         isDataDirty,
         masterAccountEditData,
-        // updateCostumes,
         addServant,
         addServants,
         updateServants,
@@ -105,14 +98,17 @@ export const MasterServantsRoute = React.memo(() => {
         deleteServants,
         revertChanges,
         persistChanges
-    } = useMasterAccountDataEditHook(MasterAccountDataEditOptions);
+    } = useMasterAccountDataEditHook({
+        includeCostumes: true,
+        includeServants: true
+    });
 
     const {
         dragDropData,
         startDragDrop,
         endDragDrop,
         handleDragOrderChange
-    } = useDragDropHelper(MasterServantUtils.getInstanceId);
+    } = useDragDropHelper<ImmutableMasterServant>(InstantiatedServantUtils.getInstanceId);
 
     /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
@@ -133,7 +129,7 @@ export const MasterServantsRoute = React.memo(() => {
         toggleFilters,
         toggleInfoPanelOpen,
         toggleShowUnsummonedServants
-    } = useMasterServantsUserPreferencesHook(masterAccountId);
+    } = useMasterServantsUserPreferencesHook();
 
     const {
         activeContextMenu,
@@ -299,7 +295,7 @@ export const MasterServantsRoute = React.memo(() => {
     const handleMultiAddServant = openMultiAddServantDialog;
 
     const handleDragDropActivate = useCallback(() => {
-        /*
+        /**
          * Deselect servants...servant selection is not allowed in drag-drop mode.
          */
         deselectAllServants();
@@ -395,7 +391,7 @@ export const MasterServantsRoute = React.memo(() => {
     const handleMultiAddServantDialogClose = useCallback((_event: any, _reason: any, data?: MultiAddServantData): void => {
         if (data && data.gameIds.length) {
             const servantData = MasterServantUpdateUtils.createNew();
-            servantData.summoned = MasterServantUpdateUtils.convertBoolean(data.summoned);
+            servantData.summoned = InstantiatedServantUpdateUtils.fromBoolean(data.summoned);
             addServants(data.gameIds, servantData);
         }
         setIsMultiAddServantDialogOpen(false);

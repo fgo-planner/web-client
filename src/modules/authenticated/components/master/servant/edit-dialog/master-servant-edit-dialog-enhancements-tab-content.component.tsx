@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, MasterServantAscensionLevel, MasterServantSkillLevel, MasterServantUpdate, MasterServantUpdateNumber } from '@fgo-planner/data-core';
+import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantSkillLevel, MasterServantUpdate, InstantiatedServantUpdateNumber } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
@@ -87,7 +87,7 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
 
     const handleLevelAscensionInputChange = useCallback((_: any, level: string, ascension: string): void => {
         masterServantUpdate.level = Number(level);
-        masterServantUpdate.ascension = Number(ascension) as MasterServantAscensionLevel;
+        masterServantUpdate.ascension = Number(ascension) as InstantiatedServantAscensionLevel;
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
@@ -95,7 +95,7 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
         if (!value) {
             masterServantUpdate[skillSet][slot] = null;
         } else {
-            const skillLevel = Number(value) as MasterServantUpdateNumber<MasterServantSkillLevel>;
+            const skillLevel = Number(value) as InstantiatedServantUpdateNumber<InstantiatedServantSkillLevel>;
             masterServantUpdate[skillSet][slot] = skillLevel;
         }
         forceUpdate();
@@ -114,7 +114,7 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
         forceUpdate();
     }, [forceUpdate]);
 
-    const handleLevelQuickToggleClick = useCallback((level: number, ascension: MasterServantAscensionLevel): void => {
+    const handleLevelQuickToggleClick = useCallback((level: number, ascension: InstantiatedServantAscensionLevel): void => {
         if (masterServantUpdate.ascension === ascension && masterServantUpdate.level === level) {
             return;
         }
@@ -134,7 +134,7 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleSkillQuickToggleClick = useCallback((value: MasterServantSkillLevel | null, stat: 'skills' | 'appendSkills'): void => {
+    const handleSkillQuickToggleClick = useCallback((value: InstantiatedServantSkillLevel | null, stat: 'skills' | 'appendSkills'): void => {
         const skillSet = masterServantUpdate[stat];
         if (skillSet[1] === value && skillSet[2] === value && skillSet[3] === value) {
             return;

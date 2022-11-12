@@ -1,4 +1,4 @@
-import { ImmutableArray, Nullable, SetUtils } from '@fgo-planner/common-core';
+import { ImmutableArray, Nullable, CollectionUtils } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { useMemo } from 'react';
@@ -44,7 +44,7 @@ export const useGameServantCostumeList = (gameServants: Nullable<ImmutableArray<
 
     const alwaysUnlockedIds = useMemo((): ReadonlySet<number> => {
         if (!costumeList.length) {
-            return SetUtils.emptySet();
+            return CollectionUtils.emptySet();
         }
         const result = costumeList
             .filter(alwaysUnlockedFilter)

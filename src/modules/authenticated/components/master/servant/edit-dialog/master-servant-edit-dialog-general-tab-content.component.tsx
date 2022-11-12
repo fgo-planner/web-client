@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantUpdate, MasterServantUpdateBoolean, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateNumber } from '@fgo-planner/data-core';
+import { GameServant, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateIndeterminate as Indeterminate, InstantiatedServantUpdateNumber, InstantiatedServantBondLevel, InstantiatedServantNoblePhantasmLevel, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
@@ -70,17 +70,17 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
         if (!value) {
             masterServantUpdate.bondLevel = null;
         } else {
-            masterServantUpdate.bondLevel = Number(value) as MasterServantUpdateNumber<MasterServantBondLevel>;
+            masterServantUpdate.bondLevel = Number(value) as InstantiatedServantUpdateNumber<InstantiatedServantBondLevel>;
         }
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
     const handleNpInputChange = useCallback((_name: string, value: string): void => {
-        masterServantUpdate.np = Number(value) as MasterServantUpdateNumber<MasterServantNoblePhantasmLevel>;
+        masterServantUpdate.np = Number(value) as InstantiatedServantUpdateNumber<InstantiatedServantNoblePhantasmLevel>;
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleSummonedCheckboxChange = useCallback((_name: string, value: MasterServantUpdateBoolean): void => {
+    const handleSummonedCheckboxChange = useCallback((_name: string, value: InstantiatedServantUpdateBoolean): void => {
         masterServantUpdate.summoned = value;
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);

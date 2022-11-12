@@ -25,7 +25,7 @@ type Props = {
     servantSelectDisabled?: boolean;
     showAppendSkills?: boolean;
     submitButtonLabel?: string;
-    unlockedCostumes: ReadonlyArray<number>;
+    targetCostumes: ReadonlyArray<number>;
 } & Omit<DialogComponentProps<DialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const DialogWidth = 640;
@@ -48,7 +48,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
         servantSelectDisabled,
         showAppendSkills,
         submitButtonLabel,
-        unlockedCostumes,
+        targetCostumes,
         onClose,
         ...dialogProps
     } = props;
@@ -92,7 +92,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
                         planServant={planServant!}
                         planServants={planServants}
                         showAppendSkills={showAppendSkills}
-                        unlockedCostumes={unlockedCostumes}
+                        targetCostumes={targetCostumes}
                         servantSelectDisabled={servantSelectDisabled}
                     />
                 </DialogContent>

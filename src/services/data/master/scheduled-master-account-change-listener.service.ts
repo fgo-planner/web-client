@@ -1,4 +1,4 @@
-import { ArrayUtils, Nullable, ObjectUtils } from '@fgo-planner/common-core';
+import { CollectionUtils, Nullable, ObjectUtils } from '@fgo-planner/common-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { BasicMasterAccounts, MasterAccountChange, MasterAccountChanges } from '../../../types/data';
@@ -71,9 +71,9 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
         if (!currentAccounts.length && !updatedAccounts.length) {
             return {};
         } else if (!currentAccounts.length) {
-            return ArrayUtils.mapArrayToObject(updatedAccounts, account => account._id, () => 'Created');
+            return CollectionUtils.mapIterableToObject(updatedAccounts, account => account._id, () => 'Created');
         } else if (!updatedAccounts.length) {
-            return ArrayUtils.mapArrayToObject(currentAccounts, account => account._id, () => 'Deleted');
+            return CollectionUtils.mapIterableToObject(currentAccounts, account => account._id, () => 'Deleted');
         }
 
         const result = {} as Record<string, MasterAccountChange>;

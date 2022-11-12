@@ -1,4 +1,4 @@
-import { PlanServantEnhancements } from '@fgo-planner/data-core';
+import { InstantiatedServantEnhancements } from '@fgo-planner/data-core';
 import { PlanEnhancementRequirements } from './plan-enhancement-requirements.type';
 
 /**
@@ -13,13 +13,13 @@ export type PlanServantRequirements = {
      * user. Computed based on master servant data and/or previous plans in the
      * group.
      */
-    current: PlanServantEnhancements;
+    current: InstantiatedServantEnhancements;
     /**
      * Effective target skills. This may differ actual current skills set by the
      * user. Computed based on master servant data and/or previous plans in the
      * group.
      */
-    target: PlanServantEnhancements;
+    target: InstantiatedServantEnhancements;
     /**
      * Requirements for enhancing the servant only for the target plan.
      */

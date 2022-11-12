@@ -1,4 +1,4 @@
-import { MasterServantUpdateBoolean, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateBoolean, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { MouseEvent, useCallback } from 'react';
@@ -8,8 +8,8 @@ type Props = {
     label?: string;
     multiEditMode?: boolean;
     name: string;
-    onChange: (name: string, value: MasterServantUpdateBoolean, pushChanges: boolean) => void;
-    value: MasterServantUpdateBoolean;
+    onChange: (name: string, value: InstantiatedServantUpdateBoolean, pushChanges: boolean) => void;
+    value: InstantiatedServantUpdateBoolean;
 };
 
 const DefaultLabel = 'Servant is summoned';
@@ -46,16 +46,16 @@ export const MasterServantSummonedCheckbox = React.memo((props: Props) => {
          * `multiEditMode` is falsy: `false` -> `true`
          */
         /** */
-        let nextValue: MasterServantUpdateBoolean;
+        let nextValue: InstantiatedServantUpdateBoolean;
         switch (value) {
-            case MasterServantUpdateBoolean.True:
-                nextValue = multiEditMode ? MasterServantUpdateBoolean.Indeterminate : MasterServantUpdateBoolean.False;
+            case InstantiatedServantUpdateBoolean.True:
+                nextValue = multiEditMode ? InstantiatedServantUpdateBoolean.Indeterminate : InstantiatedServantUpdateBoolean.False;
                 break;
-            case MasterServantUpdateBoolean.False:
-                nextValue = MasterServantUpdateBoolean.True;
+            case InstantiatedServantUpdateBoolean.False:
+                nextValue = InstantiatedServantUpdateBoolean.True;
                 break;
             default:
-                nextValue = multiEditMode ? MasterServantUpdateBoolean.False : MasterServantUpdateBoolean.True;
+                nextValue = multiEditMode ? InstantiatedServantUpdateBoolean.False : InstantiatedServantUpdateBoolean.True;
                 break;
         }
         onChange(name, nextValue, true);

@@ -1,4 +1,4 @@
-import { MasterServantAscensionLevel, MasterServantConstants } from '@fgo-planner/data-core';
+import { InstantiatedServantAscensionLevel, InstantiatedServantConstants } from '@fgo-planner/data-core';
 import { WineBarOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
@@ -13,7 +13,7 @@ type Props = {
      * The servant's natural max level.
      */
     maxNaturalLevel: number;
-    onClick: (level: number, ascension: MasterServantAscensionLevel) => void;
+    onClick: (level: number, ascension: InstantiatedServantAscensionLevel) => void;
 } & Pick<ComponentStyleProps, 'className'>;
 
 const StyleClassPrefix = 'ServantLevelQuickToggleButtons';
@@ -32,15 +32,15 @@ export const ServantLevelQuickToggleButtons = React.memo((props: Props) => {
     } = props;
 
     const handleLeftButtonClick = useCallback((): void => {
-        onClick(MasterServantConstants.MinLevel, MasterServantConstants.MinAscensionLevel);
+        onClick(InstantiatedServantConstants.MinLevel, InstantiatedServantConstants.MinAscensionLevel);
     }, [onClick]);
 
     const handleCenterButtonClick = useCallback((): void => {
-        onClick(maxNaturalLevel, MasterServantConstants.MaxAscensionLevel);
+        onClick(maxNaturalLevel, InstantiatedServantConstants.MaxAscensionLevel);
     }, [onClick, maxNaturalLevel]);
 
     const handleRightButtonClick = useCallback((): void => {
-        onClick(100, MasterServantConstants.MaxAscensionLevel);
+        onClick(100, InstantiatedServantConstants.MaxAscensionLevel);
     }, [onClick]);
 
     return (
@@ -51,7 +51,7 @@ export const ServantLevelQuickToggleButtons = React.memo((props: Props) => {
 
             // Left button
             leftButtonIcon={<IconButtonText children={1} />}
-            leftButtonTooltip={`Set level to ${MasterServantConstants.MinLevel}`}
+            leftButtonTooltip={`Set level to ${InstantiatedServantConstants.MinLevel}`}
             onLeftButtonClick={handleLeftButtonClick}
 
             // Center button

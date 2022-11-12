@@ -5,7 +5,7 @@ import React from 'react';
 type Props = {
     gameServant: Immutable<GameServant>;
     onChange?: (values: Array<number>) => void;
-    unlockedCostumes: Array<number>;
+    targetCostumes: ReadonlyArray<number>;
 };
 
 export const PlanServantEditCostumesTabContent = React.memo((props: Props) => {

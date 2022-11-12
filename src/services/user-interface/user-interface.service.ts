@@ -1,4 +1,4 @@
-import { MapUtils } from '@fgo-planner/common-core';
+import { CollectionUtils } from '@fgo-planner/common-core';
 import { Subject } from 'rxjs';
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
 import { GlobalDialog, NavigationBlockerDialogOptions } from '../../types/internal';
@@ -51,7 +51,7 @@ export class UserInterfaceService {
      */
     requestLock(feature: LockableFeature): string {
         const lockId = this._generateLockId();
-        const lockIdSet = MapUtils.getOrDefault(this._LockIdSets, feature, () => new Set());
+        const lockIdSet = CollectionUtils.getOrDefault(this._LockIdSets, feature, () => new Set());
         lockIdSet.add(lockId);
         if (!this._LockableFeaturesStates.get(feature)) {
             this._LockableFeaturesStates.set(feature, true);

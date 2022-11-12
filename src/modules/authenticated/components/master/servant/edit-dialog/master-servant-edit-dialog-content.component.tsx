@@ -1,5 +1,5 @@
 import { Immutable, ImmutableArray, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, MasterServantBondLevel, MasterServantUpdate, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUtils, NewMasterServantUpdateType } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { alpha, DialogContent, Tab, Tabs, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
@@ -14,7 +14,7 @@ export type MasterServantEditTab = 'general' | 'enhancements' | 'costumes';
 
 type Props = {
     activeTab: MasterServantEditTab;
-    bondLevels: ReadonlyRecord<number, MasterServantBondLevel>;
+    bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
     /**
      * The update payload for editing. This will be modified directly, so provide a
      * clone if modification to the original object is not desired.
@@ -149,7 +149,7 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
          */
         const { ascension, level } = masterServantUpdate;
         if (level !== IndeterminateValue && ascension !== IndeterminateValue) {
-            masterServantUpdate.level = MasterServantUtils.roundToNearestValidLevel(ascension, level, gameServant);
+            masterServantUpdate.level = InstantiatedServantUtils.roundToNearestValidLevel(ascension, level, gameServant.maxLevel);
         }
         /**
          * Also update the bond level.

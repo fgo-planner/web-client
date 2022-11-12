@@ -1,5 +1,5 @@
-import { ImmutableArray, SetUtils } from '@fgo-planner/common-core';
-import { GameServant, MasterServantUpdate, MasterServantUpdateBoolean } from '@fgo-planner/data-core';
+import { CollectionUtils, ImmutableArray } from '@fgo-planner/common-core';
+import { GameServant, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -15,13 +15,15 @@ type Props = {
     masterServantUpdate: MasterServantUpdate;
 };
 
-const transformUnlockedCostumes = (unlockedCostumes: Map<number, MasterServantUpdateBoolean>): Set<number> => {
+/**
+ * TODO Move this to utils?
+ */
+const transformCostumes = (unlockedCostumes: Map<number, boolean>): Set<number> => {
     const result = new Set<number>();
     for (const [key, value] of unlockedCostumes.entries()) {
-        if (!value) {
-            continue;
+        if (value) {
+            result.add(key);
         }
-        result.add(key);
     }
     return result;
 };
@@ -47,23 +49,23 @@ export const MasterServantEditDialogCostumesTabContent = React.memo((props: Prop
         }
     } = props;
 
-    const [selectedCostumeIds, setSelectedCostumeIds] = useState<ReadonlySet<number>>(() => transformUnlockedCostumes(unlockedCostumes));
+    const [selectedCostumeIds, setSelectedCostumeIds] = useState<ReadonlySet<number>>(() => transformCostumes(unlockedCostumes));
 
     useEffect((): void => {
-        setSelectedCostumeIds(transformUnlockedCostumes(unlockedCostumes));
+        setSelectedCostumeIds(transformCostumes(unlockedCostumes));
     }, [unlockedCostumes]);
 
     const handleSelectionChange = useCallback((selectedCostumeIds: ReadonlySet<number>): void => {
         setSelectedCostumeIds(prevSelectedCostumeIds => {
-            if (SetUtils.isEqual(prevSelectedCostumeIds, selectedCostumeIds)) {
+            if (CollectionUtils.isSetsEqual(prevSelectedCostumeIds, selectedCostumeIds)) {
                 return prevSelectedCostumeIds;
             }
             for (const costumeId of selectedCostumeIds) {
-                unlockedCostumes.set(costumeId, MasterServantUpdateBoolean.True);
+                unlockedCostumes.set(costumeId, true);
             }
             for (const costumeId of unlockedCostumes.keys()) {
                 if (!selectedCostumeIds.has(costumeId)) {
-                    unlockedCostumes.set(costumeId, MasterServantUpdateBoolean.False);
+                    unlockedCostumes.set(costumeId, false);
                 }
             }
             return selectedCostumeIds;

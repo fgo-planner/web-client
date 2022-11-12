@@ -1,5 +1,5 @@
 import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
-import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, MasterServant, MasterServantConstants } from '@fgo-planner/data-core';
+import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantConstants, MasterServant } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { GameServantMap, GameSoundtrackList } from '../../../../types/data';
 
@@ -164,7 +164,7 @@ function _updateForServantSkills(
          * Exclude debt computation for the last skill level if `includeLores` is set to
          * false.
          */
-        const excludeDebt = !includeLores && skillLevel === MasterServantConstants.MaxSkillLevel - 1;
+        const excludeDebt = !includeLores && skillLevel === InstantiatedServantConstants.MaxSkillLevel - 1;
 
         _updateForServantEnhancement(stats, skill, 3, skillUpgradeCount, excludeDebt);
     }

@@ -1,5 +1,5 @@
 import { Immutable, Nullable } from '@fgo-planner/common-core';
-import { GameServant, GameServantClass, MasterServantConstants, GameServantRarity, MasterAccount, MasterServant, MasterServantAscensionLevel, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantSkillLevel } from '@fgo-planner/data-core';
+import { GameServant, GameServantClass, GameServantRarity, InstantiatedServantAscensionLevel, InstantiatedServantBondLevel, InstantiatedServantConstants, InstantiatedServantNoblePhantasmLevel, InstantiatedServantSkillLevel, MasterAccount, MasterServant } from '@fgo-planner/data-core';
 import { GameServantClassSimplified, GameServantMap } from '../../../../types/data';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 
@@ -14,15 +14,15 @@ type MasterServantStatGroupedByClass = {
 export type MasterServantStats<T> = {
     totalCount: T;
     uniqueCount: T;
-    npLevels: Record<MasterServantNoblePhantasmLevel | 'total', T>;
+    npLevels: Record<InstantiatedServantNoblePhantasmLevel | 'total', T>;
     averageNpLevel: T;
-    ascensionLevels: Record<MasterServantAscensionLevel, T>;
+    ascensionLevels: Record<InstantiatedServantAscensionLevel, T>;
     averageAscensionLevel: T;
-    skillLevels: Record<MasterServantSkillLevel | 0, T>;
+    skillLevels: Record<InstantiatedServantSkillLevel | 0, T>;
     tripleNineSkillsCount: T;
     tripleTenSkillsCount: T;
     averageSkillLevel: T;
-    appendSkillLevels: Record<MasterServantSkillLevel | 0, T>;
+    appendSkillLevels: Record<InstantiatedServantSkillLevel | 0, T>;
     tripleNineAppendSkillsCount: T;
     tripleTenAppendSkillsCount: T;
     averageAppendSkillLevel: T;
@@ -34,7 +34,7 @@ export type MasterServantStats<T> = {
     doubleMaxGoldFouCount: T;
     fouValuesCount: T; // For computing the average; undefined values are excluded
     averageFou: T;
-    bondLevels: Record<MasterServantBondLevel, T>;
+    bondLevels: Record<InstantiatedServantBondLevel, T>;
     bondLevelValuesCount: T; // For computing the average; undefined values are excluded
     averageBondLevel: T;
 };
@@ -191,7 +191,7 @@ export class MasterServantStatsUtils {
         stats: MasterServantStats<T>,
         statKey: Partial<keyof T>,
         masterServant: MasterServant,
-        bondLevelMap: Record<number, MasterServantBondLevel>,
+        bondLevelMap: Record<number, InstantiatedServantBondLevel>,
         isUnique: boolean
     ): void {
 
@@ -367,7 +367,7 @@ export class MasterServantStatsUtils {
     private static _populateBondStats<T extends Record<string, number>>(
         stats: MasterServantStats<T>,
         statKey: string,
-        bond: Nullable<MasterServantBondLevel>
+        bond: Nullable<InstantiatedServantBondLevel>
     ): void {
 
         if (bond == null) {
@@ -421,7 +421,7 @@ export class MasterServantStatsUtils {
                  * Average ascension level stats
                  */
                 let totalAscensionLevels = 0;
-                for (const level of MasterServantConstants.AscensionLevels) {
+                for (const level of InstantiatedServantConstants.AscensionLevels) {
                     if (level === 0) {
                         continue;
                     }
@@ -433,7 +433,7 @@ export class MasterServantStatsUtils {
                  * Average skill level stats
                  */
                 let totalSkillLevels = 0;
-                for (const level of MasterServantConstants.SkillLevels) {
+                for (const level of InstantiatedServantConstants.SkillLevels) {
                     totalSkillLevels += skillLevels[level][key] * level;
                 }
                 averageSkillLevel[key] = totalSkillLevels / (count * 3);
@@ -442,7 +442,7 @@ export class MasterServantStatsUtils {
                 * Average skill level stats
                 */
                 let totalAppendSkillLevels = 0;
-                for (const level of MasterServantConstants.SkillLevels) {
+                for (const level of InstantiatedServantConstants.SkillLevels) {
                     totalAppendSkillLevels += appendSkillLevels[level][key] * level;
                 }
                 averageAppendSkillLevel[key] = totalAppendSkillLevels / (count * 3);
@@ -462,7 +462,7 @@ export class MasterServantStatsUtils {
             count = bondLevelValuesCount[key];
             if (count !== 0) {
                 let totalBondLevels = 0;
-                for (const level of MasterServantConstants.BondLevels) {
+                for (const level of InstantiatedServantConstants.BondLevels) {
                     totalBondLevels += bondLevels[level][key] * level;
                 }
                 averageBondLevel[key] = totalBondLevels / bondLevelValuesCount[key];

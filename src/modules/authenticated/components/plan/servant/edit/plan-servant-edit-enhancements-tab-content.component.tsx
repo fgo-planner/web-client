@@ -1,8 +1,8 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, MasterServantAscensionLevel, MasterServantSkillLevel, PlanServant, PlanServantEnhancements } from '@fgo-planner/data-core';
+import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantSkillLevel, PlanServant } from '@fgo-planner/data-core';
 import { Checkbox, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { ChangeEvent, FocusEvent, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { ServantAscensionInputField } from '../../../../../../components/input/servant/servant-ascension-input-field.component';
 import { ServantFouInputField } from '../../../../../../components/input/servant/servant-fou-input-field.component';
@@ -14,7 +14,6 @@ import { ServantSkillQuickToggleButtons } from '../../../../../../components/inp
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 
 type Props = {
-    enhancementSet: 'current' | 'target';
     /**
      * The game data for the planned servant that is being edited.
      */
@@ -23,8 +22,11 @@ type Props = {
     /**
      * The planned servant that is being edited. This will be modified directly, so
      * provide a clone if modification to the original object is not desired.
+     * 
+     * @deprecated
      */
     planServant: PlanServant;
+    // planServantUpdate: PlanServantUpdate;
     readonly?: boolean;
     showAppendSkills?: boolean;
 };
@@ -76,23 +78,13 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const forceUpdate = useForceUpdate();
 
     const {
-        enhancementSet,
         gameServant,
         onChange,
         planServant,
+        // planServantUpdate,
         readonly,
         showAppendSkills
     } = props;
-
-    const [enhancements, setEnhancements] = useState<PlanServantEnhancements>(() => planServant[enhancementSet]);
-
-    /*
-     * Update the `enhancements` state if the `enhancementSet` or `planServant` has
-     * changed.
-     */
-    useEffect(() => {
-        setEnhancements(planServant[enhancementSet]);
-    }, [enhancementSet, planServant]);
 
     /**
      * Notifies the parent component of stats change by invoking the `onChange`
@@ -113,34 +105,34 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     }, [forceUpdate, planServant, pushStatsChange]);
 
     const handleLevelAscensionInputChange = useCallback((_name: string, level: string, ascension: string, pushChanges = false): void => {
-        enhancements.level = Number(level);
-        enhancements.ascension = Number(ascension) as MasterServantAscensionLevel;
+        planServant.level = Number(level);
+        planServant.ascension = Number(ascension) as InstantiatedServantAscensionLevel;
         if (pushChanges) {
             pushStatsChange();
         }
         forceUpdate();
-    }, [enhancements, forceUpdate, pushStatsChange]);
+    }, [forceUpdate, planServant, pushStatsChange]);
 
     const handleSkillInputChange = useCallback((_name: any, set: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
-        enhancements[set][slot] = value ? Number(value) as MasterServantSkillLevel : undefined;
+        planServant[set][slot] = value ? Number(value) as InstantiatedServantSkillLevel : undefined;
         if (pushChanges) {
             pushStatsChange();
         }
         forceUpdate();
-    }, [enhancements, forceUpdate, pushStatsChange]);
+    }, [forceUpdate, planServant, pushStatsChange]);
 
     const handleFouInputChange = useCallback((_: string, stat: FouStat, value: string): void => {
-        enhancements[stat] = value ? Number(value) : undefined;
+        planServant[stat] = value ? Number(value) : undefined;
         forceUpdate();
-    }, [enhancements, forceUpdate]);
+    }, [forceUpdate, planServant]);
 
     const handleInputBlurEvent = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         pushStatsChange();
         forceUpdate();
     }, [forceUpdate, pushStatsChange]);
 
-    const handleLevelQuickToggleClick = useCallback((level: number, ascension: MasterServantAscensionLevel): void => {
-        if (enhancements.ascension === ascension && enhancements.level === level) {
+    const handleLevelQuickToggleClick = useCallback((level: number, ascension: InstantiatedServantAscensionLevel): void => {
+        if (planServant.ascension === ascension && planServant.level === level) {
             return;
         }
         handleLevelAscensionInputChange(
@@ -149,20 +141,21 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             String(ascension),
             true
         );
-    }, [enhancements, handleLevelAscensionInputChange]);
+    }, [handleLevelAscensionInputChange, planServant.ascension, planServant.level]);
 
     const handleFouQuickToggleClick = useCallback((value: number): void => {
-        if (enhancements.fouHp === value && enhancements.fouAtk === value) {
+        if (planServant.fouHp === value && planServant.fouAtk === value) {
             return;
         }
-        enhancements.fouHp = value;
-        enhancements.fouAtk = value;
+        planServant.fouHp = value;
+        planServant.fouAtk = value;
         pushStatsChange();
         forceUpdate();
-    }, [enhancements, forceUpdate, pushStatsChange]);
+    }, [forceUpdate, planServant, pushStatsChange]);
 
-    const handleSkillQuickToggleClick = useCallback((value: MasterServantSkillLevel | null, stat: 'skills' | 'appendSkills'): void => {
-        const skillSet = enhancements[stat];
+    // eslint-disable-next-line max-len
+    const handleSkillQuickToggleClick = useCallback((value: InstantiatedServantSkillLevel | null, stat: 'skills' | 'appendSkills'): void => {
+        const skillSet = planServant[stat];
         const skillLevel = value ?? undefined;
         if (skillSet[1] === skillLevel && skillSet[2] === skillLevel && skillSet[3] === skillLevel) {
             return;
@@ -172,7 +165,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         skillSet[3] = skillLevel;
         pushStatsChange();
         forceUpdate();
-    }, [enhancements, forceUpdate, pushStatsChange]);
+    }, [forceUpdate, planServant, pushStatsChange]);
 
     //#endregion
 
@@ -180,7 +173,6 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     //#region Input fields
 
     const { enabled } = planServant;
-    const disabled = readonly || enhancementSet === 'current';
 
     const enableAscensionsCheckbox = (
         <Tooltip
@@ -191,7 +183,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                 name='ascensions'
                 checked={enabled.ascensions}
                 onChange={handleEnableCheckboxChange}
-                disabled={disabled}
+                disabled={readonly}
             />
         </Tooltip>
     );
@@ -205,7 +197,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                 name='skills'
                 checked={enabled.skills}
                 onChange={handleEnableCheckboxChange}
-                disabled={disabled}
+                disabled={readonly}
             />
         </Tooltip>
     );
@@ -219,134 +211,134 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                 name='appendSkills'
                 checked={enabled.appendSkills}
                 onChange={handleEnableCheckboxChange}
-                disabled={disabled}
+                disabled={readonly}
             />
         </Tooltip>
     );
 
     const levelField = (
         <ServantLevelInputField
-            level={String(enhancements.level || '')}
-            ascension={String(enhancements.level)}
+            level={String(planServant.level || '')}
+            ascension={String(planServant.level)}
             gameServant={gameServant}
             label='Level'
             name='level'
             onChange={handleLevelAscensionInputChange}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
     const ascensionField = (
         <ServantAscensionInputField
-            level={String(enhancements.level || '')}
-            ascension={String(enhancements.ascension)}
+            level={String(planServant.level || '')}
+            ascension={String(planServant.ascension)}
             gameServant={gameServant}
             label='Ascension'
             name='ascension'
             onChange={handleLevelAscensionInputChange}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
     const fouHpField = (
         <ServantFouInputField
-            value={String(enhancements.fouHp ?? '')}
+            value={String(planServant.fouHp ?? '')}
             label='HP Fou'
             name='fouHp'
             stat='fouHp'
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
     const fouAtkField = (
         <ServantFouInputField
-            value={String(enhancements.fouAtk ?? '')}
+            value={String(planServant.fouAtk ?? '')}
             label='ATK Fou'
             name='fouAtk'
             stat='fouAtk'
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
     const skill1Field = (
         <ServantSkillInputField
-            value={String(enhancements.skills[1] || '')}
+            value={String(planServant.skills[1] || '')}
             label='Skill 1'
             name='skill1'
             skillSet='skills'
             slot={1}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
     const skill2Field = (
         <ServantSkillInputField
-            value={String(enhancements.skills[2] || '')}
+            value={String(planServant.skills[2] || '')}
             label='Skill 2'
             name='skill2'
             skillSet='skills'
             slot={2}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
     const skill3Field = (
         <ServantSkillInputField
-            value={String(enhancements.skills[3] || '')}
+            value={String(planServant.skills[3] || '')}
             label='Skill 3'
             name='skill3'
             skillSet='skills'
             slot={3}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
     const appendSkill1Field = (
         <ServantSkillInputField
-            value={String(enhancements.appendSkills[1] || '')}
+            value={String(planServant.appendSkills[1] || '')}
             label='Append 1'
             name='appendSkill1'
             skillSet='appendSkills'
             slot={1}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
     const appendSkill2Field = (
         <ServantSkillInputField
-            value={String(enhancements.appendSkills[2] || '')}
+            value={String(planServant.appendSkills[2] || '')}
             label='Append 2'
             name='appendSkill2'
             skillSet='appendSkills'
             slot={2}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
     const appendSkill3Field = (
         <ServantSkillInputField
-            value={String(enhancements.appendSkills[3] || '')}
+            value={String(planServant.appendSkills[3] || '')}
             label='Append 3'
             name='appendSkill3'
             skillSet='appendSkills'
             slot={3}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={disabled}
+            disabled={readonly}
         />
     );
 
@@ -372,7 +364,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                     maxNaturalLevel={gameServant.maxLevel}
                     onClick={handleLevelQuickToggleClick}
                     ignoreTabNavigation
-                    disabled={disabled}
+                    disabled={readonly}
                 />
             </div>
             <div className={`${StyleClassPrefix}-input-field-group`}>
@@ -390,7 +382,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                     className={`${StyleClassPrefix}-toggle-button-group`}
                     onClick={handleFouQuickToggleClick}
                     ignoreTabNavigation
-                    disabled={disabled}
+                    disabled={readonly}
                 />
             </div>
             <div className={`${StyleClassPrefix}-input-field-group`}>
@@ -414,7 +406,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                     rightToggleTarget={10}
                     ignoreTabNavigation
                     onClick={handleSkillQuickToggleClick}
-                    disabled={disabled}
+                    disabled={readonly}
                 />
             </div>
             {showAppendSkills && (
@@ -439,7 +431,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                         rightToggleTarget={10}
                         ignoreTabNavigation
                         onClick={handleSkillQuickToggleClick}
-                        disabled={disabled}
+                        disabled={readonly}
                     />
                 </div>
             )}

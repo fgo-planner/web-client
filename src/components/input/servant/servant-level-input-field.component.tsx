@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, MasterServantConstants, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, InstantiatedServantConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
 import { FormUtils } from '../../../utils/form.utils';
@@ -28,13 +28,13 @@ const IndeterminateDisplayText = '?';
 
 const InputProps = {
     step: 1,
-    min: MasterServantConstants.MinLevel,
-    max: MasterServantConstants.MaxLevel
+    min: InstantiatedServantConstants.MinLevel,
+    max: InstantiatedServantConstants.MaxLevel
 } as InputBaseComponentProps;
 
 const transformLevelValue = (value: string): number => {
-    const level = FormUtils.convertToInteger(value, MasterServantConstants.MinLevel, MasterServantConstants.MaxLevel);
-    return level || MasterServantConstants.MinLevel;
+    const level = FormUtils.convertToInteger(value, InstantiatedServantConstants.MinLevel, InstantiatedServantConstants.MaxLevel);
+    return level || InstantiatedServantConstants.MinLevel;
 };
 
 /**
@@ -73,8 +73,9 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         if (!value && allowEmpty) {
             return onChange(name, value, ascension, true);
         }
+        const maxLevel = gameServant.maxLevel;
         const updatedLevel = transformLevelValue(value);
-        const updatedAscension = MasterServantUtils.roundToNearestValidAscensionLevel(updatedLevel, Number(ascension), gameServant);
+        const updatedAscension = InstantiatedServantUtils.roundToNearestValidAscensionLevel(updatedLevel, Number(ascension), maxLevel);
         onChange(name, String(updatedLevel), String(updatedAscension), true);
     }, [allowEmpty, ascension, gameServant, name, onChange]);
 

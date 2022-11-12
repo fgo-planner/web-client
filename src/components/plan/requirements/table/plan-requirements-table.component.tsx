@@ -1,4 +1,4 @@
-import { ArrayUtils, Immutable } from '@fgo-planner/common-core';
+import { CollectionUtils, Immutable } from '@fgo-planner/common-core';
 import { GameItemConstants, ImmutableMasterAccount, Plan, PlanServant } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
@@ -105,7 +105,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     } = props;
 
     const masterServantMap = useMemo(() => {
-        return ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
+        return CollectionUtils.mapIterableToObject(masterAccount.servants, servant => servant.instanceId);
     }, [masterAccount]);
 
     const displayedItems = useMemo((): Array<number> => {

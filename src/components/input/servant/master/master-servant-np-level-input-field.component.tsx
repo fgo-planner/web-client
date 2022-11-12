@@ -1,4 +1,4 @@
-import { MasterServantConstants, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
+import { InstantiatedServantConstants, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
 
@@ -57,7 +57,7 @@ export const MasterServantNpLevelInputField = React.memo((props: Props) => {
                 disabled={disabled}
             >
                 {multiEditMode && <option key={IndeterminateValue} value={IndeterminateValue}>{IndeterminateDisplayText}</option>}
-                {MasterServantConstants.NoblePhantasmLevels.map(value => (
+                {InstantiatedServantConstants.NoblePhantasmLevels.map(value => (
                     <option key={value} value={value}>
                         {value}
                     </option>

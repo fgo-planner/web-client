@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, MasterServantConstants, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, InstantiatedServantConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
 import React, { useCallback } from 'react';
 
@@ -54,7 +54,8 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
             return;
         }
         const { value } = event.target;
-        const updatedLevel = MasterServantUtils.roundToNearestValidLevel(Number(value), Number(level), gameServant);
+        const maxLevel = gameServant.maxLevel;
+        const updatedLevel = InstantiatedServantUtils.roundToNearestValidLevel(Number(value), Number(level), maxLevel);
         onChange(name, String(updatedLevel), value, true);
     }, [gameServant, level, name, onChange]);
 
@@ -90,7 +91,7 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
                 disabled={disabled}
             >
                 {allowEmpty && <option value=''>{'\u2014'}</option>}
-                {MasterServantConstants.AscensionLevels.map(value => (
+                {InstantiatedServantConstants.AscensionLevels.map(value => (
                     <option key={value} value={value}>
                         {value}
                     </option>

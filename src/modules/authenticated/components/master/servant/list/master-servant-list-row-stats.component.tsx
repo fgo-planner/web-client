@@ -1,5 +1,5 @@
 import { ObjectUtils, ReadonlyPartial } from '@fgo-planner/common-core';
-import { ImmutableMasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
+import { ImmutableMasterServant, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import React, { DOMAttributes } from 'react';
 import { MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRowBondLevel } from './master-servant-list-row-bond-level.component';
@@ -11,7 +11,7 @@ import { MasterServantListRowSummonDate } from './master-servant-list-row-summon
 
 type Props = {
     active?: boolean;
-    bond: MasterServantBondLevel | undefined;
+    bond: InstantiatedServantBondLevel | undefined;
     masterServant: ImmutableMasterServant;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
 } & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu'>;

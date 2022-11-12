@@ -1,5 +1,5 @@
 import { DateTimeUtils, Immutable, ImmutableArray, Nullable } from '@fgo-planner/common-core';
-import { ImmutableMasterAccount, ImmutableMasterServant, ImmutablePlan, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
+import { ImmutableMasterAccount, ImmutableMasterServant, ImmutablePlan, Plan, PlanServant, PlanServantUtils, PlanUpcomingResources } from '@fgo-planner/data-core';
 import { Add as AddIcon, FormatSize as FormatSizeIcon, HideImageOutlined as HideImageOutlinedIcon } from '@mui/icons-material';
 import { IconButton, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -20,7 +20,6 @@ import { PlanService } from '../../../../services/data/plan/plan.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { PlanRequirements } from '../../../../types/data';
 import { PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
-import { PlanServantUtils } from '../../../../utils/plan/plan-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { DialogData as PlanServantEditDialogData, PlanServantEditDialog } from '../../components/plan/servant/edit/plan-servant-edit-dialog.component';
@@ -40,6 +39,22 @@ const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
         fous: true
     }
 });
+
+/**
+ * Returns an array of `MasterServant` that have not been added to the plan.
+ * 
+ * TODO Move this to utils class
+ */
+const findAvailableServants = (
+    planServants: ImmutableArray<PlanServant>,
+    masterServants: ReadonlyArray<ImmutableMasterServant>
+): Array<ImmutableMasterServant> => {
+    const planInstanceIds = new Set<number>();
+    for (const { instanceId } of planServants) {
+        planInstanceIds.add(instanceId);
+    }
+    return masterServants.filter(({ instanceId }) => !planInstanceIds.has(instanceId));
+}
 
 const PathMatchPattern: PathPattern = {
     path: '/user/master/planner/:id'
@@ -62,7 +77,7 @@ const instantiatePlanServant = (
     /**
      * Servants that have not been added to the plan yet.
      */
-    const availableServants = PlanServantUtils.findAvailableServants(planServants, masterServants);
+    const availableServants = findAvailableServants(planServants, masterServants);
     if (!availableServants.length) {
         throw new Error('No more servants available');
     }
@@ -71,7 +86,6 @@ const instantiatePlanServant = (
      */
     const masterServant = availableServants[0];
     const planServant = PlanServantUtils.instantiate(masterServant.instanceId);
-    PlanServantUtils.updateCurrentEnhancements(planServant, masterServant);
     // TODO Populate costume data.
     return planServant;
 };
@@ -91,6 +105,9 @@ const clonePlan = (plan: ImmutablePlan): Plan => {
         },
         servants: plan.servants.map(servant => PlanServantUtils.clone(servant)),
         upcomingResources: plan.upcomingResources.map(lodash.cloneDeep) as Array<PlanUpcomingResources>,
+        costumes: [
+            ...plan.costumes
+        ],
         createdAt,
         updatedAt
     };
@@ -516,7 +533,8 @@ export const PlanRoute = React.memo(() => {
                 planServant={editServantTarget!}
                 planServants={_plan.servants}
                 masterServants={masterAccount.servants}
-                unlockedCostumes={masterAccount.costumes}
+                // targetCostumes={masterAccount.costumes}
+                targetCostumes={_plan.costumes}
                 showAppendSkills={showAppendSkills}
                 servantSelectDisabled={!!editServantTargetRef.current}
                 onClose={handleEditServantDialogClose}

@@ -1,7 +1,6 @@
-import { ArrayUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, MasterServantAscensionLevel, MasterServantConstants, MasterServantSkillLevel, Plan, PlanServant } from '@fgo-planner/data-core';
+import { CollectionUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, Plan, PlanServant } from '@fgo-planner/data-core';
 import { GameServantMap, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types/data';
-import { PlanServantUtils } from './plan-servant.utils';
 
 //#region Exported type definitions
 
@@ -19,13 +18,13 @@ export type ComputationOptions = {
 //#region Internal type definitions
 
 type SkillEnhancements = Readonly<{
-    1?: Nullable<MasterServantSkillLevel>;
-    2?: Nullable<MasterServantSkillLevel>;
-    3?: Nullable<MasterServantSkillLevel>;
+    1?: Nullable<InstantiatedServantSkillLevel>;
+    2?: Nullable<InstantiatedServantSkillLevel>;
+    3?: Nullable<InstantiatedServantSkillLevel>;
 }>;
 
 type ServantEnhancements = Immutable<{
-    ascension?: Nullable<MasterServantAscensionLevel>;
+    ascension?: Nullable<InstantiatedServantAscensionLevel>;
     skills: SkillEnhancements;
     appendSkills: SkillEnhancements;
 }>;
@@ -64,16 +63,16 @@ export class PlanComputationUtils {
 
     private static get _defaultTargetEnhancements(): Immutable<ServantEnhancements> {
         return {
-            ascension: MasterServantConstants.MaxAscensionLevel,
+            ascension: InstantiatedServantConstants.MaxAscensionLevel,
             skills: {
-                1: MasterServantConstants.MaxSkillLevel,
-                2: MasterServantConstants.MaxSkillLevel,
-                3: MasterServantConstants.MaxSkillLevel
+                1: InstantiatedServantConstants.MaxSkillLevel,
+                2: InstantiatedServantConstants.MaxSkillLevel,
+                3: InstantiatedServantConstants.MaxSkillLevel
             },
             appendSkills: {
-                1: MasterServantConstants.MaxSkillLevel,
-                2: MasterServantConstants.MaxSkillLevel,
-                3: MasterServantConstants.MaxSkillLevel,
+                1: InstantiatedServantConstants.MaxSkillLevel,
+                2: InstantiatedServantConstants.MaxSkillLevel,
+                3: InstantiatedServantConstants.MaxSkillLevel,
             }
         };
     };
@@ -194,6 +193,8 @@ export class PlanComputationUtils {
         isTargetPlan = false
     ): void {
 
+        const targetCostumes = CollectionUtils.toReadonlySet(plan.costumes);
+
         for (const planServant of plan.servants) {
             /**
              * Skip the servant if it is not enabled.
@@ -232,7 +233,8 @@ export class PlanComputationUtils {
                 gameServant,
                 masterServant,
                 planServant,
-                // masterAccountData,
+                masterAccountData.costumes,
+                targetCostumes,
                 mergedOptions
             );
 
@@ -265,7 +267,8 @@ export class PlanComputationUtils {
         gameServant: Immutable<GameServant>,
         masterServant: ImmutableMasterServant,
         planServant: Immutable<PlanServant>,
-        // masterAccountData: MasterAccountData,
+        currentCostumes: ReadonlySet<number>,
+        targetCostumes: ReadonlySet<number>,
         options: ComputationOptions
     ): [PlanServantRequirements, EnhancementRequirements] | undefined {
 
@@ -278,13 +281,8 @@ export class PlanComputationUtils {
              * If the plan servant does not yet exist in the result, then instantiate it and
              * add it to the result.
              */
-            planServantRequirements = this._instantiatePlanServantRequirements(planServant);
+            planServantRequirements = this._instantiatePlanServantRequirements(planServant, masterServant);
             resultServants[instanceId] = planServantRequirements;
-            /**
-             * Make sure that the current enhancement values match those from the master
-             * servant.
-             */
-            PlanServantUtils.updateEnhancements(planServantRequirements.current, masterServant);
         } else {
             /**
              * If the plan servant was already in the result, then it was from a previous
@@ -292,8 +290,8 @@ export class PlanComputationUtils {
              * enhancements should be the new current, and the target values from the plan
              * should be the new target.
              */
-            PlanServantUtils.updateEnhancements(planServantRequirements.current, planServantRequirements.target);
-            PlanServantUtils.updateEnhancements(planServantRequirements.target, planServant.target);
+            InstantiatedServantUtils.updateEnhancements(planServantRequirements.current, planServantRequirements.target);
+            InstantiatedServantUtils.updateEnhancements(planServantRequirements.target, planServant);
         }
 
         const { current, target } = planServantRequirements;
@@ -301,9 +299,9 @@ export class PlanComputationUtils {
         const enhancementRequirements = this._computeServantEnhancementRequirements(
             gameServant,
             current,
-            current.costumes,
+            currentCostumes,
             target,
-            target.costumes,
+            targetCostumes,
             options
         );
 
@@ -311,7 +309,7 @@ export class PlanComputationUtils {
     }
 
     private static _preProcessMasterAccount(masterAccount: ImmutableMasterAccount): MasterAccountData {
-        const servants = ArrayUtils.mapArrayToObject(masterAccount.servants, servant => servant.instanceId);
+        const servants = CollectionUtils.mapIterableToObject(masterAccount.servants, InstantiatedServantUtils.getInstanceId);
         const items = masterAccount.resources.items;
         const costumes = new Set(masterAccount.costumes);
         const qp = masterAccount.resources.qp;
@@ -327,14 +325,16 @@ export class PlanComputationUtils {
     static computeServantEnhancementRequirements(
         gameServant: Immutable<GameServant>,
         currentEnhancements: ServantEnhancements,
-        currentCostumes: ReadonlyArray<number>,
+        currentCostumes: Iterable<number>,
         options?: ComputationOptions
     ): EnhancementRequirements {
+
+        const currentCostumeSet = CollectionUtils.toReadonlySet(currentCostumes);
 
         return this._computeServantEnhancementRequirements(
             gameServant,
             currentEnhancements,
-            currentCostumes,
+            currentCostumeSet,
             this._defaultTargetEnhancements,
             undefined,
             options
@@ -344,9 +344,9 @@ export class PlanComputationUtils {
     private static _computeServantEnhancementRequirements(
         gameServant: Immutable<GameServant>,
         currentEnhancements: Immutable<ServantEnhancements>,
-        currentCostumes: ReadonlyArray<number>,
+        currentCostumes: ReadonlySet<number>,
         targetEnhancements: Immutable<ServantEnhancements>,
-        targetCostumes?: ReadonlyArray<number>,
+        targetCostumes?: ReadonlySet<number>,
         options = this._defaultOptions
     ): EnhancementRequirements {
 
@@ -411,7 +411,7 @@ export class PlanComputationUtils {
                  * Skip if the costume is already unlocked, or if it is not targeted. If the
                  * targetCostumes set is undefined, then all costumes are target by default.
                  */
-                if (currentCostumes.includes(costumeId) || (targetCostumes && !targetCostumes.includes(costumeId))) {
+                if (currentCostumes.has(costumeId) || (targetCostumes && !targetCostumes.has(costumeId))) {
                     continue;
                 }
                 this._updateEnhancementRequirementResult(result, costume.materials, 'costumes');
@@ -440,7 +440,7 @@ export class PlanComputationUtils {
 
         for (const [key, skill] of Object.entries(skillMaterials)) {
             const skillLevel = Number(key);
-            if (excludeLores && skillLevel === (MasterServantConstants.MaxSkillLevel - 1)) {
+            if (excludeLores && skillLevel === (InstantiatedServantConstants.MaxSkillLevel - 1)) {
                 continue;
             }
             /**
@@ -553,17 +553,25 @@ export class PlanComputationUtils {
         };
     }
 
-    private static _instantiatePlanServantRequirements(planServant: Immutable<PlanServant>): PlanServantRequirements {
-        const {
-            instanceId,
-            current,
-            target
-        } = planServant;
+    /**
+     * Instantiates a `PlanServantRequirements` object using the given plan and
+     * master servant data. The `current` enhancement fo the resulting object will
+     * be initialized with the values from the master servant.
+     */
+    private static _instantiatePlanServantRequirements(
+        planServant: Immutable<PlanServant>,
+        masterServant: ImmutableMasterServant
+    ): PlanServantRequirements {
+
+        const current = InstantiatedServantUtils.instantiateEnhancements();
+        InstantiatedServantUtils.updateEnhancements(current, masterServant);
+
+        const target = InstantiatedServantUtils.cloneEnhancements(planServant);
 
         return {
-            instanceId,
-            current: PlanServantUtils.cloneEnhancements(current),
-            target: PlanServantUtils.cloneEnhancements(target),
+            instanceId: planServant.instanceId,
+            current,
+            target,
             requirements: this._instantiateEnhancementRequirements()
         };
     }

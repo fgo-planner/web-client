@@ -1,8 +1,5 @@
+import { InstantiatedServant } from '@fgo-planner/data-core';
 import { SetStateAction } from 'react';
-
-type AnyServant = Readonly<{
-    instanceId: number
-}>;
 
 /**
  * Contains common utility functions for data edit hooks.
@@ -17,8 +14,8 @@ export class DataEditUtils {
     };
 
     static isServantsOrderChanged(
-        reference: ReadonlyMap<number, AnyServant>,
-        servants: Array<AnyServant>
+        reference: ReadonlyMap<number, InstantiatedServant>,
+        servants: Array<InstantiatedServant>
     ): boolean {
         if (reference.size !== servants.length) {
             return true;

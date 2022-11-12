@@ -1,43 +1,33 @@
-import { CollectionUtils, Immutable, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { ExistingMasterServantUpdate, ImmutablePlan, InstantiatedServantUtils, NewMasterServantUpdate, Plan, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
+import { CollectionUtils, DateTimeUtils, Immutable, ImmutableArray, Nullable, ReadonlyDate, ReadonlyRecord } from '@fgo-planner/common-core';
+import { ExistingMasterServantUpdate, ImmutablePlan, InstantiatedServantUtils, Plan, PlanServant, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanUpcomingResources, PlanUtils } from '@fgo-planner/data-core';
 import { SetStateAction, useCallback, useEffect, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
 import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
 import { PlanService } from '../../../services/data/plan/plan.service';
-import { MasterAccountEditData, useMasterAccountDataEditHook } from './use-master-account-data-edit.hook';
-import { ReadonlyNumbers } from '../../../types/internal';
+import { DataEditUtils } from './data-edit.utils';
+import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccountDataEditHook } from './use-master-account-data-edit.hook';
 
 //#region Type definitions
 
-/* eslint-disable @typescript-eslint/indent */
+/**
+ * Return data forwarded from the `useMasterAccountDataEditHook`.
+ */
+type PartialMasterAccountEditData = Pick<MasterAccountEditData, 'costumes' | 'items' | 'qp' | 'servants'>;
 
-type PartialMasterAccountEditData = Pick<MasterAccountEditData,
-    'costumes' |
-    'items' |
-    'qp' |
-    'servants'
->;
+type PlanInfo = {
+    name: string;
+    description: string;
+    targetDate?: ReadonlyDate;
+    enabled: ImmutablePlan['enabled'];
+    // shared: boolean;
+};
 
-type PlanEditData = Pick<ImmutablePlan,
-    'name' |
-    'description' |
-    'enabled' |
-    'servants' |
-    // 'shared' |
-    'targetDate' |
-    'upcomingResources'
->;
-
-type PlanInfo = Pick<Plan,
-    'name' |
-    'description' |
-    'enabled' |
-    // 'shared' |
-    'targetDate'
->;
-
-/* eslint-enable @typescript-eslint/indent */
+type PlanEditData = PlanInfo & {
+    servants: ImmutableArray<PlanServant>;
+    costumes: ReadonlySet<number>;
+    upcomingResources: ImmutableArray<PlanUpcomingResources>;
+};
 
 /**
  * For internal use only by the hook. Keeps track of the which plan data have
@@ -58,7 +48,7 @@ type PlanEditDirtyData = {
  * Contains unmodified plan data, slightly restructured for more efficient
  * comparison against current edit data to determine what has been modified.
  */
-type PlanEditReferenceData = Omit<PlanEditData, 'servants'> & Readonly<{
+type PlanEditReferenceData = Readonly<Omit<PlanEditData, 'servants'> & {
     servants: ReadonlyMap<number, Immutable<PlanServant>>;
 }>;
 
@@ -79,24 +69,31 @@ type PlanDataEditHookResult = {
      * Calls the `updateServants` function from the `useMasterAccountDataEditHook`
      * internally.
      */
-    updateMasterServants: (instanceIds: ReadonlyNumbers, update: ExistingMasterServantUpdate) => void;
+    updateMasterServants: (instanceIds: Iterable<number>, update: ExistingMasterServantUpdate) => void;
     updatePlanInfo: (planInfo: PlanInfo) => void;
     /**
-     * Adds a single servant using the given `NewMasterServantUpdate` object.
-     * 
+     * Adds a single servant using the given `PlanServantUpdate` object.
+     *
      * Calls the `addServants` function internally. 
+     *
+     * @param instanceId The instance ID of the corresponding master servant. If the
+     * value already exists in the plan, then the function will silently return
+     * without doing anything.
      */
-    addPlanServant: (servantData: NewMasterServantUpdate) => void;
+    addPlanServant: (instanceId: number, servantData: PlanServantUpdate) => void;
     /**
      * Batch adds servants. Each added servant will be instantiated using the given
-     * `NewMasterServantUpdate` object.
+     * `PlanServantUpdate` object.
+     *
+     * @param instanceIds The instance IDs of the corresponding master servants.
+     * Any values that already exist in the plan will be silently skipped.
      */
-    addPlanServants: (instanceIds: ReadonlyNumbers, servantData: NewMasterServantUpdate) => void;
+    addPlanServants: (instanceIds: Iterable<number>, servantData: PlanServantUpdate) => void;
     /**
      * Updates the servants with the corresponding `instanceIds` using the given
-     * `ExistingMasterServantUpdate` object.
+     * `PlanServantUpdate` object.
      */
-    updatePlanServants: (instanceIds: ReadonlyNumbers, update: ExistingMasterServantUpdate) => void;
+    updatePlanServants: (instanceIds: Iterable<number>, update: PlanServantUpdate) => void;
     /**
      * Updates the servant ordering based on an array of `instanceId` values.
      * Assumes that the array contains a corresponding `instanceId` value for each
@@ -107,7 +104,7 @@ type PlanDataEditHookResult = {
     /**
      * Deletes the servants with the corresponding `instanceIds`.
      */
-    deletePlanServants: (instanceIds: ReadonlyNumbers) => void;
+    deletePlanServants: (instanceIds: Iterable<number>) => void;
     addUpcomingResources: (resources: PlanUpcomingResources) => void;
     updateUpcomingResources: (index: number, resources: PlanUpcomingResources) => void;
     deleteUpcomingResources: (index: number) => void;
@@ -131,6 +128,14 @@ const BlockNavigationHookOptions: UseBlockNavigationOptions = {
     prompt: BlockNavigationPrompt
 };
 
+// TODO Use `satisfies` keyword instead of `as` once Typescript is updated to version 4.9.
+const masterAccountDataEditHookOptions = {
+    blockNavigationOnDirtyData: false,
+    includeCostumes: true,
+    includeItems: true,
+    includeServants: true
+} as MasterAccountDataEditHookOptions;
+
 //#endregion
 
 
@@ -145,8 +150,9 @@ const getDefaultPlanEditData = (): PlanEditData => ({
         appendSkills: true,
         costumes: true
     },
-    servants: [],
     // shared: false,
+    servants: [],
+    costumes: CollectionUtils.emptySet(),
     upcomingResources: []
 });
 
@@ -156,16 +162,25 @@ const clonePlanDataForEdit = (plan: Nullable<ImmutablePlan>): PlanEditData => {
     }
 
     const {
+        name,
+        description,
+        targetDate,
         enabled,
         servants,
+        costumes,
         upcomingResources
     } = plan;
 
     return {
-        ...plan,
-        enabled: { ...enabled },
-        servants: [...servants], // TODO Need to deep clone.
-        upcomingResources: [...upcomingResources], // TODO Need to deep clone.
+        name,
+        description,
+        targetDate,
+        enabled: {
+            ...enabled
+        },
+        servants: servants.map(PlanServantUtils.clone),
+        costumes: new Set(costumes),
+        upcomingResources: upcomingResources.map(PlanUtils.clonePlanUpcomingResources)
     };
 };
 
@@ -174,17 +189,34 @@ const getDefaultPlanReferenceData = (): PlanEditReferenceData => ({
     servants: new Map()
 });
 
-const clonePlanDataForReference = (plan: Nullable<PlanEditData>): PlanEditReferenceData => {
+const clonePlanDataForReference = (plan: Nullable<ImmutablePlan>): PlanEditReferenceData => {
     if (!plan) {
         return getDefaultPlanReferenceData();
     }
-    const servants = CollectionUtils.mapIterableToMap(
-        plan.servants,
-        InstantiatedServantUtils.getInstanceId
-    );
+
+    const {
+        name,
+        description,
+        targetDate,
+        enabled,
+        servants,
+        costumes,
+        upcomingResources
+    } = plan;
+
+    /**
+     * No need to deep clone here as long as the source data is properly deep cloned
+     * for the edit data.
+     */
+
     return {
-        ...plan,
-        servants
+        name,
+        description,
+        targetDate,
+        enabled,
+        servants: CollectionUtils.mapIterableToMap(servants, InstantiatedServantUtils.getInstanceId),
+        costumes: new Set(costumes),
+        upcomingResources
     };
 };
 
@@ -200,6 +232,16 @@ const hasDirtyData = (dirtyData: any): boolean => (
     false
 );
 
+const isPlanServantChanged = (
+    reference: Immutable<PlanServant> | undefined,
+    planServant: Immutable<PlanServant>
+): boolean => {
+    if (!reference) {
+        return true;
+    }
+    return !PlanServantUtils.isEqual(reference, planServant);
+};
+
 //#endregion
 
 
@@ -213,7 +255,7 @@ const hasDirtyData = (dirtyData: any): boolean => (
  * Uses the `useMasterAccountDataEditHook` internally to manage the master
  * account data.
  */
-export function usePlanDataEditHook(planId: string): PlanDataEditHookResult {
+export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHookResult {
 
     const {
         invokeLoadingIndicator,
@@ -230,12 +272,7 @@ export function usePlanDataEditHook(planId: string): PlanDataEditHookResult {
         isDataDirty: isMasterAccountDataDirty,
         revertChanges: revertMasterAccountChanges,
         persistChanges: persistMasterAccountChanges
-    } = useMasterAccountDataEditHook({
-        blockNavigationOnDirtyData: false,
-        includeCostumes: true,
-        includeItems: true,
-        includeServants: true
-    });
+    } = useMasterAccountDataEditHook(masterAccountDataEditHookOptions);
 
     /**
      * The original plan data.
@@ -261,12 +298,12 @@ export function usePlanDataEditHook(planId: string): PlanDataEditHookResult {
     /**
      * Whether the tracked data is dirty.
      */
-    const isDataDirty = hasDirtyData(dirtyData);
+    const isPlanDataDirty = hasDirtyData(dirtyData);
 
     /**
      * Prevent user from navigating away if data is dirty.
      */
-    useBlockNavigation(isDataDirty, BlockNavigationHookOptions);
+    useBlockNavigation(isPlanDataDirty, BlockNavigationHookOptions);
 
     /**
      * Processes the plan data fetched from API server.
@@ -302,46 +339,257 @@ export function usePlanDataEditHook(planId: string): PlanDataEditHookResult {
     //#region Local create, update, delete functions
 
     const updatePlanInfo = useCallback((planInfo: PlanInfo): void => {
+        editData.name = planInfo.name;
+        editData.description = planInfo.description;
+        editData.targetDate = DateTimeUtils.cloneDate(planInfo.targetDate);
+        editData.enabled = {
+            ...planInfo.enabled
+        };
+        // TODO Compute dirty data properly
+        setDirtyData(dirtyData => ({
+            ...dirtyData,
+            info: true
+        }));
+    }, [editData]);
 
-    }, []);
+    const addPlanServants = useCallback((instanceIds: Iterable<number>, servantData: PlanServantUpdate): void => {
+        
+        const {
+            servants: currentServants,
+            costumes: currentCostumes
+        } = editData;
 
-    const addPlanServant = useCallback((servantData: NewMasterServantUpdate): void => {
+        /**
+         * The set of instance IDs that already exist in the plan.
+         */
+        const existingInstanceIds = new Set(currentServants.map(InstantiatedServantUtils.getInstanceId));
 
-    }, []);
+        /**
+         * New object for the target costumes data. A new set instance is created to
+         * conform with the hook specifications.
+         */
+        const costumes = new Set(currentCostumes);
 
-    const addPlanServants = useCallback((instanceIds: ReadonlyNumbers, servantData: NewMasterServantUpdate): void => {
+        /**
+         * Contains the new `PlanServant` objects being added to the plan.
+         */
+        const newServants: Array<PlanServant> = [];
 
-    }, []);
+        /**
+         * Construct new instance of a `PlanServant` object for each `instanceId` and
+         * add to the array. Target costumes are also updated during this process.
+         */
+        for (const instanceId of instanceIds) {
+            /**
+             * Skip instance ID if it already exists in the plan.
+             */
+            if (existingInstanceIds.has(instanceId)) {
+                console.warn(`Servant instanceId=${instanceId} was not added because it already exists in the plan.`);
+                continue;
+            }
+            const newServant = PlanServantUtils.instantiate(instanceId);
+            PlanServantUpdateUtils.applyToPlanServant(servantData, newServant, costumes);
+            newServants.push(newServant);
+        }
 
-    const updatePlanServants = useCallback((instanceIds: ReadonlyNumbers, update: ExistingMasterServantUpdate): void => {
+        /**
+         * If no new servants are being added (due to all instance IDs being skipped),
+         * then return without doing anything else.
+         */
+        if (!newServants.length) {
+            return;
+        }
 
-    }, []);
+        /**
+         * Updated servants array. A new array instance is created to conform with the
+         * hook specifications.
+         */
+        const servants = [...currentServants, ...newServants];
+
+        editData.servants = servants;
+        editData.costumes = costumes;
+
+        const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
+        setDirtyData(dirtyData => {
+            const dirtyServants = dirtyData.servants;
+            for (const servant of newServants) {
+                dirtyServants.add(servant.instanceId);
+            }
+            return {
+                ...dirtyData,
+                servantOrder: true,
+                costumes: isCostumesDirty
+            };
+        });
+    }, [editData, referenceData]);
+
+    const addPlanServant = useCallback((instanceId: number, servantData: PlanServantUpdate): void => {
+        addPlanServants([instanceId], servantData);
+    }, [addPlanServants]);
+
+    const updatePlanServants = useCallback((instanceIds: Iterable<number>, update: PlanServantUpdate): void => {
+
+        const {
+            servants: currentServants,
+            costumes: currentCostumes
+        } = editData;
+
+        const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
+
+        /**
+         * New array for the servants data. A new array instance is created to conform
+         * with the hook specifications.
+         */
+        const servants = [];
+
+        /**
+         * New object for the unlocked costumes data. A new set instance is created to
+         * conform with the hook specifications.
+         */
+        const costumes = new Set(currentCostumes);
+
+        /**
+         * Keeps track of the dirty states of the updated servants.
+         */
+        const isDirties: Record<number, boolean> = {};
+
+        for (const servant of currentServants) {
+            const instanceId = servant.instanceId;
+            /**
+             * If the servant is not an update target, then just push to new array and
+             * continue.
+             */
+            if (!instanceIdSet.has(instanceId)) {
+                servants.push(servant);
+                continue;
+            }
+            /**
+             * The target servant that the update is applied to. A cloned copy is used to
+             * conform with the hook specifications.
+             */
+            const targetServant = PlanServantUtils.clone(servant);
+            /**
+             * Apply update to the target servant. Target costumes are also updated here.
+             */
+            PlanServantUpdateUtils.applyToPlanServant(update, targetServant, costumes);
+
+            const referenceServant = referenceData.servants.get(instanceId);
+            const isDirty = isPlanServantChanged(referenceServant, targetServant);
+            isDirties[instanceId] = isDirty;
+
+            servants.push(targetServant);
+        }
+
+        editData.servants = servants;
+        editData.costumes = costumes;
+
+        const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
+        setDirtyData(dirtyData => {
+            const dirtyServants = dirtyData.servants;
+            for (const [key, isDirty] of Object.entries(isDirties)) {
+                const instanceId = Number(key);
+                if (isDirty) {
+                    dirtyServants.add(instanceId);
+                } else {
+                    dirtyServants.delete(instanceId);
+                }
+            }
+            return {
+                ...dirtyData,
+                costumes: isCostumesDirty
+            };
+        });
+    }, [editData, referenceData]);
 
     const updatePlanServantOrder = useCallback((instanceIds: ReadonlyArray<number>): void => {
-        
-    }, []);
+        const currentServants = editData.servants;
 
-    const deletePlanServants = useCallback((instanceIds: ReadonlyNumbers): void => {
+        /**
+         * New array for the servants data. A new array instance is created to conform
+         * with the hook specifications.
+         */
+        const servants = [];
 
-    }, []);
+        /**
+         * TODO This is an n^2 operation, may need some optimizations if servant list
+         * gets too big.
+         */
+        for (const instanceId of instanceIds) {
+            const index = currentServants.findIndex(servant => servant.instanceId === instanceId);
+            if (index !== -1) {
+                servants.push(currentServants[index]);
+            }
+        }
+
+        editData.servants = servants;
+
+        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceData.servants, servants);
+        setDirtyData(dirtyData => ({
+            ...dirtyData,
+            servantOrder: isOrderDirty
+        }));
+    }, [editData, referenceData]);
+
+    const deletePlanServants = useCallback((instanceIds: Iterable<number>): void => {
+        const currentServants = editData.servants;
+
+        const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
+
+        /**
+         * Updated servants array with the specified IDs removed. A new array instance
+         * is created to conform with the hook specifications.
+         */
+        const servants = currentServants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
+
+        // TODO Also remove costume data if the last instance of the servant is removed.
+
+        editData.servants = servants;
+
+        const referenceServants = referenceData.servants;
+        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceServants, servants);
+        setDirtyData(dirtyData => {
+            const dirtyServants = dirtyData.servants;
+            for (const instanceId of instanceIds) {
+                /**
+                 * If the reference data doesn't contain a servant with this `instanceId`, that
+                 * means it was newly added. In this case, removing the servant should also
+                 * reset its dirty state.
+                 */
+                if (!referenceServants.has(instanceId)) {
+                    dirtyServants.delete(instanceId);
+                } else {
+                    dirtyServants.add(instanceId);
+                }
+            }
+            return {
+                ...dirtyData,
+                servantOrder: isOrderDirty
+            };
+        });
+    }, [editData, referenceData]);
 
     const addUpcomingResources = useCallback((resources: PlanUpcomingResources): void => {
-
+        // TODO Implement this
     }, []);
 
     const updateUpcomingResources = useCallback((index: number, resources: PlanUpcomingResources): void => {
-
+        // TODO Implement this
     }, []);
 
     const deleteUpcomingResources = useCallback((index: number): void => {
-
+        // TODO Implement this
     }, []);
     
     const revertChanges = useCallback((): void => {
         if (isMasterAccountDataDirty) {
             revertMasterAccountChanges();
         }
-    }, [isMasterAccountDataDirty, revertMasterAccountChanges]);
+        if (isPlanDataDirty) {
+            const editData = clonePlanDataForEdit(plan);
+            setEditData(editData);
+            setDirtyData(getDefaultPlanEditDirtyData());
+        }
+    }, [isMasterAccountDataDirty, isPlanDataDirty, plan, revertMasterAccountChanges]);
     
     //#endregion
 
@@ -349,13 +597,57 @@ export function usePlanDataEditHook(planId: string): PlanDataEditHookResult {
     //#region Back-end API functions
 
     const persistChanges = useCallback(async (): Promise<void> => {
-        if (isLoadingIndicatorActive) {
+        if (isLoadingIndicatorActive || !plan) {
             return;
         }
         if (isMasterAccountDataDirty) {
-            persistMasterAccountChanges();
+            /**
+             * No need to try/catch/finally here. Exceptions thrown here will be handled by
+             * the caller.
+             */
+            await persistMasterAccountChanges();
         }
-    }, [isLoadingIndicatorActive, isMasterAccountDataDirty, persistMasterAccountChanges]);
+        if (isPlanDataDirty) {
+            invokeLoadingIndicator();
+            try {
+                const update: Plan = {
+                    _id: plan._id,
+                    accountId: plan.accountId,
+                    name: editData.name,
+                    description: editData.description,
+                    shared: plan.shared,  // TODO Change this to editData.shared
+                    targetDate: editData.targetDate as Date,
+                    enabled: {
+                        ...editData.enabled
+                    },
+                    servants: [
+                        ...editData.servants
+                    ],
+                    costumes: [
+                        ...editData.costumes
+                    ],
+                    upcomingResources: [
+                        ...editData.upcomingResources
+                    ]
+                };
+                const updatedPlan = await planService.updatePlan(update);
+                handlePlanLoad(updatedPlan);
+            } finally {
+                resetLoadingIndicator();
+            }
+        }
+    }, [
+        editData,
+        handlePlanLoad,
+        invokeLoadingIndicator,
+        isLoadingIndicatorActive,
+        isMasterAccountDataDirty,
+        isPlanDataDirty,
+        persistMasterAccountChanges,
+        plan,
+        planService,
+        resetLoadingIndicator
+    ]);
 
     //#endregion
 
@@ -375,7 +667,7 @@ export function usePlanDataEditHook(planId: string): PlanDataEditHookResult {
         updateUpcomingResources,
         deleteUpcomingResources,
         isMasterAccountDataDirty,
-        isPlanDataDirty: false,
+        isPlanDataDirty,
         revertChanges,
         persistChanges
     };

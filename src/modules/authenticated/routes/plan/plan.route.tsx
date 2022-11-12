@@ -23,6 +23,7 @@ import { PlanComputationUtils } from '../../../../utils/plan/plan-computation.ut
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { DialogData as PlanServantEditDialogData, PlanServantEditDialog } from '../../components/plan/servant/edit/plan-servant-edit-dialog.component';
+import { usePlanDataEditHook } from '../../hooks/use-plan-data-edit.hook';
 
 const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
     layout: {
@@ -178,6 +179,26 @@ export const PlanRoute = React.memo(() => {
     const planService = useInjectable(PlanService);
 
     const gameServantMap = useGameServantMap();
+
+    const {
+        masterAccountEditData,
+        planEditData,
+        updateMasterItems,
+        updateMasterServants,
+        updatePlanInfo,
+        addPlanServant,
+        addPlanServants,
+        updatePlanServants,
+        updatePlanServantOrder,
+        deletePlanServants,
+        addUpcomingResources,
+        updateUpcomingResources,
+        deleteUpcomingResources,
+        isMasterAccountDataDirty,
+        isPlanDataDirty,
+        revertChanges,
+        persistChanges
+    } = usePlanDataEditHook(planId);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
     

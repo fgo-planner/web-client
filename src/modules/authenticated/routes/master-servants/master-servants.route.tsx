@@ -1,4 +1,4 @@
-import { ExistingMasterServantUpdate, ExistingMasterServantUpdateType, ImmutableMasterServant, MasterServantUpdate, MasterServantUpdateUtils, NewMasterServantUpdateType, InstantiatedServantUpdateUtils, InstantiatedServantUtils } from '@fgo-planner/data-core';
+import { ExistingMasterServantUpdate, ExistingMasterServantUpdateType, ImmutableMasterServant, InstantiatedServantUpdateUtils, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -17,7 +17,7 @@ import { MasterServantEditDialog } from '../../components/master/servant/edit-di
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
-import { useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
+import { MasterAccountDataEditHookOptions, useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterServantsFilter, MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
 import { MasterServantsInfoPanel } from './components/master-servants-info-panel.component';
 import { MasterServantsListRowContextMenu } from './components/master-servants-list-row-context-menu.component';
@@ -29,6 +29,12 @@ import { useMasterServantsUserPreferencesHook } from './hooks/use-master-servant
 type MasterServantsContextMenu = 
     'header' |
     'row';
+
+// TODO Use `satisfies` keyword instead of `as` once Typescript is updated to version 4.9.
+const masterAccountDataEditHookOptions = {
+    includeCostumes: true,
+    includeServants: true
+} as MasterAccountDataEditHookOptions;
 
 const StyleClassPrefix = 'MasterServants';
 
@@ -89,6 +95,7 @@ export const MasterServantsRoute = React.memo(() => {
     const gameServantMap = useGameServantMap();
 
     const {
+        awaitingRequest,
         isDataDirty,
         masterAccountEditData,
         addServant,
@@ -98,10 +105,7 @@ export const MasterServantsRoute = React.memo(() => {
         deleteServants,
         revertChanges,
         persistChanges
-    } = useMasterAccountDataEditHook({
-        includeCostumes: true,
-        includeServants: true
-    });
+    } = useMasterAccountDataEditHook(masterAccountDataEditHookOptions);
 
     const {
         dragDropData,
@@ -148,7 +152,6 @@ export const MasterServantsRoute = React.memo(() => {
         updateSelectedServants
     } = useMasterServantsSelectedServants(masterAccountEditData.servants);
 
-    const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
 
     /**
      * Whether the multi-add servant dialog is open.
@@ -374,17 +377,14 @@ export const MasterServantsRoute = React.memo(() => {
     const handleSaveButtonClick = useCallback(async (): Promise<void> => {
         setEditServantDialogData(undefined);
         setDeleteServantDialogData(undefined);
-        setAwaitingRequest(true);
         try {
             await persistChanges();
-            setAwaitingRequest(false);
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);
-            setAwaitingRequest(false);
-            revertChanges();
+            // revertChanges();
         }
-    }, [persistChanges, revertChanges]);
+    }, [persistChanges]);
 
     const handleRevertButtonClick = revertChanges;
 

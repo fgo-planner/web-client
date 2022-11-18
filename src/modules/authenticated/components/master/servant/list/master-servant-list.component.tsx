@@ -7,7 +7,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
-import { SortDirection, SortOptions } from '../../../../../../types/data';
+import { SortDirection, SortOptions } from '../../../../../../types';
 import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';

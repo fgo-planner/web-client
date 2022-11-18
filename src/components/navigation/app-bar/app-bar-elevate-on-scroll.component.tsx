@@ -3,7 +3,7 @@ import React, { DOMAttributes, PropsWithChildren, useEffect, useRef, useState } 
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { LockableFeature, UserInterfaceService } from '../../../services/user-interface/user-interface.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { ComponentStyleProps } from '../../../types/internal';
+import { ComponentStyleProps } from '../../../types';
 
 type Props = PropsWithChildren<{}> & ComponentStyleProps & DOMAttributes<HTMLDivElement>;
 

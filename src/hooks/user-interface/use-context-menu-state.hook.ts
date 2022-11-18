@@ -1,5 +1,5 @@
 import { MouseEvent, useCallback, useState } from 'react';
-import { Position2D } from '../../types/internal';
+import { Position2D } from '../../types';
 
 export type ContextMenuStateHookResult<T extends string> = {
 

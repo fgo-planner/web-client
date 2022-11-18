@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, useCallback, useRef } from 'react';
 import { DataTableListHeaderLabel } from '../../../../../components/data-table-list/data-table-list-header-label.component';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
-import { SortDirection, SortOptions } from '../../../../../types/data';
+import { SortDirection, SortOptions } from '../../../../../types';
 import { MasterAccountColumnProperties, MasterAccountListColumn, MasterAccountListVisibleColumns } from './master-account-list-columns';
 
 type Props = {

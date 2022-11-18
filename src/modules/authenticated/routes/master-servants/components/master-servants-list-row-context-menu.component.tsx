@@ -1,7 +1,7 @@
 import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon } from '@mui/icons-material';
 import { Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover } from '@mui/material';
 import React, { MouseEvent, useCallback, useMemo } from 'react';
-import { Position2D } from '../../../../../types/internal';
+import { Position2D } from '../../../../../types';
 
 type Props = {
     onAddServant: () => void;

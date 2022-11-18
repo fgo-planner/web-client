@@ -8,7 +8,7 @@ import { InputFieldContainer } from '../../../../../components/input/input-field
 import { useInjectable } from '../../../../../hooks/dependency-injection/use-injectable.hook';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { PlanService } from '../../../../../services/data/plan/plan.service';
-import { DialogComponentProps } from '../../../../../types/internal';
+import { DialogComponentProps } from '../../../../../types';
 import { FormUtils } from '../../../../../utils/form.utils';
 
 type Props = {

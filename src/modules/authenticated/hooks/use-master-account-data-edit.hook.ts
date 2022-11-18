@@ -1,5 +1,5 @@
 import { CollectionUtils, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, MasterAccountUpdate, MasterServant, InstantiatedServantBondLevel, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdate, InstantiatedServantUtils } from '@fgo-planner/data-core';
+import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, MasterAccountUpdate, MasterServant, InstantiatedServantBondLevel, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdate, InstantiatedServantUtils, MasterAccount } from '@fgo-planner/data-core';
 import { SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
@@ -24,6 +24,14 @@ export type MasterAccountDataEditHookOptions = {
     includeItems?: boolean;
     includeServants?: boolean;
     includeSoundtracks?: boolean;
+    /**
+     * Whether to not process incoming new master account data if the account is
+     * different (ID does not match previous account).
+     *
+     * This should only be set to `true` if the component is expected to be
+     * unmounted when another master account is selected.
+     */
+    skipProcessOnActiveAccountChange?: boolean;
 };
 
 export type MasterAccountEditData = {
@@ -82,6 +90,7 @@ type MasterAccountEditReferenceData = {
 };
 
 type MasterAccountDataEditHookCommon = {
+    masterAccountId: string | undefined;
     awaitingRequest: boolean;
     isDataDirty: boolean;
     revertChanges: () => void;
@@ -308,7 +317,7 @@ const isMasterServantChanged = (
  * 
  * Specific overload for costumes route.
  */
-export function useMasterAccountDataEditHook(
+export function useMasterAccountDataEdit(
     options: MasterAccountDataEditHookOptions & {
         includeCostumes: true;
         includeItems?: false;
@@ -323,7 +332,7 @@ export function useMasterAccountDataEditHook(
  * 
  * Specific overload for items route.
  */
-export function useMasterAccountDataEditHook(
+export function useMasterAccountDataEdit(
     options: MasterAccountDataEditHookOptions & {
         includeCostumes?: false;
         includeItems: true;
@@ -338,7 +347,7 @@ export function useMasterAccountDataEditHook(
  * 
  * Specific overload for servants route.
  */
-export function useMasterAccountDataEditHook(
+export function useMasterAccountDataEdit(
     options: MasterAccountDataEditHookOptions & {
         includeCostumes: true;
         includeItems?: false;
@@ -353,7 +362,7 @@ export function useMasterAccountDataEditHook(
  * 
  * Specific overload for soundtracks route.
  */
-export function useMasterAccountDataEditHook(
+export function useMasterAccountDataEdit(
     options: MasterAccountDataEditHookOptions & {
         includeCostumes?: false;
         includeItems?: false;
@@ -366,14 +375,14 @@ export function useMasterAccountDataEditHook(
  * editing. Returns the current state of the data and functions that can be
  * called to update the data.
  */
-export function useMasterAccountDataEditHook(
+export function useMasterAccountDataEdit(
     options?: MasterAccountDataEditHookOptions
 ): MasterAccountDataEditHookResult;
 
 /**
  * Function implementation.
  */
-export function useMasterAccountDataEditHook(
+export function useMasterAccountDataEdit(
     options: MasterAccountDataEditHookOptions = {}
 ): MasterAccountDataEditHookResult {
 
@@ -390,13 +399,19 @@ export function useMasterAccountDataEditHook(
         includeCostumes,
         includeItems,
         includeServants,
-        includeSoundtracks
+        includeSoundtracks,
+        skipProcessOnActiveAccountChange
     } = options;
 
     /**
      * The original master account data.
      */
     const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
+
+    /**
+     * The current master account ID.
+     */
+    const masterAccountId = masterAccount?._id;
 
     /**
      * The transformed copy of the master account data for editing.
@@ -446,9 +461,23 @@ export function useMasterAccountDataEditHook(
      * Master account change subscription.
      */
     useEffect(() => {
+        /**
+         * Whether or not to process the next `MasterAccount` data that comes in from
+         * the observable.
+         */
+        const shouldProcessNext = (nextMasterAccount: Nullable<MasterAccount>): boolean => {
+            if (!skipProcessOnActiveAccountChange || !masterAccountId) {
+                return true;
+            }
+            return masterAccountId === nextMasterAccount?._id;
+        };
+
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopics.User.CurrentMasterAccountChange)
             .subscribe(masterAccount => {
+                if (!shouldProcessNext(masterAccount)) {
+                    return;
+                }
                 const editData = cloneMasterAccountDataForEdit(masterAccount, includeOptions);
                 const referenceData = cloneMasterAccountDataForReference(masterAccount, includeOptions);
                 setEditData(editData);
@@ -458,7 +487,7 @@ export function useMasterAccountDataEditHook(
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [includeOptions]);
+    }, [includeOptions, masterAccountId, skipProcessOnActiveAccountChange]);
 
     /**
      * Master account available changes subscription.
@@ -953,6 +982,7 @@ export function useMasterAccountDataEditHook(
 
     
     return {
+        masterAccountId,
         awaitingRequest,
         isDataDirty,
         masterAccountEditData: editData,

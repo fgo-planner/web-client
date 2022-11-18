@@ -6,7 +6,7 @@ import { SectionTitle } from '../../../../components/text/section-title.componen
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
-import { ThemeMode } from '../../../../types/internal';
+import { ThemeMode } from '../../../../types';
 import { UserThemeBackgroundImage } from './user-theme-background-image.component';
 import { UserThemeColor } from './user-theme-color.component';
 

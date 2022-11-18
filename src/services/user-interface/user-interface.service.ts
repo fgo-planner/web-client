@@ -1,7 +1,7 @@
 import { CollectionUtils } from '@fgo-planner/common-core';
 import { Subject } from 'rxjs';
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
-import { GlobalDialog, NavigationBlockerDialogOptions } from '../../types/internal';
+import { GlobalDialog, NavigationBlockerDialogOptions } from '../../types';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 

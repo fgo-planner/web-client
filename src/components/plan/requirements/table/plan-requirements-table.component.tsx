@@ -4,7 +4,7 @@ import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
-import { GameItemCategory, GameItemCategoryMap, PlanRequirements } from '../../../../types/data';
+import { GameItemCategory, GameItemCategoryMap, PlanRequirements } from '../../../../types';
 import { PlanRequirementsTableFooter } from './plan-requirements-table-footer.component';
 import { PlanRequirementsTableHeader, StyleClassPrefix as PlanRequirementsTableHeaderStyleClassPrefix } from './plan-requirements-table-header.component';
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';

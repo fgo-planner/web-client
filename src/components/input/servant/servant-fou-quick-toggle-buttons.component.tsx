@@ -1,7 +1,7 @@
 import { InstantiatedServantConstants } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React from 'react';
-import { ComponentStyleProps } from '../../../types/internal';
+import { ComponentStyleProps } from '../../../types';
 import { IconButtonText } from '../../text/icon-button-text.component';
 import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
 

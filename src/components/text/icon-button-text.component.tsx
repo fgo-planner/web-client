@@ -2,7 +2,7 @@ import { FilteringStyledOptions } from '@mui/styled-engine';
 import { CSSInterpolation, styled } from '@mui/system';
 import { CSSProperties } from 'react';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { StyledFunctionThemeProp } from '../../types/internal';
+import { StyledFunctionThemeProp } from '../../types';
 
 type Props = {
     textDecoration?: CSSProperties['textDecoration']

@@ -3,7 +3,7 @@ import { CSSInterpolation, MuiStyledOptions, styled, SystemStyleObject, Theme } 
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren } from 'react';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { ComponentStyleProps } from '../../types/internal';
+import { ComponentStyleProps } from '../../types';
 import { LayoutPanel, StyleClassPrefix as LayoutPanelStyleClassPrefix } from './layout-panel.component';
 
 type Props = PropsWithChildren<{

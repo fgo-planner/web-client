@@ -2,7 +2,7 @@ import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode } from 'react';
-import { BasicMasterAccounts } from '../../../../../types/data';
+import { BasicMasterAccounts } from '../../../../../types';
 import { MasterAccountColumnProperties, MasterAccountListVisibleColumns } from './master-account-list-columns';
 import { MasterAccountListHeader } from './master-account-list-header.component';
 import { MasterAccountListRow, StyleClassPrefix as MasterAccountListRowStyleClassPrefix } from './master-account-list-row.component';

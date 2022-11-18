@@ -1,32 +1,34 @@
 import { ImmutableArray } from '@fgo-planner/common-core';
-import { ImmutableMasterServant, PlanServant } from '@fgo-planner/data-core';
+import { ImmutableMasterServant, PlanServant, PlanServantUpdate } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, Typography } from '@mui/material';
 import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../../../../../types/internal';
-import { PlanServantEdit } from './plan-servant-edit.component';
+import { DialogComponentProps } from '../../../../../../types';
 
-export type DialogData = {
-    planServant: PlanServant;
+export type PlanServantEditDialogData = {
+    action: 'add' | 'edit';
+    update: PlanServantUpdate;
 };
 
 type Props = {
-    dialogTitle?: string;
+    action: 'add' | 'edit';
     masterServants: ReadonlyArray<ImmutableMasterServant>;
     /**
-     * The planned servant to edit. This will be modified directly, so provide a
-     * clone if modification to the original object is not desired.
-     * 
-     * If this is not provided, then the dialog will remain closed.
+     * The update payload for editing. This object will be modified directly.
+     *
+     * If this is `undefined`, then the dialog will remain closed.
      */
-    planServant?: PlanServant;
-    planServants: ImmutableArray<PlanServant>;
-    servantSelectDisabled?: boolean;
-    showAppendSkills?: boolean;
-    submitButtonLabel?: string;
+    planServantUpdate?: PlanServantUpdate;
     targetCostumes: ReadonlyArray<number>;
-} & Omit<DialogComponentProps<DialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
+    /**
+     * Array containing the `PlanServant` objects being edited.
+     *
+     * If dialog is inactive (`masterServants` is `undefined`), this should be set
+     * to an empty array to avoid unnecessary re-renders while the dialog is closed.
+     */
+    targetPlanServants: ImmutableArray<PlanServant>;
+} & Omit<DialogComponentProps<PlanServantEditDialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const DialogWidth = 640;
 
@@ -41,14 +43,11 @@ const DialogPaperProps = {
 export const PlanServantEditDialog = React.memo((props: Props) => {
 
     const {
-        dialogTitle,
+        action,
         masterServants,
-        planServant,
-        planServants,
-        servantSelectDisabled,
-        showAppendSkills,
-        submitButtonLabel,
+        planServantUpdate,
         targetCostumes,
+        targetPlanServants,
         onClose,
         ...dialogProps
     } = props;
@@ -65,14 +64,21 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
     } = useAutoResizeDialog(props);
 
     const handleSubmitButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-        planServant && onClose(event, 'submit', { planServant });
-    }, [onClose, planServant]);
+        if (!planServantUpdate) {
+            return;
+        }
+        const data: PlanServantEditDialogData = { 
+            action,
+            update: planServantUpdate 
+        };
+        onClose(event, 'submit', data);
+    }, [action, onClose, planServantUpdate]);
 
     const handleCancelButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         onClose(event, 'cancel');
     }, [onClose]);
 
-    const open = !!planServant;
+    const open = !!planServantUpdate;
 
     /*
      * Only re-render the dialog child node if the dialog is open. This allows the
@@ -83,18 +89,18 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
         dialogChildRef.current = (
             <Typography component={'div'}>
                 <DialogTitle>
-                    {dialogTitle}
+                    {`${action === 'add' ? 'Add' : 'Edit'} Servant`}
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
                 <DialogContent>
-                    <PlanServantEdit
+                    {/* <PlanServantEdit
                         masterServants={masterServants}
                         planServant={planServant!}
                         planServants={planServants}
                         showAppendSkills={showAppendSkills}
                         targetCostumes={targetCostumes}
                         servantSelectDisabled={servantSelectDisabled}
-                    />
+                    /> */}
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -109,7 +115,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
                         color='primary'
                         onClick={handleSubmitButtonClick}
                     >
-                        {submitButtonLabel || 'Submit'}
+                        Done
                     </Button>
                 </DialogActions>
             </Typography>

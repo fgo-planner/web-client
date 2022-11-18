@@ -1,5 +1,5 @@
 import { Type } from '@fgo-planner/common-core';
-import { InjectableDefinition, InjectableToken, InjectedFieldParams } from '../../types/internal';
+import { InjectableDefinition, InjectableToken, InjectedFieldParams } from '../../types';
 
 export class InjectablesContainer {
 

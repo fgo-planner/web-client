@@ -1,6 +1,6 @@
 import { Plan, PlanGroup } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { BasicPlans } from '../../../types/data';
+import { BasicPlans } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 
 @Injectable

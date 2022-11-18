@@ -3,7 +3,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, T
 import { Box } from '@mui/system';
 import React, { ChangeEvent, FormEvent, useCallback, useRef, useState } from 'react';
 import { useAutoResizeDialog } from '../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../../types/internal';
+import { DialogComponentProps } from '../../../types';
 import { DialogCloseButton } from '../../dialog/dialog-close-button.component';
 import { InputFieldContainer } from '../../input/input-field-container.component';
 

@@ -5,7 +5,7 @@ import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, PropsWithChildren, PureComponent, ReactNode } from 'react';
 import Dropzone, { DropzoneRef, DropzoneState } from 'react-dropzone';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { ComponentStyleProps } from '../../types/internal';
+import { ComponentStyleProps } from '../../types';
 
 type Props = PropsWithChildren<{
     dropzoneRef?: React.RefObject<DropzoneRef>;

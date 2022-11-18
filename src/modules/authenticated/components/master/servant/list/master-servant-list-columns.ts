@@ -1,5 +1,5 @@
 import { ImmutableRecord } from '@fgo-planner/common-core';
-import { ColumnProperties } from '../../../../../../types/internal';
+import { DataTableListColumnProperties } from '../../../../../../types';
 
 export type MasterServantListColumn =
     'npLevel' |
@@ -14,7 +14,7 @@ export type MasterServantListColumn =
 export type MasterServantListVisibleColumns = Partial<Record<MasterServantListColumn, boolean>>;
 
 // TODO Convert widths to use theme spacing/rem.
-export const MasterServantColumnProperties = {
+export const MasterServantColumnProperties: ImmutableRecord<MasterServantListColumn | 'label', DataTableListColumnProperties> = {
     label: {
         key: 'label',
         width: 300,
@@ -69,4 +69,4 @@ export const MasterServantColumnProperties = {
         label: 'Summon Date',
         sortable: true
     }
-} as ImmutableRecord<MasterServantListColumn | 'label', ColumnProperties>;
+};

@@ -6,15 +6,14 @@ import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { ScrollbarStyleProps } from '../../../../../../styles/scrollbar-style-props';
-import { DialogComponentProps } from '../../../../../../types/internal';
+import { DialogComponentProps } from '../../../../../../types';
 import { MasterServantEditDialogContent, MasterServantEditTab } from './master-servant-edit-dialog-content.component';
 
 type Props = {
     activeTab: MasterServantEditTab;
     bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
     /**
-     * The update payload for editing. This will be modified directly, so provide a
-     * clone if modification to the original object is not desired.
+     * The update payload for editing. This object will be modified directly.
      *
      * If this is `undefined`, then the dialog will remain closed.
      */

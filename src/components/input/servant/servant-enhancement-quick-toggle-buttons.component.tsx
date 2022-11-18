@@ -2,7 +2,7 @@ import { IconButton, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEventHandler, ReactNode } from 'react';
-import { ComponentStyleProps } from '../../../types/internal';
+import { ComponentStyleProps } from '../../../types';
 
 type Props = {
     disabled?: boolean;

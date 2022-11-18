@@ -12,8 +12,8 @@ import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-activ
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { BasicPlans, PlanType } from '../../../../types/data';
-import { ModalOnCloseReason } from '../../../../types/internal';
+import { BasicPlans, PlanType } from '../../../../types';
+import { ModalOnCloseReason } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { PlanAddDialog } from './components/plan-add-dialog.component';

@@ -5,7 +5,7 @@ import { GameItemQuantity } from '../../../../components/game/item/game-item-qua
 import { GameServantThumbnail } from '../../../../components/game/servant/game-servant-thumbnail.component';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { GameServantCostumeListData } from '../../../../types/data';
+import { GameServantCostumeListData } from '../../../../types';
 
 type Props = {
     alwaysUnlocked: boolean;

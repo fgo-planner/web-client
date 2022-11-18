@@ -3,13 +3,12 @@ import { Box } from '@mui/material';
 import { SystemStyleObject } from '@mui/system';
 import clsx from 'clsx';
 import React, { CSSProperties, MouseEvent, MouseEventHandler, ReactNode, useMemo } from 'react';
-import { SortOptions } from '../../types/data';
-import { ColumnProperties } from '../../types/internal';
+import { DataTableListColumnProperties, SortOptions } from '../../types';
 import { HeaderLabel } from '../text/header-label.component';
 
 type Props<T extends string> = {
     column: T;
-    columnProperties: ColumnProperties;
+    columnProperties: DataTableListColumnProperties;
     onClick?: (e: MouseEvent, column: T) => void;
     sortOptions?: SortOptions<T>;
 };

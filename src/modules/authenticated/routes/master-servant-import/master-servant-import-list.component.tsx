@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseReason } from '../../../../types/internal';
+import { ModalOnCloseReason } from '../../../../types';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantImportExistingDialog } from './master-servant-import-existing-dialog.component';

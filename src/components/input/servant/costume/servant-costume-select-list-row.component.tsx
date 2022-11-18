@@ -1,7 +1,7 @@
 import { Checkbox } from '@mui/material';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useRef } from 'react';
-import { GameServantCostumeListData } from '../../../../types/data';
+import { GameServantCostumeListData } from '../../../../types';
 import { GameServantThumbnail } from '../../../game/servant/game-servant-thumbnail.component';
 import { TruncateText } from '../../../text/truncate-text.component';
 

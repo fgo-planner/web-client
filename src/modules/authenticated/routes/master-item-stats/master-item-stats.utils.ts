@@ -1,7 +1,7 @@
 import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
 import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantConstants, MasterServant } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
-import { GameServantMap, GameSoundtrackList } from '../../../../types/data';
+import { GameServantMap, GameSoundtrackList } from '../../../../types';
 
 export type MasterItemStat = {
     inventory: number;

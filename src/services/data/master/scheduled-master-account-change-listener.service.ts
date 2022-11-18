@@ -1,8 +1,7 @@
 import { CollectionUtils, Nullable, ObjectUtils } from '@fgo-planner/common-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { BasicMasterAccounts, MasterAccountChange, MasterAccountChanges } from '../../../types/data';
-import { UserInfo } from '../../../types/internal';
+import { BasicMasterAccounts, MasterAccountChange, MasterAccountChanges, UserTokenPayload } from '../../../types';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 import { MasterAccountChangeListenerService } from './master-account-change-listener.service';
@@ -130,8 +129,8 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
         return result;
     }
 
-    private _handleCurrentUserChange(userInfo: Nullable<UserInfo>): void {
-        const userId = userInfo?.id;
+    private _handleCurrentUserChange(userToken: Nullable<UserTokenPayload>): void {
+        const userId = userToken?.id;
         if (this._currentUserId === userId) {
             return;
         }

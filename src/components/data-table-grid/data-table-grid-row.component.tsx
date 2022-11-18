@@ -1,9 +1,9 @@
-import { Theme, CSSInterpolation } from '@mui/material';
+import { CSSInterpolation, Theme } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
 import { alpha, styled, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren, ReactNode } from 'react';
-import { ComponentStyleProps } from '../../types/internal';
+import { ComponentStyleProps } from '../../types';
 
 type Props = PropsWithChildren<{
     active?: boolean;

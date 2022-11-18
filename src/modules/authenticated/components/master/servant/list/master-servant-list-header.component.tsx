@@ -5,7 +5,7 @@ import React, { MouseEvent, MouseEventHandler, useCallback, useRef } from 'react
 import { DataTableListHeaderLabel } from '../../../../../../components/data-table-list/data-table-list-header-label.component';
 import { HeaderLabel } from '../../../../../../components/text/header-label.component';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
-import { SortDirection, SortOptions } from '../../../../../../types/data';
+import { SortDirection, SortOptions } from '../../../../../../types';
 import { MasterServantColumnProperties, MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
 
 type Props = {

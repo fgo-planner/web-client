@@ -11,20 +11,21 @@ import { useContextMenuState } from '../../../../hooks/user-interface/use-contex
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { SortDirection, SortOptions } from '../../../../types/data';
-import { ModalOnCloseReason } from '../../../../types/internal';
+import { SortDirection, SortOptions } from '../../../../types';
+import { ModalOnCloseReason } from '../../../../types';
+import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
-import { MasterAccountDataEditHookOptions, useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
+import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../../hooks/use-master-account-data-edit.hook';
+import { useSelectedServantInstances } from '../../hooks/use-selected-servant-instances.hook';
 import { MasterServantsFilter, MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
 import { MasterServantsInfoPanel } from './components/master-servants-info-panel.component';
 import { MasterServantsListRowContextMenu } from './components/master-servants-list-row-context-menu.component';
 import { MasterServantsMultiAddDialog, MultiAddServantData } from './components/master-servants-multi-add-dialog.component';
 import { MasterServantsNavigationRail } from './components/master-servants-navigation-rail.component';
-import { useMasterServantsSelectedServants } from './hooks/use-master-servants-selected-servants.hook';
-import { useMasterServantsUserPreferencesHook } from './hooks/use-master-servants-user-preferences.hook';
+import { useMasterServantsUserPreferences } from './hooks/use-master-servants-user-preferences.hook';
 
 type MasterServantsContextMenu = 
     'header' |
@@ -105,7 +106,7 @@ export const MasterServantsRoute = React.memo(() => {
         deleteServants,
         revertChanges,
         persistChanges
-    } = useMasterAccountDataEditHook(masterAccountDataEditHookOptions);
+    } = useMasterAccountDataEdit(masterAccountDataEditHookOptions);
 
     const {
         dragDropData,
@@ -133,7 +134,7 @@ export const MasterServantsRoute = React.memo(() => {
         toggleFilters,
         toggleInfoPanelOpen,
         toggleShowUnsummonedServants
-    } = useMasterServantsUserPreferencesHook();
+    } = useMasterServantsUserPreferences();
 
     const {
         activeContextMenu,
@@ -150,8 +151,7 @@ export const MasterServantsRoute = React.memo(() => {
         selectAllServants,
         deselectAllServants,
         updateSelectedServants
-    } = useMasterServantsSelectedServants(masterAccountEditData.servants);
-
+    } = useSelectedServantInstances(masterAccountEditData.servants);
 
     /**
      * Whether the multi-add servant dialog is open.
@@ -159,9 +159,9 @@ export const MasterServantsRoute = React.memo(() => {
     const [isMultiAddServantDialogOpen, setIsMultiAddServantDialogOpen] = useState<boolean>(false);
 
     /**
-     * Contains a copy of the target servants' data that is passed directly into and
-     * modified by the dialog. The original data is not modified until the changes
-     * are submitted.
+     * The `MasterServantUpdate` that is passed directly into and modified by the
+     * dialog. The original plan servant is not modified until the changes are
+     * submitted.
      *
      * The `open` state of the servant edit dialog is also determined by whether
      * this data is present (dialog is opened if data is defined, and closed if data
@@ -233,7 +233,7 @@ export const MasterServantsRoute = React.memo(() => {
     }, []);
 
     const openEditServantDialog = useCallback((): void => {
-        const { servants: selectedServants } = selectedServantsData;
+        const selectedServants = selectedServantsData.servants;
         if (!selectedServants.length) {
             return;
         }
@@ -253,7 +253,7 @@ export const MasterServantsRoute = React.memo(() => {
         if (!gameServantMap) {
             return;
         }
-        const { servants: selectedServants } = selectedServantsData;
+        const selectedServants = selectedServantsData.servants;
         if (!selectedServants.length) {
             return;
         }
@@ -262,8 +262,9 @@ export const MasterServantsRoute = React.memo(() => {
             <p>The following servant{selectedServants.length > 1 && 's'} will be deleted:</p>
             <ul>
                 {selectedServants.map(({ gameId }) => {
-                    const { name, metadata } = gameServantMap[gameId];
-                    return <li>{metadata?.displayName || name || gameId}</li>;
+                    const gameServant = gameServantMap[gameId];
+                    const displayedName = GameServantUtils.getDisplayedName(gameServant);
+                    return <li>{displayedName}</li>;
                 })}
             </ul>
             <p>Are you sure you want to proceed?</p>
@@ -288,7 +289,6 @@ export const MasterServantsRoute = React.memo(() => {
 
         return () => window.removeEventListener('keydown', listener);
     }, [openDeleteServantDialog]);
-
 
     //#endregion
 

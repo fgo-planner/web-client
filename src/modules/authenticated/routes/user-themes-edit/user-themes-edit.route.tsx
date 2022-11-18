@@ -12,7 +12,7 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { UserService } from '../../../../services/data/user/user.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
-import { ThemeMode } from '../../../../types/internal';
+import { ThemeMode } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { UserThemeEdit } from './user-theme-edit.component';

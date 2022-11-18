@@ -1,5 +1,5 @@
 import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, PlanServant, PlanServantUtils } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, PlanServant, PlanServantUpdate, PlanServantUtils } from '@fgo-planner/data-core';
 import { alpha, Box, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
@@ -13,10 +13,9 @@ type Props = {
     masterServants: ReadonlyArray<ImmutableMasterServant>;
     onChange?: (planServant: PlanServant) => void;
     /**
-     * The planned servant to edit. This will be modified directly, so provide a
-     * clone if modification to the original object is not desired.
+     * The update payload for editing. This object will be modified directly.
      */
-    planServant: PlanServant;
+    planServantUpdate: PlanServantUpdate;
     planServants: ImmutableArray<PlanServant>;
     readonly?: boolean;
     servantSelectDisabled?: boolean;
@@ -70,8 +69,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
 
     const {
         masterServants,
-        planServant,
-        planServants,
+        planServantUpdate,
         readonly,
         servantSelectDisabled,
         showAppendSkills,
@@ -96,17 +94,17 @@ export const PlanServantEdit = React.memo((props: Props) => {
         if (!gameServantMap) {
             return;
         }
-        const instanceId = planServant.instanceId;
-        const masterServant = masterServants.find(servant => servant.instanceId === instanceId);
-        if (!masterServant) {
-            console.error(`masterServant instanceId=[${instanceId}] could not be found`);
-            return;
-        }
-        setMasterServant(masterServant);
-        if (gameServant?._id !== masterServant.gameId) {
-            setGameServant(gameServantMap[masterServant.gameId]);
-        }
-    }, [gameServant, gameServantMap, masterServants, planServant.instanceId]);
+        // const instanceId = planServantUpdate.instanceId;
+        // const masterServant = masterServants.find(servant => servant.instanceId === instanceId);
+        // if (!masterServant) {
+        //     console.error(`masterServant instanceId=[${instanceId}] could not be found`);
+        //     return;
+        // }
+        // setMasterServant(masterServant);
+        // if (gameServant?._id !== masterServant.gameId) {
+        //     setGameServant(gameServantMap[masterServant.gameId]);
+        // }
+    }, [gameServant, gameServantMap, masterServants]);
 
     /*
      * Updates the `availableServants` state when there are changes to the
@@ -120,7 +118,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
 
         // const availableServants = PlanServantUtils.findAvailableServants(planServants, masterServants);
         // setAvailableServants(availableServants);
-    }, [gameServantMap, masterServants, planServants]);
+    }, [gameServantMap, masterServants]);
 
     
     //#region Input event handlers
@@ -130,7 +128,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
             return;
         }
         const { gameId, instanceId } = value;
-        planServant.instanceId = instanceId;
+        // planServant.instanceId = instanceId;
         // FIXME Need to keep track of the current master servant.
         setMasterServant(value);
         if (gameServant?._id !== gameId) {
@@ -138,7 +136,7 @@ export const PlanServantEdit = React.memo((props: Props) => {
         }
         // TODO Need to update ascension and level as needed.
         // TODO Is force update needed?
-    }, [gameServant?._id, gameServantMap, planServant, servantSelectDisabled]);
+    }, [gameServant?._id, gameServantMap, servantSelectDisabled]);
 
     const handleActiveTabChange = useCallback((event: SyntheticEvent, value: TabId) => {
         setActiveTab(value);
@@ -165,14 +163,14 @@ export const PlanServantEdit = React.memo((props: Props) => {
             />
         );
     } else {
-        tabsContentNode = (
-            <PlanServantEditEnhancementsTabContent
-                planServant={planServant}
-                gameServant={gameServant}
-                showAppendSkills={showAppendSkills}
-                onChange={(e) => console.log(e)}
-            />
-        );
+        // tabsContentNode = (
+        //     <PlanServantEditEnhancementsTabContent
+        //         planServant={planServant}
+        //         gameServant={gameServant}
+        //         showAppendSkills={showAppendSkills}
+        //         onChange={(e) => console.log(e)}
+        //     />
+        // );
     }
 
     return (

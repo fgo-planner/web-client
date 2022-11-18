@@ -1,4 +1,4 @@
-export type ColumnProperties = {
+export type DataTableListColumnProperties = {
     key: string;
     width: number;
     label: string;

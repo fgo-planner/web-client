@@ -1,5 +1,5 @@
 import { DialogProps } from '@mui/material';
-import { ModalOnCloseHandler } from '../modal-on-close-handler.type';
+import { ModalOnCloseHandler } from './modal-on-close-handler.type';
 
 export type DialogComponentProps<T = {}> = {
 

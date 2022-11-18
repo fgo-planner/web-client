@@ -1,6 +1,6 @@
 import { CollectionUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, Plan, PlanServant } from '@fgo-planner/data-core';
-import { GameServantMap, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types/data';
+import { GameServantMap, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types';
 
 //#region Exported type definitions
 

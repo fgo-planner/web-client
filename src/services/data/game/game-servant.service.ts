@@ -2,7 +2,7 @@ import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { GameServantList, GameServantMap, Page, Pagination } from '../../../types/data';
+import { GameServantList, GameServantMap, Page, Pagination } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
 

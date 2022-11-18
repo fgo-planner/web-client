@@ -4,7 +4,7 @@ import { InputBaseComponentProps, TextField } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import { colord, RgbColor } from 'colord';
 import React, { ChangeEvent, FocusEvent, MouseEvent, useCallback, useEffect, useState } from 'react';
-import { ModalOnCloseReason } from '../../../../types/internal';
+import { ModalOnCloseReason } from '../../../../types';
 import { UserThemeColorPickerMenu } from './user-theme-color-picker-menu.component';
 import { UserThemeColorSwatch } from './user-theme-color-swatch.component';
 

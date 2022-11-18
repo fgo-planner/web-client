@@ -18,12 +18,11 @@ import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loadin
 import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { PlanRequirements } from '../../../../types/data';
+import { PlanRequirements } from '../../../../types';
 import { PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { DialogData as PlanServantEditDialogData, PlanServantEditDialog } from '../../components/plan/servant/edit/plan-servant-edit-dialog.component';
-import { usePlanDataEditHook } from '../../hooks/use-plan-data-edit.hook';
+import { usePlanDataEdit } from '../../hooks/use-plan-data-edit.hook';
 
 const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
     layout: {
@@ -198,7 +197,7 @@ export const PlanRoute = React.memo(() => {
         isPlanDataDirty,
         revertChanges,
         persistChanges
-    } = usePlanDataEditHook(planId);
+    } = usePlanDataEdit(planId);
 
     const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
     
@@ -406,46 +405,6 @@ export const PlanRoute = React.memo(() => {
         openEditServantDialog();
     }, [openEditServantDialog]);
 
-    const handleEditServantDialogClose = useCallback((event: any, reason: any, data?: PlanServantEditDialogData): void => {
-        /**
-         * Close the dialog without taking any further action if the changes were
-         * cancelled (if `data` is undefined, then the changes were cancelled).
-         */
-        if (!data) {
-            return closeEditServantDialog();
-        }
-
-        const plan = planRef.current!; // Not possible to be null here.
-        const planServants = plan.servants;
-
-        /**
-         * If a new servant is being added, then `editServantTargetRef.current` will be
-         * undefined. Conversely, if an existing servant is being edited, then
-         * `editServantTargetRef.current` should be defined.
-         */
-        if (!editServantTargetRef.current) {
-            planServants.push(data.planServant);
-        } else {
-            /**
-             * TODO Compare objects and just close dialog if there are no changes.
-             * 
-             * Re-build the servant object to force its row to re-render.
-             */
-            /** */
-            const index = planServants.indexOf(editServantTargetRef.current as PlanServant);
-            if (index !== -1) {
-                planServants[index] = { ...editServantTarget! };
-            }
-        }
-
-        plan.servants = [...planServants]; // Forces child list to re-render
-
-        setDirty(true);
-        closeEditServantDialog();
-        computePlanRequirements();
-        // updateSelectedServants();
-    }, [closeEditServantDialog, computePlanRequirements, editServantTarget]);
-
     /**
      * TODO This is temporary...will need some changes (delete prompt dialog, etc.)
      */
@@ -548,7 +507,7 @@ export const PlanRoute = React.memo(() => {
                     </div>
                 </div>
             </div>
-            <PlanServantEditDialog
+            {/* <PlanServantEditDialog
                 dialogTitle={`${!editServantTargetRef.current ? 'Add' : 'Edit'} Servant`}
                 submitButtonLabel='Done'
                 planServant={editServantTarget!}
@@ -559,7 +518,7 @@ export const PlanRoute = React.memo(() => {
                 showAppendSkills={showAppendSkills}
                 servantSelectDisabled={!!editServantTargetRef.current}
                 onClose={handleEditServantDialogClose}
-            />
+            /> */}
         </Box>
     );
 

@@ -97,7 +97,7 @@ const writeUserPreferencesToLocalStorage = (userPreferences: MasterServantsUserP
  * This is intended to be used only within the `MasterServants` route component,
  * do not use inside any other component!
  */
-export const useMasterServantsUserPreferencesHook = (): MasterServantsUserPreferencesHookResult => {
+export const useMasterServantsUserPreferences = (): MasterServantsUserPreferencesHookResult => {
 
     const [userPreferences, setUserPreferences] = useState<MasterServantsUserPreferences>(getDefaultUserPreferences);
 

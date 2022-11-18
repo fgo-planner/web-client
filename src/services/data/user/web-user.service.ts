@@ -1,7 +1,7 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { User, UserPreferences } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { UserInfo } from '../../../types/internal';
+import { UserTokenPayload } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
@@ -12,7 +12,7 @@ export class WebUserService extends UserService {
 
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user`;
 
-    private _currentUserInfo: Nullable<UserInfo>;
+    private _currentUserToken: Nullable<UserTokenPayload>;
 
     private _currentBasicUserPromise: Nullable<Promise<BasicUser>>;
 
@@ -55,7 +55,7 @@ export class WebUserService extends UserService {
     }
 
     async getCurrentUser(): Promise<Nullable<BasicUser>> {
-        if (!this._currentUserInfo) {
+        if (!this._currentUserToken) {
             return null;
         }
         if (!this._currentBasicUser) {
@@ -80,9 +80,9 @@ export class WebUserService extends UserService {
         return this._currentBasicUserPromise = basicUserPromise;
     }
 
-    private async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
-        this._currentUserInfo = userInfo;
-        if (!userInfo) {
+    private async _handleCurrentUserChange(userToken: Nullable<UserTokenPayload>): Promise<void> {
+        this._currentUserToken = userToken;
+        if (!userToken) {
             this._currentBasicUser = null;
             this._onCurrentUserPreferencesChange.next(this._currentUserPreferences = null);
             return;

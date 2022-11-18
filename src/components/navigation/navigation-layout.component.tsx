@@ -2,7 +2,7 @@ import { Theme } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { PropsWithChildren } from 'react';
 import { useActiveBreakpoints } from '../../hooks/user-interface/use-active-breakpoints.hook';
-import { SxPropsFunction } from '../../types/internal';
+import { SxPropsFunction } from '../../types';
 import { LoadingIndicatorOverlay } from '../utils/loading-indicator-overlay.component';
 import { AppBar } from './app-bar/app-bar.component';
 import { GlobalDialogs } from './global-dialogs-container.component';

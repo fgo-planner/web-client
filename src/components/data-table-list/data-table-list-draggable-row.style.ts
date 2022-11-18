@@ -1,5 +1,5 @@
 import { CSSInterpolation, Theme } from '@mui/material';
-import { StyledFunctionPropsWithTheme } from '../../types/internal';
+import { StyledFunctionPropsWithTheme } from '../../types';
 
 export const StyleClassPrefix = 'DataTableListDraggableRow';
 

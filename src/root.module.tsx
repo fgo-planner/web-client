@@ -1,11 +1,13 @@
 import React, { Suspense, useEffect, useMemo } from 'react';
 import { RouteObject, useRoutes } from 'react-router-dom';
+import { UAParser } from 'ua-parser-js';
 import { NavigationLayout } from './components/navigation/navigation-layout.component';
 import { LazyLoadFallback } from './components/route-fallback/lazy-load-fallback.component';
 import { ThemeProviderWrapper } from './components/theme/theme-provider-wrapper.component';
 import { RequireAuthentication } from './components/utils/require-authentication.component';
 import { DeviceInfoContext } from './contexts/device-info.context';
 import { useInjectable } from './hooks/dependency-injection/use-injectable.hook';
+import { useNavigationDrawerNoAnimations } from './hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { AboutRoute } from './routes/about.route';
 import { ErrorRoute } from './routes/error.route';
 import { ForgotPasswordRoute } from './routes/forgot-password.route';
@@ -13,11 +15,9 @@ import { HomeRoute } from './routes/home/home.route';
 import { LoginRoute } from './routes/login.route';
 import { RegistrationRoute } from './routes/registration.route';
 import { BackgroundMusicService } from './services/audio/background-music.service';
-import { DeviceInfo, DeviceType } from './types/internal';
-import { UAParser } from 'ua-parser-js';
-import { useNavigationDrawerNoAnimations } from './hooks/user-interface/use-navigation-drawer-no-animations.hook';
+import { DeviceInfo, DeviceType } from './types';
 
-console.log('RootModule loaded');
+console.info('RootModule loaded');
 
 /*================= Navigation Outline =================
 

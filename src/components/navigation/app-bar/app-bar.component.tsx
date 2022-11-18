@@ -9,7 +9,7 @@ import { useInjectable } from '../../../hooks/dependency-injection/use-injectabl
 import { BasicUser, UserService } from '../../../services/data/user/user.service';
 import { UserInterfaceService } from '../../../services/user-interface/user-interface.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { SxPropsFunction } from '../../../types/internal';
+import { SxPropsFunction } from '../../../types';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';

@@ -4,7 +4,7 @@ import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, Edit as EditIcon } 
 import { Box, IconButton, Theme } from '@mui/material';
 import { useTheme } from '@mui/system';
 import React, { ReactNode, useCallback } from 'react';
-import { PlanServantRequirements } from '../../../../types/data';
+import { PlanServantRequirements } from '../../../../types';
 import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
 import { GameServantThumbnail } from '../../../game/servant/game-servant-thumbnail.component';

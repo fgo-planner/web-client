@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import React, { useCallback, useState } from 'react';
 import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
+import { useMasterAccountDataEdit } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterServantCostumesList } from './master-servant-costumes-list.component';
 
 const StyleClassPrefix = 'MasterCostumes';
@@ -32,7 +32,7 @@ export const MasterServantCostumesRoute = React.memo(() => {
         updateCostumes,
         revertChanges,
         persistChanges
-    } = useMasterAccountDataEditHook({ includeCostumes: true });
+    } = useMasterAccountDataEdit({ includeCostumes: true });
 
     const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
 

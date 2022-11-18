@@ -1,6 +1,6 @@
 import React, { DetailedHTMLProps, MetaHTMLAttributes, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { PageMetadata as PageMetadataType } from '../../types/internal';
+import { PageMetadata as PageMetadataType } from '../../types';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 

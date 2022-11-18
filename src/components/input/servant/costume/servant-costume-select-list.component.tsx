@@ -6,7 +6,7 @@ import React, { ReactNode, useEffect } from 'react';
 import { useGameServantCostumeList } from '../../../../hooks/data/use-game-servant-costume-list.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { GameServantCostumeListData } from '../../../../types/data';
+import { GameServantCostumeListData } from '../../../../types';
 import { ServantCostumeSelectListRow, StyleClassPrefix as ServantCostumeSelectListRowStyleClassPrefix } from './servant-costume-select-list-row.component';
 
 type Props = {

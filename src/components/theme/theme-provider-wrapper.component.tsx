@@ -2,7 +2,7 @@ import { createTheme, Palette, Theme, ThemeProvider, Typography } from '@mui/mat
 import { StyledEngineProvider } from '@mui/system';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { ScrollbarStyleProps } from '../../styles/scrollbar-style-props';
-import { ThemeInfo } from '../../types/internal';
+import { ThemeInfo } from '../../types';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { ThemeBackground } from './theme-background.component';

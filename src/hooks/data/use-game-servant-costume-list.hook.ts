@@ -1,8 +1,8 @@
-import { ImmutableArray, Nullable, CollectionUtils } from '@fgo-planner/common-core';
+import { CollectionUtils, ImmutableArray, Nullable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { useMemo } from 'react';
-import { GameServantCostumeList, GameServantCostumeListData } from '../../types/data';
+import { GameServantCostumeList, GameServantCostumeListData } from '../../types';
 
 export type UseGameServantCostumeListResult = {
     alwaysUnlockedIds: ReadonlySet<number>,

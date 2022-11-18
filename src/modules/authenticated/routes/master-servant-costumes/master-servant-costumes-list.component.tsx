@@ -3,7 +3,7 @@ import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode } from 'react';
 import { useGameServantCostumeList } from '../../../../hooks/data/use-game-servant-costume-list.hook';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
-import { GameServantCostumeListData } from '../../../../types/data';
+import { GameServantCostumeListData } from '../../../../types';
 import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
 import { MasterServantCostumesListRow, StyleClassPrefix as MasterServantCostumesListRowStyleClassPrefix } from './master-servant-costumes-list-row.component';
 

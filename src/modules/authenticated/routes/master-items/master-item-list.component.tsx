@@ -5,7 +5,7 @@ import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, SetStateAction, useMemo } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { GameItemCategory } from '../../../../types/data';
+import { GameItemCategory } from '../../../../types';
 import { MasterItemListHeader } from './master-item-list-header.component';
 import { StyleClassPrefix as MasterItemListRowLabelStyleClassPrefix } from './master-item-list-row-label.component';
 import { MasterItemListRow, StyleClassPrefix as MasterItemListRowStyleClassPrefix } from './master-item-list-row.component';

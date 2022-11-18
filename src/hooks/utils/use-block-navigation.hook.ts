@@ -2,7 +2,7 @@ import { History, Transition } from 'history';
 import { ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { UNSAFE_NavigationContext, useLocation, useNavigate } from 'react-router-dom';
 import { UserInterfaceService } from '../../services/user-interface/user-interface.service';
-import { NavigationBlockerDialogOptions } from '../../types/internal';
+import { NavigationBlockerDialogOptions } from '../../types';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 export type UseBlockNavigationOptions = {

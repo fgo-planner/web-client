@@ -1,16 +1,16 @@
 import { CollectionUtils } from '@fgo-planner/common-core';
-import { ImmutableMasterServant, InstantiatedServantUtils } from '@fgo-planner/data-core';
+import { InstantiatedServant, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { useCallback, useEffect, useState } from 'react';
-import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
+import { useForceUpdate } from '../../../hooks/utils/use-force-update.hook';
 
-type SelectedServantsData = {
+type SelectedServantsData<T extends InstantiatedServant> = {
     instanceIds: ReadonlySet<number>;
-    servants: ReadonlyArray<ImmutableMasterServant>  // TODO Add option for ordering
+    servants: ReadonlyArray<T>
 };
 
-class SelectedServantsDataContainer implements SelectedServantsData {
+class SelectedServantsDataContainer<T extends InstantiatedServant> implements SelectedServantsData<T> {
 
-    selectedServants?: ReadonlyArray<ImmutableMasterServant>;
+    selectedServants?: ReadonlyArray<T>;
 
     selectedInstanceIds: ReadonlySet<number> = CollectionUtils.emptySet();
 
@@ -24,7 +24,7 @@ class SelectedServantsDataContainer implements SelectedServantsData {
      * 
      * TODO Add option to order by the `selectedInstanceIds` set.
      */
-    get servants(): ReadonlyArray<ImmutableMasterServant> {
+    get servants(): ReadonlyArray<T> {
         if (!this.selectedServants) {
             const selectedInstanceIds = this.selectedInstanceIds;
             this.selectedServants = this.sourceData.filter(({ instanceId }) => {
@@ -34,35 +34,32 @@ class SelectedServantsDataContainer implements SelectedServantsData {
         return this.selectedServants!;
     }
 
-    constructor(public sourceData: ReadonlyArray<ImmutableMasterServant>) {
+    constructor(public sourceData: ReadonlyArray<T>) {
 
     }
 
 }
 
-type MasterServantsSelectedServantsHootResult = {
+type MasterServantsSelectedServantsHootResult<T extends InstantiatedServant> = {
     /**
      * Guaranteed to be stable between rerenders.
      */
-    selectedServantsData: Readonly<SelectedServantsData>;
+    selectedServantsData: Readonly<SelectedServantsData<T>>;
     selectAllServants: () => void;
     deselectAllServants: () => void;
     updateSelectedServants: (selectedInstanceIds: ReadonlySet<number>) => void;
 };
 
 /**
- * Utility hook that manages servant selection on the master servants route.
- *
- * TODO Move this under the `hooks` directory of the authenticated module if
- * other routes need to use it.
+ * Utility hook that manages servant instance selection.
  */
-export const useMasterServantsSelectedServants = (
-    sourceData: ReadonlyArray<ImmutableMasterServant>
-): MasterServantsSelectedServantsHootResult => {
+export const useSelectedServantInstances = <T extends InstantiatedServant>(
+    sourceData: ReadonlyArray<T>
+): MasterServantsSelectedServantsHootResult<T> => {
 
     const forceUpdate = useForceUpdate();
 
-    const [selectedServantsData] = useState<SelectedServantsDataContainer>(() => new SelectedServantsDataContainer(sourceData));
+    const [selectedServantsData] = useState<SelectedServantsDataContainer<T>>(() => new SelectedServantsDataContainer<T>(sourceData));
     
     useEffect(() => {
         selectedServantsData.sourceData = sourceData;

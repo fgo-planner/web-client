@@ -4,7 +4,7 @@ import { Tooltip, TooltipProps } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../../constants';
-import { ComponentStyleProps } from '../../../types/internal';
+import { ComponentStyleProps } from '../../../types';
 
 type ClassIconName = GameServantClass | 'Extra' | 'All';
 

@@ -1,4 +1,3 @@
-import { ReadonlyIterable } from '@fgo-planner/common-core';
 import { GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import { IconButton, Link, Theme, Tooltip } from '@mui/material';
@@ -11,7 +10,7 @@ import { GameServantBondIcon } from '../../../../../components/game/servant/game
 import { useGameItemMap } from '../../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
-import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types/data';
+import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types';
 import { ComputationOptions, PlanComputationUtils } from '../../../../../utils/plan/plan-computation.utils';
 
 type Props = {
@@ -26,7 +25,7 @@ type Props = {
     onStatsChange?: (data: any) => void;
     open?: boolean;
     statsOptions?: ComputationOptions;
-    unlockedCostumes: ReadonlyIterable<number>;
+    unlockedCostumes: Iterable<number>;
 };
 
 // const FormId = 'master-servant-info-panel-form';

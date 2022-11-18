@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationDrawerContent as Content } from '../../../types/internal';
+import { NavigationDrawerContent as Content } from '../../../types';
 import { NavigationDrawerContentSection } from './navigation-drawer-content-section.component';
 
 type Props = {

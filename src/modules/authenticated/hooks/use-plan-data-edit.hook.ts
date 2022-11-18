@@ -6,12 +6,12 @@ import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-i
 import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
 import { PlanService } from '../../../services/data/plan/plan.service';
 import { DataEditUtils } from './data-edit.utils';
-import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccountDataEditHook } from './use-master-account-data-edit.hook';
+import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccountDataEdit } from './use-master-account-data-edit.hook';
 
 //#region Type definitions
 
 /**
- * Return data forwarded from the `useMasterAccountDataEditHook`.
+ * Return data forwarded from the `useMasterAccountDataEdit`.
  */
 type PartialMasterAccountEditData = Pick<MasterAccountEditData, 'costumes' | 'items' | 'qp' | 'servants'>;
 
@@ -53,12 +53,16 @@ type PlanEditReferenceData = Readonly<Omit<PlanEditData, 'servants'> & {
 }>;
 
 type PlanDataEditHookResult = {
+    masterAccountId: string | undefined;
+    awaitingRequest: boolean;
+    isMasterAccountDataDirty: boolean;
+    isPlanDataDirty: boolean;
     masterAccountEditData: PartialMasterAccountEditData;
     planEditData: PlanEditData;
     /**
      * Updates the quantities of inventory items.
      *
-     * Calls the `updateItems` function from the `useMasterAccountDataEditHook`
+     * Calls the `updateItems` function from the `useMasterAccountDataEdit`
      * internally.
      */
     updateMasterItems: (items: ReadonlyRecord<number, SetStateAction<number>>) => void;
@@ -66,7 +70,7 @@ type PlanDataEditHookResult = {
      * Updates the master servants with the corresponding `instanceIds` using the
      * given `ExistingMasterServantUpdate` object. 
      *
-     * Calls the `updateServants` function from the `useMasterAccountDataEditHook`
+     * Calls the `updateServants` function from the `useMasterAccountDataEdit`
      * internally.
      */
     updateMasterServants: (instanceIds: Iterable<number>, update: ExistingMasterServantUpdate) => void;
@@ -108,8 +112,6 @@ type PlanDataEditHookResult = {
     addUpcomingResources: (resources: PlanUpcomingResources) => void;
     updateUpcomingResources: (index: number, resources: PlanUpcomingResources) => void;
     deleteUpcomingResources: (index: number) => void;
-    isMasterAccountDataDirty: boolean;
-    isPlanDataDirty: boolean;
     revertChanges: () => void;
     persistChanges: () => Promise<void>;
 };
@@ -133,7 +135,8 @@ const masterAccountDataEditHookOptions = {
     blockNavigationOnDirtyData: false,
     includeCostumes: true,
     includeItems: true,
-    includeServants: true
+    includeServants: true,
+    skipProcessOnActiveAccountChange: true
 } as MasterAccountDataEditHookOptions;
 
 //#endregion
@@ -252,10 +255,10 @@ const isPlanServantChanged = (
  * during editing. Returns the current state of the data and functions that can
  * be called to update the data.
  *
- * Uses the `useMasterAccountDataEditHook` internally to manage the master
+ * Uses the `useMasterAccountDataEdit` internally to manage the master
  * account data.
  */
-export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHookResult {
+export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookResult {
 
     const {
         invokeLoadingIndicator,
@@ -266,13 +269,15 @@ export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHoo
     const planService = useInjectable(PlanService);
 
     const {
+        masterAccountId,
         masterAccountEditData,
         updateItems: updateMasterItems,
         updateServants: updateMasterServants,
+        awaitingRequest: awaitingMasterAccountRequest,
         isDataDirty: isMasterAccountDataDirty,
         revertChanges: revertMasterAccountChanges,
         persistChanges: persistMasterAccountChanges
-    } = useMasterAccountDataEditHook(masterAccountDataEditHookOptions);
+    } = useMasterAccountDataEdit(masterAccountDataEditHookOptions);
 
     /**
      * The original plan data.
@@ -301,6 +306,17 @@ export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHoo
     const isPlanDataDirty = hasDirtyData(dirtyData);
 
     /**
+     * Whether there is an awaiting request to the back-end from this hook.
+     */
+    const [awaitingPlanRequest, setAwaitingPlanRequest] = useState<boolean>(false);
+
+    /**
+     * Whether there is an awaiting request to the back-end, either from this hook
+     * or from the `useMasterAccountDataEdit`.
+     */
+    const awaitingRequest = awaitingMasterAccountRequest || awaitingPlanRequest;
+
+    /**
      * Prevent user from navigating away if data is dirty.
      */
     useBlockNavigation(isPlanDataDirty, BlockNavigationHookOptions);
@@ -308,8 +324,13 @@ export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHoo
     /**
      * Processes the plan data fetched from API server.
      */
-    const handlePlanLoad = useCallback((plan: ImmutablePlan): void => {
-        // TODO Sanitize plan against current master account data.
+    const handlePlanLoad = useCallback((plan: Plan): void => {
+        /**
+         * TODO Sanitize plan against current master account data.
+         * 
+         * - Any `instanceId` that are not present in the master account should also be
+         *   removed from the plan.
+         */
         const editData = clonePlanDataForEdit(plan);
         const referenceData = clonePlanDataForReference(plan);
         setEditData(editData);
@@ -322,6 +343,12 @@ export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHoo
      * Initial load of plan data.
      */
     useEffect(() => {
+        /**
+         * Don't load plan until master account data is loaded.
+         */
+        if (!masterAccountId) {
+            return;
+        }
         if (!planId) {
             console.error(`Invalid plan ID '${planId}'`);
         } else {
@@ -333,7 +360,7 @@ export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHoo
             };
             loadPlan();
         }
-    }, [handlePlanLoad, invokeLoadingIndicator, planId, planService, resetLoadingIndicator]);
+    }, [handlePlanLoad, invokeLoadingIndicator, masterAccountId, planId, planService, resetLoadingIndicator]);
 
 
     //#region Local create, update, delete functions
@@ -609,6 +636,7 @@ export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHoo
         }
         if (isPlanDataDirty) {
             invokeLoadingIndicator();
+            setAwaitingPlanRequest(true);
             try {
                 const update: Plan = {
                     _id: plan._id,
@@ -634,6 +662,7 @@ export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHoo
                 handlePlanLoad(updatedPlan);
             } finally {
                 resetLoadingIndicator();
+                setAwaitingPlanRequest(false);
             }
         }
     }, [
@@ -653,6 +682,10 @@ export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHoo
 
 
     return {
+        masterAccountId,
+        awaitingRequest,
+        isMasterAccountDataDirty,
+        isPlanDataDirty,
         masterAccountEditData,
         planEditData: editData,
         updateMasterItems,
@@ -666,8 +699,6 @@ export function usePlanDataEditHook(planId: string | undefined): PlanDataEditHoo
         addUpcomingResources,
         updateUpcomingResources,
         deleteUpcomingResources,
-        isMasterAccountDataDirty,
-        isPlanDataDirty,
         revertChanges,
         persistChanges
     };

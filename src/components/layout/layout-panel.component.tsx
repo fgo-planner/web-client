@@ -2,7 +2,7 @@ import { FilteringStyledOptions } from '@emotion/styled/types/base';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren } from 'react';
-import { ComponentStyleProps } from '../../types/internal';
+import { ComponentStyleProps } from '../../types';
 
 type Props = PropsWithChildren<{
 

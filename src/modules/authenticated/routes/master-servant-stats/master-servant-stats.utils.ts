@@ -1,6 +1,6 @@
 import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { GameServant, GameServantClass, GameServantRarity, InstantiatedServantAscensionLevel, InstantiatedServantBondLevel, InstantiatedServantConstants, InstantiatedServantNoblePhantasmLevel, InstantiatedServantSkillLevel, MasterAccount, MasterServant } from '@fgo-planner/data-core';
-import { GameServantClassSimplified, GameServantMap } from '../../../../types/data';
+import { GameServantClassSimplified, GameServantMap } from '../../../../types';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 
 type MasterServantStatGroupedByRarity = {

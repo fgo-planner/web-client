@@ -2,7 +2,7 @@ import { InstantiatedServantAscensionLevel, InstantiatedServantConstants } from 
 import { WineBarOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
-import { ComponentStyleProps } from '../../../types/internal';
+import { ComponentStyleProps } from '../../../types';
 import { IconButtonText } from '../../text/icon-button-text.component';
 import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
 

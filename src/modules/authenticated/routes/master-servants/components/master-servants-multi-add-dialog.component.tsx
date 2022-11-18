@@ -4,7 +4,7 @@ import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useRef, useStat
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useGameServantList } from '../../../../../hooks/data/use-game-servant-list.hook';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../../../../types/internal';
+import { DialogComponentProps } from '../../../../../types';
 
 export type MultiAddServantData = {
     gameIds: Array<number>,

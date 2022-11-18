@@ -9,7 +9,7 @@ import { AuthenticationService } from '../../../../services/authentication/authe
 import { BasicUser } from '../../../../services/data/user/user.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseHandler, ThemeInfo } from '../../../../types/internal';
+import { ModalOnCloseHandler, ThemeInfo } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';

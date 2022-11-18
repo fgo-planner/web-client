@@ -5,7 +5,7 @@ import React, { ChangeEvent, CSSProperties, MouseEvent, useCallback, useState } 
 import { DialogCloseButton } from '../../../../components/dialog/dialog-close-button.component';
 import { InputFieldContainer , StyleClassPrefix as InputFieldContainerStyleClassPrefix} from '../../../../components/input/input-field-container.component';
 import { useAutoResizeDialog } from '../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../../../types/internal';
+import { DialogComponentProps } from '../../../../types';
 import { MasterServantImportExistingAction as ExistingAction } from './master-servant-import-existing-servants-action.enum';
 
 type RenderedProps = {

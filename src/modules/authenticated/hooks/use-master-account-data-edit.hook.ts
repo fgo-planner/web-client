@@ -1,10 +1,13 @@
 import { CollectionUtils, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, MasterAccountUpdate, MasterServant, InstantiatedServantBondLevel, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdate, InstantiatedServantUtils, MasterAccount } from '@fgo-planner/data-core';
+import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdate } from '@fgo-planner/data-core';
 import { SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import { useGameServantMap } from '../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
 import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
+import { GameServantMap, MasterServantAggregatedData } from '../../../types';
+import { DataAggregationUtils } from '../../../utils/data-aggregation.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 import { DataEditUtils } from './data-edit.utils';
@@ -34,23 +37,22 @@ export type MasterAccountDataEditHookOptions = {
     skipProcessOnActiveAccountChange?: boolean;
 };
 
+/**
+ * This container object is guaranteed to be stable between re-renders. A new
+ * instance will only be constructed under the following scenarios:
+ * - Changes are reverted or persisted.
+ * - A different master account selected.
+ *
+ * The sub-objects within this container object are readonly; new instances will
+ * be created whenever the respective data is changed.
+ */
 export type MasterAccountEditData = {
     bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
     costumes: ReadonlySet<number>;
     items: ReadonlyRecord<number, number>;
-    /**
-     * This value will always be kept up-to-date during servant add and delete
-     * operations.
-     */
     lastServantInstanceId: number;
     qp: number;
-    /**
-     * Any edits to a servant (including bond levels and unlocked costumes) will
-     * result in a new array to be instantiated for this field. In addition, the
-     * servants that were edited (tracked by `instanceId`) will also be
-     * reconstructed.
-     */
-    servants: ReadonlyArray<ImmutableMasterServant>;
+    servantsData: ReadonlyArray<MasterServantAggregatedData>;
     soundtracks: ReadonlySet<number>;
 };
 
@@ -155,7 +157,7 @@ type MasterAccountDataEditHookResultItemsSubset = MasterAccountDataEditHookCommo
 } & Pick<MasterAccountUpdateFunctions, 'updateItem' | 'updateQp'>;
 
 type MasterAccountDataEditHookResultServantsSubset = MasterAccountDataEditHookCommon & {
-    masterAccountEditData: Pick<MasterAccountEditData, 'bondLevels' | 'servants'>;
+    masterAccountEditData: Pick<MasterAccountEditData, 'bondLevels' | 'servantsData'>;
 } & Pick<MasterAccountUpdateFunctions, 'addServant' | 'addServants' | 'updateServants' | 'updateServantOrder' | 'deleteServants'>;
 
 type MasterAccountDataEditHookResultSoundtracksSubset = MasterAccountDataEditHookCommon & {
@@ -187,12 +189,13 @@ const getDefaultMasterAccountEditData = (): MasterAccountEditData => ({
     lastServantInstanceId: 0,
     items: {},
     qp: 0,
-    servants: [],
+    servantsData: CollectionUtils.emptyArray(),
     soundtracks: CollectionUtils.emptySet()
 });
 
 const cloneMasterAccountDataForEdit = (
     masterAccount: Nullable<ImmutableMasterAccount>,
+    gameServantMap: GameServantMap,
     options: MasterAccountDataEditHookOptions
 ): MasterAccountEditData => {
 
@@ -215,7 +218,10 @@ const cloneMasterAccountDataForEdit = (
         result.bondLevels = {
             ...masterAccount.bondLevels
         };
-        result.servants = masterAccount.servants.map(MasterServantUtils.clone);
+        result.servantsData = DataAggregationUtils.aggregateDataForMasterServants(
+            masterAccount.servants.map(MasterServantUtils.clone),
+            gameServantMap
+        );
         result.lastServantInstanceId = masterAccount.lastServantInstanceId;
     }
     if (options.includeSoundtracks) {
@@ -394,6 +400,8 @@ export function useMasterAccountDataEdit(
 
     const masterAccountService = useInjectable(MasterAccountService);
 
+    const gameServantMap = useGameServantMap();
+
     const {
         blockNavigationOnDirtyData = true,
         includeCostumes,
@@ -461,6 +469,10 @@ export function useMasterAccountDataEdit(
      * Master account change subscription.
      */
     useEffect(() => {
+        if (!gameServantMap) {
+            return;
+        }
+
         /**
          * Whether or not to process the next `MasterAccount` data that comes in from
          * the observable.
@@ -478,7 +490,7 @@ export function useMasterAccountDataEdit(
                 if (!shouldProcessNext(masterAccount)) {
                     return;
                 }
-                const editData = cloneMasterAccountDataForEdit(masterAccount, includeOptions);
+                const editData = cloneMasterAccountDataForEdit(masterAccount, gameServantMap, includeOptions);
                 const referenceData = cloneMasterAccountDataForReference(masterAccount, includeOptions);
                 setEditData(editData);
                 setReferenceData(referenceData);
@@ -487,7 +499,7 @@ export function useMasterAccountDataEdit(
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [includeOptions, masterAccountId, skipProcessOnActiveAccountChange]);
+    }, [gameServantMap, includeOptions, masterAccountId, skipProcessOnActiveAccountChange]);
 
     /**
      * Master account available changes subscription.
@@ -630,11 +642,11 @@ export function useMasterAccountDataEdit(
     }, [editData, getReferenceItemQuantity, getUpdatedItemQuantity, includeItems, updateQp]);
 
     const addServants = useCallback((servantIds: Iterable<number>, servantData: NewMasterServantUpdate): void => {
-        if (!includeServants) {
+        if (!includeServants || !gameServantMap) {
             return;
         }
         const {
-            servants: currentServants,
+            servantsData: currentServantsData,
             bondLevels: currentBondLevels,
             costumes: currentCostumes
         } = editData;
@@ -654,9 +666,10 @@ export function useMasterAccountDataEdit(
         const costumes = new Set(currentCostumes);
 
         /**
-         * Contains the new `MasterServant` objects being added.
+         * Contains the new master servants (wrapped in a `MasterServantAggregatedData`
+         * object) being added.
          */
-        const newServants: Array<MasterServant> = [];
+        const newServantsData: Array<MasterServantAggregatedData> = [];
 
         /**
          * Construct new instance of a `MasterServant` object for each `servantId` and
@@ -664,18 +677,22 @@ export function useMasterAccountDataEdit(
          */
         for (const servantId of servantIds) {
             const newServant = MasterServantUtils.instantiate(++lastServantInstanceId);
+            const newServantData = DataAggregationUtils.aggregateDataForMasterServant(newServant, gameServantMap);
+            if (!newServantData) {
+                continue;
+            }
             MasterServantUpdateUtils.applyToMasterServant(servantData, newServant, bondLevels, costumes);
             newServant.gameId = servantId;
-            newServants.push(newServant);
+            newServantsData.push(newServantData);
         }
 
         /**
          * Updated servants array. A new array instance is created to conform with the
          * hook specifications.
          */
-        const servants = [...currentServants, ...newServants];
+        const servantsData = [...currentServantsData, ...newServantsData];
 
-        editData.servants = servants;
+        editData.servantsData = servantsData;
         editData.lastServantInstanceId = lastServantInstanceId;
         editData.bondLevels = bondLevels;
         editData.costumes = costumes;
@@ -684,8 +701,8 @@ export function useMasterAccountDataEdit(
         const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
-            for (const servant of newServants) {
-                dirtyServants.add(servant.instanceId);
+            for (const servantData of newServantsData) {
+                dirtyServants.add(servantData.instanceId);
             }
             return {
                 ...dirtyData,
@@ -694,7 +711,7 @@ export function useMasterAccountDataEdit(
                 costumes: isCostumesDirty
             };
         });
-    }, [editData, includeServants, referenceData]);
+    }, [editData, gameServantMap, includeServants, referenceData]);
 
     const addServant = useCallback((servantData: NewMasterServantUpdate): void => {
         addServants([servantData.gameId], servantData);
@@ -705,7 +722,7 @@ export function useMasterAccountDataEdit(
             return;
         }
         const {
-            servants: currentServants,
+            servantsData: currentServantsData,
             bondLevels: currentBondLevels,
             costumes: currentCostumes
         } = editData;
@@ -713,17 +730,17 @@ export function useMasterAccountDataEdit(
         const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
 
         /**
-         * New array for the servants data. A new array instance is created to conform
-         * with the hook specifications.
+         * New `servantsData` array. A new array instance is created to conform with the
+         * hook specifications.
          */
-        const servants = [];
+        const servantsData: Array<MasterServantAggregatedData> = [];
 
         /**
          * New object for the bond level data. A new object is instantiated to conform
          * with the hook specifications.
          */
         const bondLevels = { ...currentBondLevels };
-        
+
         /**
          * New object for the unlocked costumes data. A new set instance is created to
          * conform with the hook specifications.
@@ -735,21 +752,21 @@ export function useMasterAccountDataEdit(
          */
         const isDirties: Record<number, boolean> = {};
 
-        for (const servant of currentServants) {
-            const instanceId = servant.instanceId;
+        for (const servantData of currentServantsData) {
+            const instanceId = servantData.instanceId;
             /**
              * If the servant is not an update target, then just push to new array and
              * continue.
              */
             if (!instanceIdSet.has(instanceId)) {
-                servants.push(servant);
+                servantsData.push(servantData);
                 continue;
             }
             /**
              * The target servant that the update is applied to. A cloned copy is used to
              * conform with the hook specifications.
              */
-            const targetServant = MasterServantUtils.clone(servant);
+            const targetServant = MasterServantUtils.clone(servantData.masterServant);
             /**
              * Apply update to the target servant. Unlocked costumes are also updated here.
              */
@@ -759,10 +776,13 @@ export function useMasterAccountDataEdit(
             const isDirty = isMasterServantChanged(referenceServant, targetServant);
             isDirties[instanceId] = isDirty;
 
-            servants.push(targetServant);
+            servantsData.push({
+                ...servantData,
+                masterServant: targetServant
+            });
         }
 
-        editData.servants = servants;
+        editData.servantsData = servantsData;
         editData.bondLevels = bondLevels;
         editData.costumes = costumes;
 
@@ -790,28 +810,28 @@ export function useMasterAccountDataEdit(
         if (!includeServants) {
             return;
         }
-        const currentServants = editData.servants;
+        const currentServantsData = editData.servantsData;
 
         /**
-         * New array for the servants data. A new array instance is created to conform
-         * with the hook specifications.
+         * New `servantsData` array. A new array instance is created to conform with the
+         * hook specifications.
          */
-        const servants = [];
+        const servantsData: Array<MasterServantAggregatedData> = [];
 
         /**
          * TODO This is an n^2 operation, may need some optimizations if servant list
          * gets too big.
          */
         for (const instanceId of instanceIds) {
-            const index = currentServants.findIndex(servant => servant.instanceId === instanceId);
+            const index = currentServantsData.findIndex(servant => servant.instanceId === instanceId);
             if (index !== -1) {
-                servants.push(currentServants[index]);
+                servantsData.push(currentServantsData[index]);
             }
         }
 
-        editData.servants = servants;
+        editData.servantsData = servantsData;
 
-        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceData.servants, servants);
+        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceData.servants, servantsData);
         setDirtyData(dirtyData => ({
             ...dirtyData,
             servantOrder: isOrderDirty
@@ -822,7 +842,7 @@ export function useMasterAccountDataEdit(
         if (!includeServants) {
             return;
         }
-        const currentServants = editData.servants;
+        const currentServantsData = editData.servantsData;
 
         const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
 
@@ -830,7 +850,7 @@ export function useMasterAccountDataEdit(
          * Updated servants array with the specified IDs removed. A new array instance
          * is created to conform with the hook specifications.
          */
-        const servants = currentServants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
+        const servantsData = currentServantsData.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
 
         /**
          * If the last servant in terms of `instanceId` was deleted during this
@@ -854,11 +874,11 @@ export function useMasterAccountDataEdit(
 
         // TODO Also remove bond/costume data if the last instance of the servant is removed.
 
-        editData.servants = servants;
+        editData.servantsData = servantsData;
         editData.lastServantInstanceId = lastServantInstanceId;
 
         const referenceServants = referenceData.servants;
-        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceServants, servants);
+        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceServants, servantsData);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
             for (const instanceId of instanceIds) {
@@ -897,13 +917,13 @@ export function useMasterAccountDataEdit(
     }, [editData, referenceData.soundtracks, includeSoundtracks]);
 
     const revertChanges = useCallback((): void => {
-        if (!isDataDirty) {
+        if (!isDataDirty || !gameServantMap) {
             return;
         }
-        const editData = cloneMasterAccountDataForEdit(masterAccount, includeOptions);
+        const editData = cloneMasterAccountDataForEdit(masterAccount, gameServantMap, includeOptions);
         setEditData(editData);
         setDirtyData(getDefaultMasterAccountEditDirtyData());
-    }, [includeOptions, isDataDirty, masterAccount]);
+    }, [gameServantMap, includeOptions, isDataDirty, masterAccount]);
 
     //#endregion
 
@@ -937,9 +957,7 @@ export function useMasterAccountDataEdit(
             }
             if (includeServants) {
                 if (dirtyData.servants.size || dirtyData.servantOrder) {
-                    update.servants = [
-                        ...(editData.servants as Array<MasterServant>)
-                    ];
+                    update.servants = editData.servantsData.map(DataAggregationUtils.getMasterServant) as Array<MasterServant>;
                     update.lastServantInstanceId = editData.lastServantInstanceId;
                 }
                 if (dirtyData.bondLevels) {
@@ -980,7 +998,7 @@ export function useMasterAccountDataEdit(
 
     //#endregion
 
-    
+
     return {
         masterAccountId,
         awaitingRequest,

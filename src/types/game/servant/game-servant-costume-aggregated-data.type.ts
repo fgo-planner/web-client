@@ -2,10 +2,10 @@ import { Immutable } from '@fgo-planner/common-core';
 import { GameServant, GameServantCostume } from '@fgo-planner/data-core';
 
 /**
- * DTO containing a costume and additional related data (costume number and
- * source `GameServant` object).
+ * DTO containing a `GameServantCostume` object, as well as the costume ID and
+ * the source `GameServant` object.
  */
-export type GameServantCostumeListData = Immutable<{
+export type GameServantCostumeAggregatedData = Immutable<{
 
     /**
      * Not the same as `collectionNo`.
@@ -17,5 +17,3 @@ export type GameServantCostumeListData = Immutable<{
     costume: GameServantCostume;
 
 }>;
-
-export type GameServantCostumeList = ReadonlyArray<GameServantCostumeListData>;

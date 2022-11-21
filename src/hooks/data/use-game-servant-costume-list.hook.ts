@@ -1,24 +1,33 @@
-import { CollectionUtils, ImmutableArray, Nullable } from '@fgo-planner/common-core';
+import { CollectionUtils, Immutable, ImmutableArray, Nullable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { useMemo } from 'react';
-import { GameServantCostumeList, GameServantCostumeListData } from '../../types';
+import { GameServantCostumeAggregatedData } from '../../types';
 
 export type UseGameServantCostumeListResult = {
-    alwaysUnlockedIds: ReadonlySet<number>,
-    costumeList: GameServantCostumeList
+    alwaysUnlockedIds: ReadonlySet<number>;
+    costumeList: ReadonlyArray<GameServantCostumeAggregatedData>;
 };
 
-const collectionNoComparator = (a: GameServantCostumeListData, b: GameServantCostumeListData): number => {
+type InputData = Immutable<GameServant> | ImmutableArray<GameServant>;
+
+const isSingularGameServant = (data: InputData): data is Immutable<GameServant> => {
+    return !Array.isArray(data);
+};
+
+const collectionNoComparator = (a: GameServantCostumeAggregatedData, b: GameServantCostumeAggregatedData): number => {
     return a.costume.collectionNo - b.costume.collectionNo;
 };
 
-const alwaysUnlockedFilter = (costume: GameServantCostumeListData): boolean => {
+const alwaysUnlockedFilter = (costume: GameServantCostumeAggregatedData): boolean => {
     return isEmpty(costume.costume.materials.materials);
 };
 
-const transformCostumesList = (gameServants: ImmutableArray<GameServant>): Array<GameServantCostumeListData> => {
-    const result: Array<GameServantCostumeListData> = [];
+const transformCostumesList = (gameServants: ImmutableArray<GameServant>): Array<GameServantCostumeAggregatedData> => {
+    const result: Array<GameServantCostumeAggregatedData> = [];
+    if (!gameServants.length) {
+        return result;
+    }
     for (const servant of gameServants) {
         const { costumes } = servant;
         for (const [id, costume] of Object.entries(costumes)) {
@@ -33,14 +42,26 @@ const transformCostumesList = (gameServants: ImmutableArray<GameServant>): Array
     return result;
 };
 
-export const useGameServantCostumeList = (gameServants: Nullable<ImmutableArray<GameServant>>): UseGameServantCostumeListResult => {
+export function useGameServantCostumeList(gameServant: Nullable<Immutable<GameServant>>): UseGameServantCostumeListResult;
+export function useGameServantCostumeList(gameServants: Nullable<ImmutableArray<GameServant>>): UseGameServantCostumeListResult;
+export function useGameServantCostumeList(data: Nullable<InputData>): UseGameServantCostumeListResult;
+/**
+ * Function implementation.
+ */
+export function useGameServantCostumeList(data: Nullable<InputData>): UseGameServantCostumeListResult {
 
-    const costumeList = useMemo((): GameServantCostumeList => {
-        if (!gameServants) {
-            return [];
+    const costumeList = useMemo((): ReadonlyArray<GameServantCostumeAggregatedData> => {
+        if (!data) {
+            return CollectionUtils.emptyArray();
+        }
+        let gameServants: ImmutableArray<GameServant>;
+        if (isSingularGameServant(data)) {
+            gameServants = [data];
+        } else {
+            gameServants = data;
         }
         return transformCostumesList(gameServants);
-    }, [gameServants]);
+    }, [data]);
 
     const alwaysUnlockedIds = useMemo((): ReadonlySet<number> => {
         if (!costumeList.length) {

@@ -1,10 +1,10 @@
-import { CollectionUtils, Immutable } from '@fgo-planner/common-core';
-import { GameItemConstants, ImmutableMasterAccount, Plan, PlanServant } from '@fgo-planner/data-core';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameItemConstants } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
-import { GameItemCategory, GameItemCategoryMap, PlanRequirements } from '../../../../types';
+import { GameItemCategory, GameItemCategoryMap, PlanRequirements, PlanServantAggregatedData } from '../../../../types';
 import { PlanRequirementsTableFooter } from './plan-requirements-table-footer.component';
 import { PlanRequirementsTableHeader, StyleClassPrefix as PlanRequirementsTableHeaderStyleClassPrefix } from './plan-requirements-table-header.component';
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
@@ -12,18 +12,16 @@ import { PlanRequirementsTableOptions } from './plan-requirements-table-options.
 import { PlanRequirementsTableServantRow } from './plan-requirements-table-servant-row.component';
 
 type Props = {
-    masterAccount: ImmutableMasterAccount;
     /**
-     * @deprecated Remove edit button from servant row
+     * The current quantities of items in the master account.
      */
-    onEditServant?: (planServant: Immutable<PlanServant>) => void;
-    /**
-     * @deprecated Remove delete button from servant row
-     */
-    onDeleteServant?: (planServant: Immutable<PlanServant>) => void;
+    masterItems: ReadonlyRecord<number, number>;
     options: PlanRequirementsTableOptions;
-    plan: Plan;
+    /**
+     * The computed requirements for the plan.
+     */
     planRequirements: PlanRequirements;
+    planServantsData: ReadonlyArray<PlanServantAggregatedData>;
 };
 
 const CellSizeCondensed = 42;
@@ -55,13 +53,13 @@ const getDisplayedItems = (
     if (itemDisplayOptions.lores) {
         defaultItems.push(GameItemConstants.LoreItemId);
     }
-    /*
+    /** 
      * If unused items are being displayed, then just return the default item IDs.
      */
     if (itemDisplayOptions.unused) {
         return defaultItems;
     }
-    /*
+    /** 
      * The overall group requirements should contain all the items required.
      */
     const groupItems = planRequirements.group.items;
@@ -96,17 +94,11 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     const gameItemCategoryMap = useGameItemCategoryMap();
 
     const {
-        masterAccount,
-        onEditServant,
-        onDeleteServant,
+        masterItems,
         options,
-        plan,
-        planRequirements
+        planRequirements,
+        planServantsData
     } = props;
-
-    const masterServantMap = useMemo(() => {
-        return CollectionUtils.mapIterableToObject(masterAccount.servants, servant => servant.instanceId);
-    }, [masterAccount]);
 
     const displayedItems = useMemo((): Array<number> => {
         if (!gameItemCategoryMap) {
@@ -128,8 +120,6 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         };
     }, [displayedItems, options.layout]);
 
-    const planServants = plan.servants;
-
     //#region Component rendering
 
     /**
@@ -139,16 +129,20 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         return null;
     }
 
-    const renderServantRow = (planServant: Immutable<PlanServant>, index: number): ReactNode => {
-        const { instanceId } = planServant;
-        const masterServant = masterServantMap[instanceId];
+    const renderServantRow = (planServantData: PlanServantAggregatedData, index: number): ReactNode => {
+        const {
+            instanceId,
+            gameServant,
+            masterServant,
+            planServant
+        } = planServantData;
+
         const servantRequirements = planRequirements.servants[instanceId];
-        if (!masterServant || !servantRequirements) {
+        if (!servantRequirements) {
             // TODO Log this
             return null;
         }
-        const { gameId } = masterServant;
-        const gameServant = gameServantMap[gameId];
+        
         // const active = selectedServants?.has(instanceId);
 
         return (
@@ -161,8 +155,6 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 planServant={planServant}
                 servantRequirements={servantRequirements}
                 options={internalTableOptions}
-                onEditServant={onEditServant}
-                onDeleteServant={onDeleteServant}
                 // TODO Add right click (context) handler
             />
         );
@@ -174,9 +166,9 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 <PlanRequirementsTableHeader
                     options={internalTableOptions}
                 />
-                {planServants.map(renderServantRow)}
+                {planServantsData.map(renderServantRow)}
                 <PlanRequirementsTableFooter
-                    masterAccount={masterAccount}
+                    masterItems={masterItems}
                     planRequirements={planRequirements}
                     options={internalTableOptions}
                 />

@@ -1,29 +1,24 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant } from '@fgo-planner/data-core';
+import { CollectionUtils, Immutable } from '@fgo-planner/common-core';
+import { GameServant } from '@fgo-planner/data-core';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
-import React, { ChangeEvent, CSSProperties, HTMLAttributes, ReactNode, useCallback, useMemo } from 'react';
+import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { GameServantClassIcon } from '../../../../../components/game/servant/game-servant-class-icon.component';
-import { useGameServantMap } from '../../../../../hooks/data/use-game-servant-map.hook';
+import { AutocompleteOptionWithLabel, MasterServantAggregatedData } from '../../../../../types';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
 type Props = {
-    availableServants?: ReadonlyArray<ImmutableMasterServant>;
+    availableServants?: ReadonlyArray<MasterServantAggregatedData>;
     disabled?: boolean;
-    onChange?: (event: ChangeEvent<{}>, value: ImmutableMasterServant) => void;
+    onChange: (value: MasterServantAggregatedData) => void;
     /**
-     * The `MasterServant` instance that corresponds to the currently selected
-     * option.
+     * The currently selected option.
      */
-    selectedServant?: ImmutableMasterServant;
+    selectedServant?: MasterServantAggregatedData;
     size?: 'small' | 'medium';
 };
 
-type ServantOption = Readonly<{
-    label: string;
-    gameServant: Immutable<GameServant>;
-    masterServant: ImmutableMasterServant;
-}>;
+type Option = AutocompleteOptionWithLabel<MasterServantAggregatedData>;
 
 const optionStyles = {
     root: {
@@ -42,31 +37,38 @@ const optionStyles = {
     } as SystemStyleObject<Theme>
 };
 
-const generateServantOption = (gameServant: Immutable<GameServant>, masterServant: ImmutableMasterServant): ServantOption => {
-    const label = gameServant.metadata?.displayName || gameServant.name || String(gameServant._id);
-    return {
-        label,
-        gameServant,
-        masterServant
-    };
+const generateOption = (data: MasterServantAggregatedData): Option => ({
+    label: GameServantUtils.getDisplayedName(data.gameServant),
+    data
+});
+
+const getGameServant = (option: Option): Immutable<GameServant> => {
+    return option.data.gameServant;
 };
 
-const filterOptions = (options: Array<ServantOption>, state: FilterOptionsState<ServantOption>): Array<ServantOption> => {
+const filterOptions = (options: Array<Option>, state: FilterOptionsState<Option>): Array<Option> => {
     const inputValue = state.inputValue.trim();
     if (!inputValue) {
         return options;
     }
-    return GameServantUtils.filterServants(inputValue, options, o => o.gameServant);
+    return GameServantUtils.filterServants(inputValue, options, getGameServant);
 };
 
-const isOptionSelected = (option: ServantOption, value: ServantOption): boolean => {
-    return option.masterServant.instanceId === value.masterServant.instanceId;
+const isOptionSelected = (option: Option, value: Option): boolean => {
+    return option.data.instanceId === value.data.instanceId;
 };
 
-const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: ServantOption): ReactNode => {
-    const { label, gameServant, masterServant } = option;
+const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: Option): ReactNode => {
+    const {
+        label,
+        data: {
+            instanceId,
+            gameServant
+        }
+    } = option;
+
     return (
-        <li {...props} key={masterServant.instanceId}>
+        <li {...props} key={instanceId}>
             <div style={optionStyles.root}>
                 <div style={optionStyles.rarity}>
                     {`${gameServant.rarity} \u2605`}
@@ -91,56 +93,61 @@ const renderInput = (params: any): ReactNode => {
 export const PlanServantSelectAutocomplete = React.memo((props: Props) => {
 
     const {
-        availableServants,
+        availableServants = CollectionUtils.emptyArray(),
         disabled,
         onChange,
         selectedServant,
         size
     } = props;
 
-    const gameServantMap = useGameServantMap();
+    /**
+     * If there is currently no servant selected, and there are available servants,
+     * then select the first servant from the list.
+     */
+    useEffect((): void => {
+        if (selectedServant || !availableServants.length) {
+            return;
+        }
+        onChange(availableServants[0]);
+    }, [availableServants, onChange, selectedServant]);
 
-    const options = useMemo((): Array<ServantOption> => {
-        if (!gameServantMap || !availableServants?.length) {
+    const options = useMemo((): Array<Option> => {
+        if (!availableServants.length) {
             return [];
         }
-        return availableServants.map(masterServant => {
-            const gameServant = gameServantMap[masterServant.gameId];
-            return generateServantOption(gameServant, masterServant);
-        });
-    }, [availableServants, gameServantMap]);
+        return availableServants.map(generateOption);
+    }, [availableServants]);
 
-    const selectedOption = useMemo((): ServantOption | undefined => {
-        if (!gameServantMap || !selectedServant) {
+    const selectedOption = useMemo((): Option | undefined => {
+        if (!selectedServant || !options.length) {
             return undefined;
         }
-        const gameServant = gameServantMap[selectedServant.gameId];
-        return generateServantOption(gameServant, selectedServant);
-    }, [gameServantMap, selectedServant]);
+        return generateOption(selectedServant);
+    }, [options, selectedServant]);
 
-    const handleChange = useCallback((event: ChangeEvent<{}>, value: ServantOption | null): void => {
+    const handleChange = useCallback((_event: SyntheticEvent, value: Option | null): void => {
         if (value === null) {
             // Is this case even possible?
             return;
         }
-        onChange?.(event, value.masterServant);
+        onChange(value.data);
     }, [onChange]);
 
     /*
      * This can be undefined during the initial render.
      */
-    if (!selectedOption) {
+    if (!selectedServant) {
         return null;
     }
 
-    if (disabled || !options.length) {
+    if (disabled || !availableServants.length) {
         return (
             <TextField
                 variant='outlined'
                 size={size}
                 fullWidth
                 label='Servant'
-                value={selectedOption.gameServant.name}
+                value={selectedServant.gameServant.name}
                 disabled
             />
         );

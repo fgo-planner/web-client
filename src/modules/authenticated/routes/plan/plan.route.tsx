@@ -1,28 +1,28 @@
-import { DateTimeUtils, Immutable, ImmutableArray, Nullable } from '@fgo-planner/common-core';
-import { ImmutableMasterAccount, ImmutableMasterServant, ImmutablePlan, Plan, PlanServant, PlanServantUtils, PlanUpcomingResources } from '@fgo-planner/data-core';
-import { Add as AddIcon, FormatSize as FormatSizeIcon, HideImageOutlined as HideImageOutlinedIcon } from '@mui/icons-material';
-import { IconButton, Theme, Tooltip } from '@mui/material';
+import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
+import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, PlanServant, PlanServantUpdate, PlanServantUpdateUtils } from '@fgo-planner/data-core';
+import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import lodash from 'lodash-es';
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
 import { PlanRequirementsTableOptions } from '../../../../components/plan/requirements/table/plan-requirements-table-options.type';
 import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/plan-requirements-table.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
-import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
-import { useForceUpdate } from '../../../../hooks/utils/use-force-update.hook';
-import { PlanService } from '../../../../services/data/plan/plan.service';
+import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
+import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
+import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { PlanRequirements } from '../../../../types';
+import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, PlanRequirements, PlanServantAggregatedData } from '../../../../types';
+import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 import { PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { usePlanDataEdit } from '../../hooks/use-plan-data-edit.hook';
+import { PlanNavigationRail } from './components/plan-navigation-rail.component';
+import { PlanServantEditDialogData } from './components/plan-servant-edit-dialog-data.type';
+import { PlanServantEditDialog } from './components/plan-servant-edit-dialog.component';
 
 const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
     layout: {
@@ -40,77 +40,17 @@ const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
     }
 });
 
-/**
- * Returns an array of `MasterServant` that have not been added to the plan.
- * 
- * TODO Move this to utils class
- */
-const findAvailableServants = (
-    planServants: ImmutableArray<PlanServant>,
-    masterServants: ReadonlyArray<ImmutableMasterServant>
-): Array<ImmutableMasterServant> => {
-    const planInstanceIds = new Set<number>();
-    for (const { instanceId } of planServants) {
-        planInstanceIds.add(instanceId);
-    }
-    return masterServants.filter(({ instanceId }) => !planInstanceIds.has(instanceId));
-}
-
 const PathMatchPattern: PathPattern = {
     path: '/user/master/planner/:id'
 };
 
-/**
- * Instantiates a new `PlanServant` based on the available servants in the
- * master account (a servant is available if it has not yet been added to the
- * plan). If there are multiple servants available, then the first available
- * servant is used. If there are no servants available, then an error will be
- * thrown.
- *
- * @param planServants The servants that are already added to the plan.
- * @param masterServants The servants in the master account.
- */
-const instantiatePlanServant = (
-    planServants: ImmutableArray<PlanServant>,
-    masterServants: ReadonlyArray<ImmutableMasterServant>
-): PlanServant => {
-    /**
-     * Servants that have not been added to the plan yet.
-     */
-    const availableServants = findAvailableServants(planServants, masterServants);
-    if (!availableServants.length) {
-        throw new Error('No more servants available');
-    }
-    /**
-     * Instantiate using first available servant.
-     */
-    const masterServant = availableServants[0];
-    const planServant = PlanServantUtils.instantiate(masterServant.instanceId);
-    // TODO Populate costume data.
-    return planServant;
-};
-
-/**
- * Returns cloned servant data from the given plan.
- */
-const clonePlan = (plan: ImmutablePlan): Plan => {
-    const targetDate = DateTimeUtils.cloneDate(plan.targetDate);
-    const createdAt = DateTimeUtils.cloneDate(plan.createdAt);
-    const updatedAt = DateTimeUtils.cloneDate(plan.updatedAt);
-    return {
-        ...plan,
-        targetDate,
-        enabled: {
-            ...plan.enabled
-        },
-        servants: plan.servants.map(servant => PlanServantUtils.clone(servant)),
-        upcomingResources: plan.upcomingResources.map(lodash.cloneDeep) as Array<PlanUpcomingResources>,
-        costumes: [
-            ...plan.costumes
-        ],
-        createdAt,
-        updatedAt
-    };
+const computeAvailableServants = (
+    planServantData: ReadonlyArray<PlanServantAggregatedData>,
+    masterServantData: ReadonlyArray<MasterServantAggregatedData>
+): ReadonlyArray<MasterServantAggregatedData> => {
+    const planServantIds = planServantData.map(InstantiatedServantUtils.getInstanceId);
+    const planServantIdSet = new Set(planServantIds);
+    return masterServantData.filter(servantData => !planServantIdSet.has(servantData.instanceId));
 };
 
 const StyleClassPrefix = 'Plan';
@@ -166,20 +106,12 @@ export const PlanRoute = React.memo(() => {
     const routeMatch = useMatch<'id', string>(PathMatchPattern);
     const planId = routeMatch?.params.id;
 
-    const forceUpdate = useForceUpdate();
     const navigate = useNavigate();
-
-    const {
-        invokeLoadingIndicator,
-        resetLoadingIndicator,
-        isLoadingIndicatorActive
-    } = useLoadingIndicator();
-
-    const planService = useInjectable(PlanService);
 
     const gameServantMap = useGameServantMap();
 
     const {
+        masterAccountId,
         masterAccountEditData,
         planEditData,
         updateMasterItems,
@@ -193,32 +125,68 @@ export const PlanRoute = React.memo(() => {
         addUpcomingResources,
         updateUpcomingResources,
         deleteUpcomingResources,
+        awaitingRequest,
         isMasterAccountDataDirty,
         isPlanDataDirty,
         revertChanges,
         persistChanges
     } = usePlanDataEdit(planId);
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
-    
-    /**
-     * The plan data loaded from the backend. This should not be modified or used
-     * anywhere in this route, except when reverting changes. Use `planRef` instead.
-     */
-    const [plan, setPlan] = useState<ImmutablePlan>();
-    /**
-     * Contains a clone of the currently loaded `Plan` object.
-     *
-     * The data is cloned to avoid unwanted modification of the original data. In
-     * addition, the data is stored as a ref to prevent unwanted triggering of hooks
-     * on change.
-     */
-    const planRef = useRef<Plan>();
+    const {
+        dragDropData,
+        startDragDrop,
+        endDragDrop,
+        handleDragOrderChange
+    } = useDragDropHelper<Immutable<PlanServantAggregatedData>>(InstantiatedServantUtils.getInstanceId);
 
     /**
-     * Whether the user has made any unsaved changes.
+     * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
+     * rearrange the default ordering of the list. As such, when in drag-drop mode,
+     * the full list in the current default order is visible, regardless of any
+     * filter or visibility settings.
      */
-    const [dirty, setDirty] = useState<boolean>(false); // TODO Rename this
+    const dragDropMode = !!dragDropData;
+
+    const {
+        selectedData: selectedServantsData,
+        selectAll: selectAllServants,
+        deselectAll: deselectAllServants,
+        updateSelection: updateServantSelection
+    } = useSelectedInstancesHelper(
+        planEditData.servantsData, 
+        InstantiatedServantUtils.getInstanceId
+    );
+
+    /**
+     * Master servants that have not been added to the plan yet.
+     */
+    const [availableServants, setAvailableServants] = useState<ReadonlyArray<MasterServantAggregatedData>>(CollectionUtils.emptyArray);
+
+    /**
+     * Whether the multi-add servant dialog is open.
+     */
+    const [isMultiAddServantDialogOpen, setIsMultiAddServantDialogOpen] = useState<boolean>(false);
+
+    /**
+     * The `PlanServantEditDialogData` DTO that is passed directly into and modified
+     * by the dialog. The original plan servant is not modified until the changes
+     * are submitted.
+     *
+     * The `open` state of the servant edit dialog is also determined by whether
+     * this data is present (dialog is opened if data is defined, and closed if data
+     * is undefined).
+     */
+    const [editServantDialogData, setEditServantDialogData] = useState<PlanServantEditDialogData>();
+
+    /**
+     * Contains the message prompt that is displayed by the delete servant dialog.
+     *
+     * The `open` state of the delete servant dialog is also determined by whether
+     * this data is present (dialog is opened if data is defined, and closed if data
+     * is undefined).
+     */
+    const [deleteServantDialogData, setDeleteServantDialogData] = useState<ReactNode>();
+
 
     const [showAppendSkills, setShowAppendSkills] = useState<boolean>(true); // TODO Change this back to false
     const [tableOptions, setTableOptions] = useState<PlanRequirementsTableOptions>(instantiateDefaultTableOptions);
@@ -240,106 +208,165 @@ export const PlanRoute = React.memo(() => {
     const [deleteServantTarget, setDeleteServantTarget] = useState<PlanServant>();
     const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
 
-    const planRequirementsRef = useRef<PlanRequirements>();
+    const { sm, md } = useActiveBreakpoints();
 
-    const computePlanRequirements = useCallback(() => {
-        /**
-         * We don't have to actually check if `plan` is undefined here, because if
-         * `planRef.current` is undefined then so is `plan` (and vice versa), so we only
-         * have to check one of the two. However, we need to trigger a this hook when
-         * `plan` is loaded, so we check it here anyways so that we can add it as a hook
-         * dependency without eslint complaining.
-         */
-        if (!gameServantMap || !masterAccount || !plan || !planRef.current) {
-            return;
+    const planRequirements = useMemo((): PlanRequirements | null => {
+        if (!gameServantMap || !masterAccountEditData || !planId) {
+            return null;
         }
         const planRequirements = PlanComputationUtils.computePlanRequirements(
-            gameServantMap,
-            masterAccount,
-            planRef.current
+            {
+                planId,
+                ...planEditData
+            },
+            masterAccountEditData
             // TODO Add previous plans
         );
-        planRequirementsRef.current = planRequirements;
-        /**
-         * Force update is needed here because if the plan loads in after the other data
-         * (servant map and master account data), then the component wont be re-rendered
-         * after requirements are computed.
-         */
-        forceUpdate();
-    }, [forceUpdate, gameServantMap, masterAccount, plan]);
+        console.log(planRequirements);
+        return planRequirements;
+    }, [gameServantMap, masterAccountEditData, planEditData, planId]);
+
+
+    //#region Topic subscriptions
 
     /**
-     * Initial load of plan data.
-     */
-    useEffect(() => {
-        if (!planId) {
-            console.error('Could not parse plan ID from route.');
-        } else {
-            invokeLoadingIndicator();
-            const loadPlan = async (): Promise<void> => {
-                const plan = await planService.getPlan(planId);
-                // TODO Sanitize plan against current master account data.
-                planRef.current = clonePlan(plan);
-                setPlan(plan);
-                resetLoadingIndicator();
-            };
-            loadPlan();
-        }
-    }, [invokeLoadingIndicator, planId, planService, resetLoadingIndicator]);
-
-    /**
-     * Master account change subscription.
+     * Master account change subscription. Will redirect the user to the plans list
+     * if another master account is selected.
      */
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopics.User.CurrentMasterAccountChange)
-            .subscribe(account => {
-                const isSameAccount = masterAccount?._id === account?._id;
-                if (!masterAccount || isSameAccount) {
-                    // TODO Sanitize current plan against master account data.
-                    setMasterAccount(account);
-                    computePlanRequirements();
-                } else {
-                    navigate('/user/master/planner');
+            .subscribe(masterAccount => {
+                if (!masterAccountId || masterAccountId === masterAccount?._id) {
+                    return;
                 }
+                navigate('/user/master/planner');
             });
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [computePlanRequirements, masterAccount, navigate]);
+    }, [masterAccountId, navigate]);
+
+    //#endregion
+
+
+    //#region Internal helper functions
     
     /**
-     * Sends plan update request to the back-end.
+     * Applies the update to the currently selected servants.
      */
-    const updatePlan = useCallback(async (): Promise<void> => {
-        invokeLoadingIndicator();
+    const applyUpdateToSelectedServants = useCallback((update: PlanServantUpdate) => {
+        updatePlanServants(selectedServantsData.ids, update);
+    }, [selectedServantsData, updatePlanServants]);
 
-        editServantTargetRef.current = undefined;
-        setEditServantTarget(undefined);
-        setDeleteServantTarget(undefined);
-        setDeleteServantDialogOpen(false);
+    /**
+     * Deletes the currently selected servants.
+     */
+    const deleteSelectedServants = useCallback((): void => {
+        deletePlanServants(selectedServantsData.ids);
+    }, [deletePlanServants, selectedServantsData]);
 
-        try {
-            /**
-             * Use the entire plan as the update request payload. 
-             */
-            const updatedPlan = await planService.updatePlan(planRef.current!);
-            planRef.current = clonePlan(updatedPlan);
-            setPlan(updatedPlan);
-            setDirty(false);
-            computePlanRequirements();
-        } catch (error: any) {
-            // TODO Display error message to user.
-            console.error(error);
-            planRef.current = clonePlan(plan!);
+    const openAddServantDialog = useCallback((): void => {
+        const editServantDialogData: PlanServantEditDialogData = {
+            action: EditDialogAction.Add,
+            data: {
+                instanceId: IndeterminateValue,
+                update: PlanServantUpdateUtils.createNew(planEditData.costumes)
+            }
+        };
+        const availableServants = computeAvailableServants(planEditData.servantsData, masterAccountEditData.servantsData);
+        setAvailableServants(availableServants);
+        setEditServantDialogData(editServantDialogData);
+        setIsMultiAddServantDialogOpen(false);
+        setDeleteServantDialogData(undefined);
+    }, [masterAccountEditData, planEditData]);
+
+    const openMultiAddServantDialog = useCallback((): void => {
+        setIsMultiAddServantDialogOpen(true);
+        setEditServantDialogData(undefined);
+        setDeleteServantDialogData(undefined);
+    }, []);
+
+    const openEditServantDialog = useCallback((): void => {
+        if (!selectedServantsData.instances.length) {
+            return;
         }
+        const selectedServants = selectedServantsData.instances.map(servantData => servantData.planServant);
+        const editServantDialogData: PlanServantEditDialogData = {
+            action: EditDialogAction.Edit,
+            data: {
+                instanceId: IndeterminateValue,
+                update: PlanServantUpdateUtils.createFromExisting(selectedServants, planEditData.costumes)
+            }
+        };
+        setAvailableServants(CollectionUtils.emptyArray());
+        setEditServantDialogData(editServantDialogData);
+        setIsMultiAddServantDialogOpen(false);
+        setDeleteServantDialogData(undefined);
+    }, [planEditData, selectedServantsData]);
 
-        // updateSelectedServants();
-        resetLoadingIndicator();
+    const openDeleteServantDialog = useCallback((): void => {
+        const deleteCount = selectedServantsData.instances.length;
+        if (!deleteCount) {
+            return;
+        }
+        // TODO Un-hardcode static strings.
+        const prompt = <>
+            <p>The following servant{deleteCount > 1 && 's'} will be deleted:</p>
+            <ul>
+                {selectedServantsData.instances.map(servantData => {
+                    const displayedName = GameServantUtils.getDisplayedName(servantData.gameServant);
+                    return <li>{displayedName}</li>;
+                })}
+            </ul>
+            <p>Are you sure you want to proceed?</p>
+        </>;
+        setDeleteServantDialogData(prompt);
+        setIsMultiAddServantDialogOpen(false);
+        setEditServantDialogData(undefined);
+    }, [selectedServantsData]);
 
-    }, [computePlanRequirements, invokeLoadingIndicator, plan, planService, resetLoadingIndicator]);
+    /**
+     * Adds a listener to invoke the `openDeleteServantDialog` function when the
+     * delete key is pressed.
+     */
+    useEffect(() => {
+        const listener = (event: KeyboardEvent): void => {
+            if (event.key !== 'Delete') {
+                return;
+            }
+            openDeleteServantDialog();
+        };
+        window.addEventListener('keydown', listener);
+
+        return () => window.removeEventListener('keydown', listener);
+    }, [openDeleteServantDialog]);
+
+    //#endregion
 
 
-    //#region Input event handlers
+    //#region Navigation rail event handlers
+
+    const handleMultiAddServant = openMultiAddServantDialog;
+
+    const handleDragDropActivate = useCallback(() => {
+        /**
+         * Deselect servants...servant selection is not allowed in drag-drop mode.
+         */
+        deselectAllServants();
+        startDragDrop(planEditData.servantsData);
+    }, [deselectAllServants, planEditData, startDragDrop]);
+
+    const handleDragDropApply = useCallback(() => {
+        const updatedInstanceIdOrder = endDragDrop();
+        if (!updatedInstanceIdOrder) {
+            return;
+        }
+        updatePlanServantOrder(updatedInstanceIdOrder);
+    }, [endDragDrop, updatePlanServantOrder]);
+
+    const handleDragDropCancel = useCallback(() => {
+        endDragDrop();
+    }, [endDragDrop]);
 
     const handleToggleCellSize = useCallback((): void => {
         const layout = { ...tableOptions.layout };
@@ -359,167 +386,124 @@ export const PlanRoute = React.memo(() => {
         });
     }, [tableOptions]);
 
-    const handleSaveButtonClick = useCallback((): void => {
-        updatePlan();
-    }, [updatePlan]);
+    //#endregion
 
-    const handleRevertButtonClick = useCallback((): void => {
-        // Copy data back from plan
-        planRef.current = clonePlan(plan!);
-        // updateSelectedServants();
-        setDirty(false);
-        computePlanRequirements();
-    }, [computePlanRequirements, plan]);
 
-    const openEditServantDialog = useCallback((planServant?: Immutable<PlanServant>): void => {
-        if (!planServant) {
-            /**
-             * Adding a planned servant.
-             */
-            /** */
-            const plan = planRef.current!;
-            const editServantTarget = instantiatePlanServant(plan.servants, masterAccount!.servants);
-            editServantTargetRef.current = undefined;
-            setEditServantTarget(editServantTarget);
-        } else {
-            /**
-             * Editing a planned servant.
-             */
-            editServantTargetRef.current = planServant;
-            setEditServantTarget(PlanServantUtils.clone(planServant));
-        }
-        setDeleteServantTarget(undefined);
-        setDeleteServantDialogOpen(false);
-    }, [masterAccount]);
+    //#region Common event handlers
 
-    const closeEditServantDialog = useCallback((): void => {
-        editServantTargetRef.current = undefined;
-        setEditServantTarget(undefined);
-    }, []);
+    const handleAddServant = openAddServantDialog;
 
-    const handleEditServant = useCallback((planServant: Immutable<PlanServant>): void => {
-        openEditServantDialog(planServant);
-    }, [openEditServantDialog]);
+    const handleEditSelectedServants = openEditServantDialog;
 
-    const handleAddServantButtonClick = useCallback((): void => {
-        openEditServantDialog();
-    }, [openEditServantDialog]);
-
-    /**
-     * TODO This is temporary...will need some changes (delete prompt dialog, etc.)
-     */
-    const handleDeleteServant = useCallback((planServant: Immutable<PlanServant>): void => {
-        const plan = planRef.current!; // Not possible to be null here.
-        const planServants = plan.servants;
-        plan.servants = planServants.filter(servant => servant !== planServant); // Forces child list to re-render
-
-        setDirty(true);
-        computePlanRequirements();
-    }, [computePlanRequirements]);
+    const handleDeleteSelectedServants = openDeleteServantDialog;
 
     //#endregion
 
-    const deleteServantDialogPrompt = useMemo((): string | undefined => {
-        if (!deleteServantTarget || !gameServantMap || !masterAccount) {
-            return undefined;
+
+    //#region Other event handlers
+
+    const handleSaveButtonClick = useCallback(async (): Promise<void> => {
+        editServantTargetRef.current = undefined;
+        setEditServantTarget(undefined);
+        setDeleteServantTarget(undefined);
+        setDeleteServantDialogOpen(false);
+        try {
+            await persistChanges();
+        } catch (error: any) {
+            // TODO Display error message to user.
+            console.error(error);
         }
-        const { instanceId } = deleteServantTarget;
-        const masterServant = masterAccount.servants.find(servant => servant.instanceId === instanceId);
-        if (!masterServant) {
-            return undefined;
+        persistChanges();
+    }, [persistChanges]);
+
+    const handleRevertButtonClick = revertChanges;
+
+    const handleEditServantDialogClose = useCallback((_event: any, _reason: any, data?: PlanServantEditDialogData): void => {
+        setAvailableServants(CollectionUtils.emptyArray());
+        setEditServantDialogData(undefined);
+        /**
+         * Close the dialog without taking any further action if the changes were
+         * cancelled (if `data` is undefined, then the changes were cancelled).
+         */
+        if (!data) {
+            return;
         }
-        const { gameId } = masterServant;
-        const servant = gameServantMap[gameId];
-        return `Are you sure you want to remove ${servant?.name} from the servant list?`;
-    }, [deleteServantTarget, gameServantMap, masterAccount]);
+        if (data.action === EditDialogAction.Add) {
+            const { instanceId, update } = data.data;
+            addPlanServant(instanceId, update);
+        } else {
+            applyUpdateToSelectedServants(data.data.update);
+        }
+    }, [addPlanServant, applyUpdateToSelectedServants]);
+
+    const handleDeleteServantDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): any => {
+        if (reason === 'submit') {
+            deleteSelectedServants();
+        }
+        setDeleteServantDialogData(undefined);
+    }, [deleteSelectedServants]);
+
+    //#endregion
+
+
+    //#region Component rendering
 
     /**
      * These can be undefined during the initial render.
-     *
-     * Note that `planRequirementsRef.current` is computed from `planRef.current`,
-     * which itself is a clone of `plan`. Thus, if `planRequirementsRef.current` is
-     * defined, then so will the other two.
      */
-    if (!gameServantMap || !masterAccount || !planRequirementsRef.current) {
+    if (!gameServantMap || !masterAccountId || !planRequirements) {
         return null;
     }
-    /**
-     * The clone of `plan`. As noted above, this cannot be undefined at this point.
-     */
-    const _plan = planRef.current!; // TODO Rename this
-
-    /**
-     * NavigationRail children
-     */
-    const navigationRailChildNodes: ReactNode = [
-        <Tooltip key='add' title='Add servant' placement='right'>
-            <div>
-                <IconButton
-                    onClick={handleAddServantButtonClick}
-                    children={<AddIcon />}
-                    size='large'
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key='test' title='Test' placement='right'>
-            <div>
-                <IconButton
-                    onClick={handleToggleCellSize}
-                    children={<FormatSizeIcon />}
-                    size='large'
-                />
-            </div>
-        </Tooltip>,
-        <Tooltip key='test2' title='Test 2' placement='right'>
-            <div>
-                <IconButton
-                    onClick={handleToggleShowUnused}
-                    children={<HideImageOutlinedIcon />}
-                    size='large'
-                />
-            </div>
-        </Tooltip>,
-    ];
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-upper-layout-container`}>
                 <RouteDataEditControls
-                    title={_plan.name}
-                    hasUnsavedData={dirty}
+                    title={planEditData.name}
+                    hasUnsavedData={isMasterAccountDataDirty || isPlanDataDirty}
                     onRevertButtonClick={handleRevertButtonClick}
                     onSaveButtonClick={handleSaveButtonClick}
-                    disabled={isLoadingIndicatorActive}
+                    disabled={awaitingRequest}
                 />
             </div>
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
-                <NavigationRail children={navigationRailChildNodes} border />
+                <PlanNavigationRail
+                    layout={sm ? 'column' : 'row'}
+                    dragDropMode={dragDropMode}
+                    selectedServantsCount={selectedServantsData.ids.size}
+                    onAddServant={handleAddServant}
+                    onMultiAddServant={handleMultiAddServant}
+                    onDeleteSelectedServants={handleDeleteSelectedServants}
+                    onDragDropActivate={handleDragDropActivate}
+                    onDragDropApply={handleDragDropApply}
+                    onDragDropCancel={handleDragDropCancel}
+                    onEditSelectedServants={handleEditSelectedServants}
+                    onOpenDisplaySettings={() => { }}
+                    onToggleCellSize={handleToggleCellSize}
+                    onToggleShowUnused={handleToggleShowUnused}
+                />
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <PlanRequirementsTable
-                            masterAccount={masterAccount}
-                            plan={_plan}
-                            planRequirements={planRequirementsRef.current!}
+                            masterItems={masterAccountEditData.items}
+                            planServantsData={planEditData.servantsData}
+                            planRequirements={planRequirements}
                             options={tableOptions}
-                            onDeleteServant={handleDeleteServant}
-                            onEditServant={handleEditServant}
                         />
                     </div>
                 </div>
             </div>
-            {/* <PlanServantEditDialog
-                dialogTitle={`${!editServantTargetRef.current ? 'Add' : 'Edit'} Servant`}
-                submitButtonLabel='Done'
-                planServant={editServantTarget!}
-                planServants={_plan.servants}
-                masterServants={masterAccount.servants}
-                // targetCostumes={masterAccount.costumes}
-                targetCostumes={_plan.costumes}
-                showAppendSkills={showAppendSkills}
-                servantSelectDisabled={!!editServantTargetRef.current}
+            <PlanServantEditDialog
+                availableServants={availableServants}
+                dialogData={editServantDialogData}
+                targetPlanServantsData={selectedServantsData.instances}
+                activeTab='enhancements'
+                onTabChange={Functions.identity}
                 onClose={handleEditServantDialogClose}
-            /> */}
+            />
         </Box>
     );
+
+    //#endregion
 
 });

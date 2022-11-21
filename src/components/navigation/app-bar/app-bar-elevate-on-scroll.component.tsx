@@ -54,6 +54,10 @@ export const AppBarElevateOnScroll = React.memo((props: Props) => {
         if (!element || element.onscroll) {
             return;
         }
+        /**
+         * TODO This may be called twice for each `setLockId` call in development mode
+         * due to strict mode.
+         */
         const setLockIdAction = (lockId?: string): string | undefined => {
             const scrollAmount = element.scrollTop;
             const shouldElevate = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;

@@ -48,9 +48,9 @@ export class GameServantUtils {
 
     static filterServants(search: string, servants: GameServantList): GameServantList;
 
-    static filterServants<T>(search: string, data: Array<T>, mappingFunction: (elem: T) => Immutable<GameServant>): Array<T>;
+    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction: (elem: T) => Immutable<GameServant>): Array<T>;
 
-    static filterServants<T>(search: string, data: Array<T>, mappingFunction?: (elem: T) => Immutable<GameServant>): Array<T> {
+    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction?: (elem: T) => Immutable<GameServant>): Array<T> {
         const searchTrimmed = search.trim();
         if (!searchTrimmed) {
             return [...data];

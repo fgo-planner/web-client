@@ -1,12 +1,12 @@
 import { ReadonlyRecord } from '@fgo-planner/common-core';
-import { ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
+import { InstantiatedServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogTitle, PaperProps, SxProps, Typography } from '@mui/material';
 import { Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { ScrollbarStyleProps } from '../../../../../../styles/scrollbar-style-props';
-import { DialogComponentProps } from '../../../../../../types';
+import { DialogComponentProps, MasterServantAggregatedData } from '../../../../../../types';
 import { MasterServantEditDialogContent, MasterServantEditTab } from './master-servant-edit-dialog-content.component';
 
 type Props = {
@@ -20,7 +20,8 @@ type Props = {
     masterServantUpdate?: MasterServantUpdate;
     onTabChange: (tab: MasterServantEditTab) => void;
     /**
-     * Array containing the `MasterServant` objects being edited.
+     * Array containing the source `MasterServantAggregatedData` objects for the
+     * servants being edited.
      *
      * If a single servant is being edited, this array should contain exactly one
      * `MasterServant`, whose `gameId` value matches that of the given
@@ -32,8 +33,10 @@ type Props = {
      *
      * If inactive (`masterServantUpdate` is `undefined`), this should be set to an
      * empty array to avoid unnecessary re-renders while the dialog is closed.
+     * 
+     * Only used in edit mode; this is ignored in add mode.
      */
-    targetMasterServants: ReadonlyArray<ImmutableMasterServant>;
+    targetMasterServantsData: ReadonlyArray<MasterServantAggregatedData>;
 } & Omit<DialogComponentProps<MasterServantUpdate>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';
@@ -71,7 +74,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         masterServantUpdate,
         onTabChange,
         onClose,
-        targetMasterServants,
+        targetMasterServantsData,
         ...dialogProps
     } = props;
 
@@ -98,7 +101,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         onClose(event, reason);
     }, [onClose]);
 
-    const multiEditMode = targetMasterServants.length > 1;
+    const multiEditMode = targetMasterServantsData.length > 1;
 
     const dialogTitle = useMemo((): string => {
         if (!masterServantUpdate) {
@@ -130,8 +133,8 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
                 </DialogTitle>
                 <MasterServantEditDialogContent
                     bondLevels={bondLevels}
-                    masterServantUpdate={masterServantUpdate!}
-                    targetMasterServants={targetMasterServants}
+                    masterServantUpdate={masterServantUpdate}
+                    targetMasterServantsData={targetMasterServantsData}
                     showAppendSkills
                     activeTab={activeTab}
                     onTabChange={onTabChange}

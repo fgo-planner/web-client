@@ -1,4 +1,4 @@
-import { CollectionUtils, ImmutableArray } from '@fgo-planner/common-core';
+import { CollectionUtils, Immutable, ImmutableArray } from '@fgo-planner/common-core';
 import { GameServant, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -7,7 +7,7 @@ import { ServantCostumeSelectList } from '../../../../../../components/input/ser
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
 
 type Props = {
-    gameServants: ImmutableArray<GameServant>;
+    gameServants?: Immutable<GameServant> | ImmutableArray<GameServant>;
     /**
      * The update payload for editing. This will be modified directly, so provide a
      * clone if modification to the original object is not desired.

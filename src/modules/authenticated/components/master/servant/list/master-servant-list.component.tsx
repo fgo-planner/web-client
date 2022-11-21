@@ -1,13 +1,12 @@
 import { CollectionUtils, ReadonlyPartial, ReadonlyRecord } from '@fgo-planner/common-core';
-import { ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
+import { InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
-import { SortDirection, SortOptions } from '../../../../../../types';
+import { MasterServantAggregatedData, SortDirection, SortOptions } from '../../../../../../types';
 import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';
@@ -27,7 +26,7 @@ type Props = {
      * the list by the parent component. The only transformation handled by this
      * component is sorting.
      */
-    masterServants: ReadonlyArray<ImmutableMasterServant>;
+    masterServantsData: ReadonlyArray<MasterServantAggregatedData>;
     /**
      * Instance IDs of selected servants.
      */
@@ -55,12 +54,10 @@ const RootComponent = styled('div', StyledOptions)(MasterServantListStyle);
 
 export const MasterServantList = React.memo((props: Props) => {
 
-    const gameServantMap = useGameServantMap();
-
     const {
         bondLevels,
         dragDropMode,
-        masterServants,
+        masterServantsData,
         onDragOrderChange,
         onHeaderClick,
         onRowClick,
@@ -75,18 +72,18 @@ export const MasterServantList = React.memo((props: Props) => {
         visibleColumns
     } = props;
 
-    const masterServantsProcessed = useMemo((): ReadonlyArray<ImmutableMasterServant> => {
+    const displayedMasterServantsData = useMemo((): ReadonlyArray<MasterServantAggregatedData> => {
         if (dragDropMode) {
-            return masterServants;
+            return masterServantsData;
         }
-        let result = masterServants;
+        let result = masterServantsData;
         const start1 = window.performance.now();
         // TODO Rework the filtering logic
         if (!showUnsummonedServants) {
-            result = result.filter(({ summoned }) => summoned);
+            result = result.filter(servantData => servantData.masterServant.summoned);
         }
-        if (textFilter && gameServantMap) {
-            result = GameServantUtils.filterServants(textFilter, [...result], ({ gameId }) => gameServantMap[gameId]);
+        if (textFilter) {
+            result = GameServantUtils.filterServants(textFilter, result, servantData => servantData.gameServant);
         }
         const end1 = window.performance.now();
         console.log(`Filtering completed in ${(end1 - start1).toFixed(2)}ms.`);
@@ -98,39 +95,41 @@ export const MasterServantList = React.memo((props: Props) => {
         const start2 = window.performance.now();
         // TODO Move this to utilities class.
         result = [...result].sort((a, b): number => {
+            const masterServantA = a.masterServant;
+            const masterServantB = b.masterServant;
             let paramA: number, paramB: number;
             switch (sort) {
                 case 'npLevel':
-                    paramA = a.np;
-                    paramB = b.np;
+                    paramA = masterServantA.np;
+                    paramB = masterServantB.np;
                     break;
                 case 'level':
-                    paramA = a.level;
-                    paramB = b.level;
+                    paramA = masterServantA.level;
+                    paramB = masterServantB.level;
                     break;
                 case 'fouHp':
-                    paramA = a.fouHp || -1;
-                    paramB = b.fouHp || -1;
+                    paramA = masterServantA.fouHp || -1;
+                    paramB = masterServantB.fouHp || -1;
                     break;
                 case 'fouAtk':
-                    paramA = a.fouAtk || -1;
-                    paramB = b.fouAtk || -1;
+                    paramA = masterServantA.fouAtk || -1;
+                    paramB = masterServantB.fouAtk || -1;
                     break;
                 case 'bondLevel':
-                    paramA = bondLevels[a.gameId] || -1;
-                    paramB = bondLevels[b.gameId] || -1;
+                    paramA = bondLevels[masterServantA.gameId] || -1;
+                    paramB = bondLevels[masterServantB.gameId] || -1;
                     break;
                 case 'summonDate':
-                    paramA = a.summonDate?.getTime() || -1;
-                    paramB = b.summonDate?.getTime() || -1;
+                    paramA = masterServantA.summonDate?.getTime() || -1;
+                    paramB = masterServantB.summonDate?.getTime() || -1;
                     break;
                 default:
-                    paramA = a.gameId;
-                    paramB = b.gameId;
+                    paramA = masterServantA.gameId;
+                    paramB = masterServantB.gameId;
             }
             if (paramA === paramB) {
-                paramA = a.gameId;
-                paramB = b.gameId;
+                paramA = masterServantA.gameId;
+                paramB = masterServantB.gameId;
             }
             return direction === 'asc' ? paramA - paramB : paramB - paramA;
         });
@@ -140,8 +139,7 @@ export const MasterServantList = React.memo((props: Props) => {
     }, [
         bondLevels,
         dragDropMode,
-        gameServantMap,
-        masterServants,
+        masterServantsData,
         showUnsummonedServants,
         sortOptions?.direction,
         sortOptions?.sort,
@@ -152,7 +150,7 @@ export const MasterServantList = React.memo((props: Props) => {
         selectionResult,
         handleItemClick
     } = useMultiSelectHelperForMouseEvent(
-        masterServantsProcessed,
+        displayedMasterServantsData,
         selectedInstanceIds,
         InstantiatedServantUtils.getInstanceId,
         {
@@ -170,18 +168,12 @@ export const MasterServantList = React.memo((props: Props) => {
         onRowClick?.(e);
     }, [handleItemClick, onRowClick]);
 
+
     //#region Component rendering
 
-    /**
-     * This can be undefined during the initial render.
-     */
-    if (!gameServantMap) {
-        return null;
-    }
-
-    const renderMasterServantRow = (masterServant: ImmutableMasterServant, index: number): ReactNode => {
+    const renderMasterServantRow = (masterServantData: MasterServantAggregatedData, index: number): ReactNode => {
+        const masterServant = masterServantData.masterServant;
         const { gameId, instanceId } = masterServant;
-        const gameServant = gameServantMap[gameId];
         const bondLevel = bondLevels[gameId];
         const active = selectedInstanceIds?.has(instanceId);
 
@@ -189,7 +181,7 @@ export const MasterServantList = React.memo((props: Props) => {
             <MasterServantListRow
                 key={instanceId}
                 index={index}
-                gameServant={gameServant}
+                gameServant={masterServantData.gameServant}
                 bond={bondLevel}
                 masterServant={masterServant}
                 visibleColumns={visibleColumns}
@@ -216,7 +208,7 @@ export const MasterServantList = React.memo((props: Props) => {
                 />}
                 <div className={clsx(`${StyleClassPrefix}-list`, dragDropMode && 'drag-drop-mode')}>
                     <DndProvider backend={HTML5Backend}>
-                        {masterServantsProcessed.map(renderMasterServantRow)}
+                        {displayedMasterServantsData.map(renderMasterServantRow)}
                     </DndProvider>
                 </div>
             </div>

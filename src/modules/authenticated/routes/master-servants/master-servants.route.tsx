@@ -1,4 +1,4 @@
-import { ExistingMasterServantUpdate, ExistingMasterServantUpdateType, ImmutableMasterServant, InstantiatedServantUpdateUtils, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, NewMasterServantUpdateType } from '@fgo-planner/data-core';
+import { ExistingMasterServantUpdate, ExistingMasterServantUpdateType, InstantiatedServantUpdateUtils, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -6,20 +6,20 @@ import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useState
 import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useContextMenuState } from '../../../../hooks/user-interface/use-context-menu-state.hook';
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { SortDirection, SortOptions } from '../../../../types';
-import { ModalOnCloseReason } from '../../../../types';
+import { MasterServantAggregatedData, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
+import { DataAggregationUtils } from '../../../../utils/data-aggregation.utils';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
 import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../../hooks/use-master-account-data-edit.hook';
-import { useSelectedServantInstances } from '../../hooks/use-selected-servant-instances.hook';
 import { MasterServantsFilter, MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
 import { MasterServantsInfoPanel } from './components/master-servants-info-panel.component';
 import { MasterServantsListRowContextMenu } from './components/master-servants-list-row-context-menu.component';
@@ -113,7 +113,7 @@ export const MasterServantsRoute = React.memo(() => {
         startDragDrop,
         endDragDrop,
         handleDragOrderChange
-    } = useDragDropHelper<ImmutableMasterServant>(InstantiatedServantUtils.getInstanceId);
+    } = useDragDropHelper<MasterServantAggregatedData>(InstantiatedServantUtils.getInstanceId);
 
     /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
@@ -147,11 +147,14 @@ export const MasterServantsRoute = React.memo(() => {
     const [sortOptions, setSortOptions] = useState<SortOptions<MasterServantListColumn>>();
 
     const {
-        selectedServantsData,
-        selectAllServants,
-        deselectAllServants,
-        updateSelectedServants
-    } = useSelectedServantInstances(masterAccountEditData.servants);
+        selectedData: selectedServantsData,
+        selectAll: selectAllServants,
+        deselectAll: deselectAllServants,
+        updateSelection: updateServantSelection
+    } = useSelectedInstancesHelper(
+        masterAccountEditData.servantsData,
+        InstantiatedServantUtils.getInstanceId
+    );
 
     /**
      * Whether the multi-add servant dialog is open.
@@ -204,14 +207,14 @@ export const MasterServantsRoute = React.memo(() => {
      * Applies the submitted edit to the currently selected servants.
      */
     const applyUpdateToSelectedServants = useCallback((update: ExistingMasterServantUpdate) => {
-        updateServants(selectedServantsData.instanceIds, update);
+        updateServants(selectedServantsData.ids, update);
     }, [selectedServantsData, updateServants]);
 
     /**
      * Deletes the currently selected servants.
      */
     const deleteSelectedServants = useCallback((): void => {
-        deleteServants(selectedServantsData.instanceIds);
+        deleteServants(selectedServantsData.ids);
     }, [deleteServants, selectedServantsData]);
 
     const openAddServantDialog = useCallback((): void => {
@@ -233,10 +236,10 @@ export const MasterServantsRoute = React.memo(() => {
     }, []);
 
     const openEditServantDialog = useCallback((): void => {
-        const selectedServants = selectedServantsData.servants;
-        if (!selectedServants.length) {
+        if (!selectedServantsData.instances.length) {
             return;
         }
+        const selectedServants = selectedServantsData.instances.map(DataAggregationUtils.getMasterServant);
 
         const {
             bondLevels,
@@ -250,20 +253,16 @@ export const MasterServantsRoute = React.memo(() => {
     }, [masterAccountEditData, selectedServantsData]);
 
     const openDeleteServantDialog = useCallback((): void => {
-        if (!gameServantMap) {
-            return;
-        }
-        const selectedServants = selectedServantsData.servants;
-        if (!selectedServants.length) {
+        const deleteCount = selectedServantsData.instances.length;
+        if (!deleteCount) {
             return;
         }
         // TODO Un-hardcode static strings.
         const prompt = <>
-            <p>The following servant{selectedServants.length > 1 && 's'} will be deleted:</p>
+            <p>The following servant{deleteCount > 1 && 's'} will be deleted:</p>
             <ul>
-                {selectedServants.map(({ gameId }) => {
-                    const gameServant = gameServantMap[gameId];
-                    const displayedName = GameServantUtils.getDisplayedName(gameServant);
+                {selectedServantsData.instances.map(servantData => {
+                    const displayedName = GameServantUtils.getDisplayedName(servantData.gameServant);
                     return <li>{displayedName}</li>;
                 })}
             </ul>
@@ -272,7 +271,7 @@ export const MasterServantsRoute = React.memo(() => {
         setDeleteServantDialogData(prompt);
         setIsMultiAddServantDialogOpen(false);
         setEditServantDialogData(undefined);
-    }, [gameServantMap, selectedServantsData]);
+    }, [selectedServantsData]);
 
     /**
      * Adds a listener to invoke the `openDeleteServantDialog` function when the
@@ -302,7 +301,7 @@ export const MasterServantsRoute = React.memo(() => {
          * Deselect servants...servant selection is not allowed in drag-drop mode.
          */
         deselectAllServants();
-        startDragDrop(masterAccountEditData.servants);
+        startDragDrop(masterAccountEditData.servantsData);
     }, [deselectAllServants, masterAccountEditData, startDragDrop]);
 
     const handleDragDropApply = useCallback(() => {
@@ -439,13 +438,11 @@ export const MasterServantsRoute = React.memo(() => {
         return null;
     }
 
-    const selectedInstanceIds = selectedServantsData.instanceIds;
-    const selectedServantsCount = selectedInstanceIds.size;
-
+    const selectedServantsCount = selectedServantsData.ids.size;
     const isMultipleServantsSelected = selectedServantsCount > 1;
 
     const {
-        servants: masterServants,
+        servantsData,
         bondLevels,
         costumes
     } = masterAccountEditData;
@@ -486,9 +483,9 @@ export const MasterServantsRoute = React.memo(() => {
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <MasterServantList
-                            masterServants={dragDropData || masterServants}
+                            masterServantsData={dragDropData || servantsData}
                             bondLevels={bondLevels}
-                            selectedInstanceIds={selectedInstanceIds}
+                            selectedInstanceIds={selectedServantsData.ids}
                             showHeader={sm}
                             visibleColumns={visibleColumns}
                             dragDropMode={dragDropMode}
@@ -499,7 +496,7 @@ export const MasterServantsRoute = React.memo(() => {
                             onHeaderClick={handleHeaderClick}
                             onRowClick={handleRowClick}
                             onRowDoubleClick={handleRowDoubleClick}
-                            onSelectionChange={updateSelectedServants}
+                            onSelectionChange={updateServantSelection}
                             onSortChange={handleSortChange}
                         />
                     </div>
@@ -509,11 +506,7 @@ export const MasterServantsRoute = React.memo(() => {
                              * TODO Change this to false for mobile view, also make it user configurable.
                              */
                             keepChildrenMounted
-                            /**
-                             * TODO If closed and not kept mounted, then don't load the servants since it is
-                             * lazy loaded.
-                             */
-                            activeServants={selectedServantsData.servants}
+                            activeServantsData={selectedServantsData.instances}
                             bondLevels={bondLevels}
                             unlockedCostumes={costumes}
                             // editMode={editMode}
@@ -526,14 +519,14 @@ export const MasterServantsRoute = React.memo(() => {
             <MasterServantEditDialog
                 bondLevels={bondLevels}
                 masterServantUpdate={editServantDialogData}
-                targetMasterServants={selectedServantsData.servants}
+                targetMasterServantsData={selectedServantsData.instances}
                 activeTab={servantEditDialogActiveTab}
                 onTabChange={setServantEditDialogActiveTab}
                 onClose={handleEditServantDialogClose}
             />
             <MasterServantsMultiAddDialog
                 open={isMultiAddServantDialogOpen}
-                masterServants={masterServants}
+                masterServantsData={masterAccountEditData.servantsData}
                 onClose={handleMultiAddServantDialogClose}
             />
             <PromptDialog

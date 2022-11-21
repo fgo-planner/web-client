@@ -24,7 +24,6 @@ type Props = {
      * clone if modification to the original object is not desired.
      */
     masterServantUpdate: MasterServantUpdate;
-    multiEditMode?: boolean;
     readonly?: boolean;
     showAppendSkills?: boolean;
 };
@@ -77,10 +76,16 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
     const {
         gameServant,
         masterServantUpdate,
-        multiEditMode,
         readonly,
         showAppendSkills
     } = props;
+
+    /**
+     * An undefined `gameServant` value indicates that multiple servants are being
+     * edited.
+     */
+    /** */
+    const multiEditMode = !gameServant;
 
 
     //#region Input event handlers
@@ -134,7 +139,10 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleSkillQuickToggleClick = useCallback((value: InstantiatedServantSkillLevel | null, stat: 'skills' | 'appendSkills'): void => {
+    const handleSkillQuickToggleClick = useCallback((
+        value: InstantiatedServantSkillLevel | null,
+        stat: 'skills' | 'appendSkills'
+    ): void => {
         const skillSet = masterServantUpdate[stat];
         if (skillSet[1] === value && skillSet[2] === value && skillSet[3] === value) {
             return;

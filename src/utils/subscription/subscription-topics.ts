@@ -1,7 +1,6 @@
-import { Nullable } from '@fgo-planner/common-core';
+import { Functions, Nullable } from '@fgo-planner/common-core';
 import { MasterAccount, UserPreferences } from '@fgo-planner/data-core';
 import { BasicMasterAccounts, GlobalDialogOpenAction, HttpResponseError, MasterAccountChanges, PageMetadata, ThemeInfo, UserTokenPayload } from '../../types';
-import { Functions } from '../functions';
 import { SubscriptionTopic } from './subscription-topic.class';
 
 const Audio = {

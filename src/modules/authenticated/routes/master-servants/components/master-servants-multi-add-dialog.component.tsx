@@ -1,10 +1,9 @@
-import { ImmutableMasterServant } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormGroup, InputLabel, PaperProps, Select, Switch, Typography } from '@mui/material';
 import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useRef, useState } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useGameServantList } from '../../../../../hooks/data/use-game-servant-list.hook';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../../../../types';
+import { DialogComponentProps, MasterServantAggregatedData } from '../../../../../types';
 
 export type MultiAddServantData = {
     gameIds: Array<number>,
@@ -12,7 +11,7 @@ export type MultiAddServantData = {
 };
 
 type Props = {
-    masterServants: ReadonlyArray<ImmutableMasterServant>;
+    masterServantsData: ReadonlyArray<MasterServantAggregatedData>;
 } & Omit<DialogComponentProps<MultiAddServantData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';
@@ -85,7 +84,7 @@ export const MasterServantsMultiAddDialog = React.memo((props: Props) => {
     const gameServantList = useGameServantList();
 
     const {
-        masterServants,
+        masterServantsData,
         onClose,
         open,
         ...dialogProps
@@ -119,16 +118,16 @@ export const MasterServantsMultiAddDialog = React.memo((props: Props) => {
     }, []);
 
     const handleSelectMissing = useCallback(() => {
-        if (!gameServantList || !masterServants) {
+        if (!gameServantList) {
             return;
         }
-        const masterServantGameIds = new Set(masterServants.map(({ gameId }) => gameId));
+        const masterServantGameIdsSet = new Set(masterServantsData.map(servantData => servantData.masterServant.gameId));
         const selectedServants = gameServantList
-            .map(({ _id: gameId }) => gameId)
-            .filter(gameId => !masterServantGameIds.has(gameId));
+            .map(gameServant => gameServant._id)
+            .filter(gameId => !masterServantGameIdsSet.has(gameId));
 
         setSelectedServants(selectedServants);
-    }, [gameServantList, masterServants]);
+    }, [gameServantList, masterServantsData]);
 
     const handleMultiSelectChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
         const { options } = event.target;
@@ -166,7 +165,7 @@ export const MasterServantsMultiAddDialog = React.memo((props: Props) => {
         onClose(event, reason);
     }, [onClose]);
 
-    /*
+    /**
      * Only re-render the dialog contents if the dialog is open. This allows the
      * dialog to keep displaying the same contents while it is undergoing its exit
      * transition, even if the props were changed by the parent component.

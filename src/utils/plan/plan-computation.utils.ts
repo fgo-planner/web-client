@@ -1,6 +1,7 @@
 import { CollectionUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, Plan, PlanServant } from '@fgo-planner/data-core';
-import { GameServantMap, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types';
+import { GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, ImmutablePlan, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
+import { MasterServantAggregatedData, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantAggregatedData, PlanServantRequirements } from '../../types';
+import { DataAggregationUtils } from '../data-aggregation.utils';
 
 //#region Exported type definitions
 
@@ -11,6 +12,30 @@ export type ComputationOptions = {
     includeCostumes?: boolean;
     excludeLores?: boolean;
 };
+
+/**
+ * Transformed master account data for plan computation.
+ * 
+ * TODO Move this to its own file.
+ */
+export type MasterAccountData = Readonly<{
+    costumes: ReadonlySet<number>;
+    items: ReadonlyRecord<number, number>;
+    qp: number;
+}>;
+
+/**
+ * Transformed plan account data for plan computation.
+ * 
+ * TODO Move this to its own file.
+ */
+export type PlanData = Readonly<{
+    planId: string;
+    enabled: ImmutablePlan['enabled'];
+    servantsData: ReadonlyArray<PlanServantAggregatedData>;
+    costumes: ReadonlySet<number>;
+    upcomingResources: ImmutableArray<PlanUpcomingResources>;
+}>;
 
 //#endregion
 
@@ -27,24 +52,6 @@ type ServantEnhancements = Immutable<{
     ascension?: Nullable<InstantiatedServantAscensionLevel>;
     skills: SkillEnhancements;
     appendSkills: SkillEnhancements;
-}>;
-
-/**
- * Simplified version of `MasterAccount` for internal use.
- */
-type MasterAccountData = Readonly<{
-    /**
-     * Map of item quantities held by the master account, where the key is the
-     * `itemId` and the value is the quantity.
-     */
-    items: ReadonlyRecord<number, number>;
-    /**
-     * Map of servants in the master account, where the key is the `instanceId` and
-     * the value is the `MasterServant`
-     */
-    servants: ReadonlyRecord<number, ImmutableMasterServant>;
-    costumes: ReadonlySet<number>;
-    qp: number;
 }>;
 
 //#endregion
@@ -81,6 +88,9 @@ export class PlanComputationUtils {
         
     }
 
+
+    //#region Arithmetic methods
+
     /**
      * Adds the values from the source `EnhancementRequirements` to the target
      * `EnhancementRequirements`. Only the the target map will be updated; the
@@ -116,23 +126,62 @@ export class PlanComputationUtils {
         return result;
     }
 
-    //#region computePlanRequirements + helper methods
+    //#endregion
 
+
+    //#region Data transformation methods
+
+    /**
+     * TODO Move this into a more general utilities class.
+     */
+    static transformMasterAccount(
+        masterAccount: ImmutableMasterAccount
+    ): MasterAccountData {
+        return {
+            costumes: new Set(masterAccount.costumes),
+            items: masterAccount.resources.items,
+            qp: masterAccount.resources.qp
+        };
+    }
+
+    /**
+     * TODO Move this into a more general utilities class.
+     */
+    static transformPlan(
+        plan: ImmutablePlan,
+        masterServantsDataMap: ReadonlyMap<number, MasterServantAggregatedData>, 
+    ): PlanData {
+        const servantsData = DataAggregationUtils.aggregateDataForPlanServants(
+            plan.servants,
+            masterServantsDataMap
+        );
+        return {
+            planId: plan._id,
+            enabled: plan.enabled,
+            servantsData,
+            costumes: new Set(plan.costumes),
+            upcomingResources: plan.upcomingResources
+        };
+    }
+
+    //#endregion
+
+
+    //#region computePlanRequirements + helper methods
+    
     /**
      * Computes the material debt for the given plan, and optionally the other plans
      * from the plan group, if any.
      *
-     * @param gameServantMap Game servant map data.
-     * @param masterAccount Master account data.
-     * @param targetPlan The target plan.
+     * @param targetPlanData The target plan data.
+     * @param masterAccountData Master account data.
      * @param previousPlans (optional) Plans that precede the target plan. This
      * should exclude the target plan itself and any proceeding plans.
      */
     static computePlanRequirements(
-        gameServantMap: GameServantMap,
-        masterAccount: ImmutableMasterAccount,
-        targetPlan: Immutable<Plan>,
-        previousPlans?: ImmutableArray<Plan>,
+        targetPlanData: PlanData,
+        masterAccountData: MasterAccountData,
+        previousPlansData?: ReadonlyArray<PlanData>,
         optionsOverride?: ComputationOptions
     ): PlanRequirements {
 
@@ -144,25 +193,19 @@ export class PlanComputationUtils {
         const result = this._instantiatePlanRequirements();
 
         /**
-         * Pre-processed master account data.
-         */
-        const masterAccountData = this._preProcessMasterAccount(masterAccount);
-
-        /**
          * The computation options. If options override was not given, then use options
          * from target plan.
          */
-        const options = optionsOverride || this._parseComputationOptions(targetPlan);
+        const options = optionsOverride || this._parseComputationOptions(targetPlanData);
 
         /**
          * Run computations for previous plans in the group first.
          */
-        previousPlans?.forEach(plan => {
+        previousPlansData?.forEach(previousPlanData => {
             this._computePlanRequirements(
                 result,
-                gameServantMap,
+                previousPlanData,
                 masterAccountData,
-                plan,
                 options
             );
         });
@@ -171,9 +214,8 @@ export class PlanComputationUtils {
          */
         this._computePlanRequirements(
             result,
-            gameServantMap,
+            targetPlanData,
             masterAccountData,
-            targetPlan,
             options,
             true
         );
@@ -186,36 +228,22 @@ export class PlanComputationUtils {
 
     private static _computePlanRequirements(
         result: PlanRequirements,
-        gameServantMap: GameServantMap,
+        planData: PlanData,
         masterAccountData: MasterAccountData,
-        plan: Immutable<Plan>,
         options: ComputationOptions,
         isTargetPlan = false
     ): void {
 
-        const targetCostumes = CollectionUtils.toReadonlySet(plan.costumes);
-
-        for (const planServant of plan.servants) {
+        for (const planServantData of planData.servantsData) {
+            const {
+                gameServant,
+                masterServant,
+                planServant
+            } = planServantData;
             /**
              * Skip the servant if it is not enabled.
              */
             if (!planServant.enabled.servant) {
-                continue;
-            }
-            /**
-             * Retrieve the master servant data from the map.
-             */
-            /** */
-            const masterServant = masterAccountData.servants[planServant.instanceId];
-            if (!masterServant) {
-                continue;
-            }
-            /**
-             * Retrieve the game servant data from the map.
-             */
-            /** */
-            const gameServant = gameServantMap[masterServant.gameId];
-            if (!gameServant) {
                 continue;
             }
             /**
@@ -234,7 +262,7 @@ export class PlanComputationUtils {
                 masterServant,
                 planServant,
                 masterAccountData.costumes,
-                targetCostumes,
+                planData.costumes,
                 mergedOptions
             );
 
@@ -252,8 +280,11 @@ export class PlanComputationUtils {
                 this.addEnhancementRequirements(planServantRequirements.requirements, enhancementRequirements);
                 planEnhancementRequirements = result.targetPlan;
             } else {
-                const { previousPlans } = result;
-                planEnhancementRequirements = ObjectUtils.getOrDefault(previousPlans, plan._id, this._instantiateEnhancementRequirements);
+                planEnhancementRequirements = ObjectUtils.getOrDefault(
+                    result.previousPlans,
+                    planData.planId,
+                    this._instantiateEnhancementRequirements
+                );
             }
             this.addEnhancementRequirements(planEnhancementRequirements, enhancementRequirements);
             this.addEnhancementRequirements(result.group, enhancementRequirements);
@@ -306,15 +337,6 @@ export class PlanComputationUtils {
         );
 
         return [planServantRequirements, enhancementRequirements];
-    }
-
-    private static _preProcessMasterAccount(masterAccount: ImmutableMasterAccount): MasterAccountData {
-        const servants = CollectionUtils.mapIterableToObject(masterAccount.servants, InstantiatedServantUtils.getInstanceId);
-        const items = masterAccount.resources.items;
-        const costumes = new Set(masterAccount.costumes);
-        const qp = masterAccount.resources.qp;
-
-        return { servants, items, costumes, qp };
     }
 
     //#endregion
@@ -498,7 +520,7 @@ export class PlanComputationUtils {
         target.total += source.total;
     }
 
-    private static _parseComputationOptions(data: Immutable<Plan> | Immutable<PlanServant>): ComputationOptions {
+    private static _parseComputationOptions(data: PlanData | Immutable<PlanServant>): ComputationOptions {
         const {
             ascensions,
             skills,

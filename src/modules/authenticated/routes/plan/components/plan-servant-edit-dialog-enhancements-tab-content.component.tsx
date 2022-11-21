@@ -3,15 +3,15 @@ import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantSkil
 import { Checkbox, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
-import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
-import { ServantAscensionInputField } from '../../../../../../components/input/servant/servant-ascension-input-field.component';
-import { ServantFouInputField } from '../../../../../../components/input/servant/servant-fou-input-field.component';
-import { ServantFouQuickToggleButtons } from '../../../../../../components/input/servant/servant-fou-quick-toggle-buttons.component';
-import { ServantLevelInputField } from '../../../../../../components/input/servant/servant-level-input-field.component';
-import { ServantLevelQuickToggleButtons } from '../../../../../../components/input/servant/servant-level-quick-toggle-buttons.component';
-import { ServantSkillInputField } from '../../../../../../components/input/servant/servant-skill-input-field.component';
-import { ServantSkillQuickToggleButtons } from '../../../../../../components/input/servant/servant-skill-quick-toggle-buttons.component';
-import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
+import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/input-field-container.component';
+import { ServantAscensionInputField } from '../../../../../components/input/servant/servant-ascension-input-field.component';
+import { ServantFouInputField } from '../../../../../components/input/servant/servant-fou-input-field.component';
+import { ServantFouQuickToggleButtons } from '../../../../../components/input/servant/servant-fou-quick-toggle-buttons.component';
+import { ServantLevelInputField } from '../../../../../components/input/servant/servant-level-input-field.component';
+import { ServantLevelQuickToggleButtons } from '../../../../../components/input/servant/servant-level-quick-toggle-buttons.component';
+import { ServantSkillInputField } from '../../../../../components/input/servant/servant-skill-input-field.component';
+import { ServantSkillQuickToggleButtons } from '../../../../../components/input/servant/servant-skill-quick-toggle-buttons.component';
+import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
 
 type Props = {
     /**

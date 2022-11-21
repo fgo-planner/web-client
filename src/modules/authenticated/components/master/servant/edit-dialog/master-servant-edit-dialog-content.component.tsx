@@ -1,10 +1,10 @@
-import { Immutable, ImmutableArray, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils } from '@fgo-planner/data-core';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameServant, InstantiatedServantBondLevel, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { alpha, DialogContent, Tab, Tabs, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
-import { useGameServantMap } from '../../../../../../hooks/data/use-game-servant-map.hook';
+import { MasterServantAggregatedData } from '../../../../../../types';
 import { MasterServantSelectAutocomplete } from '../master-servant-select-autocomplete.component';
 import { MasterServantEditDialogCostumesTabContent } from './master-servant-edit-dialog-costumes-tab-content.component';
 import { MasterServantEditDialogEnhancementsTabContent } from './master-servant-edit-dialog-enhancements-tab-content.component';
@@ -16,16 +16,16 @@ type Props = {
     activeTab: MasterServantEditTab;
     bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
     /**
-     * The update payload for editing. This will be modified directly, so provide a
-     * clone if modification to the original object is not desired.
+     * The update payload for editing. This object will be modified directly.
      */
     masterServantUpdate: MasterServantUpdate;
     onTabChange: (tab: MasterServantEditTab) => void;
     readonly?: boolean;
     showAppendSkills?: boolean;
     /**
-     * Array containing the `MasterServant` objects being edited.
-     *
+     * Array containing the source `MasterServantAggregatedData` objects for the
+     * servants being edited.
+     * 
      * If a single servant is being edited, this array should contain exactly one
      * `MasterServant`, whose `gameId` value matches that of the given
      * `masterServantUpdate`.
@@ -33,8 +33,10 @@ type Props = {
      * If multiple servants are being edited, this array should contain all the
      * target `MasterServant`, and `masterServantUpdate.gameId` should be set to the
      * indeterminate value.
+     * 
+     * Only used in edit mode; this is ignored in add mode.
      */
-    targetMasterServants: ReadonlyArray<ImmutableMasterServant>;
+    targetMasterServantsData: ReadonlyArray<MasterServantAggregatedData>;
 };
 
 const DefaultTab = 'general';
@@ -93,9 +95,13 @@ const StyleProps = (theme: Theme) => {
     } as SystemStyleObject<SystemTheme>;
 };
 
+/**
+ * TODO REMOVE React.memo. It is not needed for this component because in most
+ * cases a re-render of the parent component (`MasterServantEditDialog`) will
+ * also trigger a re-render of this component.
+ */
+/** */
 export const MasterServantEditDialogContent = React.memo((props: Props) => {
-
-    const gameServantMap = useGameServantMap();
 
     const {
         activeTab = DefaultTab,
@@ -104,63 +110,52 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
         onTabChange,
         readonly,
         showAppendSkills,
-        targetMasterServants
+        targetMasterServantsData
     } = props;
 
-    const { type } = masterServantUpdate;
+    const [selectedServant, setSelectedServant] = useState<Immutable<GameServant>>();
 
-    const [gameServants, setGameServants] = useState<ImmutableArray<GameServant>>([]);
+    const multiEditMode = targetMasterServantsData.length > 1;
 
-    const multiEditMode = targetMasterServants.length > 1;
+    const isNewServant = masterServantUpdate.type === NewMasterServantUpdateType;
 
-    const servantSelectDisabled = readonly || multiEditMode || type !== NewMasterServantUpdateType;
+    const servantSelectDisabled = readonly || multiEditMode || !isNewServant;
 
-    /**
-     * Updates the `gameServants` state when there are changes to the target master
-     * servants array.
-     */
-    useEffect(() => {
-        const gameServants: Array<Immutable<GameServant>> = [];
-        if (gameServantMap && targetMasterServants.length) {
-            const targetServantIds = new Set(targetMasterServants.map(({ gameId }) => gameId));
-            targetServantIds.forEach(gameId => {
-                gameServants.push(gameServantMap[gameId]);
-            });
-            // TODO Recompute level/ascension values?
+    const targetGameServant = useMemo((): Immutable<GameServant> | undefined => {
+        if (isNewServant) {
+            return selectedServant;
         }
-        setGameServants(gameServants);
-    }, [gameServantMap, targetMasterServants]);
+        if (!multiEditMode) {
+            return targetMasterServantsData[0].gameServant;
+        }
+    }, [isNewServant, multiEditMode, selectedServant, targetMasterServantsData]);
 
 
     //#region Input event handlers
 
     const handleSelectedServantChange = useCallback((value: Immutable<GameServant>): void => {
-        if (!gameServantMap || servantSelectDisabled) {
+        if (servantSelectDisabled) {
             return;
         }
-        const { _id: gameId } = value;
+        const gameId = value._id;
         if (masterServantUpdate.gameId === gameId) {
             return;
         }
-        const gameServant = gameServantMap[gameId];
-        masterServantUpdate.gameId = gameId;
         /**
          * Recompute level/ascension values in case the servant rarity has changed.
          */
         const { ascension, level } = masterServantUpdate;
         if (level !== IndeterminateValue && ascension !== IndeterminateValue) {
-            masterServantUpdate.level = InstantiatedServantUtils.roundToNearestValidLevel(ascension, level, gameServant.maxLevel);
+            masterServantUpdate.level = InstantiatedServantUtils.roundToNearestValidLevel(ascension, level, value.maxLevel);
         }
         /**
          * Also update the bond level.
          */
         masterServantUpdate.bondLevel = bondLevels[gameId];
+        setSelectedServant(value);
+    }, [bondLevels, servantSelectDisabled, masterServantUpdate]);
 
-        // TODO For optimization, check if the current `gameServant` value is already the same servant.
-        setGameServants([gameServant]);
-    }, [bondLevels, gameServantMap, servantSelectDisabled, masterServantUpdate]);
-
-    const handleActiveTabChange = useCallback((_: SyntheticEvent, value: MasterServantEditTab) => {
+    const handleActiveTabChange = useCallback((_event: SyntheticEvent, value: MasterServantEditTab): void => {
         onTabChange(value);
     }, [onTabChange]);
 
@@ -169,27 +164,20 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
 
     //#region Component rendering
 
-    /*
-     * These can be undefined during the initial render.
-     */
-    if (!gameServantMap || !gameServants.length) {
-        return null;
-    }
 
     let tabsContentNode: ReactNode;
     if (activeTab === 'costumes') {
         tabsContentNode = (
             <MasterServantEditDialogCostumesTabContent
                 masterServantUpdate={masterServantUpdate}
-                gameServants={gameServants}
+                gameServants={targetGameServant || selectedServant}
             />
         );
     } else if (activeTab === 'enhancements') {
         tabsContentNode = (
             <MasterServantEditDialogEnhancementsTabContent
                 masterServantUpdate={masterServantUpdate}
-                gameServant={multiEditMode ? undefined : gameServants[0]}
-                multiEditMode={multiEditMode}
+                gameServant={targetGameServant}
                 showAppendSkills={showAppendSkills}
             />
         );
@@ -197,7 +185,6 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
         tabsContentNode = (
             <MasterServantEditDialogGeneralTabContent
                 masterServantUpdate={masterServantUpdate}
-                gameServant={multiEditMode ? undefined : gameServants[0]}
                 multiEditMode={multiEditMode}
                 showAppendSkills={showAppendSkills}
             />
@@ -205,11 +192,11 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
     }
 
     return (
-        <DialogContent className={`${StyleClassPrefix}-root`} sx={StyleProps} >
+        <DialogContent className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
                     <MasterServantSelectAutocomplete
-                        selectedServant={multiEditMode ? undefined : gameServants[0]}
+                        selectedServant={targetGameServant}
                         onChange={handleSelectedServantChange}
                         multiEditMode={multiEditMode}
                         disabled={servantSelectDisabled}

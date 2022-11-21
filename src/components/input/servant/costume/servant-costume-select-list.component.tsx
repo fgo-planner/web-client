@@ -1,4 +1,4 @@
-import { ImmutableArray } from '@fgo-planner/common-core';
+import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { alpha, Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -6,19 +6,19 @@ import React, { ReactNode, useEffect } from 'react';
 import { useGameServantCostumeList } from '../../../../hooks/data/use-game-servant-costume-list.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { GameServantCostumeListData } from '../../../../types';
+import { GameServantCostumeAggregatedData } from '../../../../types';
 import { ServantCostumeSelectListRow, StyleClassPrefix as ServantCostumeSelectListRowStyleClassPrefix } from './servant-costume-select-list-row.component';
 
 type Props = {
     disabledCostumeIds?: ReadonlySet<number>;
-    gameServants: ImmutableArray<GameServant>;
+    gameServants?: Immutable<GameServant> | ImmutableArray<GameServant>;
     onSelectionChange: (selectedCostumeIds: ReadonlySet<number>) => void;
     selectedCostumeIds: ReadonlySet<number>;
 };
 
 const NoCostumesMessage = 'No costumes available for the selected servant(s).';
 
-const getCostumeId = ({ costumeId }: GameServantCostumeListData): number => {
+const getCostumeId = ({ costumeId }: GameServantCostumeAggregatedData): number => {
     return costumeId;
 };
 
@@ -102,7 +102,7 @@ export const ServantCostumeSelectList = React.memo((props: Props) => {
         onSelectionChange?.(selectionResult);
     }, [onSelectionChange, selectionResult]);
 
-    const renderRow = (costumeData: GameServantCostumeListData, index: number): ReactNode => {
+    const renderRow = (costumeData: GameServantCostumeAggregatedData, index: number): ReactNode => {
         const { costumeId } = costumeData;
         const alwaysUnlocked = alwaysUnlockedIds.has(costumeId);
         const selected = selectedCostumeIds.has(costumeId);

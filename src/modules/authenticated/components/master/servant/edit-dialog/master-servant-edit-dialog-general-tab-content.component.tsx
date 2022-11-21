@@ -1,5 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateIndeterminate as Indeterminate, InstantiatedServantUpdateNumber, InstantiatedServantBondLevel, InstantiatedServantNoblePhantasmLevel, MasterServantUpdate } from '@fgo-planner/data-core';
+import { InstantiatedServantBondLevel, InstantiatedServantNoblePhantasmLevel, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateIndeterminate as Indeterminate, InstantiatedServantUpdateNumber, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
@@ -11,14 +10,7 @@ import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.h
 
 type Props = {
     /**
-     * The game servant data that corresponds to the servant being edited. This
-     * should be set to `undefined` if and only if multiple servants are being
-     * edited.
-     */
-    gameServant?: Immutable<GameServant>;
-    /**
-     * The update payload for editing. This will be modified directly, so provide a
-     * clone if modification to the original object is not desired.
+     * The update payload for editing. This will be modified directly.
      */
     masterServantUpdate: MasterServantUpdate;
     multiEditMode?: boolean;

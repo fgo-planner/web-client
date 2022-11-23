@@ -1,15 +1,16 @@
-import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameItemConstants } from '@fgo-planner/data-core';
-import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { ReactNode, useMemo } from 'react';
+import { CollectionUtils, Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameItemConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
+import { Box } from '@mui/system';
+import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
-import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { GameItemCategory, GameItemCategoryMap, PlanRequirements, PlanServantAggregatedData } from '../../../../types';
 import { PlanRequirementsTableFooter } from './plan-requirements-table-footer.component';
-import { PlanRequirementsTableHeader, StyleClassPrefix as PlanRequirementsTableHeaderStyleClassPrefix } from './plan-requirements-table-header.component';
+import { PlanRequirementsTableHeader } from './plan-requirements-table-header.component';
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
 import { PlanRequirementsTableOptions } from './plan-requirements-table-options.type';
 import { PlanRequirementsTableServantRow } from './plan-requirements-table-servant-row.component';
+import { PlanRequirementsTableStyle } from './plan-requirements-table-style';
 
 type Props = {
     /**
@@ -22,6 +23,14 @@ type Props = {
      */
     planRequirements: PlanRequirements;
     planServantsData: ReadonlyArray<PlanServantAggregatedData>;
+    hideEmptyColumns?: boolean;
+    /**
+     * Instance IDs of selected servants.
+     */
+    selectedInstanceIds?: ReadonlySet<number>;
+    onRowClick?: MouseEventHandler;
+    onRowDoubleClick?: MouseEventHandler;
+    onSelectionChange?: (selectedInstanceIds: ReadonlySet<number>) => void;
 };
 
 const CellSizeCondensed = 42;
@@ -54,9 +63,9 @@ const getDisplayedItems = (
         defaultItems.push(GameItemConstants.LoreItemId);
     }
     /** 
-     * If unused items are being displayed, then just return the default item IDs.
+     * If empty columns are being displayed, then just return the default item IDs.
      */
-    if (itemDisplayOptions.unused) {
+    if (itemDisplayOptions.empty) {
         return defaultItems;
     }
     /** 
@@ -68,28 +77,7 @@ const getDisplayedItems = (
 
 export const StyleClassPrefix = 'PlanRequirementsTable';
 
-const StyleProps = () => ({
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    overflow: 'auto',
-    [`& .${StyleClassPrefix}-table-container`]: {
-        height: '100%',
-        overflow: 'auto',
-        /**
-         * PlanRequirementsTableHeader component
-         */
-        [`& .${PlanRequirementsTableHeaderStyleClassPrefix}-root`]: {
-            position: 'sticky',
-            top: 0,
-            zIndex: 3
-        }
-    }
-} as SystemStyleObject<SystemTheme>);
-
 export const PlanRequirementsTable = React.memo((props: Props) => {
-
-    const gameServantMap = useGameServantMap();
 
     const gameItemCategoryMap = useGameItemCategoryMap();
 
@@ -97,8 +85,33 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         masterItems,
         options,
         planRequirements,
-        planServantsData
+        planServantsData,
+        selectedInstanceIds = CollectionUtils.emptySet(),
+        onRowClick,
+        onRowDoubleClick,
+        onSelectionChange
     } = props;
+
+    const {
+        selectionResult,
+        handleItemClick
+    } = useMultiSelectHelperForMouseEvent(
+        planServantsData,
+        selectedInstanceIds,
+        InstantiatedServantUtils.getInstanceId,
+        {
+            // disabled: dragDropMode,
+            rightClickAction: 'contextmenu'
+        }
+    );
+
+    /**
+     * Notify parent component whenever selection has changed.
+     */
+    useEffect(() => {
+        onSelectionChange?.(selectionResult);
+    }, [onSelectionChange, selectionResult]);
+
 
     const displayedItems = useMemo((): Array<number> => {
         if (!gameItemCategoryMap) {
@@ -120,48 +133,46 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         };
     }, [displayedItems, options.layout]);
 
+
+    //#region Input event handlers
+    
+    const handleRowClick = useCallback((e: MouseEvent, index: number) => {
+        handleItemClick(e, index);
+        onRowClick?.(e);
+    }, [handleItemClick, onRowClick]);
+
+    //#endregion
+
+
     //#region Component rendering
 
-    /**
-     * This can be undefined during the initial render.
-     */
-    if (!gameServantMap) {
-        return null;
-    }
-
     const renderServantRow = (planServantData: PlanServantAggregatedData, index: number): ReactNode => {
-        const {
-            instanceId,
-            gameServant,
-            masterServant,
-            planServant
-        } = planServantData;
-
+        const instanceId = planServantData.instanceId;
         const servantRequirements = planRequirements.servants[instanceId];
         if (!servantRequirements) {
             // TODO Log this
             return null;
         }
-        
-        // const active = selectedServants?.has(instanceId);
+        const active = selectedInstanceIds?.has(instanceId);
 
         return (
             <PlanRequirementsTableServantRow
                 key={instanceId}
-                // index={index}
+                active={active}
                 borderTop={!!index}
-                gameServant={gameServant}
-                masterServant={masterServant}
-                planServant={planServant}
-                servantRequirements={servantRequirements}
+                index={index}
                 options={internalTableOptions}
-                // TODO Add right click (context) handler
+                planServantData={planServantData}
+                servantRequirements={servantRequirements}
+                onClick={handleRowClick}
+                onContextMenu={handleRowClick}
+                onDoubleClick={onRowDoubleClick}
             />
         );
     };
 
     return (
-        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+        <Box className={`${StyleClassPrefix}-root`} sx={PlanRequirementsTableStyle}>
             <div className={`${StyleClassPrefix}-table-container`}>
                 <PlanRequirementsTableHeader
                     options={internalTableOptions}

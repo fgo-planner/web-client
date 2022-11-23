@@ -11,7 +11,7 @@ import { useGameItemMap } from '../../../../../hooks/data/use-game-item-map.hook
 import { ThemeConstants } from '../../../../../styles/theme-constants';
 import { MasterServantAggregatedData, PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
-import { ComputationOptions, PlanComputationUtils } from '../../../../../utils/plan/plan-computation.utils';
+import * as PlanComputationUtils from '../../../../../utils/plan/plan-computation.utils';
 
 type Props = {
     activeServantsData: ReadonlyArray<MasterServantAggregatedData>;
@@ -24,7 +24,7 @@ type Props = {
      */
     onStatsChange?: (data: any) => void;
     open?: boolean;
-    statsOptions?: ComputationOptions;
+    statsOptions?: PlanComputationUtils.ComputationOptions;
     unlockedCostumes: Iterable<number>;
 };
 

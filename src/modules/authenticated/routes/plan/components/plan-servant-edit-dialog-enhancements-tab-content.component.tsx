@@ -1,8 +1,8 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantSkillLevel, PlanServant } from '@fgo-planner/data-core';
-import { Checkbox, Tooltip } from '@mui/material';
+import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateNumber, PlanServantUpdate } from '@fgo-planner/data-core';
+import { Checkbox } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
-import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/input-field-container.component';
 import { ServantAscensionInputField } from '../../../../../components/input/servant/servant-ascension-input-field.component';
 import { ServantFouInputField } from '../../../../../components/input/servant/servant-fou-input-field.component';
@@ -12,40 +12,32 @@ import { ServantLevelQuickToggleButtons } from '../../../../../components/input/
 import { ServantSkillInputField } from '../../../../../components/input/servant/servant-skill-input-field.component';
 import { ServantSkillQuickToggleButtons } from '../../../../../components/input/servant/servant-skill-quick-toggle-buttons.component';
 import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
+import { MasterServantAggregatedData } from '../../../../../types';
+import { EnhancementCategory, PlanServantEditDialogEnabledCheckbox } from './plan-servant-edit-dialog-enabled-checkbox.component';
 
 type Props = {
     /**
-     * The game data for the planned servant that is being edited.
+     * The servant update data. This object will be modified directly.
      */
-    gameServant: Immutable<GameServant>;
-    onChange: (planServant: PlanServant) => void;
-    /**
-     * The planned servant that is being edited. This will be modified directly, so
-     * provide a clone if modification to the original object is not desired.
-     * 
-     * @deprecated
-     */
-    planServant: PlanServant;
-    // planServantUpdate: PlanServantUpdate;
-    readonly?: boolean;
-    showAppendSkills?: boolean;
+    planServantUpdate: PlanServantUpdate;
+    targetMasterServantsData: ReadonlyArray<MasterServantAggregatedData>;
 };
-
-type SkillSet = 'skills' | 'appendSkills';
-
-type SkillSlot = 1 | 2 | 3;
-
-type FouStat = 'fouHp' | 'fouAtk';
-
-const TooltipEnterDelay = 250;
 
 const StyleClassPrefix = 'PlanServantEditEnhancementsTabContent';
 
 const StyleProps = (theme: Theme) => ({
+    overflowY: 'auto',
+    height: '100%',
+    boxSizing: 'border-box',
+    px: 6,
+    pt: 8,
     [`& .${StyleClassPrefix}-toggle-button-group`]: {
         width: 128,
         height: 56,
-        ml: 2
+        ml: 2,
+        [theme.breakpoints.down('sm')]: {
+            display: 'none'
+        }
     },
     [`& .${StyleClassPrefix}-input-field-group`]: {
         display: 'flex',
@@ -78,267 +70,238 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const forceUpdate = useForceUpdate();
 
     const {
-        gameServant,
-        onChange,
-        planServant,
-        // planServantUpdate,
-        readonly,
-        showAppendSkills
+        planServantUpdate,
+        targetMasterServantsData
     } = props;
 
-    /**
-     * Notifies the parent component of stats change by invoking the `onChange`
-     * callback function.
-     */
-    const pushStatsChange = useCallback((): void => {
-        onChange?.(planServant);
-    }, [onChange, planServant]);
 
 
     //#region Input event handlers
 
-    const handleEnableCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
-        const { name, checked } = event.target;
-        (planServant.enabled as any)[name] = checked;
-        pushStatsChange();
+    const handleEnableCheckboxChange = useCallback((enhancement: EnhancementCategory, value: InstantiatedServantUpdateBoolean): void => {
+        planServantUpdate.enabled[enhancement] = value;
         forceUpdate();
-    }, [forceUpdate, planServant, pushStatsChange]);
+    }, [forceUpdate, planServantUpdate]);
 
-    const handleLevelAscensionInputChange = useCallback((_name: string, level: string, ascension: string, pushChanges = false): void => {
-        planServant.level = Number(level);
-        planServant.ascension = Number(ascension) as InstantiatedServantAscensionLevel;
-        if (pushChanges) {
-            pushStatsChange();
+    const handleLevelAscensionInputChange = useCallback((level: string, ascension: string): void => {
+        planServantUpdate.level = Number(level);
+        planServantUpdate.ascension = Number(ascension) as InstantiatedServantAscensionLevel;
+        forceUpdate();
+    }, [forceUpdate, planServantUpdate]);
+
+    // eslint-disable-next-line max-len
+    const handleSkillInputChange = useCallback((set: InstantiatedServantSkillSet, slot: InstantiatedServantSkillSlot, value: string): void => {
+        if (!value) {
+            planServantUpdate[set][slot] = null;
+        } else {
+            const skillLevel = Number(value) as InstantiatedServantUpdateNumber<InstantiatedServantSkillLevel>;
+            planServantUpdate[set][slot] = skillLevel;
         }
         forceUpdate();
-    }, [forceUpdate, planServant, pushStatsChange]);
+    }, [forceUpdate, planServantUpdate]);
 
-    const handleSkillInputChange = useCallback((_name: any, set: SkillSet, slot: SkillSlot, value: string, pushChanges = false): void => {
-        planServant[set][slot] = value ? Number(value) as InstantiatedServantSkillLevel : undefined;
-        if (pushChanges) {
-            pushStatsChange();
+    const handleFouInputChange = useCallback((set: InstantiatedServantFouSet, value: string): void => {
+        if (!value) {
+            planServantUpdate[set] = null;
+        } else {
+            planServantUpdate[set] = Number(value);
         }
         forceUpdate();
-    }, [forceUpdate, planServant, pushStatsChange]);
+    }, [forceUpdate, planServantUpdate]);
 
-    const handleFouInputChange = useCallback((_: string, stat: FouStat, value: string): void => {
-        planServant[stat] = value ? Number(value) : undefined;
+    const handleInputBlurEvent = useCallback((): void => {
         forceUpdate();
-    }, [forceUpdate, planServant]);
-
-    const handleInputBlurEvent = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
-        pushStatsChange();
-        forceUpdate();
-    }, [forceUpdate, pushStatsChange]);
+    }, [forceUpdate]);
 
     const handleLevelQuickToggleClick = useCallback((level: number, ascension: InstantiatedServantAscensionLevel): void => {
-        if (planServant.ascension === ascension && planServant.level === level) {
+        if (planServantUpdate.ascension === ascension && planServantUpdate.level === level) {
             return;
         }
         handleLevelAscensionInputChange(
-            'TODO The the name param should no longer be needed',
             String(level),
-            String(ascension),
-            true
+            String(ascension)
         );
-    }, [handleLevelAscensionInputChange, planServant.ascension, planServant.level]);
+    }, [handleLevelAscensionInputChange, planServantUpdate.ascension, planServantUpdate.level]);
 
     const handleFouQuickToggleClick = useCallback((value: number): void => {
-        if (planServant.fouHp === value && planServant.fouAtk === value) {
+        if (planServantUpdate.fouHp === value && planServantUpdate.fouAtk === value) {
             return;
         }
-        planServant.fouHp = value;
-        planServant.fouAtk = value;
-        pushStatsChange();
+        planServantUpdate.fouHp = value;
+        planServantUpdate.fouAtk = value;
         forceUpdate();
-    }, [forceUpdate, planServant, pushStatsChange]);
+    }, [forceUpdate, planServantUpdate]);
 
     // eslint-disable-next-line max-len
-    const handleSkillQuickToggleClick = useCallback((value: InstantiatedServantSkillLevel | null, stat: 'skills' | 'appendSkills'): void => {
-        const skillSet = planServant[stat];
-        const skillLevel = value ?? undefined;
-        if (skillSet[1] === skillLevel && skillSet[2] === skillLevel && skillSet[3] === skillLevel) {
+    const handleSkillQuickToggleClick = useCallback((value: InstantiatedServantSkillLevel | null, set: InstantiatedServantSkillSet): void => {
+        const skillSet = planServantUpdate[set];
+        if (skillSet[1] === value && skillSet[2] === value && skillSet[3] === value) {
             return;
         }
-        skillSet[1] = skillLevel;
-        skillSet[2] = skillLevel;
-        skillSet[3] = skillLevel;
-        pushStatsChange();
+        skillSet[1] = value;
+        skillSet[2] = value;
+        skillSet[3] = value;
         forceUpdate();
-    }, [forceUpdate, planServant, pushStatsChange]);
+    }, [forceUpdate, planServantUpdate]);
 
     //#endregion
 
 
     //#region Input fields
 
-    const { enabled } = planServant;
+    const enabled = planServantUpdate.enabled;
+
+    const multiEditMode = targetMasterServantsData.length > 1;
+
+    let targetGameServant: Immutable<GameServant> | undefined;
+    if (!multiEditMode) {
+        /**
+         * This can be empty during the initial render.
+         */
+        if (!targetMasterServantsData.length) {
+            return null;
+        }
+        targetGameServant = targetMasterServantsData[0].gameServant;
+    }
 
     const enableAscensionsCheckbox = (
-        <Tooltip
-            title={`Ascensions/levels ${enabled.ascensions ? 'enabled' : 'disabled'}`}
-            enterDelay={TooltipEnterDelay}
-        >
-            <Checkbox
-                name='ascensions'
-                checked={enabled.ascensions}
-                onChange={handleEnableCheckboxChange}
-                disabled={readonly}
-            />
-        </Tooltip>
+        <PlanServantEditDialogEnabledCheckbox
+            enhancement='ascensions'
+            label='Ascensions/levels'
+            multiEditMode={multiEditMode}
+            value={enabled.ascensions}
+            onChange={handleEnableCheckboxChange}
+        />
+    );
+
+    // TODO Add a flag to enable/disable fous
+    const enableFousCheckbox = (
+         <Checkbox disabled />
     );
 
     const enableSkillsCheckbox = (
-        <Tooltip
-            title={`Ascensions/levels ${enabled.skills ? 'enabled' : 'disabled'}`}
-            enterDelay={TooltipEnterDelay}
-        >
-            <Checkbox
-                name='skills'
-                checked={enabled.skills}
-                onChange={handleEnableCheckboxChange}
-                disabled={readonly}
-            />
-        </Tooltip>
+        <PlanServantEditDialogEnabledCheckbox
+            enhancement='skills'
+            label='Skills'
+            multiEditMode={multiEditMode}
+            value={enabled.skills}
+            onChange={handleEnableCheckboxChange}
+        />
     );
 
     const enableAppendSkillsCheckbox = (
-        <Tooltip
-            title={`Ascensions/levels ${enabled.appendSkills ? 'enabled' : 'disabled'}`}
-            enterDelay={TooltipEnterDelay}
-        >
-            <Checkbox
-                name='appendSkills'
-                checked={enabled.appendSkills}
-                onChange={handleEnableCheckboxChange}
-                disabled={readonly}
-            />
-        </Tooltip>
+        <PlanServantEditDialogEnabledCheckbox
+            enhancement='appendSkills'
+            label='Append Skills'
+            multiEditMode={multiEditMode}
+            value={enabled.appendSkills}
+            onChange={handleEnableCheckboxChange}
+        />
     );
 
     const levelField = (
         <ServantLevelInputField
-            level={String(planServant.level || '')}
-            ascension={String(planServant.level)}
-            gameServant={gameServant}
+            level={String(planServantUpdate.level || '')}
+            ascension={String(planServantUpdate.level)}
+            gameServant={targetGameServant}
             label='Level'
-            name='level'
             onChange={handleLevelAscensionInputChange}
-            disabled={readonly}
         />
     );
 
     const ascensionField = (
         <ServantAscensionInputField
-            level={String(planServant.level || '')}
-            ascension={String(planServant.ascension)}
-            gameServant={gameServant}
+            level={String(planServantUpdate.level || '')}
+            ascension={String(planServantUpdate.ascension)}
+            gameServant={targetGameServant}
             label='Ascension'
-            name='ascension'
             onChange={handleLevelAscensionInputChange}
-            disabled={readonly}
         />
     );
 
     const fouHpField = (
         <ServantFouInputField
-            value={String(planServant.fouHp ?? '')}
+            value={String(planServantUpdate.fouHp ?? '')}
             label='HP Fou'
-            name='fouHp'
-            stat='fouHp'
+            set='fouHp'
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
-            disabled={readonly}
         />
     );
 
     const fouAtkField = (
         <ServantFouInputField
-            value={String(planServant.fouAtk ?? '')}
+            value={String(planServantUpdate.fouAtk ?? '')}
             label='ATK Fou'
-            name='fouAtk'
-            stat='fouAtk'
+            set='fouAtk'
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
-            disabled={readonly}
         />
     );
 
     const skill1Field = (
         <ServantSkillInputField
-            value={String(planServant.skills[1] || '')}
-            label='Skill 1'
-            name='skill1'
-            skillSet='skills'
+            value={String(planServantUpdate.skills[1] || '')}
+            label='Skill'
+            set='skills'
             slot={1}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={readonly}
         />
     );
 
     const skill2Field = (
         <ServantSkillInputField
-            value={String(planServant.skills[2] || '')}
-            label='Skill 2'
-            name='skill2'
-            skillSet='skills'
+            value={String(planServantUpdate.skills[2] || '')}
+            label='Skill'
+            set='skills'
             slot={2}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={readonly}
         />
     );
 
     const skill3Field = (
         <ServantSkillInputField
-            value={String(planServant.skills[3] || '')}
-            label='Skill 3'
-            name='skill3'
-            skillSet='skills'
+            value={String(planServantUpdate.skills[3] || '')}
+            label='Skill'
+            set='skills'
             slot={3}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={readonly}
         />
     );
 
     const appendSkill1Field = (
         <ServantSkillInputField
-            value={String(planServant.appendSkills[1] || '')}
-            label='Append 1'
-            name='appendSkill1'
-            skillSet='appendSkills'
+            value={String(planServantUpdate.appendSkills[1] || '')}
+            label='Append'
+            set='appendSkills'
             slot={1}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={readonly}
         />
     );
 
     const appendSkill2Field = (
         <ServantSkillInputField
-            value={String(planServant.appendSkills[2] || '')}
-            label='Append 2'
-            name='appendSkill2'
-            skillSet='appendSkills'
+            value={String(planServantUpdate.appendSkills[2] || '')}
+            label='Append'
+            set='appendSkills'
             slot={2}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={readonly}
         />
     );
 
     const appendSkill3Field = (
         <ServantSkillInputField
-            value={String(planServant.appendSkills[3] || '')}
-            label='Append 3'
-            name='appendSkill3'
-            skillSet='appendSkills'
+            value={String(planServantUpdate.appendSkills[3] || '')}
+            label='Append'
+            set='appendSkills'
             slot={3}
             allowEmpty
             onChange={handleSkillInputChange}
-            disabled={readonly}
         />
     );
 
@@ -361,16 +324,14 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                 </InputFieldContainer>
                 <ServantLevelQuickToggleButtons
                     className={`${StyleClassPrefix}-toggle-button-group`}
-                    maxNaturalLevel={gameServant.maxLevel}
+                    maxNaturalLevel={targetGameServant?.maxLevel || 90}
                     onClick={handleLevelQuickToggleClick}
                     ignoreTabNavigation
-                    disabled={readonly}
                 />
             </div>
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <div className={`${StyleClassPrefix}-checkbox-container`}>
-                    {/* TODO Add a flag to enable/disable fous */}
-                    <Checkbox />
+                    {enableFousCheckbox}
                 </div>
                 <InputFieldContainer>
                     {fouHpField}
@@ -382,7 +343,6 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                     className={`${StyleClassPrefix}-toggle-button-group`}
                     onClick={handleFouQuickToggleClick}
                     ignoreTabNavigation
-                    disabled={readonly}
                 />
             </div>
             <div className={`${StyleClassPrefix}-input-field-group`}>
@@ -406,35 +366,31 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
                     rightToggleTarget={10}
                     ignoreTabNavigation
                     onClick={handleSkillQuickToggleClick}
-                    disabled={readonly}
                 />
             </div>
-            {showAppendSkills && (
-                <div className={`${StyleClassPrefix}-input-field-group`}>
-                    <div className={`${StyleClassPrefix}-checkbox-container`}>
-                        {enableAppendSkillsCheckbox}
-                    </div>
-                    <InputFieldContainer>
-                        {appendSkill1Field}
-                    </InputFieldContainer>
-                    <InputFieldContainer>
-                        {appendSkill2Field}
-                    </InputFieldContainer>
-                    <InputFieldContainer>
-                        {appendSkill3Field}
-                    </InputFieldContainer>
-                    <ServantSkillQuickToggleButtons
-                        className={`${StyleClassPrefix}-toggle-button-group`}
-                        skillSet='appendSkills'
-                        leftToggleTarget={1}
-                        centerToggleTarget={9}
-                        rightToggleTarget={10}
-                        ignoreTabNavigation
-                        onClick={handleSkillQuickToggleClick}
-                        disabled={readonly}
-                    />
+            <div className={`${StyleClassPrefix}-input-field-group`}>
+                <div className={`${StyleClassPrefix}-checkbox-container`}>
+                    {enableAppendSkillsCheckbox}
                 </div>
-            )}
+                <InputFieldContainer>
+                    {appendSkill1Field}
+                </InputFieldContainer>
+                <InputFieldContainer>
+                    {appendSkill2Field}
+                </InputFieldContainer>
+                <InputFieldContainer>
+                    {appendSkill3Field}
+                </InputFieldContainer>
+                <ServantSkillQuickToggleButtons
+                    className={`${StyleClassPrefix}-toggle-button-group`}
+                    skillSet='appendSkills'
+                    leftToggleTarget={1}
+                    centerToggleTarget={9}
+                    rightToggleTarget={10}
+                    ignoreTabNavigation
+                    onClick={handleSkillQuickToggleClick}
+                />
+            </div>
         </Box>
     );
 

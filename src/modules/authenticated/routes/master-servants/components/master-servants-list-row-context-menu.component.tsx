@@ -1,7 +1,8 @@
 import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon } from '@mui/icons-material';
 import { Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover } from '@mui/material';
-import React, { MouseEvent, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Position2D } from '../../../../../types';
+import { EventHandlers } from '../../../../../utils/event-handlers';
 
 type Props = {
     onAddServant: () => void;
@@ -21,11 +22,6 @@ type Props = {
  * brief moment when it is opened. Setting the duration to 1 fixes this.
  */
 const TransitionDuration = 1;
-
-// TODO Move this to a utility class.
-const handleBackdropContextMenu = (e: MouseEvent<HTMLElement>): void => {
-    e.preventDefault();
-};
 
 export const MasterServantsListRowContextMenu = React.memo((props: Props) => {
 
@@ -72,7 +68,7 @@ export const MasterServantsListRowContextMenu = React.memo((props: Props) => {
     }, [position]);
 
     const backdropProps = useMemo(() => ({
-        onContextMenu: handleBackdropContextMenu,
+        onContextMenu: EventHandlers.preventDefault,
         style: { opacity: 0 }
     }), []);
 

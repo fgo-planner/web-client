@@ -20,10 +20,11 @@ type Props = {
     label?: string;
     level: string;
     multiEditMode?: boolean;
-    name: string;
-    onChange: (name: string, level: string, ascension: string, pushChanges: boolean) => void;
+    onChange: (level: string, ascension: string, pushChanges: boolean) => void;
     variant?: BaseTextFieldProps['variant'];
 };
+
+const FieldName = 'ascension';
 
 const DefaultLabel = 'Ascension';
 
@@ -44,7 +45,6 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
         label,
         level,
         multiEditMode,
-        name,
         onChange,
         variant
     } = props;
@@ -56,15 +56,15 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
         const { value } = event.target;
         const maxLevel = gameServant.maxLevel;
         const updatedLevel = InstantiatedServantUtils.roundToNearestValidLevel(Number(value), Number(level), maxLevel);
-        onChange(name, String(updatedLevel), value, true);
-    }, [gameServant, level, name, onChange]);
+        onChange(String(updatedLevel), value, true);
+    }, [gameServant, level, onChange]);
 
     if (!gameServant && !multiEditMode) {
         console.error('ServantAscensionInputField: gameServant must be provided when editing single servant');
         return null;
     }
 
-    const fieldId = formId ? `${formId}-${name}` : name;
+    const fieldId = formId ? `${formId}-${FieldName}` : FieldName;
 
     if (multiEditMode) {
         return (
@@ -80,11 +80,11 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
 
     return (
         <FormControl variant={variant} fullWidth>
-            <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
+            <InputLabel htmlFor={FieldName} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
                 id={fieldId}
-                name={name}
+                name={FieldName}
                 label={label || DefaultLabel}
                 value={ascension}
                 onChange={handleChange}

@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantSkillLevel, MasterServantUpdate, InstantiatedServantUpdateNumber } from '@fgo-planner/data-core';
+import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateNumber, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
@@ -27,12 +27,6 @@ type Props = {
     readonly?: boolean;
     showAppendSkills?: boolean;
 };
-
-type SkillSet = 'skills' | 'appendSkills';
-
-type SkillSlot = 1 | 2 | 3;
-
-type FouStat = 'fouHp' | 'fouAtk';
 
 const StyleClassPrefix = 'MasterServantEditDialogEnhancementsTabContent';
 
@@ -90,27 +84,28 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
 
     //#region Input event handlers
 
-    const handleLevelAscensionInputChange = useCallback((_: any, level: string, ascension: string): void => {
+    const handleLevelAscensionInputChange = useCallback((level: string, ascension: string): void => {
         masterServantUpdate.level = Number(level);
         masterServantUpdate.ascension = Number(ascension) as InstantiatedServantAscensionLevel;
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleSkillInputChange = useCallback((_: any, skillSet: SkillSet, slot: SkillSlot, value: string): void => {
+    // eslint-disable-next-line max-len
+    const handleSkillInputChange = useCallback((set: InstantiatedServantSkillSet, slot: InstantiatedServantSkillSlot, value: string): void => {
         if (!value) {
-            masterServantUpdate[skillSet][slot] = null;
+            masterServantUpdate[set][slot] = null;
         } else {
             const skillLevel = Number(value) as InstantiatedServantUpdateNumber<InstantiatedServantSkillLevel>;
-            masterServantUpdate[skillSet][slot] = skillLevel;
+            masterServantUpdate[set][slot] = skillLevel;
         }
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleFouInputChange = useCallback((_: string, stat: FouStat, value: string): void => {
+    const handleFouInputChange = useCallback((set: InstantiatedServantFouSet, value: string): void => {
         if (!value) {
-            masterServantUpdate[stat] = null;
+            masterServantUpdate[set] = null;
         } else {
-            masterServantUpdate[stat] = Number(value);
+            masterServantUpdate[set] = Number(value);
         }
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
@@ -124,9 +119,8 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
             return;
         }
         handleLevelAscensionInputChange(
-            'TODO The the name param should no longer be needed',
             String(level),
-            String(ascension),
+            String(ascension)
         );
     }, [handleLevelAscensionInputChange, masterServantUpdate]);
 
@@ -139,11 +133,9 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleSkillQuickToggleClick = useCallback((
-        value: InstantiatedServantSkillLevel | null,
-        stat: 'skills' | 'appendSkills'
-    ): void => {
-        const skillSet = masterServantUpdate[stat];
+    // eslint-disable-next-line max-len
+    const handleSkillQuickToggleClick = useCallback((value: InstantiatedServantSkillLevel | null, set: InstantiatedServantSkillSet): void => {
+        const skillSet = masterServantUpdate[set];
         if (skillSet[1] === value && skillSet[2] === value && skillSet[3] === value) {
             return;
         }
@@ -173,7 +165,6 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
             ascension={String(ascension)}
             gameServant={gameServant}
             label='Level'
-            name='level'
             multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
             disabled={readonly}
@@ -186,7 +177,6 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
             ascension={String(ascension)}
             gameServant={gameServant}
             label='Ascension'
-            name='ascension'
             multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
             disabled={readonly}
@@ -197,8 +187,7 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
         <ServantFouInputField
             value={String(fouHp ?? '')}
             label='HP Fou'
-            name='fouHp'
-            stat='fouHp'
+            set='fouHp'
             multiEditMode={multiEditMode}
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
@@ -210,8 +199,7 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
         <ServantFouInputField
             value={String(fouAtk ?? '')}
             label='ATK Fou'
-            name='fouAtk'
-            stat='fouAtk'
+            set='fouAtk'
             multiEditMode={multiEditMode}
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
@@ -222,9 +210,8 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
     const skill1Field = (
         <ServantSkillInputField
             value={String(skills[1] || '')}
-            label='Skill 1'
-            name='skill1'
-            skillSet='skills'
+            label='Skill'
+            set='skills'
             slot={1}
             multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
@@ -235,9 +222,8 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
     const skill2Field = (
         <ServantSkillInputField
             value={String(skills[2] || '')}
-            label='Skill 2'
-            name='skill2'
-            skillSet='skills'
+            label='Skill'
+            set='skills'
             slot={2}
             allowEmpty
             multiEditMode={multiEditMode}
@@ -249,9 +235,8 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
     const skill3Field = (
         <ServantSkillInputField
             value={String(skills[3] || '')}
-            label='Skill 3'
-            name='skill3'
-            skillSet='skills'
+            label='Skill'
+            set='skills'
             slot={3}
             allowEmpty
             multiEditMode={multiEditMode}
@@ -263,9 +248,8 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
     const appendSkill1Field = (
         <ServantSkillInputField
             value={String(appendSkills[1] || '')}
-            label='Append 1'
-            name='appendSkill1'
-            skillSet='appendSkills'
+            label='Append'
+            set='appendSkills'
             slot={1}
             allowEmpty
             multiEditMode={multiEditMode}
@@ -277,9 +261,8 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
     const appendSkill2Field = (
         <ServantSkillInputField
             value={String(appendSkills[2] || '')}
-            label='Append 2'
-            name='appendSkill2'
-            skillSet='appendSkills'
+            label='Append'
+            set='appendSkills'
             slot={2}
             allowEmpty
             multiEditMode={multiEditMode}
@@ -291,9 +274,8 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
     const appendSkill3Field = (
         <ServantSkillInputField
             value={String(appendSkills[3] || '')}
-            label='Append 3'
-            name='appendSkill3'
-            skillSet='appendSkills'
+            label='Append'
+            set='appendSkills'
             slot={3}
             allowEmpty
             multiEditMode={multiEditMode}

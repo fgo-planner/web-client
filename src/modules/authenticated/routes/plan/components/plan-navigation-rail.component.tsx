@@ -140,7 +140,7 @@ export const PlanNavigationRail = React.memo((props: Props) => {
                         size='large'
                     />
                 </div>
-            </Tooltip>,
+            </Tooltip>
             <Tooltip key='test2' title='Test 2' placement='right'>
                 <div>
                     <IconButton
@@ -149,7 +149,7 @@ export const PlanNavigationRail = React.memo((props: Props) => {
                         size='large'
                     />
                 </div>
-            </Tooltip>,
+            </Tooltip>
         </NavigationRail>
     );
 

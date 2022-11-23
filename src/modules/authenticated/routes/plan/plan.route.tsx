@@ -3,42 +3,25 @@ import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, Inst
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
-import { PlanRequirementsTableOptions } from '../../../../components/plan/requirements/table/plan-requirements-table-options.type';
 import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/plan-requirements-table.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, PlanRequirements, PlanServantAggregatedData } from '../../../../types';
+import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, PlanServantAggregatedData } from '../../../../types';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
-import { PlanComputationUtils } from '../../../../utils/plan/plan-computation.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { usePlanDataEdit } from '../../hooks/use-plan-data-edit.hook';
 import { PlanNavigationRail } from './components/plan-navigation-rail.component';
 import { PlanServantEditDialogData } from './components/plan-servant-edit-dialog-data.type';
 import { PlanServantEditDialog } from './components/plan-servant-edit-dialog.component';
-
-const instantiateDefaultTableOptions = (): PlanRequirementsTableOptions => ({
-    layout: {
-        cells: 'normal',
-        stickyColumn: 'normal'
-    },
-    displayItems: {
-        unused: true,
-        statues: true,
-        gems: true,
-        lores: true,
-        grails: true,
-        embers: true,
-        fous: true
-    }
-});
+import { usePlanUserPreferences } from './hooks/use-plan-user-preferences.hook';
 
 const PathMatchPattern: PathPattern = {
     path: '/user/master/planner/:id'
@@ -114,6 +97,7 @@ export const PlanRoute = React.memo(() => {
         masterAccountId,
         masterAccountEditData,
         planEditData,
+        planRequirements,
         updateMasterItems,
         updateMasterServants,
         updatePlanInfo,
@@ -146,6 +130,15 @@ export const PlanRoute = React.memo(() => {
      * filter or visibility settings.
      */
     const dragDropMode = !!dragDropData;
+
+    const {
+        userPreferences: {
+            table: tableOptions
+        },
+        // setServantEditDialogActiveTab,
+        toggleCellSize,
+        toggleShowEmptyColumns
+    } = usePlanUserPreferences();
 
     const {
         selectedData: selectedServantsData,
@@ -189,7 +182,6 @@ export const PlanRoute = React.memo(() => {
 
 
     const [showAppendSkills, setShowAppendSkills] = useState<boolean>(true); // TODO Change this back to false
-    const [tableOptions, setTableOptions] = useState<PlanRequirementsTableOptions>(instantiateDefaultTableOptions);
 
     /**
      * Clone of the servant that is being edited by the servant edit dialog. This
@@ -209,23 +201,6 @@ export const PlanRoute = React.memo(() => {
     const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
 
     const { sm, md } = useActiveBreakpoints();
-
-    const planRequirements = useMemo((): PlanRequirements | null => {
-        if (!gameServantMap || !masterAccountEditData || !planId) {
-            return null;
-        }
-        const planRequirements = PlanComputationUtils.computePlanRequirements(
-            {
-                planId,
-                ...planEditData
-            },
-            masterAccountEditData
-            // TODO Add previous plans
-        );
-        console.log(planRequirements);
-        return planRequirements;
-    }, [gameServantMap, masterAccountEditData, planEditData, planId]);
-
 
     //#region Topic subscriptions
 
@@ -368,23 +343,37 @@ export const PlanRoute = React.memo(() => {
         endDragDrop();
     }, [endDragDrop]);
 
-    const handleToggleCellSize = useCallback((): void => {
-        const layout = { ...tableOptions.layout };
-        layout.cells = layout.cells === 'condensed' ? 'normal' : 'condensed';
-        setTableOptions({
-            ...tableOptions,
-            layout
-        });
-    }, [tableOptions]);
+    //#endregion
 
-    const handleToggleShowUnused = useCallback((): void => {
-        const { displayItems } = tableOptions;
-        displayItems.unused = !displayItems.unused;
-        setTableOptions({
-            ...tableOptions,
-            displayItems: { ...displayItems }
-        });
-    }, [tableOptions]);
+
+    //#region Table event handlers
+
+    // const handleRowClick = useCallback((e: MouseEvent): void => {
+    //     if (e.type === 'contextmenu') {
+    //         openContextMenu('row', e);
+    //     }
+    // }, [openContextMenu]);
+
+    const handleRowDoubleClick = openEditServantDialog;
+
+    // const handleHeaderClick = useCallback((e: MouseEvent) => {
+    //     console.log('handleHeaderClick', e);
+    //     if (e.type === 'contextmenu') {
+    //         openContextMenu('header', e);
+    //     }
+    // }, [openContextMenu]);
+
+    // const handleSortChange = useCallback((column?: MasterServantListColumn, direction: SortDirection = 'asc'): void => {
+    //     /**
+    //      * Deselect servants when changing sort. This is consistent with Google Drive
+    //      * behavior.
+    //      */
+    //     deselectAllServants();
+    //     setSortOptions({
+    //         sort: column,
+    //         direction
+    //     });
+    // }, [deselectAllServants]);
 
     //#endregion
 
@@ -479,8 +468,8 @@ export const PlanRoute = React.memo(() => {
                     onDragDropCancel={handleDragDropCancel}
                     onEditSelectedServants={handleEditSelectedServants}
                     onOpenDisplaySettings={() => { }}
-                    onToggleCellSize={handleToggleCellSize}
-                    onToggleShowUnused={handleToggleShowUnused}
+                    onToggleCellSize={toggleCellSize}
+                    onToggleShowUnused={toggleShowEmptyColumns}
                 />
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
@@ -488,7 +477,10 @@ export const PlanRoute = React.memo(() => {
                             masterItems={masterAccountEditData.items}
                             planServantsData={planEditData.servantsData}
                             planRequirements={planRequirements}
+                            selectedInstanceIds={selectedServantsData.ids}
                             options={tableOptions}
+                            onRowDoubleClick={handleRowDoubleClick}
+                            onSelectionChange={updateServantSelection}
                         />
                     </div>
                 </div>

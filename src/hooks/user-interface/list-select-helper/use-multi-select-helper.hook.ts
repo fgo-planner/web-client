@@ -60,7 +60,7 @@ export function useMultiSelectHelper<T, ID = number>(
     const selectedIdsRef = useRef<ReadonlySet<ID>>(selectedIds);
 
     /**
-     * Updates the `selectedDataContainer` whenever the input params change.
+     * Updates the `selectedIdsRef` whenever the input params change.
      */
     useEffect(() => {
         if (disabled) {

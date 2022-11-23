@@ -57,557 +57,549 @@ type ServantEnhancements = Immutable<{
 //#endregion
 
 
-export class PlanComputationUtils {
+//#region Default values
 
-    private static get _defaultOptions(): Readonly<ComputationOptions> {
-        return {
-            includeAscensions: true,
-            includeSkills: true,
-            includeAppendSkills: true,
-            includeCostumes: true
-        };
-    };
+const DefaultOptions: Readonly<ComputationOptions> = {
+    includeAscensions: true,
+    includeSkills: true,
+    includeAppendSkills: true,
+    includeCostumes: true
+};
 
-    private static get _defaultTargetEnhancements(): Immutable<ServantEnhancements> {
-        return {
-            ascension: InstantiatedServantConstants.MaxAscensionLevel,
-            skills: {
-                1: InstantiatedServantConstants.MaxSkillLevel,
-                2: InstantiatedServantConstants.MaxSkillLevel,
-                3: InstantiatedServantConstants.MaxSkillLevel
-            },
-            appendSkills: {
-                1: InstantiatedServantConstants.MaxSkillLevel,
-                2: InstantiatedServantConstants.MaxSkillLevel,
-                3: InstantiatedServantConstants.MaxSkillLevel,
-            }
-        };
-    };
-
-    private constructor () {
-        
+const DefaultTargetEnhancements: Immutable<ServantEnhancements> = {
+    ascension: InstantiatedServantConstants.MaxAscensionLevel,
+    skills: {
+        1: InstantiatedServantConstants.MaxSkillLevel,
+        2: InstantiatedServantConstants.MaxSkillLevel,
+        3: InstantiatedServantConstants.MaxSkillLevel
+    },
+    appendSkills: {
+        1: InstantiatedServantConstants.MaxSkillLevel,
+        2: InstantiatedServantConstants.MaxSkillLevel,
+        3: InstantiatedServantConstants.MaxSkillLevel,
     }
+};
+
+//#endregion
 
 
-    //#region Arithmetic methods
+//#region Arithmetic methods
 
-    /**
-     * Adds the values from the source `EnhancementRequirements` to the target
-     * `EnhancementRequirements`. Only the the target map will be updated; the
-     * values of the source map will not be changed.
-     */
-    static addEnhancementRequirements(target: EnhancementRequirements, source: EnhancementRequirements): void {
-        const targetEmbers = target.embers;
-        for (const [key, value] of Object.entries(source.embers)) {
-            const rarity = Number(key) as 1 | 2 | 3 | 4 | 5;
-            targetEmbers[rarity] += value;
-        }
-        const targetItems = target.items;
-        for (const [key, value] of Object.entries(source.items)) {
-            const itemId = Number(key);
-            if (!targetItems[itemId]) {
-                targetItems[itemId] = { ...value };
-            } else {
-                this._addEnhancementItemRequirements(targetItems[itemId], value);
-            }
-        }
-        target.qp += source.qp;
+/**
+ * Adds the values from the source `EnhancementRequirements` to the target
+ * `EnhancementRequirements`. Only the the target map will be updated; the
+ * values of the source map will not be changed.
+ */
+export function addEnhancementRequirements(target: EnhancementRequirements, source: EnhancementRequirements): void {
+    const targetEmbers = target.embers;
+    for (const [key, value] of Object.entries(source.embers)) {
+        const rarity = Number(key) as 1 | 2 | 3 | 4 | 5;
+        targetEmbers[rarity] += value;
     }
-
-    /**
-     * Takes an array of `EnhancementRequirements` and returns a new
-     * `EnhancementRequirements` containing the sum of all the values.
-     */
-    static sumEnhancementRequirements(arr: Array<EnhancementRequirements>): EnhancementRequirements {
-        const result = this._instantiateEnhancementRequirements();
-        for (const enhancementRequirements of arr) {
-            this.addEnhancementRequirements(result, enhancementRequirements);
-        }
-        return result;
-    }
-
-    //#endregion
-
-
-    //#region Data transformation methods
-
-    /**
-     * TODO Move this into a more general utilities class.
-     */
-    static transformMasterAccount(
-        masterAccount: ImmutableMasterAccount
-    ): MasterAccountData {
-        return {
-            costumes: new Set(masterAccount.costumes),
-            items: masterAccount.resources.items,
-            qp: masterAccount.resources.qp
-        };
-    }
-
-    /**
-     * TODO Move this into a more general utilities class.
-     */
-    static transformPlan(
-        plan: ImmutablePlan,
-        masterServantsDataMap: ReadonlyMap<number, MasterServantAggregatedData>, 
-    ): PlanData {
-        const servantsData = DataAggregationUtils.aggregateDataForPlanServants(
-            plan.servants,
-            masterServantsDataMap
-        );
-        return {
-            planId: plan._id,
-            enabled: plan.enabled,
-            servantsData,
-            costumes: new Set(plan.costumes),
-            upcomingResources: plan.upcomingResources
-        };
-    }
-
-    //#endregion
-
-
-    //#region computePlanRequirements + helper methods
-    
-    /**
-     * Computes the material debt for the given plan, and optionally the other plans
-     * from the plan group, if any.
-     *
-     * @param targetPlanData The target plan data.
-     * @param masterAccountData Master account data.
-     * @param previousPlans (optional) Plans that precede the target plan. This
-     * should exclude the target plan itself and any proceeding plans.
-     */
-    static computePlanRequirements(
-        targetPlanData: PlanData,
-        masterAccountData: MasterAccountData,
-        previousPlansData?: ReadonlyArray<PlanData>,
-        optionsOverride?: ComputationOptions
-    ): PlanRequirements {
-
-        const start = window.performance.now();
-
-        /**
-         * The computation result. This will be updated as each plan is computed.
-         */
-        const result = this._instantiatePlanRequirements();
-
-        /**
-         * The computation options. If options override was not given, then use options
-         * from target plan.
-         */
-        const options = optionsOverride || this._parseComputationOptions(targetPlanData);
-
-        /**
-         * Run computations for previous plans in the group first.
-         */
-        previousPlansData?.forEach(previousPlanData => {
-            this._computePlanRequirements(
-                result,
-                previousPlanData,
-                masterAccountData,
-                options
-            );
-        });
-        /**
-         * Finally, run computations for the target plan.
-         */
-        this._computePlanRequirements(
-            result,
-            targetPlanData,
-            masterAccountData,
-            options,
-            true
-        );
-
-        const end = window.performance.now();
-        console.log(`Plan debt took ${(end - start).toFixed(2)}ms to compute.`);
-        console.log(result);
-        return result;
-    }
-
-    private static _computePlanRequirements(
-        result: PlanRequirements,
-        planData: PlanData,
-        masterAccountData: MasterAccountData,
-        options: ComputationOptions,
-        isTargetPlan = false
-    ): void {
-
-        for (const planServantData of planData.servantsData) {
-            const {
-                gameServant,
-                masterServant,
-                planServant
-            } = planServantData;
-            /**
-             * Skip the servant if it is not enabled.
-             */
-            if (!planServant.enabled.servant) {
-                continue;
-            }
-            /**
-             * Compute the options based on a merge of the plan and servant options.
-             */
-            /** */
-            const servantOptions = this._parseComputationOptions(planServant);
-            const mergedOptions = this._mergeComputationOptions(options, servantOptions);
-            /**
-             * Compute the debt for the servant for the current plan.
-             */
-            /** */
-            const servantComputationResult = this._computePlanServantRequirements(
-                result,
-                gameServant,
-                masterServant,
-                planServant,
-                masterAccountData.costumes,
-                planData.costumes,
-                mergedOptions
-            );
-
-            if (!servantComputationResult) {
-                continue;
-            }
-
-            const [planServantRequirements, enhancementRequirements] = servantComputationResult;
-            /**
-             * Update the result with the computed data.
-             */
-            /** */
-            let planEnhancementRequirements: EnhancementRequirements;
-            if (isTargetPlan) {
-                this.addEnhancementRequirements(planServantRequirements.requirements, enhancementRequirements);
-                planEnhancementRequirements = result.targetPlan;
-            } else {
-                planEnhancementRequirements = ObjectUtils.getOrDefault(
-                    result.previousPlans,
-                    planData.planId,
-                    this._instantiateEnhancementRequirements
-                );
-            }
-            this.addEnhancementRequirements(planEnhancementRequirements, enhancementRequirements);
-            this.addEnhancementRequirements(result.group, enhancementRequirements);
-        }
-
-        // TODO Compute the grand total in the `result.itemDebt`;
-    }
-
-    private static _computePlanServantRequirements(
-        result: PlanRequirements,
-        gameServant: Immutable<GameServant>,
-        masterServant: ImmutableMasterServant,
-        planServant: Immutable<PlanServant>,
-        currentCostumes: ReadonlySet<number>,
-        targetCostumes: ReadonlySet<number>,
-        options: ComputationOptions
-    ): [PlanServantRequirements, EnhancementRequirements] | undefined {
-
-        const { instanceId } = planServant;
-        const resultServants = result.servants;
-
-        let planServantRequirements = resultServants[instanceId];
-        if (!planServantRequirements) {
-            /**
-             * If the plan servant does not yet exist in the result, then instantiate it and
-             * add it to the result.
-             */
-            planServantRequirements = this._instantiatePlanServantRequirements(planServant, masterServant);
-            resultServants[instanceId] = planServantRequirements;
+    const targetItems = target.items;
+    for (const [key, value] of Object.entries(source.items)) {
+        const itemId = Number(key);
+        if (!targetItems[itemId]) {
+            targetItems[itemId] = { ...value };
         } else {
-            /**
-             * If the plan servant was already in the result, then it was from a previous
-             * plan in the group. This means the for the current plan, the previous target
-             * enhancements should be the new current, and the target values from the plan
-             * should be the new target.
-             */
-            InstantiatedServantUtils.updateEnhancements(planServantRequirements.current, planServantRequirements.target);
-            InstantiatedServantUtils.updateEnhancements(planServantRequirements.target, planServant);
+            _addEnhancementItemRequirements(targetItems[itemId], value);
         }
+    }
+    target.qp += source.qp;
+}
 
-        const { current, target } = planServantRequirements;
+/**
+ * Takes an array of `EnhancementRequirements` and returns a new
+ * `EnhancementRequirements` containing the sum of all the values.
+ */
+export function sumEnhancementRequirements(arr: Array<EnhancementRequirements>): EnhancementRequirements {
+    const result = _instantiateEnhancementRequirements();
+    for (const enhancementRequirements of arr) {
+        addEnhancementRequirements(result, enhancementRequirements);
+    }
+    return result;
+}
 
-        const enhancementRequirements = this._computeServantEnhancementRequirements(
-            gameServant,
-            current,
-            currentCostumes,
-            target,
-            targetCostumes,
+//#endregion
+
+
+//#region Data transformation methods
+
+/**
+ * TODO Move this into a more general utilities class.
+ */
+export function transformMasterAccount(
+    masterAccount: ImmutableMasterAccount
+): MasterAccountData {
+    return {
+        costumes: new Set(masterAccount.costumes),
+        items: masterAccount.resources.items,
+        qp: masterAccount.resources.qp
+    };
+}
+
+/**
+ * TODO Move this into a more general utilities class.
+ */
+export function transformPlan(
+    plan: ImmutablePlan,
+    masterServantsDataMap: ReadonlyMap<number, MasterServantAggregatedData>, 
+): PlanData {
+    const servantsData = DataAggregationUtils.aggregateDataForPlanServants(
+        plan.servants,
+        masterServantsDataMap
+    );
+    return {
+        planId: plan._id,
+        enabled: plan.enabled,
+        servantsData,
+        costumes: new Set(plan.costumes),
+        upcomingResources: plan.upcomingResources
+    };
+}
+
+//#endregion
+
+
+//#region computePlanRequirements + helper methods
+
+/**
+ * Computes the material debt for the given plan, and optionally the other plans
+ * from the plan group, if any.
+ *
+ * @param targetPlanData The target plan data.
+ * @param masterAccountData Master account data.
+ * @param previousPlans (optional) Plans that precede the target plan. This
+ * should exclude the target plan itself and any proceeding plans.
+ */
+export function computePlanRequirements(
+    targetPlanData: PlanData,
+    masterAccountData: MasterAccountData,
+    previousPlansData?: ReadonlyArray<PlanData>,
+    optionsOverride?: ComputationOptions
+): PlanRequirements {
+
+    const start = window.performance.now();
+
+    /**
+     * The computation result. This will be updated as each plan is computed.
+     */
+    const result = instantiatePlanRequirements();
+
+    /**
+     * The computation options. If options override was not given, then use options
+     * from target plan.
+     */
+    const options = optionsOverride || _parseComputationOptions(targetPlanData);
+
+    /**
+     * Run computations for previous plans in the group first.
+     */
+    previousPlansData?.forEach(previousPlanData => {
+        _computePlanRequirements(
+            result,
+            previousPlanData,
+            masterAccountData,
             options
         );
+    });
+    /**
+     * Finally, run computations for the target plan.
+     */
+    _computePlanRequirements(
+        result,
+        targetPlanData,
+        masterAccountData,
+        options,
+        true
+    );
 
-        return [planServantRequirements, enhancementRequirements];
-    }
+    const end = window.performance.now();
+    console.log(`Plan debt took ${(end - start).toFixed(2)}ms to compute.`);
+    return result;
+}
 
-    //#endregion
+function _computePlanRequirements(
+    result: PlanRequirements,
+    planData: PlanData,
+    masterAccountData: MasterAccountData,
+    options: ComputationOptions,
+    isTargetPlan = false
+): void {
 
-
-    //#region computeServantRequirements + helper methods
-
-    static computeServantEnhancementRequirements(
-        gameServant: Immutable<GameServant>,
-        currentEnhancements: ServantEnhancements,
-        currentCostumes: Iterable<number>,
-        options?: ComputationOptions
-    ): EnhancementRequirements {
-
-        const currentCostumeSet = CollectionUtils.toReadonlySet(currentCostumes);
-
-        return this._computeServantEnhancementRequirements(
-            gameServant,
-            currentEnhancements,
-            currentCostumeSet,
-            this._defaultTargetEnhancements,
-            undefined,
-            options
-        );
-    }
-
-    private static _computeServantEnhancementRequirements(
-        gameServant: Immutable<GameServant>,
-        currentEnhancements: Immutable<ServantEnhancements>,
-        currentCostumes: ReadonlySet<number>,
-        targetEnhancements: Immutable<ServantEnhancements>,
-        targetCostumes?: ReadonlySet<number>,
-        options = this._defaultOptions
-    ): EnhancementRequirements {
-
+    for (const planServantData of planData.servantsData) {
         const {
-            includeAscensions,
-            includeSkills,
-            includeAppendSkills,
-            includeCostumes,
-            excludeLores
-        } = options;
-
+            gameServant,
+            masterServant,
+            planServant
+        } = planServantData;
         /**
-         * The result data for the servant, instantiated with an entry for QP.
+         * Skip the servant if it is not enabled.
          */
-        const result = this._instantiateEnhancementRequirements();
+        if (!planServant.enabled.servant) {
+            continue;
+        }
+        /**
+         * Compute the options based on a merge of the plan and servant options.
+         */
+        /** */
+        const servantOptions = _parseComputationOptions(planServant);
+        const mergedOptions = _mergeComputationOptions(options, servantOptions);
+        /**
+         * Compute the debt for the servant for the current plan.
+         */
+        /** */
+        const servantComputationResult = _computePlanServantRequirements(
+            result,
+            gameServant,
+            masterServant,
+            planServant,
+            masterAccountData.costumes,
+            planData.costumes,
+            mergedOptions
+        );
 
-        if (includeSkills) {
-            this._updateResultForSkills(
-                result,
-                gameServant.skillMaterials,
-                currentEnhancements.skills,
-                targetEnhancements.skills,
-                'skills',
-                excludeLores
+        if (!servantComputationResult) {
+            continue;
+        }
+
+        const [planServantRequirements, enhancementRequirements] = servantComputationResult;
+        /**
+         * Update the result with the computed data.
+         */
+        /** */
+        let planEnhancementRequirements: EnhancementRequirements;
+        if (isTargetPlan) {
+            addEnhancementRequirements(planServantRequirements.requirements, enhancementRequirements);
+            planEnhancementRequirements = result.targetPlan;
+        } else {
+            planEnhancementRequirements = ObjectUtils.getOrDefault(
+                result.previousPlans,
+                planData.planId,
+                _instantiateEnhancementRequirements
             );
         }
+        addEnhancementRequirements(planEnhancementRequirements, enhancementRequirements);
+        addEnhancementRequirements(result.group, enhancementRequirements);
+    }
 
-        if (includeAppendSkills) {
-            this._updateResultForSkills(
-                result,
-                gameServant.appendSkillMaterials,
-                currentEnhancements.appendSkills,
-                targetEnhancements.appendSkills,
-                'appendSkills',
-                excludeLores
-            );
-        }
+    // TODO Compute the grand total in the `result.itemDebt`;
+}
 
-        const targetAscension = targetEnhancements.ascension;
-        if (includeAscensions && targetAscension != null) {
-            if (gameServant.ascensionMaterials) {
-                for (const [key, ascension] of Object.entries(gameServant.ascensionMaterials)) {
-                    const ascensionLevel = Number(key);
-                    const currentAscension = currentEnhancements.ascension || 0;
-                    /**
-                     * Skip this ascension if the servant is already at least this level, or if this
-                     * level beyond the targeted level.
-                     */
-                    if (currentAscension >= ascensionLevel || ascensionLevel > targetAscension) {
-                        continue;
-                    }
-                    this._updateEnhancementRequirementResult(result, ascension, 'ascensions');
-                }
-            }
-            // TODO Compute ember requirements
-        }
+function _computePlanServantRequirements(
+    result: PlanRequirements,
+    gameServant: Immutable<GameServant>,
+    masterServant: ImmutableMasterServant,
+    planServant: Immutable<PlanServant>,
+    currentCostumes: ReadonlySet<number>,
+    targetCostumes: ReadonlySet<number>,
+    options: ComputationOptions
+): [PlanServantRequirements, EnhancementRequirements] | undefined {
 
-        if (includeCostumes) {
-            for (const [key, costume] of Object.entries(gameServant.costumes)) {
-                const costumeId = Number(key);
+    const { instanceId } = planServant;
+    const resultServants = result.servants;
+
+    let planServantRequirements = resultServants[instanceId];
+    if (!planServantRequirements) {
+        /**
+         * If the plan servant does not yet exist in the result, then instantiate it and
+         * add it to the result.
+         */
+        planServantRequirements = _instantiatePlanServantRequirements(planServant, masterServant);
+        resultServants[instanceId] = planServantRequirements;
+    } else {
+        /**
+         * If the plan servant was already in the result, then it was from a previous
+         * plan in the group. This means the for the current plan, the previous target
+         * enhancements should be the new current, and the target values from the plan
+         * should be the new target.
+         */
+        InstantiatedServantUtils.updateEnhancements(planServantRequirements.current, planServantRequirements.target);
+        InstantiatedServantUtils.updateEnhancements(planServantRequirements.target, planServant);
+    }
+
+    const { current, target } = planServantRequirements;
+
+    const enhancementRequirements = _computeServantEnhancementRequirements(
+        gameServant,
+        current,
+        currentCostumes,
+        target,
+        targetCostumes,
+        options
+    );
+
+    return [planServantRequirements, enhancementRequirements];
+}
+
+//#endregion
+
+
+//#region computeServantRequirements + helper methods
+
+export function computeServantEnhancementRequirements(
+    gameServant: Immutable<GameServant>,
+    currentEnhancements: ServantEnhancements,
+    currentCostumes: Iterable<number>,
+    options?: ComputationOptions
+): EnhancementRequirements {
+
+    const currentCostumeSet = CollectionUtils.toReadonlySet(currentCostumes);
+
+    return _computeServantEnhancementRequirements(
+        gameServant,
+        currentEnhancements,
+        currentCostumeSet,
+        DefaultTargetEnhancements,
+        undefined,
+        options
+    );
+}
+
+function _computeServantEnhancementRequirements(
+    gameServant: Immutable<GameServant>,
+    currentEnhancements: Immutable<ServantEnhancements>,
+    currentCostumes: ReadonlySet<number>,
+    targetEnhancements: Immutable<ServantEnhancements>,
+    targetCostumes?: ReadonlySet<number>,
+    options = DefaultOptions
+): EnhancementRequirements {
+
+    const {
+        includeAscensions,
+        includeSkills,
+        includeAppendSkills,
+        includeCostumes,
+        excludeLores
+    } = options;
+
+    /**
+     * The result data for the servant, instantiated with an entry for QP.
+     */
+    const result = _instantiateEnhancementRequirements();
+
+    if (includeSkills) {
+        _updateResultForSkills(
+            result,
+            gameServant.skillMaterials,
+            currentEnhancements.skills,
+            targetEnhancements.skills,
+            'skills',
+            excludeLores
+        );
+    }
+
+    if (includeAppendSkills) {
+        _updateResultForSkills(
+            result,
+            gameServant.appendSkillMaterials,
+            currentEnhancements.appendSkills,
+            targetEnhancements.appendSkills,
+            'appendSkills',
+            excludeLores
+        );
+    }
+
+    const targetAscension = targetEnhancements.ascension;
+    if (includeAscensions && targetAscension != null) {
+        if (gameServant.ascensionMaterials) {
+            for (const [key, ascension] of Object.entries(gameServant.ascensionMaterials)) {
+                const ascensionLevel = Number(key);
+                const currentAscension = currentEnhancements.ascension || 0;
                 /**
-                 * Skip if the costume is already unlocked, or if it is not targeted. If the
-                 * targetCostumes set is undefined, then all costumes are target by default.
+                 * Skip this ascension if the servant is already at least this level, or if this
+                 * level beyond the targeted level.
                  */
-                if (currentCostumes.has(costumeId) || (targetCostumes && !targetCostumes.has(costumeId))) {
+                if (currentAscension >= ascensionLevel || ascensionLevel > targetAscension) {
                     continue;
                 }
-                this._updateEnhancementRequirementResult(result, costume.materials, 'costumes');
+                _updateEnhancementRequirementResult(result, ascension, 'ascensions');
             }
         }
-
-        return result;
+        // TODO Compute ember requirements
     }
 
-    private static _updateResultForSkills(
-        result: EnhancementRequirements,
-        skillMaterials: Immutable<GameServantSkillMaterials>,
-        currentSkills: SkillEnhancements,
-        targetSkills: SkillEnhancements,
-        skillType: 'skills' | 'appendSkills',
-        excludeLores?: boolean
-    ): void {
-
-        const currentSkill1 = currentSkills[1] || 0;
-        const currentSkill2 = currentSkills[2] || 0;
-        const currentSkill3 = currentSkills[3] || 0;
-
-        const targetSkill1 = targetSkills[1] || 0;
-        const targetSkill2 = targetSkills[2] || 0;
-        const targetSkill3 = targetSkills[3] || 0;
-
-        for (const [key, skill] of Object.entries(skillMaterials)) {
-            const skillLevel = Number(key);
-            if (excludeLores && skillLevel === (InstantiatedServantConstants.MaxSkillLevel - 1)) {
+    if (includeCostumes) {
+        for (const [key, costume] of Object.entries(gameServant.costumes)) {
+            const costumeId = Number(key);
+            /**
+             * Skip if the costume is already unlocked, or if it is not targeted. If the
+             * targetCostumes set is undefined, then all costumes are target by default.
+             */
+            if (currentCostumes.has(costumeId) || (targetCostumes && !targetCostumes.has(costumeId))) {
                 continue;
             }
-            /**
-             * The number of skills that need to be upgraded to this level. A skill does not
-             * need to be upgraded if it is already at least this level, or if this level beyond
-             * the targeted level.
-             */
-            /** */
-            const skillUpgradeCount =
-                (currentSkill1 > skillLevel || skillLevel >= targetSkill1 ? 0 : 1) +
-                (currentSkill2 > skillLevel || skillLevel >= targetSkill2 ? 0 : 1) +
-                (currentSkill3 > skillLevel || skillLevel >= targetSkill3 ? 0 : 1);
-            /**
-             * Skip if all three skills do not need enhancement at this level.
-             */
-            if (skillUpgradeCount === 0) {
-                continue;
-            }
-            this._updateEnhancementRequirementResult(result, skill, skillType, skillUpgradeCount);
+            _updateEnhancementRequirementResult(result, costume.materials, 'costumes');
         }
     }
 
-    private static _updateEnhancementRequirementResult(
-        result: EnhancementRequirements,
-        enhancement: Immutable<GameServantEnhancement>,
-        propertyKey: keyof EnhancementItemRequirements,
-        enhancementCount = 1
-    ): void {
-        /**
-         * Update material count.
-         */
-        for (const [key, quantity] of Object.entries(enhancement.materials)) {
-            const itemId = Number(key);
-            const itemCount = ObjectUtils.getOrDefault(result.items, itemId, this._instantiateEnhancementItemRequirements);
-            const total = quantity * enhancementCount;
-            itemCount[propertyKey] += total;
-            itemCount.total += total;
-        }
-        /**
-         * Also update QP count.
-         */
-        result.qp += enhancement.qp * enhancementCount;
-    }
-
-    //#endregion
-
-
-    //#region Other helper methods
-
-    private static _addEnhancementItemRequirements(target: EnhancementItemRequirements, source: EnhancementItemRequirements): void {
-        target.ascensions += source.ascensions;
-        target.skills += source.skills;
-        target.appendSkills += source.appendSkills;
-        target.costumes += source.costumes;
-        target.total += source.total;
-    }
-
-    private static _parseComputationOptions(data: PlanData | Immutable<PlanServant>): ComputationOptions {
-        const {
-            ascensions,
-            skills,
-            appendSkills,
-            costumes
-        } = data.enabled;
-
-        return {
-            includeAscensions: ascensions,
-            includeSkills: skills,
-            includeAppendSkills: appendSkills,
-            includeCostumes: costumes
-        };
-    }
-
-    private static _mergeComputationOptions(a: ComputationOptions, b: ComputationOptions): ComputationOptions {
-        return {
-            includeAscensions: a.includeAscensions && a.includeAscensions,
-            includeSkills: a.includeSkills && b.includeSkills,
-            includeAppendSkills: a.includeAppendSkills && b.includeAppendSkills,
-            includeCostumes: a.includeCostumes && b.includeCostumes,
-            excludeLores: a.excludeLores && b.excludeLores
-        };
-    }
-
-    //#endregion
-
-
-    //#region Instantiation methods
-
-    private static _instantiateEnhancementItemRequirements(): EnhancementItemRequirements {
-        return {
-            ascensions: 0,
-            skills: 0,
-            appendSkills: 0,
-            costumes: 0,
-            total: 0
-        };
-    }
-
-    private static _instantiateEnhancementRequirements(): EnhancementRequirements {
-        return {
-            embers: {
-                1: 0,
-                2: 0,
-                3: 0,
-                4: 0,
-                5: 0
-            },
-            items: {},
-            qp: 0
-        };
-    }
-
-    /**
-     * Instantiates a `PlanServantRequirements` object using the given plan and
-     * master servant data. The `current` enhancement fo the resulting object will
-     * be initialized with the values from the master servant.
-     */
-    private static _instantiatePlanServantRequirements(
-        planServant: Immutable<PlanServant>,
-        masterServant: ImmutableMasterServant
-    ): PlanServantRequirements {
-
-        const current = InstantiatedServantUtils.instantiateEnhancements();
-        InstantiatedServantUtils.updateEnhancements(current, masterServant);
-
-        const target = InstantiatedServantUtils.cloneEnhancements(planServant);
-
-        return {
-            instanceId: planServant.instanceId,
-            current,
-            target,
-            requirements: this._instantiateEnhancementRequirements()
-        };
-    }
-
-    private static _instantiatePlanRequirements(): PlanRequirements {
-        return {
-            servants: {},
-            targetPlan: this._instantiateEnhancementRequirements(),
-            previousPlans: {},
-            group: this._instantiateEnhancementRequirements(),
-            itemDebt: {}
-        };
-    }
-
-    //#endregion
-
+    return result;
 }
+
+function _updateResultForSkills(
+    result: EnhancementRequirements,
+    skillMaterials: Immutable<GameServantSkillMaterials>,
+    currentSkills: SkillEnhancements,
+    targetSkills: SkillEnhancements,
+    skillType: 'skills' | 'appendSkills',
+    excludeLores?: boolean
+): void {
+
+    const currentSkill1 = currentSkills[1] || 0;
+    const currentSkill2 = currentSkills[2] || 0;
+    const currentSkill3 = currentSkills[3] || 0;
+
+    const targetSkill1 = targetSkills[1] || 0;
+    const targetSkill2 = targetSkills[2] || 0;
+    const targetSkill3 = targetSkills[3] || 0;
+
+    for (const [key, skill] of Object.entries(skillMaterials)) {
+        const skillLevel = Number(key);
+        if (excludeLores && skillLevel === (InstantiatedServantConstants.MaxSkillLevel - 1)) {
+            continue;
+        }
+        /**
+         * The number of skills that need to be upgraded to this level. A skill does not
+         * need to be upgraded if it is already at least this level, or if this level beyond
+         * the targeted level.
+         */
+        /** */
+        const skillUpgradeCount =
+            (currentSkill1 > skillLevel || skillLevel >= targetSkill1 ? 0 : 1) +
+            (currentSkill2 > skillLevel || skillLevel >= targetSkill2 ? 0 : 1) +
+            (currentSkill3 > skillLevel || skillLevel >= targetSkill3 ? 0 : 1);
+        /**
+         * Skip if all three skills do not need enhancement at this level.
+         */
+        if (skillUpgradeCount === 0) {
+            continue;
+        }
+        _updateEnhancementRequirementResult(result, skill, skillType, skillUpgradeCount);
+    }
+}
+
+function _updateEnhancementRequirementResult(
+    result: EnhancementRequirements,
+    enhancement: Immutable<GameServantEnhancement>,
+    propertyKey: keyof EnhancementItemRequirements,
+    enhancementCount = 1
+): void {
+    /**
+     * Update material count.
+     */
+    for (const [key, quantity] of Object.entries(enhancement.materials)) {
+        const itemId = Number(key);
+        const itemCount = ObjectUtils.getOrDefault(result.items, itemId, _instantiateEnhancementItemRequirements);
+        const total = quantity * enhancementCount;
+        itemCount[propertyKey] += total;
+        itemCount.total += total;
+    }
+    /**
+     * Also update QP count.
+     */
+    result.qp += enhancement.qp * enhancementCount;
+}
+
+//#endregion
+
+
+//#region Other helper methods
+
+function _addEnhancementItemRequirements(target: EnhancementItemRequirements, source: EnhancementItemRequirements): void {
+    target.ascensions += source.ascensions;
+    target.skills += source.skills;
+    target.appendSkills += source.appendSkills;
+    target.costumes += source.costumes;
+    target.total += source.total;
+}
+
+function _parseComputationOptions(data: PlanData | Immutable<PlanServant>): ComputationOptions {
+    const {
+        ascensions,
+        skills,
+        appendSkills,
+        costumes
+    } = data.enabled;
+
+    return {
+        includeAscensions: ascensions,
+        includeSkills: skills,
+        includeAppendSkills: appendSkills,
+        includeCostumes: costumes
+    };
+}
+
+function _mergeComputationOptions(a: ComputationOptions, b: ComputationOptions): ComputationOptions {
+    return {
+        includeAscensions: a.includeAscensions && a.includeAscensions,
+        includeSkills: a.includeSkills && b.includeSkills,
+        includeAppendSkills: a.includeAppendSkills && b.includeAppendSkills,
+        includeCostumes: a.includeCostumes && b.includeCostumes,
+        excludeLores: a.excludeLores && b.excludeLores
+    };
+}
+
+//#endregion
+
+
+//#region Instantiation methods
+
+
+export function instantiatePlanRequirements(): PlanRequirements {
+    return {
+        servants: {},
+        targetPlan: _instantiateEnhancementRequirements(),
+        previousPlans: {},
+        group: _instantiateEnhancementRequirements(),
+        itemDebt: {}
+    };
+}
+
+function _instantiateEnhancementItemRequirements(): EnhancementItemRequirements {
+    return {
+        ascensions: 0,
+        skills: 0,
+        appendSkills: 0,
+        costumes: 0,
+        total: 0
+    };
+}
+
+function _instantiateEnhancementRequirements(): EnhancementRequirements {
+    return {
+        embers: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0
+        },
+        items: {},
+        qp: 0
+    };
+}
+
+/**
+ * Instantiates a `PlanServantRequirements` object using the given plan and
+ * master servant data. The `current` enhancement fo the resulting object will
+ * be initialized with the values from the master servant.
+ */
+function _instantiatePlanServantRequirements(
+    planServant: Immutable<PlanServant>,
+    masterServant: ImmutableMasterServant
+): PlanServantRequirements {
+
+    const current = InstantiatedServantUtils.instantiateEnhancements();
+    InstantiatedServantUtils.updateEnhancements(current, masterServant);
+
+    const target = InstantiatedServantUtils.cloneEnhancements(planServant);
+
+    return {
+        instanceId: planServant.instanceId,
+        current,
+        target,
+        requirements: _instantiateEnhancementRequirements()
+    };
+}
+
+//#endregion

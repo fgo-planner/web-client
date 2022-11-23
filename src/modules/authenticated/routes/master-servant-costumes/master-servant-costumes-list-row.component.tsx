@@ -8,7 +8,6 @@ import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { GameServantCostumeAggregatedData } from '../../../../types';
 
 type Props = {
-    alwaysUnlocked: boolean;
     costumeData: GameServantCostumeAggregatedData;
     onChange: (costumeId: number, unlocked: boolean) => void;
     openLinksInNewTab?: boolean;
@@ -22,14 +21,14 @@ export const StyleClassPrefix = 'MasterServantCostumesListRow';
 export const MasterServantCostumesListRow = React.memo((props: Props) => {
 
     const {
-        alwaysUnlocked,
         costumeData: {
+            costumeId,
+            alwaysUnlocked,
             costume: {
                 collectionNo,
                 materials,
-                name
+                name,
             },
-            costumeId,
             servant
         },
         onChange,

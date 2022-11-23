@@ -1,16 +1,18 @@
-import { InstantiatedServantUpdateBoolean, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateBoolean } from '@fgo-planner/data-core';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { MouseEvent, useCallback } from 'react';
+import { FormUtils } from '../../../../utils/form.utils';
 
 type Props = {
     disabled?: boolean;
     label?: string;
     multiEditMode?: boolean;
-    name: string;
-    onChange: (name: string, value: InstantiatedServantUpdateBoolean, pushChanges: boolean) => void;
+    onChange: (value: InstantiatedServantUpdateBoolean, pushChanges: boolean) => void;
     value: InstantiatedServantUpdateBoolean;
 };
+
+const FieldName = 'summoned';
 
 const DefaultLabel = 'Servant is summoned';
 
@@ -32,39 +34,19 @@ export const MasterServantSummonedCheckbox = React.memo((props: Props) => {
         disabled,
         label,
         multiEditMode,
-        name,
         onChange,
         value
     } = props;
 
-    const handleClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-        /**
-         * Find the next value in the cycle. The possible values depends on the value of `multiEditMode`:
-         * 
-         * `multiEditMode` is truthy: `false` -> `true` -> `IndeterminateValue`
-         *
-         * `multiEditMode` is falsy: `false` -> `true`
-         */
-        /** */
-        let nextValue: InstantiatedServantUpdateBoolean;
-        switch (value) {
-            case InstantiatedServantUpdateBoolean.True:
-                nextValue = multiEditMode ? InstantiatedServantUpdateBoolean.Indeterminate : InstantiatedServantUpdateBoolean.False;
-                break;
-            case InstantiatedServantUpdateBoolean.False:
-                nextValue = InstantiatedServantUpdateBoolean.True;
-                break;
-            default:
-                nextValue = multiEditMode ? InstantiatedServantUpdateBoolean.False : InstantiatedServantUpdateBoolean.True;
-                break;
-        }
-        onChange(name, nextValue, true);
-    }, [multiEditMode, name, onChange, value]);
+    const handleClick = useCallback((_event: MouseEvent<HTMLButtonElement>): void => {
+        const nextValue = FormUtils.computeNextToggleValue(value, multiEditMode);
+        onChange(nextValue, true);
+    }, [multiEditMode, onChange, value]);
 
     const checkboxNode = (
         <Checkbox
-            name={name}
-            indeterminate={value === IndeterminateValue}
+            name={FieldName}
+            indeterminate={value === InstantiatedServantUpdateBoolean.Indeterminate}
             checked={!!value}
             onClick={handleClick}
             disabled={disabled}

@@ -1,9 +1,13 @@
+import { CollectionUtils } from '@fgo-planner/common-core';
 import { alpha, DialogContent, Tab, Tabs } from '@mui/material';
-import { SystemStyleObject, Theme } from '@mui/system';
-import { ReactNode, SyntheticEvent, useCallback, useState } from 'react';
+import { SystemStyleObject, Theme as SystemTheme, Theme } from '@mui/system';
+import { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/input-field-container.component';
+import { useGameServantCostumesData } from '../../../../../hooks/data/use-game-servant-costumes-data.hook';
 import { EditDialogAction, MasterServantAggregatedData, PlanServantAggregatedData } from '../../../../../types';
+import { PlanServantEditCostumesTabContent } from './plan-servant-edit-dialog-costumes-tab-content.component';
 import { PlanServantEditDialogData } from './plan-servant-edit-dialog-data.type';
+import { PlanServantEditEnhancementsTabContent } from './plan-servant-edit-dialog-enhancements-tab-content.component';
 import { PlanServantSelectAutocomplete } from './plan-servant-select-autocomplete.component';
 
 export type PlanServantEditTab = 'enhancements' | 'costumes';
@@ -21,7 +25,6 @@ type Props = {
      * on dialog close. This object will be modified directly.
      */
     dialogData: PlanServantEditDialogData;
-    onTabChange: (tab: PlanServantEditTab) => void;
     /**
      * Array containing the source `PlanServantAggregatedData` objects for the
      * servants being edited.
@@ -29,45 +32,63 @@ type Props = {
      * Only used in edit mode; this is ignored in add mode.
      */
     targetPlanServantsData: ReadonlyArray<PlanServantAggregatedData>;
+    onTabChange: (tab: PlanServantEditTab) => void;
 };
 
 export const StyleClassPrefix = 'PlanServantEdit';
 
-const StyleProps = (theme: Theme) => ({
-    pt: 4,
-    [`& .${StyleClassPrefix}-tabs-container`]: {
-        mx: 4,
-        mt: -6
-    },
-    [`& .${StyleClassPrefix}-tabs-content-container`]: {
-        height: '26.25rem',  // 420px
-        mx: 2,
-        px: 4,
-        pt: 8,
-        boxSizing: 'border-box',
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: alpha(theme.palette.text.primary, 0.23),
-        borderRadius: 1
-    },
-    [`& .${StyleClassPrefix}-input-field-group`]: {
+const StyleProps = (theme: Theme) => {
+
+    const {
+        breakpoints,
+        palette
+    } = theme as Theme;
+
+    return {
+        height: '100%',
         display: 'flex',
-        flexWrap: 'nowrap',
-        [theme.breakpoints.down('sm')]: {
-            flexWrap: 'wrap'
-        },
-        [`& .${InputFieldContainerStyleClassPrefix}-root`]: {
-            flex: 1,
-            px: 2,
-            [theme.breakpoints.down('sm')]: {
-                flex: '100% !important',
-                '&.empty': {
-                    display: 'none'
+        flexDirection: 'column',
+        [`& .${StyleClassPrefix}-input-field-group`]: {
+            display: 'flex',
+            flexWrap: 'nowrap',
+            [breakpoints.down('sm')]: {
+                flexWrap: 'wrap'
+            },
+            [`& .${InputFieldContainerStyleClassPrefix}-root`]: {
+                flex: 1,
+                px: 2,
+                mt: 2,
+                [breakpoints.down('sm')]: {
+                    flex: '100% !important',
+                    '&.empty': {
+                        display: 'none'
+                    }
                 }
             }
+        },
+        [`& .${StyleClassPrefix}-tabs-container`]: {
+            mt: -6,
+            [breakpoints.up('sm')]: {
+                mx: 4
+            }
+        },
+        [`& .${StyleClassPrefix}-tabs-content-container`]: {
+            flex: 1,
+            boxSizing: 'border-box',
+            overflowY: 'hidden',
+            borderRadius: 1,
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: alpha(palette.text.primary, 0.23),
+            [breakpoints.up('sm')]: {
+                position: 'relative',
+                minHeight: '26.25rem',  // 420px
+                maxHeight: '26.25rem'   // 420px
+            }
         }
-    }
-} as SystemStyleObject<Theme>);
+    } as SystemStyleObject<SystemTheme>;
+};
+
 
 /**
  * React.memo is not needed for this component because in most cases a re-render
@@ -85,12 +106,47 @@ export const PlanServantEditDialogContent = (props: Props) => {
             data
         },
         onTabChange,
-        // targetPlanServantsData
+        targetPlanServantsData
     } = props;
 
     const servantSelectDisabled = action === EditDialogAction.Edit;
 
-    const [selectedServant, setSelectedServant] = useState<MasterServantAggregatedData>();
+    /**
+     * This is used as a data source by children components. The source of this data
+     * depends on whether the dialog in add mode or edit mode.
+     *
+     * In add mode, the array contains at most one element which corresponds to the
+     * selected servant. If no servant is select, then this will be an empty array.
+     *
+     * In edit mode, this is the `targetPlanServantsData` data passed from the props
+     * (it is possible to do this since `PlanServantAggregatedData` extends
+     * `MasterServantAggregatedData`, and both arrays are meant to be readonly).
+     */
+    const [
+        targetMasterServantsData, 
+        setTargetMasterServantsData
+    ] = useState<ReadonlyArray<MasterServantAggregatedData>>(CollectionUtils.emptyArray);
+
+    /**
+     * Updates `targetMasterServantsData` whenever the `targetPlanServantsData`
+     * reference changes in edit mode (will not do anything in add mode).
+     */
+    useEffect(() => {
+        if (action === EditDialogAction.Add) {
+            return;
+        }
+        setTargetMasterServantsData(targetPlanServantsData);
+    }, [action, targetPlanServantsData]);
+
+
+    /**
+     * Compute the costumes data here instead of inside the costumes tab
+     * component(s) to avoid recomputing every time the user changes to/from the
+     * costumes tab (tab components are unmounted/remounted when the user switches
+     * from/to the respective tab).
+     */
+    /** */
+    const costumesData = useGameServantCostumesData(targetPlanServantsData);
 
 
     //#region Input event handlers
@@ -105,7 +161,7 @@ export const PlanServantEditDialogContent = (props: Props) => {
         }
         data.instanceId = instanceId;
         // TODO Need to update ascension and level as needed.
-        setSelectedServant(value);
+        setTargetMasterServantsData([value]);
     }, [data, servantSelectDisabled]);
 
     const handleActiveTabChange = useCallback((_event: SyntheticEvent, value: PlanServantEditTab): void => {
@@ -118,24 +174,21 @@ export const PlanServantEditDialogContent = (props: Props) => {
     //#region Component rendering
 
     let tabsContentNode: ReactNode;
-    // if (activeTab === 'costumes') {
-    //     tabsContentNode = (
-    //         <PlanServantEditCostumesTabContent
-    //             gameServant={gameServant}
-    //             targetCostumes={targetCostumes}
-    //         />
-    //     );
-    // } else {
-    //     tabsContentNode = (
-    //         <PlanServantEditEnhancementsTabContent
-    //             planServant={planServant}
-    //             gameServant={gameServant}
-    //             showAppendSkills={showAppendSkills}
-    //             onChange={(e) => console.log(e)}
-    //         />
-    //     );
-    // }
-    tabsContentNode = null;
+    if (activeTab === 'costumes') {
+        tabsContentNode = (
+            <PlanServantEditCostumesTabContent
+                costumesData={costumesData}
+                planServantUpdate={data.update}
+            />
+        );
+    } else {
+        tabsContentNode = (
+            <PlanServantEditEnhancementsTabContent
+                planServantUpdate={data.update}
+                targetMasterServantsData={targetMasterServantsData}
+            />
+        );
+    }
 
     return (
         <DialogContent className={`${StyleClassPrefix}-root`} sx={StyleProps}>
@@ -143,7 +196,7 @@ export const PlanServantEditDialogContent = (props: Props) => {
                 <InputFieldContainer>
                     <PlanServantSelectAutocomplete
                         availableServants={availableServants}
-                        selectedServant={selectedServant}
+                        selectedServant={targetMasterServantsData[0]}
                         onChange={handleSelectedServantChange}
                         disabled={servantSelectDisabled}
                     />

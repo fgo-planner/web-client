@@ -82,6 +82,10 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
         onClose(event, 'cancel');
     }, [onClose]);
 
+    const handleDialogClose = useCallback((event: any, reason: 'backdropClick' | 'escapeKeyDown'): void => {
+        onClose(event, reason);
+    }, [onClose]);
+
     const open = !!dialogData;
 
     /**
@@ -131,6 +135,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
             open={open}
             fullScreen={fullScreen}
             keepMounted={false}
+            onClose={handleDialogClose}
         >
             {dialogChildRef.current}
         </Dialog>

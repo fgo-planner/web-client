@@ -1,10 +1,12 @@
-import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { Immutable, ImmutableArray, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameServant, InstantiatedServantBondLevel, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { alpha, DialogContent, Tab, Tabs, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
+import { useGameServantCostumesData } from '../../../../../../hooks/data/use-game-servant-costumes-data.hook';
 import { MasterServantAggregatedData } from '../../../../../../types';
+import { DataAggregationUtils } from '../../../../../../utils/data-aggregation.utils';
 import { MasterServantSelectAutocomplete } from '../master-servant-select-autocomplete.component';
 import { MasterServantEditDialogCostumesTabContent } from './master-servant-edit-dialog-costumes-tab-content.component';
 import { MasterServantEditDialogEnhancementsTabContent } from './master-servant-edit-dialog-enhancements-tab-content.component';
@@ -130,6 +132,22 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
         }
     }, [isNewServant, multiEditMode, selectedServant, targetMasterServantsData]);
 
+    const costumesDataSource = useMemo((): ImmutableArray<GameServant> | undefined =>{
+        if (isNewServant) {
+            return selectedServant && [selectedServant];
+        }
+        return targetMasterServantsData.map(DataAggregationUtils.getGameServant);
+    }, [isNewServant, selectedServant, targetMasterServantsData]);
+
+    /**
+     * Compute the costumes data here instead of inside the costumes tab
+     * component(s) to avoid recomputing every time the user changes to/from the
+     * costumes tab (tab components are unmounted/remounted when the user switches
+     * from/to the respective tab).
+     */
+    /** */
+    const costumesData = useGameServantCostumesData(costumesDataSource);
+
 
     //#region Input event handlers
 
@@ -164,13 +182,12 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
 
     //#region Component rendering
 
-
     let tabsContentNode: ReactNode;
     if (activeTab === 'costumes') {
         tabsContentNode = (
             <MasterServantEditDialogCostumesTabContent
+                costumesData={costumesData}
                 masterServantUpdate={masterServantUpdate}
-                gameServants={targetGameServant || selectedServant}
             />
         );
     } else if (activeTab === 'enhancements') {

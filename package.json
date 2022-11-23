@@ -13,7 +13,7 @@
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@fgo-planner/common-core": "^0.1.1",
-    "@fgo-planner/data-core": "^0.3.0",
+    "@fgo-planner/data-core": "^0.3.1",
     "@fgo-planner/transform-core": "^0.3.0",
     "@mui/icons-material": "^5.10.6",
     "@mui/material": "^5.10.8",

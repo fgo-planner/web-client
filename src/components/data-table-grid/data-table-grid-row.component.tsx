@@ -7,8 +7,8 @@ import { ComponentStyleProps } from '../../types';
 
 type Props = PropsWithChildren<{
     active?: boolean;
-    borderTop?: boolean;
     borderBottom?: boolean;
+    borderTop?: boolean;
     stickyContent?: ReactNode;
 }> & ComponentStyleProps & DOMAttributes<HTMLDivElement>;
 
@@ -16,9 +16,10 @@ const StyleClassPrefix = 'DataTableGridCell';
 
 const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
     prop !== 'active' &&
-    prop !== 'borderTop' &&
     prop !== 'borderBottom' &&
-    prop !== 'stickyContent'
+    prop !== 'borderTop' &&
+    prop !== 'stickyContent' &&
+    prop !== 'sx'
 );
 
 const StyleOptions = {

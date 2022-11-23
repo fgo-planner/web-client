@@ -45,9 +45,7 @@ export class PlanService {
     }
 
     private _transformPlanGroup(planGroup: PlanGroup): PlanGroup {
-        // TODO Also add add timestamps to PlanGroup
-        // return Http.stringTimestampsToDate(plan);
-        return planGroup;
+        return Http.stringTimestampsToDate(planGroup);
     }
 
     private _transformPlan(plan: Plan): Plan {

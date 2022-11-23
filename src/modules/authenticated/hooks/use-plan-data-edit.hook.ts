@@ -5,10 +5,11 @@ import { useInjectable } from '../../../hooks/dependency-injection/use-injectabl
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
 import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
 import { PlanService } from '../../../services/data/plan/plan.service';
-import { MasterServantAggregatedData, PlanServantAggregatedData } from '../../../types';
+import { MasterServantAggregatedData, PlanRequirements, PlanServantAggregatedData } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/data-aggregation.utils';
 import { DataEditUtils } from './data-edit.utils';
 import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccountDataEdit } from './use-master-account-data-edit.hook';
+import * as PlanComputationUtils from '../../../utils/plan/plan-computation.utils';
 
 //#region Type definitions
 
@@ -60,7 +61,19 @@ type PlanDataEditHookResult = {
     isMasterAccountDataDirty: boolean;
     isPlanDataDirty: boolean;
     masterAccountEditData: PartialMasterAccountEditData;
+    /**
+     * Guaranteed to be stable between re-renders. A new instance will only be
+     * constructed if changes are persisted or reverted.
+     *
+     * The sub-objects within this container object are readonly; new instances will
+     * be created whenever the respective data is changed.
+     */
     planEditData: PlanEditData;
+    /**
+     * The computed requirements for the plan at its current state. New instance
+     * will be created each time the plan and/or master account data is updated.
+     */
+    planRequirements: PlanRequirements;
     /**
      * Updates the quantities of inventory items.
      *
@@ -317,6 +330,11 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     const isPlanDataDirty = hasDirtyData(dirtyData);
 
     /**
+     * Prevent user from navigating away if data is dirty.
+     */
+    useBlockNavigation(isPlanDataDirty, BlockNavigationHookOptions);
+
+    /**
      * Whether there is an awaiting request to the back-end from this hook.
      */
     const [awaitingPlanRequest, setAwaitingPlanRequest] = useState<boolean>(false);
@@ -328,31 +346,89 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     const awaitingRequest = awaitingMasterAccountRequest || awaitingPlanRequest;
 
     /**
-     * Prevent user from navigating away if data is dirty.
-     */
-    useBlockNavigation(isPlanDataDirty, BlockNavigationHookOptions);
-
-    /**
      * Map of master servants by its instance ID.
      */
-    const masterServantDataMap = useRef<ReadonlyMap<number, MasterServantAggregatedData>>(CollectionUtils.emptyMap());
+    const masterServantsDataMapRefRef = useRef<ReadonlyMap<number, MasterServantAggregatedData>>(CollectionUtils.emptyMap());
 
     /**
      * Rebuilds the master servants Map every time the source array instance
-     * changes.
+     * changes. Also updates the aggregated plan servant data with the updated
+     * master servant instances.
      */
     useEffect((): void => {
-        masterServantDataMap.current = CollectionUtils.mapIterableToMap(
+        const masterServantsDataMapRef = CollectionUtils.mapIterableToMap(
             masterAccountEditData.servantsData,
             InstantiatedServantUtils.getInstanceId
         );
-    }, [masterAccountEditData.servantsData]);
+        masterServantsDataMapRefRef.current = masterServantsDataMapRef;
+
+        /**
+         * The updated `servantsData` array. A new array instance is created to conform
+         * with the hook specifications.
+         */
+        const servantsData: Array<PlanServantAggregatedData> = [];
+        for (const servantData of editData.servantsData) {
+            const masterServantData = masterServantsDataMapRef.get(servantData.instanceId);
+            if (!masterServantData) {
+                continue;
+            }
+            servantsData.push({
+                ...masterServantData,
+                planServant: servantData.planServant
+            });
+        }
+        editData.servantsData = servantsData;
+
+        /**
+         * No need to trigger re-rendering here via state update, etc. The recomputation
+         * of the plan in the `useEffect` below should take care of it.
+         */
+    }, [editData, masterAccountEditData.servantsData]);
+
+    const [planRequirements, setPlanRequirements] = useState<PlanRequirements>(PlanComputationUtils.instantiatePlanRequirements);
+
+    /**
+     * Recomputes the plan requirements every time the dependent datasets change.
+     * The datasets are listed individually in the hook dependency array, because
+     * the container object (`editData` and `masterAccountEditData`) are designed to
+     * keep the same reference between changes.
+     */
+    useEffect((): void => {
+        if (!planId) {
+            return;
+        }
+        const planRequirements = PlanComputationUtils.computePlanRequirements(
+            {
+                planId,
+                enabled: editData.enabled,
+                servantsData: editData.servantsData,
+                upcomingResources: editData.upcomingResources,
+                costumes: editData.costumes
+            },
+            {
+                items: masterAccountEditData.items,
+                qp: masterAccountEditData.qp,
+                costumes: masterAccountEditData.costumes,
+            }
+            // TODO Add previous plans
+        );
+        setPlanRequirements(planRequirements);
+    }, [
+        editData.costumes,
+        editData.enabled,
+        editData.servantsData,
+        editData.upcomingResources,
+        masterAccountEditData.costumes,
+        masterAccountEditData.items,
+        masterAccountEditData.qp,
+        planId
+    ]);
 
     /**
      * Processes the plan data fetched from API server.
      */
     const handlePlanLoad = useCallback((plan: Plan): void => {
-        const editData = clonePlanDataForEdit(plan, masterServantDataMap.current);
+        const editData = clonePlanDataForEdit(plan, masterServantsDataMapRefRef.current);
         const referenceData = clonePlanDataForReference(plan);
         setEditData(editData);
         setReferenceData(referenceData);
@@ -438,7 +514,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
             }
             const newServant = DataAggregationUtils.aggregateDataForPlanServant(
                 PlanServantUtils.instantiate(instanceId),
-                masterServantDataMap.current
+                masterServantsDataMapRefRef.current
             );
             if (!newServant) {
                 continue;
@@ -643,7 +719,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
             revertMasterAccountChanges();
         }
         if (isPlanDataDirty) {
-            const editData = clonePlanDataForEdit(plan, masterServantDataMap.current);
+            const editData = clonePlanDataForEdit(plan, masterServantsDataMapRefRef.current);
             setEditData(editData);
             setDirtyData(getDefaultPlanEditDirtyData());
         }
@@ -717,6 +793,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
         isPlanDataDirty,
         masterAccountEditData,
         planEditData: editData,
+        planRequirements,
         updateMasterItems,
         updateMasterServants,
         updatePlanInfo,

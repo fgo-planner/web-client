@@ -174,8 +174,6 @@ export class MasterAccountService {
             return;
         }
 
-        // TODO Use localStorage to retain selected account when opening new windows/tabs.
-
         /**
          * Default to the first account in the list.
          */

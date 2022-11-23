@@ -12,8 +12,13 @@ export type GameServantCostumeAggregatedData = Immutable<{
      */
     costumeId: number;
 
-    servant: GameServant;
+    /**
+     * Whether the costume is always unlocked by default (has no unlock materials).
+     */
+    alwaysUnlocked: boolean;
 
     costume: GameServantCostume;
+    
+    servant: GameServant;
 
 }>;

@@ -11,11 +11,12 @@ type Props = {
     formId?: string;
     label?: string;
     multiEditMode?: boolean;
-    name: string;
-    onChange: (name: string, value: string, pushChanges: boolean) => void;
+    onChange: (value: string, pushChanges: boolean) => void;
     value: string;
     variant?: BaseTextFieldProps['variant'];
 };
+
+const FieldName = 'bondLevel';
 
 const DefaultLabel = 'Bond';
 
@@ -33,26 +34,25 @@ export const MasterServantBondInputField = React.memo((props: Props) => {
         formId,
         label,
         multiEditMode,
-        name,
         onChange,
         value,
         variant
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
-        const { name, value } = event.target;
-        onChange(name, value, true);
+        const value = event.target.value;
+        onChange(value, true);
     }, [onChange]);
 
-    const fieldId = formId ? `${formId}-${name}` : name;
+    const fieldId = formId ? `${formId}-${FieldName}` : FieldName;
 
     return (
         <FormControl variant={variant} fullWidth>
-            <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
+            <InputLabel htmlFor={FieldName} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
                 id={fieldId}
-                name={name}
+                name={FieldName}
                 label={label || DefaultLabel}
                 value={value}
                 onChange={handleChange}

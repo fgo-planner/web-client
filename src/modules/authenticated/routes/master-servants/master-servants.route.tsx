@@ -183,9 +183,6 @@ export const MasterServantsRoute = React.memo(() => {
 
     const [servantFilter, setServantFilter] = useState<MasterServantsFilter>();
 
-    // TODO No way to toggle this right now...
-    const [showAppendSkills,] = useState<boolean>(true);
-
     const { sm, md } = useActiveBreakpoints();
 
     // TODO Make this user configurable...
@@ -196,9 +193,9 @@ export const MasterServantsRoute = React.memo(() => {
         fouHp: sm,
         fouAtk: sm,
         skills: sm,
-        appendSkills: sm && showAppendSkills,
+        appendSkills: sm,
         summonDate: sm
-    }), [showAppendSkills, sm]);
+    }), [sm]);
 
 
     //#region Internal helper functions

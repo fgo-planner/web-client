@@ -1,9 +1,9 @@
 import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
-import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, PlanServant, PlanServantUpdate, PlanServantUpdateUtils } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, PlanServantUpdate, PlanServantUpdateUtils } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
@@ -42,7 +42,6 @@ const StyleProps = (theme: SystemTheme) => {
 
     const {
         breakpoints,
-        palette,
         spacing
     } = theme as Theme;
 
@@ -62,12 +61,7 @@ const StyleProps = (theme: SystemTheme) => {
                 width: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`,
                 [`& .${StyleClassPrefix}-table-container`]: {
                     flex: 1,
-                    overflow: 'hidden',
-                    // [`& .${MasterServantListStyleClassPrefix}-root`]: {
-                    //     borderRightWidth: 1,
-                    //     borderRightStyle: 'solid',
-                    //     borderRightColor: palette.divider
-                    // }
+                    overflow: 'hidden'
                 },
                 [`& .${StyleClassPrefix}-info-panel-container`]: {
                     width: 320,
@@ -169,31 +163,12 @@ export const PlanRoute = React.memo(() => {
     /**
      * Whether the multi-add servant dialog is open.
      */
-    const [planServantMultiAddDialogOpen, isPlanServantMultiAddDialogOpen] = useState<boolean>(false);
+    const [planServantMultiAddDialogOpen, setPlanServantMultiAddDialogOpen] = useState<boolean>(false);
 
     /**
      * Whether the delete plan servant dialog is open.
      */
     const [planServantDeleteDialogOpen, setPlanServantDeleteDialogOpen] = useState<boolean>(false);
-
-    const [showAppendSkills, setShowAppendSkills] = useState<boolean>(true); // TODO Change this back to false
-
-    /**
-     * Clone of the servant that is being edited by the servant edit dialog. This
-     * data is passed directly into and modified by the dialog. The original data is
-     * not modified until the changes are submitted.
-     */
-    const [editServantTarget, setEditServantTarget] = useState<PlanServant>();
-    /**
-     * Reference to the original data of the servant that is being edited.
-     *
-     * When adding a new servant, this will remain `undefined`.
-     */
-    const editServantTargetRef = useRef<Immutable<PlanServant>>();
-    // const [editServantDialogOpen, setEditServantDialogOpen] = useState<boolean>(false);
-
-    const [deleteServantTarget, setDeleteServantTarget] = useState<PlanServant>();
-    const [deleteServantDialogOpen, setDeleteServantDialogOpen] = useState<boolean>(false);
 
     const { sm, md } = useActiveBreakpoints();
 
@@ -246,12 +221,12 @@ export const PlanRoute = React.memo(() => {
         const availableServants = computeAvailableServants(planEditData.servantsData, masterAccountEditData.servantsData);
         setAvailableServants(availableServants);
         setPlanServantEditDialogData(planServantEditDialogData);
-        isPlanServantMultiAddDialogOpen(false);
+        setPlanServantMultiAddDialogOpen(false);
         setPlanServantDeleteDialogOpen(false);
     }, [masterAccountEditData, planEditData]);
 
     const openMultiAddServantDialog = useCallback((): void => {
-        isPlanServantMultiAddDialogOpen(true);
+        setPlanServantMultiAddDialogOpen(true);
         setPlanServantEditDialogData(undefined);
         setPlanServantDeleteDialogOpen(false);
     }, []);
@@ -270,7 +245,7 @@ export const PlanRoute = React.memo(() => {
         };
         setAvailableServants(CollectionUtils.emptyArray());
         setPlanServantEditDialogData(planServantEditDialogData);
-        isPlanServantMultiAddDialogOpen(false);
+        setPlanServantMultiAddDialogOpen(false);
         setPlanServantDeleteDialogOpen(false);
     }, [planEditData, selectedServantsData]);
 
@@ -279,8 +254,8 @@ export const PlanRoute = React.memo(() => {
             return;
         }
         setPlanServantDeleteDialogOpen(true);
-        isPlanServantMultiAddDialogOpen(false);
         setPlanServantEditDialogData(undefined);
+        setPlanServantMultiAddDialogOpen(false);
     }, [selectedServantsData]);
 
     /**
@@ -375,10 +350,9 @@ export const PlanRoute = React.memo(() => {
     //#region Other event handlers
 
     const handleSaveButtonClick = useCallback(async (): Promise<void> => {
-        editServantTargetRef.current = undefined;
-        setEditServantTarget(undefined);
-        setDeleteServantTarget(undefined);
-        setDeleteServantDialogOpen(false);
+        setPlanServantEditDialogData(undefined);
+        setPlanServantMultiAddDialogOpen(false);
+        setPlanServantDeleteDialogOpen(false);
         try {
             await persistChanges();
         } catch (error: any) {

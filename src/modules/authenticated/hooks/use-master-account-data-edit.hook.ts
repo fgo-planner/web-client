@@ -289,16 +289,14 @@ const getDefaultMasterAccountEditDirtyData = (): MasterAccountEditDirtyData => (
     soundtracks: false
 });
 
-const hasDirtyData = (dirtyData: MasterAccountEditDirtyData): boolean => (
-    !!(
-        dirtyData.bondLevels ||
-        dirtyData.costumes ||
-        dirtyData.items.size ||
-        dirtyData.qp ||
-        dirtyData.servants.size ||
-        dirtyData.servantOrder ||
-        dirtyData.soundtracks
-    )
+const hasDirtyData = (dirtyData: MasterAccountEditDirtyData): boolean => !!(
+    dirtyData.bondLevels ||
+    dirtyData.costumes ||
+    dirtyData.items.size ||
+    dirtyData.qp ||
+    dirtyData.servants.size ||
+    dirtyData.servantOrder ||
+    dirtyData.soundtracks
 );
 
 const isMasterServantChanged = (

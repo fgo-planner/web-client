@@ -75,7 +75,6 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     } = props;
 
 
-
     //#region Input event handlers
 
     const handleEnableCheckboxChange = useCallback((enhancement: EnhancementCategory, value: InstantiatedServantUpdateBoolean): void => {
@@ -149,7 +148,15 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
 
     //#region Input fields
 
-    const enabled = planServantUpdate.enabled;
+    const {
+        enabled,
+        level,
+        ascension,
+        fouAtk,
+        fouHp,
+        skills,
+        appendSkills
+    } = planServantUpdate;
 
     const multiEditMode = targetMasterServantsData.length > 1;
 
@@ -201,29 +208,32 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
 
     const levelField = (
         <ServantLevelInputField
-            level={String(planServantUpdate.level || '')}
-            ascension={String(planServantUpdate.level)}
+            level={String(level || '')}
+            ascension={String(level)}
             gameServant={targetGameServant}
             label='Level'
+            multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
         />
     );
 
     const ascensionField = (
         <ServantAscensionInputField
-            level={String(planServantUpdate.level || '')}
-            ascension={String(planServantUpdate.ascension)}
+            level={String(level || '')}
+            ascension={String(ascension)}
             gameServant={targetGameServant}
             label='Ascension'
+            multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
         />
     );
 
     const fouHpField = (
         <ServantFouInputField
-            value={String(planServantUpdate.fouHp ?? '')}
+            value={String(fouHp ?? '')}
             label='HP Fou'
             set='fouHp'
+            multiEditMode={multiEditMode}
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
         />
@@ -231,9 +241,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
 
     const fouAtkField = (
         <ServantFouInputField
-            value={String(planServantUpdate.fouAtk ?? '')}
+            value={String(fouAtk ?? '')}
             label='ATK Fou'
             set='fouAtk'
+            multiEditMode={multiEditMode}
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
         />
@@ -241,66 +252,72 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
 
     const skill1Field = (
         <ServantSkillInputField
-            value={String(planServantUpdate.skills[1] || '')}
+            value={String(skills[1] || '')}
             label='Skill'
             set='skills'
             slot={1}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
         />
     );
 
     const skill2Field = (
         <ServantSkillInputField
-            value={String(planServantUpdate.skills[2] || '')}
+            value={String(skills[2] || '')}
             label='Skill'
             set='skills'
             slot={2}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
         />
     );
 
     const skill3Field = (
         <ServantSkillInputField
-            value={String(planServantUpdate.skills[3] || '')}
+            value={String(skills[3] || '')}
             label='Skill'
             set='skills'
             slot={3}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
         />
     );
 
     const appendSkill1Field = (
         <ServantSkillInputField
-            value={String(planServantUpdate.appendSkills[1] || '')}
+            value={String(appendSkills[1] || '')}
             label='Append'
             set='appendSkills'
             slot={1}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
         />
     );
 
     const appendSkill2Field = (
         <ServantSkillInputField
-            value={String(planServantUpdate.appendSkills[2] || '')}
+            value={String(appendSkills[2] || '')}
             label='Append'
             set='appendSkills'
             slot={2}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
         />
     );
 
     const appendSkill3Field = (
         <ServantSkillInputField
-            value={String(planServantUpdate.appendSkills[3] || '')}
+            value={String(appendSkills[3] || '')}
             label='Append'
             set='appendSkills'
             slot={3}
             allowEmpty
+            multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
         />
     );

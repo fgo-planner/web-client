@@ -254,9 +254,11 @@ const getDefaultPlanEditDirtyData = (): PlanEditDirtyData => ({
     upcomingResources: false
 });
 
-const hasDirtyData = (dirtyData: any): boolean => (
-    // TODO Implement this
-    false
+const hasDirtyData = (dirtyData: PlanEditDirtyData): boolean => !!(
+    dirtyData.info ||
+    dirtyData.servants.size ||
+    dirtyData.servantOrder ||
+    dirtyData.upcomingResources
 );
 
 const isPlanServantChanged = (

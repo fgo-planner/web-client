@@ -1,16 +1,15 @@
 import { Nullable } from '@fgo-planner/common-core';
-import { UserCredentials } from '../../types/data';
-import { UserInfo } from '../../types/internal';
+import { UserCredentials, UserTokenPayload } from '../../types';
 
 export abstract class AuthenticationService {
 
-    protected _currentUser: Nullable<UserInfo>;
+    protected _currentUserToken: Nullable<UserTokenPayload>;
     /**
      * The currently logged in user's info. Is `null` if the user is not currently
      * logged in.
      */
-    get currentUser() {
-        return this._currentUser;
+    get currentUserToken() {
+        return this._currentUserToken;
     }
 
     /**
@@ -19,7 +18,7 @@ export abstract class AuthenticationService {
      * @deprecated No need for this, just check if the currentUser is present.
      */
     get isLoggedIn() {
-        return !!this.currentUser;
+        return !!this.currentUserToken;
     }
 
     abstract login(credentials: UserCredentials): Promise<void>;

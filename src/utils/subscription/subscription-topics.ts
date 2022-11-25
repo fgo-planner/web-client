@@ -1,87 +1,55 @@
-import { Nullable } from '@fgo-planner/common-core';
+import { Functions, Nullable } from '@fgo-planner/common-core';
 import { MasterAccount, UserPreferences } from '@fgo-planner/data-core';
-import { BasicMasterAccounts, MasterAccountChanges } from '../../types/data';
-import { GlobalDialogOpenAction, HttpResponseError, PageMetadata, ThemeInfo, UserInfo } from '../../types/internal';
-import { Functions } from '../functions';
+import { BasicMasterAccounts, GlobalDialogOpenAction, HttpResponseError, MasterAccountChanges, PageMetadata, ThemeInfo, UserTokenPayload } from '../../types';
 import { SubscriptionTopic } from './subscription-topic.class';
 
-export class SubscriptionTopics {
+const Audio = {
 
-    static get Audio() {
-        return Audio;
-    }
+    BackgroundPlayStatusChange: SubscriptionTopic.forSubject<boolean>(),
 
-    static get User() {
-        return User;
-    }
+    SoundtrackPlayStatusChange: SubscriptionTopic.forSubject<boolean>()
 
-    static get UserInterface() {
-        return UserInterface;
-    }
+} as const;
 
-    private constructor() {
-        
-    }
+const User = {
 
-}
+    CurrentMasterAccountChange: SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccount>>(Functions.nullSupplier),
 
-class Audio {
-
-    static readonly BackgroundPlayStatusChange = SubscriptionTopic.forSubject<boolean>();
-
-    static readonly SoundtrackPlayStatusChange = SubscriptionTopic.forSubject<boolean>();
-
-    private constructor() {
-        
-    }
-
-}
-
-class User {
-
-    /* eslint-disable max-len */
-
-    static readonly CurrentMasterAccountChange = SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccount>>(Functions.nullSupplier);
-
-    static readonly CurrentUserChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserInfo>>(Functions.nullSupplier);
+    CurrentUserChange: SubscriptionTopic.forBehaviorSubject<Nullable<UserTokenPayload>>(Functions.nullSupplier),
 
     // TODO Wrap UserPreferences with Immutable<>
-    static readonly CurrentUserPreferencesChange = SubscriptionTopic.forBehaviorSubject<Nullable<UserPreferences>>(Functions.nullSupplier);
+    CurrentUserPreferencesChange: SubscriptionTopic.forBehaviorSubject<Nullable<UserPreferences>>(Functions.nullSupplier),
+
+    MasterAccountListChange: SubscriptionTopic.forBehaviorSubject<Nullable<BasicMasterAccounts>>(Functions.nullSupplier),
+
+    MasterAccountChangesAvailable: SubscriptionTopic.forReplaySubject<MasterAccountChanges>(),
+
+    Unauthorized: SubscriptionTopic.forReplaySubject<HttpResponseError>()
+
+} as const;
+
+const UserInterface = {
+
+    AppBarElevatedChange: SubscriptionTopic.forReplaySubject<boolean>(),
+
+    GlobalDialogAction: SubscriptionTopic.forReplaySubject<GlobalDialogOpenAction>(),
+
+    LoadingIndicatorActiveChange: SubscriptionTopic.forReplaySubject<boolean>(),
+
+    MetadataChange: SubscriptionTopic.forReplaySubject<PageMetadata>(),
+
+    // NavigationDrawerContentChange: SubscriptionTopic.forReplaySubject<Nullable<NavigationDrawerContent>>(),
     
-    static readonly MasterAccountListChange = SubscriptionTopic.forBehaviorSubject<Nullable<BasicMasterAccounts>>(Functions.nullSupplier);
-
-    static readonly MasterAccountChangesAvailable = SubscriptionTopic.forReplaySubject<MasterAccountChanges>();
+    NavigationDrawerOpenChange: SubscriptionTopic.forReplaySubject<boolean>(),
     
-    static readonly Unauthorized = SubscriptionTopic.forReplaySubject<HttpResponseError>();
-    
-    /* eslint-enable max-len */
+    NavigationDrawerNoAnimationsChange: SubscriptionTopic.forReplaySubject<boolean>(),
 
-    private constructor() {
-        
-    }
+    ThemeChange: SubscriptionTopic.forReplaySubject<ThemeInfo>()
 
-}
+} as const;
 
-class UserInterface {
-
-    static readonly AppBarElevatedChange = SubscriptionTopic.forReplaySubject<boolean>();
-
-    static readonly GlobalDialogAction = SubscriptionTopic.forReplaySubject<GlobalDialogOpenAction>();
-
-    static readonly LoadingIndicatorActiveChange = SubscriptionTopic.forReplaySubject<boolean>();
-
-    static readonly MetadataChange = SubscriptionTopic.forReplaySubject<PageMetadata>();
-
-    // static readonly NavigationDrawerContentChange = SubscriptionTopic.forReplaySubject<Nullable<NavigationDrawerContent>>();
-    
-    static readonly NavigationDrawerOpenChange = SubscriptionTopic.forReplaySubject<boolean>();
-    
-    static readonly NavigationDrawerNoAnimationsChange = SubscriptionTopic.forReplaySubject<boolean>();
-
-    static readonly ThemeChange = SubscriptionTopic.forReplaySubject<ThemeInfo>();
-
-    private constructor() {
-        
-    }
-
-}
+export const SubscriptionTopics = {
+    Audio,
+    User,
+    UserInterface
+} as const;

@@ -1,6 +1,5 @@
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
-import { UserCredentials } from '../../types/data';
-import { HttpResponseError } from '../../types/internal';
+import { HttpResponseError, UserCredentials } from '../../types';
 import { JwtUtils } from '../../utils/jwt.utils';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
@@ -70,8 +69,8 @@ export class WebAuthenticationService extends AuthenticationService {
         if (response.status === 200) {
             const token = await response.text();
             JwtUtils.writeTokenToStorage(token);
-            this._currentUser = JwtUtils.parseToken(token);
-            this._onCurrentUserChange.next(this._currentUser);
+            this._currentUserToken = JwtUtils.parseToken(token);
+            this._onCurrentUserChange.next(this._currentUserToken);
         } else {
             throw await response.text();
         }
@@ -87,8 +86,8 @@ export class WebAuthenticationService extends AuthenticationService {
     private _loadTokenFromStorage(): void {
         const token = JwtUtils.readTokenFromStorage();
         if (token) {
-            this._currentUser = JwtUtils.parseToken(token);
-            this._onCurrentUserChange.next(this._currentUser);
+            this._currentUserToken = JwtUtils.parseToken(token);
+            this._onCurrentUserChange.next(this._currentUserToken);
         }
     }
 
@@ -102,7 +101,7 @@ export class WebAuthenticationService extends AuthenticationService {
          * Remove the access token from local storage and set current user to null.
          */
         JwtUtils.removeTokenFromStorage();
-        this._currentUser = null;
+        this._currentUserToken = null;
         this._onCurrentUserChange.next(null);
 
         /*

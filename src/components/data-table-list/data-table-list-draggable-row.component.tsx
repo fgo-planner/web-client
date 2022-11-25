@@ -4,7 +4,7 @@ import { styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren, ReactNode, useCallback, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { ComponentStyleProps, StyledFunctionProps } from '../../types/internal';
+import { ComponentStyleProps, StyledFunctionProps } from '../../types';
 import { EventHandlers } from '../../utils/event-handlers';
 import { DataTableListBaseRowStyle } from './data-table-list-base-row.style';
 import { DataTableListDraggableRowStyle, StyleClassPrefix } from './data-table-list-draggable-row.style';

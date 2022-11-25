@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { InjectableToken, InjectedField } from '../../types/internal';
+import { InjectableToken, InjectedField } from '../../types';
 
 export const InjectableMetadataKey = Symbol('InjectedFields');
 

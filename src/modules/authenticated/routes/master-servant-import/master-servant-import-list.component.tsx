@@ -1,12 +1,15 @@
-import { ImportedMasterServantUpdate, MasterServant, MasterServantBondLevel, MasterServantUpdateIndeterminateValue as IndeterminateValue, MasterServantUpdateUtils } from '@fgo-planner/data-core';
+import { CollectionUtils, Functions } from '@fgo-planner/common-core';
+import { ImportedMasterServantUpdate, InstantiatedServantBondLevel, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterServant, MasterServantUpdateUtils } from '@fgo-planner/data-core';
 import { Check as CheckIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { Button, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseReason } from '../../../../types/internal';
+import { MasterServantAggregatedData, ModalOnCloseReason } from '../../../../types';
+import { DataAggregationUtils } from '../../../../utils/data-aggregation.utils';
 import { MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { MasterServantImportExistingDialog } from './master-servant-import-existing-dialog.component';
@@ -92,6 +95,8 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const MasterServantImportList = React.memo((props: Props) => {
 
+    const gameServantMap = useGameServantMap();
+
     const {
         hasExistingServants,
         onCancel,
@@ -101,14 +106,18 @@ export const MasterServantImportList = React.memo((props: Props) => {
 
     const [showExistingDialog, setShowExistingDialog] = useState<boolean>(false);
 
+    const [masterServantsData, setMasterServantsData] = useState<Array<MasterServantAggregatedData>>(CollectionUtils.newArray);
+
+    const [bondLevels, setBondLevels] = useState<Record<number, InstantiatedServantBondLevel>>(Functions.emptyObjectSupplier);
+
     const { sm } = useActiveBreakpoints();
 
-    const masterServantListData = useMemo((): {
-        masterServants: Array<MasterServant>;
-        bondLevels: Record<number, MasterServantBondLevel>;
-    } => {
+    useEffect((): void => {
+        if (!gameServantMap) {
+            return;
+        }
         const masterServants = [] as Array<MasterServant>;
-        const bondLevels = {} as Record<number, MasterServantBondLevel>;
+        const bondLevels = {} as Record<number, InstantiatedServantBondLevel>;
         let instanceId = 0;
         for (const parsedServant of parsedServants) {
             const bondLevel = parsedServant.bondLevel;
@@ -118,8 +127,10 @@ export const MasterServantImportList = React.memo((props: Props) => {
             const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedServant, bondLevels);
             masterServants.push(masterServant);
         }
-        return { masterServants, bondLevels };
-    }, [parsedServants]);
+        const masterServantsData = DataAggregationUtils.aggregateDataForMasterServants(masterServants, gameServantMap);
+        setMasterServantsData(masterServantsData);
+        setBondLevels(bondLevels);
+    }, [gameServantMap, parsedServants]);
 
     const handleSubmitButtonClick = useCallback((): void => {
         /*
@@ -187,8 +198,8 @@ export const MasterServantImportList = React.memo((props: Props) => {
             <div className={`${StyleClassPrefix}-main-content`}>
                 <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                     <MasterServantList
-                        masterServants={masterServantListData.masterServants}
-                        bondLevels={masterServantListData.bondLevels}
+                        masterServantsData={masterServantsData}
+                        bondLevels={bondLevels}
                         showHeader
                         visibleColumns={ServantListVisibleColumns}
                     />

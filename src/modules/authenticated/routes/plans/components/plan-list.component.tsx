@@ -2,7 +2,7 @@ import { ImmutableBasicPlan, ImmutableBasicPlanGroup } from '@fgo-planner/data-c
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
-import { BasicPlans, PlanType, SortDirection } from '../../../../../types/data';
+import { BasicPlans, PlanType, SortDirection } from '../../../../../types';
 import { PlanColumnProperties, PlanListColumn, PlanListVisibleColumns } from './plan-list-columns';
 import { PlanListHeader } from './plan-list-header.component';
 import { PlanListRow, StyleClassPrefix as PlanListRowStyleClassPrefix } from './plan-list-row.component';

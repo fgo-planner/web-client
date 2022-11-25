@@ -1,114 +1,101 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, PlanServant } from '@fgo-planner/data-core';
-import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, Edit as EditIcon } from '@mui/icons-material';
-import { Box, IconButton, Theme } from '@mui/material';
-import { useTheme } from '@mui/system';
-import React, { ReactNode, useCallback } from 'react';
-import { PlanServantRequirements } from '../../../../types/data';
-import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
+import clsx from 'clsx';
+import React, { MouseEvent, ReactNode, useCallback } from 'react';
+import { PlanServantAggregatedData, PlanServantRequirements } from '../../../../types';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
-import { GameServantThumbnail } from '../../../game/servant/game-servant-thumbnail.component';
-import { TruncateText } from '../../../text/truncate-text.component';
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
+import { PlanRequirementsTableServantRowCell } from './plan-requirements-table-servant-row-cell.component';
+import { PlanRequirementsTableServantRowHeader } from './plan-requirements-table-servant-row-header.component';
 
 type Props = {
+    active?: boolean;
     borderBottom?: boolean;
     borderTop?: boolean;
-    gameServant: Immutable<GameServant>;
-    masterServant: ImmutableMasterServant;
-    /**
-     * @deprecated Remove edit button from servant row
-     */
-    onEditServant?: (planServant: Immutable<PlanServant>) => void;
-    /**
-     * @deprecated Remove delete button from servant row
-     */
-    onDeleteServant?: (planServant: Immutable<PlanServant>) => void;
+    index: number;
     options: PlanRequirementsTableOptionsInternal;
-    planServant: Immutable<PlanServant>;
+    planServantData: Immutable<PlanServantAggregatedData>;
     servantRequirements: PlanServantRequirements;
+    onClick?: (e: MouseEvent, index: number) => void;
+    onContextMenu?: (e: MouseEvent, index: number) => void;
+    onDoubleClick?: (e: MouseEvent, index: number) => void;
+    // onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
 };
+
+export const StyleClassPrefix = 'PlanRequirementsTableServantRow';
 
 export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
 
     const {
+        active,
         borderBottom,
         borderTop,
-        gameServant,
-        masterServant,
-        onDeleteServant,
-        onEditServant,
+        index,
         options,
-        planServant,
-        servantRequirements
+        planServantData: {
+            gameServant
+        },
+        servantRequirements,
+        onClick,
+        onContextMenu,
+        onDoubleClick,
+        // onDragOrderChange
     } = props;
 
-    const {
-        palette
-    } = useTheme() as Theme;
-
-
+    
     //#region Input event handlers
 
-    const handleEditClick = useCallback(() => {
-        onEditServant?.(planServant);
-    }, [onEditServant, planServant]);
+    const handleClick = useCallback((e: MouseEvent): void => {
+        onClick?.(e, index);
+    }, [index, onClick]);
 
-    const handleDeleteClick = useCallback(() => {
-        onDeleteServant?.(planServant);
-    }, [onDeleteServant, planServant]);
+    const handleContextMenu = useCallback((e: MouseEvent): void => {
+        onContextMenu?.(e, index);
+    }, [index, onContextMenu]);
+
+    const handleDoubleClick = useCallback((e: MouseEvent): void => {
+        onDoubleClick?.(e, index);
+    }, [index, onDoubleClick]);
 
     //#endregion
 
 
     //#region Component rendering
     
-    const stickyContent: ReactNode = (
-        <Box
-            style={{
-                width: 320,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: palette.background.paper
-            }}
-        >
-            <GameServantThumbnail
-                gameServant={gameServant}
-                size={options.cellSize}
-            />
-            <TruncateText className='flex-fill px-2'>
-                {gameServant.name}
-            </TruncateText>
-            <div>
-                <IconButton onClick={handleEditClick}>
-                    <EditIcon />
-                </IconButton>
-                <IconButton color='error' onClick={handleDeleteClick}>
-                    <DeleteForeverOutlinedIcon />
-                </IconButton>
-            </div>
-        </Box>
+    const rowHeaderNode: ReactNode = (
+        <PlanRequirementsTableServantRowHeader
+            gameServant={gameServant}
+            options={options}
+        />
     );
 
+    const itemRequirements = servantRequirements.requirements.items;
+
     const renderItemCell = (itemId: number): ReactNode => {
-        const itemRequirements = servantRequirements.requirements.items[itemId];
+        const itemQuantity = itemRequirements[itemId]?.total;
         return (
-            <DataTableGridCell
+            <PlanRequirementsTableServantRowCell
                 key={itemId}
-                size={options.cellSize}
-                backgroundColor={palette.background.paper}
-            >
-                {itemRequirements?.total}
-            </DataTableGridCell>
+                quantity={itemQuantity}
+                options={options}
+                // backgroundColor={palette.background.paper}
+            />
         );
     };
 
+    const className = clsx(
+        `${StyleClassPrefix}-root`,
+        active && `${StyleClassPrefix}-active`
+    );
+
     return (
         <DataTableGridRow
+            className={className}
             borderTop={borderTop}
             borderBottom={borderBottom}
-            stickyContent={stickyContent}
+            onClick={handleClick}
+            onDoubleClick={handleDoubleClick}
+            onContextMenu={handleContextMenu}
+            stickyContent={rowHeaderNode}
         >
             {options.displayedItems.map(renderItemCell)}
         </DataTableGridRow>

@@ -7,7 +7,7 @@ import { DataTableListStaticRow } from '../../../../components/data-table-list/d
 import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { GameItemCategory, GameItemMap } from '../../../../types/data';
+import { GameItemCategory, GameItemMap } from '../../../../types';
 import { MasterItemStats, MasterItemStatsFilterOptions } from './master-item-stats.utils';
 
 type Props = {

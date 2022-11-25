@@ -1,4 +1,4 @@
-import { GameItemBackground, MasterServantBondLevel } from '@fgo-planner/data-core';
+import { GameItemBackground, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 
 export class AssetConstants {
 
@@ -28,7 +28,7 @@ export class AssetConstants {
 
     static readonly ServantAscensionOnIcon = `${AssetConstants._InternalIconAssetsBaseUrl}/ascension_on.png`;
 
-    static readonly ServantBondIconMap: { readonly [key in MasterServantBondLevel]: string } = {
+    static readonly ServantBondIconMap: { readonly [key in InstantiatedServantBondLevel]: string } = {
         0: `${AssetConstants._InternalIconAssetsBaseUrl}/bond_0.png`,
         1: `${AssetConstants._InternalIconAssetsBaseUrl}/bond_1.png`,
         2: `${AssetConstants._InternalIconAssetsBaseUrl}/bond_2.png`,

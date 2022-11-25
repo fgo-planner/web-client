@@ -6,7 +6,7 @@ export type PlanRequirementsTableOptions = {
     }
 
     displayItems: {
-        unused?: boolean;
+        empty?: boolean;
         statues?: boolean;
         gems?: boolean;
         lores?: boolean;

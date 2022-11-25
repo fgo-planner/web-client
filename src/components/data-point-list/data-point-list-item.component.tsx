@@ -1,7 +1,7 @@
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { CSSProperties, useMemo } from 'react';
-import { ComponentStyleProps } from '../../types/internal';
+import { ComponentStyleProps } from '../../types';
 
 type Props = {
     label: JSX.Element | string | number;

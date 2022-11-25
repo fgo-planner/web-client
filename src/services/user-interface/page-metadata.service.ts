@@ -1,5 +1,5 @@
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
-import { PageMetadata } from '../../types/internal';
+import { PageMetadata } from '../../types';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 

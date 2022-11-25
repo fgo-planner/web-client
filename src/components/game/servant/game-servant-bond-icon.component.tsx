@@ -1,9 +1,9 @@
-import { MasterServantBondLevel } from '@fgo-planner/data-core';
+import { InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../../constants';
 
 type Props = {
-    bond: MasterServantBondLevel;
+    bond: InstantiatedServantBondLevel;
     size?: string | number;
 };
 

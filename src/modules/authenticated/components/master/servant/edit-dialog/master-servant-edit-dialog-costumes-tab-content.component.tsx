@@ -1,29 +1,19 @@
-import { ImmutableArray, SetUtils } from '@fgo-planner/common-core';
-import { GameServant, MasterServantUpdate, MasterServantUpdateBoolean } from '@fgo-planner/data-core';
+import { CollectionUtils } from '@fgo-planner/common-core';
+import { InstantiatedServantUpdateUtils, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ServantCostumeSelectList } from '../../../../../../components/input/servant/costume/servant-costume-select-list.component';
 import { ThemeConstants } from '../../../../../../styles/theme-constants';
+import { GameServantCostumeAggregatedData } from '../../../../../../types';
 
 type Props = {
-    gameServants: ImmutableArray<GameServant>;
+    costumesData: ReadonlyArray<GameServantCostumeAggregatedData>;
     /**
      * The update payload for editing. This will be modified directly, so provide a
      * clone if modification to the original object is not desired.
      */
     masterServantUpdate: MasterServantUpdate;
-};
-
-const transformUnlockedCostumes = (unlockedCostumes: Map<number, MasterServantUpdateBoolean>): Set<number> => {
-    const result = new Set<number>();
-    for (const [key, value] of unlockedCostumes.entries()) {
-        if (!value) {
-            continue;
-        }
-        result.add(key);
-    }
-    return result;
 };
 
 const StyleClassPrefix = 'MasterServantEditDialogCostumesTabContent';
@@ -41,29 +31,31 @@ const StyleProps = (theme: SystemTheme) => ({
 export const MasterServantEditDialogCostumesTabContent = React.memo((props: Props) => {
 
     const {
-        gameServants,
+        costumesData,
         masterServantUpdate: {
             unlockedCostumes
         }
     } = props;
 
-    const [selectedCostumeIds, setSelectedCostumeIds] = useState<ReadonlySet<number>>(() => transformUnlockedCostumes(unlockedCostumes));
+    const [selectedCostumeIds, setSelectedCostumeIds] = useState<ReadonlySet<number>>(CollectionUtils.emptySet);
 
     useEffect((): void => {
-        setSelectedCostumeIds(transformUnlockedCostumes(unlockedCostumes));
+        const selectedCostumeIds = InstantiatedServantUpdateUtils.convertFromCostumesMap(unlockedCostumes);
+        setSelectedCostumeIds(selectedCostumeIds);
     }, [unlockedCostumes]);
 
     const handleSelectionChange = useCallback((selectedCostumeIds: ReadonlySet<number>): void => {
         setSelectedCostumeIds(prevSelectedCostumeIds => {
-            if (SetUtils.isEqual(prevSelectedCostumeIds, selectedCostumeIds)) {
+            // TODO Is this equality check even needed?
+            if (CollectionUtils.isSetsEqual(prevSelectedCostumeIds, selectedCostumeIds)) {
                 return prevSelectedCostumeIds;
             }
             for (const costumeId of selectedCostumeIds) {
-                unlockedCostumes.set(costumeId, MasterServantUpdateBoolean.True);
+                unlockedCostumes.set(costumeId, true);
             }
             for (const costumeId of unlockedCostumes.keys()) {
                 if (!selectedCostumeIds.has(costumeId)) {
-                    unlockedCostumes.set(costumeId, MasterServantUpdateBoolean.False);
+                    unlockedCostumes.set(costumeId, false);
                 }
             }
             return selectedCostumeIds;
@@ -78,7 +70,7 @@ export const MasterServantEditDialogCostumesTabContent = React.memo((props: Prop
     return (
         <Box className={classNames} sx={StyleProps}>
             <ServantCostumeSelectList
-                gameServants={gameServants}
+                costumesData={costumesData}
                 selectedCostumeIds={selectedCostumeIds}
                 onSelectionChange={handleSelectionChange}
             />

@@ -1,4 +1,4 @@
-import { MasterServantUtils } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateBoolean, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { FormikErrors, FormikTouched } from 'formik';
 import lodash from 'lodash-es';
 
@@ -52,7 +52,7 @@ export class FormUtils {
         if (value === undefined) {
             return undefined;
         }
-        return ~~value as any;
+        return ~~value as T;
     }
 
     /**
@@ -68,11 +68,30 @@ export class FormUtils {
             return undefined;
         }
         const value = Number(input);
-        return MasterServantUtils.roundToNearestValidFouValue(value);
+        return InstantiatedServantUtils.roundToNearestValidFouValue(value);
     }
 
     static assignValue<T>(object: NonNullable<T>, path: string, value: string | number | undefined): T {
         return lodash.set(object as any, path, value);
+    }
+
+    /**
+     * Find the next value in the cycle for a toggleable form input (ie. checkbox).
+     * The possible values depends on whether indeterminate values are allowed:
+     *
+     * Indeterminate allowed: `false` -> `true` -> `IndeterminateValue`
+     *
+     * Indeterminate not allowed: `false` -> `true`
+     */
+    static computeNextToggleValue(current: InstantiatedServantUpdateBoolean, allowIndeterminate = false): InstantiatedServantUpdateBoolean {
+        switch (current) {
+            case InstantiatedServantUpdateBoolean.True:
+                return allowIndeterminate ? InstantiatedServantUpdateBoolean.Indeterminate : InstantiatedServantUpdateBoolean.False;
+            case InstantiatedServantUpdateBoolean.False:
+                return InstantiatedServantUpdateBoolean.True;
+            default:
+                return allowIndeterminate ? InstantiatedServantUpdateBoolean.False : InstantiatedServantUpdateBoolean.True;
+        }
     }
 
 }

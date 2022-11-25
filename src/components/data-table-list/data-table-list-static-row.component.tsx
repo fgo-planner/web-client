@@ -2,7 +2,7 @@ import { FilteringStyledOptions } from '@mui/styled-engine';
 import { styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren, ReactNode } from 'react';
-import { ComponentStyleProps, StyledFunctionProps } from '../../types/internal';
+import { ComponentStyleProps, StyledFunctionProps } from '../../types';
 import { DataTableListBaseRowStyle } from './data-table-list-base-row.style';
 
 // TODO Add prop for cursor style.

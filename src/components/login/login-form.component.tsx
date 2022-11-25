@@ -2,7 +2,7 @@ import { Checkbox, FormControlLabel, FormGroup, TextField } from '@mui/material'
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import React, { ReactNode, useCallback, useRef } from 'react';
 import * as Yup from 'yup';
-import { UserCredentials } from '../../types/data';
+import { UserCredentials } from '../../types';
 import { FormUtils } from '../../utils/form.utils';
 import { InputFieldContainer } from '../input/input-field-container.component';
 

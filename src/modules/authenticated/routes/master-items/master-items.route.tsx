@@ -8,7 +8,7 @@ import { RouteDataEditControls } from '../../../../components/control/route-data
 import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
+import { useMasterAccountDataEdit } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterItemList } from './master-item-list.component';
 
 const StyleClassPrefix = 'MasterItems';
@@ -55,7 +55,7 @@ export const MasterItemsRoute = React.memo(() => {
         updateItem,
         revertChanges,
         persistChanges
-    } = useMasterAccountDataEditHook({ includeItems: true });
+    } = useMasterAccountDataEdit({ includeItems: true });
 
     const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
 

@@ -6,7 +6,7 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { ThemeService } from '../../../../services/user-interface/theme.service';
 import { UserInterfaceService } from '../../../../services/user-interface/user-interface.service';
-import { ThemeInfo } from '../../../../types/internal';
+import { ThemeInfo } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 

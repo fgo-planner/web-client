@@ -1,5 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, MasterServantBondLevel, MasterServantNoblePhantasmLevel, MasterServantUpdate, MasterServantUpdateBoolean, MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateNumber } from '@fgo-planner/data-core';
+import { InstantiatedServantBondLevel, InstantiatedServantNoblePhantasmLevel, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateIndeterminate as Indeterminate, InstantiatedServantUpdateNumber, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
@@ -11,14 +10,7 @@ import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.h
 
 type Props = {
     /**
-     * The game servant data that corresponds to the servant being edited. This
-     * should be set to `undefined` if and only if multiple servants are being
-     * edited.
-     */
-    gameServant?: Immutable<GameServant>;
-    /**
-     * The update payload for editing. This will be modified directly, so provide a
-     * clone if modification to the original object is not desired.
+     * The update payload for editing. This will be modified directly.
      */
     masterServantUpdate: MasterServantUpdate;
     multiEditMode?: boolean;
@@ -66,26 +58,26 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
 
     //#region Input event handlers
 
-    const handleBondInputChange = useCallback((_: string, value: string): void => {
+    const handleBondInputChange = useCallback((value: string): void => {
         if (!value) {
             masterServantUpdate.bondLevel = null;
         } else {
-            masterServantUpdate.bondLevel = Number(value) as MasterServantUpdateNumber<MasterServantBondLevel>;
+            masterServantUpdate.bondLevel = Number(value) as InstantiatedServantUpdateNumber<InstantiatedServantBondLevel>;
         }
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleNpInputChange = useCallback((_name: string, value: string): void => {
-        masterServantUpdate.np = Number(value) as MasterServantUpdateNumber<MasterServantNoblePhantasmLevel>;
+    const handleNpInputChange = useCallback((value: string): void => {
+        masterServantUpdate.np = Number(value) as InstantiatedServantUpdateNumber<InstantiatedServantNoblePhantasmLevel>;
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleSummonedCheckboxChange = useCallback((_name: string, value: MasterServantUpdateBoolean): void => {
+    const handleSummonedCheckboxChange = useCallback((value: InstantiatedServantUpdateBoolean): void => {
         masterServantUpdate.summoned = value;
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleSummonDateInputChange = useCallback((_name: string, value: number | Indeterminate | null ): void => {
+    const handleSummonDateInputChange = useCallback((value: number | Indeterminate | null ): void => {
         masterServantUpdate.summonDate = value;
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
@@ -110,7 +102,6 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
     const summonedField = (
         <MasterServantSummonedCheckbox
             value={summoned}
-            name='summoned'
             multiEditMode={multiEditMode}
             onChange={handleSummonedCheckboxChange}
             disabled={readonly}
@@ -120,7 +111,6 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
     const summonDateField = (
         <MasterServantSummonDateInputField
             value={summonDate}
-            name='summonDate'
             label={summoned ? 'Summon date' : 'Planned summon date'}
             multiEditMode={multiEditMode}
             onChange={handleSummonDateInputChange}
@@ -133,7 +123,6 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
         <MasterServantNpLevelInputField
             value={String(np ?? '')}
             label='NP Level'
-            name='np'
             multiEditMode={multiEditMode}
             onChange={handleNpInputChange}
             disabled={readonly}
@@ -144,7 +133,6 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
         <MasterServantBondInputField
             value={String(bondLevel ?? '')}
             label='Bond'
-            name='bondLevel'
             allowEmpty
             multiEditMode={multiEditMode}
             onChange={handleBondInputChange}

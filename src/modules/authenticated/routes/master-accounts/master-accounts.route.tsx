@@ -11,8 +11,7 @@ import { useInjectable } from '../../../../hooks/dependency-injection/use-inject
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { BasicMasterAccounts } from '../../../../types/data';
-import { ModalOnCloseReason } from '../../../../types/internal';
+import { BasicMasterAccounts, ModalOnCloseReason } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { MasterAccountListVisibleColumns } from './components/master-account-list-columns';

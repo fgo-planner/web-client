@@ -1,10 +1,10 @@
 import { Nullable } from '@fgo-planner/common-core';
-import { MasterServantBondLevel } from '@fgo-planner/data-core';
+import { InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import React from 'react';
 import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
 
 type Props = {
-    bondLevel: Nullable<MasterServantBondLevel>;
+    bondLevel: Nullable<InstantiatedServantBondLevel>;
 };
 
 export const StyleClassPrefix = 'MasterServantListRowBondLevel';

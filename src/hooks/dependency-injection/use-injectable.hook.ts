@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { InjectableToken } from '../../types/internal';
+import { InjectableToken } from '../../types';
 import { InjectablesContainer } from '../../utils/dependency-injection/injectables-container';
 
 export function useInjectable<T = any>(token: InjectableToken<T>, qualifier?: string): T;

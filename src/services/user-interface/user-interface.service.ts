@@ -1,14 +1,15 @@
-import { MapUtils } from '@fgo-planner/common-core';
+import { CollectionUtils } from '@fgo-planner/common-core';
+import { uniqueId } from 'lodash-es';
 import { Subject } from 'rxjs';
 import { Injectable } from '../../decorators/dependency-injection/injectable.decorator';
-import { GlobalDialog, NavigationBlockerDialogOptions } from '../../types/internal';
+import { GlobalDialog, NavigationBlockerDialogOptions } from '../../types';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 
 export enum LockableFeature {
-    AppBarElevate,
-    LoadingIndicator,
-    NavigationDrawerNoAnimations
+    AppBarElevate = 'AppBarElevate',
+    LoadingIndicator = 'LoadingIndicator',
+    NavigationDrawerNoAnimations = 'NavigationDrawerNoAnimations'
 }
 
 /**
@@ -17,6 +18,8 @@ export enum LockableFeature {
  */
 @Injectable
 export class UserInterfaceService {
+
+    private readonly _DebugMode = false;
 
     private readonly _LockIdSets = new Map<LockableFeature, Set<string>>();
 
@@ -51,11 +54,17 @@ export class UserInterfaceService {
      */
     requestLock(feature: LockableFeature): string {
         const lockId = this._generateLockId();
-        const lockIdSet = MapUtils.getOrDefault(this._LockIdSets, feature, () => new Set());
+        if (this._DebugMode) {
+            console.debug(`Lock requested for feature=${feature} lockId=${lockId}`);
+        }
+        const lockIdSet = CollectionUtils.getOrDefault(this._LockIdSets, feature, () => new Set());
         lockIdSet.add(lockId);
         if (!this._LockableFeaturesStates.get(feature)) {
             this._LockableFeaturesStates.set(feature, true);
             const subject = this._getSubjectForLockableFeature(feature);
+            if (this._DebugMode) {
+                console.debug(`Lock request granted for feature=${feature} lockId=${lockId}`);
+            }
             this._pushChange(subject, true);
         }
         return lockId;
@@ -65,11 +74,17 @@ export class UserInterfaceService {
      * Defaults to `false`.
      */
     releaseLock(feature: LockableFeature, lockId: string): void {
+        if (this._DebugMode) {
+            console.debug(`Release requested for feature=${feature} lockId=${lockId}`);
+        }
         const lockIdSet = this._LockIdSets.get(feature);
         lockIdSet?.delete(lockId);
         if (!lockIdSet?.size) {
             this._LockableFeaturesStates.set(feature, false);
             const subject = this._getSubjectForLockableFeature(feature);
+            if (this._DebugMode) {
+                console.debug(`Release granted for feature=${feature} lockId=${lockId}`);
+            }
             this._pushChange(subject, false);
         }
     }
@@ -86,7 +101,7 @@ export class UserInterfaceService {
     }
 
     private _generateLockId(): string {
-        return String(new Date().getTime());
+        return uniqueId() + Math.round(Math.random() * 1000);
     }
 
     setNavigationDrawerOpen(open: boolean): void {

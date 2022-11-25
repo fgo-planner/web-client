@@ -1,9 +1,9 @@
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode } from 'react';
-import { useGameServantCostumeList } from '../../../../hooks/data/use-game-servant-costume-list.hook';
+import { useGameServantCostumesData } from '../../../../hooks/data/use-game-servant-costumes-data.hook';
 import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
-import { GameServantCostumeListData } from '../../../../types/data';
+import { GameServantCostumeAggregatedData } from '../../../../types';
 import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
 import { MasterServantCostumesListRow, StyleClassPrefix as MasterServantCostumesListRowStyleClassPrefix } from './master-servant-costumes-list-row.component';
 
@@ -72,28 +72,23 @@ export const MasterServantCostumesList = React.memo(({ onChange, unlockedCostume
 
     const gameServantList = useGameServantList();
 
-    const {
-        costumeList,
-        alwaysUnlockedIds
-    } = useGameServantCostumeList(gameServantList);
+    const costumesData = useGameServantCostumesData(gameServantList);
 
-    /*
+    /**
      * This can be empty during the initial render.
      */
-    if (!costumeList.length) {
+    if (!costumesData.length) {
         return null;
     }
 
-    const renderCostumeRow = (costumeData: GameServantCostumeListData): ReactNode => {
+    const renderCostumeRow = (costumeData: GameServantCostumeAggregatedData): ReactNode => {
         const { costumeId } = costumeData;
         const unlocked = unlockedCostumes.has(costumeId);
-        const alwaysUnlocked = alwaysUnlockedIds.has(costumeId);
         return (
             <MasterServantCostumesListRow
                 key={costumeId}
                 costumeData={costumeData}
                 unlocked={unlocked}
-                alwaysUnlocked={alwaysUnlocked}
                 onChange={onChange}
                 openLinksInNewTab
             />
@@ -104,7 +99,7 @@ export const MasterServantCostumesList = React.memo(({ onChange, unlockedCostume
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-list-container`}>
                 <MasterServantCostumesListHeader />
-                {costumeList.map(renderCostumeRow)}
+                {costumesData.map(renderCostumeRow)}
             </div>
         </Box>
     );

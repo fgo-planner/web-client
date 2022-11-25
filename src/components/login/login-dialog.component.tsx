@@ -5,8 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useInjectable } from '../../hooks/dependency-injection/use-injectable.hook';
 import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { AuthenticationService } from '../../services/authentication/authentication.service';
-import { UserCredentials } from '../../types/data';
-import { DialogComponentProps } from '../../types/internal';
+import { DialogComponentProps, UserCredentials } from '../../types';
 import { DialogCloseButton } from '../dialog/dialog-close-button.component';
 import { LoginForm, StyleClassPrefix as LoginFormStyleClassPrefix } from './login-form.component';
 

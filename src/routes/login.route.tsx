@@ -6,7 +6,7 @@ import { LoginForm, StyleClassPrefix as LoginFormStyleClassPrefix } from '../com
 import { PageTitle } from '../components/text/page-title.component';
 import { useInjectable } from '../hooks/dependency-injection/use-injectable.hook';
 import { AuthenticationService } from '../services/authentication/authentication.service';
-import { UserCredentials } from '../types/data';
+import { UserCredentials } from '../types';
 
 const FormId = 'login-form';
 

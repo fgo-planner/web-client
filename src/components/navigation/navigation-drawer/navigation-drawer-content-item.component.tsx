@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useContext, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
-import { NavigationDrawerActionItem as ActionItem, NavigationDrawerItem as Item, NavigationDrawerLinkItem as LinkItem, SxPropsFunction } from '../../../types/internal';
+import { NavigationDrawerActionItem as ActionItem, NavigationDrawerItem as Item, NavigationDrawerLinkItem as LinkItem, SxPropsFunction } from '../../../types';
 
 type Props = {
     item: Item;

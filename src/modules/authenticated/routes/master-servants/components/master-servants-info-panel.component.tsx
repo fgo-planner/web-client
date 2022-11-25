@@ -1,22 +1,21 @@
-import { ReadonlyIterable } from '@fgo-planner/common-core';
-import { GameServantClass, GameServantConstants, ImmutableMasterServant, MasterServantBondLevel } from '@fgo-planner/data-core';
+import { GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import { IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { Fragment, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
 import { DataPointListItem } from '../../../../../components/data-point-list/data-point-list-item.component';
 import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
 import { GameServantBondIcon } from '../../../../../components/game/servant/game-servant-bond-icon.component';
 import { useGameItemMap } from '../../../../../hooks/data/use-game-item-map.hook';
-import { useGameServantMap } from '../../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
-import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types/data';
-import { ComputationOptions, PlanComputationUtils } from '../../../../../utils/plan/plan-computation.utils';
+import { MasterServantAggregatedData, PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types';
+import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
+import * as PlanComputationUtils from '../../../../../utils/plan/plan-computation.utils';
 
 type Props = {
-    activeServants: ReadonlyArray<ImmutableMasterServant>;
-    bondLevels: Record<number, MasterServantBondLevel>;
+    activeServantsData: ReadonlyArray<MasterServantAggregatedData>;
+    bondLevels: Record<number, InstantiatedServantBondLevel>;
     editMode?: boolean;
     keepChildrenMounted?: boolean;
     onOpenToggle: () => void;
@@ -25,8 +24,8 @@ type Props = {
      */
     onStatsChange?: (data: any) => void;
     open?: boolean;
-    statsOptions?: ComputationOptions;
-    unlockedCostumes: ReadonlyIterable<number>;
+    statsOptions?: PlanComputationUtils.ComputationOptions;
+    unlockedCostumes: Iterable<number>;
 };
 
 // const FormId = 'master-servant-info-panel-form';
@@ -35,8 +34,8 @@ const hasDebt = (enhancementRequirements: EnhancementRequirements): boolean => {
     return enhancementRequirements.qp > 0;
 };
 
-const renderFouLevels = (activeServant: ImmutableMasterServant): JSX.Element => {
-    const { fouAtk, fouHp } = activeServant;
+const renderFouLevels = (masterServant: ImmutableMasterServant): JSX.Element => {
+    const { fouAtk, fouHp } = masterServant;
     return (
         <div className={`${StyleClassPrefix}-skill-level-stat`}>
             {fouHp ?? '\u2014'}
@@ -46,8 +45,8 @@ const renderFouLevels = (activeServant: ImmutableMasterServant): JSX.Element => 
     );
 };
 
-const renderSkillLevels = (activeServant: ImmutableMasterServant, stat: 'skills' | 'appendSkills'): JSX.Element => {
-    const skills = activeServant[stat];
+const renderSkillLevels = (masterServant: ImmutableMasterServant, stat: 'skills' | 'appendSkills'): JSX.Element => {
+    const skills = masterServant[stat];
     return (
         <div className={`${StyleClassPrefix}-skill-level-stat`}>
             {skills[1] ?? '\u2013'}
@@ -59,12 +58,11 @@ const renderSkillLevels = (activeServant: ImmutableMasterServant, stat: 'skills'
     );
 };
 
-const renderNpLevel = (activeServant: ImmutableMasterServant): string | number => {
-    const { summoned, np: npLevel } = activeServant;
-    return summoned ? npLevel : 'Not summoned';
+const renderNpLevel = (masterServant: ImmutableMasterServant): string | number => {
+    return masterServant.summoned ? masterServant.np : 'Not summoned';
 };
 
-const renderBondLevel = (bond?: MasterServantBondLevel): JSX.Element => {
+const renderBondLevel = (bond?: InstantiatedServantBondLevel): JSX.Element => {
     if (bond == null) {
         return (
             <div className={`${StyleClassPrefix}-bond-level-stat`}>
@@ -229,85 +227,40 @@ const StyleProps = (theme: SystemTheme) => {
 export const MasterServantsInfoPanel = React.memo((props: Props) => {
 
     const {
-        activeServants,
+        activeServantsData,
         bondLevels,
-        editMode,
+        // editMode,
         keepChildrenMounted,
         onOpenToggle,
-        onStatsChange,
+        // onStatsChange,
         open,
         statsOptions,
         unlockedCostumes
     } = props;
 
     const gameItemMap = useGameItemMap();
-    const gameServantMap = useGameServantMap();
 
     const [selectedServantsEnhancementRequirements, setSelectedServantsEnhancementRequirements] = useState<EnhancementRequirements>();
 
     const renderChildren = open || keepChildrenMounted;
 
     useEffect(() => {
-        if (!gameServantMap || !renderChildren || !activeServants.length) {
+        if (!renderChildren || !activeServantsData.length) {
             setSelectedServantsEnhancementRequirements(undefined);
         } else {
             const results = [];
-            for (const activeServant of activeServants) {
-                const servant = gameServantMap[activeServant.gameId];
-                if (!servant) {
-                    continue;
-                }
+            for (const activeServant of activeServantsData) {
                 const result = PlanComputationUtils.computeServantEnhancementRequirements(
-                    servant,
-                    activeServant,
-                    [...unlockedCostumes], // TODO Update computeServantEnhancementRequirements method to accept both Sets and arrays.
+                    activeServant.gameServant,
+                    activeServant.masterServant,
+                    unlockedCostumes, 
                     statsOptions
                 );
                 results.push(result);
             }
             setSelectedServantsEnhancementRequirements(PlanComputationUtils.sumEnhancementRequirements(results));
         }
-    }, [activeServants, gameServantMap, renderChildren, statsOptions, unlockedCostumes]);
-
-    /**
-     * For edit mode, currently unused.
-     */
-    const handleStatsChange = useCallback((data: any): void => {
-        if (!editMode || !gameServantMap || activeServants.length !== 1) {
-            return;
-        }
-        const activeServant = activeServants[0];
-        const { gameId } = activeServant;
-        /*
-         * Update data from the form. Note that `data.masterServant` does not contain an
-         * `instanceId` value, but it should not affect the `merge` method; we just need
-         * to typecast to `any` to bypass the type check error.
-         */
-        // MasterServantUtils.merge(activeServant, data.masterServant as any);
-        if (data.bond === undefined) {
-            delete bondLevels[gameId];
-        } else {
-            bondLevels[gameId] = data.bond;
-        }
-        // TODO Update unlocked costumes
-
-        /*
-         * Re-compute servant material stats. Only one servant should be active at this
-         * point.
-         */
-        const servant = gameServantMap[gameId];
-        if (servant) {
-            const result = PlanComputationUtils.computeServantEnhancementRequirements(
-                servant,
-                activeServant,
-                [...unlockedCostumes], // TODO Update computeServantEnhancementRequirements method to accept both Sets and arrays.
-                statsOptions
-            );
-            setSelectedServantsEnhancementRequirements(result);
-        }
-
-        onStatsChange && onStatsChange(data);
-    }, [activeServants, bondLevels, editMode, gameServantMap, onStatsChange, statsOptions, unlockedCostumes]);
+    }, [activeServantsData, renderChildren, statsOptions, unlockedCostumes]);
 
     const actionButtonsNode: ReactNode = (
         <div className={`${StyleClassPrefix}-actions-container`}>
@@ -329,37 +282,31 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
         if (!renderChildren) {
             return null;
         }
-        if (activeServants.length !== 1) {
+        if (activeServantsData.length === 1) {
+            const gameServant = activeServantsData[0].gameServant;
             return (
                 <div className={`${StyleClassPrefix}-title`}>
-                    {!activeServants.length ? 'No servant selected' : 'Multiple servants selected'}
-                </div>
-            );
-        }
-        const activeServant = activeServants[0];
-        const servant = gameServantMap?.[activeServant.gameId];
-        if (!servant) {
-            return (
-                <div className={`${StyleClassPrefix}-title`}>
-                    Unknown Servant
+                    <div className={clsx(`${StyleClassPrefix}-servant-name`, 'truncate')}>
+                        {GameServantUtils.getDisplayedName(gameServant)}
+                    </div>
                 </div>
             );
         }
         return (
             <div className={`${StyleClassPrefix}-title`}>
-                <div className={clsx(`${StyleClassPrefix}-servant-name`, 'truncate')}>
-                    {servant.name}
-                </div>
+                {!activeServantsData.length ? 'No servant selected' : 'Multiple servants selected'}
             </div>
         );
-    }, [activeServants, gameServantMap, renderChildren]);
+    }, [activeServantsData, renderChildren]);
 
     const servantStatsNode: ReactNode = useMemo(() => {
-        if (!gameServantMap || !renderChildren || activeServants.length !== 1) {
+        if (!renderChildren || activeServantsData.length !== 1) {
             return null;
         }
-        const activeServant = activeServants[0];
-        const servant = gameServantMap[activeServant.gameId];
+        const {
+            gameServant,
+            masterServant
+        } = activeServantsData[0];
         // if (editMode) {
         //     return (
         //         <MasterServantEditForm
@@ -380,61 +327,61 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Rarity'
                     labelWidth={ServantStatLabelWidth}
-                    value={`${servant?.rarity || '\u2014'} \u2605`}
+                    value={`${gameServant.rarity || '\u2014'} \u2605`}
                 />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Class'
                     labelWidth={ServantStatLabelWidth}
-                    value={GameServantConstants.ClassDisplayNameMap[servant?.class || GameServantClass.Unknown]}
+                    value={GameServantConstants.ClassDisplayNameMap[gameServant.class || GameServantClass.Unknown]}
                 />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Level'
                     labelWidth={ServantStatLabelWidth}
-                    value={activeServant.level}
+                    value={masterServant.level}
                 />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Ascension'
                     labelWidth={ServantStatLabelWidth}
-                    value={activeServant.ascension}
+                    value={masterServant.ascension}
                 />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Fou (HP/ATK)'
                     labelWidth={ServantStatLabelWidth}
-                    value={renderFouLevels(activeServant)}
+                    value={renderFouLevels(masterServant)}
                 />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Skills'
                     labelWidth={ServantStatLabelWidth}
-                    value={renderSkillLevels(activeServant, 'skills')}
+                    value={renderSkillLevels(masterServant, 'skills')}
                 />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Append Skills'
                     labelWidth={ServantStatLabelWidth}
-                    value={renderSkillLevels(activeServant, 'appendSkills')}
+                    value={renderSkillLevels(masterServant, 'appendSkills')}
                 />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Noble Phantasm'
                     labelWidth={ServantStatLabelWidth}
-                    value={renderNpLevel(activeServant)}
+                    value={renderNpLevel(masterServant)}
                 />
                 <DataPointListItem
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Bond'
                     labelWidth={ServantStatLabelWidth}
-                    value={renderBondLevel(bondLevels[activeServant.gameId])}
+                    value={renderBondLevel(bondLevels[masterServant.gameId])}
                 />
             </div>
             <div className={`${StyleClassPrefix}-divider`} />
         </>;
         // }
-    }, [activeServants, bondLevels, gameServantMap, renderChildren]);
+    }, [activeServantsData, bondLevels, renderChildren]);
 
     const servantMaterialDebtNode: ReactNode = useMemo(() => {
         if (!gameItemMap || !renderChildren || !selectedServantsEnhancementRequirements) {
@@ -516,12 +463,10 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
     }, [gameItemMap, renderChildren, selectedServantsEnhancementRequirements]);
 
     const servantLinksNode: ReactNode = useMemo(() => {
-        if (!renderChildren || activeServants.length !== 1) {
+        if (!renderChildren || activeServantsData.length !== 1) {
             return null;
         }
-        const activeServant = activeServants[0];
-        const servant = gameServantMap?.[activeServant.gameId];
-        const links = servant?.metadata?.links;
+        const links = activeServantsData[0].gameServant.metadata?.links;
         if (!links?.length) {
             return null;
         }
@@ -539,7 +484,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
                 ))}
             </div>
         );
-    }, [activeServants, gameServantMap, renderChildren]);
+    }, [activeServantsData, renderChildren]);
 
     const scrollContainerNode: ReactNode = useMemo(() => {
         if (!servantMaterialDebtNode) {

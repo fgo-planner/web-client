@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { UserInfo } from '../types/internal';
+import { UserTokenPayload } from '../types';
 import { StorageKeys } from './storage/storage-keys';
 import { StorageUtils } from './storage/storage.utils';
 
@@ -26,14 +26,14 @@ export class JwtUtils {
     /**
      * Parses user info from JWT.
      */
-    static parseToken(token: string): UserInfo | null {
+    static parseToken(token: string): UserTokenPayload | null {
         if (!token) {
             return null;
         }
         if (token.startsWith(this.BearerTokenPrefix)) {
             token = token.substring(this.BearerTokenPrefix.length);
         }
-        return jwt.decode(token) as UserInfo;
+        return jwt.decode(token) as UserTokenPayload;
     }
 
 }

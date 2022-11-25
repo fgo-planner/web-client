@@ -1,5 +1,5 @@
 import { User } from '@fgo-planner/data-core';
-import { MasterAccountChanges } from '../../../types/data';
+import { MasterAccountChanges } from '../../../types';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 

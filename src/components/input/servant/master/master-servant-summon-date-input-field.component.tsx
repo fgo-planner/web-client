@@ -1,5 +1,5 @@
 import { DateTimeUtils } from '@fgo-planner/common-core';
-import { MasterServantUpdateIndeterminate as Indeterminate, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateIndeterminate as Indeterminate, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, TextField, TextFieldProps } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -10,12 +10,8 @@ type Props = {
     disabled?: boolean;
     label?: string;
     multiEditMode?: boolean;
-    /**
-     * @deprecated unused
-     */
-    name: string;
     onBlur?: (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
-    onChange: (name: string, value: number | Indeterminate | null, pushChanges: boolean) => void;
+    onChange: (value: number | Indeterminate | null, pushChanges: boolean) => void;
     /**
      * The servant's summoning date in number of milliseconds since the ECMAScript
      * epoch. This is expected to be truncated such that the UTC hours and lower
@@ -83,7 +79,6 @@ export const MasterServantSummonDateInputField = React.memo((props: Props) => {
         disabled,
         label,
         multiEditMode,
-        name,
         onBlur,
         onChange,
         value,
@@ -109,8 +104,8 @@ export const MasterServantSummonDateInputField = React.memo((props: Props) => {
             return;
         }
         const transformedValue = transformDateFromPicker(date);
-        onChange(name, transformedValue, true);
-    }, [name, onChange]);
+        onChange(transformedValue, true);
+    }, [onChange]);
 
     /**
      * This function only handles changes from the input field.
@@ -121,9 +116,9 @@ export const MasterServantSummonDateInputField = React.memo((props: Props) => {
          * undefined to allow the user to continue typing normally.
          */
         if (isIndeterminate) {
-            onChange(name, null, true);
+            onChange(null, true);
         }
-    }, [isIndeterminate, name, onChange]);
+    }, [isIndeterminate, onChange]);
 
     const handleIndeterminateInput = useCallback((event: KeyboardEvent<HTMLInputElement>): void => {
         /*
@@ -133,12 +128,12 @@ export const MasterServantSummonDateInputField = React.memo((props: Props) => {
         if (!multiEditMode || event.key !== '?') {
             return;
         }
-        onChange(name, IndeterminateValue, true);
+        onChange(IndeterminateValue, true);
         /*
          * Prevent the onChange event from firing again.
          */
         event.preventDefault();
-    }, [multiEditMode, name, onChange]);
+    }, [multiEditMode, onChange]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         let transformedValue: number | Indeterminate | null;
@@ -147,9 +142,9 @@ export const MasterServantSummonDateInputField = React.memo((props: Props) => {
         } else {
             transformedValue = transformDateFromPicker(lastDatePickerChangeValueRef.current);
         }
-        onChange(name, transformedValue, false);
+        onChange(transformedValue, false);
         onBlur?.(event);
-    }, [isIndeterminate, name, onBlur, onChange]);
+    }, [isIndeterminate, onBlur, onChange]);
 
     const renderInput = useCallback((textFieldProps: TextFieldProps): JSX.Element => {
         const { inputProps } = textFieldProps;

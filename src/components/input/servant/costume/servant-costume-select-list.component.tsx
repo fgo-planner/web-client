@@ -1,24 +1,22 @@
-import { ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant } from '@fgo-planner/data-core';
+import { CollectionUtils } from '@fgo-planner/common-core';
 import { Theme } from '@mui/material';
 import { alpha, Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { ReactNode, useEffect } from 'react';
-import { useGameServantCostumeList } from '../../../../hooks/data/use-game-servant-costume-list.hook';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { GameServantCostumeListData } from '../../../../types/data';
+import { GameServantCostumeAggregatedData } from '../../../../types';
 import { ServantCostumeSelectListRow, StyleClassPrefix as ServantCostumeSelectListRowStyleClassPrefix } from './servant-costume-select-list-row.component';
 
 type Props = {
+    costumesData?: ReadonlyArray<GameServantCostumeAggregatedData>;
     disabledCostumeIds?: ReadonlySet<number>;
-    gameServants: ImmutableArray<GameServant>;
     onSelectionChange: (selectedCostumeIds: ReadonlySet<number>) => void;
     selectedCostumeIds: ReadonlySet<number>;
 };
 
 const NoCostumesMessage = 'No costumes available for the selected servant(s).';
 
-const getCostumeId = ({ costumeId }: GameServantCostumeListData): number => {
+const getCostumeId = ({ costumeId }: GameServantCostumeAggregatedData): number => {
     return costumeId;
 };
 
@@ -73,26 +71,31 @@ const StyleProps = (theme: SystemTheme) => {
 export const ServantCostumeSelectList = React.memo((props: Props) => {
 
     const {
+        costumesData = CollectionUtils.emptyArray(),
         disabledCostumeIds,
-        gameServants,
         onSelectionChange,
         selectedCostumeIds
     } = props;
 
-    const {
-        costumeList,
-        alwaysUnlockedIds
-    } = useGameServantCostumeList(gameServants);
+    const disabledIds = useMemo((): ReadonlySet<number> => {
+        const result = new Set<number>();
+        for (const costumeData of costumesData) {
+            if (costumeData.alwaysUnlocked) {
+                result.add(costumeData.costumeId);
+            }
+        }
+        return result;
+    }, [costumesData]);
 
     const {
         selectionResult,
         handleItemClick
     } = useMultiSelectHelperForMouseEvent(
-        costumeList,
+        costumesData,
         selectedCostumeIds,
         getCostumeId,
         {
-            disabledIds: alwaysUnlockedIds,
+            disabledIds,
             rightClickAction: 'none',
             preventOverride: true
         }
@@ -102,9 +105,8 @@ export const ServantCostumeSelectList = React.memo((props: Props) => {
         onSelectionChange?.(selectionResult);
     }, [onSelectionChange, selectionResult]);
 
-    const renderRow = (costumeData: GameServantCostumeListData, index: number): ReactNode => {
+    const renderRow = (costumeData: GameServantCostumeAggregatedData, index: number): ReactNode => {
         const { costumeId } = costumeData;
-        const alwaysUnlocked = alwaysUnlockedIds.has(costumeId);
         const selected = selectedCostumeIds.has(costumeId);
         const disabled = !!disabledCostumeIds?.has(costumeId);
         return (
@@ -113,7 +115,6 @@ export const ServantCostumeSelectList = React.memo((props: Props) => {
                 index={index}
                 costumeData={costumeData}
                 onClick={handleItemClick}
-                alwaysSelected={alwaysUnlocked}
                 selected={selected}
                 disabled={disabled}
             />
@@ -121,8 +122,8 @@ export const ServantCostumeSelectList = React.memo((props: Props) => {
     };
 
     let contentNode: ReactNode;
-    if (costumeList.length) {
-        contentNode = <>{costumeList.map(renderRow)}</>;
+    if (costumesData.length) {
+        contentNode = <>{costumesData.map(renderRow)}</>;
     } else {
         contentNode = (
             <div className={`${StyleClassPrefix}-not-available-message`}>

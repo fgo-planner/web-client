@@ -1,13 +1,12 @@
 import { Checkbox } from '@mui/material';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useRef } from 'react';
-import { GameServantCostumeListData } from '../../../../types/data';
+import { GameServantCostumeAggregatedData } from '../../../../types';
 import { GameServantThumbnail } from '../../../game/servant/game-servant-thumbnail.component';
 import { TruncateText } from '../../../text/truncate-text.component';
 
 type Props = {
-    alwaysSelected?: boolean;
-    costumeData: GameServantCostumeListData;
+    costumeData: GameServantCostumeAggregatedData;
     disabled: boolean;
     index: number;
     onClick: (event: MouseEvent, index: number) => void;
@@ -21,10 +20,10 @@ export const StyleClassPrefix = 'ServantCostumeSelectListRow';
 export const ServantCostumeSelectListRow = React.memo((props: Props) => {
 
     const {
-        alwaysSelected,
         costumeData: {
-            costume,
             costumeId,
+            alwaysUnlocked,
+            costume,
             servant
         },
         disabled,
@@ -37,24 +36,24 @@ export const ServantCostumeSelectListRow = React.memo((props: Props) => {
     selectedRef.current = selected;
 
     const handleClick = useCallback((event: MouseEvent): void => {
-        if (disabled || alwaysSelected) {
+        if (disabled || alwaysUnlocked) {
             return;
         }
         onClick(event, index);
-    }, [alwaysSelected, disabled, index, onClick]);
+    }, [alwaysUnlocked, disabled, index, onClick]);
 
     const classNames = clsx(
         `${StyleClassPrefix}-root`,
         selected && `${StyleClassPrefix}-active`,
-        (disabled || alwaysSelected) && `${StyleClassPrefix}-disabled`
+        (disabled || alwaysUnlocked) && `${StyleClassPrefix}-disabled`
     );
 
     return (
         <div className={classNames} onClick={handleClick}>
             <div className={`${StyleClassPrefix}-checkbox`}>
                 <Checkbox
-                    checked={selected || alwaysSelected}
-                    disabled={disabled || alwaysSelected}
+                    checked={selected || alwaysUnlocked}
+                    disabled={disabled || alwaysUnlocked}
                 />
             </div>
             <div className={`${StyleClassPrefix}-thumbnail`}>

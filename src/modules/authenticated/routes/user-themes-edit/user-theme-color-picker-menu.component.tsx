@@ -5,7 +5,7 @@ import { SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
 import { RgbaColorPicker, RgbColor, RgbColorPicker } from 'react-colorful';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { ModalOnCloseHandler } from '../../../../types/internal';
+import { ModalOnCloseHandler } from '../../../../types';
 
 type Props = {
     color: RgbaColor,

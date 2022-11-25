@@ -1,7 +1,7 @@
 import { Theme } from '@mui/material';
 import { alpha, CSSInterpolation } from '@mui/system';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { StyledFunctionPropsWithTheme } from '../../types/internal';
+import { StyledFunctionPropsWithTheme } from '../../types';
 
 export const DefaultStyleClassPrefix = 'DataTableListRow';
 

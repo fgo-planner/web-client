@@ -1,7 +1,7 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { PaperProps } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { GlobalDialog, GlobalDialogOpenAction, ModalOnCloseReason, NavigationBlockerDialogOpenAction, UserInfo } from '../../types/internal';
+import { GlobalDialog, GlobalDialogOpenAction, ModalOnCloseReason, NavigationBlockerDialogOpenAction, UserTokenPayload } from '../../types';
 import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
 import { PromptDialog } from '../dialog/prompt-dialog.component';
@@ -30,7 +30,7 @@ const closeActiveDialogAction = (activeDialogAction?: GlobalDialogOpenAction): u
 
 export const GlobalDialogs = React.memo(() => {
 
-    const [user, setUser] = useState<Nullable<UserInfo>>();
+    const [user, setUser] = useState<Nullable<UserTokenPayload>>();
 
     const [activeDialogAction, setActiveDialogAction] = useState<GlobalDialogOpenAction>();
 

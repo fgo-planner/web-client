@@ -2,8 +2,7 @@ import { Nullable } from '@fgo-planner/common-core';
 import { MasterAccount, MasterAccountUpdate } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { BasicMasterAccounts } from '../../../types/data';
-import { UserInfo } from '../../../types/internal';
+import { BasicMasterAccounts, UserTokenPayload } from '../../../types';
 import { HttpUtils as Http, HttpUtils } from '../../../utils/http.utils';
 import { StorageKeys } from '../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../utils/storage/storage.utils';
@@ -175,8 +174,6 @@ export class MasterAccountService {
             return;
         }
 
-        // TODO Use localStorage to retain selected account when opening new windows/tabs.
-
         /**
          * Default to the first account in the list.
          */
@@ -202,7 +199,7 @@ export class MasterAccountService {
         this._onMasterAccountListChange.next(this._masterAccountList);
     }
 
-    private async _handleCurrentUserChange(userInfo: Nullable<UserInfo>): Promise<void> {
+    private async _handleCurrentUserChange(userInfo: Nullable<UserTokenPayload>): Promise<void> {
         if (!userInfo) {
             this._onCurrentMasterAccountChange.next(this._currentMasterAccount = null);
             this._onMasterAccountListChange.next(this._masterAccountList = null);

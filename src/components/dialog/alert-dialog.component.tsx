@@ -1,7 +1,7 @@
 import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import React, { Fragment, MouseEvent, useCallback, useRef } from 'react';
 import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps } from '../../types/internal';
+import { DialogComponentProps } from '../../types';
 import { DialogCloseButton } from './dialog-close-button.component';
 
 type Props = {

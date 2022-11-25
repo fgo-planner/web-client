@@ -1,4 +1,4 @@
-import { SetUtils } from '@fgo-planner/common-core';
+import { CollectionUtils } from '@fgo-planner/common-core';
 import { useCallback, useEffect, useRef } from 'react';
 import { useForceUpdate } from '../../utils/use-force-update.hook';
 import { ListSelectAction } from './list-select-action.type';
@@ -29,7 +29,7 @@ const removeUnselectableIds = <ID>(selectedIds: Set<ID>, disabledIds?: ReadonlyS
     if (!disabledIds) {
         return;
     }
-    // TODO Move this to SetUtils
+    // TODO Move this to CollectionUtils
     for (const unselectableId of disabledIds) {
         selectedIds.delete(unselectableId);
     }
@@ -60,14 +60,14 @@ export function useMultiSelectHelper<T, ID = number>(
     const selectedIdsRef = useRef<ReadonlySet<ID>>(selectedIds);
 
     /**
-     * Updates the `selectedDataContainer` whenever the input params change.
+     * Updates the `selectedIdsRef` whenever the input params change.
      */
     useEffect(() => {
         if (disabled) {
             return;
         }
         let hasChanges = false;
-        if (!SetUtils.isEqual(selectedIds, selectedIdsRef.current)) {
+        if (!CollectionUtils.isSetsEqual(selectedIds, selectedIdsRef.current)) {
             /**
              * The only way this can change is if the value of the `selected` prop does not
              * match the one returned by the hook in the previous render. As such, we will

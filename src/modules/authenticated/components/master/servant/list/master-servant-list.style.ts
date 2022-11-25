@@ -2,7 +2,7 @@ import { CSSInterpolation, Theme } from '@mui/material';
 import { DataTableListBaseRowStyle } from '../../../../../../components/data-table-list/data-table-list-base-row.style';
 import { DataTableListDraggableRowStyle } from '../../../../../../components/data-table-list/data-table-list-draggable-row.style';
 import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
-import { StyledFunctionPropsWithTheme, StyledFunctionThemeProp } from '../../../../../../types/internal';
+import { StyledFunctionPropsWithTheme, StyledFunctionThemeProp } from '../../../../../../types';
 import { MasterServantColumnProperties } from './master-servant-list-columns';
 import { StyleClassPrefix as MasterServantListRowBondLevelStyleClassPrefix } from './master-servant-list-row-bond-level.component';
 import { StyleClassPrefix as MasterServantListRowFouLevelStyleClassPrefix } from './master-servant-list-row-fou-level.component';

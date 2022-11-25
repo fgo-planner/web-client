@@ -3,7 +3,7 @@ import React, { DOMAttributes, PropsWithChildren, useEffect, useRef, useState } 
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { LockableFeature, UserInterfaceService } from '../../../services/user-interface/user-interface.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { ComponentStyleProps } from '../../../types/internal';
+import { ComponentStyleProps } from '../../../types';
 
 type Props = PropsWithChildren<{}> & ComponentStyleProps & DOMAttributes<HTMLDivElement>;
 
@@ -54,6 +54,10 @@ export const AppBarElevateOnScroll = React.memo((props: Props) => {
         if (!element || element.onscroll) {
             return;
         }
+        /**
+         * TODO This may be called twice for each `setLockId` call in development mode
+         * due to strict mode.
+         */
         const setLockIdAction = (lockId?: string): string | undefined => {
             const scrollAmount = element.scrollTop;
             const shouldElevate = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;

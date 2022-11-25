@@ -1,4 +1,4 @@
-import { MasterServantConstants, MasterServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
+import { InstantiatedServantConstants, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
 
@@ -10,11 +10,12 @@ type Props = {
     formId?: string;
     label?: string;
     multiEditMode?: boolean;
-    name: string;
-    onChange: (name: string, value: string, pushChanges: boolean) => void;
+    onChange: (value: string, pushChanges: boolean) => void;
     value: string;
     variant?: BaseTextFieldProps['variant'];
 };
+
+const FieldName = 'np';
 
 const DefaultLabel = 'NP Level';
 
@@ -31,33 +32,32 @@ export const MasterServantNpLevelInputField = React.memo((props: Props) => {
         formId,
         label,
         multiEditMode,
-        name,
         onChange,
         value,
         variant
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
-        const { name, value } = event.target;
-        onChange(name, value, true);
+        const value = event.target.value;
+        onChange(value, true);
     }, [onChange]);
 
-    const fieldId = formId ? `${formId}-${name}` : name;
+    const fieldId = formId ? `${formId}-${FieldName}` : FieldName;
 
     return (
         <FormControl variant={variant} fullWidth>
-            <InputLabel htmlFor={name} shrink>{label || DefaultLabel}</InputLabel>
+            <InputLabel htmlFor={FieldName} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
                 id={fieldId}
-                name={name}
+                name={FieldName}
                 label={label || DefaultLabel}
                 value={value}
                 onChange={handleChange}
                 disabled={disabled}
             >
                 {multiEditMode && <option key={IndeterminateValue} value={IndeterminateValue}>{IndeterminateDisplayText}</option>}
-                {MasterServantConstants.NoblePhantasmLevels.map(value => (
+                {InstantiatedServantConstants.NoblePhantasmLevels.map(value => (
                     <option key={value} value={value}>
                         {value}
                     </option>

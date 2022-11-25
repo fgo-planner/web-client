@@ -1,6 +1,6 @@
 import { Plan, PlanGroup } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { BasicPlans } from '../../../types/data';
+import { BasicPlans } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 
 @Injectable
@@ -45,9 +45,7 @@ export class PlanService {
     }
 
     private _transformPlanGroup(planGroup: PlanGroup): PlanGroup {
-        // TODO Also add add timestamps to PlanGroup
-        // return Http.stringTimestampsToDate(plan);
-        return planGroup;
+        return Http.stringTimestampsToDate(planGroup);
     }
 
     private _transformPlan(plan: Plan): Plan {

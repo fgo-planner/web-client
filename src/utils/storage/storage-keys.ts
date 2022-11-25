@@ -6,39 +6,21 @@ const PrefixLocalUserPreference = 'LocalUserPreference_';
 
 const PrefixLocalUserPreferenceRoute = `${PrefixLocalUserPreference}Route_`;
 
-export class StorageKeys {
-
-    static get User() {
-        return User;
-    };
-
-    static get LocalUserPreference() {
-        return LocalUserPreference;
-    };
-
-    private constructor() {
-
-    }
-
-}
-
-class User {
-
-    private static readonly _Prefix = PrefixUser;
+const User = {
 
     /**
      * Contains the user's access token.
      * 
      * Local scope
      */
-    static readonly AccessToken = StorageKey.forStringValue(`${this._Prefix}AccessToken`, 'local');
+    AccessToken: StorageKey.forStringValue(`${PrefixUser}AccessToken`, 'local'),
 
     /**
      * Contains the ID of the active master account for the current tab.
      * 
      * Session scope
      */
-    static readonly ActiveMasterAccountId = StorageKey.forStringValue(`${this._Prefix}ActiveMasterAccountId`, 'session');
+    ActiveMasterAccountId: StorageKey.forStringValue(`${PrefixUser}ActiveMasterAccountId`, 'session'),
 
     /**
      * Contains the ID of the master account that was active in the last focused
@@ -47,40 +29,28 @@ class User {
      * 
      * Local scope
      */
-    static readonly LastMasterAccountId = StorageKey.forStringValue(`${this._Prefix}LastMasterAccountId`, 'local');
+    LastMasterAccountId: StorageKey.forStringValue(`${PrefixUser}LastMasterAccountId`, 'local')
 
-    private constructor() {
+} as const;
 
-    }
+const LocalUserPreference = {
 
-}
+    ThemeMode: StorageKey.forStringValue(`${PrefixLocalUserPreference}ThemeMode`, 'local'),
 
-class LocalUserPreference {
+    Route: {
 
-    private static readonly _Prefix = PrefixLocalUserPreference;
+        MasterItemStats: StorageKey.forObjectValue(`${PrefixLocalUserPreferenceRoute}MasterItemStats`, 'local'),
 
-    static readonly ThemeMode = StorageKey.forStringValue(`${this._Prefix}ThemeMode`, 'local');
+        MasterServants: StorageKey.forObjectValue(`${PrefixLocalUserPreferenceRoute}MasterServants`, 'local'),
 
-    static get Route() {
-        return LocalUserPreferenceRoute;
-    };
-
-    private constructor() {
+        Plan: StorageKey.forObjectValue(`${PrefixLocalUserPreferenceRoute}Plan`, 'local')
 
     }
 
-}
+} as const;
 
-class LocalUserPreferenceRoute {
 
-    private static readonly _Prefix = PrefixLocalUserPreferenceRoute;
-
-    static readonly MasterItemStats = StorageKey.forObjectValue(`${this._Prefix}MasterItemStats`, 'local');
-
-    static readonly MasterServants = StorageKey.forObjectValue(`${this._Prefix}MasterServants`, 'local');
-
-    private constructor() {
-
-    }
-
-}
+export const StorageKeys = {
+    User,
+    LocalUserPreference
+} as const;

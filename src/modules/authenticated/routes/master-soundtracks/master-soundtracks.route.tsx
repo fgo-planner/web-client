@@ -9,7 +9,7 @@ import { SoundtrackPlayerService } from '../../../../services/audio/soundtrack-p
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { useMasterAccountDataEditHook } from '../../hooks/use-master-account-data-edit.hook';
+import { useMasterAccountDataEdit } from '../../hooks/use-master-account-data-edit.hook';
 import { MasterSoundtracksList } from './master-soundtracks-list.component';
 
 const StyleClassPrefix = 'MasterSoundtracks';
@@ -38,7 +38,7 @@ export const MasterSoundtracksRoute = React.memo(() => {
         updateSoundtracks,
         revertChanges,
         persistChanges
-    } = useMasterAccountDataEditHook({ includeSoundtracks: true });
+    } = useMasterAccountDataEdit({ includeSoundtracks: true });
 
     const backgroundMusicService = useInjectable(BackgroundMusicService);
     const soundtrackPlayerService = useInjectable(SoundtrackPlayerService);

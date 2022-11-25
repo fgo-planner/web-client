@@ -1,5 +1,5 @@
 import { ImmutableRecord } from '@fgo-planner/common-core';
-import { ColumnProperties } from '../../../../../types/internal';
+import { DataTableListColumnProperties } from '../../../../../types';
 
 export type MasterAccountListColumn =
     'name' |
@@ -10,7 +10,7 @@ export type MasterAccountListColumn =
 export type MasterAccountListVisibleColumns = Record<MasterAccountListColumn, boolean>;
 
 // TODO Convert widths to use theme spacing/rem.
-export const MasterAccountColumnProperties = {
+export const MasterAccountColumnProperties: ImmutableRecord<MasterAccountListColumn, DataTableListColumnProperties> = {
     name: {
         key: 'name',
         width: 256,
@@ -35,4 +35,4 @@ export const MasterAccountColumnProperties = {
         label: 'Last Modified',
         sortable: false
     }
-} as ImmutableRecord<MasterAccountListColumn | 'label', ColumnProperties>;
+};

@@ -1,14 +1,17 @@
-import { ImmutableMasterAccount } from '@fgo-planner/data-core';
+import { ReadonlyRecord } from '@fgo-planner/common-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { ReactNode, useMemo } from 'react';
-import { PlanRequirements } from '../../../../types/data';
+import React, { ReactNode } from 'react';
+import { PlanRequirements } from '../../../../types';
 import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
 import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
 
 type Props = {
-    masterAccount: ImmutableMasterAccount;
+    /**
+     * The current quantities of items in the master account.
+     */
+    masterItems: ReadonlyRecord<number, number>;
     options: PlanRequirementsTableOptionsInternal;
     planRequirements: PlanRequirements;
 };
@@ -45,20 +48,10 @@ const StyleProps = (theme: SystemTheme) => {
 export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
     const {
-        masterAccount,
+        masterItems,
         options,
         planRequirements
     } = props;
-
-    const inventoryQuantityMap = useMemo((): Record<number, number> => {
-        const result: Record<number, number> = {};
-        for (const [key, quantity] of Object.entries(masterAccount.resources.items)) {
-            const itemId = Number(key);
-            result[itemId] = quantity;
-        }
-        return result;
-    }, [masterAccount]);
-
     //#region Required quantity row
 
     const requiredStickyContent: ReactNode = (
@@ -102,7 +95,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
     );
 
     const renderInventoryItemCell = (itemId: number): ReactNode => {
-        const quantity = inventoryQuantityMap[itemId] || 0;
+        const quantity = masterItems[itemId] || 0;
         return (
             <DataTableGridCell
                 key={itemId}
@@ -136,7 +129,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
     );
 
     const renderDeficitItemCell = (itemId: number): ReactNode => {
-        const quantity = inventoryQuantityMap[itemId] || 0;
+        const quantity = masterItems[itemId] || 0;
         const required = planRequirements.group.items[itemId]?.total || 0;
         const deficit = Math.max(required - quantity, 0);
         return (

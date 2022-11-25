@@ -1,6 +1,6 @@
 import { Function, Nullable } from '@fgo-planner/common-core';
 import { EntityWithTimestamps } from '@fgo-planner/data-core';
-import { HttpOptions, HttpResponseError, HttpResponseType } from '../types/internal';
+import { HttpOptions, HttpResponseError, HttpResponseType } from '../types';
 import { JwtUtils } from './jwt.utils';
 import { SubscribablesContainer } from './subscription/subscribables-container';
 import { SubscriptionTopics } from './subscription/subscription-topics';

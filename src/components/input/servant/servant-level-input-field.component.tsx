@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, MasterServantConstants, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, InstantiatedServantConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
 import { FormUtils } from '../../../utils/form.utils';
@@ -17,10 +17,11 @@ type Props = {
     label?: string;
     level: string;
     multiEditMode?: boolean;
-    name: string;
-    onChange: (name: string, level: string, ascension: string, pushChanges?: boolean) => void;
+    onChange: (level: string, ascension: string, pushChanges?: boolean) => void;
     variant?: BaseTextFieldProps['variant'];
 };
+
+const FieldName = 'level';
 
 const DefaultLabel = 'Servant Level';
 
@@ -28,13 +29,13 @@ const IndeterminateDisplayText = '?';
 
 const InputProps = {
     step: 1,
-    min: MasterServantConstants.MinLevel,
-    max: MasterServantConstants.MaxLevel
+    min: InstantiatedServantConstants.MinLevel,
+    max: InstantiatedServantConstants.MaxLevel
 } as InputBaseComponentProps;
 
 const transformLevelValue = (value: string): number => {
-    const level = FormUtils.convertToInteger(value, MasterServantConstants.MinLevel, MasterServantConstants.MaxLevel);
-    return level || MasterServantConstants.MinLevel;
+    const level = FormUtils.convertToInteger(value, InstantiatedServantConstants.MinLevel, InstantiatedServantConstants.MaxLevel);
+    return level || InstantiatedServantConstants.MinLevel;
 };
 
 /**
@@ -51,7 +52,6 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         label,
         level,
         multiEditMode,
-        name,
         onChange,
         variant
     } = props;
@@ -59,11 +59,11 @@ export const ServantLevelInputField = React.memo((props: Props) => {
     const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         const { value } = event.target;
         if (!value && allowEmpty) {
-            return onChange(name, value, ascension);
+            return onChange(value, ascension);
         }
         const updatedLevel = transformLevelValue(value);
-        onChange(name, String(updatedLevel), ascension);
-    }, [allowEmpty, ascension, name, onChange]);
+        onChange(String(updatedLevel), ascension);
+    }, [allowEmpty, ascension, onChange]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         if (!gameServant) {
@@ -71,12 +71,13 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         }
         const { value } = event.target;
         if (!value && allowEmpty) {
-            return onChange(name, value, ascension, true);
+            return onChange(value, ascension, true);
         }
+        const maxLevel = gameServant.maxLevel;
         const updatedLevel = transformLevelValue(value);
-        const updatedAscension = MasterServantUtils.roundToNearestValidAscensionLevel(updatedLevel, Number(ascension), gameServant);
-        onChange(name, String(updatedLevel), String(updatedAscension), true);
-    }, [allowEmpty, ascension, gameServant, name, onChange]);
+        const updatedAscension = InstantiatedServantUtils.roundToNearestValidAscensionLevel(updatedLevel, Number(ascension), maxLevel);
+        onChange(String(updatedLevel), String(updatedAscension), true);
+    }, [allowEmpty, ascension, gameServant, onChange]);
 
     if (!gameServant && !multiEditMode) {
         console.error('ServantLevelInputField: gameServant must be provided when editing single servant');
@@ -100,7 +101,7 @@ export const ServantLevelInputField = React.memo((props: Props) => {
             variant={variant}
             fullWidth
             label={label || DefaultLabel}
-            name={name}
+            name={FieldName}
             type='number'
             inputProps={InputProps}
             value={level}

@@ -1,11 +1,11 @@
-import { Button } from '@mui/material';
-import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
-import React, { Fragment, PureComponent, ReactNode } from 'react';
-import { ModalOnCloseReason } from '../../../../types/internal';
-import { MasterAccountAddDialog } from '../../../master/account/master-account-add-dialog.component';
-import { InjectablesContainer } from '../../../../utils/dependency-injection/injectables-container';
-import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { BasicMasterAccount } from '@fgo-planner/data-core';
+import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
+import { Button } from '@mui/material';
+import { Fragment, PureComponent, ReactNode } from 'react';
+import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { ModalOnCloseReason } from '../../../../types';
+import { InjectablesContainer } from '../../../../utils/dependency-injection/injectables-container';
+import { MasterAccountAddDialog } from '../../../master/account/master-account-add-dialog.component';
 
 type Props = {
 

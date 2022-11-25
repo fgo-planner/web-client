@@ -1,4 +1,4 @@
-import { ArrayUtils } from '@fgo-planner/common-core';
+import { CollectionUtils } from '@fgo-planner/common-core';
 import { useCallback, useState } from 'react';
 
 type DragDropHelperHookResult<T> = {
@@ -58,7 +58,7 @@ export const useDragDropHelper = <T>(getIdFunction: (value: T) => number): DragD
             }
             const sourceIndex = dragDropData.findIndex((value: T) => getIdFunction(value) === sourceId);
             const destinationIndex = dragDropData.findIndex((value: T) => getIdFunction(value) === destinationId);
-            const updatedDragDropData = ArrayUtils.moveElement([...dragDropData], sourceIndex, destinationIndex);
+            const updatedDragDropData = CollectionUtils.moveElement([...dragDropData], sourceIndex, destinationIndex);
             return updatedDragDropData;
         });
     }, [getIdFunction]);

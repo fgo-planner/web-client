@@ -5,11 +5,10 @@ import { GameItemQuantity } from '../../../../components/game/item/game-item-qua
 import { GameServantThumbnail } from '../../../../components/game/servant/game-servant-thumbnail.component';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { GameServantCostumeListData } from '../../../../types/data';
+import { GameServantCostumeAggregatedData } from '../../../../types';
 
 type Props = {
-    alwaysUnlocked: boolean;
-    costumeData: GameServantCostumeListData;
+    costumeData: GameServantCostumeAggregatedData;
     onChange: (costumeId: number, unlocked: boolean) => void;
     openLinksInNewTab?: boolean;
     unlocked?: boolean;
@@ -22,14 +21,14 @@ export const StyleClassPrefix = 'MasterServantCostumesListRow';
 export const MasterServantCostumesListRow = React.memo((props: Props) => {
 
     const {
-        alwaysUnlocked,
         costumeData: {
+            costumeId,
+            alwaysUnlocked,
             costume: {
                 collectionNo,
                 materials,
-                name
+                name,
             },
-            costumeId,
             servant
         },
         onChange,

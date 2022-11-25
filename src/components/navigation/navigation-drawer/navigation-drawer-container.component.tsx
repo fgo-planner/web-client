@@ -9,7 +9,7 @@ import { useInjectable } from '../../../hooks/dependency-injection/use-injectabl
 import { AuthenticationService } from '../../../services/authentication/authentication.service';
 import { UserInterfaceService } from '../../../services/user-interface/user-interface.service';
 import { ThemeConstants } from '../../../styles/theme-constants';
-import { NavigationDrawerContent as Content, NavigationDrawerSection as Section, SxPropsFunction } from '../../../types/internal';
+import { NavigationDrawerContent as Content, NavigationDrawerSection as Section, SxPropsFunction } from '../../../types';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
 import { NavigationDrawerDesktop } from './navigation-drawer-desktop.component';

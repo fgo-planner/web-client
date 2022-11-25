@@ -1,5 +1,5 @@
 import { Immutable, ObjectUtils, ReadonlyPartial } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, MasterServantBondLevel, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, InstantiatedServantUtils, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { DataTableListDraggableRow } from '../../../../../../components/data-table-list/data-table-list-draggable-row.component';
 import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
@@ -9,7 +9,7 @@ import { MasterServantListRowStats } from './master-servant-list-row-stats.compo
 
 type Props = {
     active?: boolean;
-    bond: MasterServantBondLevel | undefined;
+    bond: InstantiatedServantBondLevel | undefined;
     dragDropMode?: boolean;
     gameServant: Immutable<GameServant> | undefined; // Not optional, but possible to be undefined.
     index: number;
@@ -70,7 +70,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
         );
     }
 
-    const artStage = MasterServantUtils.getArtStage(masterServant.ascension);
+    const artStage = InstantiatedServantUtils.getArtStage(masterServant.ascension);
 
     const servantThumbnailNode: ReactNode = (
         <GameServantThumbnail

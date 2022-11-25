@@ -1,5 +1,5 @@
 import { ImmutableRecord } from '@fgo-planner/common-core';
-import { ColumnProperties } from '../../../../../types/internal';
+import { DataTableListColumnProperties } from '../../../../../types';
 
 export type PlanListColumn =
     'name' |
@@ -10,7 +10,7 @@ export type PlanListColumn =
 export type PlanListVisibleColumns = Record<PlanListColumn, boolean>;
 
 // TODO Convert widths to use theme spacing/rem.
-export const PlanColumnProperties = {
+export const PlanColumnProperties: ImmutableRecord<PlanListColumn, DataTableListColumnProperties> = {
     name: {
         key: 'name',
         width: 300,
@@ -35,4 +35,4 @@ export const PlanColumnProperties = {
         label: 'Last Modified',
         sortable: true
     }
-} as ImmutableRecord<PlanListColumn | 'label', ColumnProperties>;
+};

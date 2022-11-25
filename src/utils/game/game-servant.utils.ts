@@ -1,11 +1,15 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { GameServant, GameServantClass, GameServantConstants, GameServantRarity } from '@fgo-planner/data-core';
-import { GameServantClassSimplified, GameServantList } from '../../types/data';
+import { GameServantClassSimplified, GameServantList } from '../../types';
 
 export class GameServantUtils {
 
     private constructor () {
         
+    }
+
+    static getDisplayedName(servant: Immutable<GameServant>): string {
+        return servant.metadata?.displayName || servant.name || String(servant._id);
     }
 
     static convertToSimplifiedClass(servantClass: GameServantClass): GameServantClassSimplified {
@@ -44,9 +48,9 @@ export class GameServantUtils {
 
     static filterServants(search: string, servants: GameServantList): GameServantList;
 
-    static filterServants<T>(search: string, data: Array<T>, mappingFunction: (elem: T) => Immutable<GameServant>): Array<T>;
+    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction: (elem: T) => Immutable<GameServant>): Array<T>;
 
-    static filterServants<T>(search: string, data: Array<T>, mappingFunction?: (elem: T) => Immutable<GameServant>): Array<T> {
+    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction?: (elem: T) => Immutable<GameServant>): Array<T> {
         const searchTrimmed = search.trim();
         if (!searchTrimmed) {
             return [...data];

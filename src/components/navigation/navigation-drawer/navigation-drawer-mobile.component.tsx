@@ -1,7 +1,7 @@
 import { Drawer } from '@mui/material';
 import React, { useContext } from 'react';
 import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
-import { NavigationDrawerContent as Content } from '../../../types/internal';
+import { NavigationDrawerContent as Content } from '../../../types';
 import { NavigationDrawerContent } from './navigation-drawer-content.component';
 
 type Props = {

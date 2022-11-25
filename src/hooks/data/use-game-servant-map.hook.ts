@@ -1,7 +1,7 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { useEffect, useState } from 'react';
 import { GameServantService } from '../../services/data/game/game-servant.service';
-import { GameServantMap } from '../../types/data';
+import { GameServantMap } from '../../types';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 /**

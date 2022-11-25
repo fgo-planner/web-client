@@ -4,7 +4,7 @@ import { Theme } from '@mui/material';
 import { alpha, Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
-import { GameSoundtrackList } from '../../../../types/data';
+import { GameSoundtrackList } from '../../../../types';
 import { MasterSoundtracksListHeader } from './master-soundtracks-list-header.component';
 import { MasterSoundtracksListRow, StyleClassPrefix as MasterSoundtracksListRowStyleClassPrefix } from './master-soundtracks-list-row.component';
 

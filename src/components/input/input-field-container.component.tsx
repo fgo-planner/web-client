@@ -1,7 +1,7 @@
 import { Box } from '@mui/system';
 import clsx from 'clsx';
 import React, { CSSProperties, PropsWithChildren, useMemo } from 'react';
-import { ComponentStyleProps } from '../../types/internal';
+import { ComponentStyleProps } from '../../types';
 
 type Props = PropsWithChildren<{
     width?: string | number;

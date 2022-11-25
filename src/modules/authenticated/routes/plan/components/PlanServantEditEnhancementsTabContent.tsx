@@ -13,7 +13,7 @@ import { ServantSkillInputField } from '../../../../../components/input/servant/
 import { ServantSkillQuickToggleButtons } from '../../../../../components/input/servant/servant-skill-quick-toggle-buttons.component';
 import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
 import { MasterServantAggregatedData } from '../../../../../types';
-import { EnhancementCategory, PlanServantEditDialogEnabledCheckbox } from './plan-servant-edit-dialog-enabled-checkbox.component';
+import { EnhancementCategory, PlanServantEditDialogEnabledCheckbox } from './PlanServantEditDialogEnabledCheckbox';
 
 type Props = {
     /**

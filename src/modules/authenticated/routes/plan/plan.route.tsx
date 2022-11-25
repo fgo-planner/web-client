@@ -18,9 +18,9 @@ import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { usePlanDataEdit } from '../../hooks/use-plan-data-edit.hook';
-import { PlanNavigationRail } from './components/plan-navigation-rail.component';
-import { PlanServantEditDialogData } from './components/plan-servant-edit-dialog-data.type';
-import { PlanServantEditDialog } from './components/plan-servant-edit-dialog.component';
+import { PlanNavigationRail } from './components/PlanNavigationRail';
+import { PlanServantEditDialog } from './components/PlanServantEditDialog';
+import { PlanServantEditDialogData } from './components/PlanServantEditDialogData.type';
 import { usePlanUserPreferences } from './hooks/use-plan-user-preferences.hook';
 
 const PathMatchPattern: PathPattern = {

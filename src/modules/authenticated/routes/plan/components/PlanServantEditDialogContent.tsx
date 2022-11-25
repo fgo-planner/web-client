@@ -5,10 +5,10 @@ import { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'rea
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/input-field-container.component';
 import { useGameServantCostumesData } from '../../../../../hooks/data/use-game-servant-costumes-data.hook';
 import { EditDialogAction, MasterServantAggregatedData, PlanServantAggregatedData } from '../../../../../types';
-import { PlanServantEditCostumesTabContent } from './plan-servant-edit-dialog-costumes-tab-content.component';
-import { PlanServantEditDialogData } from './plan-servant-edit-dialog-data.type';
-import { PlanServantEditEnhancementsTabContent } from './plan-servant-edit-dialog-enhancements-tab-content.component';
-import { PlanServantSelectAutocomplete } from './plan-servant-select-autocomplete.component';
+import { PlanServantEditCostumesTabContent } from './PlanServantEditCostumesTabContent';
+import { PlanServantEditDialogData } from './PlanServantEditDialogData.type';
+import { PlanServantEditEnhancementsTabContent } from './PlanServantEditEnhancementsTabContent';
+import { PlanServantSelectAutocomplete } from './PlanServantSelectAutocomplete';
 
 export type PlanServantEditTab = 'enhancements' | 'costumes';
 
@@ -96,7 +96,7 @@ const StyleProps = (theme: Theme) => {
  * re-render of this component.
  */
 /** */
-export const PlanServantEditDialogContent = (props: Props) => {
+export const PlanServantEditDialogContent: React.FC<Props> = (props: Props): JSX.Element => {
 
     const {
         activeTab,

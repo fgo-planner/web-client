@@ -3,8 +3,8 @@ import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { DialogComponentProps, EditDialogAction, MasterServantAggregatedData, PlanServantAggregatedData } from '../../../../../types';
-import { PlanServantEditDialogContent, PlanServantEditTab } from './plan-servant-edit-dialog-content.component';
-import { PlanServantEditDialogData } from './plan-servant-edit-dialog-data.type';
+import { PlanServantEditDialogContent, PlanServantEditTab } from './PlanServantEditDialogContent';
+import { PlanServantEditDialogData } from './PlanServantEditDialogData.type';
 
 type Props = {
     activeTab: PlanServantEditTab;

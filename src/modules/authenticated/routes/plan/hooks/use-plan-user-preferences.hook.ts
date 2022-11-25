@@ -6,7 +6,7 @@ import { StorageUtils } from '../../../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../../utils/subscription/subscription-topics';
 import { MasterServantEditTab } from '../../../components/master/servant/edit-dialog/master-servant-edit-dialog-content.component';
-import { PlanServantEditTab } from '../components/plan-servant-edit-dialog-content.component';
+import { PlanServantEditTab } from '../components/PlanServantEditDialogContent';
 
 /**
  * User preferences for the plan route that are stored locally.

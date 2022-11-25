@@ -531,7 +531,7 @@ function _parseComputationOptions(data: PlanData | Immutable<PlanServant>): Comp
 
 function _mergeComputationOptions(a: ComputationOptions, b: ComputationOptions): ComputationOptions {
     return {
-        includeAscensions: a.includeAscensions && a.includeAscensions,
+        includeAscensions: a.includeAscensions && b.includeAscensions,
         includeSkills: a.includeSkills && b.includeSkills,
         includeAppendSkills: a.includeAppendSkills && b.includeAppendSkills,
         includeCostumes: a.includeCostumes && b.includeCostumes,

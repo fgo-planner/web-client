@@ -1,5 +1,5 @@
 import { Button, ButtonProps, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import React, { Fragment, MouseEvent, ReactNode, useCallback, useRef } from 'react';
+import React, { MouseEvent, ReactNode, useCallback, useRef } from 'react';
 import { useAutoResizeDialog } from '../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { DialogComponentProps } from '../../types';
 import { DialogCloseButton } from './dialog-close-button.component';
@@ -48,14 +48,14 @@ export const PromptDialog = React.memo((props: Props) => {
         onClose(event, 'cancel');
     }, [onClose]);
 
-    /*
+    /**
      * Only re-render the dialog contents if the dialog is open. This allows the
      * dialog to keep displaying the same contents while it is undergoing its exit
      * transition, even if the props were changed by the parent component.
      */
     if (!dialogContentsRef.current || props.open) {
         dialogContentsRef.current = (
-            <Fragment>
+            <>
                 {showTitle &&
                     <DialogTitle>
                         {title}
@@ -81,7 +81,7 @@ export const PromptDialog = React.memo((props: Props) => {
                         {confirmButtonLabel || 'Confirm'}
                     </Button>
                 </DialogActions>
-            </Fragment>
+            </>
         );
     }
 

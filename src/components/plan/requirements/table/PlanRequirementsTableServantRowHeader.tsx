@@ -1,10 +1,9 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
-import clsx from 'clsx';
 import React from 'react';
 import { GameServantThumbnail } from '../../../game/servant/game-servant-thumbnail.component';
 import { TruncateText } from '../../../text/truncate-text.component';
-import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
+import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 
 type Props = {
     gameServant: Immutable<GameServant>;

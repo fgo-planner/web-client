@@ -1,9 +1,9 @@
 import { Theme } from '@mui/material';
 import { alpha, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import { StyleClassPrefix as HeaderStyleClassPrefix } from './plan-requirements-table-header.component';
-import { StyleClassPrefix as ServantRowStyleClassPrefix } from './plan-requirements-table-servant-row.component';
-import { StyleClassPrefix as ServantRowHeaderStyleClassPrefix } from './plan-requirements-table-servant-row-header.component';
-import { StyleClassPrefix as ServantRowCellStyleClassPrefix } from './plan-requirements-table-servant-row-cell.component';
+import { StyleClassPrefix as HeaderStyleClassPrefix } from './PlanRequirementsTableHeader';
+import { StyleClassPrefix as ServantRowStyleClassPrefix } from './PlanRequirementsTableServantRow';
+import { StyleClassPrefix as ServantRowHeaderStyleClassPrefix } from './PlanRequirementsTableServantRowHeader';
+import { StyleClassPrefix as ServantRowCellStyleClassPrefix } from './PlanRequirementsTableServantRowCell';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 
 export const StyleClassPrefix = 'PlanRequirementsTable';

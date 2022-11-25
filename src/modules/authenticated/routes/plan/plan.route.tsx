@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
-import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/plan-requirements-table.component';
+import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/PlanRequirementsTable';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';

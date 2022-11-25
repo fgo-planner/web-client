@@ -5,7 +5,7 @@ import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
 import { GameItemThumbnail } from '../../../game/item/game-item-thumbnail.component';
-import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
+import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 
 type Props = {
     options: PlanRequirementsTableOptionsInternal;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
-import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
+import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 
 type Props = {
     options: PlanRequirementsTableOptionsInternal;

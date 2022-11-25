@@ -1,6 +1,6 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { useCallback, useEffect, useState } from 'react';
-import { PlanRequirementsTableOptions } from '../../../../../components/plan/requirements/table/plan-requirements-table-options.type';
+import { PlanRequirementsTableOptions } from '../../../../../components/plan/requirements/table/PlanRequirementsTableOptions.type';
 import { StorageKeys } from '../../../../../utils/storage/storage-keys';
 import { StorageUtils } from '../../../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/subscribables-container';

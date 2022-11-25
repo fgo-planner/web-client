@@ -5,12 +5,12 @@ import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { GameItemCategory, GameItemCategoryMap, PlanRequirements, PlanServantAggregatedData } from '../../../../types';
-import { PlanRequirementsTableFooter } from './plan-requirements-table-footer.component';
-import { PlanRequirementsTableHeader } from './plan-requirements-table-header.component';
-import { PlanRequirementsTableOptionsInternal } from './plan-requirements-table-options-internal.type';
-import { PlanRequirementsTableOptions } from './plan-requirements-table-options.type';
-import { PlanRequirementsTableServantRow } from './plan-requirements-table-servant-row.component';
-import { PlanRequirementsTableStyle } from './plan-requirements-table-style';
+import { PlanRequirementsTableFooter } from './PlanRequirementsTableFooter';
+import { PlanRequirementsTableHeader } from './PlanRequirementsTableHeader';
+import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
+import { PlanRequirementsTableOptions } from './PlanRequirementsTableOptions.type';
+import { PlanRequirementsTableServantRow } from './PlanRequirementsTableServantRow';
+import { PlanRequirementsTableStyle } from './PlanRequirementsTableStyle';
 
 type Props = {
     /**

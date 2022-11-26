@@ -1,22 +1,18 @@
-import { CollectionUtils, Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
 import { GameItemConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { Box } from '@mui/system';
-import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';
+import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { GameItemCategory, GameItemCategoryMap, PlanRequirements, PlanServantAggregatedData } from '../../../../types';
 import { PlanRequirementsTableFooter } from './PlanRequirementsTableFooter';
 import { PlanRequirementsTableHeader } from './PlanRequirementsTableHeader';
-import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 import { PlanRequirementsTableOptions } from './PlanRequirementsTableOptions.type';
+import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 import { PlanRequirementsTableServantRow } from './PlanRequirementsTableServantRow';
 import { PlanRequirementsTableStyle } from './PlanRequirementsTableStyle';
 
 type Props = {
-    /**
-     * The current quantities of items in the master account.
-     */
-    masterItems: ReadonlyRecord<number, number>;
     options: PlanRequirementsTableOptions;
     /**
      * The computed requirements for the plan.
@@ -31,6 +27,11 @@ type Props = {
     onRowClick?: MouseEventHandler;
     onRowDoubleClick?: MouseEventHandler;
     onSelectionChange?: (selectedInstanceIds: ReadonlySet<number>) => void;
+};
+
+type HoverState = {
+    rowIndex?: number;
+    itemId?: number;
 };
 
 const CellSizeCondensed = 42;
@@ -71,7 +72,7 @@ const getDisplayedItems = (
     /** 
      * The overall group requirements should contain all the items required.
      */
-    const groupItems = planRequirements.group.items;
+    const groupItems = planRequirements.requirements.group.items;
     return defaultItems.filter(itemId => groupItems[itemId] !== undefined);
 };
 
@@ -82,7 +83,6 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     const gameItemCategoryMap = useGameItemCategoryMap();
 
     const {
-        masterItems,
         options,
         planRequirements,
         planServantsData,
@@ -112,6 +112,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         onSelectionChange?.(selectionResult);
     }, [onSelectionChange, selectionResult]);
 
+    const [hoverState, setHoverState] = useState<HoverState>(Functions.emptyObjectSupplier);
 
     const displayedItems = useMemo((): Array<number> => {
         if (!gameItemCategoryMap) {
@@ -125,13 +126,22 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     }, [gameItemCategoryMap, planRequirements, options.displayItems]);
 
     const internalTableOptions = useMemo((): PlanRequirementsTableOptionsInternal => {
-        const layout = options.layout;
+
+        const {
+            displayZeroValues = false,
+            layout: {
+                cells,
+                stickyColumn: stickyColumnLayout
+            }
+        } = options;
+
         return {
-            cellSize: layout.cells === 'condensed' ? CellSizeCondensed : CellSizeNormal,
+            cellSize: cells === 'condensed' ? CellSizeCondensed : CellSizeNormal,
             displayedItems,
-            stickyColumnLayout: layout.stickyColumn
+            displayZeroValues,
+            stickyColumnLayout
         };
-    }, [displayedItems, options.layout]);
+    }, [displayedItems, options]);
 
 
     //#region Input event handlers
@@ -141,24 +151,43 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         onRowClick?.(e);
     }, [handleItemClick, onRowClick]);
 
+    const handleHover = useCallback((rowIndex?: number, itemId?: number) => {
+        setHoverState({
+            rowIndex,
+            itemId
+        });
+    }, []);
+
+    const handleTableContainerMouseLeave = useCallback((_event: MouseEvent) => {
+        setHoverState({
+            rowIndex: undefined,
+            itemId: undefined
+        });
+    }, []);
+
     //#endregion
 
 
     //#region Component rendering
 
+    const servantsRequirements = planRequirements.requirements.servants;
+
     const renderServantRow = (planServantData: PlanServantAggregatedData, index: number): ReactNode => {
         const instanceId = planServantData.instanceId;
-        const servantRequirements = planRequirements.servants[instanceId];
+        const servantRequirements = servantsRequirements[instanceId];
         if (!servantRequirements) {
             // TODO Log this
             return null;
         }
         const active = selectedInstanceIds?.has(instanceId);
+        const hover = hoverState.rowIndex === index;
 
         return (
             <PlanRequirementsTableServantRow
                 key={instanceId}
                 active={active}
+                hover={hover}
+                hoverItemId={hoverState.itemId}
                 borderTop={!!index}
                 index={index}
                 options={internalTableOptions}
@@ -167,21 +196,28 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 onClick={handleRowClick}
                 onContextMenu={handleRowClick}
                 onDoubleClick={onRowDoubleClick}
+                onHover={handleHover}
             />
         );
     };
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={PlanRequirementsTableStyle}>
-            <div className={`${StyleClassPrefix}-table-container`}>
+            <div
+                className={`${StyleClassPrefix}-table-container`}
+                onMouseLeave={handleTableContainerMouseLeave}
+            >
                 <PlanRequirementsTableHeader
+                    hoverItemId={hoverState.itemId}
                     options={internalTableOptions}
+                    onHover={handleHover}
                 />
                 {planServantsData.map(renderServantRow)}
                 <PlanRequirementsTableFooter
-                    masterItems={masterItems}
+                    hoverItemId={hoverState.itemId}
                     planRequirements={planRequirements}
                     options={internalTableOptions}
+                    onHover={handleHover}
                 />
             </div>
         </Box>

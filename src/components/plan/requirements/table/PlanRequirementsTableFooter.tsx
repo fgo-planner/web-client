@@ -1,58 +1,41 @@
-import { ReadonlyRecord } from '@fgo-planner/common-core';
-import { Theme } from '@mui/material';
-import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import { GameItemConstants } from '@fgo-planner/data-core';
 import React, { ReactNode } from 'react';
 import { PlanRequirements } from '../../../../types';
-import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
+import { PlanRequirementsTableFooterCell } from './PlanRequirementsTableFooterCell';
 import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 
 type Props = {
-    /**
-     * The current quantities of items in the master account.
-     */
-    masterItems: ReadonlyRecord<number, number>;
+    activeItemId?: number;
+    hoverItemId: number | undefined;
     options: PlanRequirementsTableOptionsInternal;
     planRequirements: PlanRequirements;
+    onHover: (index?: number, itemId?: number) => void;
 };
 
-const StyleClassPrefix = 'PlanRequirementsTableFooter';
-
-const StyleProps = (theme: SystemTheme) => {
-
-    const {
-        palette,
-        spacing
-    } = theme as Theme;
-
-    return {
-        position: 'sticky',
-        bottom: 0,
-        zIndex: 3,
-        [`& .${StyleClassPrefix}-sticky-content`]: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 320,
-            height: '100%',
-            fontWeight: 500,
-            background: palette.background.paper
-        },
-        [`& .${StyleClassPrefix}-cell`]: {
-            background: palette.background.paper,
-            fontSize: '1rem'
-        }
-    } as SystemStyleObject<SystemTheme>;
-};
+export const StyleClassPrefix = 'PlanRequirementsTableFooter';
 
 export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
     const {
-        masterItems,
-        options,
-        planRequirements
+        activeItemId,
+        hoverItemId,
+        options: {
+            cellSize,
+            displayZeroValues,
+            displayedItems
+        },
+        planRequirements: {
+            requirements,
+            resources
+        },
+        onHover
     } = props;
+
+
     //#region Required quantity row
+
+    const requiredItems = requirements.group.items;
 
     const requiredStickyContent: ReactNode = (
         <div className={`${StyleClassPrefix}-sticky-content`}>
@@ -61,16 +44,18 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
     );
 
     const renderRequiredItemCell = (itemId: number): ReactNode => {
-        const itemRequirements = planRequirements.group.items[itemId];
+        const quantity = requiredItems[itemId]?.total;
         return (
-            <DataTableGridCell
+            <PlanRequirementsTableFooterCell
                 key={itemId}
-                className={`${StyleClassPrefix}-cell`}
-                size={options.cellSize}
-                bold
-            >
-                {itemRequirements?.total}
-            </DataTableGridCell>
+                active={itemId === activeItemId}
+                cellSize={cellSize}
+                displayZeroValues={displayZeroValues}
+                hover={itemId === hoverItemId}
+                itemId={itemId}
+                quantity={quantity}
+                onHover={onHover}
+            />
         );
     };
 
@@ -79,7 +64,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
             borderTop
             stickyContent={requiredStickyContent}
         >
-            {options.displayedItems.map(renderRequiredItemCell)}
+            {displayedItems.map(renderRequiredItemCell)}
         </DataTableGridRow>
     );
 
@@ -88,6 +73,8 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
     //#region Inventory quantity row
 
+    const currentItems = resources.current.items;
+
     const inventoryStickyContent: ReactNode = (
         <div className={`${StyleClassPrefix}-sticky-content`}>
             Inventory
@@ -95,16 +82,23 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
     );
 
     const renderInventoryItemCell = (itemId: number): ReactNode => {
-        const quantity = masterItems[itemId] || 0;
+        let quantity: number;
+        if (itemId === GameItemConstants.QpItemId) {
+            quantity = resources.current.qp;
+        } else {
+            quantity = currentItems[itemId] || 0;
+        }
         return (
-            <DataTableGridCell
-                key={itemId}
-                className={`${StyleClassPrefix}-cell`}
-                size={options.cellSize}
-                bold
-            >
-                {quantity}
-            </DataTableGridCell>
+            <PlanRequirementsTableFooterCell
+            key={itemId}
+            active={itemId === activeItemId}
+            cellSize={cellSize}
+            displayZeroValues={displayZeroValues}
+            hover={itemId === hoverItemId}
+            itemId={itemId}
+            quantity={quantity}
+            onHover={onHover}
+            />
         );
     };
 
@@ -113,7 +107,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
             borderTop
             stickyContent={inventoryStickyContent}
         >
-            {options.displayedItems.map(renderInventoryItemCell)}
+            {displayedItems.map(renderInventoryItemCell)}
         </DataTableGridRow>
     );
 
@@ -122,6 +116,8 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
     //#region Deficit quantity row
 
+    const deficitItems = resources.deficit.items;
+
     const deficitStickyContent: ReactNode = (
         <div className={`${StyleClassPrefix}-sticky-content`}>
             Deficit
@@ -129,18 +125,23 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
     );
 
     const renderDeficitItemCell = (itemId: number): ReactNode => {
-        const quantity = masterItems[itemId] || 0;
-        const required = planRequirements.group.items[itemId]?.total || 0;
-        const deficit = Math.max(required - quantity, 0);
+        let quantity: number | undefined;
+        if (itemId === GameItemConstants.QpItemId) {
+            quantity = resources.deficit.qp;
+        } else {
+            quantity = deficitItems[itemId];
+        }
         return (
-            <DataTableGridCell
+            <PlanRequirementsTableFooterCell
                 key={itemId}
-                className={`${StyleClassPrefix}-cell`}
-                size={options.cellSize}
-                bold
-            >
-                {deficit || ''}
-            </DataTableGridCell>
+                active={itemId === activeItemId}
+                cellSize={cellSize}
+                displayZeroValues={displayZeroValues}
+                hover={itemId === hoverItemId}
+                itemId={itemId}
+                quantity={quantity}
+                onHover={onHover}
+            />
         );
     };
 
@@ -150,7 +151,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
             borderBottom
             stickyContent={deficitStickyContent}
         >
-            {options.displayedItems.map(renderDeficitItemCell)}
+            {displayedItems.map(renderDeficitItemCell)}
         </DataTableGridRow>
     );
 
@@ -158,13 +159,11 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
 
     return (
-        <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
+        <div className={`${StyleClassPrefix}-root`}>
             {requiredRow}
             {inventoryRow}
             {deficitRow}
-        </Box>
+        </div>
     );
-
-    //#endregion
 
 });

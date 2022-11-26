@@ -4,6 +4,8 @@ export type PlanRequirementsTableOptionsInternal = {
 
     displayedItems: Array<number>;
     
+    displayZeroValues: boolean;
+
     stickyColumnLayout: 'condensed' | 'normal';
 
 };

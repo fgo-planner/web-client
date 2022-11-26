@@ -431,7 +431,6 @@ export const PlanRoute = React.memo(() => {
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <PlanRequirementsTable
-                            masterItems={masterAccountEditData.items}
                             planServantsData={planEditData.servantsData}
                             planRequirements={planRequirements}
                             selectedInstanceIds={selectedServantsData.ids}

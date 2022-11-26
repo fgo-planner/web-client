@@ -1,43 +1,31 @@
-import { Theme } from '@mui/material';
-import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode } from 'react';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
-import { GameItemThumbnail } from '../../../game/item/game-item-thumbnail.component';
+import { PlanRequirementsTableHeaderCell } from './PlanRequirementsTableHeaderCell';
 import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 
 type Props = {
+    activeItemId?: number;
+    hoverItemId: number | undefined;
     options: PlanRequirementsTableOptionsInternal;
+    onHover: (index?: number, itemId?: number) => void;
 };
 
 export const StyleClassPrefix = 'PlanRequirementsTableHeader';
 
-const StyleProps = (theme: SystemTheme) => {
-
-    const {
-        palette,
-        spacing
-    } = theme as Theme;
-
-    return {
-        position: 'sticky',
-        top: 0,
-        zIndex: 3,
-        [`& .${StyleClassPrefix}-sticky-content`]: {
-            width: 320,
-            height: '100%',
-            background: palette.background.paper
-        },
-        [`& .${StyleClassPrefix}-cell`]: {
-            background: palette.background.paper
-        }
-    } as SystemStyleObject<SystemTheme>;
-};
-
-export const PlanRequirementsTableHeader = React.memo(({ options }: Props) => {
+export const PlanRequirementsTableHeader = React.memo((props: Props) => {
 
     const gameItemMap = useGameItemMap();
+
+    const {
+        activeItemId,
+        hoverItemId,
+        options: {
+            cellSize,
+            displayedItems
+        },
+        onHover
+    } = props;
 
     if (!gameItemMap) {
         return null;
@@ -50,28 +38,24 @@ export const PlanRequirementsTableHeader = React.memo(({ options }: Props) => {
     const renderItemCell = (itemId: number): ReactNode => {
         const gameItem = gameItemMap[itemId];
         return (
-            <DataTableGridCell
+            <PlanRequirementsTableHeaderCell
                 key={itemId}
-                className={`${StyleClassPrefix}-cell`}
-                size={options.cellSize}
-            >
-                <GameItemThumbnail
-                    gameItem={gameItem}
-                    size={options.cellSize}
-                    showBackground
-                />
-            </DataTableGridCell>
+                active={itemId === activeItemId}
+                cellSize={cellSize}
+                gameItem={gameItem}
+                hover={itemId === hoverItemId}
+                onHover={onHover}
+            />
         );
     };
 
     return (
         <DataTableGridRow
             className={`${StyleClassPrefix}-root`}
-            sx={StyleProps}
             borderBottom
             stickyContent={stickyContent}
         >
-            {options.displayedItems.map(renderItemCell)}
+            {displayedItems.map(renderItemCell)}
         </DataTableGridRow>
     );
 

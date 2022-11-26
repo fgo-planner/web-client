@@ -15,4 +15,6 @@ export type PlanRequirementsTableOptions = {
         fous?: boolean;
     }
 
+    displayZeroValues?: boolean;
+
 };

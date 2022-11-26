@@ -1,7 +1,7 @@
 import { CollectionUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, ImmutablePlan, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
-import { MasterServantAggregatedData, PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantAggregatedData, PlanServantRequirements } from '../../types';
-import { DataAggregationUtils } from '../data-aggregation.utils';
+import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterServant, ImmutablePlan, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, PlanResources, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
+import { PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantAggregatedData, PlanServantRequirements } from '../../types';
+
 
 //#region Exported type definitions
 
@@ -19,8 +19,8 @@ export type ComputationOptions = {
  * TODO Move this to its own file.
  */
 export type MasterAccountData = Readonly<{
-    costumes: ReadonlySet<number>;
     items: ReadonlyRecord<number, number>;
+    costumes: ReadonlySet<number>;
     qp: number;
 }>;
 
@@ -83,88 +83,10 @@ const DefaultTargetEnhancements: Immutable<ServantEnhancements> = {
 //#endregion
 
 
-//#region Arithmetic methods
+//#region computePlanRequirements + helper functions
 
 /**
- * Adds the values from the source `EnhancementRequirements` to the target
- * `EnhancementRequirements`. Only the the target map will be updated; the
- * values of the source map will not be changed.
- */
-export function addEnhancementRequirements(target: EnhancementRequirements, source: EnhancementRequirements): void {
-    const targetEmbers = target.embers;
-    for (const [key, value] of Object.entries(source.embers)) {
-        const rarity = Number(key) as 1 | 2 | 3 | 4 | 5;
-        targetEmbers[rarity] += value;
-    }
-    const targetItems = target.items;
-    for (const [key, value] of Object.entries(source.items)) {
-        const itemId = Number(key);
-        if (!targetItems[itemId]) {
-            targetItems[itemId] = { ...value };
-        } else {
-            _addEnhancementItemRequirements(targetItems[itemId], value);
-        }
-    }
-    target.qp += source.qp;
-}
-
-/**
- * Takes an array of `EnhancementRequirements` and returns a new
- * `EnhancementRequirements` containing the sum of all the values.
- */
-export function sumEnhancementRequirements(arr: Array<EnhancementRequirements>): EnhancementRequirements {
-    const result = _instantiateEnhancementRequirements();
-    for (const enhancementRequirements of arr) {
-        addEnhancementRequirements(result, enhancementRequirements);
-    }
-    return result;
-}
-
-//#endregion
-
-
-//#region Data transformation methods
-
-/**
- * TODO Move this into a more general utilities class.
- */
-export function transformMasterAccount(
-    masterAccount: ImmutableMasterAccount
-): MasterAccountData {
-    return {
-        costumes: new Set(masterAccount.costumes),
-        items: masterAccount.resources.items,
-        qp: masterAccount.resources.qp
-    };
-}
-
-/**
- * TODO Move this into a more general utilities class.
- */
-export function transformPlan(
-    plan: ImmutablePlan,
-    masterServantsDataMap: ReadonlyMap<number, MasterServantAggregatedData>, 
-): PlanData {
-    const servantsData = DataAggregationUtils.aggregateDataForPlanServants(
-        plan.servants,
-        masterServantsDataMap
-    );
-    return {
-        planId: plan._id,
-        enabled: plan.enabled,
-        servantsData,
-        costumes: new Set(plan.costumes),
-        upcomingResources: plan.upcomingResources
-    };
-}
-
-//#endregion
-
-
-//#region computePlanRequirements + helper methods
-
-/**
- * Computes the material debt for the given plan, and optionally the other plans
+ * Computes the material deficit for the given plan, and optionally the other plans
  * from the plan group, if any.
  *
  * @param targetPlanData The target plan data.
@@ -214,8 +136,17 @@ export function computePlanRequirements(
         true
     );
 
+    /**
+     * Compute/copy resources data.
+     */
+    _computePlanResources(
+        result,
+        targetPlanData,
+        masterAccountData
+    );
+
     const end = window.performance.now();
-    console.log(`Plan debt took ${(end - start).toFixed(2)}ms to compute.`);
+    console.log(`Plan deficit took ${(end - start).toFixed(2)}ms to compute.`);
     return result;
 }
 
@@ -246,7 +177,7 @@ function _computePlanRequirements(
         const servantOptions = _parseComputationOptions(planServant);
         const mergedOptions = _mergeComputationOptions(options, servantOptions);
         /**
-         * Compute the debt for the servant for the current plan.
+         * Compute the deficit for the servant for the current plan.
          */
         /** */
         const servantComputationResult = _computePlanServantRequirements(
@@ -270,17 +201,17 @@ function _computePlanRequirements(
         /** */
         let planEnhancementRequirements: EnhancementRequirements;
         if (isTargetPlan) {
-            addEnhancementRequirements(planServantRequirements.requirements, enhancementRequirements);
-            planEnhancementRequirements = result.targetPlan;
+            _addEnhancementRequirements(planServantRequirements.requirements, enhancementRequirements);
+            planEnhancementRequirements = result.requirements.targetPlan;
         } else {
             planEnhancementRequirements = ObjectUtils.getOrDefault(
-                result.previousPlans,
+                result.requirements.previousPlans,
                 planData.planId,
                 _instantiateEnhancementRequirements
             );
         }
-        addEnhancementRequirements(planEnhancementRequirements, enhancementRequirements);
-        addEnhancementRequirements(result.group, enhancementRequirements);
+        _addEnhancementRequirements(planEnhancementRequirements, enhancementRequirements);
+        _addEnhancementRequirements(result.requirements.group, enhancementRequirements);
     }
 
     // TODO Compute the grand total in the `result.itemDebt`;
@@ -297,7 +228,7 @@ function _computePlanServantRequirements(
 ): [PlanServantRequirements, EnhancementRequirements] | undefined {
 
     const { instanceId } = planServant;
-    const resultServants = result.servants;
+    const resultServants = result.requirements.servants;
 
     let planServantRequirements = resultServants[instanceId];
     if (!planServantRequirements) {
@@ -332,10 +263,87 @@ function _computePlanServantRequirements(
     return [planServantRequirements, enhancementRequirements];
 }
 
+/**
+ * Computes and populates the resources for the given `PlanRequirements`.
+ */
+function _computePlanResources(
+    result: PlanRequirements,
+    planData: PlanData,
+    masterAccountData: MasterAccountData
+): void {
+    /**
+     * Copy master account resources. Deep cloning should not be needed here because
+     * the returned data is expected to be readonly/immutable.
+     * 
+     * TODO Copy embers
+     */
+    result.resources.current.items = masterAccountData.items;
+    result.resources.current.qp = masterAccountData.qp;
+    /**
+     * Compute the total upcoming resources.
+     */
+    /** */
+    result.resources.upcoming = _sumPlanResources(planData.upcomingResources);
+    /**
+     * Compute the total resource deficit.
+     */
+    _computeResourceDebt(result);
+}
+
+/**
+ * Computes and populates the resource deficit for the given `PlanRequirements`.
+ * Assumes that the `resources.current` and `resources.upcoming` data sets are
+ * already populated.
+ */ 
+function _computeResourceDebt(result: PlanRequirements): void {
+    const requiredResources = result.requirements.group;
+    const currentResources = result.resources.current;
+    const upcomingResources = result.resources.upcoming;
+    const deficitResources = result.resources.deficit;
+
+    let required: number, 
+        current: number, 
+        upcoming: number, 
+        deficit: number;
+
+    /**
+     * Items
+     */
+    /** */
+    const currentItems = currentResources.items;
+    const upcomingItems = upcomingResources.items;
+    const deficitItems = deficitResources.items;
+    for (const [key, value] of Object.entries(requiredResources.items)) {
+        const itemId = Number(key);
+        required = value.total;
+        current = currentItems[itemId] || 0;
+        upcoming = upcomingItems[itemId] || 0;
+        deficit = Math.max(required - current - upcoming, 0);
+        if (deficit) {
+            deficitItems[itemId] = deficit;
+        }
+    }
+
+    /**
+     * QP
+     */
+    required = requiredResources.qp;
+    current = currentResources.qp;
+    upcoming = upcomingResources.qp;
+    deficit = Math.max(required - current - upcoming, 0);
+    if (deficit) {
+        deficitResources.qp = deficit;
+    }
+
+    /**
+     * TODO Embers
+     */
+}
+
 //#endregion
 
 
-//#region computeServantRequirements + helper methods
+//#region computeServantRequirements + helper functions
 
 export function computeServantEnhancementRequirements(
     gameServant: Immutable<GameServant>,
@@ -503,14 +511,83 @@ function _updateEnhancementRequirementResult(
 //#endregion
 
 
-//#region Other helper methods
+//#region Other helper functions
 
-function _addEnhancementItemRequirements(target: EnhancementItemRequirements, source: EnhancementItemRequirements): void {
-    target.ascensions += source.ascensions;
-    target.skills += source.skills;
-    target.appendSkills += source.appendSkills;
-    target.costumes += source.costumes;
-    target.total += source.total;
+/**
+ * Takes an array of `EnhancementRequirements` and returns a new
+ * `EnhancementRequirements` containing the sum of all the values.
+ */
+export function sumEnhancementRequirements(enhancementRequirements: ImmutableArray<EnhancementRequirements>): EnhancementRequirements {
+    const result = _instantiateEnhancementRequirements();
+    for (const requirements of enhancementRequirements) {
+        _addEnhancementRequirements(result, requirements);
+    }
+    return result;
+}
+
+/**
+ * Adds the values from the source `EnhancementRequirements` to the target
+ * `EnhancementRequirements`.
+ */
+function _addEnhancementRequirements(target: EnhancementRequirements, source: Immutable<EnhancementRequirements>): void {
+    const targetEmbers = target.embers;
+    for (const [key, value] of Object.entries(source.embers)) {
+        const rarity = Number(key) as GameEmberRarity;
+        targetEmbers[rarity] += value;
+    }
+    const targetItems = target.items;
+    for (const [key, value] of Object.entries(source.items)) {
+        const itemId = Number(key);
+        const targetItem = targetItems[itemId];
+        if (!targetItem) {
+            targetItems[itemId] = { ...value };
+        } else {
+            targetItem.ascensions += value.ascensions;
+            targetItem.skills += value.skills;
+            targetItem.appendSkills += value.appendSkills;
+            targetItem.costumes += value.costumes;
+            targetItem.total += value.total;
+        }
+    }
+    target.qp += source.qp;
+}
+
+/**
+ * Takes an array of `PlanResources` and returns a new `PlanResources`
+ * containing the sum of all the values.
+ */
+function _sumPlanResources(resources: ImmutableArray<PlanResources>): PlanResources {
+    const result = _instantiatePlanResources();
+    for (const enhancementRequirements of resources) {
+        _addPlanResources(result, enhancementRequirements);
+    }
+    return result;
+}
+
+/**
+ * Adds the values from the source `PlanResources` to the target
+ * `PlanResources`.
+ */
+function _addPlanResources(target: PlanResources, source: Immutable<PlanResources>): void {
+    const targetEmbers = target.embers;
+    for (const [key, value] of Object.entries(source.embers)) {
+        const rarity = Number(key) as GameEmberRarity;
+        if (!targetEmbers[rarity]) {
+            targetEmbers[rarity] = value;
+        } else {
+            targetEmbers[rarity]! += value;
+        }
+    }
+    const targetItems = target.items;
+    for (const [key, value] of Object.entries(source.items)) {
+        const itemId = Number(key);
+        if (!targetItems[itemId]) {
+            targetItems[itemId] = value;
+        } else {
+            targetItems[itemId] += value;
+        }
+    }
+    target.qp += source.qp;
 }
 
 function _parseComputationOptions(data: PlanData | Immutable<PlanServant>): ComputationOptions {
@@ -542,16 +619,22 @@ function _mergeComputationOptions(a: ComputationOptions, b: ComputationOptions):
 //#endregion
 
 
-//#region Instantiation methods
+//#region Instantiation functions
 
 
 export function instantiatePlanRequirements(): PlanRequirements {
     return {
-        servants: {},
-        targetPlan: _instantiateEnhancementRequirements(),
-        previousPlans: {},
-        group: _instantiateEnhancementRequirements(),
-        itemDebt: {}
+        requirements: {
+            servants: {},
+            targetPlan: _instantiateEnhancementRequirements(),
+            previousPlans: {},
+            group: _instantiateEnhancementRequirements(),
+        },
+        resources: {
+            current: _instantiatePlanResources(),
+            deficit: _instantiatePlanResources(),
+            upcoming: _instantiatePlanResources()
+        }
     };
 }
 
@@ -574,6 +657,14 @@ function _instantiateEnhancementRequirements(): EnhancementRequirements {
             4: 0,
             5: 0
         },
+        items: {},
+        qp: 0
+    };
+}
+
+function _instantiatePlanResources(): PlanResources {
+    return {
+        embers: {},
         items: {},
         qp: 0
     };

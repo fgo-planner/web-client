@@ -19,7 +19,7 @@ export const StyleClassPrefix = 'PlanRequirementsTableServantRowHeader';
  */
 /** */
 export const PlanRequirementsTableServantRowHeader: React.FC<Props> = (props: Props): JSX.Element => {
-    
+
     const {
         gameServant,
         options

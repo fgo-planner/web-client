@@ -1,11 +1,11 @@
+import { GameEmberRarity } from '@fgo-planner/data-core';
 import { PlanEnhancementItemRequirements } from './plan-enhancement-item-requirements.type';
 
 /**
- * Resources required to reach the targeted enhancement levels. Includes embers,
- * fous (TODO), items, and QP.
+ * Container object for resource count.
  */
 export type PlanEnhancementRequirements = {
-    embers: { [key in 1 | 2 | 3 | 4 | 5]: number };
+    embers: Record<GameEmberRarity, number>;
     /**
      * Map of items required to reach the targeted enhancement levels. The key is
      * the item's ID, and the value is a breakdown of the quantities required for

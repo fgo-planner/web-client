@@ -1,21 +1,19 @@
 import { CSSInterpolation, Theme } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { alpha, styled, Theme as SystemTheme } from '@mui/system';
+import { styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren, ReactNode } from 'react';
-import { ComponentStyleProps } from '../../types';
+import { ComponentStyleProps, StyledFunctionThemeProp } from '../../types';
 
 type Props = PropsWithChildren<{
-    active?: boolean;
     borderBottom?: boolean;
     borderTop?: boolean;
     stickyContent?: ReactNode;
 }> & ComponentStyleProps & DOMAttributes<HTMLDivElement>;
 
-const StyleClassPrefix = 'DataTableGridCell';
+const StyleClassPrefix = 'DataTableGridRow';
 
 const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
-    prop !== 'active' &&
     prop !== 'borderBottom' &&
     prop !== 'borderTop' &&
     prop !== 'stickyContent' &&
@@ -29,7 +27,7 @@ const StyleOptions = {
     shouldForwardProp
 } as FilteringStyledOptions<Props>;
 
-const StyleProps = (props: Props & { theme: SystemTheme }) => {
+const StyleProps = (props: Props & StyledFunctionThemeProp) => {
 
     const { palette } = props.theme as Theme;
 
@@ -37,9 +35,6 @@ const StyleProps = (props: Props & { theme: SystemTheme }) => {
         display: 'flex',
         width: 'fit-content',
         backgroundColor: palette.background.paper,
-        '&.active': {
-            backgroundColor: `${alpha(palette.primary.main, 0.07)} !important`
-        },
         '&.border-top': {
             borderTopWidth: 1,
             borderTopStyle: 'solid',
@@ -67,7 +62,6 @@ export const DataTableGridRow = React.memo((props: Props) => {
 
     const {
         children,
-        active,
         borderTop,
         borderBottom,
         stickyContent,
@@ -79,7 +73,6 @@ export const DataTableGridRow = React.memo((props: Props) => {
 
     const classNames = clsx(
         className,
-        active && 'active',
         borderTop && 'border-top',
         borderBottom && 'border-bottom'
     );

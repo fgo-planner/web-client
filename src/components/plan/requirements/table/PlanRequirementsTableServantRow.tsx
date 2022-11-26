@@ -9,8 +9,11 @@ import { PlanRequirementsTableServantRowHeader } from './PlanRequirementsTableSe
 
 type Props = {
     active?: boolean;
+    activeItemId?: number;
     borderBottom?: boolean;
     borderTop?: boolean;
+    hover: boolean;
+    hoverItemId: number | undefined;
     index: number;
     options: PlanRequirementsTableOptionsInternal;
     planServantData: Immutable<PlanServantAggregatedData>;
@@ -18,6 +21,7 @@ type Props = {
     onClick?: (e: MouseEvent, index: number) => void;
     onContextMenu?: (e: MouseEvent, index: number) => void;
     onDoubleClick?: (e: MouseEvent, index: number) => void;
+    onHover: (index: number, itemId?: number) => void;
     // onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
 };
 
@@ -27,8 +31,11 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
 
     const {
         active,
+        activeItemId,
         borderBottom,
         borderTop,
+        hover,
+        hoverItemId,
         index,
         options,
         planServantData: {
@@ -38,23 +45,28 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
         onClick,
         onContextMenu,
         onDoubleClick,
+        onHover
         // onDragOrderChange
     } = props;
 
     
     //#region Input event handlers
 
-    const handleClick = useCallback((e: MouseEvent): void => {
-        onClick?.(e, index);
+    const handleClick = useCallback((event: MouseEvent): void => {
+        onClick?.(event, index);
     }, [index, onClick]);
 
-    const handleContextMenu = useCallback((e: MouseEvent): void => {
-        onContextMenu?.(e, index);
+    const handleContextMenu = useCallback((event: MouseEvent): void => {
+        onContextMenu?.(event, index);
     }, [index, onContextMenu]);
 
-    const handleDoubleClick = useCallback((e: MouseEvent): void => {
-        onDoubleClick?.(e, index);
+    const handleDoubleClick = useCallback((event: MouseEvent): void => {
+        onDoubleClick?.(event, index);
     }, [index, onDoubleClick]);
+
+    const handleMouseEnter = useCallback((_event: MouseEvent): void => {
+        onHover(index);
+    }, [index, onHover]);
 
     //#endregion
 
@@ -75,16 +87,18 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
         return (
             <PlanRequirementsTableServantRowCell
                 key={itemId}
+                active={active || itemId === activeItemId}
+                hover={hover || itemId === hoverItemId}
                 quantity={itemQuantity}
                 options={options}
-                // backgroundColor={palette.background.paper}
             />
         );
     };
 
     const className = clsx(
         `${StyleClassPrefix}-root`,
-        active && `${StyleClassPrefix}-active`
+        active && `${StyleClassPrefix}-active`,
+        hover && `${StyleClassPrefix}-hover`
     );
 
     return (
@@ -95,6 +109,7 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
             onContextMenu={handleContextMenu}
+            onMouseEnter={handleMouseEnter}
             stickyContent={rowHeaderNode}
         >
             {options.displayedItems.map(renderItemCell)}

@@ -3,7 +3,7 @@ import { InstantiatedServantUpdateUtils, PlanServantUpdate } from '@fgo-planner/
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ServantCostumeSelectList } from '../../../../../components/input/servant/costume/servant-costume-select-list.component';
+import { ServantCostumeSelectList } from '../../../../../components/input/servant/costume/ServantCostumeSelectList';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
 import { GameServantCostumeAggregatedData } from '../../../../../types';
 

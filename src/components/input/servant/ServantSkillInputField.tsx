@@ -1,4 +1,4 @@
-import { InstantiatedServantConstants, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
+import { InstantiatedServantConstants, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent } from '@mui/material';
 import React, { useCallback } from 'react';
 
@@ -11,22 +11,22 @@ type Props = {
     formId?: string;
     label?: string;
     multiEditMode?: boolean;
-    onChange: (value: string, pushChanges: boolean) => void;
+    set: InstantiatedServantSkillSet,
+    slot: InstantiatedServantSkillSlot,
     value: string;
     variant?: BaseTextFieldProps['variant'];
+    onChange: (set: InstantiatedServantSkillSet, slot: InstantiatedServantSkillSlot, value: string, pushChanges: boolean) => void;
 };
 
-const FieldName = 'bondLevel';
-
-const DefaultLabel = 'Bond';
+const DefaultLabel = 'Skill';
 
 const IndeterminateDisplayText = '?';
 
 /**
- * Input field for a servant's bond level. This is currently only applicable to
- * master servants.
+ * Input field for a servant's skill level. This is applicable to both master
+ * and planned servants.
  */
-export const MasterServantBondInputField = React.memo((props: Props) => {
+export const ServantSkillInputField = React.memo((props: Props) => {
 
     const {
         allowEmpty,
@@ -34,33 +34,39 @@ export const MasterServantBondInputField = React.memo((props: Props) => {
         formId,
         label,
         multiEditMode,
-        onChange,
+        set,
+        slot,
         value,
-        variant
+        variant,
+        onChange
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {
         const value = event.target.value;
-        onChange(value, true);
-    }, [onChange]);
+        onChange(set, slot, value, true);
+    }, [onChange, set, slot]);
 
-    const fieldId = formId ? `${formId}-${FieldName}` : FieldName;
+    const fieldName = `${set}-${slot}`;
+
+    const fieldId = formId ? `${formId}-${fieldName}` : fieldName;
+
+    const fieldLabel = `${label || DefaultLabel} ${slot}`;
 
     return (
         <FormControl variant={variant} fullWidth>
-            <InputLabel htmlFor={FieldName} shrink>{label || DefaultLabel}</InputLabel>
+            <InputLabel htmlFor={fieldName} shrink>{label || DefaultLabel}</InputLabel>
             <Select
                 native
                 id={fieldId}
-                name={FieldName}
-                label={label || DefaultLabel}
+                name={fieldName}
+                label={fieldLabel}
                 value={value}
                 onChange={handleChange}
                 disabled={disabled}
             >
                 {multiEditMode && <option key={IndeterminateValue} value={IndeterminateValue}>{IndeterminateDisplayText}</option>}
                 {allowEmpty && <option value=''>{'\u2014'}</option>}
-                {InstantiatedServantConstants.BondLevels.map(value => (
+                {InstantiatedServantConstants.SkillLevels.map(value => (
                     <option key={value} value={value}>
                         {value}
                     </option>

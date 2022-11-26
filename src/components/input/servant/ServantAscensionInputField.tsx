@@ -20,8 +20,8 @@ type Props = {
     label?: string;
     level: string;
     multiEditMode?: boolean;
-    onChange: (level: string, ascension: string, pushChanges: boolean) => void;
     variant?: BaseTextFieldProps['variant'];
+    onChange: (level: string, ascension: string, pushChanges: boolean) => void;
 };
 
 const FieldName = 'ascension';
@@ -45,8 +45,8 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
         label,
         level,
         multiEditMode,
-        onChange,
-        variant
+        variant,
+        onChange
     } = props;
 
     const handleChange = useCallback((event: SelectChangeEvent<string>): void => {

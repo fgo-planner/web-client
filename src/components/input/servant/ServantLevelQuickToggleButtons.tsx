@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import React, { useCallback } from 'react';
 import { ComponentStyleProps } from '../../../types';
 import { IconButtonText } from '../../text/icon-button-text.component';
-import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
+import { ServantEnhancementQuickToggleButtons } from './ServantEnhancementQuickToggleButtons';
 
 type Props = {
     disabled?: boolean;
@@ -26,8 +26,8 @@ export const ServantLevelQuickToggleButtons = React.memo((props: Props) => {
     const {
         disabled,
         ignoreTabNavigation,
-        onClick,
         maxNaturalLevel,
+        onClick,
         className
     } = props;
 

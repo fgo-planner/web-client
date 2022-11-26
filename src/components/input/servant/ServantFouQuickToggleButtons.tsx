@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { ComponentStyleProps } from '../../../types';
 import { IconButtonText } from '../../text/icon-button-text.component';
-import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
+import { ServantEnhancementQuickToggleButtons } from './ServantEnhancementQuickToggleButtons';
 
 type Props = {
     disabled?: boolean;
@@ -15,8 +15,9 @@ const StyleClassPrefix = 'ServantFouQuickToggleButtons';
 
 /**
  * The usage of `useMemo`, `useCallback`, etc. hooks in this component are
- * unnecessary because this is is never re-rendered (due to prop values never
- * changing).
+ * unnecessary because it is intended to be used in a way such that the prop
+ * values never change (hence the component is never re-rendered after the
+ * initial mount).
  */
 
 /**

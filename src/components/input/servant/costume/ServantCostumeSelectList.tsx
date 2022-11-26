@@ -5,7 +5,7 @@ import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { GameServantCostumeAggregatedData } from '../../../../types';
-import { ServantCostumeSelectListRow, StyleClassPrefix as ServantCostumeSelectListRowStyleClassPrefix } from './servant-costume-select-list-row.component';
+import { ServantCostumeSelectListRow, StyleClassPrefix as ServantCostumeSelectListRowStyleClassPrefix } from './ServantCostumeSelectListRow';
 
 type Props = {
     costumesData?: ReadonlyArray<GameServantCostumeAggregatedData>;

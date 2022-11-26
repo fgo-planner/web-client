@@ -2,7 +2,7 @@ import { InstantiatedServantUpdateBoolean } from '@fgo-planner/data-core';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { MouseEvent, useCallback } from 'react';
-import { FormUtils } from '../../../../utils/form.utils';
+import { FormUtils } from '../../../utils/form.utils';
 
 type Props = {
     disabled?: boolean;
@@ -28,7 +28,7 @@ const StyleProps = {
  * Checkbox for toggling a servant's `summoned` flag. This is currently only
  * applicable to master servants.
  */
-export const MasterServantSummonedCheckbox = React.memo((props: Props) => {
+export const ServantSummonedCheckbox = React.memo((props: Props) => {
 
     const {
         disabled,

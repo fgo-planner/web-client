@@ -67,13 +67,13 @@ const transformDateFromPicker = (date: Date | null): number | null => {
     return DateTimeUtils.zonedToUtcTime(truncated).getTime();
 };
 
-const StyleClassPrefix = 'MasterServantSummonDateInputField';
+const StyleClassPrefix = 'ServantSummonDateInputField';
 
 /**
  * Input field for a servant's summon date. This is currently only applicable to
  * master servants.
  */
-export const MasterServantSummonDateInputField = React.memo((props: Props) => {
+export const ServantSummonDateInputField = React.memo((props: Props) => {
 
     const {
         disabled,

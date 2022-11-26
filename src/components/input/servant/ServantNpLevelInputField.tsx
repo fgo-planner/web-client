@@ -25,7 +25,7 @@ const IndeterminateDisplayText = '?';
  * Input field for a servant's NP level. This is currently only applicable to
  * master servants.
  */
-export const MasterServantNpLevelInputField = React.memo((props: Props) => {
+export const ServantNpLevelInputField = React.memo((props: Props) => {
 
     const {
         disabled,

@@ -30,7 +30,13 @@ const StyleProps = {
     width: 40
 } as SystemStyleObject<Theme>;
 
-export const ServantEnhancementQuickToggleButtons = React.memo((props: Props) => {
+/**
+ * Wrapping this component in React.memo is unnecessary because a re-render of
+ * the parent components will always trigger a re-render of this component
+ * anyways.
+ */
+/** */
+export const ServantEnhancementQuickToggleButtons: React.FC<Props> = (props: Props): JSX.Element => {
 
     const {
         disabled,
@@ -84,4 +90,4 @@ export const ServantEnhancementQuickToggleButtons = React.memo((props: Props) =>
         </Box>
     );
 
-});
+};

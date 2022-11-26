@@ -17,8 +17,8 @@ type Props = {
     label?: string;
     level: string;
     multiEditMode?: boolean;
-    onChange: (level: string, ascension: string, pushChanges?: boolean) => void;
     variant?: BaseTextFieldProps['variant'];
+    onChange: (level: string, ascension: string, pushChanges?: boolean) => void;
 };
 
 const FieldName = 'level';
@@ -52,8 +52,8 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         label,
         level,
         multiEditMode,
-        onChange,
-        variant
+        variant,
+        onChange
     } = props;
 
     const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {

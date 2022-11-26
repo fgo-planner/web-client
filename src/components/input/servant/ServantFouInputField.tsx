@@ -7,11 +7,11 @@ type Props = {
     disabled?: boolean;
     label?: string;
     multiEditMode?: boolean;
-    onBlur?: (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
-    onChange: (set: InstantiatedServantFouSet, value: string) => void;
     set: InstantiatedServantFouSet;
     value: string;
     variant?: BaseTextFieldProps['variant'];
+    onBlur?: (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
+    onChange: (set: InstantiatedServantFouSet, value: string) => void;
 };
 
 const DefaultLabel = 'Fou';
@@ -44,11 +44,11 @@ export const ServantFouInputField = React.memo((props: Props) => {
         disabled,
         label,
         multiEditMode,
-        onBlur,
-        onChange,
         set,
         value,
-        variant
+        variant,
+        onBlur,
+        onChange,
     } = props;
 
     const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {

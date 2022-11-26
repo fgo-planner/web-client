@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import React, { MouseEventHandler, ReactNode } from 'react';
 import { ComponentStyleProps } from '../../../types';
 import { IconButtonText } from '../../text/icon-button-text.component';
-import { ServantEnhancementQuickToggleButtons } from './servant-enhancement-quick-toggle-buttons.component';
+import { ServantEnhancementQuickToggleButtons } from './ServantEnhancementQuickToggleButtons';
 
 type SkillSet = 'skills' | 'appendSkills';
 
@@ -14,9 +14,9 @@ type Props = {
     disabled?: boolean;
     ignoreTabNavigation?: boolean;
     leftToggleTarget: ToggleTarget;
-    onClick: (value: InstantiatedServantSkillLevel | null, skillSet: SkillSet) => void;
     rightToggleTarget: ToggleTarget;
     skillSet: SkillSet;
+    onClick: (value: InstantiatedServantSkillLevel | null, skillSet: SkillSet) => void;
 } & Pick<ComponentStyleProps, 'className'>;
 
 const renderButtonIcon = (target: ToggleTarget): ReactNode => {
@@ -40,8 +40,9 @@ const StyleClassPrefix = 'ServantSkillQuickToggleButtons';
 
 /**
  * The usage of `useMemo`, `useCallback`, etc. hooks in this component are
- * unnecessary because this is is never re-rendered (due to prop values never
- * changing).
+ * unnecessary because it is intended to be used in a way such that the prop
+ * values never change (hence the component is never re-rendered after the
+ * initial mount).
  */
 
 /**
@@ -55,9 +56,9 @@ export const ServantSkillQuickToggleButtons = React.memo((props: Props) => {
         disabled,
         ignoreTabNavigation,
         leftToggleTarget,
-        onClick,
         rightToggleTarget,
         skillSet,
+        onClick,
         className
     } = props;
 

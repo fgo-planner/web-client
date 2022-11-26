@@ -2,10 +2,10 @@ import { InstantiatedServantBondLevel, InstantiatedServantNoblePhantasmLevel, In
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
-import { MasterServantBondInputField } from '../../../../../../components/input/servant/master/master-servant-bond-input-field.component';
-import { MasterServantNpLevelInputField } from '../../../../../../components/input/servant/master/master-servant-np-level-input-field.component';
-import { MasterServantSummonDateInputField } from '../../../../../../components/input/servant/master/master-servant-summon-date-input-field.component';
-import { MasterServantSummonedCheckbox } from '../../../../../../components/input/servant/master/master-servant-summoned-checkbox.component';
+import { ServantBondInputField } from '../../../../../../components/input/servant/ServantBondInputField';
+import { ServantNpLevelInputField } from '../../../../../../components/input/servant/ServantNpLevelInputField';
+import { ServantSummonDateInputField } from '../../../../../../components/input/servant/ServantSummonDateInputField';
+import { ServantSummonedCheckbox } from '../../../../../../components/input/servant/ServantSummonedCheckbox';
 import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
 
 type Props = {
@@ -100,7 +100,7 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
     } = masterServantUpdate;
 
     const summonedField = (
-        <MasterServantSummonedCheckbox
+        <ServantSummonedCheckbox
             value={summoned}
             multiEditMode={multiEditMode}
             onChange={handleSummonedCheckboxChange}
@@ -109,7 +109,7 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
     );
 
     const summonDateField = (
-        <MasterServantSummonDateInputField
+        <ServantSummonDateInputField
             value={summonDate}
             label={summoned ? 'Summon date' : 'Planned summon date'}
             multiEditMode={multiEditMode}
@@ -120,7 +120,7 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
     );
 
     const npField = (
-        <MasterServantNpLevelInputField
+        <ServantNpLevelInputField
             value={String(np ?? '')}
             label='NP Level'
             multiEditMode={multiEditMode}
@@ -130,7 +130,7 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
     );
 
     const bondField = (
-        <MasterServantBondInputField
+        <ServantBondInputField
             value={String(bondLevel ?? '')}
             label='Bond'
             allowEmpty

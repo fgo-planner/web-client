@@ -1,4 +1,4 @@
-import { CollectionUtils, Functions, Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
 import { GameItemConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { Box } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
@@ -13,10 +13,6 @@ import { PlanRequirementsTableServantRow } from './PlanRequirementsTableServantR
 import { PlanRequirementsTableStyle } from './PlanRequirementsTableStyle';
 
 type Props = {
-    /**
-     * The current quantities of items in the master account.
-     */
-    masterItems: ReadonlyRecord<number, number>;
     options: PlanRequirementsTableOptions;
     /**
      * The computed requirements for the plan.
@@ -87,7 +83,6 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     const gameItemCategoryMap = useGameItemCategoryMap();
 
     const {
-        masterItems,
         options,
         planRequirements,
         planServantsData,

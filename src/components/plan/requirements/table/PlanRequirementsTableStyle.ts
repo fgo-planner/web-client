@@ -32,6 +32,14 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
             overflow: 'auto',
             width: 'fit-content',
             maxWidth: '100%',
+            backgroundColor: palette.background.paper,
+            boxSizing: 'border-box',
+            borderBottomWidth: 1,
+            borderBottomStyle: 'solid',
+            borderBottomColor: palette.divider,
+            borderRightWidth: 1,
+            borderRightStyle: 'solid',
+            borderRightColor: palette.divider,
             /**
              * PlanRequirementsTableHeader component
              */
@@ -48,6 +56,9 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                  * PlanRequirementsTableHeaderCell component
                  */
                 [`& .${HeaderCellStyleClassPrefix}-root`]: {
+                    '&:last-of-type': {
+                        borderRightWidth: 0
+                    },
                     [`&.${HeaderCellStyleClassPrefix}-active`]: {
                         backgroundColor: activeBackgroundColor
                     },
@@ -88,6 +99,9 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                  */
                 [`& .${ServantRowCellStyleClassPrefix}-root`]: {
                     userSelect: 'none',
+                    '&:last-of-type': {
+                        borderRightWidth: 0
+                    },
                     [`&.${ServantRowCellStyleClassPrefix}-active`]: {
                         backgroundColor: activeBackgroundColor
                     },
@@ -136,6 +150,9 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                 [`& .${FooterCellStyleClassPrefix}-root`]: {
                     userSelect: 'none',
                     fontSize: '1rem',
+                    '&:last-of-type': {
+                        borderRightWidth: 0
+                    },
                     [`&.${FooterCellStyleClassPrefix}-active`]: {
                         backgroundColor: activeBackgroundColor
                     },

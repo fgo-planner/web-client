@@ -148,7 +148,6 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
     const deficitRow = (
         <DataTableGridRow
             borderTop
-            borderBottom
             stickyContent={deficitStickyContent}
         >
             {displayedItems.map(renderDeficitItemCell)}

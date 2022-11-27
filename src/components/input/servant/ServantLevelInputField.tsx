@@ -14,6 +14,7 @@ type Props = {
      * edited, in which case, in which case the the field will be disabled.
      */
     gameServant?: Immutable<GameServant>;
+    helperText?: string;
     label?: string;
     level: string;
     multiEditMode?: boolean;
@@ -49,6 +50,7 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         ascension,
         disabled,
         gameServant,
+        helperText,
         label,
         level,
         multiEditMode,
@@ -105,6 +107,7 @@ export const ServantLevelInputField = React.memo((props: Props) => {
             type='number'
             inputProps={InputProps}
             value={level}
+            helperText={helperText}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={disabled || multiEditMode}

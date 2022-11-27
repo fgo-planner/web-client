@@ -98,7 +98,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
             <Typography component={'div'}>
                 <DialogTitle>
                     {/* TODO Un-hardcode title strings */}
-                    {dialogData.action === EditDialogAction.Add ? 'Add Servant to Plan' : 'Edit Servant'}
+                    {dialogData.action === EditDialogAction.Add ? 'Add Servant to Plan' : 'Edit Servant Targets'}
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
                 <PlanServantEditDialogContent

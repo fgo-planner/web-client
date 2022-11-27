@@ -1,6 +1,6 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { GameServant, InstantiatedServantConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
-import { BaseTextFieldProps, FormControl, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
+import { BaseTextFieldProps, FormControl, FormHelperText, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
 import React, { useCallback } from 'react';
 
 type Props = {
@@ -17,6 +17,7 @@ type Props = {
      * edited, in which case, in which case the the field will be disabled.
      */
     gameServant?: Immutable<GameServant>;
+    helperText?: string;
     label?: string;
     level: string;
     multiEditMode?: boolean;
@@ -42,6 +43,7 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
         disabled,
         formId,
         gameServant,
+        helperText,
         label,
         level,
         multiEditMode,
@@ -97,6 +99,7 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
                     </option>
                 ))}
             </Select>
+            <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
     );
 

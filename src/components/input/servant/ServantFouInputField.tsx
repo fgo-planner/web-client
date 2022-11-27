@@ -5,6 +5,7 @@ import { FormUtils } from '../../../utils/form.utils';
 
 type Props = {
     disabled?: boolean;
+    helperText?: string;
     label?: string;
     multiEditMode?: boolean;
     set: InstantiatedServantFouSet;
@@ -42,6 +43,7 @@ export const ServantFouInputField = React.memo((props: Props) => {
 
     const {
         disabled,
+        helperText,
         label,
         multiEditMode,
         set,
@@ -123,6 +125,7 @@ export const ServantFouInputField = React.memo((props: Props) => {
                 onKeyPress: handleIndeterminateInput
             }}
             value={value}
+            helperText={helperText}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={disabled}

@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateNumber, PlanServantUpdate } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateNumber, PlanServantUpdate } from '@fgo-planner/data-core';
 import { Checkbox } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback } from 'react';
@@ -21,6 +21,15 @@ type Props = {
      */
     planServantUpdate: PlanServantUpdate;
     targetMasterServantsData: ReadonlyArray<MasterServantAggregatedData>;
+};
+
+const CurrentTextLabel = 'Current: ';
+
+const generateCurrentTextLabel = (currentValue: number | undefined): string | undefined => {
+    if (currentValue === undefined) {
+        return undefined;
+    }
+    return CurrentTextLabel + currentValue;
 };
 
 const StyleClassPrefix = 'PlanServantEditEnhancementsTabContent';
@@ -161,6 +170,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const multiEditMode = targetMasterServantsData.length > 1;
 
     let targetGameServant: Immutable<GameServant> | undefined;
+    let targetMasterServant: ImmutableMasterServant | undefined;
     if (!multiEditMode) {
         /**
          * This can be empty during the initial render.
@@ -168,7 +178,9 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
         if (!targetMasterServantsData.length) {
             return null;
         }
-        targetGameServant = targetMasterServantsData[0].gameServant;
+        const targetMasterServantData = targetMasterServantsData[0];
+        targetGameServant = targetMasterServantData.gameServant;
+        targetMasterServant = targetMasterServantData.masterServant;
     }
 
     const enableAscensionsCheckbox = (
@@ -212,6 +224,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             ascension={String(level)}
             gameServant={targetGameServant}
             label='Level'
+            helperText={generateCurrentTextLabel(targetMasterServant?.level)}
             multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
         />
@@ -223,6 +236,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             ascension={String(ascension)}
             gameServant={targetGameServant}
             label='Ascension'
+            helperText={generateCurrentTextLabel(targetMasterServant?.ascension)}
             multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
         />
@@ -231,8 +245,9 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const fouHpField = (
         <ServantFouInputField
             value={String(fouHp ?? '')}
-            label='HP Fou'
             set='fouHp'
+            label='HP Fou'
+            helperText={generateCurrentTextLabel(targetMasterServant?.fouHp)}
             multiEditMode={multiEditMode}
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
@@ -242,8 +257,9 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const fouAtkField = (
         <ServantFouInputField
             value={String(fouAtk ?? '')}
-            label='ATK Fou'
             set='fouAtk'
+            label='ATK Fou'
+            helperText={generateCurrentTextLabel(targetMasterServant?.fouAtk)}
             multiEditMode={multiEditMode}
             onChange={handleFouInputChange}
             onBlur={handleInputBlurEvent}
@@ -253,9 +269,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const skill1Field = (
         <ServantSkillInputField
             value={String(skills[1] || '')}
-            label='Skill'
             set='skills'
             slot={1}
+            label='Skill'
+            helperText={generateCurrentTextLabel(targetMasterServant?.skills[1])}
             allowEmpty
             multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
@@ -265,9 +282,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const skill2Field = (
         <ServantSkillInputField
             value={String(skills[2] || '')}
-            label='Skill'
             set='skills'
             slot={2}
+            label='Skill'
+            helperText={generateCurrentTextLabel(targetMasterServant?.skills[2])}
             allowEmpty
             multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
@@ -277,9 +295,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const skill3Field = (
         <ServantSkillInputField
             value={String(skills[3] || '')}
-            label='Skill'
             set='skills'
             slot={3}
+            label='Skill'
+            helperText={generateCurrentTextLabel(targetMasterServant?.skills[3])}
             allowEmpty
             multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
@@ -289,9 +308,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const appendSkill1Field = (
         <ServantSkillInputField
             value={String(appendSkills[1] || '')}
-            label='Append'
             set='appendSkills'
             slot={1}
+            label='Append'
+            helperText={generateCurrentTextLabel(targetMasterServant?.appendSkills[1])}
             allowEmpty
             multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
@@ -301,9 +321,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const appendSkill2Field = (
         <ServantSkillInputField
             value={String(appendSkills[2] || '')}
-            label='Append'
             set='appendSkills'
             slot={2}
+            label='Append'
+            helperText={generateCurrentTextLabel(targetMasterServant?.appendSkills[2])}
             allowEmpty
             multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}
@@ -313,9 +334,10 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     const appendSkill3Field = (
         <ServantSkillInputField
             value={String(appendSkills[3] || '')}
-            label='Append'
             set='appendSkills'
             slot={3}
+            label='Append'
+            helperText={generateCurrentTextLabel(targetMasterServant?.appendSkills[3])}
             allowEmpty
             multiEditMode={multiEditMode}
             onChange={handleSkillInputChange}

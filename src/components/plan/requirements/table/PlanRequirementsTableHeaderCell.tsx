@@ -7,7 +7,6 @@ import { GameItemThumbnail } from '../../../game/item/game-item-thumbnail.compon
 
 type Props = {
     active?: boolean;
-    cellSize: number;
     gameItem: Immutable<GameItem>;
     hover?: boolean;
     onHover?: (index?: number, itemId?: number) => void;
@@ -19,7 +18,6 @@ export const PlanRequirementsTableHeaderCell = React.memo((props: Props) => {
 
     const {
         active,
-        cellSize,
         gameItem,
         hover,
         onHover
@@ -38,12 +36,11 @@ export const PlanRequirementsTableHeaderCell = React.memo((props: Props) => {
     return (
         <DataTableGridCell
             className={className}
-            size={cellSize}
             onMouseEnter={handleMouseEnter}
         >
             <GameItemThumbnail
                 gameItem={gameItem}
-                size={cellSize}
+                size='3.25em'  // TODO Un-hardcode this
                 showBackground
             />
         </DataTableGridCell>

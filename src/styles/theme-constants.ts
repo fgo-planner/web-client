@@ -10,7 +10,7 @@ export class ThemeConstants {
     /**
      * The spacing transformation function.
      */
-    static readonly SpacingFunction = (factor: number) => `${factor / this.Spacing}rem`;
+    static readonly SpacingFunction = (factor: number) => `${factor / this.Spacing}em`;
 
     //#endregion
 

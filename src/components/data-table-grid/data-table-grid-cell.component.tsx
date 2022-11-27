@@ -6,16 +6,19 @@ type Props = {
     backgroundColor?: string;
     bold?: boolean;
     color?: string;
-    size: number;
 };
+
+/**
+ * Equivalent to 52px at 16px font-size.
+ */
+const DefaultSize = '3.25em';
 
 const StyleClassPrefix = 'DataTableGridCell';
 
 const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
     prop !== 'backgroundColor' &&
     prop !== 'bold' &&
-    prop !== 'color' &&
-    prop !== 'size'
+    prop !== 'color'
 );
 
 const StyleOptions = {
@@ -32,7 +35,6 @@ const StyleProps = (props: Props & { theme: SystemTheme }) => {
         backgroundColor,
         bold,
         color,
-        size,
         theme
     } = props;
 
@@ -42,12 +44,11 @@ const StyleProps = (props: Props & { theme: SystemTheme }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: size,
-        height: size,
+        width: DefaultSize,
+        height: DefaultSize,
         boxSizing: 'border-box',
         backgroundColor,
         color,
-        fontSize: Math.ceil(size / 3) + 2,
         fontWeight: bold ? 500 : undefined,
         borderRightWidth: 1,
         borderRightStyle: 'solid',

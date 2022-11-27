@@ -62,6 +62,7 @@ const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
         '& .MuiAvatar-root': {
             width: size,
             height: size,
+            fontSize: 'unset',
             '&.inactive': {
                 filter: 'grayscale(1.0) contrast(0.69) brightness(0.69)'
             }

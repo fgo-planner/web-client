@@ -21,7 +21,6 @@ export const PlanRequirementsTableHeader = React.memo((props: Props) => {
         activeItemId,
         hoverItemId,
         options: {
-            cellSize,
             displayedItems
         },
         onHover
@@ -41,7 +40,6 @@ export const PlanRequirementsTableHeader = React.memo((props: Props) => {
             <PlanRequirementsTableHeaderCell
                 key={itemId}
                 active={itemId === activeItemId}
-                cellSize={cellSize}
                 gameItem={gameItem}
                 hover={itemId === hoverItemId}
                 onHover={onHover}

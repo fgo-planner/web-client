@@ -4,7 +4,6 @@ import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell
 
 type Props = {
     active?: boolean;
-    cellSize: number;
     displayZeroValues: boolean;
     hover?: boolean;
     itemId: number;
@@ -18,7 +17,6 @@ export const PlanRequirementsTableFooterCell = React.memo((props: Props) => {
 
     const {
         active,
-        cellSize,
         displayZeroValues,
         hover,
         itemId,
@@ -46,10 +44,9 @@ export const PlanRequirementsTableFooterCell = React.memo((props: Props) => {
     return (
         <DataTableGridCell
             className={className}
-            size={cellSize}
             onMouseEnter={handleMouseEnter}
         >
-            {value}
+            <div>{value}</div>
         </DataTableGridCell>
     );
 

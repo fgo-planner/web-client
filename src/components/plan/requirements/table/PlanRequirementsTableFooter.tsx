@@ -21,7 +21,6 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
         activeItemId,
         hoverItemId,
         options: {
-            cellSize,
             displayZeroValues,
             displayedItems
         },
@@ -49,7 +48,6 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
             <PlanRequirementsTableFooterCell
                 key={itemId}
                 active={itemId === activeItemId}
-                cellSize={cellSize}
                 displayZeroValues={displayZeroValues}
                 hover={itemId === hoverItemId}
                 itemId={itemId}
@@ -92,7 +90,6 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
             <PlanRequirementsTableFooterCell
             key={itemId}
             active={itemId === activeItemId}
-            cellSize={cellSize}
             displayZeroValues={displayZeroValues}
             hover={itemId === hoverItemId}
             itemId={itemId}
@@ -135,7 +132,6 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
             <PlanRequirementsTableFooterCell
                 key={itemId}
                 active={itemId === activeItemId}
-                cellSize={cellSize}
                 displayZeroValues={displayZeroValues}
                 hover={itemId === hoverItemId}
                 itemId={itemId}

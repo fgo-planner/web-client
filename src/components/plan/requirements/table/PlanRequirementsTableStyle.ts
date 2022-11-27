@@ -48,7 +48,7 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                 top: 0,
                 zIndex: 3,
                 [`& .${HeaderStyleClassPrefix}-sticky-content`]: {
-                    width: 320,
+                    width: '20em',  // 320px at 16px font-size
                     height: '100%',
                     backgroundColor: palette.background.paper
                 },
@@ -78,7 +78,7 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                  * PlanRequirementsServantRowHeader component
                  */
                 [`& .${ServantRowHeaderStyleClassPrefix}-root`]: {
-                    width: 320,
+                    width: '20em',  // 320px at 16px font-size
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -92,6 +92,24 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                         userSelect: 'none',
                         flex: 1,
                         px: 2
+                    },
+                    [`& .${ServantRowHeaderStyleClassPrefix}-enhancements`]: {
+                        userSelect: 'none',
+                        flex: 1,
+                        px: 4,
+                        fontSize: '0.8125em',
+                        '> div': {
+                            display: 'flex',
+                            my: 1,
+                            '> div:first-of-type': {
+                                width: '40%'
+                            }
+                        }
+                    },
+                    [`& .${ServantRowHeaderStyleClassPrefix}-toggle`]: {
+                        userSelect: 'none',
+                        flex: 1,
+                        px: 2
                     }
                 },
                 /**
@@ -99,6 +117,9 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                  */
                 [`& .${ServantRowCellStyleClassPrefix}-root`]: {
                     userSelect: 'none',
+                    '> div': {
+                        fontSize: '1.125em'
+                    },
                     '&:last-of-type': {
                         borderRightWidth: 0
                     },
@@ -139,7 +160,7 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: 320,
+                    width: '20em',  // 320px at 16px font-size
                     height: '100%',
                     fontWeight: 500,
                     background: palette.background.paper
@@ -149,7 +170,9 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                  */
                 [`& .${FooterCellStyleClassPrefix}-root`]: {
                     userSelect: 'none',
-                    fontSize: '1rem',
+                    '> div': {
+                        fontSize: '1.125em'
+                    },
                     '&:last-of-type': {
                         borderRightWidth: 0
                     },

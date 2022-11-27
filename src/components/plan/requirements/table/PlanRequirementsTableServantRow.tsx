@@ -37,10 +37,11 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
         hover,
         hoverItemId,
         index,
-        options,
-        planServantData: {
-            gameServant
+        options: {
+            displayedItems,
+            servantRowHeaderMode
         },
+        planServantData,
         servantRequirements,
         onClick,
         onContextMenu,
@@ -75,8 +76,8 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
     
     const rowHeaderNode: ReactNode = (
         <PlanRequirementsTableServantRowHeader
-            gameServant={gameServant}
-            options={options}
+            planServantData={planServantData}
+            servantRowHeaderMode={servantRowHeaderMode}
         />
     );
 
@@ -90,7 +91,6 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
                 active={active || itemId === activeItemId}
                 hover={hover || itemId === hoverItemId}
                 quantity={itemQuantity}
-                options={options}
             />
         );
     };
@@ -112,7 +112,7 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
             onMouseEnter={handleMouseEnter}
             stickyContent={rowHeaderNode}
         >
-            {options.displayedItems.map(renderItemCell)}
+            {displayedItems.map(renderItemCell)}
         </DataTableGridRow>
     );
 

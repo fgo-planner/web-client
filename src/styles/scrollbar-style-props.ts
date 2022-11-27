@@ -7,6 +7,10 @@ import { ThemeConstants } from './theme-constants';
  */
 export const ScrollbarStyleProps = (({ palette, spacing }: Theme) => ({
     '& *::-webkit-scrollbar': {
+        /**
+         * Keeps scrollbar size consistent with root font-size.
+         */
+        fontSize: '1rem',
         width: spacing(ThemeConstants.ScrollbarWidthScale),
         height: spacing(ThemeConstants.ScrollbarWidthScale)
     },
@@ -14,6 +18,10 @@ export const ScrollbarStyleProps = (({ palette, spacing }: Theme) => ({
         backgroundColor: palette.background.paper,
     },
     '& *::-webkit-scrollbar-thumb': {
+        /**
+         * Keeps scrollbar radius consistent with root font-size.
+         */
+        fontSize: '1rem',
         backgroundColor: palette.primary.main,
         borderRadius: spacing(ThemeConstants.ScrollbarWidthScale / 2)
     },

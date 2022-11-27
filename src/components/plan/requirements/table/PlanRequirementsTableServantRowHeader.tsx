@@ -1,13 +1,12 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant } from '@fgo-planner/data-core';
-import React from 'react';
+import React, { ReactNode } from 'react';
+import { PlanServantAggregatedData } from '../../../../types';
 import { GameServantThumbnail } from '../../../game/servant/game-servant-thumbnail.component';
 import { TruncateText } from '../../../text/truncate-text.component';
-import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 
 type Props = {
-    gameServant: Immutable<GameServant>;
-    options: PlanRequirementsTableOptionsInternal;
+    planServantData: Immutable<PlanServantAggregatedData>;
+    servantRowHeaderMode: 'name' | 'enhancements' | 'toggle';
 };
 
 export const StyleClassPrefix = 'PlanRequirementsTableServantRowHeader';
@@ -21,20 +20,43 @@ export const StyleClassPrefix = 'PlanRequirementsTableServantRowHeader';
 export const PlanRequirementsTableServantRowHeader: React.FC<Props> = (props: Props): JSX.Element => {
 
     const {
-        gameServant,
-        options
+        planServantData: {
+            gameServant,
+            masterServant,
+            planServant
+        },
+        servantRowHeaderMode
     } = props;
+
+    let contentNode: ReactNode;
+    if (servantRowHeaderMode === 'name') {
+        contentNode = (
+            <TruncateText className={`${StyleClassPrefix}-name`}>
+                {gameServant.name}
+            </TruncateText>
+        );
+    } else if (servantRowHeaderMode === 'enhancements') {
+        contentNode = (
+            <div className={`${StyleClassPrefix}-enhancements`}>
+                enhancements
+            </div>
+        );
+    } else {
+        contentNode = (
+            <div className={`${StyleClassPrefix}-toggle`}>
+                toggle
+            </div>
+        );
+    }
 
     return (
         <div className={`${StyleClassPrefix}-root`}>
             <GameServantThumbnail
                 gameServant={gameServant}
-                size={options.cellSize}
+                size='3.25em'  // TODO Un-hardcode this
             />
             <div className={`${StyleClassPrefix}-hover-overlay`} />
-            <TruncateText className={`${StyleClassPrefix}-name`}>
-                {gameServant.name}
-            </TruncateText>
+            {contentNode} 
         </div>
     );
 

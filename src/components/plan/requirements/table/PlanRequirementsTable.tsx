@@ -1,7 +1,7 @@
 import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
 import { GameItemConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { Box } from '@mui/system';
-import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { CSSProperties, MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { GameItemCategory, GameItemCategoryMap, PlanRequirements, PlanServantAggregatedData } from '../../../../types';
@@ -34,8 +34,8 @@ type HoverState = {
     itemId?: number;
 };
 
-const CellSizeCondensed = 42;
-const CellSizeNormal = 52;
+const CellSizeCondensed = 0.8125;
+const CellSizeNormal = 1.0;
 
 const getDisplayedItems = (
     gameItemCategoryMap: GameItemCategoryMap,
@@ -136,12 +136,19 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         } = options;
 
         return {
-            cellSize: cells === 'condensed' ? CellSizeCondensed : CellSizeNormal,
             displayedItems,
             displayZeroValues,
+            servantRowHeaderMode: 'enhancements', // TODO Implement UI element to toggle this.
             stickyColumnLayout
         };
     }, [displayedItems, options]);
+
+    const scalingStyle = useMemo((): CSSProperties => {
+        const scale = options.layout.cells === 'condensed' ? CellSizeCondensed : CellSizeNormal;
+        return {
+            fontSize: `${scale}rem`
+        } as CSSProperties;
+    }, [options.layout.cells]);
 
 
     //#region Input event handlers
@@ -205,6 +212,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         <Box className={`${StyleClassPrefix}-root`} sx={PlanRequirementsTableStyle}>
             <div
                 className={`${StyleClassPrefix}-table-container`}
+                style={scalingStyle}
                 onMouseLeave={handleTableContainerMouseLeave}
             >
                 <PlanRequirementsTableHeader

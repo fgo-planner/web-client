@@ -1,10 +1,10 @@
 export type PlanRequirementsTableOptionsInternal = {
 
-    cellSize: number;
-
     displayedItems: Array<number>;
     
     displayZeroValues: boolean;
+
+    servantRowHeaderMode: 'name' | 'enhancements' | 'toggle';
 
     stickyColumnLayout: 'condensed' | 'normal';
 

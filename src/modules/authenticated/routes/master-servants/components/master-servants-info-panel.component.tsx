@@ -5,8 +5,8 @@ import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
 import { DataPointListItem } from '../../../../../components/data-point-list/data-point-list-item.component';
-import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
-import { GameServantBondIcon } from '../../../../../components/game/servant/game-servant-bond-icon.component';
+import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
+import { ServantBondIcon } from '../../../../../components/servant/ServantBondIcon';
 import { useGameItemMap } from '../../../../../hooks/data/use-game-item-map.hook';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
 import { MasterServantAggregatedData, PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types';
@@ -72,7 +72,7 @@ const renderBondLevel = (bond?: InstantiatedServantBondLevel): JSX.Element => {
     }
     return (
         <div className={`${StyleClassPrefix}-bond-level-stat`}>
-            <GameServantBondIcon bond={bond} size={24} />
+            <ServantBondIcon bond={bond} size={24} />
             <div className='pl-1'>{bond}</div>
         </div>
     );
@@ -406,7 +406,7 @@ export const MasterServantsInfoPanel = React.memo((props: Props) => {
 
                 const label = (
                     <div className={`${StyleClassPrefix}-material-stat-label`}>
-                        <GameItemThumbnail gameItem={gameItem} size={24} />
+                        <ItemThumbnail gameItem={gameItem} size={24} />
                         <div className='pl-2 truncate'>
                             {gameItem.name}
                         </div>

@@ -1,7 +1,7 @@
 import { Immutable, ImmutableRecord, Nullable } from '@fgo-planner/common-core';
 import { GameItem, GameServant, GameServantEnhancement } from '@fgo-planner/data-core';
 import { Fragment, PureComponent, ReactNode } from 'react';
-import { GameItemThumbnail } from '../../../../../components/game/item/game-item-thumbnail.component';
+import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
 import { LoadingIndicator } from '../../../../../components/utils/loading-indicator.component';
 import { UnderConstruction } from '../../../../../components/utils/under-construction.component';
 import { GameItemService } from '../../../../../services/data/game/game-item.service';
@@ -87,7 +87,7 @@ export const GameItemInfo = class extends PureComponent<Props, State> {
         }
         const { servants, total } = itemUsage;
         return <>
-            <GameItemThumbnail gameItem={item} />
+            <ItemThumbnail gameItem={item} />
             <div className='p-2'>
                 <div>Ascensions: {total.ascensions}</div>
                 <div>Per Skill (Total): {total.skills} ({total.skills * 3})</div>

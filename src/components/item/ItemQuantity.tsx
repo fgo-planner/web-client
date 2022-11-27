@@ -4,7 +4,7 @@ import { Immutable } from '@fgo-planner/common-core';
 import { GameItem } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React from 'react';
-import { GameItemThumbnail } from './game-item-thumbnail.component';
+import { ItemThumbnail } from './ItemThumbnail';
 
 type Props = {
     gameItem: Immutable<GameItem>;
@@ -14,7 +14,7 @@ type Props = {
 
 const DefaultThumbnailSize = 42;
 
-export const StyleClassPrefix = 'GameItemQuantity';
+export const StyleClassPrefix = 'ItemQuantity';
 
 const StyleProps = {
     display: 'flex',
@@ -26,7 +26,7 @@ const StyleProps = {
     } as SystemStyleObject<Theme>
 };
 
-export const GameItemQuantity = React.memo(({ gameItem, quantity, size }: Props) => {
+export const ItemQuantity = React.memo(({ gameItem, quantity, size }: Props) => {
 
     const thumbnailSize = size || DefaultThumbnailSize;
 
@@ -35,7 +35,7 @@ export const GameItemQuantity = React.memo(({ gameItem, quantity, size }: Props)
             <div className={`${StyleClassPrefix}-quantity`}>
                 {quantity}
             </div>
-            <GameItemThumbnail
+            <ItemThumbnail
                 gameItem={gameItem}
                 size={thumbnailSize}
                 showBackground

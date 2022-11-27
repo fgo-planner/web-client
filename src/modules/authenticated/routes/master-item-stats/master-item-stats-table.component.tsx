@@ -4,7 +4,7 @@ import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { NumericFormat } from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
-import { GameItemThumbnail } from '../../../../components/game/item/game-item-thumbnail.component';
+import { ItemThumbnail } from '../../../../components/item/ItemThumbnail';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { GameItemCategory, GameItemMap } from '../../../../types';
@@ -179,7 +179,7 @@ export const MasterItemStatsTable = React.memo((props: Props) => {
             <DataTableListStaticRow key={itemId} borderBottom={index !== itemIds.length - 1}>
                 <div className={`${StyleClassPrefix}-data-row`}>
                     <div className={`${StyleClassPrefix}-label-cell`}>
-                        <GameItemThumbnail
+                        <ItemThumbnail
                             gameItem={gameItem}
                             size={42}
                             showBackground

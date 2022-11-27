@@ -7,7 +7,7 @@ import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from
 import clsx from 'clsx';
 import React, { MouseEventHandler, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { AssetConstants } from '../../../constants';
+import { AssetConstants } from '../../constants';
 
 type Props = {
     costumeId?: number;

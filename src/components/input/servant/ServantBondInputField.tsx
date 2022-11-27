@@ -66,7 +66,7 @@ export const ServantBondInputField = React.memo((props: Props) => {
                 id={fieldId}
                 name={FieldName}
                 label={label || DefaultLabel}
-                value={value}
+                value={value || FormConstants.BlankOptionValue}
                 onChange={handleChange}
                 disabled={disabled}
             >

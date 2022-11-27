@@ -6,7 +6,7 @@ import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GameServantClassIcon } from '../../../../components/game/servant/game-servant-class-icon.component';
+import { ServantClassIcon } from '../../../../components/servant/ServantClassIcon';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
 import { PageTitle } from '../../../../components/text/page-title.component';
@@ -33,7 +33,7 @@ const renderClassHeaderLabel = (value: string | number): ReactNode => {
     }
     return (
         <div className='flex justify-center'>
-            <GameServantClassIcon
+            <ServantClassIcon
                 servantClass={value as any}
                 rarity={3}
                 size={24}

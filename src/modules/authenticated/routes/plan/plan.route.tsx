@@ -138,6 +138,7 @@ export const PlanRoute = React.memo(() => {
         },
         // setServantEditDialogActiveTab,
         toggleCellSize,
+        toggleRowHeaderMode,
         toggleShowEmptyColumns
     } = usePlanUserPreferences();
 
@@ -433,6 +434,7 @@ export const PlanRoute = React.memo(() => {
                     onEditSelectedServants={handleEditSelectedServants}
                     onOpenDisplaySettings={() => { }}
                     onToggleCellSize={toggleCellSize}
+                    onToggleRowheaderMode={toggleRowHeaderMode}
                     onToggleShowUnused={toggleShowEmptyColumns}
                 />
                 <div className={`${StyleClassPrefix}-main-content`}>

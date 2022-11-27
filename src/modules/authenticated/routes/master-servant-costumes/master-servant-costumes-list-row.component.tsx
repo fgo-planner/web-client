@@ -1,8 +1,8 @@
 import { Checkbox } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
-import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
-import { GameServantThumbnail } from '../../../../components/game/servant/game-servant-thumbnail.component';
+import { ItemQuantity } from '../../../../components/item/ItemQuantity';
+import { GameServantThumbnail } from '../../../../components/servant/ServantThumbnail';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { GameServantCostumeAggregatedData } from '../../../../types';
@@ -63,7 +63,7 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
                 continue;
             }
             nodes.push(
-                <GameItemQuantity key={itemId} gameItem={unlockMaterial} quantity={quantity} />
+                <ItemQuantity key={itemId} gameItem={unlockMaterial} quantity={quantity} />
             );
         }
         return nodes;

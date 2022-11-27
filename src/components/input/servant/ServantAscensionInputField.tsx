@@ -2,6 +2,7 @@ import { Immutable } from '@fgo-planner/common-core';
 import { GameServant, InstantiatedServantConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, FormControl, FormHelperText, InputLabel, Select, SelectChangeEvent, TextField } from '@mui/material';
 import React, { useCallback } from 'react';
+import { FormConstants } from '../../../constants';
 
 type Props = {
     allowEmpty?: boolean;
@@ -31,6 +32,8 @@ const DefaultLabel = 'Ascension';
 
 const IndeterminateDisplayText = '?';
 
+const BlankDisplayText = '\u2014';
+
 /**
  * Input field for a servant's ascension level. This is applicable to both master
  * and planned servants.
@@ -55,11 +58,22 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
         if (!gameServant) {
             return;
         }
-        const { value } = event.target;
+        let value = event.target.value;
+        /**
+         * If the blank option was selected, convert it back to an empty string before
+         * calling the `onChange` callback.
+         */
+        if (value === FormConstants.BlankOptionValue) {
+            value = '';
+        }
+        if (!value && allowEmpty) {
+            return onChange('', value, true);
+        }
         const maxLevel = gameServant.maxLevel;
-        const updatedLevel = InstantiatedServantUtils.roundToNearestValidLevel(Number(value), Number(level), maxLevel);
+        const currentLevel = Number(level) || InstantiatedServantConstants.MinLevel;  // Level can be blank
+        const updatedLevel = InstantiatedServantUtils.roundToNearestValidLevel(Number(value), currentLevel, maxLevel);
         onChange(String(updatedLevel), value, true);
-    }, [gameServant, level, onChange]);
+    }, [allowEmpty, gameServant, level, onChange]);
 
     if (!gameServant && !multiEditMode) {
         console.error('ServantAscensionInputField: gameServant must be provided when editing single servant');
@@ -88,11 +102,15 @@ export const ServantAscensionInputField = React.memo((props: Props) => {
                 id={fieldId}
                 name={FieldName}
                 label={label || DefaultLabel}
-                value={ascension}
+                value={ascension || FormConstants.BlankOptionValue}
                 onChange={handleChange}
                 disabled={disabled}
             >
-                {allowEmpty && <option value=''>{'\u2014'}</option>}
+                {allowEmpty && 
+                    <option key={FormConstants.BlankOptionValue} value={FormConstants.BlankOptionValue}>
+                        {BlankDisplayText}
+                    </option>
+                }
                 {InstantiatedServantConstants.AscensionLevels.map(value => (
                     <option key={value} value={value}>
                         {value}

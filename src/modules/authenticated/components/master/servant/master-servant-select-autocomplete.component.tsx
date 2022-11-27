@@ -3,7 +3,7 @@ import { GameServant } from '@fgo-planner/data-core';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCallback, useMemo } from 'react';
-import { GameServantClassIcon } from '../../../../../components/game/servant/game-servant-class-icon.component';
+import { ServantClassIcon } from '../../../../../components/servant/ServantClassIcon';
 import { useGameServantList } from '../../../../../hooks/data/use-game-servant-list.hook';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
@@ -64,7 +64,7 @@ const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: ServantOptio
                 <div style={optionStyles.rarity}>
                     {`${servant.rarity} \u2605`}
                 </div>
-                <GameServantClassIcon
+                <ServantClassIcon
                     servantClass={servant.class}
                     rarity={servant.rarity}
                     sx={optionStyles.classIcon}

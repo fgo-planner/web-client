@@ -20,7 +20,7 @@ type PlanLocalUserPreferences = Immutable<{
 const DefaultTableValues = {
     layout: {
         cells: 'normal',
-        stickyColumn: 'normal'
+        rowHeader: 'name'
     },
     displayItems: {
         empty: true,
@@ -52,6 +52,7 @@ export type PlanUserPreferencesHookResult = {
     setMasterServantEditDialogActiveTab: (tab: MasterServantEditTab) => void;
     setPlanServantEditDialogActiveTab: (tab: PlanServantEditTab) => void;
     toggleCellSize: () => void;
+    toggleRowHeaderMode: () => void;
     toggleShowEmptyColumns: () => void;
 };
 
@@ -174,11 +175,28 @@ export const usePlanUserPreferences = (): PlanUserPreferencesHookResult => {
         });
     }, []);
 
+    const toggleRowHeaderMode = useCallback((): void => {
+        setUserPreferences(userPreferences => {
+            const currentValue = userPreferences.table.layout.rowHeader;
+            return writeToLocalStorage({
+                ...userPreferences,
+                table: {
+                    ...userPreferences.table,
+                    layout: {
+                        ...userPreferences.table.layout,
+                        rowHeader: currentValue === 'name' ? 'targets' : 'name'
+                    }
+                }
+            });
+        });
+    }, []);
+
     return {
         userPreferences,
         setMasterServantEditDialogActiveTab,
         setPlanServantEditDialogActiveTab,
         toggleCellSize,
+        toggleRowHeaderMode,
         toggleShowEmptyColumns
     };
 

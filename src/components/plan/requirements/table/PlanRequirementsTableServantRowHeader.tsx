@@ -1,12 +1,14 @@
 import { Immutable } from '@fgo-planner/common-core';
+import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 import { PlanServantAggregatedData } from '../../../../types';
-import { GameServantThumbnail } from '../../../game/servant/game-servant-thumbnail.component';
+import { GameServantThumbnail } from '../../../servant/ServantThumbnail';
 import { TruncateText } from '../../../text/truncate-text.component';
+import { PlanRequirementsTableServantRowEnhancementTargets } from './PlanRequirementsTableServantRowEnhancementTargets';
 
 type Props = {
     planServantData: Immutable<PlanServantAggregatedData>;
-    servantRowHeaderMode: 'name' | 'enhancements' | 'toggle';
+    servantRowHeaderMode: 'name' | 'targets' | 'toggle';
 };
 
 export const StyleClassPrefix = 'PlanRequirementsTableServantRowHeader';
@@ -20,30 +22,34 @@ export const StyleClassPrefix = 'PlanRequirementsTableServantRowHeader';
 export const PlanRequirementsTableServantRowHeader: React.FC<Props> = (props: Props): JSX.Element => {
 
     const {
-        planServantData: {
-            gameServant,
-            masterServant,
-            planServant
-        },
+        planServantData,
         servantRowHeaderMode
     } = props;
+
+    const gameServant = planServantData.gameServant;
+
+    const contentNodeClassName = clsx(
+        `${StyleClassPrefix}-content`,
+        `${StyleClassPrefix}-${servantRowHeaderMode}`
+    );
 
     let contentNode: ReactNode;
     if (servantRowHeaderMode === 'name') {
         contentNode = (
-            <TruncateText className={`${StyleClassPrefix}-name`}>
+            <TruncateText className={contentNodeClassName}>
                 {gameServant.name}
             </TruncateText>
         );
-    } else if (servantRowHeaderMode === 'enhancements') {
+    } else if (servantRowHeaderMode === 'targets') {
         contentNode = (
-            <div className={`${StyleClassPrefix}-enhancements`}>
-                enhancements
-            </div>
+            <PlanRequirementsTableServantRowEnhancementTargets
+                className={contentNodeClassName}
+                planServantData={planServantData}
+            />
         );
     } else {
         contentNode = (
-            <div className={`${StyleClassPrefix}-toggle`}>
+            <div className={contentNodeClassName}>
                 toggle
             </div>
         );

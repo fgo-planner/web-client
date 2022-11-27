@@ -130,16 +130,14 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         const {
             displayZeroValues = false,
             layout: {
-                cells,
-                stickyColumn: stickyColumnLayout
+                rowHeader: servantRowHeaderMode
             }
         } = options;
 
         return {
             displayedItems,
             displayZeroValues,
-            servantRowHeaderMode: 'enhancements', // TODO Implement UI element to toggle this.
-            stickyColumnLayout
+            servantRowHeaderMode
         };
     }, [displayedItems, options]);
 

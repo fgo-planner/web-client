@@ -1,7 +1,7 @@
 import { InstantiatedServantConstants } from '@fgo-planner/data-core';
 import React, { ReactNode, useMemo } from 'react';
 import { NumericFormat } from 'react-number-format';
-import { GameServantBondIcon } from '../../../../components/game/servant/game-servant-bond-icon.component';
+import { ServantBondIcon } from '../../../../components/servant/ServantBondIcon';
 import { MasterServantStatPanelData, MasterServantStatPanelRow, MasterServantStatsExpandablePanel } from './master-servant-stats-expandable-panel.component';
 import { MasterServantStats } from './master-servant-stats.utils';
 
@@ -216,7 +216,7 @@ export const MasterServantStatsTable = React.memo((props: Props) => {
             rows.push({
                 label: (
                     <div className='flex'>
-                        <GameServantBondIcon bond={bondLevel} size={20} />
+                        <ServantBondIcon bond={bondLevel} size={20} />
                         <div className='pl-2'>
                             {bondLevel}
                         </div>

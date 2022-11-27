@@ -3,8 +3,8 @@ import { GameServantClass, GameServantConstants, GameServantRarity } from '@fgo-
 import { Tooltip, TooltipProps } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';
-import { AssetConstants } from '../../../constants';
-import { ComponentStyleProps } from '../../../types';
+import { AssetConstants } from '../../constants';
+import { ComponentStyleProps } from '../../types';
 
 type ClassIconName = GameServantClass | 'Extra' | 'All';
 
@@ -69,9 +69,9 @@ const styles = {
         width: '100%',
         height: '100%'
     } as CSSProperties
-};
+} as const;
 
-export const GameServantClassIcon = React.memo((props: Props) => {
+export const ServantClassIcon = React.memo((props: Props) => {
 
     const {
         className,

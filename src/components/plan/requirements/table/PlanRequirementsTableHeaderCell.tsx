@@ -3,7 +3,7 @@ import { GameItem } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback } from 'react';
 import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
-import { GameItemThumbnail } from '../../../game/item/game-item-thumbnail.component';
+import { ItemThumbnail } from '../../../item/ItemThumbnail';
 
 type Props = {
     active?: boolean;
@@ -38,7 +38,7 @@ export const PlanRequirementsTableHeaderCell = React.memo((props: Props) => {
             className={className}
             onMouseEnter={handleMouseEnter}
         >
-            <GameItemThumbnail
+            <ItemThumbnail
                 gameItem={gameItem}
                 size='3.25em'  // TODO Un-hardcode this
                 showBackground

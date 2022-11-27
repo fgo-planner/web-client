@@ -12,6 +12,12 @@ const _InternalSoundAssetsBaseUrl = `${_InternalAssetsBaseUrl}/sounds`;
 
 const _AtlasAcademyAssetsBaseUrl = 'https://assets.atlasacademy.io/GameData/JP';
 
+export const BackgroundMusic = `${_InternalSoundAssetsBaseUrl}/background.mp3`;
+
+export const DefaultLightThemeBackground = `${_InternalBackgroundAssetsBaseUrl}/light_default.jpg`;
+
+export const DefaultDarkThemeBackground = `${_InternalBackgroundAssetsBaseUrl}/dark_default2.jpg`;
+
 export const ItemImageBaseUrl = `${_AtlasAcademyAssetsBaseUrl}/Items`;
 
 export const ItemBackgroundMap: { readonly [ key in GameItemBackground ]: string } = {
@@ -21,6 +27,12 @@ export const ItemBackgroundMap: { readonly [ key in GameItemBackground ]: string
     [GameItemBackground.Gold]: `${_InternalThumbnailAssetsBaseUrl}/item_bg_gold.png`,
     [GameItemBackground.QPReward]: `${_InternalThumbnailAssetsBaseUrl}/item_bg_qp.png`,
 };
+
+export const ServantActiveSkillIconUrl = `${_InternalIconAssetsBaseUrl}/skills_active.png`;
+
+export const ServantAppendSkillIconUrl = `${_InternalIconAssetsBaseUrl}/skills_append.png`;
+
+export const ServantDisabledSkillIconUrl = `${_InternalIconAssetsBaseUrl}/skills_disabled.png`;
 
 export const ServantAscensionOffIcon = `${_InternalIconAssetsBaseUrl}/ascension_off.png`;
 
@@ -52,9 +64,3 @@ export const ServantNoblePhantasmIconLargeUrl = `${_InternalIconAssetsBaseUrl}/n
 export const ServantNoblePhantasmIconSmallUrl = `${_InternalIconAssetsBaseUrl}/np_small.png`;
 
 export const ServantThumbnailBaseUrl = `${_AtlasAcademyAssetsBaseUrl}/Faces`;
-
-export const DefaultLightThemeBackground = `${_InternalBackgroundAssetsBaseUrl}/light_default.jpg`;
-
-export const DefaultDarkThemeBackground = `${_InternalBackgroundAssetsBaseUrl}/dark_default2.jpg`;
-
-export const BackgroundMusic = `${_InternalSoundAssetsBaseUrl}/background.mp3`;

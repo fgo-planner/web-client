@@ -2,7 +2,7 @@ import { Immutable, ObjectUtils, ReadonlyPartial } from '@fgo-planner/common-cor
 import { GameServant, ImmutableMasterServant, InstantiatedServantUtils, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { DataTableListDraggableRow } from '../../../../../../components/data-table-list/data-table-list-draggable-row.component';
-import { GameServantThumbnail } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
+import { GameServantThumbnail } from '../../../../../../components/servant/ServantThumbnail';
 import { MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListRowLabel } from './master-servant-list-row-label.component';
 import { MasterServantListRowStats } from './master-servant-list-row-stats.component';

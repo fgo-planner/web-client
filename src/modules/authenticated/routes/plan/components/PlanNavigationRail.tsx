@@ -1,4 +1,4 @@
-import { Clear as ClearIcon, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, FormatSize as FormatSizeIcon, GroupAddOutlined, HideImageOutlined as HideImageOutlinedIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
+import { Clear as ClearIcon, DataObject, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, FormatSize as FormatSizeIcon, GroupAddOutlined, HideImageOutlined as HideImageOutlinedIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
 import { Divider, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
 import { NavigationRail } from '../../../../../components/navigation/navigation-rail/navigation-rail.component';
@@ -15,6 +15,7 @@ type Props = {
     onEditSelectedServants: () => void;
     onOpenDisplaySettings: () => void;
     onToggleCellSize: () => void;
+    onToggleRowheaderMode: () => void;
     onToggleShowUnused: () => void;
     selectedServantsCount: number;
 };
@@ -33,6 +34,7 @@ export const PlanNavigationRail = React.memo((props: Props) => {
         onEditSelectedServants,
         onOpenDisplaySettings,
         onToggleCellSize,
+        onToggleRowheaderMode,
         onToggleShowUnused,
         selectedServantsCount
     } = props;
@@ -132,7 +134,16 @@ export const PlanNavigationRail = React.memo((props: Props) => {
                 </div>
             </Tooltip>
             <Divider />
-            <Tooltip key='test' title='Test' placement='right'>
+            <Tooltip key='toggle-target-details' title='Toggle target details' placement='right'>
+                <div>
+                    <IconButton
+                        onClick={onToggleRowheaderMode}
+                        children={<DataObject />}
+                        size='large'
+                    />
+                </div>
+            </Tooltip>
+            <Tooltip key='toggle-size' title='Toggle display size' placement='right'>
                 <div>
                     <IconButton
                         onClick={onToggleCellSize}
@@ -141,7 +152,7 @@ export const PlanNavigationRail = React.memo((props: Props) => {
                     />
                 </div>
             </Tooltip>
-            <Tooltip key='test2' title='Test 2' placement='right'>
+            <Tooltip key='toggle-empty-columns' title='Toggle empty columns' placement='right'>
                 <div>
                     <IconButton
                         onClick={onToggleShowUnused}

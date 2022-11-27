@@ -1,13 +1,25 @@
 import { Theme } from '@mui/material';
 import { alpha, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import { ThemeConstants } from '../../../../styles/theme-constants';
+import { StyleClassPrefix as ServantSkillLevelStyleClassPrefix } from '../../../servant/ServantSkillLevels';
 import { StyleClassPrefix as FooterStyleClassPrefix } from './PlanRequirementsTableFooter';
 import { StyleClassPrefix as FooterCellStyleClassPrefix } from './PlanRequirementsTableFooterCell';
 import { StyleClassPrefix as HeaderStyleClassPrefix } from './PlanRequirementsTableHeader';
 import { StyleClassPrefix as HeaderCellStyleClassPrefix } from './PlanRequirementsTableHeaderCell';
 import { StyleClassPrefix as ServantRowStyleClassPrefix } from './PlanRequirementsTableServantRow';
 import { StyleClassPrefix as ServantRowCellStyleClassPrefix } from './PlanRequirementsTableServantRowCell';
+import { StyleClassPrefix as ServantRowEnhancementTargetsStyleClassPrefix } from './PlanRequirementsTableServantRowEnhancementTargets';
 import { StyleClassPrefix as ServantRowHeaderStyleClassPrefix } from './PlanRequirementsTableServantRowHeader';
+import { StyleClassPrefix as ServantRowSkillTargetsStyleClassPrefix } from './PlanRequirementsTableServantRowSkillTargets';
+import { StyleClassPrefix as ServantRowLevelTargetStyleClassPrefix } from './PlanRequirementsTableServantRowLevelTarget';
+import { StyleClassPrefix as ServantRowAscensionTargetStyleClassPrefix } from './PlanRequirementsTableServantRowAscensionTarget';
+
+/**
+ * 360px at 16px font-size
+ */
+const StickyColumnWidth = '22.5em';
+
+const EnhancementTargetsFontSize = '0.8125em';
 
 export const StyleClassPrefix = 'PlanRequirementsTable';
 
@@ -48,7 +60,7 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                 top: 0,
                 zIndex: 3,
                 [`& .${HeaderStyleClassPrefix}-sticky-content`]: {
-                    width: '20em',  // 320px at 16px font-size
+                    width: StickyColumnWidth,
                     height: '100%',
                     backgroundColor: palette.background.paper
                 },
@@ -78,7 +90,8 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                  * PlanRequirementsServantRowHeader component
                  */
                 [`& .${ServantRowHeaderStyleClassPrefix}-root`]: {
-                    width: '20em',  // 320px at 16px font-size
+                    userSelect: 'none',
+                    width: StickyColumnWidth,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -88,28 +101,91 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                         width: '100%',
                         height: '100%'
                     },
-                    [`& .${ServantRowHeaderStyleClassPrefix}-name`]: {
-                        userSelect: 'none',
+                    [`& .${ServantRowHeaderStyleClassPrefix}-content`]: {
                         flex: 1,
-                        px: 2
-                    },
-                    [`& .${ServantRowHeaderStyleClassPrefix}-enhancements`]: {
-                        userSelect: 'none',
-                        flex: 1,
-                        px: 4,
-                        fontSize: '0.8125em',
-                        '> div': {
+                        px: 2,
+                        [`&.${ServantRowHeaderStyleClassPrefix}-name`]: {
+                            mx: 2,
+                            fontSize: '0.875rem'  // Scale this with rem rather than em
+                        }
+                    }
+                },
+                /**
+                 * PlanRequirementsTableServantRowEnhancementTargets component
+                 */
+                [`& .${ServantRowEnhancementTargetsStyleClassPrefix}-root`]: {
+                    ml: 1,
+                    [`& .${ServantRowEnhancementTargetsStyleClassPrefix}-row`]: {
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        my: 1,
+                        [`& .${ServantRowEnhancementTargetsStyleClassPrefix}-arrow`]: {
+                            mx: 1.5
+                        },
+                        /**
+                         * PlanRequirementsTableServantRowLevelTarget component
+                         */
+                        [`& .${ServantRowLevelTargetStyleClassPrefix}-root`]: {
                             display: 'flex',
-                            my: 1,
-                            '> div:first-of-type': {
-                                width: '40%'
+                            fontSize: EnhancementTargetsFontSize,
+                            '>span:first-of-type': {
+                                color: 'goldenrod',
+                                fontWeight: 800,
+                                mr: 1
+                            },
+                            [`&.${ServantRowLevelTargetStyleClassPrefix}-disabled`]: {
+                                color: palette.text.disabled,
+                                '>span:first-of-type': {
+                                    color: palette.text.disabled,
+                                    textShadow: 'none'
+                                }
+                            }
+                        },
+                        /**
+                         * PlanRequirementsTableServantRowAscensionTarget component
+                         */
+                        [`& .${ServantRowAscensionTargetStyleClassPrefix}-root`]: {
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '5em',  // 80px at 16px font-size
+                            '>img': {
+                                width: '1em',
+                                height: '1em',
+                                position: 'relative',
+                                right: '0.25em'
+                            },
+                            '>div': {
+                                fontSize: EnhancementTargetsFontSize
+                            },
+                            [`&.${ServantRowAscensionTargetStyleClassPrefix}-disabled`]: {
+                                color: palette.text.disabled
+                            }
+                        },
+                        /**
+                         * PlanRequirementsTableServantRowSkillTargets component
+                         */
+                        [`& .${ServantRowSkillTargetsStyleClassPrefix}-root`]: {
+                            display: 'flex',
+                            fontSize: EnhancementTargetsFontSize,
+                            [`&.${ServantRowSkillTargetsStyleClassPrefix}-skill1-disabled`]: {
+                                [`& .${ServantRowSkillTargetsStyleClassPrefix}-target .${ServantSkillLevelStyleClassPrefix}-skill1`]: {
+                                    color: palette.text.disabled
+                                }
+                            },
+                            [`&.${ServantRowSkillTargetsStyleClassPrefix}-skill2-disabled`]: {
+                                [`& .${ServantRowSkillTargetsStyleClassPrefix}-target .${ServantSkillLevelStyleClassPrefix}-skill2`]: {
+                                    color: palette.text.disabled
+                                }
+                            },
+                            [`&.${ServantRowSkillTargetsStyleClassPrefix}-skill3-disabled`]: {
+                                [`& .${ServantRowSkillTargetsStyleClassPrefix}-target .${ServantSkillLevelStyleClassPrefix}-skill3`]: {
+                                    color: palette.text.disabled
+                                }
+                            },
+                            [`&.${ServantRowSkillTargetsStyleClassPrefix}-disabled`]: {
+                                color: palette.text.disabled
                             }
                         }
-                    },
-                    [`& .${ServantRowHeaderStyleClassPrefix}-toggle`]: {
-                        userSelect: 'none',
-                        flex: 1,
-                        px: 2
                     }
                 },
                 /**
@@ -160,7 +236,7 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: '20em',  // 320px at 16px font-size
+                    width: StickyColumnWidth,
                     height: '100%',
                     fontWeight: 500,
                     background: palette.background.paper

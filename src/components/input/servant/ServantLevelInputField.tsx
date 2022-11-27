@@ -71,13 +71,14 @@ export const ServantLevelInputField = React.memo((props: Props) => {
         if (!gameServant) {
             return;
         }
-        const { value } = event.target;
+        const value = event.target.value;
         if (!value && allowEmpty) {
-            return onChange(value, ascension, true);
+            return onChange(value, '', true);
         }
         const maxLevel = gameServant.maxLevel;
         const updatedLevel = transformLevelValue(value);
-        const updatedAscension = InstantiatedServantUtils.roundToNearestValidAscensionLevel(updatedLevel, Number(ascension), maxLevel);
+        const currentAscension = Number(ascension) || InstantiatedServantConstants.MinAscensionLevel;  // Ascension can be blank
+        const updatedAscension = InstantiatedServantUtils.roundToNearestValidAscensionLevel(updatedLevel, currentAscension, maxLevel);
         onChange(String(updatedLevel), String(updatedAscension), true);
     }, [allowEmpty, ascension, gameServant, onChange]);
 

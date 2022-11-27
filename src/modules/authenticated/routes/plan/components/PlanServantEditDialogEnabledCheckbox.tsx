@@ -1,16 +1,15 @@
-import { InstantiatedServantUpdateBoolean, PlanServantUpdate } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateBoolean } from '@fgo-planner/data-core';
 import { Checkbox, Tooltip } from '@mui/material';
 import React, { MouseEvent, useCallback } from 'react';
+import { PlanEnhancementCategory } from '../../../../../types';
 import { FormUtils } from '../../../../../utils/form.utils';
 
-export type EnhancementCategory = keyof PlanServantUpdate['enabled'];
-
 type Props = {
-    enhancement: EnhancementCategory;
+    enhancement: PlanEnhancementCategory;
     label: string;
     multiEditMode: boolean;
     value: InstantiatedServantUpdateBoolean;
-    onChange: (enhancement: EnhancementCategory, value: InstantiatedServantUpdateBoolean) => void;
+    onChange: (enhancement: PlanEnhancementCategory, value: InstantiatedServantUpdateBoolean) => void;
 };
 
 const TooltipEnterDelay = 250;

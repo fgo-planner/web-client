@@ -1,7 +1,8 @@
 import { CSSInterpolation, Theme } from '@mui/material';
 import { DataTableListBaseRowStyle } from '../../../../../../components/data-table-list/data-table-list-base-row.style';
 import { DataTableListDraggableRowStyle } from '../../../../../../components/data-table-list/data-table-list-draggable-row.style';
-import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/game/servant/game-servant-thumbnail.component';
+import { StyleClassPrefix as ServantSkillLevelStyleClassPrefix } from '../../../../../../components/servant/ServantSkillLevels';
+import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/servant/ServantThumbnail';
 import { StyledFunctionPropsWithTheme, StyledFunctionThemeProp } from '../../../../../../types';
 import { MasterServantColumnProperties } from './master-servant-list-columns';
 import { StyleClassPrefix as MasterServantListRowBondLevelStyleClassPrefix } from './master-servant-list-row-bond-level.component';
@@ -9,7 +10,6 @@ import { StyleClassPrefix as MasterServantListRowFouLevelStyleClassPrefix } from
 import { StyleClassPrefix as MasterServantListRowLabelStyleClassPrefix } from './master-servant-list-row-label.component';
 import { StyleClassPrefix as MasterServantListRowLevelStyleClassPrefix } from './master-servant-list-row-level.component';
 import { StyleClassPrefix as MasterServantListRowNpLevelStyleClassPrefix } from './master-servant-list-row-np-level.component';
-import { StyleClassPrefix as MasterServantListRowSkillLevelStyleClassPrefix } from './master-servant-list-row-skill-level.component';
 import { StyleClassPrefix as MasterServantListRowStatsStyleClassPrefix } from './master-servant-list-row-stats.component';
 import { StyleClassPrefix as MasterServantListRowSummonDateStyleClassPrefix } from './master-servant-list-row-summon-date.component';
 import { StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './master-servant-list-row.component';
@@ -97,15 +97,8 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                             [`& .${MasterServantListRowFouLevelStyleClassPrefix}-root`]: {
                                 width: MasterServantColumnProperties.fouHp.width
                             },
-                            [`& .${MasterServantListRowSkillLevelStyleClassPrefix}-root`]: {
+                            [`& .${ServantSkillLevelStyleClassPrefix}-root`]: {
                                 width: MasterServantColumnProperties.skills.width,
-                                display: 'flex',
-                                textAlign: 'center',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                '&>.value': {
-                                    width: '1.25rem'
-                                },
                             },
                             [`& .${MasterServantListRowBondLevelStyleClassPrefix}-root`]: {
                                 width: MasterServantColumnProperties.bondLevel.width,

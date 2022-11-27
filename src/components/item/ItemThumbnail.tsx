@@ -3,7 +3,7 @@ import { GameItem } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { AssetConstants } from '../../../constants';
+import { AssetConstants } from '../../constants';
 
 type Props = {
     enableLink?: boolean;
@@ -17,7 +17,7 @@ const ImageBaseUrl = AssetConstants.ItemImageBaseUrl;
 
 const DefaultSize = 42;
 
-export const StyleClassPrefix = 'GameItemThumbnail';
+export const StyleClassPrefix = 'ItemThumbnail';
 
 const StyleProps = {
     [`& .${StyleClassPrefix}-composite-container`]: {
@@ -40,7 +40,7 @@ const StyleProps = {
     }
 } as SystemStyleObject<Theme>;
 
-export const GameItemThumbnail = React.memo((props: Props) => {
+export const ItemThumbnail = React.memo((props: Props) => {
 
     const {
         enableLink,

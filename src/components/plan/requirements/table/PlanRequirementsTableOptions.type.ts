@@ -2,7 +2,7 @@ export type PlanRequirementsTableOptions = {
 
     layout: {
         cells: 'condensed' | 'normal';
-        stickyColumn: 'condensed' | 'normal';
+        rowHeader: 'name' | 'targets' | 'toggle';
     }
 
     displayItems: {

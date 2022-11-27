@@ -36,6 +36,7 @@ export * from './master/account/basic-master-accounts.type';
 export * from './master/account/master-account-changes.type';
 export * from './master/servant/master-servant-aggregated-data.type';
 export * from './plan/basic-plans.type';
+export * from './plan/PlanEnhancementCategory.type';
 export * from './plan/requirements/plan-enhancement-item-requirements.type';
 export * from './plan/requirements/plan-enhancement-requirements.type';
 export * from './plan/requirements/plan-requirements.type';

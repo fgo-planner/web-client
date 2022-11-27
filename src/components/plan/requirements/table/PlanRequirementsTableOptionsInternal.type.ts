@@ -4,8 +4,6 @@ export type PlanRequirementsTableOptionsInternal = {
     
     displayZeroValues: boolean;
 
-    servantRowHeaderMode: 'name' | 'enhancements' | 'toggle';
-
-    stickyColumnLayout: 'condensed' | 'normal';
+    servantRowHeaderMode: 'name' | 'targets' | 'toggle';
 
 };

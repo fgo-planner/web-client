@@ -12,8 +12,8 @@ import { ServantLevelQuickToggleButtons } from '../../../../../components/input/
 import { ServantSkillInputField } from '../../../../../components/input/servant/ServantSkillInputField';
 import { ServantSkillQuickToggleButtons } from '../../../../../components/input/servant/ServantSkillQuickToggleButtons';
 import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
-import { MasterServantAggregatedData } from '../../../../../types';
-import { EnhancementCategory, PlanServantEditDialogEnabledCheckbox } from './PlanServantEditDialogEnabledCheckbox';
+import { MasterServantAggregatedData, PlanEnhancementCategory } from '../../../../../types';
+import { PlanServantEditDialogEnabledCheckbox } from './PlanServantEditDialogEnabledCheckbox';
 
 type Props = {
     /**
@@ -86,14 +86,15 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
 
     //#region Input event handlers
 
-    const handleEnableCheckboxChange = useCallback((enhancement: EnhancementCategory, value: InstantiatedServantUpdateBoolean): void => {
+    // eslint-disable-next-line max-len
+    const handleEnableCheckboxChange = useCallback((enhancement: PlanEnhancementCategory, value: InstantiatedServantUpdateBoolean): void => {
         planServantUpdate.enabled[enhancement] = value;
         forceUpdate();
     }, [forceUpdate, planServantUpdate]);
 
     const handleLevelAscensionInputChange = useCallback((level: string, ascension: string): void => {
-        planServantUpdate.level = Number(level);
-        planServantUpdate.ascension = Number(ascension) as InstantiatedServantAscensionLevel;
+        planServantUpdate.level = Number(level) || null;
+        planServantUpdate.ascension = Number(ascension) as InstantiatedServantAscensionLevel || null;
         forceUpdate();
     }, [forceUpdate, planServantUpdate]);
 
@@ -225,6 +226,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             gameServant={targetGameServant}
             label='Level'
             helperText={generateCurrentTextLabel(targetMasterServant?.level)}
+            allowEmpty
             multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
         />
@@ -237,6 +239,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
             gameServant={targetGameServant}
             label='Ascension'
             helperText={generateCurrentTextLabel(targetMasterServant?.ascension)}
+            allowEmpty
             multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
         />

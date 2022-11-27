@@ -1,7 +1,7 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import React from 'react';
-import { GameServantBondIcon } from '../../../../../../components/game/servant/game-servant-bond-icon.component';
+import { ServantBondIcon } from '../../../../../../components/servant/ServantBondIcon';
 
 type Props = {
     bondLevel: Nullable<InstantiatedServantBondLevel>;
@@ -21,7 +21,7 @@ export const MasterServantListRowBondLevel = React.memo(({ bondLevel }: Props) =
 
     return (
         <div className={`${StyleClassPrefix}-root`}>
-            <GameServantBondIcon bond={bondLevel} size={28} />
+            <ServantBondIcon bond={bondLevel} size={28} />
             <div className='value'>
                 {bondLevel}
             </div>

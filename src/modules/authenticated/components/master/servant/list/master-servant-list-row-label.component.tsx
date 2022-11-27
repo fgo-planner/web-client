@@ -1,7 +1,7 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import React from 'react';
-import { GameServantClassIcon } from '../../../../../../components/game/servant/game-servant-class-icon.component';
+import { ServantClassIcon } from '../../../../../../components/servant/ServantClassIcon';
 
 type Props = {
     gameServant: Immutable<GameServant>;
@@ -14,7 +14,7 @@ export const StyleClassPrefix = 'MasterServantListRowLabel';
  */
 export const MasterServantListRowLabel = React.memo(({ gameServant }: Props) => (
     <div className={`${StyleClassPrefix}-root`}>
-        <GameServantClassIcon
+        <ServantClassIcon
             className={`${StyleClassPrefix}-class-icon`}
             servantClass={gameServant.class}
             rarity={gameServant.rarity}

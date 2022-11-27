@@ -5,7 +5,7 @@ import { Checkbox, IconButton } from '@mui/material';
 import { isEmpty } from 'lodash-es';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
-import { GameItemQuantity } from '../../../../components/game/item/game-item-quantity.component';
+import { ItemQuantity } from '../../../../components/item/ItemQuantity';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 
@@ -77,7 +77,7 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
             return null;
         }
         return (
-            <GameItemQuantity gameItem={unlockMaterial} quantity={quantity} />
+            <ItemQuantity gameItem={unlockMaterial} quantity={quantity} />
         );
     }, [alwaysUnlocked, gameItemMap, material]);
 

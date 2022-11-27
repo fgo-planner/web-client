@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataTableListStaticRow } from '../../../components/data-table-list/data-table-list-static-row.component';
-import { GameServantThumbnail } from '../../../components/game/servant/game-servant-thumbnail.component';
+import { GameServantThumbnail } from '../../../components/servant/ServantThumbnail';
 import { LayoutContentSection } from '../../../components/layout/layout-content-section.component';
 import { AppBarElevateOnScroll } from '../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
 import { PageTitle } from '../../../components/text/page-title.component';

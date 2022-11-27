@@ -73,6 +73,13 @@ const StyleProps = (theme: SystemTheme) => {
                         width: 300
                     }
                 }
+            },
+            [breakpoints.down('sm')]: {
+                flexDirection: 'column',
+                [`& .${StyleClassPrefix}-main-content`]: {
+                    width: '100%',
+                    height: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`
+                }
             }
         }
     } as SystemStyleObject<SystemTheme>;

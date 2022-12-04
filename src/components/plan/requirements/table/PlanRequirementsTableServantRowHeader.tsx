@@ -34,11 +34,11 @@ export const PlanRequirementsTableServantRowHeader: React.FC<Props> = (props: Pr
     );
 
     let contentNode: ReactNode;
-    if (servantRowHeaderMode === 'name') {
+    if (servantRowHeaderMode === 'toggle') {
         contentNode = (
-            <TruncateText className={contentNodeClassName}>
-                {gameServant.name}
-            </TruncateText>
+            <div className={contentNodeClassName}>
+                toggle
+            </div>
         );
     } else if (servantRowHeaderMode === 'targets') {
         contentNode = (
@@ -49,9 +49,9 @@ export const PlanRequirementsTableServantRowHeader: React.FC<Props> = (props: Pr
         );
     } else {
         contentNode = (
-            <div className={contentNodeClassName}>
-                toggle
-            </div>
+            <TruncateText className={contentNodeClassName}>
+                {gameServant.name}
+            </TruncateText>
         );
     }
 

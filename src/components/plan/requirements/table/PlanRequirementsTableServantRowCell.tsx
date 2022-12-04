@@ -26,7 +26,7 @@ export const PlanRequirementsTableServantRowCell = React.memo((props: Props) => 
 
     return (
         <DataTableGridCell className={className}>
-            <div>{quantity}</div>
+            <span>{quantity}</span>
         </DataTableGridCell>
     );
 

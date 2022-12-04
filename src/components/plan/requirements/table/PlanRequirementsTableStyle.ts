@@ -21,6 +21,8 @@ const StickyColumnWidth = '22.5em';
 
 const EnhancementTargetsFontSize = '0.8125em';
 
+const CellValueFontSize = '1.125em';
+
 export const StyleClassPrefix = 'PlanRequirementsTable';
 
 /**
@@ -193,8 +195,8 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                  */
                 [`& .${ServantRowCellStyleClassPrefix}-root`]: {
                     userSelect: 'none',
-                    '> div': {
-                        fontSize: '1.125em'
+                    '> span': {
+                        fontSize: CellValueFontSize
                     },
                     '&:last-of-type': {
                         borderRightWidth: 0
@@ -235,19 +237,25 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                 [`& .${FooterStyleClassPrefix}-sticky-content`]: {
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'flex-end',
                     width: StickyColumnWidth,
                     height: '100%',
-                    fontWeight: 500,
-                    background: palette.background.paper
+                    px: 4,
+                    boxSizing: 'border-box',
+                    background: palette.background.paper,
+                    '> span': {
+                        fontFamily: ThemeConstants.FontFamilyGoogleSans,
+                        fontSize: '0.9375rem',
+                        fontWeight: 500
+                    }
                 },
                 /**
                  * PlanRequirementsTableFooterCell component
                  */
                 [`& .${FooterCellStyleClassPrefix}-root`]: {
                     userSelect: 'none',
-                    '> div': {
-                        fontSize: '1.125em'
+                    '> span': {
+                        fontSize: CellValueFontSize
                     },
                     '&:last-of-type': {
                         borderRightWidth: 0

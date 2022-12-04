@@ -38,7 +38,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
     const requiredStickyContent: ReactNode = (
         <div className={`${StyleClassPrefix}-sticky-content`}>
-            Required
+            <span>Required</span>
         </div>
     );
 
@@ -75,7 +75,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
     const inventoryStickyContent: ReactNode = (
         <div className={`${StyleClassPrefix}-sticky-content`}>
-            Inventory
+            <span>Inventory</span>
         </div>
     );
 
@@ -117,7 +117,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
     const deficitStickyContent: ReactNode = (
         <div className={`${StyleClassPrefix}-sticky-content`}>
-            Deficit
+            <span>Deficit</span>
         </div>
     );
 

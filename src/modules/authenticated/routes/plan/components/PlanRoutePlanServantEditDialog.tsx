@@ -3,8 +3,8 @@ import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { DialogComponentProps, EditDialogAction, MasterServantAggregatedData, PlanServantAggregatedData } from '../../../../../types';
-import { PlanServantEditDialogContent, PlanServantEditTab } from './PlanServantEditDialogContent';
-import { PlanServantEditDialogData } from './PlanServantEditDialogData.type';
+import { PlanRoutePlanServantEditDialogContent, PlanServantEditTab } from './PlanRoutePlanServantEditDialogContent';
+import { PlanRoutePlanServantEditDialogData } from './PlanRoutePlanServantEditDialogData.type';
 
 type Props = {
     activeTab: PlanServantEditTab;
@@ -20,7 +20,7 @@ type Props = {
      * 
      * If this is `undefined`, then the dialog will remain closed.
      */
-    dialogData?: PlanServantEditDialogData;
+    dialogData?: PlanRoutePlanServantEditDialogData;
     onTabChange: (tab: PlanServantEditTab) => void;
     /**
      * Array containing the source `PlanServantAggregatedData` objects for the
@@ -33,7 +33,7 @@ type Props = {
      * closed.
      */
     targetPlanServantsData: ReadonlyArray<PlanServantAggregatedData>;
-} & Omit<DialogComponentProps<PlanServantEditDialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
+} & Omit<DialogComponentProps<PlanRoutePlanServantEditDialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';
 const SubmitButtonLabel = 'Done';
@@ -48,7 +48,7 @@ const DialogPaperProps = {
     }
 } as PaperProps;
 
-export const PlanServantEditDialog = React.memo((props: Props) => {
+export const PlanRoutePlanServantEditDialog = React.memo((props: Props) => {
 
     const {
         activeTab,
@@ -101,7 +101,7 @@ export const PlanServantEditDialog = React.memo((props: Props) => {
                     {dialogData.action === EditDialogAction.Add ? 'Add Servant to Plan' : 'Edit Servant Targets'}
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
-                <PlanServantEditDialogContent
+                <PlanRoutePlanServantEditDialogContent
                     dialogData={dialogData}
                     availableServants={availableServants}
                     targetPlanServantsData={targetPlanServantsData}

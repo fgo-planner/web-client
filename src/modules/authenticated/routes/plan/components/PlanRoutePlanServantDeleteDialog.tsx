@@ -12,7 +12,7 @@ type Props = {
     targetPlanServantsData: ReadonlyArray<PlanServantAggregatedData>;
 } & Omit<DialogComponentProps, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;;
 
-export const PlanServantDeleteDialog = React.memo((props: Props) => {
+export const PlanRoutePlanServantDeleteDialog = React.memo((props: Props) => {
 
     const {
         open: openProp,

@@ -27,7 +27,7 @@ const StyleProps = (theme: SystemTheme) => ({
     }
 } as SystemStyleObject<SystemTheme>);
 
-export const PlanServantEditCostumesTabContent = React.memo((props: Props) => {
+export const PlanRoutePlanServantEditDialogCostumesTabContent = React.memo((props: Props) => {
 
     const {
         costumesData,

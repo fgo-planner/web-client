@@ -5,10 +5,10 @@ import { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'rea
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/input-field-container.component';
 import { useGameServantCostumesData } from '../../../../../hooks/data/use-game-servant-costumes-data.hook';
 import { EditDialogAction, MasterServantAggregatedData, PlanServantAggregatedData } from '../../../../../types';
-import { PlanServantEditCostumesTabContent } from './PlanServantEditCostumesTabContent';
-import { PlanServantEditDialogData } from './PlanServantEditDialogData.type';
-import { PlanServantEditEnhancementsTabContent } from './PlanServantEditEnhancementsTabContent';
-import { PlanServantSelectAutocomplete } from './PlanServantSelectAutocomplete';
+import { PlanRoutePlanServantEditDialogAutocomplete } from './PlanRoutePlanServantEditDialogAutocomplete';
+import { PlanRoutePlanServantEditDialogCostumesTabContent } from './PlanRoutePlanServantEditDialogCostumesTabContent';
+import { PlanRoutePlanServantEditDialogData } from './PlanRoutePlanServantEditDialogData.type';
+import { PlanRoutePlanServantEditDialogEnhancementsTabContent } from './PlanRoutePlanServantEditDialogEnhancementsTabContent';
 
 export type PlanServantEditTab = 'enhancements' | 'costumes';
 
@@ -24,7 +24,7 @@ type Props = {
      * DTO containing the dialog data that will be returned to the parent component
      * on dialog close. This object will be modified directly.
      */
-    dialogData: PlanServantEditDialogData;
+    dialogData: PlanRoutePlanServantEditDialogData;
     /**
      * Array containing the source `PlanServantAggregatedData` objects for the
      * servants being edited.
@@ -96,7 +96,7 @@ const StyleProps = (theme: Theme) => {
  * re-render of this component.
  */
 /** */
-export const PlanServantEditDialogContent: React.FC<Props> = (props: Props): JSX.Element => {
+export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Props): JSX.Element => {
 
     const {
         activeTab,
@@ -176,14 +176,14 @@ export const PlanServantEditDialogContent: React.FC<Props> = (props: Props): JSX
     let tabsContentNode: ReactNode;
     if (activeTab === 'costumes') {
         tabsContentNode = (
-            <PlanServantEditCostumesTabContent
+            <PlanRoutePlanServantEditDialogCostumesTabContent
                 costumesData={costumesData}
                 planServantUpdate={data.update}
             />
         );
     } else {
         tabsContentNode = (
-            <PlanServantEditEnhancementsTabContent
+            <PlanRoutePlanServantEditDialogEnhancementsTabContent
                 planServantUpdate={data.update}
                 targetMasterServantsData={targetMasterServantsData}
             />
@@ -194,7 +194,7 @@ export const PlanServantEditDialogContent: React.FC<Props> = (props: Props): JSX
         <DialogContent className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
-                    <PlanServantSelectAutocomplete
+                    <PlanRoutePlanServantEditDialogAutocomplete
                         availableServants={availableServants}
                         selectedServant={targetMasterServantsData[0]}
                         onChange={handleSelectedServantChange}

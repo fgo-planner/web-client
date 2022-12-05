@@ -10,7 +10,7 @@ import { MasterServantStatsRoute } from './routes/master-servant-stats/master-se
 import { MasterServantsRoute } from './routes/master-servants/master-servants.route';
 import { MasterSettingsRoute } from './routes/master-settings/master-settings.route';
 import { MasterSoundtracksRoute } from './routes/master-soundtracks/master-soundtracks.route';
-import { PlanRoute } from './routes/plan/plan.route';
+import { PlanRoute } from './routes/plan/PlanRoute';
 import { PlansRoute } from './routes/plans/plans.route';
 import { UserProfileRoute } from './routes/user-profile.route';
 import { UserSettingsRoute } from './routes/user-settings.route';

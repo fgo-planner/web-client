@@ -17,11 +17,11 @@ import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, Plan
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { usePlanDataEdit } from '../../hooks/use-plan-data-edit.hook';
-import { PlanNavigationRail } from './components/PlanNavigationRail';
-import { PlanServantDeleteDialog } from './components/PlanServantDeleteDialog';
-import { PlanServantEditDialog } from './components/PlanServantEditDialog';
-import { PlanServantEditDialogData } from './components/PlanServantEditDialogData.type';
-import { usePlanUserPreferences } from './hooks/use-plan-user-preferences.hook';
+import { PlanRouteNavigationRail } from './components/PlanRouteNavigationRail';
+import { PlanRoutePlanServantDeleteDialog } from './components/PlanRoutePlanServantDeleteDialog';
+import { PlanRoutePlanServantEditDialog } from './components/PlanRoutePlanServantEditDialog';
+import { PlanRoutePlanServantEditDialogData } from './components/PlanRoutePlanServantEditDialogData.type';
+import { usePlanRouteUserPreferences } from './hooks/usePlanRouteUserPreferences';
 
 const PathMatchPattern: PathPattern = {
     path: '/user/master/planner/:id'
@@ -140,7 +140,7 @@ export const PlanRoute = React.memo(() => {
         toggleCellSize,
         toggleRowHeaderMode,
         toggleShowEmptyColumns
-    } = usePlanUserPreferences();
+    } = usePlanRouteUserPreferences();
 
     const {
         selectedData: selectedServantsData,
@@ -166,7 +166,7 @@ export const PlanRoute = React.memo(() => {
      * this data is present (dialog is opened if data is defined, and closed if data
      * is undefined).
      */
-    const [planServantEditDialogData, setPlanServantEditDialogData] = useState<PlanServantEditDialogData>();
+    const [planServantEditDialogData, setPlanServantEditDialogData] = useState<PlanRoutePlanServantEditDialogData>();
 
     /**
      * Whether the multi-add servant dialog is open.
@@ -219,7 +219,7 @@ export const PlanRoute = React.memo(() => {
     }, [deletePlanServants, selectedServantsData]);
 
     const openAddServantDialog = useCallback((): void => {
-        const planServantEditDialogData: PlanServantEditDialogData = {
+        const planServantEditDialogData: PlanRoutePlanServantEditDialogData = {
             action: EditDialogAction.Add,
             data: {
                 instanceId: IndeterminateValue,
@@ -244,7 +244,7 @@ export const PlanRoute = React.memo(() => {
             return;
         }
         const selectedServants = selectedServantsData.instances.map(servantData => servantData.planServant);
-        const planServantEditDialogData: PlanServantEditDialogData = {
+        const planServantEditDialogData: PlanRoutePlanServantEditDialogData = {
             action: EditDialogAction.Edit,
             data: {
                 instanceId: IndeterminateValue,
@@ -372,7 +372,7 @@ export const PlanRoute = React.memo(() => {
 
     const handleRevertButtonClick = revertChanges;
 
-    const handleEditServantDialogClose = useCallback((_event: any, _reason: any, data?: PlanServantEditDialogData): void => {
+    const handleEditServantDialogClose = useCallback((_event: any, _reason: any, data?: PlanRoutePlanServantEditDialogData): void => {
         setAvailableServants(CollectionUtils.emptyArray());
         setPlanServantEditDialogData(undefined);
         /**
@@ -421,7 +421,7 @@ export const PlanRoute = React.memo(() => {
                 />
             </div>
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
-                <PlanNavigationRail
+                <PlanRouteNavigationRail
                     layout={sm ? 'column' : 'row'}
                     dragDropMode={dragDropMode}
                     selectedServantsCount={selectedServantsData.ids.size}
@@ -450,7 +450,7 @@ export const PlanRoute = React.memo(() => {
                     </div>
                 </div>
             </div>
-            <PlanServantEditDialog
+            <PlanRoutePlanServantEditDialog
                 availableServants={availableServants}
                 dialogData={planServantEditDialogData}
                 targetPlanServantsData={selectedServantsData.instances}
@@ -458,7 +458,7 @@ export const PlanRoute = React.memo(() => {
                 onTabChange={Functions.identity}
                 onClose={handleEditServantDialogClose}
             />
-            <PlanServantDeleteDialog
+            <PlanRoutePlanServantDeleteDialog
                 open={planServantDeleteDialogOpen}
                 targetPlanServantsData={selectedServantsData.instances}
                 onClose={handleDeleteServantDialogClose}

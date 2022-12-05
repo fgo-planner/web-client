@@ -1,7 +1,7 @@
 import { PlanServantUpdate } from '@fgo-planner/data-core';
 import { EditDialogData } from '../../../../../types';
 
-export type PlanServantEditDialogData = EditDialogData<{
+export type PlanRoutePlanServantEditDialogData = EditDialogData<{
 
     /**
      * The instance ID when adding a plan servant. This is not used when editing

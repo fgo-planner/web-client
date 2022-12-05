@@ -6,7 +6,7 @@ import { StorageUtils } from '../../../../../utils/storage/storage.utils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../../utils/subscription/subscription-topics';
 import { MasterServantEditTab } from '../../../components/master/servant/edit-dialog/master-servant-edit-dialog-content.component';
-import { PlanServantEditTab } from '../components/PlanServantEditDialogContent';
+import { PlanServantEditTab } from '../components/PlanRoutePlanServantEditDialogContent';
 
 /**
  * User preferences for the plan route that are stored locally.
@@ -101,7 +101,7 @@ const writeToLocalStorage = (userPreferences: PlanUserPreferences): PlanUserPref
  * This is intended to be used only within the `Plan` route component,
  * do not use inside any other component!
  */
-export const usePlanUserPreferences = (): PlanUserPreferencesHookResult => {
+export const usePlanRouteUserPreferences = (): PlanUserPreferencesHookResult => {
 
     const [userPreferences, setUserPreferences] = useState<PlanUserPreferences>(getDefaultUserPreferences);
 

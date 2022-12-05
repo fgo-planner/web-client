@@ -13,7 +13,7 @@ import { ServantSkillInputField } from '../../../../../components/input/servant/
 import { ServantSkillQuickToggleButtons } from '../../../../../components/input/servant/ServantSkillQuickToggleButtons';
 import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
 import { MasterServantAggregatedData, PlanEnhancementCategory } from '../../../../../types';
-import { PlanServantEditDialogEnabledCheckbox } from './PlanServantEditDialogEnabledCheckbox';
+import { PlanRoutePlanServantEditDialogEnabledCheckbox } from './PlanRoutePlanServantEditDialogEnabledCheckbox';
 
 type Props = {
     /**
@@ -74,7 +74,7 @@ const StyleProps = (theme: Theme) => ({
     }
 } as SystemStyleObject<Theme>);
 
-export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) => {
+export const PlanRoutePlanServantEditDialogEnhancementsTabContent = React.memo((props: Props) => {
 
     const forceUpdate = useForceUpdate();
 
@@ -185,7 +185,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     }
 
     const enableAscensionsCheckbox = (
-        <PlanServantEditDialogEnabledCheckbox
+        <PlanRoutePlanServantEditDialogEnabledCheckbox
             enhancement='ascensions'
             label='Ascensions/levels'
             multiEditMode={multiEditMode}
@@ -200,7 +200,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     );
 
     const enableSkillsCheckbox = (
-        <PlanServantEditDialogEnabledCheckbox
+        <PlanRoutePlanServantEditDialogEnabledCheckbox
             enhancement='skills'
             label='Skills'
             multiEditMode={multiEditMode}
@@ -210,7 +210,7 @@ export const PlanServantEditEnhancementsTabContent = React.memo((props: Props) =
     );
 
     const enableAppendSkillsCheckbox = (
-        <PlanServantEditDialogEnabledCheckbox
+        <PlanRoutePlanServantEditDialogEnabledCheckbox
             enhancement='appendSkills'
             label='Append Skills'
             multiEditMode={multiEditMode}

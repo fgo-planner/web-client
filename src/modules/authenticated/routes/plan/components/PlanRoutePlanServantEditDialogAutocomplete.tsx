@@ -90,7 +90,7 @@ const renderInput = (params: any): ReactNode => {
     return <TextField {...params} label='Servant' variant='outlined' />;
 };
 
-export const PlanServantSelectAutocomplete = React.memo((props: Props) => {
+export const PlanRoutePlanServantEditDialogAutocomplete = React.memo((props: Props) => {
 
     const {
         availableServants = CollectionUtils.emptyArray(),

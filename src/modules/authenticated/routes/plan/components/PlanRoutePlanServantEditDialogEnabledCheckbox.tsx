@@ -14,7 +14,7 @@ type Props = {
 
 const TooltipEnterDelay = 250;
 
-export const PlanServantEditDialogEnabledCheckbox = React.memo((props: Props) => {
+export const PlanRoutePlanServantEditDialogEnabledCheckbox = React.memo((props: Props) => {
 
     const {
         enhancement,

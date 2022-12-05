@@ -15,7 +15,7 @@ type Props = {
     planServantUpdate: PlanServantUpdate;
 };
 
-const StyleClassPrefix = 'PlanServantEditCostumesTabContent';
+const StyleClassPrefix = 'PlanRoutePlanServantEditDialogCostumesTabContent';
 
 const StyleProps = (theme: SystemTheme) => ({
     overflowY: 'auto',

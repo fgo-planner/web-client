@@ -1,22 +1,29 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { PromptDialog } from '../../../../../components/dialog/prompt-dialog.component';
-import { DialogComponentProps, PlanServantAggregatedData } from '../../../../../types';
+import { DialogComponentProps, ModalOnCloseReason, PlanServantAggregatedData } from '../../../../../types';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
-type Props = {
-    open: boolean;
+export type PlanRoutePlanServantDeleteDialogData = {
     /**
      * Array containing the source `PlanServantAggregatedData` objects for the
      * servants being deleted.
      */
     targetPlanServantsData: ReadonlyArray<PlanServantAggregatedData>;
-} & Omit<DialogComponentProps, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;;
+};
+
+type Props = {
+    /**
+     * If this is `undefined` or has a length of 0, then the dialog will remain
+     * closed.
+     */
+    dialogData?: PlanRoutePlanServantDeleteDialogData;
+} & Omit<DialogComponentProps<PlanRoutePlanServantDeleteDialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;;
 
 export const PlanRoutePlanServantDeleteDialog = React.memo((props: Props) => {
 
     const {
-        open: openProp,
-        targetPlanServantsData,
+        dialogData,
+        onClose,
         ...dialogProps
     } = props;
 
@@ -24,7 +31,17 @@ export const PlanRoutePlanServantDeleteDialog = React.memo((props: Props) => {
 
     const [prompt, setPrompt] = useState<ReactNode>();
 
-    const open = openProp && !!targetPlanServantsData.length;
+    const targetPlanServantsData = dialogData?.targetPlanServantsData;
+
+    const open = !!targetPlanServantsData?.length;
+
+    const handleDialogClose = useCallback((event: any, reason: ModalOnCloseReason): void => {
+        if (reason === 'submit') {
+            onClose(event, reason, dialogData);
+        } else {
+            onClose(event, reason);
+        }
+    }, [dialogData, onClose]);
 
     /**
      * Recomputes the dialog title and prompt when the props change.
@@ -62,6 +79,7 @@ export const PlanRoutePlanServantDeleteDialog = React.memo((props: Props) => {
             {...dialogProps}
             open={open}
             keepMounted={false}
+            onClose={handleDialogClose}
             title={title}
             prompt={prompt}
             cancelButtonColor='secondary'

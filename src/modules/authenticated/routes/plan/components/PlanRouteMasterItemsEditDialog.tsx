@@ -2,32 +2,18 @@ import { Button, Dialog, DialogActions, DialogTitle, PaperProps, Typography } fr
 import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps, EditDialogAction, PlanServantAggregatedData } from '../../../../../types';
-import { PlanRoutePlanServantEditDialogContent, PlanServantEditTab } from './PlanRoutePlanServantEditDialogContent';
-import { PlanRoutePlanServantEditDialogData } from './PlanRoutePlanServantEditDialogData.type';
+import { DialogComponentProps, EditDialogAction } from '../../../../../types';
+import { PlanRouteMasterItemsEditDialogData } from './PlanRouteMasterItemsEditDialogData.type';
 
 type Props = {
-    activeTab: PlanServantEditTab;
     /**
      * DTO containing the dialog data that will be returned to the parent component
      * on dialog close. This object will be modified directly.
      * 
      * If this is `undefined`, then the dialog will remain closed.
      */
-    dialogData?: PlanRoutePlanServantEditDialogData;
-    onTabChange: (tab: PlanServantEditTab) => void;
-    /**
-     * Array containing the source `PlanServantAggregatedData` objects for the
-     * servants being edited.
-     *
-     * Only used in edit mode; this is ignored in add mode.
-     * 
-     * If dialog is inactive (`planServantUpdate` is `undefined`), this should be
-     * set to an empty array to avoid unnecessary re-renders while the dialog is
-     * closed.
-     */
-    targetPlanServantsData: ReadonlyArray<PlanServantAggregatedData>;
-} & Omit<DialogComponentProps<PlanRoutePlanServantEditDialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
+    dialogData?: PlanRouteMasterItemsEditDialogData;
+} & Omit<DialogComponentProps<PlanRouteMasterItemsEditDialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';
 const SubmitButtonLabel = 'Done';
@@ -42,13 +28,10 @@ const DialogPaperProps = {
     }
 } as PaperProps;
 
-export const PlanRoutePlanServantEditDialog = React.memo((props: Props) => {
+export const PlanRouteMasterItemsEditDialog = React.memo((props: Props) => {
 
     const {
-        activeTab,
         dialogData,
-        onTabChange,
-        targetPlanServantsData,
         onClose,
         ...dialogProps
     } = props;
@@ -94,7 +77,7 @@ export const PlanRoutePlanServantEditDialog = React.memo((props: Props) => {
                     {dialogData.action === EditDialogAction.Add ? 'Add Servant to Plan' : 'Edit Servant Targets'}
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
-                <PlanRoutePlanServantEditDialogContent
+                <PlanRouteMasterItemsEditDialogContent
                     dialogData={dialogData}
                     targetPlanServantsData={targetPlanServantsData}
                     activeTab={activeTab}

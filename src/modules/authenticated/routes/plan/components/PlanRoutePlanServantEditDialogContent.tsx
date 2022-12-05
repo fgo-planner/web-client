@@ -15,12 +15,6 @@ export type PlanServantEditTab = 'enhancements' | 'costumes';
 type Props = {
     activeTab: PlanServantEditTab;
     /**
-     * The master servants that are available to be added to the plan.
-     *
-     * Only used in add mode; this is ignored in edit mode.
-     */
-    availableServants: ReadonlyArray<MasterServantAggregatedData>;
-    /**
      * DTO containing the dialog data that will be returned to the parent component
      * on dialog close. This object will be modified directly.
      */
@@ -35,7 +29,7 @@ type Props = {
     onTabChange: (tab: PlanServantEditTab) => void;
 };
 
-export const StyleClassPrefix = 'PlanServantEdit';
+export const StyleClassPrefix = 'PlanRoutePlanServantEditDialogContent';
 
 const StyleProps = (theme: Theme) => {
 
@@ -100,7 +94,6 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
 
     const {
         activeTab,
-        availableServants,
         dialogData: {
             action,
             data
@@ -195,7 +188,7 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
                     <PlanRoutePlanServantEditDialogAutocomplete
-                        availableServants={availableServants}
+                        availableServants={data.availableServants}
                         selectedServant={targetMasterServantsData[0]}
                         onChange={handleSelectedServantChange}
                         disabled={servantSelectDisabled}

@@ -3,7 +3,7 @@ import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, Inst
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
@@ -18,9 +18,10 @@ import { SubscribablesContainer } from '../../../../utils/subscription/subscriba
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { usePlanDataEdit } from '../../hooks/use-plan-data-edit.hook';
 import { PlanRouteNavigationRail } from './components/PlanRouteNavigationRail';
-import { PlanRoutePlanServantDeleteDialog } from './components/PlanRoutePlanServantDeleteDialog';
+import { PlanRoutePlanServantDeleteDialog, PlanRoutePlanServantDeleteDialogData } from './components/PlanRoutePlanServantDeleteDialog';
 import { PlanRoutePlanServantEditDialog } from './components/PlanRoutePlanServantEditDialog';
 import { PlanRoutePlanServantEditDialogData } from './components/PlanRoutePlanServantEditDialogData.type';
+import { usePlanRouteDialogState } from './hooks/usePlanRouteDialogState';
 import { usePlanRouteUserPreferences } from './hooks/usePlanRouteUserPreferences';
 
 const PathMatchPattern: PathPattern = {
@@ -118,6 +119,36 @@ export const PlanRoute = React.memo(() => {
     } = usePlanDataEdit(planId);
 
     const {
+        userPreferences: {
+            table: tableOptions
+        },
+        // setServantEditDialogActiveTab,
+        toggleCellSize,
+        toggleRowHeaderMode,
+        toggleShowEmptyColumns
+    } = usePlanRouteUserPreferences();
+
+    const {
+        openDialogInfo,
+        closeAllDialogs,
+        openMasterItemsEditDialog,
+        openMasterServantEditDialog,
+        openPlanServantDeleteDialog,
+        openPlanServantEditDialog,
+        openPlanServantMultiAddDialog
+    } = usePlanRouteDialogState();
+
+    const {
+        selectedData: selectedServantsData,
+        selectAll: selectAllServants,
+        deselectAll: deselectAllServants,
+        updateSelection: updateServantSelection
+    } = useSelectedInstancesHelper(
+        planEditData.servantsData, 
+        InstantiatedServantUtils.getInstanceId
+    );
+
+    const {
         dragDropData,
         startDragDrop,
         endDragDrop,
@@ -132,53 +163,7 @@ export const PlanRoute = React.memo(() => {
      */
     const dragDropMode = !!dragDropData;
 
-    const {
-        userPreferences: {
-            table: tableOptions
-        },
-        // setServantEditDialogActiveTab,
-        toggleCellSize,
-        toggleRowHeaderMode,
-        toggleShowEmptyColumns
-    } = usePlanRouteUserPreferences();
-
-    const {
-        selectedData: selectedServantsData,
-        selectAll: selectAllServants,
-        deselectAll: deselectAllServants,
-        updateSelection: updateServantSelection
-    } = useSelectedInstancesHelper(
-        planEditData.servantsData, 
-        InstantiatedServantUtils.getInstanceId
-    );
-
-    /**
-     * Master servants that have not been added to the plan yet.
-     */
-    const [availableServants, setAvailableServants] = useState<ReadonlyArray<MasterServantAggregatedData>>(CollectionUtils.emptyArray);
-
-    /**
-     * The `PlanServantEditDialogData` DTO that is passed directly into and modified
-     * by the dialog. The original plan servant is not modified until the changes
-     * are submitted.
-     *
-     * The `open` state of the servant edit dialog is also determined by whether
-     * this data is present (dialog is opened if data is defined, and closed if data
-     * is undefined).
-     */
-    const [planServantEditDialogData, setPlanServantEditDialogData] = useState<PlanRoutePlanServantEditDialogData>();
-
-    /**
-     * Whether the multi-add servant dialog is open.
-     */
-    const [planServantMultiAddDialogOpen, setPlanServantMultiAddDialogOpen] = useState<boolean>(false);
-
-    /**
-     * Whether the delete plan servant dialog is open.
-     */
-    const [planServantDeleteDialogOpen, setPlanServantDeleteDialogOpen] = useState<boolean>(false);
-
-    const { sm, md } = useActiveBreakpoints();
+    const { sm } = useActiveBreakpoints();
 
     //#region Topic subscriptions
 
@@ -214,30 +199,27 @@ export const PlanRoute = React.memo(() => {
     /**
      * Deletes the currently selected servants.
      */
-    const deleteSelectedServants = useCallback((): void => {
-        deletePlanServants(selectedServantsData.ids);
-    }, [deletePlanServants, selectedServantsData]);
+    // const deleteSelectedServants = useCallback((): void => {
+    //     deletePlanServants(selectedServantsData.ids);
+    // }, [deletePlanServants, selectedServantsData]);
 
     const openAddServantDialog = useCallback((): void => {
+        const availableServants = computeAvailableServants(planEditData.servantsData, masterAccountEditData.servantsData);
         const planServantEditDialogData: PlanRoutePlanServantEditDialogData = {
             action: EditDialogAction.Add,
             data: {
                 instanceId: IndeterminateValue,
-                update: PlanServantUpdateUtils.createNew(planEditData.costumes)
+                update: PlanServantUpdateUtils.createNew(planEditData.costumes),
+                availableServants
             }
         };
-        const availableServants = computeAvailableServants(planEditData.servantsData, masterAccountEditData.servantsData);
-        setAvailableServants(availableServants);
-        setPlanServantEditDialogData(planServantEditDialogData);
-        setPlanServantMultiAddDialogOpen(false);
-        setPlanServantDeleteDialogOpen(false);
-    }, [masterAccountEditData, planEditData]);
+        openPlanServantEditDialog(planServantEditDialogData);
+    }, [masterAccountEditData, openPlanServantEditDialog, planEditData]);
 
     const openMultiAddServantDialog = useCallback((): void => {
-        setPlanServantMultiAddDialogOpen(true);
-        setPlanServantEditDialogData(undefined);
-        setPlanServantDeleteDialogOpen(false);
-    }, []);
+        const availableServants = computeAvailableServants(planEditData.servantsData, masterAccountEditData.servantsData);
+        openPlanServantMultiAddDialog(availableServants);
+    }, [masterAccountEditData, openPlanServantMultiAddDialog, planEditData]);
 
     const openEditServantDialog = useCallback((): void => {
         if (!selectedServantsData.instances.length) {
@@ -248,23 +230,21 @@ export const PlanRoute = React.memo(() => {
             action: EditDialogAction.Edit,
             data: {
                 instanceId: IndeterminateValue,
-                update: PlanServantUpdateUtils.createFromExisting(selectedServants, planEditData.costumes)
+                update: PlanServantUpdateUtils.createFromExisting(selectedServants, planEditData.costumes),
+                availableServants: CollectionUtils.emptyArray()
             }
         };
-        setAvailableServants(CollectionUtils.emptyArray());
-        setPlanServantEditDialogData(planServantEditDialogData);
-        setPlanServantMultiAddDialogOpen(false);
-        setPlanServantDeleteDialogOpen(false);
-    }, [planEditData, selectedServantsData]);
+        openPlanServantEditDialog(planServantEditDialogData);
+    }, [openPlanServantEditDialog, planEditData, selectedServantsData]);
 
     const openDeleteServantDialog = useCallback((): void => {
         if (!selectedServantsData.instances.length) {
             return;
         }
-        setPlanServantDeleteDialogOpen(true);
-        setPlanServantEditDialogData(undefined);
-        setPlanServantMultiAddDialogOpen(false);
-    }, [selectedServantsData]);
+        openPlanServantDeleteDialog({
+            targetPlanServantsData: selectedServantsData.instances
+        });
+    }, [openPlanServantDeleteDialog, selectedServantsData]);
 
     /**
      * Adds a listener to invoke the `openDeleteServantDialog` function when the
@@ -358,9 +338,7 @@ export const PlanRoute = React.memo(() => {
     //#region Other event handlers
 
     const handleSaveButtonClick = useCallback(async (): Promise<void> => {
-        setPlanServantEditDialogData(undefined);
-        setPlanServantMultiAddDialogOpen(false);
-        setPlanServantDeleteDialogOpen(false);
+        closeAllDialogs();
         try {
             await persistChanges();
         } catch (error: any) {
@@ -368,13 +346,16 @@ export const PlanRoute = React.memo(() => {
             console.error(error);
         }
         persistChanges();
-    }, [persistChanges]);
+    }, [closeAllDialogs, persistChanges]);
 
     const handleRevertButtonClick = revertChanges;
 
-    const handleEditServantDialogClose = useCallback((_event: any, _reason: any, data?: PlanRoutePlanServantEditDialogData): void => {
-        setAvailableServants(CollectionUtils.emptyArray());
-        setPlanServantEditDialogData(undefined);
+    const handleEditServantDialogClose = useCallback((
+        _event: MouseEvent,
+        _reason: ModalOnCloseReason,
+        data?: PlanRoutePlanServantEditDialogData
+    ): void => {
+        closeAllDialogs();
         /**
          * Close the dialog without taking any further action if the changes were
          * cancelled (if `data` is undefined, then the changes were cancelled).
@@ -388,14 +369,23 @@ export const PlanRoute = React.memo(() => {
         } else {
             applyUpdateToSelectedServants(data.data.update);
         }
-    }, [addPlanServant, applyUpdateToSelectedServants]);
+    }, [addPlanServant, applyUpdateToSelectedServants, closeAllDialogs]);
 
-    const handleDeleteServantDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): any => {
-        if (reason === 'submit') {
-            deleteSelectedServants();
+    const handleDeleteServantDialogClose = useCallback((
+        _event: MouseEvent,
+        _reason: ModalOnCloseReason,
+        data?: PlanRoutePlanServantDeleteDialogData
+    ): any => {
+        closeAllDialogs();
+        /**
+         * Close the dialog without taking any further action if the changes were
+         * cancelled (if `data` is undefined, then the changes were cancelled).
+         */
+        if (!data) {
+            return;
         }
-        setPlanServantDeleteDialogOpen(false);
-    }, [deleteSelectedServants]);
+        deletePlanServants(data.targetPlanServantsData.map(InstantiatedServantUtils.getInstanceId));
+    }, [closeAllDialogs, deletePlanServants]);
 
     //#endregion
 
@@ -451,16 +441,14 @@ export const PlanRoute = React.memo(() => {
                 </div>
             </div>
             <PlanRoutePlanServantEditDialog
-                availableServants={availableServants}
-                dialogData={planServantEditDialogData}
+                dialogData={openDialogInfo.name === 'planServantEdit' ? openDialogInfo.data : undefined}
                 targetPlanServantsData={selectedServantsData.instances}
                 activeTab='enhancements'
                 onTabChange={Functions.identity}
                 onClose={handleEditServantDialogClose}
             />
             <PlanRoutePlanServantDeleteDialog
-                open={planServantDeleteDialogOpen}
-                targetPlanServantsData={selectedServantsData.instances}
+                dialogData={openDialogInfo.name === 'planServantDelete' ? openDialogInfo.data : undefined}
                 onClose={handleDeleteServantDialogClose}
             />
         </Box>

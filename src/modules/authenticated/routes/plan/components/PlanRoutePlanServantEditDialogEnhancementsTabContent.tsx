@@ -32,7 +32,7 @@ const generateCurrentTextLabel = (currentValue: number | undefined): string | un
     return CurrentTextLabel + currentValue;
 };
 
-const StyleClassPrefix = 'PlanServantEditEnhancementsTabContent';
+const StyleClassPrefix = 'PlanRoutePlanServantEditDialogEnhancementsTabContent';
 
 const StyleProps = (theme: Theme) => ({
     overflowY: 'auto',

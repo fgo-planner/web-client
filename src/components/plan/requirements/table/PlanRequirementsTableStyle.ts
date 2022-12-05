@@ -243,6 +243,9 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                     px: 4,
                     boxSizing: 'border-box',
                     background: palette.background.paper,
+                    '& .MuiIconButton-root': {
+                        mx: 2
+                    },
                     '> span': {
                         fontFamily: ThemeConstants.FontFamilyGoogleSans,
                         fontSize: '0.9375rem',

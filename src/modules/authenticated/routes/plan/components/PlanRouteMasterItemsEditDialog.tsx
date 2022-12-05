@@ -1,8 +1,11 @@
-import { Button, Dialog, DialogActions, DialogTitle, PaperProps, Typography } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogTitle, PaperProps, SxProps, Typography } from '@mui/material';
+import { Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps, EditDialogAction } from '../../../../../types';
+import { ScrollbarStyleProps } from '../../../../../styles/scrollbar-style-props';
+import { DialogComponentProps } from '../../../../../types';
+import { PlanRoutePlanMasterItemsEditDialogContent } from './PlanRouteMasterItemsEditDialogContent';
 import { PlanRouteMasterItemsEditDialogData } from './PlanRouteMasterItemsEditDialogData.type';
 
 type Props = {
@@ -20,12 +23,22 @@ const SubmitButtonLabel = 'Done';
 
 const DialogWidth = 640;
 
-const DialogPaperProps = {
-    style: {
+const DialogPaperStyleProps = [
+    ScrollbarStyleProps,
+    {
         width: DialogWidth,
         maxWidth: DialogWidth,
-        margin: 0
+        margin: 0,
+        '>.MuiTypography-root': {
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+        }
     }
+] as SxProps<SystemTheme>;
+
+const DialogPaperProps = {
+    sx: DialogPaperStyleProps
 } as PaperProps;
 
 export const PlanRouteMasterItemsEditDialog = React.memo((props: Props) => {
@@ -73,16 +86,10 @@ export const PlanRouteMasterItemsEditDialog = React.memo((props: Props) => {
         dialogChildRef.current = (
             <Typography component={'div'}>
                 <DialogTitle>
-                    {/* TODO Un-hardcode title strings */}
-                    {dialogData.action === EditDialogAction.Add ? 'Add Servant to Plan' : 'Edit Servant Targets'}
+                    Edit Inventory
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
-                <PlanRouteMasterItemsEditDialogContent
-                    dialogData={dialogData}
-                    targetPlanServantsData={targetPlanServantsData}
-                    activeTab={activeTab}
-                    onTabChange={onTabChange}
-                />
+                <PlanRoutePlanMasterItemsEditDialogContent dialogData={dialogData} />
                 <DialogActions>
                     <Button
                         variant={actionButtonVariant}

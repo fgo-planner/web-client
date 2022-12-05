@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { MasterServantAggregatedData } from '../../../../../types';
+import { PlanRouteMasterItemsEditDialogData } from '../components/PlanRouteMasterItemsEditDialogData.type';
 import { PlanRoutePlanServantDeleteDialogData } from '../components/PlanRoutePlanServantDeleteDialog';
 import { PlanRoutePlanServantEditDialogData } from '../components/PlanRoutePlanServantEditDialogData.type';
 
@@ -14,7 +15,7 @@ export type PlanRouteOpenDialogInfo = {
     name: undefined;
 } | {
     name: 'masterItemsEdit';
-    data: any;  // TODO Create type for this
+    data: PlanRouteMasterItemsEditDialogData;
 } | {
     name: 'masterServantEdit';
     data: any;  // TODO Create type for this
@@ -32,7 +33,7 @@ export type PlanRouteOpenDialogInfo = {
 export type PlanRouteDialogState = {
     openDialogInfo: Readonly<PlanRouteOpenDialogInfo>;
     closeAllDialogs: () => void;
-    openMasterItemsEditDialog: (data: any) => void;
+    openMasterItemsEditDialog: (data: PlanRouteMasterItemsEditDialogData) => void;
     openMasterServantEditDialog: (data: any) => void;
     openPlanServantDeleteDialog: (data: PlanRoutePlanServantDeleteDialogData) => void;
     openPlanServantEditDialog: (data: PlanRoutePlanServantEditDialogData) => void;
@@ -56,7 +57,7 @@ export function usePlanRouteDialogState(): PlanRouteDialogState {
         });
     }, []);
 
-    const openMasterItemsEditDialog = useCallback((data: any): void => {
+    const openMasterItemsEditDialog = useCallback((data: PlanRouteMasterItemsEditDialogData): void => {
         setOpenDialogInfo({ name: 'masterItemsEdit', data });
     }, []);
 

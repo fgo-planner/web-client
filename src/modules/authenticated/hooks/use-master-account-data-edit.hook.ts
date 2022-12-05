@@ -615,7 +615,7 @@ export function useMasterAccountDataEdit(
             }
             const updatedQuantity = getUpdatedItemQuantity(itemId, action);
             if (updatedQuantity == null) {
-                return;
+                continue;
             }
             updatedItems[itemId] = updatedQuantity;
             const isDirty = updatedQuantity !== getReferenceItemQuantity(itemId);

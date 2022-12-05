@@ -1,5 +1,5 @@
 import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
-import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, PlanServantUpdate, PlanServantUpdateUtils } from '@fgo-planner/data-core';
+import { GameItemConstants, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, PlanServantUpdate, PlanServantUpdateUtils } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -17,6 +17,8 @@ import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, Plan
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { usePlanDataEdit } from '../../hooks/use-plan-data-edit.hook';
+import { PlanRouteMasterItemsEditDialog } from './components/PlanRouteMasterItemsEditDialog';
+import { PlanRouteMasterItemsEditDialogData } from './components/PlanRouteMasterItemsEditDialogData.type';
 import { PlanRouteNavigationRail } from './components/PlanRouteNavigationRail';
 import { PlanRoutePlanServantDeleteDialog, PlanRoutePlanServantDeleteDialogData } from './components/PlanRoutePlanServantDeleteDialog';
 import { PlanRoutePlanServantEditDialog } from './components/PlanRoutePlanServantEditDialog';
@@ -246,6 +248,16 @@ export const PlanRoute = React.memo(() => {
         });
     }, [openPlanServantDeleteDialog, selectedServantsData]);
 
+    const openEditItemsDialog = useCallback((): void => {
+        const masterItemsEditDialogData: PlanRouteMasterItemsEditDialogData = {
+            items: {
+                ...masterAccountEditData.items
+            },
+            qp: masterAccountEditData.qp
+        };
+        openMasterItemsEditDialog(masterItemsEditDialogData);
+    }, [masterAccountEditData, openMasterItemsEditDialog]);
+
     /**
      * Adds a listener to invoke the `openDeleteServantDialog` function when the
      * delete key is pressed.
@@ -324,17 +336,6 @@ export const PlanRoute = React.memo(() => {
     //#endregion
 
 
-    //#region Common event handlers
-
-    const handleAddServant = openAddServantDialog;
-
-    const handleEditSelectedServants = openEditServantDialog;
-
-    const handleDeleteSelectedServants = openDeleteServantDialog;
-
-    //#endregion
-
-
     //#region Other event handlers
 
     const handleSaveButtonClick = useCallback(async (): Promise<void> => {
@@ -387,6 +388,26 @@ export const PlanRoute = React.memo(() => {
         deletePlanServants(data.targetPlanServantsData.map(InstantiatedServantUtils.getInstanceId));
     }, [closeAllDialogs, deletePlanServants]);
 
+    const handleEditItemsDialogClose = useCallback((
+        _event: MouseEvent,
+        _reason: ModalOnCloseReason,
+        data?: PlanRouteMasterItemsEditDialogData
+    ): any => {
+        closeAllDialogs();
+        /**
+         * Close the dialog without taking any further action if the changes were
+         * cancelled (if `data` is undefined, then the changes were cancelled).
+         */
+        if (!data) {
+            return;
+        }
+        const itemUpdates = {
+            ...data.items,
+            [GameItemConstants.QpItemId]: data.qp
+        };
+        updateMasterItems(itemUpdates);
+    }, [closeAllDialogs, updateMasterItems]);
+
     //#endregion
 
 
@@ -415,13 +436,13 @@ export const PlanRoute = React.memo(() => {
                     layout={sm ? 'column' : 'row'}
                     dragDropMode={dragDropMode}
                     selectedServantsCount={selectedServantsData.ids.size}
-                    onAddServant={handleAddServant}
+                    onAddServant={openAddServantDialog}
                     onMultiAddServant={handleMultiAddServant}
-                    onDeleteSelectedServants={handleDeleteSelectedServants}
+                    onDeleteSelectedServants={openDeleteServantDialog}
                     onDragDropActivate={handleDragDropActivate}
                     onDragDropApply={handleDragDropApply}
                     onDragDropCancel={handleDragDropCancel}
-                    onEditSelectedServants={handleEditSelectedServants}
+                    onEditSelectedServants={openEditServantDialog}
                     onOpenDisplaySettings={() => { }}
                     onToggleCellSize={toggleCellSize}
                     onToggleRowheaderMode={toggleRowHeaderMode}
@@ -434,6 +455,7 @@ export const PlanRoute = React.memo(() => {
                             planRequirements={planRequirements}
                             selectedInstanceIds={selectedServantsData.ids}
                             options={tableOptions}
+                            onEditMasterItems={openEditItemsDialog}
                             onRowDoubleClick={handleRowDoubleClick}
                             onSelectionChange={updateServantSelection}
                         />
@@ -450,6 +472,10 @@ export const PlanRoute = React.memo(() => {
             <PlanRoutePlanServantDeleteDialog
                 dialogData={openDialogInfo.name === 'planServantDelete' ? openDialogInfo.data : undefined}
                 onClose={handleDeleteServantDialogClose}
+            />
+            <PlanRouteMasterItemsEditDialog
+                dialogData={openDialogInfo.name === 'masterItemsEdit' ? openDialogInfo.data : undefined}
+                onClose={handleEditItemsDialogClose}
             />
         </Box>
     );

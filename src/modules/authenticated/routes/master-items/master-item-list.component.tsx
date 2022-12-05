@@ -18,21 +18,19 @@ type ItemCategory = {
 
 type Props = {
     itemQuantities: ReadonlyRecord<number, number>;
-    onChange: (itemId: number, quantity: SetStateAction<number>) => void;
     qp: number;
+    showQuantityHeaderLabel?: boolean;
+    onChange: (itemId: number, quantity: SetStateAction<number>) => void;
 };
 
 const StyleClassPrefix = 'MasterItemList';
 
 const StyleProps = (theme: SystemTheme) => {
 
-    const {
-        breakpoints,
-        palette
-    } = theme as Theme;
+    const { breakpoints } = theme as Theme;
 
     return {
-        backgroundColor: palette.background.paper,
+        // backgroundColor: palette.background.paper,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -73,8 +71,9 @@ export const MasterItemList = React.memo((props: Props) => {
 
     const {
         itemQuantities,
-        onChange,
-        qp
+        qp,
+        showQuantityHeaderLabel,
+        onChange
     } = props;
 
     const itemCategories = useMemo((): Array<ItemCategory> => {
@@ -142,7 +141,10 @@ export const MasterItemList = React.memo((props: Props) => {
     const renderItemCategory = (category: ItemCategory, index: number): ReactNode => {
         return (
             <div key={category.key} className={`${StyleClassPrefix}-item-category`}>
-                <MasterItemListHeader categoryLabel={category.label} showQuantityLabel={index === 0} />
+                <MasterItemListHeader
+                    categoryLabel={category.label}
+                    showQuantityLabel={showQuantityHeaderLabel && index === 0}
+                />
                 {category.itemIds.map(renderItemRow)}
             </div>
         );

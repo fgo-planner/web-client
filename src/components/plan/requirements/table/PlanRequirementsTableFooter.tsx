@@ -1,4 +1,6 @@
 import { GameItemConstants } from '@fgo-planner/data-core';
+import { ModeEditOutlined as ModeEditOutlinedIcon } from '@mui/icons-material';
+import { IconButton, Tooltip } from '@mui/material';
 import React, { ReactNode } from 'react';
 import { PlanRequirements } from '../../../../types';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
@@ -10,6 +12,7 @@ type Props = {
     hoverItemId: number | undefined;
     options: PlanRequirementsTableOptionsInternal;
     planRequirements: PlanRequirements;
+    onEditMasterItems?: () => void;
     onHover: (index?: number, itemId?: number) => void;
 };
 
@@ -28,6 +31,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
             requirements,
             resources
         },
+        onEditMasterItems,
         onHover
     } = props;
 
@@ -75,6 +79,16 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
 
     const inventoryStickyContent: ReactNode = (
         <div className={`${StyleClassPrefix}-sticky-content`}>
+            {onEditMasterItems &&
+                <Tooltip title='Edit inventory' placement='left'>
+                    <IconButton
+                        // color='info'
+                        onClick={onEditMasterItems}
+                        children={<ModeEditOutlinedIcon />}
+                        size='small'
+                    />
+                </Tooltip>
+            }
             <span>Inventory</span>
         </div>
     );

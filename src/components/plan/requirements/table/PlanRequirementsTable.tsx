@@ -24,6 +24,7 @@ type Props = {
      * Instance IDs of selected servants.
      */
     selectedInstanceIds?: ReadonlySet<number>;
+    onEditMasterItems?: () => void;
     onRowClick?: MouseEventHandler;
     onRowDoubleClick?: MouseEventHandler;
     onSelectionChange?: (selectedInstanceIds: ReadonlySet<number>) => void;
@@ -87,6 +88,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         planRequirements,
         planServantsData,
         selectedInstanceIds = CollectionUtils.emptySet(),
+        onEditMasterItems,
         onRowClick,
         onRowDoubleClick,
         onSelectionChange
@@ -223,6 +225,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                     hoverItemId={hoverState.itemId}
                     planRequirements={planRequirements}
                     options={internalTableOptions}
+                    onEditMasterItems={onEditMasterItems}
                     onHover={handleHover}
                 />
             </div>

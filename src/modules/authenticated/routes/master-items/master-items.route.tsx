@@ -17,6 +17,7 @@ const StyleProps = (theme: SystemTheme) => {
 
     const {
         breakpoints,
+        palette,
         spacing
     } = theme as Theme;
 
@@ -33,7 +34,8 @@ const StyleProps = (theme: SystemTheme) => {
                 width: `calc(100% - ${spacing(ThemeConstants.NavigationRailSizeScale)})`,
                 [`& .${StyleClassPrefix}-list-container`]: {
                     flex: 1,
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    backgroundColor: palette.background.paper
                 }
             },
             [breakpoints.down('sm')]: {
@@ -124,6 +126,7 @@ export const MasterItemsRoute = React.memo(() => {
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <MasterItemList
+                            showQuantityHeaderLabel
                             itemQuantities={masterAccountEditData.items}
                             qp={masterAccountEditData.qp}
                             onChange={updateItem}

@@ -1,5 +1,5 @@
 import { CollectionUtils, DateTimeUtils, Immutable, ImmutableArray, Nullable, ReadonlyDate, ReadonlyRecord } from '@fgo-planner/common-core';
-import { ExistingMasterServantUpdate, ImmutablePlan, InstantiatedServantUtils, Plan, PlanServant, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanUpcomingResources, PlanUtils } from '@fgo-planner/data-core';
+import { ImmutablePlan, InstantiatedServantUtils, MasterServantUpdate, Plan, PlanServant, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanUpcomingResources, PlanUtils } from '@fgo-planner/data-core';
 import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
@@ -7,9 +7,9 @@ import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/ut
 import { PlanService } from '../../../services/data/plan/plan.service';
 import { MasterServantAggregatedData, PlanRequirements, PlanServantAggregatedData } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/data-aggregation.utils';
+import * as PlanComputationUtils from '../../../utils/plan/plan-computation.utils';
 import { DataEditUtils } from './data-edit.utils';
 import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccountDataEdit } from './use-master-account-data-edit.hook';
-import * as PlanComputationUtils from '../../../utils/plan/plan-computation.utils';
 
 //#region Type definitions
 
@@ -88,7 +88,7 @@ type PlanDataEditHookResult = {
      * Calls the `updateServants` function from the `useMasterAccountDataEdit`
      * internally.
      */
-    updateMasterServants: (instanceIds: Iterable<number>, update: ExistingMasterServantUpdate) => void;
+    updateMasterServants: (instanceIds: Iterable<number>, update: MasterServantUpdate) => void;
     updatePlanInfo: (planInfo: PlanInfo) => void;
     /**
      * Adds a single servant using the given `PlanServantUpdate` object.

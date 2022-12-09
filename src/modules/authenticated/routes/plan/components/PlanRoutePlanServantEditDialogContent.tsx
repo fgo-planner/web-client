@@ -16,7 +16,7 @@ type Props = {
     activeTab: PlanServantEditTab;
     /**
      * DTO containing the dialog data that will be returned to the parent component
-     * on dialog close. This object will be modified directly.
+     * on dialog close. Data contained in this object may be modified directly.
      */
     dialogData: PlanRoutePlanServantEditDialogData;
     /**
@@ -102,8 +102,6 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
         targetPlanServantsData
     } = props;
 
-    const servantSelectDisabled = action === EditDialogAction.Edit;
-
     /**
      * This is used as a data source by children components. The source of this data
      * depends on whether the dialog in add mode or edit mode.
@@ -131,7 +129,6 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
         setTargetMasterServantsData(targetPlanServantsData);
     }, [action, targetPlanServantsData]);
 
-
     /**
      * Compute the costumes data here instead of inside the costumes tab
      * component(s) to avoid recomputing every time the user changes to/from the
@@ -140,6 +137,8 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
      */
     /** */
     const costumesData = useGameServantCostumesData(targetPlanServantsData);
+
+    const servantSelectDisabled = action === EditDialogAction.Edit;
 
 
     //#region Input event handlers

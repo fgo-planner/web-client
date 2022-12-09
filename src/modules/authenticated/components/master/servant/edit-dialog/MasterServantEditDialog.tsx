@@ -1,23 +1,22 @@
-import { ReadonlyRecord } from '@fgo-planner/common-core';
-import { InstantiatedServantBondLevel, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogTitle, PaperProps, SxProps, Typography } from '@mui/material';
 import { Theme as SystemTheme } from '@mui/system';
-import React, { MouseEvent, useCallback, useMemo, useRef } from 'react';
+import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { ScrollbarStyleProps } from '../../../../../../styles/scrollbar-style-props';
-import { DialogComponentProps, MasterServantAggregatedData } from '../../../../../../types';
-import { MasterServantEditDialogContent, MasterServantEditTab } from './master-servant-edit-dialog-content.component';
+import { DialogComponentProps, EditDialogAction, MasterServantAggregatedData } from '../../../../../../types';
+import { MasterServantEditDialogContent, MasterServantEditTab } from './MasterServantEditDialogContent';
+import { MasterServantEditDialogData } from './MasterServantEditDialogData.type';
 
 type Props = {
     activeTab: MasterServantEditTab;
-    bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
     /**
-     * The update payload for editing. This object will be modified directly.
-     *
+     * DTO containing the dialog data that will be returned to the parent component
+     * on dialog close. Data contained in this object may be modified directly.
+     * 
      * If this is `undefined`, then the dialog will remain closed.
      */
-    masterServantUpdate?: MasterServantUpdate;
+    dialogData?: MasterServantEditDialogData;
     onTabChange: (tab: MasterServantEditTab) => void;
     /**
      * Array containing the source `MasterServantAggregatedData` objects for the
@@ -37,7 +36,7 @@ type Props = {
      * Only used in edit mode; this is ignored in add mode.
      */
     targetMasterServantsData: ReadonlyArray<MasterServantAggregatedData>;
-} & Omit<DialogComponentProps<MasterServantUpdate>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
+} & Omit<DialogComponentProps<MasterServantEditDialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';
 const SubmitButtonLabel = 'Done';
@@ -70,8 +69,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
 
     const {
         activeTab,
-        bondLevels,
-        masterServantUpdate,
+        dialogData,
         onTabChange,
         onClose,
         targetMasterServantsData,
@@ -90,8 +88,11 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
     } = useAutoResizeDialog(props);
 
     const handleSubmitButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-        onClose(event, 'submit', masterServantUpdate);
-    }, [onClose, masterServantUpdate]);
+        if (!dialogData) {
+            return;
+        }
+        onClose(event, 'submit', dialogData);
+    }, [dialogData, onClose]);
 
     const handleCancelButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         onClose(event, 'cancel');
@@ -101,23 +102,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
         onClose(event, reason);
     }, [onClose]);
 
-    const multiEditMode = targetMasterServantsData.length > 1;
-
-    const dialogTitle = useMemo((): string => {
-        if (!masterServantUpdate) {
-            return '';
-        }
-        // TODO Un-hardcode the strings.
-        if (masterServantUpdate.type === NewMasterServantUpdateType) {
-            return 'Add Servant';
-        } else if (multiEditMode)  {
-            return 'Edit Servants';
-        } else {
-            return 'Edit Servant';
-        }
-    }, [masterServantUpdate, multiEditMode]);
-
-    const open = !!masterServantUpdate;
+    const open = !!dialogData;
 
     /**
      * Only re-render the dialog contents if the dialog is open. This allows the
@@ -125,6 +110,17 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
      * transition, even if the props were changed by the parent component.
      */
     if (open) {
+
+        let dialogTitle: string;
+        // TODO Un-hardcode title strings
+        if (dialogData.action === EditDialogAction.Add) {
+            dialogTitle = 'Add Servant';
+        } else if (targetMasterServantsData.length > 1)  {
+            dialogTitle = 'Edit Servants';
+        } else {
+            dialogTitle = 'Edit Servant';
+        }
+
         dialogContentsRef.current = (
             <Typography component={'div'}>
                 <DialogTitle>
@@ -132,8 +128,7 @@ export const MasterServantEditDialog = React.memo((props: Props) => {
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
                 <MasterServantEditDialogContent
-                    bondLevels={bondLevels}
-                    masterServantUpdate={masterServantUpdate}
+                    dialogData={dialogData}
                     targetMasterServantsData={targetMasterServantsData}
                     showAppendSkills
                     activeTab={activeTab}

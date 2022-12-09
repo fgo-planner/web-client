@@ -2,15 +2,15 @@ import { Immutable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
-import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCallback, useMemo } from 'react';
-import { ServantClassIcon } from '../../../../../components/servant/ServantClassIcon';
-import { useGameServantList } from '../../../../../hooks/data/use-game-servant-list.hook';
-import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
+import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
+import { ServantClassIcon } from '../../../../../../components/servant/ServantClassIcon';
+import { useGameServantList } from '../../../../../../hooks/data/use-game-servant-list.hook';
+import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 
 type Props = {
     disabled?: boolean;
-    multiEditMode?: boolean;
-    onChange?: (value: Immutable<GameServant>) => void;
+    multiEditMode: boolean;
+    onChange: (value: Immutable<GameServant>) => void;
     selectedServant?: Immutable<GameServant>;
     size?: 'small' | 'medium';
 };
@@ -39,7 +39,7 @@ const optionStyles = {
     } as SystemStyleObject<Theme>
 };
 
-const generateServantOption = (servant: Immutable<GameServant>): ServantOption => {
+const generateOption = (servant: Immutable<GameServant>): ServantOption => {
     const label = servant.metadata?.displayName || servant.name || String(servant._id);
     return { label, servant };
 };
@@ -81,7 +81,7 @@ const renderInput = (params: any): ReactNode => {
     return <TextField {...params} label='Servant' variant='outlined' />;
 };
 
-export const MasterServantSelectAutocomplete = React.memo((props: Props) => {
+export const MasterServantEditDialogAutocomplete = React.memo((props: Props) => {
 
     const gameServantList = useGameServantList();
 
@@ -93,18 +93,29 @@ export const MasterServantSelectAutocomplete = React.memo((props: Props) => {
         size
     } = props;
 
+    /**
+     * If there is currently no servant selected, and there are available servants,
+     * then select the first servant from the list.
+     */
+    useEffect((): void => {
+        if (selectedServant || !gameServantList?.length) {
+            return;
+        }
+        onChange(gameServantList[0]);
+    }, [gameServantList, onChange, selectedServant]);
+
     const options = useMemo((): Array<ServantOption> => {
         if (!gameServantList?.length) {
             return [];
         }
-        return gameServantList.map(generateServantOption);
+        return gameServantList.map(generateOption);
     }, [gameServantList]);
 
     const selectedOption = useMemo((): ServantOption | undefined => {
         if (!selectedServant || !options.length) {
             return undefined;
         }
-        return generateServantOption(selectedServant);
+        return generateOption(selectedServant);
     }, [options, selectedServant]);
 
     const handleChange = useCallback((_: SyntheticEvent, value: ServantOption | null): void => {
@@ -112,10 +123,19 @@ export const MasterServantSelectAutocomplete = React.memo((props: Props) => {
             // Is this case even possible?
             return;
         }
-        onChange?.(value.servant);
+        onChange(value.servant);
     }, [onChange]);
 
-    if (multiEditMode || disabled || !selectedOption) {
+    /**
+     * This can be undefined during the initial render. We need to return `null`
+     * first or else the input box will not be populated when a servant is
+     * auto-selected.
+     */
+    if (!selectedServant) {
+        return null;
+    }
+
+    if (multiEditMode || disabled) {
         return (
             <TextField
                 variant='outlined'

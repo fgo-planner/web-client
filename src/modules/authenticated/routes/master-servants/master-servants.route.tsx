@@ -1,4 +1,4 @@
-import { ExistingMasterServantUpdate, ExistingMasterServantUpdateType, InstantiatedServantUpdateUtils, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, NewMasterServantUpdateType } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUpdateUtils, InstantiatedServantUtils, MasterServantConstants, MasterServantUpdate, MasterServantUpdateUtils } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -12,10 +12,11 @@ import { useContextMenuState } from '../../../../hooks/user-interface/use-contex
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { MasterServantAggregatedData, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
+import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
 import { DataAggregationUtils } from '../../../../utils/data-aggregation.utils';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
-import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/master-servant-edit-dialog.component';
+import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/MasterServantEditDialog';
+import { MasterServantEditDialogData } from '../../components/master/servant/edit-dialog/MasterServantEditDialogData.type';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
@@ -162,15 +163,9 @@ export const MasterServantsRoute = React.memo(() => {
     const [isMultiAddServantDialogOpen, setIsMultiAddServantDialogOpen] = useState<boolean>(false);
 
     /**
-     * The `MasterServantUpdate` that is passed directly into and modified by the
-     * dialog. The original plan servant is not modified until the changes are
-     * submitted.
-     *
-     * The `open` state of the servant edit dialog is also determined by whether
-     * this data is present (dialog is opened if data is defined, and closed if data
-     * is undefined).
+     * TODO Move to dialog state hook.
      */
-    const [editServantDialogData, setEditServantDialogData] = useState<MasterServantUpdate>();
+    const [editServantDialogData, setEditServantDialogData] = useState<MasterServantEditDialogData>();
 
     /**
      * Contains the message prompt that is displayed by the delete servant dialog.
@@ -203,7 +198,7 @@ export const MasterServantsRoute = React.memo(() => {
     /**
      * Applies the submitted edit to the currently selected servants.
      */
-    const applyUpdateToSelectedServants = useCallback((update: ExistingMasterServantUpdate) => {
+    const applyUpdateToSelectedServants = useCallback((update: MasterServantUpdate) => {
         updateServants(selectedServantsData.ids, update);
     }, [selectedServantsData, updateServants]);
 
@@ -220,8 +215,16 @@ export const MasterServantsRoute = React.memo(() => {
             costumes
         } = masterAccountEditData;
 
-        const editServantDialogData = MasterServantUpdateUtils.createNew(bondLevels, costumes);
-        setEditServantDialogData(editServantDialogData);
+        const gameId = MasterServantConstants.DefaultServantId;
+        const masterServantEditDialogData: MasterServantEditDialogData = {
+            action: EditDialogAction.Add,
+            data: {
+                gameId,
+                update: MasterServantUpdateUtils.createNew(gameId, bondLevels, costumes),
+                bondLevels
+            }
+        };
+        setEditServantDialogData(masterServantEditDialogData);
         setIsMultiAddServantDialogOpen(false);
         setDeleteServantDialogData(undefined);
     }, [masterAccountEditData]);
@@ -243,8 +246,15 @@ export const MasterServantsRoute = React.memo(() => {
             costumes
         } = masterAccountEditData;
 
-        const editServantDialogData = MasterServantUpdateUtils.createFromExisting(selectedServants, bondLevels, costumes);
-        setEditServantDialogData(editServantDialogData);
+        const masterServantEditDialogData: MasterServantEditDialogData = {
+            action: EditDialogAction.Edit,
+            data: {
+                gameId: IndeterminateValue,
+                update: MasterServantUpdateUtils.createFromExisting(selectedServants, bondLevels, costumes),
+                bondLevels
+            }
+        };
+        setEditServantDialogData(masterServantEditDialogData);
         setIsMultiAddServantDialogOpen(false);
         setDeleteServantDialogData(undefined);
     }, [masterAccountEditData, selectedServantsData]);
@@ -393,7 +403,7 @@ export const MasterServantsRoute = React.memo(() => {
         setIsMultiAddServantDialogOpen(false);
     }, [addServants]);
 
-    const handleEditServantDialogClose = useCallback((_event: any, _reason: any, data?: MasterServantUpdate): void => {
+    const handleEditServantDialogClose = useCallback((_event: any, _reason: any, data?: MasterServantEditDialogData): void => {
         setEditServantDialogData(undefined);
         /**
          * Close the dialog without taking any further action if the changes were
@@ -402,10 +412,11 @@ export const MasterServantsRoute = React.memo(() => {
         if (!data) {
             return;
         }
-        if (data.type === NewMasterServantUpdateType) {
-            addServant(data);
-        } else if (data.type === ExistingMasterServantUpdateType) {
-            applyUpdateToSelectedServants(data);
+        if (data.action === EditDialogAction.Add) {
+            const { gameId, update } = data.data;
+            addServant(gameId, update);
+        } else {
+            applyUpdateToSelectedServants(data.data.update);
         }
         /**
          * Should not be possible for update type to be `Imported` here.
@@ -514,8 +525,7 @@ export const MasterServantsRoute = React.memo(() => {
                 </div>
             </div>
             <MasterServantEditDialog
-                bondLevels={bondLevels}
-                masterServantUpdate={editServantDialogData}
+                dialogData={editServantDialogData}
                 targetMasterServantsData={selectedServantsData.instances}
                 activeTab={servantEditDialogActiveTab}
                 onTabChange={setServantEditDialogActiveTab}

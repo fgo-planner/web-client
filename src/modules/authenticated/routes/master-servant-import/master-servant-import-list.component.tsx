@@ -1,5 +1,5 @@
 import { CollectionUtils, Functions } from '@fgo-planner/common-core';
-import { ImportedMasterServantUpdate, InstantiatedServantBondLevel, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterServant, MasterServantUpdateUtils } from '@fgo-planner/data-core';
+import { BatchMasterServantUpdate, InstantiatedServantBondLevel, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterServant, MasterServantUpdateUtils } from '@fgo-planner/data-core';
 import { Check as CheckIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { Button, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -19,7 +19,7 @@ type Props = {
     hasExistingServants: boolean;
     onCancel: () => void;
     onSubmit: (existingAction?: ExistingAction) => void;
-    parsedServants: Array<ImportedMasterServantUpdate>;
+    parsedServants: Array<BatchMasterServantUpdate>;
 };
 
 const ParseResultHelperText = `The following servants were parsed from the given data. They have NOT been imported yet. Please review the

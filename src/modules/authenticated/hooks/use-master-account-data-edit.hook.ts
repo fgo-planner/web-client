@@ -1,5 +1,5 @@
 import { CollectionUtils, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { ExistingMasterServantUpdate, GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdateUtils, MasterServantUtils, NewMasterServantUpdate } from '@fgo-planner/data-core';
+import { GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameServantMap } from '../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
@@ -115,21 +115,21 @@ type MasterAccountUpdateFunctions = {
     updateItems: (items: ReadonlyRecord<number, SetStateAction<number>>) => void;
     updateQp: (action: SetStateAction<number>) => void;
     /**
-     * Adds a single servant using the given `NewMasterServantUpdate` object.
+     * Adds a single servant using the given `MasterServantUpdate` object.
      * 
      * Calls the `addServants` function internally. 
      */
-    addServant: (servantData: NewMasterServantUpdate) => void;
+    addServant: (gameId: number, servantData: MasterServantUpdate) => void;
     /**
      * Batch adds servants. Each added servant will be instantiated using the given
-     * `NewMasterServantUpdate` object.
+     * `MasterServantUpdate` object.
      */
-    addServants: (servantIds: Iterable<number>, servantData: NewMasterServantUpdate) => void;
+    addServants: (gameIds: Iterable<number>, servantData: MasterServantUpdate) => void;
     /**
      * Updates the servants with the corresponding `instanceIds` using the given
-     * `ExistingMasterServantUpdate` object.
+     * `MasterServantUpdate` object.
      */
-    updateServants: (instanceIds: Iterable<number>, update: ExistingMasterServantUpdate) => void;
+    updateServants: (instanceIds: Iterable<number>, update: MasterServantUpdate) => void;
     /**
      * Updates the servant ordering based on an array of `instanceId` values.
      * Assumes that the array contains a corresponding `instanceId` value for each
@@ -639,7 +639,7 @@ export function useMasterAccountDataEdit(
         editData.items = updatedItems;
     }, [editData, getReferenceItemQuantity, getUpdatedItemQuantity, includeItems, updateQp]);
 
-    const addServants = useCallback((servantIds: Iterable<number>, servantData: NewMasterServantUpdate): void => {
+    const addServants = useCallback((gameIds: Iterable<number>, servantData: MasterServantUpdate): void => {
         if (!includeServants || !gameServantMap) {
             return;
         }
@@ -670,17 +670,19 @@ export function useMasterAccountDataEdit(
         const newServantsData: Array<MasterServantAggregatedData> = [];
 
         /**
-         * Construct new instance of a `MasterServant` object for each `servantId` and
+         * Construct new instance of a `MasterServant` object for each `gameId` and
          * add to the array. Unlocked costumes are also updated during this process.
          */
-        for (const servantId of servantIds) {
+        for (const gameId of gameIds) {
             const newServant = MasterServantUtils.instantiate(++lastServantInstanceId);
+            
+            MasterServantUpdateUtils.applyToMasterServant(servantData, newServant, bondLevels, costumes);
+            newServant.gameId = gameId;
+
             const newServantData = DataAggregationUtils.aggregateDataForMasterServant(newServant, gameServantMap);
             if (!newServantData) {
                 continue;
             }
-            MasterServantUpdateUtils.applyToMasterServant(servantData, newServant, bondLevels, costumes);
-            newServant.gameId = servantId;
             newServantsData.push(newServantData);
         }
 
@@ -711,11 +713,11 @@ export function useMasterAccountDataEdit(
         });
     }, [editData, gameServantMap, includeServants, referenceData]);
 
-    const addServant = useCallback((servantData: NewMasterServantUpdate): void => {
-        addServants([servantData.gameId], servantData);
+    const addServant = useCallback((gameId: number, servantData: MasterServantUpdate): void => {
+        addServants([gameId], servantData);
     }, [addServants]);
 
-    const updateServants = useCallback((instanceIds: Iterable<number>, update: ExistingMasterServantUpdate): void => {
+    const updateServants = useCallback((instanceIds: Iterable<number>, update: MasterServantUpdate): void => {
         if (!includeServants) {
             return;
         }

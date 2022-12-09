@@ -1,4 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
 import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateNumber, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
@@ -14,18 +14,12 @@ import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.h
 
 type Props = {
     /**
-     * The game servant data that corresponds to the servant being edited. This
-     * should be set to `undefined` if and only if multiple servants are being
-     * edited.
-     */
-    gameServant?: Immutable<GameServant>;
-    /**
-     * The update payload for editing. This will be modified directly, so provide a
-     * clone if modification to the original object is not desired.
+     * The servant update data. This object will be modified directly.
      */
     masterServantUpdate: MasterServantUpdate;
+    multiEditMode: boolean;
     readonly?: boolean;
-    showAppendSkills?: boolean;
+    targetGameServantsData: ImmutableArray<GameServant>;
 };
 
 const StyleClassPrefix = 'MasterServantEditDialogEnhancementsTabContent';
@@ -68,18 +62,11 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
     const forceUpdate = useForceUpdate();
 
     const {
-        gameServant,
         masterServantUpdate,
+        multiEditMode,
         readonly,
-        showAppendSkills
+        targetGameServantsData
     } = props;
-
-    /**
-     * An undefined `gameServant` value indicates that multiple servants are being
-     * edited.
-     */
-    /** */
-    const multiEditMode = !gameServant;
 
 
     //#region Input event handlers
@@ -159,11 +146,22 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
         appendSkills
     } = masterServantUpdate;
 
+    let targetGameServant: Immutable<GameServant> | undefined;
+    if (!multiEditMode) {
+        /**
+         * This can be empty during the initial render.
+         */
+        if (!targetGameServantsData.length) {
+            return null;
+        }
+        targetGameServant = targetGameServantsData[0];
+    }
+
     const levelField = (
         <ServantLevelInputField
             level={String(level || '')}
             ascension={String(ascension)}
-            gameServant={gameServant}
+            gameServant={targetGameServant}
             label='Level'
             multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
@@ -175,7 +173,7 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
         <ServantAscensionInputField
             level={String(level || '')}
             ascension={String(ascension)}
-            gameServant={gameServant}
+            gameServant={targetGameServant}
             label='Ascension'
             multiEditMode={multiEditMode}
             onChange={handleLevelAscensionInputChange}
@@ -289,11 +287,6 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
 
     //#region Main component rendering
 
-    if (!gameServant && !multiEditMode) {
-        console.error('MasterServantEditEnhancementsTabContent: gameServant must be provided when editing single servant');
-        return null;
-    }
-
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-input-field-group`}>
@@ -305,7 +298,7 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
                 </InputFieldContainer>
                 <ServantLevelQuickToggleButtons
                     className={`${StyleClassPrefix}-toggle-button-group`}
-                    maxNaturalLevel={gameServant?.maxLevel || 90}
+                    maxNaturalLevel={targetGameServant?.maxLevel || 90}
                     onClick={handleLevelQuickToggleClick}
                     ignoreTabNavigation
                     disabled={readonly || multiEditMode}
@@ -346,29 +339,27 @@ export const MasterServantEditDialogEnhancementsTabContent = React.memo((props: 
                     disabled={readonly}
                 />
             </div>
-            {showAppendSkills && (
-                <div className={`${StyleClassPrefix}-input-field-group`}>
-                    <InputFieldContainer>
-                        {appendSkill1Field}
-                    </InputFieldContainer>
-                    <InputFieldContainer>
-                        {appendSkill2Field}
-                    </InputFieldContainer>
-                    <InputFieldContainer>
-                        {appendSkill3Field}
-                    </InputFieldContainer>
-                    <ServantSkillQuickToggleButtons
-                        className={`${StyleClassPrefix}-toggle-button-group`}
-                        skillSet='appendSkills'
-                        leftToggleTarget={0}
-                        centerToggleTarget={1}
-                        rightToggleTarget={9}
-                        ignoreTabNavigation
-                        onClick={handleSkillQuickToggleClick}
-                        disabled={readonly}
-                    />
-                </div>
-            )}
+            <div className={`${StyleClassPrefix}-input-field-group`}>
+                <InputFieldContainer>
+                    {appendSkill1Field}
+                </InputFieldContainer>
+                <InputFieldContainer>
+                    {appendSkill2Field}
+                </InputFieldContainer>
+                <InputFieldContainer>
+                    {appendSkill3Field}
+                </InputFieldContainer>
+                <ServantSkillQuickToggleButtons
+                    className={`${StyleClassPrefix}-toggle-button-group`}
+                    skillSet='appendSkills'
+                    leftToggleTarget={0}
+                    centerToggleTarget={1}
+                    rightToggleTarget={9}
+                    ignoreTabNavigation
+                    onClick={handleSkillQuickToggleClick}
+                    disabled={readonly}
+                />
+            </div>
         </Box>
     );
 

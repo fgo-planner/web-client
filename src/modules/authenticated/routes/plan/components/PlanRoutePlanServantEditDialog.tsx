@@ -10,7 +10,7 @@ type Props = {
     activeTab: PlanServantEditTab;
     /**
      * DTO containing the dialog data that will be returned to the parent component
-     * on dialog close. This object will be modified directly.
+     * on dialog close. Data contained in this object may be modified directly.
      * 
      * If this is `undefined`, then the dialog will remain closed.
      */
@@ -87,11 +87,19 @@ export const PlanRoutePlanServantEditDialog = React.memo((props: Props) => {
      * transition, even if the props were changed by the parent component.
      */
     if (open) {
+        
+        let dialogTitle: string;
+        // TODO Un-hardcode title strings
+        if (dialogData.action === EditDialogAction.Add) {
+            dialogTitle = 'Add Servant to Plan';
+        } else {
+            dialogTitle = 'Edit Servant Targets';
+        }
+
         dialogChildRef.current = (
             <Typography component={'div'}>
                 <DialogTitle>
-                    {/* TODO Un-hardcode title strings */}
-                    {dialogData.action === EditDialogAction.Add ? 'Add Servant to Plan' : 'Edit Servant Targets'}
+                    {dialogTitle}
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
                 <PlanRoutePlanServantEditDialogContent

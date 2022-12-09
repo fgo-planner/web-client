@@ -2,7 +2,7 @@ import { CollectionUtils, ReadonlyPartial, ReadonlyRecord } from '@fgo-planner/c
 import { InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo } from 'react';
+import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
@@ -71,6 +71,15 @@ export const MasterServantList = React.memo((props: Props) => {
         textFilter,
         visibleColumns
     } = props;
+
+    /**
+     * Due to the `onClick` event potentially firing before the `onDoubleClick` for
+     * the same click, we need a way to prevent the `onClick` event on a row from
+     * doing anything if the a `onDoubleClick` was also triggered in the same click.
+     *
+     * The row with this index will have its `onClick` events negated.
+     */
+    const blockedRowClickIndex = useRef<number>();
 
     const displayedMasterServantsData = useMemo((): ReadonlyArray<MasterServantAggregatedData> => {
         if (dragDropMode) {
@@ -164,9 +173,27 @@ export const MasterServantList = React.memo((props: Props) => {
     }, [onSelectionChange, selectionResult]);
 
     const handleRowClick = useCallback((e: MouseEvent, index: number) => {
-        handleItemClick(e, index);
-        onRowClick?.(e);
+        /**
+         * Need to set timeout here so ensure that the `onDoubleClick` event get
+         * processed before the `onClick` event.
+         */
+        setTimeout(() => {
+            if (blockedRowClickIndex.current !== index) {
+                handleItemClick(e, index);
+                onRowClick?.(e);
+            }
+            /**
+             * Only at most one `onClick` event should be blocked each time this is set...
+             * so we always reset it here.
+             */
+            blockedRowClickIndex.current = undefined;
+        });
     }, [handleItemClick, onRowClick]);
+
+    const handleRowDoubleClick = useCallback((e: MouseEvent, index: number) => {
+        blockedRowClickIndex.current = index;
+        onRowDoubleClick?.(e);
+    }, [onRowDoubleClick]);
 
 
     //#region Component rendering
@@ -190,7 +217,7 @@ export const MasterServantList = React.memo((props: Props) => {
                 onDragOrderChange={onDragOrderChange}
                 onClick={handleRowClick}
                 onContextMenu={handleRowClick}
-                onDoubleClick={onRowDoubleClick}
+                onDoubleClick={handleRowDoubleClick}
             />
         );
     };

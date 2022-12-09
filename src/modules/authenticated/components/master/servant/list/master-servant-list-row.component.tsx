@@ -1,5 +1,5 @@
 import { Immutable, ObjectUtils, ReadonlyPartial } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, InstantiatedServantUtils, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
 import { DataTableListDraggableRow } from '../../../../../../components/data-table-list/data-table-list-draggable-row.component';
 import { GameServantThumbnail } from '../../../../../../components/servant/ServantThumbnail';
@@ -16,9 +16,9 @@ type Props = {
     lastRow?: boolean;
     masterServant: ImmutableMasterServant;
     visibleColumns?: ReadonlyPartial<MasterServantListVisibleColumns>;
-    onClick?: (e: MouseEvent, index: number) => void;
+    onClick: (e: MouseEvent, index: number) => void;
     onContextMenu?: (e: MouseEvent, index: number) => void;
-    onDoubleClick?: (e: MouseEvent, index: number) => void;
+    onDoubleClick: (e: MouseEvent, index: number) => void;
     onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
 } & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu' | 'onDoubleClick'>;
 

@@ -1,26 +1,26 @@
-import { Immutable, ImmutableArray, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, InstantiatedServantBondLevel, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, MasterServantUpdate, NewMasterServantUpdateType } from '@fgo-planner/data-core';
+import { CollectionUtils, Immutable, ImmutableArray } from '@fgo-planner/common-core';
+import { GameServant, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { alpha, DialogContent, Tab, Tabs, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { ReactNode, SyntheticEvent, useCallback, useMemo, useState } from 'react';
+import { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
 import { useGameServantCostumesData } from '../../../../../../hooks/data/use-game-servant-costumes-data.hook';
-import { MasterServantAggregatedData } from '../../../../../../types';
-import { DataAggregationUtils } from '../../../../../../utils/data-aggregation.utils';
-import { MasterServantSelectAutocomplete } from '../master-servant-select-autocomplete.component';
-import { MasterServantEditDialogCostumesTabContent } from './master-servant-edit-dialog-costumes-tab-content.component';
-import { MasterServantEditDialogEnhancementsTabContent } from './master-servant-edit-dialog-enhancements-tab-content.component';
-import { MasterServantEditDialogGeneralTabContent } from './master-servant-edit-dialog-general-tab-content.component';
+import { EditDialogAction, MasterServantAggregatedData } from '../../../../../../types';
+import { MasterServantEditDialogAutocomplete } from './MasterServantEditDialogAutocomplete';
+import { MasterServantEditDialogCostumesTabContent } from './MasterServantEditDialogCostumesTabContent';
+import { MasterServantEditDialogData } from './MasterServantEditDialogData.type';
+import { MasterServantEditDialogEnhancementsTabContent } from './MasterServantEditDialogEnhancementsTabContent';
+import { MasterServantEditDialogGeneralTabContent } from './MasterServantEditDialogGeneralTabContent';
 
 export type MasterServantEditTab = 'general' | 'enhancements' | 'costumes';
 
 type Props = {
     activeTab: MasterServantEditTab;
-    bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
     /**
-     * The update payload for editing. This object will be modified directly.
+     * DTO containing the dialog data that will be returned to the parent component
+     * on dialog close. Data contained in this object may be modified directly.
      */
-    masterServantUpdate: MasterServantUpdate;
+    dialogData: MasterServantEditDialogData;
     onTabChange: (tab: MasterServantEditTab) => void;
     readonly?: boolean;
     showAppendSkills?: boolean;
@@ -40,8 +40,6 @@ type Props = {
      */
     targetMasterServantsData: ReadonlyArray<MasterServantAggregatedData>;
 };
-
-const DefaultTab = 'general';
 
 export const StyleClassPrefix = 'MasterServantEditDialogContent';
 
@@ -98,46 +96,50 @@ const StyleProps = (theme: Theme) => {
 };
 
 /**
- * TODO REMOVE React.memo. It is not needed for this component because in most
- * cases a re-render of the parent component (`MasterServantEditDialog`) will
- * also trigger a re-render of this component.
+ * React.memo is not needed for this component because in most cases a re-render
+ * of the parent component (`MasterServantEditDialog`) will also trigger a
+ * re-render of this component.
  */
 /** */
-export const MasterServantEditDialogContent = React.memo((props: Props) => {
+export const MasterServantEditDialogContent = (props: Props) => {
 
     const {
-        activeTab = DefaultTab,
-        bondLevels,
-        masterServantUpdate,
+        activeTab,
+        dialogData: {
+            action,
+            data
+        },
         onTabChange,
         readonly,
         showAppendSkills,
         targetMasterServantsData
     } = props;
 
-    const [selectedServant, setSelectedServant] = useState<Immutable<GameServant>>();
+    /**
+     * This is used as a data source by children components. The source of this data
+     * depends on whether the dialog in add mode or edit mode.
+     *
+     * In add mode, the array contains at most one element which corresponds to the
+     * selected servant. If no servant is select, then this will be an empty array.
+     *
+     * In edit mode, this is derived from the `targetMasterServantsData` data passed
+     * from the props.
+     */
+    const [
+        targetGameServantsData, 
+        setTargetGameServantsData
+    ] = useState<ImmutableArray<GameServant>>(CollectionUtils.emptyArray);
 
-    const multiEditMode = targetMasterServantsData.length > 1;
-
-    const isNewServant = masterServantUpdate.type === NewMasterServantUpdateType;
-
-    const servantSelectDisabled = readonly || multiEditMode || !isNewServant;
-
-    const targetGameServant = useMemo((): Immutable<GameServant> | undefined => {
-        if (isNewServant) {
-            return selectedServant;
+    /**
+     * Updates `targetGameServantsData` whenever the `targetMasterServantsData`
+     * reference changes in edit mode (will not do anything in add mode).
+     */
+    useEffect(() => {
+        if (action === EditDialogAction.Add) {
+            return;
         }
-        if (!multiEditMode) {
-            return targetMasterServantsData[0].gameServant;
-        }
-    }, [isNewServant, multiEditMode, selectedServant, targetMasterServantsData]);
-
-    const costumesDataSource = useMemo((): ImmutableArray<GameServant> | undefined =>{
-        if (isNewServant) {
-            return selectedServant && [selectedServant];
-        }
-        return targetMasterServantsData.map(DataAggregationUtils.getGameServant);
-    }, [isNewServant, selectedServant, targetMasterServantsData]);
+        setTargetGameServantsData(targetMasterServantsData.map(data => data.gameServant));
+    }, [action, targetMasterServantsData]);
 
     /**
      * Compute the costumes data here instead of inside the costumes tab
@@ -146,7 +148,13 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
      * from/to the respective tab).
      */
     /** */
-    const costumesData = useGameServantCostumesData(costumesDataSource);
+    const costumesData = useGameServantCostumesData(targetGameServantsData);
+
+    const isEditMode = action === EditDialogAction.Edit;
+
+    const multiEditMode = isEditMode && targetMasterServantsData.length > 1;
+
+    const servantSelectDisabled = readonly || isEditMode;
 
 
     //#region Input event handlers
@@ -156,22 +164,24 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
             return;
         }
         const gameId = value._id;
-        if (masterServantUpdate.gameId === gameId) {
+        if (data.gameId === gameId) {
             return;
         }
+        data.gameId = gameId;
+        const { bondLevels, update } = data;
+        const { ascension, level } = update;
         /**
          * Recompute level/ascension values in case the servant rarity has changed.
          */
-        const { ascension, level } = masterServantUpdate;
         if (level !== IndeterminateValue && ascension !== IndeterminateValue) {
-            masterServantUpdate.level = InstantiatedServantUtils.roundToNearestValidLevel(ascension, level, value.maxLevel);
+            update.level = InstantiatedServantUtils.roundToNearestValidLevel(ascension, level, value.maxLevel);
         }
         /**
          * Also update the bond level.
          */
-        masterServantUpdate.bondLevel = bondLevels[gameId];
-        setSelectedServant(value);
-    }, [bondLevels, servantSelectDisabled, masterServantUpdate]);
+        update.bondLevel = bondLevels[gameId];
+        setTargetGameServantsData([value]);
+    }, [servantSelectDisabled, data]);
 
     const handleActiveTabChange = useCallback((_event: SyntheticEvent, value: MasterServantEditTab): void => {
         onTabChange(value);
@@ -187,21 +197,21 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
         tabsContentNode = (
             <MasterServantEditDialogCostumesTabContent
                 costumesData={costumesData}
-                masterServantUpdate={masterServantUpdate}
+                masterServantUpdate={data.update}
             />
         );
     } else if (activeTab === 'enhancements') {
         tabsContentNode = (
             <MasterServantEditDialogEnhancementsTabContent
-                masterServantUpdate={masterServantUpdate}
-                gameServant={targetGameServant}
-                showAppendSkills={showAppendSkills}
+                masterServantUpdate={data.update}
+                multiEditMode={multiEditMode}
+                targetGameServantsData={targetGameServantsData}
             />
         );
     } else {
         tabsContentNode = (
             <MasterServantEditDialogGeneralTabContent
-                masterServantUpdate={masterServantUpdate}
+                masterServantUpdate={data.update}
                 multiEditMode={multiEditMode}
                 showAppendSkills={showAppendSkills}
             />
@@ -212,10 +222,10 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
         <DialogContent className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-input-field-group`}>
                 <InputFieldContainer>
-                    <MasterServantSelectAutocomplete
-                        selectedServant={targetGameServant}
-                        onChange={handleSelectedServantChange}
+                    <MasterServantEditDialogAutocomplete
                         multiEditMode={multiEditMode}
+                        selectedServant={targetGameServantsData[0]}
+                        onChange={handleSelectedServantChange}
                         disabled={servantSelectDisabled}
                     />
                 </InputFieldContainer>
@@ -244,4 +254,4 @@ export const MasterServantEditDialogContent = React.memo((props: Props) => {
 
     //#endregion
 
-});
+};

@@ -58,34 +58,40 @@ export const ServantEnhancementQuickToggleButtons: React.FC<Props> = (props: Pro
     return (
         <Box className={clsx(`${StyleClassPrefix}-root`, className)} sx={StyleProps}>
             <Tooltip title={leftButtonTooltip || ''} enterDelay={TooltipEnterDelay}>
-                <IconButton
-                    color='primary'
-                    onClick={onLeftButtonClick}
-                    tabIndex={tabIndex}
-                    disabled={disabled}
-                >
-                    {leftButtonIcon}
-                </IconButton>
+                <div>
+                    <IconButton
+                        color='primary'
+                        onClick={onLeftButtonClick}
+                        tabIndex={tabIndex}
+                        disabled={disabled}
+                        >
+                        {leftButtonIcon}
+                    </IconButton>
+                </div>
             </Tooltip>
             <Tooltip title={centerButtonTooltip || ''} enterDelay={TooltipEnterDelay}>
-                <IconButton
-                    color='primary'
-                    onClick={onCenterButtonClick}
-                    tabIndex={tabIndex}
-                    disabled={disabled}
-                >
-                    {centerButtonIcon}
-                </IconButton>
+                <div>
+                    <IconButton
+                        color='primary'
+                        onClick={onCenterButtonClick}
+                        tabIndex={tabIndex}
+                        disabled={disabled}
+                    >
+                        {centerButtonIcon}
+                    </IconButton>
+                </div>
             </Tooltip>
             <Tooltip title={rightButtonTooltip || ''} enterDelay={TooltipEnterDelay}>
-                <IconButton
-                    color='primary'
-                    onClick={onRightButtonClick}
-                    tabIndex={tabIndex}
-                    disabled={disabled}
-                >
-                    {rightButtonIcon}
-                </IconButton>
+                <div>
+                    <IconButton
+                        color='primary'
+                        onClick={onRightButtonClick}
+                        tabIndex={tabIndex}
+                        disabled={disabled}
+                    >
+                        {rightButtonIcon}
+                    </IconButton>
+                </div>
             </Tooltip>
         </Box>
     );

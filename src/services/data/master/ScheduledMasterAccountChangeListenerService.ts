@@ -8,7 +8,7 @@ import { SubscriptionTopics } from '../../../utils/subscription/subscription-top
 import { MasterAccountChangeListenerService } from './MasterAccountChangeListenerService';
 import { MasterAccountService } from './master-account.service';
 
-const _DefaultPollingInterval = 120000;
+const _DefaultPollingInterval = 30000;
 
 /**
  * Implementation of the `MasterAccountChangeListenerService` that uses fixed
@@ -28,10 +28,31 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
 
     private _currentTimeout?: NodeJS.Timeout;
 
+    private _windowVisible = true;
+
+    private _pollOnWindowVisible = false;
+
     constructor() {
         super();
 
         this._pollingInterval = Number(process.env.REACT_APP_MASTER_ACCOUNT_POLLING_INTERVAL) || _DefaultPollingInterval;
+
+        /**
+         * Pauses the polling when the window visibility is hidden, and resumes when 
+         */
+        window.addEventListener('visibilitychange', (e: Event) => {
+            const hidden = (e.target as Document).hidden;
+            if (hidden) {
+                console.debug('Window is hidden, account change detection paused.');
+            } else {
+                console.debug('Window is visible, account change detection resumed.');
+                if (this._pollOnWindowVisible) {
+                    this._invokePolling(true);
+                    this._pollOnWindowVisible = false;  // Reset
+                }
+            }
+            this._windowVisible = !hidden;
+        });
 
         /**
          * Set timeout before subscribing to let the dependencies inject first.
@@ -48,23 +69,39 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
                 .get(SubscriptionTopics.User.MasterAccountListChange)
                 .subscribe(this._handleMasterAccountListChange.bind(this));
         });
+
     }
 
-    private _invokePolling(): void {
+    /**
+     * @param immediate Whether the initial poll should be executed immediately. If
+     * `false`, the initial poll will happen after the set delay.
+     */
+    private _invokePolling(immediate = false): void {
+        if (immediate) {
+            this._findAndPublishChanges();
+        }
         clearTimeout(this._currentTimeout);
-        this._currentTimeout = setInterval(async () => {
-            const data = await this._masterAccountService.getAccountsForCurrentUser();
-            if (!this._currentMasterAccountList) {
+        this._currentTimeout = setInterval(() => {
+            if (!this._windowVisible) {
+                this._pollOnWindowVisible = true;  // Poll the next time window is visible
                 return;
             }
-            const changes = this._findChanges(this._currentMasterAccountList, data);
-            if (isEmpty(changes)) {
-                console.debug('No account changes found');
-            } else {
-                console.debug('Account changes found', changes);
-            }
-            this._publishAvailableChanges(changes);
+            this._findAndPublishChanges();
         }, this._pollingInterval);
+    }
+
+    private async _findAndPublishChanges(): Promise<void> {
+        const data = await this._masterAccountService.getAccountsForCurrentUser();
+        if (!this._currentMasterAccountList) {
+            return;
+        }
+        const changes = this._findChanges(this._currentMasterAccountList, data);
+        if (isEmpty(changes)) {
+            console.debug('No account changes found');
+        } else {
+            console.debug('Account changes found', changes);
+        }
+        this._publishAvailableChanges(changes);
     }
 
     private _findChanges(currentAccounts: BasicMasterAccounts, updatedAccounts: BasicMasterAccounts): MasterAccountChanges {

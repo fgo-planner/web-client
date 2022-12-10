@@ -1,10 +1,11 @@
 import { CollectionUtils, Nullable, ObjectUtils } from '@fgo-planner/common-core';
+import { isEmpty } from 'lodash-es';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { BasicMasterAccounts, MasterAccountChange, MasterAccountChanges, UserTokenPayload } from '../../../types';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
-import { MasterAccountChangeListenerService } from './master-account-change-listener.service';
+import { MasterAccountChangeListenerService } from './MasterAccountChangeListenerService';
 import { MasterAccountService } from './master-account.service';
 
 const _DefaultPollingInterval = 120000;
@@ -23,7 +24,7 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
 
     private _currentUserId?: string;
 
-    private _currentMasterAccountList: BasicMasterAccounts = [];
+    private _currentMasterAccountList: Nullable<BasicMasterAccounts>;
 
     private _currentTimeout?: NodeJS.Timeout;
 
@@ -53,13 +54,16 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
         clearTimeout(this._currentTimeout);
         this._currentTimeout = setInterval(async () => {
             const data = await this._masterAccountService.getAccountsForCurrentUser();
+            if (!this._currentMasterAccountList) {
+                return;
+            }
             const changes = this._findChanges(this._currentMasterAccountList, data);
-            if (!Object.keys(changes).length) {
+            if (isEmpty(changes)) {
                 console.debug('No account changes found');
             } else {
                 console.debug('Account changes found', changes);
-                this._publishAvailableChanges(changes);
             }
+            this._publishAvailableChanges(changes);
         }, this._pollingInterval);
     }
 
@@ -143,7 +147,8 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
     }
 
     private _handleMasterAccountListChange(masterAccountList: Nullable<BasicMasterAccounts>): void {
-        this._currentMasterAccountList = masterAccountList || [];
+        this._currentMasterAccountList = masterAccountList;
+        this._publishAvailableChanges({});  // Reset changes
     }
 
 }

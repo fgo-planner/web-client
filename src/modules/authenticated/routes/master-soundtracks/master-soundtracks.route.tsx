@@ -1,15 +1,18 @@
 import { GameSoundtrack } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useState } from 'react';
-import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
+import React, { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
 import { SoundtrackPlayerService } from '../../../../services/audio/soundtrack-player.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
+import { ModalOnCloseReason } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { useMasterAccountDataEdit } from '../../hooks/use-master-account-data-edit.hook';
+import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
+import { RouteDataEditReloadOnStaleDataDialog } from '../../components/control/RouteDataEditReloadOnStaleDataDialog';
+import { RouteDataEditSaveOnStaleDataDialog } from '../../components/control/RouteDataEditSaveOnStaleDataDialog';
+import { useMasterAccountDataEdit } from '../../hooks/useMasterAccountDataEdit';
 import { MasterSoundtracksList } from './master-soundtracks-list.component';
 
 const StyleClassPrefix = 'MasterSoundtracks';
@@ -33,17 +36,22 @@ const StyleProps = {
 export const MasterSoundtracksRoute = React.memo(() => {
 
     const {
+        awaitingRequest,
         isDataDirty,
+        isDataStale,
         masterAccountEditData,
         updateSoundtracks,
+        reloadData,
         revertChanges,
         persistChanges
     } = useMasterAccountDataEdit({ includeSoundtracks: true });
 
+    // TODO Move these to a dialog state hook.
+    const [reloadDialogOpen, setReloadDialogOpen] = useState<boolean>(false);
+    const [saveDialogOpen, setSaveDialogOpen] = useState<boolean>(false);
+
     const backgroundMusicService = useInjectable(BackgroundMusicService);
     const soundtrackPlayerService = useInjectable(SoundtrackPlayerService);
-
-    const [awaitingRequest, setAwaitingRequest] = useState<boolean>(false);
 
     const [playingId, setPlayingId] = useState<number>();
 
@@ -96,31 +104,55 @@ export const MasterSoundtracksRoute = React.memo(() => {
         updateSoundtracks(updatedSoundtracks);
     }, [masterAccountEditData, updateSoundtracks]);
 
-    const handleSaveButtonClick = useCallback(async (): Promise<void> => {
-        setAwaitingRequest(true);
+    const saveData = useCallback(async (): Promise<void> => {
         try {
-            await persistChanges();
-            setAwaitingRequest(false);
+            persistChanges();
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);
-            setAwaitingRequest(false);
-            revertChanges();
         }
-    }, [persistChanges, revertChanges]);
+    }, [persistChanges]);
 
-    const handleRevertButtonClick = useCallback((): void => {
+    const handleSaveButtonClick = useCallback((_event: MouseEvent): void => {
+        if (isDataStale) {
+            setSaveDialogOpen(true);
+        } else {
+            saveData();
+        }
+    }, [isDataStale, saveData]);
+
+    const handleReloadButtonClick = useCallback((_event: MouseEvent): void => {
+        setReloadDialogOpen(true);
+    }, []);
+
+    const handleRevertButtonClick = useCallback((_event: MouseEvent): void => {
         revertChanges();
     }, [revertChanges]);
+
+    const handleReloadDataDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): void => {
+        if (reason === 'submit') {
+            reloadData();
+        }
+        setReloadDialogOpen(false);
+    }, [reloadData]);
+
+    const handleSaveDataDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): void => {
+        if (reason === 'submit') {
+            saveData();
+        }
+        setSaveDialogOpen(false);
+    }, [saveData]);
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <RouteDataEditControls
-                title='Unlocked Soundtracks'
-                hasUnsavedData={isDataDirty}
-                onSaveButtonClick={handleSaveButtonClick}
-                onRevertButtonClick={handleRevertButtonClick}
                 disabled={awaitingRequest}
+                isDataDirty={isDataDirty}
+                isDataStale={isDataStale}
+                title='Unlocked Soundtracks'
+                onReloadButtonClick={handleReloadButtonClick}
+                onRevertButtonClick={handleRevertButtonClick}
+                onSaveButtonClick={handleSaveButtonClick}
             />
             <div className={`${StyleClassPrefix}-main-content`}>
                 <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
@@ -132,6 +164,14 @@ export const MasterSoundtracksRoute = React.memo(() => {
                     />
                 </div>
             </div>
+            <RouteDataEditReloadOnStaleDataDialog
+                open={reloadDialogOpen}
+                onClose={handleReloadDataDialogClose}
+            />
+            <RouteDataEditSaveOnStaleDataDialog
+                open={saveDialogOpen}
+                onClose={handleSaveDataDialogClose}
+            />
         </Box>
     );
 

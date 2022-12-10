@@ -17,7 +17,7 @@ type Props = {
      * closed.
      */
     dialogData?: PlanRoutePlanServantDeleteDialogData;
-} & Omit<DialogComponentProps<PlanRoutePlanServantDeleteDialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;;
+} & Omit<DialogComponentProps<PlanRoutePlanServantDeleteDialogData>, 'open' | 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 export const PlanRoutePlanServantDeleteDialog = React.memo((props: Props) => {
 

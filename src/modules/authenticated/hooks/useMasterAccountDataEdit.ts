@@ -10,7 +10,7 @@ import { GameServantMap, MasterServantAggregatedData } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/data-aggregation.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
-import { DataEditUtils } from './data-edit.utils';
+import { DataEditUtils } from './DataEditUtils';
 
 
 //#region Type definitions
@@ -94,7 +94,17 @@ type MasterAccountEditReferenceData = {
 type MasterAccountDataEditHookCommon = {
     masterAccountId: string | undefined;
     awaitingRequest: boolean;
+    /**
+     * Whether the master account data is dirty (user has made unpersisted changes
+     * to the data).
+     */
     isDataDirty: boolean;
+    /**
+     * Whether the base master account data has been modified externally (ie.
+     * through another instance of the app).
+     */
+    isDataStale: boolean;
+    reloadData: () => Promise<void>;
     revertChanges: () => void;
     persistChanges: () => Promise<void>;
 };
@@ -437,9 +447,15 @@ export function useMasterAccountDataEdit(
     const [dirtyData, setDirtyData] = useState<MasterAccountEditDirtyData>(getDefaultMasterAccountEditDirtyData);
 
     /**
-     * Whether the tracked data is dirty.
+     * Whether the tracked master account data is dirty.
      */
     const isDataDirty = hasDirtyData(dirtyData);
+
+    /**
+     * Whether the base master account data has been modified externally (ie.
+     * through another instance of the app).
+     */
+    const [isDataStale, setIsDataStale] = useState<boolean>(false);
 
     /**
      * Whether there is an awaiting request to the back-end.
@@ -462,6 +478,46 @@ export function useMasterAccountDataEdit(
         includeServants,
         includeSoundtracks
     }), [includeCostumes, includeItems, includeServants, includeSoundtracks]);
+
+    /**
+     * Master account available changes subscription.
+     */
+    useEffect(() => {
+        if (!masterAccountId) {
+            return;
+        }
+
+        const onMasterAccountChangesAvailableSubscription = SubscribablesContainer
+            .get(SubscriptionTopics.User.MasterAccountChangesAvailable)
+            .subscribe(masterAccountChanges => {
+                const currentAccountStatus = masterAccountChanges[masterAccountId];
+                if (currentAccountStatus === undefined) {
+                    setIsDataStale(false);
+                } else if (currentAccountStatus === 'Updated') {
+                    if (!isDataDirty) {
+                        console.debug(`Changes found for the current master account id=${masterAccountId}, automatically reloading data.`);
+                        /**
+                         * If data is not dirty, then silently reload the master account data.
+                         */
+                        masterAccountService.reloadCurrentAccount();
+                    } else {
+                        /**
+                         * If the data is dirty, we cannot simply reload the data since there can be
+                         * conflict between the unpersisted changes and the new data. Instead, we set
+                         * the `isDataStale` flag to true and let the component handle it.
+                         */
+                        setIsDataStale(true);
+                    }
+                } else if (currentAccountStatus === 'Deleted') {
+                    // TODO Handle case of deleted account.
+                }
+                /**
+                 * The `Created` status should not be possible here.
+                 */
+            });
+
+        return () => onMasterAccountChangesAvailableSubscription.unsubscribe();
+    }, [includeOptions, masterAccountId, masterAccountService, isDataDirty]);
 
     /**
      * Master account change subscription.
@@ -498,19 +554,6 @@ export function useMasterAccountDataEdit(
 
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, [gameServantMap, includeOptions, masterAccountId, skipProcessOnActiveAccountChange]);
-
-    /**
-     * Master account available changes subscription.
-     */
-    useEffect(() => {
-        const onMasterAccountChangesAvailableSubscription = SubscribablesContainer
-            .get(SubscriptionTopics.User.MasterAccountChangesAvailable)
-            .subscribe(masterAccountChanges => {
-                // TODO Implement this
-            });
-
-        return () => onMasterAccountChangesAvailableSubscription.unsubscribe();
-    }, [includeOptions]);
 
 
     //#region Local create, update, delete functions
@@ -930,8 +973,20 @@ export function useMasterAccountDataEdit(
 
     //#region Back-end API functions
 
+    const reloadData = useCallback(async (): Promise<void> => {
+        if (!isDataStale || awaitingRequest) {
+            return;
+        }
+        setAwaitingRequest(true);
+        try {
+            await masterAccountService.reloadCurrentAccount();
+        } finally {
+            setAwaitingRequest(false);
+        }
+    }, [awaitingRequest, isDataStale, masterAccountService]);
+
     const persistChanges = useCallback(async (): Promise<void> => {
-        if (!masterAccount || !isDataDirty || isLoadingIndicatorActive) {
+        if (!masterAccount || !isDataDirty || awaitingRequest) {
             return;
         }
         invokeLoadingIndicator();
@@ -982,6 +1037,7 @@ export function useMasterAccountDataEdit(
             setAwaitingRequest(false);
         }
     }, [
+        awaitingRequest,
         editData,
         dirtyData,
         includeCostumes,
@@ -990,7 +1046,6 @@ export function useMasterAccountDataEdit(
         includeSoundtracks,
         invokeLoadingIndicator,
         isDataDirty,
-        isLoadingIndicatorActive,
         masterAccount,
         masterAccountService,
         resetLoadingIndicator
@@ -1003,6 +1058,7 @@ export function useMasterAccountDataEdit(
         masterAccountId,
         awaitingRequest,
         isDataDirty,
+        isDataStale,
         masterAccountEditData: editData,
         updateCostumes,
         updateItem,
@@ -1014,6 +1070,7 @@ export function useMasterAccountDataEdit(
         updateServantOrder,
         deleteServants,
         updateSoundtracks,
+        reloadData,
         revertChanges,
         persistChanges
     };

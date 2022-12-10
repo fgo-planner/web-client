@@ -128,15 +128,34 @@ export class MasterAccountService {
             return this._currentMasterAccount;
         }
         // TODO Ensure that the selected account is in the accounts list.
+        let account: Nullable<MasterAccount>;
         try {
-            this._currentMasterAccount = await this.getAccount(accountId);
-            this._onCurrentMasterAccountChange.next(this._currentMasterAccount);
+            await this._updateMasterAccountList(); // Reload account list
+            account = await this.getAccount(accountId);
+            this._onCurrentMasterAccountChange.next(this._currentMasterAccount = account);
             this._writeCurrentAccountToStorage(true, true);
-            return this._currentMasterAccount;
         } catch (e) {
             console.error(e);
+            account = null;
+        }
+        return account;
+    }
+
+    async reloadCurrentAccount(): Promise<Nullable<MasterAccount>> {
+        const accountId = this._currentMasterAccount?._id;
+        if (!accountId) {
             return null;
         }
+        let account: Nullable<MasterAccount>;
+        try {
+            account = await this.getAccount(accountId);
+            await this._updateMasterAccountList(); // Reload account list
+            this._onCurrentMasterAccountChange.next(this._currentMasterAccount = account);
+        } catch (e) {
+            console.error(e);
+            account = null;
+        }
+        return account;
     }
 
     /**

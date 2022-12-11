@@ -3,10 +3,9 @@ import { GameItemConstants, InstantiatedServantUpdateIndeterminateValue as Indet
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { useCallback, useEffect } from 'react';
+import React, { MouseEvent, useCallback, useEffect } from 'react';
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
-import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
 import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/PlanRequirementsTable';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
@@ -16,7 +15,10 @@ import { ThemeConstants } from '../../../../styles/theme-constants';
 import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, PlanServantAggregatedData } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { usePlanDataEdit } from '../../hooks/use-plan-data-edit.hook';
+import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
+import { RouteDataEditReloadOnStaleDataDialog } from '../../components/control/RouteDataEditReloadOnStaleDataDialog';
+import { RouteDataEditSaveOnStaleDataDialog } from '../../components/control/RouteDataEditSaveOnStaleDataDialog';
+import { usePlanDataEdit } from '../../hooks/usePlanDataEdit';
 import { PlanRouteMasterItemsEditDialog } from './components/PlanRouteMasterItemsEditDialog';
 import { PlanRouteMasterItemsEditDialogData } from './components/PlanRouteMasterItemsEditDialogData.type';
 import { PlanRouteNavigationRail } from './components/PlanRouteNavigationRail';
@@ -115,7 +117,10 @@ export const PlanRoute = React.memo(() => {
         deleteUpcomingResources,
         awaitingRequest,
         isMasterAccountDataDirty,
+        isMasterAccountDataStale,
         isPlanDataDirty,
+        isPlanDataStale,
+        reloadData,
         revertChanges,
         persistChanges
     } = usePlanDataEdit(planId);
@@ -137,7 +142,9 @@ export const PlanRoute = React.memo(() => {
         openMasterServantEditDialog,
         openPlanServantDeleteDialog,
         openPlanServantEditDialog,
-        openPlanServantMultiAddDialog
+        openPlanServantMultiAddDialog,
+        openReloadOnStaleDataDialog,
+        openSaveOnStaleDataDialog
     } = usePlanRouteDialogState();
 
     const {
@@ -338,18 +345,46 @@ export const PlanRoute = React.memo(() => {
 
     //#region Other event handlers
 
-    const handleSaveButtonClick = useCallback(async (): Promise<void> => {
-        closeAllDialogs();
+    const isDataStale = isMasterAccountDataStale || isPlanDataStale;
+
+    const saveData = useCallback(async (): Promise<void> => {
         try {
-            await persistChanges();
+            persistChanges();
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);
         }
-        persistChanges();
-    }, [closeAllDialogs, persistChanges]);
+    }, [persistChanges]);
 
-    const handleRevertButtonClick = revertChanges;
+    const handleSaveButtonClick = useCallback((_event: MouseEvent): void => {
+        if (isDataStale) {
+            openSaveOnStaleDataDialog();
+        } else {
+            saveData();
+        }
+    }, [isDataStale, openSaveOnStaleDataDialog, saveData]);
+
+    const handleReloadButtonClick = useCallback((_event: MouseEvent): void => {
+        openReloadOnStaleDataDialog();
+    }, [openReloadOnStaleDataDialog]);
+
+    const handleRevertButtonClick = useCallback((_event: MouseEvent): void => {
+        revertChanges();
+    }, [revertChanges]);
+
+    const handleReloadDataDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): void => {
+        if (reason === 'submit') {
+            reloadData();
+        }
+        closeAllDialogs();
+    }, [closeAllDialogs, reloadData]);
+
+    const handleSaveDataDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): void => {
+        if (reason === 'submit') {
+            saveData();
+        }
+        closeAllDialogs();
+    }, [closeAllDialogs, saveData]);
 
     const handleEditServantDialogClose = useCallback((
         _event: MouseEvent,
@@ -424,11 +459,13 @@ export const PlanRoute = React.memo(() => {
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-upper-layout-container`}>
                 <RouteDataEditControls
+                    disabled={awaitingRequest}
+                    isDataDirty={isMasterAccountDataDirty || isPlanDataDirty}
+                    isDataStale={isDataStale}
                     title={planEditData.name}
-                    hasUnsavedData={isMasterAccountDataDirty || isPlanDataDirty}
+                    onReloadButtonClick={handleReloadButtonClick}
                     onRevertButtonClick={handleRevertButtonClick}
                     onSaveButtonClick={handleSaveButtonClick}
-                    disabled={awaitingRequest}
                 />
             </div>
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
@@ -476,6 +513,14 @@ export const PlanRoute = React.memo(() => {
             <PlanRouteMasterItemsEditDialog
                 dialogData={openDialogInfo.name === 'masterItemsEdit' ? openDialogInfo.data : undefined}
                 onClose={handleEditItemsDialogClose}
+            />
+            <RouteDataEditReloadOnStaleDataDialog
+                open={openDialogInfo.name === 'reloadOnStaleData'}
+                onClose={handleReloadDataDialogClose}
+            />
+            <RouteDataEditSaveOnStaleDataDialog
+                open={openDialogInfo.name === 'saveOnStaleData'}
+                onClose={handleSaveDataDialogClose}
             />
         </Box>
     );

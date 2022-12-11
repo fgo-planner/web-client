@@ -9,10 +9,12 @@ export type PlanRouteDialogs =
     'masterServantEdit' |
     'planServantDelete' |
     'planServantEdit' |
-    'planServantMultiAdd';
+    'planServantMultiAdd' | 
+    'reloadOnStaleData' |
+    'saveOnStaleData';
 
 export type PlanRouteOpenDialogInfo = {
-    name: undefined;
+    name: 'reloadOnStaleData' | 'saveOnStaleData' | undefined;
 } | {
     name: 'masterItemsEdit';
     data: PlanRouteMasterItemsEditDialogData;
@@ -38,6 +40,8 @@ export type PlanRouteDialogState = {
     openPlanServantDeleteDialog: (data: PlanRoutePlanServantDeleteDialogData) => void;
     openPlanServantEditDialog: (data: PlanRoutePlanServantEditDialogData) => void;
     openPlanServantMultiAddDialog: (data: ReadonlyArray<MasterServantAggregatedData>) => void;
+    openReloadOnStaleDataDialog: () => void;
+    openSaveOnStaleDataDialog: () => void;
 };
 
 const DefaultOpenDialogInfo = {
@@ -77,6 +81,15 @@ export function usePlanRouteDialogState(): PlanRouteDialogState {
         setOpenDialogInfo({ name: 'planServantMultiAdd', data });
     }, []);
 
+    const openReloadOnStaleDataDialog = useCallback((): void => {
+        setOpenDialogInfo({ name: 'reloadOnStaleData' });
+    }, []);
+
+    const openSaveOnStaleDataDialog = useCallback((): void => {
+        setOpenDialogInfo({ name: 'saveOnStaleData' });
+    }, []);
+
+
     return {
         openDialogInfo,
         closeAllDialogs,
@@ -84,7 +97,9 @@ export function usePlanRouteDialogState(): PlanRouteDialogState {
         openMasterServantEditDialog,
         openPlanServantDeleteDialog,
         openPlanServantEditDialog,
-        openPlanServantMultiAddDialog
+        openPlanServantMultiAddDialog,
+        openReloadOnStaleDataDialog,
+        openSaveOnStaleDataDialog
     };
 
 }

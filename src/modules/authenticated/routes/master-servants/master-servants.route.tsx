@@ -3,7 +3,6 @@ import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { RouteDataEditControls } from '../../../../components/control/route-data-edit-controls.component';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
@@ -15,12 +14,15 @@ import { ThemeConstants } from '../../../../styles/theme-constants';
 import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
 import { DataAggregationUtils } from '../../../../utils/data-aggregation.utils';
 import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
+import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
+import { RouteDataEditReloadOnStaleDataDialog } from '../../components/control/RouteDataEditReloadOnStaleDataDialog';
+import { RouteDataEditSaveOnStaleDataDialog } from '../../components/control/RouteDataEditSaveOnStaleDataDialog';
 import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/MasterServantEditDialog';
 import { MasterServantEditDialogData } from '../../components/master/servant/edit-dialog/MasterServantEditDialogData.type';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
-import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../../hooks/use-master-account-data-edit.hook';
+import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../../hooks/useMasterAccountDataEdit';
 import { MasterServantsFilter, MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
 import { MasterServantsInfoPanel } from './components/master-servants-info-panel.component';
 import { MasterServantsListRowContextMenu } from './components/master-servants-list-row-context-menu.component';
@@ -99,12 +101,14 @@ export const MasterServantsRoute = React.memo(() => {
     const {
         awaitingRequest,
         isDataDirty,
+        isDataStale,
         masterAccountEditData,
         addServant,
         addServants,
         updateServants,
         updateServantOrder,
         deleteServants,
+        reloadData,
         revertChanges,
         persistChanges
     } = useMasterAccountDataEdit(masterAccountDataEditHookOptions);
@@ -156,25 +160,15 @@ export const MasterServantsRoute = React.memo(() => {
         masterAccountEditData.servantsData,
         InstantiatedServantUtils.getInstanceId
     );
-
+    
     /**
-     * Whether the multi-add servant dialog is open.
+     * TODO Move these to a dialog state hook.
      */
     const [isMultiAddServantDialogOpen, setIsMultiAddServantDialogOpen] = useState<boolean>(false);
-
-    /**
-     * TODO Move to dialog state hook.
-     */
     const [editServantDialogData, setEditServantDialogData] = useState<MasterServantEditDialogData>();
-
-    /**
-     * Contains the message prompt that is displayed by the delete servant dialog.
-     *
-     * The `open` state of the delete servant dialog is also determined by whether
-     * this data is present (dialog is opened if data is defined, and closed if data
-     * is undefined).
-     */
     const [deleteServantDialogData, setDeleteServantDialogData] = useState<ReactNode>();
+    const [reloadDialogOpen, setReloadDialogOpen] = useState<boolean>(false);
+    const [saveDialogOpen, setSaveDialogOpen] = useState<boolean>(false);
 
     const [servantFilter, setServantFilter] = useState<MasterServantsFilter>();
 
@@ -380,19 +374,44 @@ export const MasterServantsRoute = React.memo(() => {
 
     //#region Other event handlers
 
-    const handleSaveButtonClick = useCallback(async (): Promise<void> => {
-        setEditServantDialogData(undefined);
-        setDeleteServantDialogData(undefined);
+    const saveData = useCallback(async (): Promise<void> => {
         try {
-            await persistChanges();
+            persistChanges();
         } catch (error: any) {
             // TODO Display error message to user.
             console.error(error);
-            // revertChanges();
         }
     }, [persistChanges]);
 
-    const handleRevertButtonClick = revertChanges;
+    const handleSaveButtonClick = useCallback((_event: MouseEvent): void => {
+        if (isDataStale) {
+            setSaveDialogOpen(true);
+        } else {
+            saveData();
+        }
+    }, [isDataStale, saveData]);
+
+    const handleReloadButtonClick = useCallback((_event: MouseEvent): void => {
+        setReloadDialogOpen(true);
+    }, []);
+
+    const handleRevertButtonClick = useCallback((_event: MouseEvent): void => {
+        revertChanges();
+    }, [revertChanges]);
+
+    const handleReloadDataDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): void => {
+        if (reason === 'submit') {
+            reloadData();
+        }
+        setReloadDialogOpen(false);
+    }, [reloadData]);
+
+    const handleSaveDataDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): void => {
+        if (reason === 'submit') {
+            saveData();
+        }
+        setSaveDialogOpen(false);
+    }, [saveData]);
 
     const handleMultiAddServantDialogClose = useCallback((_event: any, _reason: any, data?: MultiAddServantData): void => {
         if (data && data.gameIds.length) {
@@ -459,11 +478,13 @@ export const MasterServantsRoute = React.memo(() => {
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-upper-layout-container`}>
                 <RouteDataEditControls
+                    disabled={awaitingRequest}
+                    isDataDirty={isDataDirty}
+                    isDataStale={isDataStale}
                     title='Servant Roster'
-                    hasUnsavedData={isDataDirty}
+                    onReloadButtonClick={handleReloadButtonClick}
                     onRevertButtonClick={handleRevertButtonClick}
                     onSaveButtonClick={handleSaveButtonClick}
-                    disabled={awaitingRequest}
                 />
                 <MasterServantsFilterControls
                     filtersEnabled={filtersEnabled}
@@ -544,6 +565,14 @@ export const MasterServantsRoute = React.memo(() => {
                 confirmButtonColor='primary'
                 confirmButtonLabel='Delete'
                 onClose={handleDeleteServantDialogClose}
+            />
+            <RouteDataEditReloadOnStaleDataDialog
+                open={reloadDialogOpen}
+                onClose={handleReloadDataDialogClose}
+            />
+            <RouteDataEditSaveOnStaleDataDialog
+                open={saveDialogOpen}
+                onClose={handleSaveDataDialogClose}
             />
             <MasterServantsListRowContextMenu
                 open={activeContextMenu === 'row'}

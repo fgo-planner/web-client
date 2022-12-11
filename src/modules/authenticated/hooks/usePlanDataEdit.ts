@@ -8,8 +8,8 @@ import { PlanService } from '../../../services/data/plan/plan.service';
 import { MasterServantAggregatedData, PlanRequirements, PlanServantAggregatedData } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/data-aggregation.utils';
 import * as PlanComputationUtils from '../../../utils/plan/plan-computation.utils';
-import { DataEditUtils } from './data-edit.utils';
-import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccountDataEdit } from './use-master-account-data-edit.hook';
+import { DataEditUtils } from './DataEditUtils';
+import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccountDataEdit } from './useMasterAccountDataEdit';
 
 //#region Type definitions
 
@@ -59,7 +59,9 @@ type PlanDataEditHookResult = {
     masterAccountId: string | undefined;
     awaitingRequest: boolean;
     isMasterAccountDataDirty: boolean;
+    isMasterAccountDataStale: boolean;
     isPlanDataDirty: boolean;
+    isPlanDataStale: boolean;
     masterAccountEditData: PartialMasterAccountEditData;
     /**
      * Guaranteed to be stable between re-renders. A new instance will only be
@@ -127,6 +129,7 @@ type PlanDataEditHookResult = {
     addUpcomingResources: (resources: PlanUpcomingResources) => void;
     updateUpcomingResources: (index: number, resources: PlanUpcomingResources) => void;
     deleteUpcomingResources: (index: number) => void;
+    reloadData: () => Promise<void>;
     revertChanges: () => void;
     persistChanges: () => Promise<void>;
 };
@@ -290,8 +293,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
 
     const {
         invokeLoadingIndicator,
-        resetLoadingIndicator,
-        isLoadingIndicatorActive
+        resetLoadingIndicator
     } = useLoadingIndicator();
 
     const {
@@ -301,6 +303,8 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
         updateServants: updateMasterServants,
         awaitingRequest: awaitingMasterAccountRequest,
         isDataDirty: isMasterAccountDataDirty,
+        isDataStale: isMasterAccountDataStale,
+        reloadData: reloadMasterAccountData,
         revertChanges: revertMasterAccountChanges,
         persistChanges: persistMasterAccountChanges
     } = useMasterAccountDataEdit(masterAccountDataEditHookOptions);
@@ -327,9 +331,15 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     const [dirtyData, setDirtyData] = useState<PlanEditDirtyData>(getDefaultPlanEditDirtyData);
 
     /**
-     * Whether the tracked data is dirty.
+     * Whether the tracked plan data is dirty.
      */
     const isPlanDataDirty = hasDirtyData(dirtyData);
+
+    /**
+     * Whether the base plan data has been modified externally (ie.
+     * through another instance of the app).
+     */
+    const [isPlanDataStale, setIsPlanDataStale] = useState<boolean>(false);
 
     /**
      * Prevent user from navigating away if data is dirty.
@@ -732,8 +742,25 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
 
     //#region Back-end API functions
 
+    const reloadData = useCallback(async (): Promise<void> => {
+        if (awaitingRequest || !plan) {
+            return;
+        }
+        if (isMasterAccountDataStale) {
+            await reloadMasterAccountData();
+        }
+        if (isPlanDataStale) {
+            try {
+                setAwaitingPlanRequest(true);
+                // TODO Implement this.
+            } finally {
+                setAwaitingPlanRequest(false);
+            }
+        }
+    }, [awaitingRequest, isMasterAccountDataStale, isPlanDataStale, plan, reloadMasterAccountData]);
+
     const persistChanges = useCallback(async (): Promise<void> => {
-        if (isLoadingIndicatorActive || !plan) {
+        if (awaitingRequest || !plan) {
             return;
         }
         if (isMasterAccountDataDirty) {
@@ -773,10 +800,10 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
             }
         }
     }, [
+        awaitingRequest,
         editData,
         handlePlanLoad,
         invokeLoadingIndicator,
-        isLoadingIndicatorActive,
         isMasterAccountDataDirty,
         isPlanDataDirty,
         persistMasterAccountChanges,
@@ -792,7 +819,9 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
         masterAccountId,
         awaitingRequest,
         isMasterAccountDataDirty,
+        isMasterAccountDataStale,
         isPlanDataDirty,
+        isPlanDataStale,
         masterAccountEditData,
         planEditData: editData,
         planRequirements,
@@ -807,6 +836,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
         addUpcomingResources,
         updateUpcomingResources,
         deleteUpcomingResources,
+        reloadData,
         revertChanges,
         persistChanges
     };

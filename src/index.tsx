@@ -12,9 +12,9 @@ import { WebAuthenticationService } from './services/authentication/web-authenti
 import { GameItemService } from './services/data/game/game-item.service';
 import { GameServantService } from './services/data/game/game-servant.service';
 import { GameSoundtrackService } from './services/data/game/game-soundtrack.service';
-import { MasterAccountChangeListenerService } from './services/data/master/master-account-change-listener.service';
+import { MasterAccountChangeListenerService } from './services/data/master/MasterAccountChangeListenerService';
 import { MasterAccountService } from './services/data/master/master-account.service';
-import { ScheduledMasterAccountChangeListenerService } from './services/data/master/scheduled-master-account-change-listener.service';
+import { ScheduledMasterAccountChangeListenerService } from './services/data/master/ScheduledMasterAccountChangeListenerService';
 import { PlanService } from './services/data/plan/plan.service';
 import { UserService } from './services/data/user/user.service';
 import { WebUserService } from './services/data/user/web-user.service';

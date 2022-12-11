@@ -1,8 +1,8 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameItemConstants } from '@fgo-planner/data-core';
+import { GameItemConstants, PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { MouseEvent, ReactNode, useCallback } from 'react';
-import { PlanServantAggregatedData, PlanServantRequirements } from '../../../../types';
+import { PlanServantRequirements } from '../../../../types';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
 import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 import { PlanRequirementsTableServantRowCell } from './PlanRequirementsTableServantRowCell';

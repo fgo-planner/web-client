@@ -1,7 +1,7 @@
 import { Immutable } from '@fgo-planner/common-core';
+import { PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
-import { PlanServantAggregatedData } from '../../../../types';
 import { GameServantThumbnail } from '../../../servant/ServantThumbnail';
 import { TruncateText } from '../../../text/truncate-text.component';
 import { PlanRequirementsTableServantRowEnhancementTargets } from './PlanRequirementsTableServantRowEnhancementTargets';

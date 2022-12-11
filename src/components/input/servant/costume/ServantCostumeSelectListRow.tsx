@@ -1,7 +1,7 @@
+import { GameServantCostumeAggregatedData } from '@fgo-planner/data-core';
 import { Checkbox } from '@mui/material';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useRef } from 'react';
-import { GameServantCostumeAggregatedData } from '../../../../types';
 import { GameServantThumbnail } from '../../../servant/ServantThumbnail';
 import { TruncateText } from '../../../text/truncate-text.component';
 

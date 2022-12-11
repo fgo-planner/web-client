@@ -1,6 +1,7 @@
+import { MasterServantAggregatedData } from '@fgo-planner/data-core';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { PromptDialog } from '../../../../../components/dialog/prompt-dialog.component';
-import { DialogComponentProps, MasterServantAggregatedData, ModalOnCloseReason } from '../../../../../types';
+import { DialogComponentProps, ModalOnCloseReason } from '../../../../../types';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
 export type MasterServantsRouteDeleteDialogData = {

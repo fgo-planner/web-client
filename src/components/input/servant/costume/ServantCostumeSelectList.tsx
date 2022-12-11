@@ -1,10 +1,10 @@
 import { CollectionUtils } from '@fgo-planner/common-core';
+import { GameServantCostumeAggregatedData } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { alpha, Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { GameServantCostumeAggregatedData } from '../../../../types';
 import { ServantCostumeSelectListRow, StyleClassPrefix as ServantCostumeSelectListRowStyleClassPrefix } from './ServantCostumeSelectListRow';
 
 type Props = {

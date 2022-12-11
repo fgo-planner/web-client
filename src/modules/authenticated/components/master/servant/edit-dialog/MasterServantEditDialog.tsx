@@ -1,10 +1,11 @@
+import { MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogTitle, PaperProps, SxProps, Typography } from '@mui/material';
 import { Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../../components/dialog/dialog-close-button.component';
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { ScrollbarStyleProps } from '../../../../../../styles/scrollbar-style-props';
-import { DialogComponentProps, EditDialogAction, MasterServantAggregatedData } from '../../../../../../types';
+import { DialogComponentProps, EditDialogAction } from '../../../../../../types';
 import { MasterServantEditDialogContent, MasterServantEditTab } from './MasterServantEditDialogContent';
 import { MasterServantEditDialogData } from './MasterServantEditDialogData.type';
 

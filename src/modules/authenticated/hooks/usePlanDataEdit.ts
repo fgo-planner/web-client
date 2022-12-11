@@ -1,11 +1,11 @@
 import { CollectionUtils, DateTimeUtils, Immutable, ImmutableArray, Nullable, ReadonlyDate, ReadonlyRecord } from '@fgo-planner/common-core';
-import { ImmutablePlan, InstantiatedServantUtils, MasterServantUpdate, Plan, PlanServant, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanUpcomingResources, PlanUtils } from '@fgo-planner/data-core';
-import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { GameItemConstants, ImmutablePlan, InstantiatedServantUtils, MasterServantAggregatedData, MasterServantUpdate, Plan, PlanServant, PlanServantAggregatedData, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanUpcomingResources, PlanUtils } from '@fgo-planner/data-core';
+import React, { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
 import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
 import { PlanService } from '../../../services/data/plan/plan.service';
-import { MasterServantAggregatedData, PlanRequirements, PlanServantAggregatedData } from '../../../types';
+import { PlanEnhancementRequirements, PlanRequirements } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/data-aggregation.utils';
 import * as PlanComputationUtils from '../../../utils/plan/plan-computation.utils';
 import { DataEditUtils } from './DataEditUtils';
@@ -82,7 +82,7 @@ type PlanDataEditHookResult = {
      * Calls the `updateItems` function from the `useMasterAccountDataEdit`
      * internally.
      */
-    updateMasterItems: (items: ReadonlyRecord<number, SetStateAction<number>>) => void;
+    updateMasterItems(items: ReadonlyRecord<number, SetStateAction<number>>): void;
     /**
      * Updates the master servants with the corresponding `instanceIds` using the
      * given `ExistingMasterServantUpdate` object. 
@@ -90,8 +90,8 @@ type PlanDataEditHookResult = {
      * Calls the `updateServants` function from the `useMasterAccountDataEdit`
      * internally.
      */
-    updateMasterServants: (instanceIds: Iterable<number>, update: MasterServantUpdate) => void;
-    updatePlanInfo: (planInfo: PlanInfo) => void;
+    updateMasterServants(instanceIds: Iterable<number>, update: MasterServantUpdate): void;
+    updatePlanInfo(planInfo: PlanInfo): void;
     /**
      * Adds a single servant using the given `PlanServantUpdate` object.
      *
@@ -101,7 +101,7 @@ type PlanDataEditHookResult = {
      * value already exists in the plan, then the function will silently return
      * without doing anything.
      */
-    addPlanServant: (instanceId: number, servantData: PlanServantUpdate) => void;
+    addPlanServant(instanceId: number, servantData: PlanServantUpdate): void;
     /**
      * Batch adds servants. Each added servant will be instantiated using the given
      * `PlanServantUpdate` object.
@@ -109,29 +109,30 @@ type PlanDataEditHookResult = {
      * @param instanceIds The instance IDs of the corresponding master servants.
      * Any values that already exist in the plan will be silently skipped.
      */
-    addPlanServants: (instanceIds: Iterable<number>, servantData: PlanServantUpdate) => void;
+    addPlanServants(instanceIds: Iterable<number>, servantData: PlanServantUpdate): void;
     /**
      * Updates the servants with the corresponding `instanceIds` using the given
      * `PlanServantUpdate` object.
      */
-    updatePlanServants: (instanceIds: Iterable<number>, update: PlanServantUpdate) => void;
+    updatePlanServants(instanceIds: Iterable<number>, update: PlanServantUpdate): void;
     /**
      * Updates the servant ordering based on an array of `instanceId` values.
      * Assumes that the array contains a corresponding `instanceId` value for each
      * servant. Missing `instanceId` values will result in the corresponding servant
      * being removed.
      */
-    updatePlanServantOrder: (instanceIds: ReadonlyArray<number>) => void;
+    updatePlanServantOrder(instanceIds: ReadonlyArray<number>): void;
     /**
      * Deletes the servants with the corresponding `instanceIds`.
      */
-    deletePlanServants: (instanceIds: Iterable<number>) => void;
-    addUpcomingResources: (resources: PlanUpcomingResources) => void;
-    updateUpcomingResources: (index: number, resources: PlanUpcomingResources) => void;
-    deleteUpcomingResources: (index: number) => void;
-    reloadData: () => Promise<void>;
-    revertChanges: () => void;
-    persistChanges: () => Promise<void>;
+    deletePlanServants(instanceIds: Iterable<number>): void;
+    fulfillPlanServants(instanceIds: Iterable<number>, remove?: boolean): void;
+    addUpcomingResources(resources: PlanUpcomingResources): void;
+    updateUpcomingResources(index: number, resources: PlanUpcomingResources): void;
+    deleteUpcomingResources(index: number): void;
+    reloadData(): Promise<void>;
+    revertChanges(): void;
+    persistChanges(): Promise<void>;
 };
 
 //#endregion
@@ -272,6 +273,16 @@ const isPlanServantChanged = (
         return true;
     }
     return !PlanServantUtils.isEqual(reference, planServant);
+};
+
+const createNegativeItemUpdates = (requirements: PlanEnhancementRequirements): Record<number, React.SetStateAction<number>> => {
+    const itemUpdates: Record<number, React.SetStateAction<number>> = {
+        [GameItemConstants.QpItemId]: (current: number) => current - requirements.qp
+    };
+    for (const [key, value] of Object.entries(requirements.items)) {
+        itemUpdates[Number(key)] = (current: number) => current - value.total;
+    }
+    return itemUpdates;
 };
 
 //#endregion
@@ -714,6 +725,36 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
         });
     }, [editData, referenceData]);
 
+    const fulfillPlanServants = useCallback((instanceIds: Iterable<number>, remove = false): void => {
+        const currentServantsData = editData.servantsData;
+
+        const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
+
+        const requirements: Array<PlanEnhancementRequirements> = [];
+        for (const servantData of currentServantsData) {
+            if (!instanceIdSet.has(servantData.instanceId)) {
+                continue;
+            }
+            const fulfillmentResult = PlanComputationUtils.fulfillServant(
+                servantData,
+                masterAccountEditData.costumes,
+                editData.costumes
+            );
+            if (fulfillmentResult) {
+                updateMasterServants([servantData.instanceId], fulfillmentResult.update);
+                requirements.push(fulfillmentResult.requirements);
+            }
+        }
+
+        const totalRequirements = PlanComputationUtils.sumEnhancementRequirements(requirements);
+        const itemUpdates = createNegativeItemUpdates(totalRequirements);
+        updateMasterItems(itemUpdates);
+
+        if (remove) {
+            deletePlanServants(instanceIds);
+        }
+    }, [deletePlanServants, editData, masterAccountEditData, updateMasterItems, updateMasterServants]);
+
     const addUpcomingResources = useCallback((resources: PlanUpcomingResources): void => {
         // TODO Implement this
     }, []);
@@ -833,6 +874,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
         updatePlanServants,
         updatePlanServantOrder,
         deletePlanServants,
+        fulfillPlanServants,
         addUpcomingResources,
         updateUpcomingResources,
         deleteUpcomingResources,

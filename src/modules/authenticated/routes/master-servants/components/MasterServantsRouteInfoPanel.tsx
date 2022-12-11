@@ -1,4 +1,4 @@
-import { GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
+import { GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import { IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -9,7 +9,7 @@ import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
 import { ServantBondIcon } from '../../../../../components/servant/ServantBondIcon';
 import { useGameItemMap } from '../../../../../hooks/data/use-game-item-map.hook';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
-import { MasterServantAggregatedData, PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types';
+import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 import * as PlanComputationUtils from '../../../../../utils/plan/plan-computation.utils';
 

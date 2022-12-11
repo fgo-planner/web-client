@@ -1,4 +1,4 @@
-import { Clear as ClearIcon, DataObject, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, FormatSize as FormatSizeIcon, GroupAddOutlined, HideImageOutlined as HideImageOutlinedIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
+import { Clear as ClearIcon, DataObject, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, FormatSize as FormatSizeIcon, GroupAddOutlined, HideImageOutlined as HideImageOutlinedIcon, HowToRegOutlined as HowToRegOutlinedIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
 import { Divider, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
 import { NavigationRail } from '../../../../../components/navigation/navigation-rail/navigation-rail.component';
@@ -13,6 +13,7 @@ type Props = {
     onDragDropApply: () => void;
     onDragDropCancel: () => void;
     onEditSelectedServants: () => void;
+    onMarkSelectedAsComplete: () => void;
     onOpenDisplaySettings: () => void;
     onToggleCellSize: () => void;
     onToggleRowheaderMode: () => void;
@@ -32,6 +33,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
         onDragDropApply,
         onDragDropCancel,
         onEditSelectedServants,
+        onMarkSelectedAsComplete,
         onOpenDisplaySettings,
         onToggleCellSize,
         onToggleRowheaderMode,
@@ -117,6 +119,16 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                     <IconButton
                         onClick={onEditSelectedServants}
                         children={<ModeEditOutlinedIcon />}
+                        size='large'
+                        disabled={!selectedServantsCount}
+                    />
+                </div>
+            </Tooltip>
+            <Tooltip key='mark-complete' title='Mark as complete' placement='right'>
+                <div>
+                    <IconButton
+                        onClick={onMarkSelectedAsComplete}
+                        children={<HowToRegOutlinedIcon />}
                         size='large'
                         disabled={!selectedServantsCount}
                     />

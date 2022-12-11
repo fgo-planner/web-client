@@ -1,6 +1,6 @@
 import { CollectionUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterServant, ImmutablePlan, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, PlanResources, PlanServant, PlanUpcomingResources } from '@fgo-planner/data-core';
-import { PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanRequirements, PlanServantAggregatedData, PlanServantRequirements } from '../../types';
+import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterServant, ImmutablePlan, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, PlanResources, PlanServant, PlanServantAggregatedData, PlanServantUtils, PlanUpcomingResources } from '@fgo-planner/data-core';
+import { PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanEnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types';
 
 
 //#region Exported type definitions
@@ -36,6 +36,18 @@ export type PlanData = Readonly<{
     costumes: ReadonlySet<number>;
     upcomingResources: ImmutableArray<PlanUpcomingResources>;
 }>;
+
+export type ServantFulfillmentResult = {
+    /**
+     * The `MasterServantUpdate` that will effectively fulfill the planned
+     * enhancement for the servant.
+     */
+    update: MasterServantUpdate;
+    /**
+     * The resources required to fulfill the planned enhancements for the servant.
+     */
+    requirements: PlanEnhancementRequirements;
+};
 
 //#endregion
 
@@ -79,6 +91,128 @@ const DefaultTargetEnhancements: Immutable<ServantEnhancements> = {
         3: InstantiatedServantConstants.MaxSkillLevel,
     }
 };
+
+//#endregion
+
+
+//#region
+
+
+/**
+ * Returns a `MasterServantUpdate` and the resources that will effectively
+ * fulfill the planned enhancement for the servant. 
+ *
+ * Returns `null` if the servant plan is already fulfilled.
+ */
+export function fulfillServant(
+    planServantData: PlanServantAggregatedData,
+    currentCostumes: ReadonlySet<number>,
+    targetCostumes: ReadonlySet<number>,
+): ServantFulfillmentResult | null {
+
+    const {
+        gameServant,
+        masterServant,
+        planServant
+    } = planServantData;
+
+    if (PlanServantUtils.isAllDisabled(planServant)) {
+        return null;
+    }
+
+    let hasEnhancements = false;
+    const masterServantUpdate = MasterServantUpdateUtils.createFromExisting(masterServant);
+
+    if (planServant.enabled.ascensions) {
+        const {
+            ascension: targetAscension = InstantiatedServantConstants.MinAscensionLevel,
+            level: targetLevel = InstantiatedServantConstants.MinLevel
+        } = planServant;
+
+        if (targetAscension > masterServantUpdate.ascension) {
+            masterServantUpdate.ascension = targetAscension;
+            hasEnhancements = true;
+        }
+        if (targetLevel > masterServantUpdate.level) {
+            masterServantUpdate.level = targetLevel;
+            hasEnhancements = true;
+        }
+    }
+
+    if (planServant.enabled.skills) {
+        const {
+            1: targetSkill1,
+            2: targetSkill2,
+            3: targetSkill3
+        } = planServant.skills;
+
+        const skills = masterServantUpdate.skills;
+
+        if (targetSkill1 && targetSkill1 > skills[1]) {
+            skills[1] = targetSkill1;
+            hasEnhancements = true;
+        }
+        if (targetSkill2 && targetSkill2 > (skills[2] || 0)) {
+            skills[2] = targetSkill2;
+            hasEnhancements = true;
+        }
+        if (targetSkill3 && targetSkill3 > (skills[3] || 0)) {
+            skills[3] = targetSkill3;
+            hasEnhancements = true;
+        }
+    }
+
+    if (planServant.enabled.appendSkills) {
+        const {
+            1: targetAppendSkill1,
+            2: targetAppendSkill2,
+            3: targetAppendSkill3
+        } = planServant.appendSkills;
+
+        const appendSkills = masterServantUpdate.appendSkills;
+
+        if (targetAppendSkill1 && targetAppendSkill1 > (appendSkills[1] || 0)) {
+            appendSkills[1] = targetAppendSkill1;
+            hasEnhancements = true;
+        }
+        if (targetAppendSkill2 && targetAppendSkill2 > (appendSkills[2] || 0)) {
+            appendSkills[2] = targetAppendSkill2;
+            hasEnhancements = true;
+        }
+        if (targetAppendSkill3 && targetAppendSkill3 > (appendSkills[3] || 0)) {
+            appendSkills[3] = targetAppendSkill3;
+            hasEnhancements = true;
+        }
+    }
+
+    if (planServant.enabled.costumes && targetCostumes.size) {
+        const unlockedCostumes = masterServantUpdate.unlockedCostumes;
+        for (const key of Object.keys(gameServant.costumes)) {
+            const costumeId = Number(key);
+            if (targetCostumes.has(costumeId) && !unlockedCostumes.get(costumeId)) {
+                unlockedCostumes.set(costumeId, true);
+                hasEnhancements = true;
+            }
+        }
+    }
+
+    if (!hasEnhancements) {
+        return null;
+    }
+
+    const requirements = _computeServantEnhancementRequirements(
+        gameServant,
+        masterServant,
+        currentCostumes,
+        planServant,
+        targetCostumes
+    );
+
+    return {
+        update: masterServantUpdate,
+        requirements
+    };
+}
 
 //#endregion
 
@@ -167,7 +301,7 @@ function _computePlanRequirements(
         /**
          * Skip the servant if it is not enabled.
          */
-        if (!planServant.enabled.servant) {
+        if (PlanServantUtils.isAllDisabled(planServant)) {
             continue;
         }
         /**

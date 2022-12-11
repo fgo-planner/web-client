@@ -1,8 +1,7 @@
 import { CollectionUtils, ImmutableArray, Nullable } from '@fgo-planner/common-core';
-import { GameServant } from '@fgo-planner/data-core';
+import { GameServant, GameServantCostumeAggregatedData, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { useMemo } from 'react';
-import { GameServantCostumeAggregatedData, MasterServantAggregatedData } from '../../types';
 import { DataAggregationUtils } from '../../utils/data-aggregation.utils';
 
 export type UseGameServantCostumeListResult = {

@@ -1,12 +1,12 @@
 import { CollectionUtils, ReadonlyPartial, ReadonlyRecord } from '@fgo-planner/common-core';
-import { InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
+import { InstantiatedServantBondLevel, InstantiatedServantUtils, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
-import { MasterServantAggregatedData, SortDirection, SortOptions } from '../../../../../../types';
+import { SortDirection, SortOptions } from '../../../../../../types';
 import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';

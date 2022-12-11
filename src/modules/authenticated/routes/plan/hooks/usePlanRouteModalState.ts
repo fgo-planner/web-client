@@ -1,7 +1,7 @@
+import { MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { useCallback } from 'react';
 import { ContextMenuStateHookResult, useContextMenuState } from '../../../../../hooks/user-interface/useContextMenuState';
 import { DefaultDialogInfo, useDialogState } from '../../../../../hooks/user-interface/useDialogState';
-import { MasterServantAggregatedData } from '../../../../../types';
 import { MasterServantEditDialogData } from '../../../components/master/servant/edit-dialog/MasterServantEditDialogData.type';
 import { PlanRouteMasterItemsEditDialogData } from '../components/PlanRouteMasterItemsEditDialogData.type';
 import { PlanRoutePlanServantDeleteDialogData } from '../components/PlanRoutePlanServantDeleteDialog';

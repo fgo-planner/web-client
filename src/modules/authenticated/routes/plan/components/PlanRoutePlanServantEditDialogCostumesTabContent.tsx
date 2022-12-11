@@ -1,11 +1,10 @@
 import { CollectionUtils } from '@fgo-planner/common-core';
-import { InstantiatedServantUpdateUtils, PlanServantUpdate } from '@fgo-planner/data-core';
+import { GameServantCostumeAggregatedData, InstantiatedServantUpdateUtils, PlanServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ServantCostumeSelectList } from '../../../../../components/input/servant/costume/ServantCostumeSelectList';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
-import { GameServantCostumeAggregatedData } from '../../../../../types';
 
 type Props = {
     costumesData: ReadonlyArray<GameServantCostumeAggregatedData>;

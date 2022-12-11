@@ -1,8 +1,8 @@
 import { Immutable } from '@fgo-planner/common-core';
+import { PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 import { AssetConstants } from '../../../../constants';
-import { PlanServantAggregatedData } from '../../../../types';
 
 type Props = {
     arrowCharacter: ReactNode;

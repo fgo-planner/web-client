@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateNumber, PlanServantUpdate } from '@fgo-planner/data-core';
+import { GameServant, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateNumber, MasterServantAggregatedData, PlanServantUpdate } from '@fgo-planner/data-core';
 import { Checkbox } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback } from 'react';
@@ -12,7 +12,7 @@ import { ServantLevelQuickToggleButtons } from '../../../../../components/input/
 import { ServantSkillInputField } from '../../../../../components/input/servant/ServantSkillInputField';
 import { ServantSkillQuickToggleButtons } from '../../../../../components/input/servant/ServantSkillQuickToggleButtons';
 import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
-import { MasterServantAggregatedData, PlanEnhancementCategory } from '../../../../../types';
+import { PlanEnhancementCategory } from '../../../../../types';
 import { PlanRoutePlanServantEditDialogEnabledCheckbox } from './PlanRoutePlanServantEditDialogEnabledCheckbox';
 
 type Props = {

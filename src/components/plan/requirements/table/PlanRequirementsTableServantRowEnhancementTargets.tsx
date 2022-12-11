@@ -1,7 +1,8 @@
 import { Immutable } from '@fgo-planner/common-core';
+import { PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
-import { ComponentStyleProps, PlanServantAggregatedData } from '../../../../types';
+import { ComponentStyleProps } from '../../../../types';
 import { PlanRequirementsTableServantRowAscensionTarget } from './PlanRequirementsTableServantRowAscensionTarget';
 import { PlanRequirementsTableServantRowLevelTarget } from './PlanRequirementsTableServantRowLevelTarget';
 import { PlanRequirementsTableServantRowSkillTargets } from './PlanRequirementsTableServantRowSkillTargets';

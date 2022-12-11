@@ -1,10 +1,10 @@
 import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
-import { GameItemConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
+import { GameItemConstants, InstantiatedServantUtils, PlanServantAggregatedData } from '@fgo-planner/data-core';
 import { Box } from '@mui/system';
 import React, { CSSProperties, MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
-import { GameItemCategory, GameItemCategoryMap, PlanRequirements, PlanServantAggregatedData } from '../../../../types';
+import { GameItemCategory, GameItemCategoryMap, PlanRequirements } from '../../../../types';
 import { PlanRequirementsTableFooter } from './PlanRequirementsTableFooter';
 import { PlanRequirementsTableHeader } from './PlanRequirementsTableHeader';
 import { PlanRequirementsTableOptions } from './PlanRequirementsTableOptions.type';

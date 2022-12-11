@@ -1,9 +1,10 @@
+import { MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormGroup, InputLabel, PaperProps, Select, Switch, Typography } from '@mui/material';
 import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useRef, useState } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
 import { useGameServantList } from '../../../../../hooks/data/use-game-servant-list.hook';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { DialogComponentProps, MasterServantAggregatedData } from '../../../../../types';
+import { DialogComponentProps } from '../../../../../types';
 
 export type MasterServantsRouteMultiAddDialogData = {
     gameIds: Array<number>,

@@ -1,4 +1,4 @@
-import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUpdateUtils, InstantiatedServantUtils, MasterServantConstants, MasterServantUpdate, MasterServantUpdateUtils } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUpdateUtils, InstantiatedServantUtils, MasterServantAggregatedData, MasterServantConstants, MasterServantUpdate, MasterServantUpdateUtils } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -9,7 +9,7 @@ import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-activ
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
+import { EditDialogAction, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
 import { DataAggregationUtils } from '../../../../utils/data-aggregation.utils';
 import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
 import { RouteDataEditReloadOnStaleDataDialog } from '../../components/control/RouteDataEditReloadOnStaleDataDialog';

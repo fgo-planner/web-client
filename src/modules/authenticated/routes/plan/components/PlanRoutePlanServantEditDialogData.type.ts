@@ -1,5 +1,5 @@
-import { PlanServantUpdate } from '@fgo-planner/data-core';
-import { EditDialogData, MasterServantAggregatedData } from '../../../../../types';
+import { MasterServantAggregatedData, PlanServantUpdate } from '@fgo-planner/data-core';
+import { EditDialogData } from '../../../../../types';
 
 export type PlanRoutePlanServantEditDialogData = EditDialogData<{
 

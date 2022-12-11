@@ -1,5 +1,5 @@
 import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
-import { GameItemConstants, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, PlanServantUpdate, PlanServantUpdateUtils } from '@fgo-planner/data-core';
+import { GameItemConstants, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, MasterServantAggregatedData, PlanServantAggregatedData, PlanServantUpdate, PlanServantUpdateUtils } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -12,7 +12,7 @@ import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/lis
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, PlanServantAggregatedData } from '../../../../types';
+import { EditDialogAction, ModalOnCloseReason } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
 import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
@@ -95,6 +95,8 @@ export const PlanRoute = React.memo(() => {
     const routeMatch = useMatch<'id', string>(PathMatchPattern);
     const planId = routeMatch?.params.id;
 
+    // console.debug('PlanRoute rendered', planId);
+
     const navigate = useNavigate();
 
     const gameServantMap = useGameServantMap();
@@ -112,6 +114,7 @@ export const PlanRoute = React.memo(() => {
         updatePlanServants,
         updatePlanServantOrder,
         deletePlanServants,
+        fulfillPlanServants,
         addUpcomingResources,
         updateUpcomingResources,
         deleteUpcomingResources,
@@ -319,7 +322,9 @@ export const PlanRoute = React.memo(() => {
     //     }
     // }, [openContextMenu]);
 
-    const handleRowDoubleClick = openEditServantDialog;
+    const handleRowDoubleClick = useCallback(() => {
+        openEditServantDialog();
+    }, [openEditServantDialog]);
 
     // const handleHeaderClick = useCallback((e: MouseEvent) => {
     //     console.log('handleHeaderClick', e);
@@ -339,6 +344,13 @@ export const PlanRoute = React.memo(() => {
     //         direction
     //     });
     // }, [deselectAllServants]);
+
+    const handleMarkSelectedAsComplete = useCallback((): void => {
+        if (!selectedServantsData.instances.length) {
+            return;
+        }
+        fulfillPlanServants(selectedServantsData.ids, false);
+    }, [fulfillPlanServants, selectedServantsData]);
 
     //#endregion
 
@@ -480,7 +492,8 @@ export const PlanRoute = React.memo(() => {
                     onDragDropApply={handleDragDropApply}
                     onDragDropCancel={handleDragDropCancel}
                     onEditSelectedServants={openEditServantDialog}
-                    onOpenDisplaySettings={() => { }}
+                    onMarkSelectedAsComplete={handleMarkSelectedAsComplete}
+                    onOpenDisplaySettings={Functions.nullSupplier}
                     onToggleCellSize={toggleCellSize}
                     onToggleRowheaderMode={toggleRowHeaderMode}
                     onToggleShowUnused={toggleShowEmptyColumns}

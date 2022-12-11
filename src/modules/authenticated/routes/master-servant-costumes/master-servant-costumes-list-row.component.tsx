@@ -1,3 +1,4 @@
+import { GameServantCostumeAggregatedData } from '@fgo-planner/data-core';
 import { Checkbox } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
@@ -5,7 +6,6 @@ import { ItemQuantity } from '../../../../components/item/ItemQuantity';
 import { GameServantThumbnail } from '../../../../components/servant/ServantThumbnail';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { GameServantCostumeAggregatedData } from '../../../../types';
 
 type Props = {
     costumeData: GameServantCostumeAggregatedData;

@@ -1,6 +1,6 @@
 import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, PlanServant } from '@fgo-planner/data-core';
-import { GameServantMap, MasterServantAggregatedData, PlanServantAggregatedData } from '../types';
+import { GameServant, ImmutableMasterServant, MasterServantAggregatedData, PlanServant, PlanServantAggregatedData } from '@fgo-planner/data-core';
+import { GameServantMap } from '../types';
 
 function getGameServant(data: MasterServantAggregatedData): Immutable<GameServant> {
     return data.gameServant;

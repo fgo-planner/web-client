@@ -1,8 +1,7 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantSkillSet } from '@fgo-planner/data-core';
+import { InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
-import { PlanServantAggregatedData } from '../../../../types';
 import { ServantSkillLevel } from '../../../servant/ServantSkillLevels';
 
 type Props = {

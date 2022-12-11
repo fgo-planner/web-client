@@ -1,12 +1,12 @@
 import { CollectionUtils, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantAggregatedData, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameServantMap } from '../../../hooks/data/use-game-servant-map.hook';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
 import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
 import { MasterAccountService } from '../../../services/data/master/master-account.service';
-import { GameServantMap, MasterServantAggregatedData } from '../../../types';
+import { GameServantMap } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/data-aggregation.utils';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
@@ -402,8 +402,7 @@ export function useMasterAccountDataEdit(
 
     const {
         invokeLoadingIndicator,
-        resetLoadingIndicator,
-        isLoadingIndicatorActive
+        resetLoadingIndicator
     } = useLoadingIndicator();
 
     const masterAccountService = useInjectable(MasterAccountService);

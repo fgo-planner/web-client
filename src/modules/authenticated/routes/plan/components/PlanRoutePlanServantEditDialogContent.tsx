@@ -1,10 +1,11 @@
 import { CollectionUtils } from '@fgo-planner/common-core';
+import { MasterServantAggregatedData, PlanServantAggregatedData } from '@fgo-planner/data-core';
 import { alpha, DialogContent, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme, Theme } from '@mui/system';
 import { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/input-field-container.component';
 import { useGameServantCostumesData } from '../../../../../hooks/data/use-game-servant-costumes-data.hook';
-import { EditDialogAction, MasterServantAggregatedData, PlanServantAggregatedData } from '../../../../../types';
+import { EditDialogAction } from '../../../../../types';
 import { PlanRoutePlanServantEditDialogAutocomplete } from './PlanRoutePlanServantEditDialogAutocomplete';
 import { PlanRoutePlanServantEditDialogCostumesTabContent } from './PlanRoutePlanServantEditDialogCostumesTabContent';
 import { PlanRoutePlanServantEditDialogData } from './PlanRoutePlanServantEditDialogData.type';

@@ -7,7 +7,7 @@ import { PromptDialog } from '../../../../components/dialog/prompt-dialog.compon
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
-import { useContextMenuState } from '../../../../hooks/user-interface/use-context-menu-state.hook';
+import { useContextMenuState } from '../../../../hooks/user-interface/useContextMenuState';
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
@@ -23,12 +23,12 @@ import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
 import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../../hooks/useMasterAccountDataEdit';
-import { MasterServantsFilter, MasterServantsFilterControls } from './components/master-servants-filter-controls.component';
-import { MasterServantsInfoPanel } from './components/master-servants-info-panel.component';
-import { MasterServantsListRowContextMenu } from './components/master-servants-list-row-context-menu.component';
-import { MasterServantsMultiAddDialog, MultiAddServantData } from './components/master-servants-multi-add-dialog.component';
-import { MasterServantsNavigationRail } from './components/master-servants-navigation-rail.component';
-import { useMasterServantsUserPreferences } from './hooks/use-master-servants-user-preferences.hook';
+import { MasterServantsFilter, MasterServantsRouteFilterControls } from './components/MasterServantsRouteFilterControls';
+import { MasterServantsRouteInfoPanel } from './components/MasterServantsRouteInfoPanel';
+import { MasterServantsRouteMultiAddDialog, MasterServantsRouteMultiAddDialogData } from './components/MasterServantsRouteMultiAddDialog';
+import { MasterServantsRouteNavigationRail } from './components/MasterServantsRouteNavigationRail';
+import { MasterServantsRouteServantRowContextMenu } from './components/MasterServantsRouteServantRowContextMenu';
+import { useMasterServantsRouteUserPreferences } from './hooks/useMasterServantsRouteUserPreferences';
 
 type MasterServantsContextMenu = 
     'header' |
@@ -40,7 +40,7 @@ const masterAccountDataEditHookOptions = {
     includeServants: true
 } as MasterAccountDataEditHookOptions;
 
-const StyleClassPrefix = 'MasterServants';
+const StyleClassPrefix = 'MasterServantsRoute';
 
 const StyleProps = (theme: SystemTheme) => {
 
@@ -139,7 +139,7 @@ export const MasterServantsRoute = React.memo(() => {
         toggleFilters,
         toggleInfoPanelOpen,
         toggleShowUnsummonedServants
-    } = useMasterServantsUserPreferences();
+    } = useMasterServantsRouteUserPreferences();
 
     const {
         activeContextMenu,
@@ -413,7 +413,11 @@ export const MasterServantsRoute = React.memo(() => {
         setSaveDialogOpen(false);
     }, [saveData]);
 
-    const handleMultiAddServantDialogClose = useCallback((_event: any, _reason: any, data?: MultiAddServantData): void => {
+    const handleMultiAddServantDialogClose = useCallback((
+        _event: any,
+        _reason: any,
+        data?: MasterServantsRouteMultiAddDialogData
+    ): void => {
         if (data && data.gameIds.length) {
             const servantData = MasterServantUpdateUtils.createNew();
             servantData.summoned = InstantiatedServantUpdateUtils.fromBoolean(data.summoned);
@@ -486,13 +490,13 @@ export const MasterServantsRoute = React.memo(() => {
                     onRevertButtonClick={handleRevertButtonClick}
                     onSaveButtonClick={handleSaveButtonClick}
                 />
-                <MasterServantsFilterControls
+                <MasterServantsRouteFilterControls
                     filtersEnabled={filtersEnabled}
                     onFilterChange={setServantFilter}
                 />
             </div>
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
-                <MasterServantsNavigationRail
+                <MasterServantsRouteNavigationRail
                     layout={sm ? 'column' : 'row'}
                     dragDropMode={dragDropMode}
                     filtersEnabled={filtersEnabled}
@@ -530,7 +534,7 @@ export const MasterServantsRoute = React.memo(() => {
                         />
                     </div>
                     <div className={`${StyleClassPrefix}-info-panel-container`}>
-                        <MasterServantsInfoPanel
+                        <MasterServantsRouteInfoPanel
                             /**
                              * TODO Change this to false for mobile view, also make it user configurable.
                              */
@@ -552,7 +556,7 @@ export const MasterServantsRoute = React.memo(() => {
                 onTabChange={setServantEditDialogActiveTab}
                 onClose={handleEditServantDialogClose}
             />
-            <MasterServantsMultiAddDialog
+            <MasterServantsRouteMultiAddDialog
                 open={isMultiAddServantDialogOpen}
                 masterServantsData={masterAccountEditData.servantsData}
                 onClose={handleMultiAddServantDialogClose}
@@ -574,7 +578,7 @@ export const MasterServantsRoute = React.memo(() => {
                 open={saveDialogOpen}
                 onClose={handleSaveDataDialogClose}
             />
-            <MasterServantsListRowContextMenu
+            <MasterServantsRouteServantRowContextMenu
                 open={activeContextMenu === 'row'}
                 position={contextMenuPosition}
                 selectedServantsCount={selectedServantsCount}

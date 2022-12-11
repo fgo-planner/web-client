@@ -5,14 +5,14 @@ import { useGameServantList } from '../../../../../hooks/data/use-game-servant-l
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
 import { DialogComponentProps, MasterServantAggregatedData } from '../../../../../types';
 
-export type MultiAddServantData = {
+export type MasterServantsRouteMultiAddDialogData = {
     gameIds: Array<number>,
     summoned: boolean
 };
 
 type Props = {
     masterServantsData: ReadonlyArray<MasterServantAggregatedData>;
-} & Omit<DialogComponentProps<MultiAddServantData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
+} & Omit<DialogComponentProps<MasterServantsRouteMultiAddDialogData>, 'keepMounted' | 'onExited' | 'PaperProps'>;
 
 const CancelButtonLabel = 'Cancel';
 const SubmitButtonLabel = 'Done';
@@ -79,7 +79,7 @@ const DialogPaperProps = {
  * Dialog for bulk adding master servants. Specific to the master-servants
  * route.
  */
-export const MasterServantsMultiAddDialog = React.memo((props: Props) => {
+export const MasterServantsRouteMultiAddDialog = React.memo((props: Props) => {
 
     const gameServantList = useGameServantList();
 

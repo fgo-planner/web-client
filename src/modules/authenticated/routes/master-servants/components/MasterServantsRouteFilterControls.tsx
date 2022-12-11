@@ -12,7 +12,7 @@ type Props = {
     onFilterChange: (filter: MasterServantsFilter) => void
 };
 
-const StyleClassPrefix = 'MasterServantsFilterControls';
+const StyleClassPrefix = 'MasterServantsRouteFilterControls';
 
 const StyleProps = (theme: SystemTheme) => {
 
@@ -47,7 +47,7 @@ const StyleProps = (theme: SystemTheme) => {
     } as SystemStyleObject<SystemTheme>;
 };
 
-export const MasterServantsFilterControls = React.memo((props: Props) => {
+export const MasterServantsRouteFilterControls = React.memo((props: Props) => {
 
     const {
         filtersEnabled,

@@ -23,7 +23,7 @@ type Props = {
  */
 const TransitionDuration = 1;
 
-export const MasterServantsListRowContextMenu = React.memo((props: Props) => {
+export const MasterServantsRouteServantRowContextMenu = React.memo((props: Props) => {
 
     const {
         onAddServant,

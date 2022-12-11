@@ -29,15 +29,15 @@ type MasterServantsLocalUserPreferences = {
     showUnsummonedServants: boolean;
 };
 
-export type MasterServantsUserPreferences = MasterServantsLocalUserPreferences & {
+export type MasterServantsRouteUserPreferences = MasterServantsLocalUserPreferences & {
     // TODO
 };
 
-export type MasterServantsUserPreferencesHookResult = {
+export type MasterServantsRouteUserPreferencesHookResult = {
     /**
      * An object containing the user preferences for the route.
      */
-    userPreferences: Immutable<MasterServantsUserPreferences>;
+    userPreferences: Immutable<MasterServantsRouteUserPreferences>;
 
     setServantEditDialogActiveTab: (tab: MasterServantEditTab) => void;
     toggleFilters: () => void;
@@ -59,11 +59,11 @@ const getDefaultLocalUserPreferences = (): MasterServantsLocalUserPreferences =>
     showUnsummonedServants: ShowUnsummonedServantsDefault
 });
 
-const getDefaultUserPreferences = (): MasterServantsUserPreferences => ({
+const getDefaultUserPreferences = (): MasterServantsRouteUserPreferences => ({
     ...getDefaultLocalUserPreferences()
 });
 
-const readUserPreferencesFromLocalStorage = (): MasterServantsUserPreferences => {
+const readUserPreferencesFromLocalStorage = (): MasterServantsRouteUserPreferences => {
     try {
         const localStorageData = StorageUtils.getItem<Partial<MasterServantsLocalUserPreferences>>(
             StorageKey, 
@@ -82,7 +82,7 @@ const readUserPreferencesFromLocalStorage = (): MasterServantsUserPreferences =>
     }
 };
 
-const writeUserPreferencesToLocalStorage = (userPreferences: MasterServantsUserPreferences): MasterServantsUserPreferences => {
+const writeUserPreferencesToLocalStorage = (userPreferences: MasterServantsRouteUserPreferences): MasterServantsRouteUserPreferences => {
     StorageUtils.setItem<MasterServantsLocalUserPreferences>(StorageKey, userPreferences);
     return userPreferences;
 };
@@ -97,9 +97,9 @@ const writeUserPreferencesToLocalStorage = (userPreferences: MasterServantsUserP
  * This is intended to be used only within the `MasterServants` route component,
  * do not use inside any other component!
  */
-export const useMasterServantsUserPreferences = (): MasterServantsUserPreferencesHookResult => {
+export const useMasterServantsRouteUserPreferences = (): MasterServantsRouteUserPreferencesHookResult => {
 
-    const [userPreferences, setUserPreferences] = useState<MasterServantsUserPreferences>(getDefaultUserPreferences);
+    const [userPreferences, setUserPreferences] = useState<MasterServantsRouteUserPreferences>(getDefaultUserPreferences);
 
     /**
      * Load global user preferences.

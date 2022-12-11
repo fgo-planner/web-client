@@ -28,8 +28,6 @@ type Props = {
     unlockedCostumes: Iterable<number>;
 };
 
-// const FormId = 'master-servant-info-panel-form';
-
 const hasDebt = (enhancementRequirements: EnhancementRequirements): boolean => {
     return enhancementRequirements.qp > 0;
 };
@@ -82,7 +80,7 @@ const ServantStatLabelWidth = '60%';
 
 const MaterialLabelWidth = '80%';
 
-const StyleClassPrefix = 'MasterServantInfoPanel';
+const StyleClassPrefix = 'MasterServantsRouteInfoPanel';
 
 const StyleProps = (theme: SystemTheme) => {
 
@@ -224,7 +222,7 @@ const StyleProps = (theme: SystemTheme) => {
     } as SystemStyleObject<SystemTheme>;
 };
 
-export const MasterServantsInfoPanel = React.memo((props: Props) => {
+export const MasterServantsRouteInfoPanel = React.memo((props: Props) => {
 
     const {
         activeServantsData,

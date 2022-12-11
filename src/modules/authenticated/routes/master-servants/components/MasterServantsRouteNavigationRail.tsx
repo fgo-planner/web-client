@@ -23,7 +23,7 @@ type Props = {
     selectedServantsCount: number;
 };
 
-export const MasterServantsNavigationRail = React.memo((props: Props) => {
+export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
 
     const {
         dragDropMode,

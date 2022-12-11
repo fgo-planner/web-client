@@ -7,7 +7,7 @@ import { MasterItemStatsRoute } from './routes/master-item-stats/master-item-sta
 import { MasterItemsRoute } from './routes/master-items/master-items.route';
 import { MasterServantCostumesRoute } from './routes/master-servant-costumes/master-servant-costumes.route';
 import { MasterServantStatsRoute } from './routes/master-servant-stats/master-servant-stats.route';
-import { MasterServantsRoute } from './routes/master-servants/master-servants.route';
+import { MasterServantsRoute } from './routes/master-servants/MasterServantsRoute';
 import { MasterSettingsRoute } from './routes/master-settings/master-settings.route';
 import { MasterSoundtracksRoute } from './routes/master-soundtracks/master-soundtracks.route';
 import { PlanRoute } from './routes/plan/PlanRoute';

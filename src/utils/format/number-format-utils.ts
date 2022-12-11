@@ -26,15 +26,15 @@ function formatQuantityShort(value: number): string {
     if (value < 1_000) {
         return String(~~value);
     } else if (value < 10_000) {
-        return (value / 1_000).toFixed(1) + 'k';
+        return (~~(value / 100) / 10).toFixed(1) + 'k';
     } else if (value < 1_000_000) {
         return ~~(value / 1_000) + 'k';
     } else if (value < 10_000_000) {
-        return (value / 1_000_000).toFixed(1) + 'm';
+        return (~~(value / 100_000) / 10).toFixed(1) + 'm';
     } else if (value < 1_000_000_000) {
         return ~~(value / 1_000_000) + 'm';
     } else {
-        return (value / 1_000_000_000).toFixed(1) + 'b';
+        return (~~(value / 100_000_000) / 10).toFixed(1) + 'b';
     }
 }
 

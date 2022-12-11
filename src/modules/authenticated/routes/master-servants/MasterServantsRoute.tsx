@@ -2,18 +2,15 @@ import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, Inst
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
+import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
-import { useContextMenuState } from '../../../../hooks/user-interface/useContextMenuState';
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { EditDialogAction, MasterServantAggregatedData, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
 import { DataAggregationUtils } from '../../../../utils/data-aggregation.utils';
-import { GameServantUtils } from '../../../../utils/game/game-servant.utils';
 import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
 import { RouteDataEditReloadOnStaleDataDialog } from '../../components/control/RouteDataEditReloadOnStaleDataDialog';
 import { RouteDataEditSaveOnStaleDataDialog } from '../../components/control/RouteDataEditSaveOnStaleDataDialog';
@@ -23,16 +20,14 @@ import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../
 import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
 import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../../hooks/useMasterAccountDataEdit';
+import { MasterServantsRouteDeleteDialog, MasterServantsRouteDeleteDialogData } from './components/MasterServantsRouteDeleteDialog';
 import { MasterServantsFilter, MasterServantsRouteFilterControls } from './components/MasterServantsRouteFilterControls';
 import { MasterServantsRouteInfoPanel } from './components/MasterServantsRouteInfoPanel';
 import { MasterServantsRouteMultiAddDialog, MasterServantsRouteMultiAddDialogData } from './components/MasterServantsRouteMultiAddDialog';
 import { MasterServantsRouteNavigationRail } from './components/MasterServantsRouteNavigationRail';
 import { MasterServantsRouteServantRowContextMenu } from './components/MasterServantsRouteServantRowContextMenu';
+import { useMasterServantsRouteModalState } from './hooks/useMasterServantsRouteModalState';
 import { useMasterServantsRouteUserPreferences } from './hooks/useMasterServantsRouteUserPreferences';
-
-type MasterServantsContextMenu = 
-    'header' |
-    'row';
 
 // TODO Use `satisfies` keyword instead of `as` once Typescript is updated to version 4.9.
 const masterAccountDataEditHookOptions = {
@@ -143,10 +138,17 @@ export const MasterServantsRoute = React.memo(() => {
 
     const {
         activeContextMenu,
+        activeDialogInfo,
         contextMenuPosition,
-        closeContextMenu,
-        openContextMenu
-    } = useContextMenuState<MasterServantsContextMenu>();
+        closeActiveContextMenu,
+        closeActiveDialog,
+        openContextMenu,
+        openMasterServantDeleteDialog,
+        openMasterServantEditDialog,
+        openMasterServantMultiAddDialog,
+        openReloadOnStaleDataDialog,
+        openSaveOnStaleDataDialog
+    } = useMasterServantsRouteModalState();
 
     // TODO Move this to user preferences
     const [sortOptions, setSortOptions] = useState<SortOptions<MasterServantListColumn>>();
@@ -160,15 +162,6 @@ export const MasterServantsRoute = React.memo(() => {
         masterAccountEditData.servantsData,
         InstantiatedServantUtils.getInstanceId
     );
-    
-    /**
-     * TODO Move these to a dialog state hook.
-     */
-    const [isMultiAddServantDialogOpen, setIsMultiAddServantDialogOpen] = useState<boolean>(false);
-    const [editServantDialogData, setEditServantDialogData] = useState<MasterServantEditDialogData>();
-    const [deleteServantDialogData, setDeleteServantDialogData] = useState<ReactNode>();
-    const [reloadDialogOpen, setReloadDialogOpen] = useState<boolean>(false);
-    const [saveDialogOpen, setSaveDialogOpen] = useState<boolean>(false);
 
     const [servantFilter, setServantFilter] = useState<MasterServantsFilter>();
 
@@ -196,13 +189,6 @@ export const MasterServantsRoute = React.memo(() => {
         updateServants(selectedServantsData.ids, update);
     }, [selectedServantsData, updateServants]);
 
-    /**
-     * Deletes the currently selected servants.
-     */
-    const deleteSelectedServants = useCallback((): void => {
-        deleteServants(selectedServantsData.ids);
-    }, [deleteServants, selectedServantsData]);
-
     const openAddServantDialog = useCallback((): void => {
         const {
             bondLevels,
@@ -218,16 +204,8 @@ export const MasterServantsRoute = React.memo(() => {
                 bondLevels
             }
         };
-        setEditServantDialogData(masterServantEditDialogData);
-        setIsMultiAddServantDialogOpen(false);
-        setDeleteServantDialogData(undefined);
-    }, [masterAccountEditData]);
-
-    const openMultiAddServantDialog = useCallback((): void => {
-        setIsMultiAddServantDialogOpen(true);
-        setEditServantDialogData(undefined);
-        setDeleteServantDialogData(undefined);
-    }, []);
+        openMasterServantEditDialog(masterServantEditDialogData);
+    }, [masterAccountEditData, openMasterServantEditDialog]);
 
     const openEditServantDialog = useCallback((): void => {
         if (!selectedServantsData.instances.length) {
@@ -248,31 +226,17 @@ export const MasterServantsRoute = React.memo(() => {
                 bondLevels
             }
         };
-        setEditServantDialogData(masterServantEditDialogData);
-        setIsMultiAddServantDialogOpen(false);
-        setDeleteServantDialogData(undefined);
-    }, [masterAccountEditData, selectedServantsData]);
+        openMasterServantEditDialog(masterServantEditDialogData);
+    }, [masterAccountEditData, openMasterServantEditDialog, selectedServantsData]);
 
     const openDeleteServantDialog = useCallback((): void => {
-        const deleteCount = selectedServantsData.instances.length;
-        if (!deleteCount) {
+        if (!selectedServantsData.instances.length) {
             return;
         }
-        // TODO Un-hardcode static strings.
-        const prompt = <>
-            <p>The following servant{deleteCount > 1 && 's'} will be deleted:</p>
-            <ul>
-                {selectedServantsData.instances.map(servantData => {
-                    const displayedName = GameServantUtils.getDisplayedName(servantData.gameServant);
-                    return <li>{displayedName}</li>;
-                })}
-            </ul>
-            <p>Are you sure you want to proceed?</p>
-        </>;
-        setDeleteServantDialogData(prompt);
-        setIsMultiAddServantDialogOpen(false);
-        setEditServantDialogData(undefined);
-    }, [selectedServantsData]);
+        openMasterServantDeleteDialog({
+            targetMasterServantsData: selectedServantsData.instances
+        });
+    }, [openMasterServantDeleteDialog, selectedServantsData]);
 
     /**
      * Adds a listener to invoke the `openDeleteServantDialog` function when the
@@ -295,7 +259,9 @@ export const MasterServantsRoute = React.memo(() => {
 
     //#region Navigation rail event handlers
 
-    const handleMultiAddServant = openMultiAddServantDialog;
+    const handleMultiAddServant = useCallback(() => {
+        openMasterServantMultiAddDialog();
+    }, [openMasterServantMultiAddDialog]);
 
     const handleDragDropActivate = useCallback(() => {
         /**
@@ -385,15 +351,15 @@ export const MasterServantsRoute = React.memo(() => {
 
     const handleSaveButtonClick = useCallback((_event: MouseEvent): void => {
         if (isDataStale) {
-            setSaveDialogOpen(true);
+            openSaveOnStaleDataDialog();
         } else {
             saveData();
         }
-    }, [isDataStale, saveData]);
+    }, [isDataStale, openSaveOnStaleDataDialog, saveData]);
 
     const handleReloadButtonClick = useCallback((_event: MouseEvent): void => {
-        setReloadDialogOpen(true);
-    }, []);
+        openReloadOnStaleDataDialog();
+    }, [openReloadOnStaleDataDialog]);
 
     const handleRevertButtonClick = useCallback((_event: MouseEvent): void => {
         revertChanges();
@@ -403,15 +369,15 @@ export const MasterServantsRoute = React.memo(() => {
         if (reason === 'submit') {
             reloadData();
         }
-        setReloadDialogOpen(false);
-    }, [reloadData]);
+        closeActiveDialog();
+    }, [closeActiveDialog, reloadData]);
 
     const handleSaveDataDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): void => {
         if (reason === 'submit') {
             saveData();
         }
-        setSaveDialogOpen(false);
-    }, [saveData]);
+        closeActiveDialog();
+    }, [closeActiveDialog, saveData]);
 
     const handleMultiAddServantDialogClose = useCallback((
         _event: any,
@@ -423,11 +389,15 @@ export const MasterServantsRoute = React.memo(() => {
             servantData.summoned = InstantiatedServantUpdateUtils.fromBoolean(data.summoned);
             addServants(data.gameIds, servantData);
         }
-        setIsMultiAddServantDialogOpen(false);
-    }, [addServants]);
+        closeActiveDialog();
+    }, [addServants, closeActiveDialog]);
 
-    const handleEditServantDialogClose = useCallback((_event: any, _reason: any, data?: MasterServantEditDialogData): void => {
-        setEditServantDialogData(undefined);
+    const handleEditServantDialogClose = useCallback((
+        _event: any,
+        _reason: any,
+        data?: MasterServantEditDialogData
+    ): void => {
+        closeActiveDialog();
         /**
          * Close the dialog without taking any further action if the changes were
          * cancelled (if `data` is undefined, then the changes were cancelled).
@@ -444,14 +414,23 @@ export const MasterServantsRoute = React.memo(() => {
         /**
          * Should not be possible for update type to be `Imported` here.
          */
-    }, [addServant, applyUpdateToSelectedServants]);
+    }, [addServant, applyUpdateToSelectedServants, closeActiveDialog]);
 
-    const handleDeleteServantDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): any => {
-        if (reason === 'submit') {
-            deleteSelectedServants();
+    const handleDeleteServantDialogClose = useCallback((
+        _event: MouseEvent,
+        _reason: ModalOnCloseReason,
+        data?: MasterServantsRouteDeleteDialogData
+    ): void => {
+        closeActiveDialog();
+        /**
+         * Close the dialog without taking any further action if the changes were
+         * cancelled (if `data` is undefined, then the changes were cancelled).
+         */
+        if (!data) {
+            return;
         }
-        setDeleteServantDialogData(undefined);
-    }, [deleteSelectedServants]);
+        deleteServants(data.targetMasterServantsData.map(InstantiatedServantUtils.getInstanceId));
+    }, [closeActiveDialog, deleteServants]);
 
     // const handleFilterChange = useCallback((filter: MasterServantsFilter): void => {
     //     setServantFilter(filter);
@@ -470,7 +449,6 @@ export const MasterServantsRoute = React.memo(() => {
     }
 
     const selectedServantsCount = selectedServantsData.ids.size;
-    const isMultipleServantsSelected = selectedServantsCount > 1;
 
     const {
         servantsData,
@@ -550,32 +528,27 @@ export const MasterServantsRoute = React.memo(() => {
                 </div>
             </div>
             <MasterServantEditDialog
-                dialogData={editServantDialogData}
+                dialogData={activeDialogInfo.name === 'masterServantEdit' ? activeDialogInfo.data : undefined}
                 targetMasterServantsData={selectedServantsData.instances}
                 activeTab={servantEditDialogActiveTab}
                 onTabChange={setServantEditDialogActiveTab}
                 onClose={handleEditServantDialogClose}
             />
             <MasterServantsRouteMultiAddDialog
-                open={isMultiAddServantDialogOpen}
+                open={activeDialogInfo.name === 'masterServantMultiAdd'}
                 masterServantsData={masterAccountEditData.servantsData}
                 onClose={handleMultiAddServantDialogClose}
             />
-            <PromptDialog
-                open={!!deleteServantDialogData}
-                title={`Delete ${isMultipleServantsSelected ? 'Servants' : 'Servant'}?`}
-                prompt={deleteServantDialogData}
-                cancelButtonColor='secondary'
-                confirmButtonColor='primary'
-                confirmButtonLabel='Delete'
+            <MasterServantsRouteDeleteDialog
+                dialogData={activeDialogInfo.name === 'masterServantDelete' ? activeDialogInfo.data : undefined}
                 onClose={handleDeleteServantDialogClose}
             />
             <RouteDataEditReloadOnStaleDataDialog
-                open={reloadDialogOpen}
+                open={activeDialogInfo.name === 'reloadOnStaleData'}
                 onClose={handleReloadDataDialogClose}
             />
             <RouteDataEditSaveOnStaleDataDialog
-                open={saveDialogOpen}
+                open={activeDialogInfo.name === 'saveOnStaleData'}
                 onClose={handleSaveDataDialogClose}
             />
             <MasterServantsRouteServantRowContextMenu
@@ -587,7 +560,7 @@ export const MasterServantsRoute = React.memo(() => {
                 onEditSelectedServants={handleEditSelectedServants}
                 onSelectAllServants={handleSelectAllServants}
                 onDeselectAllServants={handleDeselectAllServants}
-                onClose={closeContextMenu}
+                onClose={closeActiveContextMenu}
             />
         </Box>
     );

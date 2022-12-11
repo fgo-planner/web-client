@@ -17,19 +17,19 @@ export type ContextMenuStateHookResult<T extends string> = {
     contextMenuPosition: Position2D;
 
     /**
-     * Close the currently open menu, if any;
+     * Close the currently open menu, if any.
      */
-    closeContextMenu(): void;
+    closeActiveContextMenu(): void;
 
     openContextMenu(menu: T, position: Position2D): void;
-    openContextMenu(menu: T, e: MouseEvent): void;
+    openContextMenu(menu: T, event: MouseEvent): void;
 
 };
 
 /**
- * Utility hook for managing context menus. This intended to be used at the
- * route component level. Each instance hook will only allow at most one managed
- * context menu to be open at a time.
+ * Utility hook for managing context menus in a route. This intended to be used
+ * at the route component level. Each instance hook will only allow at most one
+ * managed context menu to be open at a time.
  */
 export const useContextMenuState = function <T extends string = string>(): ContextMenuStateHookResult<T> {
 
@@ -45,7 +45,7 @@ export const useContextMenuState = function <T extends string = string>(): Conte
      */
     const [contextMenuPosition, setContextMenuPosition] = useState<Position2D>([0, 0]);
 
-    const closeContextMenu = useCallback((): void => {
+    const closeActiveContextMenu = useCallback((): void => {
         setActiveContextMenu(undefined);
     }, []);
 
@@ -63,7 +63,7 @@ export const useContextMenuState = function <T extends string = string>(): Conte
     return {
         activeContextMenu,
         contextMenuPosition,
-        closeContextMenu,
+        closeActiveContextMenu,
         openContextMenu
     };
 

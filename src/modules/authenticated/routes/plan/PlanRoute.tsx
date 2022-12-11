@@ -25,7 +25,7 @@ import { PlanRouteNavigationRail } from './components/PlanRouteNavigationRail';
 import { PlanRoutePlanServantDeleteDialog, PlanRoutePlanServantDeleteDialogData } from './components/PlanRoutePlanServantDeleteDialog';
 import { PlanRoutePlanServantEditDialog } from './components/PlanRoutePlanServantEditDialog';
 import { PlanRoutePlanServantEditDialogData } from './components/PlanRoutePlanServantEditDialogData.type';
-import { usePlanRouteDialogState } from './hooks/usePlanRouteDialogState';
+import { usePlanRouteModalState } from './hooks/usePlanRouteModalState';
 import { usePlanRouteUserPreferences } from './hooks/usePlanRouteUserPreferences';
 
 const PathMatchPattern: PathPattern = {
@@ -136,8 +136,8 @@ export const PlanRoute = React.memo(() => {
     } = usePlanRouteUserPreferences();
 
     const {
-        openDialogInfo,
-        closeAllDialogs,
+        activeDialogInfo,
+        closeActiveDialog,
         openMasterItemsEditDialog,
         openMasterServantEditDialog,
         openPlanServantDeleteDialog,
@@ -145,7 +145,7 @@ export const PlanRoute = React.memo(() => {
         openPlanServantMultiAddDialog,
         openReloadOnStaleDataDialog,
         openSaveOnStaleDataDialog
-    } = usePlanRouteDialogState();
+    } = usePlanRouteModalState();
 
     const {
         selectedData: selectedServantsData,
@@ -376,22 +376,22 @@ export const PlanRoute = React.memo(() => {
         if (reason === 'submit') {
             reloadData();
         }
-        closeAllDialogs();
-    }, [closeAllDialogs, reloadData]);
+        closeActiveDialog();
+    }, [closeActiveDialog, reloadData]);
 
     const handleSaveDataDialogClose = useCallback((_event: MouseEvent, reason: ModalOnCloseReason): void => {
         if (reason === 'submit') {
             saveData();
         }
-        closeAllDialogs();
-    }, [closeAllDialogs, saveData]);
+        closeActiveDialog();
+    }, [closeActiveDialog, saveData]);
 
     const handleEditServantDialogClose = useCallback((
         _event: MouseEvent,
         _reason: ModalOnCloseReason,
         data?: PlanRoutePlanServantEditDialogData
     ): void => {
-        closeAllDialogs();
+        closeActiveDialog();
         /**
          * Close the dialog without taking any further action if the changes were
          * cancelled (if `data` is undefined, then the changes were cancelled).
@@ -405,14 +405,14 @@ export const PlanRoute = React.memo(() => {
         } else {
             applyUpdateToSelectedServants(data.data.update);
         }
-    }, [addPlanServant, applyUpdateToSelectedServants, closeAllDialogs]);
+    }, [addPlanServant, applyUpdateToSelectedServants, closeActiveDialog]);
 
     const handleDeleteServantDialogClose = useCallback((
         _event: MouseEvent,
         _reason: ModalOnCloseReason,
         data?: PlanRoutePlanServantDeleteDialogData
     ): any => {
-        closeAllDialogs();
+        closeActiveDialog();
         /**
          * Close the dialog without taking any further action if the changes were
          * cancelled (if `data` is undefined, then the changes were cancelled).
@@ -421,14 +421,14 @@ export const PlanRoute = React.memo(() => {
             return;
         }
         deletePlanServants(data.targetPlanServantsData.map(InstantiatedServantUtils.getInstanceId));
-    }, [closeAllDialogs, deletePlanServants]);
+    }, [closeActiveDialog, deletePlanServants]);
 
     const handleEditItemsDialogClose = useCallback((
         _event: MouseEvent,
         _reason: ModalOnCloseReason,
         data?: PlanRouteMasterItemsEditDialogData
     ): any => {
-        closeAllDialogs();
+        closeActiveDialog();
         /**
          * Close the dialog without taking any further action if the changes were
          * cancelled (if `data` is undefined, then the changes were cancelled).
@@ -441,7 +441,7 @@ export const PlanRoute = React.memo(() => {
             [GameItemConstants.QpItemId]: data.qp
         };
         updateMasterItems(itemUpdates);
-    }, [closeAllDialogs, updateMasterItems]);
+    }, [closeActiveDialog, updateMasterItems]);
 
     //#endregion
 
@@ -500,26 +500,26 @@ export const PlanRoute = React.memo(() => {
                 </div>
             </div>
             <PlanRoutePlanServantEditDialog
-                dialogData={openDialogInfo.name === 'planServantEdit' ? openDialogInfo.data : undefined}
+                dialogData={activeDialogInfo.name === 'planServantEdit' ? activeDialogInfo.data : undefined}
                 targetPlanServantsData={selectedServantsData.instances}
                 activeTab='enhancements'
                 onTabChange={Functions.identity}
                 onClose={handleEditServantDialogClose}
             />
             <PlanRoutePlanServantDeleteDialog
-                dialogData={openDialogInfo.name === 'planServantDelete' ? openDialogInfo.data : undefined}
+                dialogData={activeDialogInfo.name === 'planServantDelete' ? activeDialogInfo.data : undefined}
                 onClose={handleDeleteServantDialogClose}
             />
             <PlanRouteMasterItemsEditDialog
-                dialogData={openDialogInfo.name === 'masterItemsEdit' ? openDialogInfo.data : undefined}
+                dialogData={activeDialogInfo.name === 'masterItemsEdit' ? activeDialogInfo.data : undefined}
                 onClose={handleEditItemsDialogClose}
             />
             <RouteDataEditReloadOnStaleDataDialog
-                open={openDialogInfo.name === 'reloadOnStaleData'}
+                open={activeDialogInfo.name === 'reloadOnStaleData'}
                 onClose={handleReloadDataDialogClose}
             />
             <RouteDataEditSaveOnStaleDataDialog
-                open={openDialogInfo.name === 'saveOnStaleData'}
+                open={activeDialogInfo.name === 'saveOnStaleData'}
                 onClose={handleSaveDataDialogClose}
             />
         </Box>

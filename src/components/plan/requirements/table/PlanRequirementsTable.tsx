@@ -44,37 +44,41 @@ const getDisplayedItems = (
     itemDisplayOptions: PlanRequirementsTableOptions['displayItems']
 ): Array<number> => {
     /** 
-     * Build default list of item IDs based on display options.
+     * Build unfiltered list of item IDs based on display options.
      */
     /** */
-    const defaultItems = [
+    let items = [
         ...gameItemCategoryMap[GameItemCategory.BronzeEnhancementMaterials],
         ...gameItemCategoryMap[GameItemCategory.SilverEnhancementMaterials],
         ...gameItemCategoryMap[GameItemCategory.GoldEnhancementMaterials]
     ];
     if (itemDisplayOptions.statues) {
-        defaultItems.push(...gameItemCategoryMap[GameItemCategory.AscensionStatues]);
+        items.push(...gameItemCategoryMap[GameItemCategory.AscensionStatues]);
     }
     if (itemDisplayOptions.grails) {
-        defaultItems.push(GameItemConstants.GrailItemId);
+        items.push(GameItemConstants.GrailItemId);
     }
     if (itemDisplayOptions.gems) {
-        defaultItems.push(...gameItemCategoryMap[GameItemCategory.SkillGems]);
+        items.push(...gameItemCategoryMap[GameItemCategory.SkillGems]);
     }
     if (itemDisplayOptions.lores) {
-        defaultItems.push(GameItemConstants.LoreItemId);
+        items.push(GameItemConstants.LoreItemId);
     }
     /** 
-     * If empty columns are being displayed, then just return the default item IDs.
+     * If only required items are displayed, then filter out all the empty
+     * (undefined) values.
      */
-    if (itemDisplayOptions.empty) {
-        return defaultItems;
+    if (!itemDisplayOptions.empty) {
+        const groupItems = planRequirements.requirements.group.items;
+        items = items.filter(itemId => groupItems[itemId] !== undefined);
     }
-    /** 
-     * The overall group requirements should contain all the items required.
+    /**
+     * QP is a special case that needs to be added last.
      */
-    const groupItems = planRequirements.requirements.group.items;
-    return defaultItems.filter(itemId => groupItems[itemId] !== undefined);
+    if (itemDisplayOptions.qp) {
+        items.push(GameItemConstants.QpItemId);
+    }
+    return items;
 };
 
 export const StyleClassPrefix = 'PlanRequirementsTable';

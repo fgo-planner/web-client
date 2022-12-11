@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback } from 'react';
-import { NumberFormatUtils } from '../../../../utils/format/number-format-utils';
 import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
+import { PlanRequirementsTableUtils } from './PlanRequirementsTableUtils';
 
 type Props = {
     active?: boolean;
@@ -29,12 +29,10 @@ export const PlanRequirementsTableFooterCell = React.memo((props: Props) => {
         onHover?.(undefined, itemId);
     }, [itemId, onHover]);
 
-    let value: string | undefined;
-    if (quantity) {
-        value = NumberFormatUtils.formatQuantityShort(quantity);
-    } else if (displayZeroValues) {
-        value = '0';
-    }
+    const {
+        title,
+        value
+    } = PlanRequirementsTableUtils.formatCellValue(quantity, displayZeroValues ? '0' : undefined);
 
     const className = clsx(
         `${StyleClassPrefix}-root`,
@@ -47,7 +45,7 @@ export const PlanRequirementsTableFooterCell = React.memo((props: Props) => {
             className={className}
             onMouseEnter={handleMouseEnter}
         >
-            <span>{value}</span>
+            {value && <span title={title}>{value}</span>}
         </DataTableGridCell>
     );
 

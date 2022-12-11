@@ -1,4 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
+import { GameItemConstants } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { MouseEvent, ReactNode, useCallback } from 'react';
 import { PlanServantAggregatedData, PlanServantRequirements } from '../../../../types';
@@ -84,7 +85,12 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
     const itemRequirements = servantRequirements.requirements.items;
 
     const renderItemCell = (itemId: number): ReactNode => {
-        const itemQuantity = itemRequirements[itemId]?.total;
+        let itemQuantity: number | undefined;
+        if (itemId === GameItemConstants.QpItemId) {
+            itemQuantity = servantRequirements.requirements.qp;
+        } else {
+            itemQuantity = itemRequirements[itemId]?.total;
+        }
         return (
             <PlanRequirementsTableServantRowCell
                 key={itemId}

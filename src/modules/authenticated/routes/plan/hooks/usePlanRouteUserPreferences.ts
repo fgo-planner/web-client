@@ -29,7 +29,8 @@ const DefaultTableValues = {
         lores: true,
         grails: true,
         embers: true,
-        fous: true
+        fous: true,
+        qp: true
     }
 } as const; // satisfies PlanRequirementsTableOptions;
 

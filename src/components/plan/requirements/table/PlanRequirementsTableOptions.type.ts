@@ -13,6 +13,7 @@ export type PlanRequirementsTableOptions = {
         grails?: boolean;
         embers?: boolean;
         fous?: boolean;
+        qp?: boolean;
     }
 
     displayZeroValues?: boolean;

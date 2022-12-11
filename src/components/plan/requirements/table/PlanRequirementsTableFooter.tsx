@@ -47,7 +47,12 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
     );
 
     const renderRequiredItemCell = (itemId: number): ReactNode => {
-        const quantity = requiredItems[itemId]?.total;
+        let quantity: number | undefined;
+        if (itemId === GameItemConstants.QpItemId) {
+            quantity = requirements.group.qp;
+        } else {
+            quantity = requiredItems[itemId]?.total;
+        }
         return (
             <PlanRequirementsTableFooterCell
                 key={itemId}

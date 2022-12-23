@@ -52,5 +52,19 @@
         ],
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-explicit-any": "off"
-    }
+    },
+    "overrides": [
+        {
+            "files": [
+                "config/**",
+                "scripts/**"
+            ],
+            "rules": {
+                "@typescript-eslint/indent": [
+                    "warn",
+                    2
+                ]
+            }
+        }
+    ]
 }

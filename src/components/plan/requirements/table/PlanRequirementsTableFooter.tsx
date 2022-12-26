@@ -107,13 +107,13 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
         }
         return (
             <PlanRequirementsTableFooterCell
-            key={itemId}
-            active={itemId === activeItemId}
-            displayZeroValues={displayZeroValues}
-            hover={itemId === hoverItemId}
-            itemId={itemId}
-            quantity={quantity}
-            onHover={onHover}
+                key={itemId}
+                active={itemId === activeItemId}
+                displayZeroValues
+                hover={itemId === hoverItemId}
+                itemId={itemId}
+                quantity={quantity}
+                onHover={onHover}
             />
         );
     };

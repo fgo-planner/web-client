@@ -1,5 +1,5 @@
 import { CollectionUtils, DateTimeUtils, Immutable, ImmutableArray, Nullable, ReadonlyDate, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameItemConstants, ImmutablePlan, InstantiatedServantUtils, MasterServantAggregatedData, MasterServantUpdate, Plan, PlanServant, PlanServantAggregatedData, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanUpcomingResources, PlanUtils } from '@fgo-planner/data-core';
+import { GameItemConstants, ImmutablePlan, InstantiatedServantUtils, MasterItemConstants, MasterServantAggregatedData, MasterServantUpdate, Plan, PlanServant, PlanServantAggregatedData, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanUpcomingResources, PlanUtils } from '@fgo-planner/data-core';
 import React, { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
@@ -277,10 +277,10 @@ const isPlanServantChanged = (
 
 const createNegativeItemUpdates = (requirements: PlanEnhancementRequirements): Record<number, React.SetStateAction<number>> => {
     const itemUpdates: Record<number, React.SetStateAction<number>> = {
-        [GameItemConstants.QpItemId]: (current: number) => current - requirements.qp
+        [GameItemConstants.QpItemId]: (current: number) => Math.max(MasterItemConstants.MinQuantity, current - requirements.qp)
     };
     for (const [key, value] of Object.entries(requirements.items)) {
-        itemUpdates[Number(key)] = (current: number) => current - value.total;
+        itemUpdates[Number(key)] = (current: number) => Math.max(MasterItemConstants.MinQuantity, current - value.total);
     }
     return itemUpdates;
 };

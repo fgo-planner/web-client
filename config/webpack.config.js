@@ -333,8 +333,24 @@ module.exports = function (webpackEnv) {
           babelRuntimeEntry,
           babelRuntimeEntryHelpers,
           babelRuntimeRegenerator,
-        ]),
+        ])
       ],
+      /**
+       * Polyfills for Webpack 5.
+       * 
+       * @see https://github.com/facebook/create-react-app/issues/11756
+       * @see https://blog.alchemy.com/blog/how-to-polyfill-node-core-modules-in-webpack-5
+       */
+      fallback: {
+        assert: require.resolve('assert'),
+        crypto: require.resolve('crypto-browserify'),
+        http: require.resolve('stream-http'),
+        https: require.resolve('https-browserify'),
+        os: require.resolve('os-browserify'),
+        stream: require.resolve('stream-browserify'),
+        url: require.resolve('url'),
+        util: require.resolve('util/')
+      }
     },
     module: {
       strictExportPresence: true,
@@ -560,6 +576,16 @@ module.exports = function (webpackEnv) {
             // Make sure to add the new loader(s) before the "file" loader.
           ],
         },
+        /**
+         * This rule resolves the error: `The request 'process/browser' failed to
+         * resolve only because it was resolved as fully specified`.
+         */
+        {
+          test: /\.m?js/,
+          resolve: {
+            fullySpecified: false
+          }
+        }
       ].filter(Boolean),
     },
     plugins: [
@@ -747,6 +773,13 @@ module.exports = function (webpackEnv) {
             },
           },
         }),
+      /**
+       * Additional polyfills for Webpack 5.
+       */
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer']
+      })
     ].filter(Boolean),
     // Turn off performance processing because we utilize
     // our own hints via the FileSizeReporter

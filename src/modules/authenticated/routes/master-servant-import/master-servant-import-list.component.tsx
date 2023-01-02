@@ -125,6 +125,7 @@ export const MasterServantImportList = React.memo((props: Props) => {
                 bondLevels[parsedServant.gameId] = bondLevel;
             }
             const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedServant, bondLevels);
+            masterServant.gameId = parsedServant.gameId;
             masterServants.push(masterServant);
         }
         const masterServantsData = DataAggregationUtils.aggregateDataForMasterServants(masterServants, gameServantMap);

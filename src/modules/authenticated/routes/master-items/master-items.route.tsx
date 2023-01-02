@@ -11,8 +11,12 @@ import { ModalOnCloseReason } from '../../../../types';
 import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
 import { RouteDataEditReloadOnStaleDataDialog } from '../../components/control/RouteDataEditReloadOnStaleDataDialog';
 import { RouteDataEditSaveOnStaleDataDialog } from '../../components/control/RouteDataEditSaveOnStaleDataDialog';
-import { useMasterAccountDataEdit } from '../../hooks/useMasterAccountDataEdit';
+import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../../hooks/useMasterAccountDataEdit';
 import { MasterItemList } from './master-item-list.component';
+
+const MasterAccountDataEditOptions = {
+    includeItems: true
+} as const satisfies MasterAccountDataEditHookOptions;
 
 const StyleClassPrefix = 'MasterItems';
 
@@ -63,7 +67,7 @@ export const MasterItemsRoute = React.memo(() => {
         reloadData,
         revertChanges,
         persistChanges
-    } = useMasterAccountDataEdit({ includeItems: true });
+    } = useMasterAccountDataEdit(MasterAccountDataEditOptions);
 
     // TODO Move these to a dialog state hook.
     const [reloadDialogOpen, setReloadDialogOpen] = useState<boolean>(false);

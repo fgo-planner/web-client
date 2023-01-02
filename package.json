@@ -43,6 +43,8 @@
   "devDependencies": {
     "@babel/core": "^7.20.7",
     "@babel/preset-env": "^7.20.2",
+    "@babel/preset-typescript": "^7.18.6",
+    "@babel/plugin-transform-typescript": "7.20.7",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@svgr/webpack": "^6.5.1",
     "@types/jest": "^29.2.5",
@@ -100,7 +102,7 @@
     "stream-http": "^3.2.0",
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.6",
-    "typescript": "4.9.3",
+    "typescript": "^4.9.4",
     "url": "^0.11.0",
     "util": "^0.12.4",
     "webpack": "^5.75.0",
@@ -113,20 +115,11 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },
-  "browserslist": {
-    "production": [
-      ">0.3%",
-      "not ie 11",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      ">0.3%",
-      "not ie 11",
-      "not dead",
-      "not op_mini all"
-    ]
-  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
   "jest": {
     "roots": [
       "<rootDir>/src"

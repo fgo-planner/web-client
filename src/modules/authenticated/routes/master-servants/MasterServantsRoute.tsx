@@ -29,11 +29,10 @@ import { MasterServantsRouteServantRowContextMenu } from './components/MasterSer
 import { useMasterServantsRouteModalState } from './hooks/useMasterServantsRouteModalState';
 import { useMasterServantsRouteUserPreferences } from './hooks/useMasterServantsRouteUserPreferences';
 
-// TODO Use `satisfies` keyword instead of `as` once Typescript is updated to version 4.9.
-const masterAccountDataEditHookOptions = {
+const MasterAccountDataEditOptions = {
     includeCostumes: true,
     includeServants: true
-} as MasterAccountDataEditHookOptions;
+} as const satisfies MasterAccountDataEditHookOptions;
 
 const StyleClassPrefix = 'MasterServantsRoute';
 
@@ -106,7 +105,7 @@ export const MasterServantsRoute = React.memo(() => {
         reloadData,
         revertChanges,
         persistChanges
-    } = useMasterAccountDataEdit(masterAccountDataEditHookOptions);
+    } = useMasterAccountDataEdit(MasterAccountDataEditOptions);
 
     const {
         dragDropData,

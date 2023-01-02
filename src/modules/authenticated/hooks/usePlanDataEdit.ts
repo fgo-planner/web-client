@@ -149,14 +149,13 @@ const BlockNavigationHookOptions: UseBlockNavigationOptions = {
     prompt: BlockNavigationPrompt
 };
 
-// TODO Use `satisfies` keyword instead of `as` once Typescript is updated to version 4.9.
-const masterAccountDataEditHookOptions = {
+const MasterAccountDataEditOptions = {
     blockNavigationOnDirtyData: false,
     includeCostumes: true,
     includeItems: true,
     includeServants: true,
     skipProcessOnActiveAccountChange: true
-} as MasterAccountDataEditHookOptions;
+} as const satisfies MasterAccountDataEditHookOptions;
 
 //#endregion
 
@@ -318,7 +317,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
         reloadData: reloadMasterAccountData,
         revertChanges: revertMasterAccountChanges,
         persistChanges: persistMasterAccountChanges
-    } = useMasterAccountDataEdit(masterAccountDataEditHookOptions);
+    } = useMasterAccountDataEdit(MasterAccountDataEditOptions);
 
     /**
      * The original plan data.

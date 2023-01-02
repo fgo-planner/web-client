@@ -15,7 +15,7 @@ import { DataEditUtils } from './DataEditUtils';
 
 //#region Type definitions
 
-export type MasterAccountDataEditHookOptions = {
+export type MasterAccountDataEditHookOptions = Readonly<{
     /**
      * Whether to prevent user from navigating away from the current route if there
      * is dirty data.
@@ -35,7 +35,7 @@ export type MasterAccountDataEditHookOptions = {
      * unmounted when another master account is selected.
      */
     skipProcessOnActiveAccountChange?: boolean;
-};
+}>;
 
 /**
  * This container object is guaranteed to be stable between re-renders. A new

@@ -32,13 +32,13 @@ const DefaultTableValues = {
         fous: true,
         qp: true
     }
-} as const; // satisfies PlanRequirementsTableOptions;
+} as const satisfies PlanRequirementsTableOptions;
 
-const DefaultValues: Readonly<PlanLocalUserPreferences> = {
+const DefaultValues: PlanLocalUserPreferences = {
     masterServantEditDialogActiveTab: 'enhancements',
     planServantEditDialogActiveTab: 'enhancements',
     table: DefaultTableValues
-} as const; // satisfies PlanLocalUserPreferences;
+};
 
 export type PlanUserPreferences = PlanLocalUserPreferences & {
     // TODO

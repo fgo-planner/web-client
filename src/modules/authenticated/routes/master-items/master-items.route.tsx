@@ -4,7 +4,7 @@ import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail/NavigationRail';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ModalOnCloseReason } from '../../../../types';

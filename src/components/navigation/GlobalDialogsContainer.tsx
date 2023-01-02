@@ -28,7 +28,7 @@ const closeActiveDialogAction = (activeDialogAction?: GlobalDialogOpenAction): u
     return undefined;
 };
 
-export const GlobalDialogs = React.memo(() => {
+export const GlobalDialogsContainer = React.memo(() => {
 
     const [user, setUser] = useState<Nullable<UserTokenPayload>>();
 

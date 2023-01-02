@@ -1,10 +1,12 @@
-import { SvgIconComponent } from '@mui/icons-material';
 import React from 'react';
+import { MaterialIconVariant } from '../MaterialIconVariant.type';
 
 type BaseNavigationDrawerItem = {
     key: React.Key;
-    icon: SvgIconComponent;
-    activeIcon?: SvgIconComponent;
+    icon: string;
+    iconVariant?: MaterialIconVariant;
+    activeIcon?: string;
+    activeIconVariant?: MaterialIconVariant;
     label: string;
     tooltip?: string;
 };

@@ -1,4 +1,3 @@
-import { ExitToApp as ExitToAppIcon, InfoOutlined as InfoOutlinedIcon, NightsStay as NightsStayIcon, Settings as SettingsIcon, SupervisedUserCircleOutlined as SupervisedUserCircleIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@mui/icons-material';
 import { Avatar, Divider } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
@@ -12,8 +11,8 @@ import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ModalOnCloseHandler, ThemeInfo } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { AppBarActionMenuItem } from '../action-menu/app-bar-action-menu-item.component';
-import { AppBarActionMenu } from '../action-menu/app-bar-action-menu.component';
+import { AppBarActionMenu } from '../action-menu/AppBarActionMenu';
+import { AppBarActionMenuItem } from '../action-menu/AppBarActionMenuItem';
 
 type Props = {
     currentUser: BasicUser;
@@ -127,33 +126,35 @@ export const AppBarUserProfileMenu = React.memo((props: Props) => {
             <Divider />
             <AppBarActionMenuItem
                 label='Settings'
-                icon={SettingsIcon}
+                icon='manage_accounts'
                 to='/user/settings'
             />
             <AppBarActionMenuItem
                 label='Master Accounts'
-                icon={SupervisedUserCircleIcon}
+                icon='supervised_user_circle'
+                iconVariant='outlined'
                 to='/user/master-accounts'
             />
             <AppBarActionMenuItem
                 label='Log Out'
-                icon={ExitToAppIcon}
+                icon='exit_to_app'
                 onClick={handleLogout}
             />
             <Divider />
             <AppBarActionMenuItem
                 label={`Appearance: ${isLightMode ? 'Light' : 'Dark'}`}
-                icon={isLightMode ? WbSunnyIcon : NightsStayIcon}
+                icon={isLightMode ? 'wb_sunny' : 'nights_stay'}
                 onClick={handleThemeModeToggle}
             />
             <AppBarActionMenuItem
                 label={`Music: ${isBackgroundMusicPlaying ? 'On' : 'Off'}`}
-                icon={isBackgroundMusicPlaying ? VolumeUpIcon : VolumeOffIcon}
+                icon={isBackgroundMusicPlaying ? 'volume_up' : 'volume_off'}
                 onClick={handleBackgroundMusicButtonClick}
             />
             <AppBarActionMenuItem
                 label='About'
-                icon={InfoOutlinedIcon}
+                icon='info'
+                iconVariant='outlined'
                 to='/about'
             />
         </AppBarActionMenu>

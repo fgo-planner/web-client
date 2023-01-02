@@ -1,19 +1,29 @@
-import { SvgIconComponent } from '@mui/icons-material';
 import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import React, { MouseEventHandler } from 'react';
 import { Link } from 'react-router-dom';
+import { MaterialIconVariant } from '../../../../types';
+import { Icon } from '../../../icons';
 
 type Props = {
+    icon: string;
+    iconVariant?: MaterialIconVariant;
     label: string;
-    icon: SvgIconComponent;
-    to?: string;
     onClick?: MouseEventHandler;
+    to?: string;
 };
 
 export const StyleClassPrefix = 'AppBarActionMenuItem';
 
 export const AppBarActionMenuItem = React.memo((props: Props) => {
-    const { label, to, onClick } = props;
+
+    const {
+        icon,
+        iconVariant,
+        label,
+        onClick,
+        to,
+    } = props;
+
     return (
         <MenuItem
             className={`${StyleClassPrefix}-root`}
@@ -22,9 +32,10 @@ export const AppBarActionMenuItem = React.memo((props: Props) => {
             onClick={onClick}
         >
             <ListItemIcon>
-                <props.icon />
+                <Icon variant={iconVariant}>{icon}</Icon>
             </ListItemIcon>
             <ListItemText primary={label} />
         </MenuItem>
     );
+
 });

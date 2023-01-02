@@ -1,7 +1,7 @@
 import { Divider, Icon, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
 import { IconOutlined } from '../../../../../components/icons';
-import { NavigationRail } from '../../../../../components/navigation/navigation-rail/navigation-rail.component';
+import { NavigationRail } from '../../../../../components/navigation/navigation-rail/NavigationRail';
 
 type Props = {
     filtersEnabled: boolean;

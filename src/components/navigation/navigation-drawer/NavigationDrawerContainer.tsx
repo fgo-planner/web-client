@@ -1,6 +1,5 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { MasterAccount } from '@fgo-planner/data-core';
-import { BusinessCenter as BusinessCenterIcon, BusinessCenterOutlined as BusinessCenterOutlinedIcon, CalendarMonth as CalendarMonthIcon, CalendarMonthOutlined as CalendarMonthOutlinedIcon, Category as CategoryIcon, CategoryOutlined as CategoryOutlinedIcon, Dashboard as DashboardIcon, DashboardOutlined as DashboardOutlinedIcon, Group as GroupIcon, GroupOutlined as GroupOutlinedIcon, Home as HomeIcon, HomeOutlined as HomeOutlinedIcon, Login as LoginIcon, Logout as LogoutIcon, MusicNote as MusicNoteIcon, MusicNoteOutlined as MusicNoteOutlinedIcon, PeopleAlt as PeopleAltIcon, PeopleAltOutlined as PeopleAltOutlinedIcon, Settings, SettingsOutlined, Stadium as StadiumIcon, StadiumOutlined as StadiumOutlinedIcon, TheaterComedy as TheaterComedyIcon, TheaterComedyOutlined as TheaterComedyOutlinedIcon } from '@mui/icons-material';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
@@ -12,8 +11,8 @@ import { ThemeConstants } from '../../../styles/theme-constants';
 import { NavigationDrawerContent as Content, NavigationDrawerSection as Section, SxPropsFunction } from '../../../types';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
-import { NavigationDrawerDesktop } from './navigation-drawer-desktop.component';
-import { NavigationDrawerMobile } from './navigation-drawer-mobile.component';
+import { NavigationDrawerDesktop } from './NavigationDrawerDesktop';
+import { NavigationDrawerMobile } from './NavigationDrawerMobile';
 
 type Props = PropsWithChildren<{
     mobileView: boolean;
@@ -25,8 +24,9 @@ const HomeButtonSection: Section = {
     items: [
         {
             key: 'app-home',
-            icon: HomeOutlinedIcon,
-            activeIcon: HomeIcon,
+            icon: 'home',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Home',
             route: '/',
             exact: true
@@ -39,45 +39,51 @@ const MasterAccountRoutesSection: Section = {
     items: [
         {
             key: 'account-dashboard',
-            icon: DashboardOutlinedIcon,
-            activeIcon: DashboardIcon,
+            icon: 'dashboard',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Dashboard',
             route: '/user/master/dashboard',
             exact: true
         },
         {
             key: 'account-planner',
-            icon: CalendarMonthOutlinedIcon,
-            activeIcon: CalendarMonthIcon,
+            icon: 'calendar_month',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Planner',
             route: '/user/master/planner'
         },
         {
             key: 'account-servants',
-            icon: PeopleAltOutlinedIcon,
-            activeIcon: PeopleAltIcon,
+            icon: 'people_alt',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Roster',
             tooltip: 'Servant Roster',
             route: '/user/master/servants'
         },
         {
             key: 'account-items',
-            icon: BusinessCenterOutlinedIcon,
-            activeIcon: BusinessCenterIcon,
+            icon: 'business_center',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Inventory',
             route: '/user/master/items'
         },
         {
             key: 'account-costumes',
-            icon: TheaterComedyOutlinedIcon,
-            activeIcon: TheaterComedyIcon,
+            icon: 'theater_comedy',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Costumes',
             route: '/user/master/costumes'
         },
         {
             key: 'account-soundtracks',
-            icon: MusicNoteOutlinedIcon,
-            activeIcon: MusicNoteIcon,
+            icon: 'music_note',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Soundtracks',
             route: '/user/master/soundtracks'
         }
@@ -89,22 +95,25 @@ const ResourceRoutesSection: Section = {
     items: [
         {
             key: 'servants',
-            icon: GroupOutlinedIcon,
-            activeIcon: GroupIcon,
+            icon: 'group',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Servants',
             route: '/resources/servants'
         },
         {
             key: 'items',
-            icon: CategoryOutlinedIcon,
-            activeIcon: CategoryIcon,
+            icon: 'category',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Items',
             route: '/resources/items'
         },
         {
             key: 'events',
-            icon: StadiumOutlinedIcon,
-            activeIcon: StadiumIcon,
+            icon: 'stadium',
+            iconVariant: 'outlined',
+            activeIconVariant: 'filled',
             label: 'Events',
             route: '/resources/events'
         }
@@ -228,14 +237,15 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
                 items: [
                     {
                         key: 'user-settings',
-                        icon: SettingsOutlined,
-                        activeIcon: Settings,
+                        icon: 'settings',
+                        iconVariant: 'outlined',
+                        activeIconVariant: 'filled',
                         label: 'Settings',
                         route: '/user/settings'
                     },
                     {
                         key: 'logout',
-                        icon: LogoutIcon,
+                        icon: 'logout',
                         label: 'Log Out',
                         onClick: () => authenticationService.logout()
                     }
@@ -247,7 +257,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
                 items: [
                     {
                         key: 'login',
-                        icon: LoginIcon,
+                        icon: 'login',
                         label: 'Log In',
                         route: '/login',
                         onClick: () => userInterfaceService.openLoginDialog()

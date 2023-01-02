@@ -6,7 +6,7 @@ import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail/NavigationRail';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';

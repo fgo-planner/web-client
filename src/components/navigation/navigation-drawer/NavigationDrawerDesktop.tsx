@@ -6,7 +6,7 @@ import React, { CSSProperties, useContext } from 'react';
 import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { NavigationDrawerContent as Content } from '../../../types';
-import { NavigationDrawerContent } from './navigation-drawer-content.component';
+import { NavigationDrawerContent } from './NavigationDrawerContent';
 
 type Props = {
     content: Content;

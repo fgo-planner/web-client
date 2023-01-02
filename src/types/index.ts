@@ -15,7 +15,7 @@ export * from './device/device-type.enum';
 export * from './dto/autocomplete-option-with-label.type';
 export * from './dto/data-table-list-column-properties.type';
 export * from './dto/edit-dialog-data.type';
-export * from './dto/navigation-drawer-content.type';
+export * from './dto/NavigationDrawerContent.type';
 export * from './dto/page-metadata.type';
 export * from './dto/theme-info.type';
 export * from './game/item/game-item-category-map.type';

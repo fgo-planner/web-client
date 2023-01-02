@@ -1,5 +1,4 @@
 import { Nullable } from '@fgo-planner/common-core';
-import { Menu as MenuIcon } from '@mui/icons-material';
 import { IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import clsx from 'clsx';
@@ -12,8 +11,9 @@ import { ThemeConstants } from '../../../styles/theme-constants';
 import { SxPropsFunction } from '../../../types';
 import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
-import { AppBarAuthenticatedUser } from './authenticated/app-bar-authenticated-user.component';
-import { AppBarGuestUser } from './guest/app-bar-guest-user.component';
+import { IconOutlined } from '../../icons';
+import { AppBarAuthenticatedUser } from './authenticated/AppBarAuthenticatedUser';
+import { AppBarGuestUser } from './guest/AppBarGuestUser';
 
 const StyleClassPrefix = 'AppBar';
 
@@ -119,7 +119,7 @@ export const AppBar = React.memo(() => {
             <div className={`${StyleClassPrefix}-contents`}>
                 {/* TODO Hide menu button in desktop view */}
                 <IconButton onClick={handleNavigationDrawerButtonClick}>
-                    <MenuIcon />
+                    <IconOutlined>menu</IconOutlined>
                 </IconButton>
                 {/* TODO Add logo */}
                 <Link className={`${StyleClassPrefix}-title`} to='/'>

@@ -5,7 +5,7 @@ import React, { useContext } from 'react';
 import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
 import { ThemeConstants } from '../../../styles/theme-constants';
 import { NavigationDrawerSection as Section } from '../../../types';
-import { NavigationDrawerContentItem } from './navigation-drawer-content-item.component';
+import { NavigationDrawerContentItem } from './NavigationDrawerContentItem';
 
 type Props = {
     isLastSection: boolean;

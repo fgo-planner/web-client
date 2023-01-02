@@ -33,6 +33,7 @@ export * from './http/http-response-error.type';
 export * from './http/http-response-type.type';
 export * from './master/account/basic-master-accounts.type';
 export * from './master/account/master-account-changes.type';
+export * from './MaterialIconVariant.type';
 export * from './plan/basic-plans.type';
 export * from './plan/PlanEnhancementCategory.type';
 export * from './plan/requirements/plan-enhancement-item-requirements.type';

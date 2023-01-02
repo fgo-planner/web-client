@@ -11,7 +11,7 @@ import { MasterServantsRoute } from './routes/master-servants/MasterServantsRout
 import { MasterSettingsRoute } from './routes/master-settings/master-settings.route';
 import { MasterSoundtracksRoute } from './routes/master-soundtracks/master-soundtracks.route';
 import { PlanRoute } from './routes/plan/PlanRoute';
-import { PlansRoute } from './routes/plans/plans.route';
+import { PlansRoute } from './routes/plans/PlansRoute';
 import { UserProfileRoute } from './routes/user-profile.route';
 import { UserSettingsRoute } from './routes/user-settings.route';
 import { UserThemesEditRoute } from './routes/user-themes-edit/user-themes-edit.route';

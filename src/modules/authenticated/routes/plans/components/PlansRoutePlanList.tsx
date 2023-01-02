@@ -3,9 +3,9 @@ import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
 import { BasicPlans, PlanType, SortDirection } from '../../../../../types';
-import { PlanColumnProperties, PlanListColumn, PlanListVisibleColumns } from './plan-list-columns';
-import { PlanListHeader } from './plan-list-header.component';
-import { PlanListRow, StyleClassPrefix as PlanListRowStyleClassPrefix } from './plan-list-row.component';
+import { PlansRoutePlanListColumn as Column, PlansRoutePlanListColumnProperties as ColumnProperties, PlansRoutePlanListVisibleColumns as VisibleColumns } from './PlansRoutePlanListColumn.type';
+import { PlansRoutePlanListHeader } from './PlansRoutePlanListHeader';
+import { PlansRoutePlanListRow, StyleClassPrefix as RowStyleClassPrefix } from './PlansRoutePlanListRow';
 
 type Props = {
     accountPlans: BasicPlans;
@@ -13,12 +13,12 @@ type Props = {
     onRowClick: MouseEventHandler;
     onRowDoubleClick: MouseEventHandler;
     onSelectionChange: (target: ImmutableBasicPlan | ImmutableBasicPlanGroup | undefined, type: PlanType) => void;
-    onSortChange?: (column?: PlanListColumn, direction?: SortDirection) => void;
+    onSortChange?: (column?: Column, direction?: SortDirection) => void;
     selectedId?: string;
-    visibleColumns: Readonly<PlanListVisibleColumns>;
+    visibleColumns: Readonly<VisibleColumns>;
 };
 
-const StyleClassPrefix = 'PlanList';
+const StyleClassPrefix = 'PlansRoutePlanList';
 
 const StyleProps = (theme: SystemTheme) => {
 
@@ -36,7 +36,7 @@ const StyleProps = (theme: SystemTheme) => {
             display: 'flex',
             flexDirection: 'column',
             minWidth: 'fit-content',
-            [`& .${PlanListRowStyleClassPrefix}-root`]: {
+            [`& .${RowStyleClassPrefix}-root`]: {
                 height: 52,
                 px: 4,
                 display: 'flex',
@@ -46,23 +46,23 @@ const StyleProps = (theme: SystemTheme) => {
                     boxSizing: 'border-box',
                     px: 2
                 },
-                [`& .${PlanListRowStyleClassPrefix}-name`]: {
-                    width: PlanColumnProperties.name.width,
+                [`& .${RowStyleClassPrefix}-name`]: {
+                    width: ColumnProperties.name.width,
                     fontWeight: 500,
                     [breakpoints.down('sm')]: {
                         width: '100%',
                         px: 0
                     }
                 },
-                [`& .${PlanListRowStyleClassPrefix}-created`]: {
-                    width: PlanColumnProperties.created.width,
+                [`& .${RowStyleClassPrefix}-created`]: {
+                    width: ColumnProperties.created.width,
                     textAlign: 'center'
                 },
-                [`& .${PlanListRowStyleClassPrefix}-modified`]: {
-                    width: PlanColumnProperties.modified.width,
+                [`& .${RowStyleClassPrefix}-modified`]: {
+                    width: ColumnProperties.modified.width,
                     textAlign: 'center'
                 },
-                [`& .${PlanListRowStyleClassPrefix}-description`]: {
+                [`& .${RowStyleClassPrefix}-description`]: {
                     pl: 8
                 }
             },
@@ -73,7 +73,7 @@ const StyleProps = (theme: SystemTheme) => {
     } as SystemStyleObject<SystemTheme>;
 };
 
-export const PlanList = React.memo((props: Props) => {
+export const PlansRoutePlanList = React.memo((props: Props) => {
 
     const {
         accountPlans: {
@@ -99,7 +99,7 @@ export const PlanList = React.memo((props: Props) => {
 
     const renderPlanRow = (plan: ImmutableBasicPlan): ReactNode => {
         return (
-            <PlanListRow
+            <PlansRoutePlanListRow
                 key={plan._id}
                 plan={plan}
                 active={plan._id === selectedId}
@@ -114,7 +114,7 @@ export const PlanList = React.memo((props: Props) => {
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <div className={`${StyleClassPrefix}-list-container`}>
-                <PlanListHeader visibleColumns={visibleColumns} />
+                <PlansRoutePlanListHeader visibleColumns={visibleColumns} />
                 {/* TODO Render plan groups */}
                 {plans.map(renderPlanRow)}
             </div>

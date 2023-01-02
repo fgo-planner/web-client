@@ -6,18 +6,18 @@ import React, { MouseEvent, MouseEventHandler, useCallback, useRef } from 'react
 import { DataTableListHeaderLabel } from '../../../../../components/data-table-list/data-table-list-header-label.component';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
 import { SortDirection, SortOptions } from '../../../../../types';
-import { PlanColumnProperties, PlanListColumn, PlanListVisibleColumns } from './plan-list-columns';
+import { PlansRoutePlanListColumn as Column, PlansRoutePlanListColumnProperties as ColumnProperties, PlansRoutePlanListVisibleColumns as VisibleColumns } from './PlansRoutePlanListColumn.type';
 
 type Props = {
     onClick?: MouseEventHandler;
-    onSortChange?: (column?: PlanListColumn, direction?: SortDirection) => void;
+    onSortChange?: (column?: Column, direction?: SortDirection) => void;
     sortEnabled?: boolean;
-    sortOptions?: SortOptions<PlanListColumn>;
-    visibleColumns: ReadonlyPartial<PlanListVisibleColumns>;
+    sortOptions?: SortOptions<Column>;
+    visibleColumns: ReadonlyPartial<VisibleColumns>;
     viewLayout?: any; // TODO Make use of this
 };
 
-export const StyleClassPrefix = 'PlanListHeader';
+export const StyleClassPrefix = 'PlansRoutePlanListHeader';
 
 const StyleProps = (theme: SystemTheme) => {
 
@@ -52,7 +52,7 @@ const StyleProps = (theme: SystemTheme) => {
     } as SystemStyleObject<SystemTheme>;
 };
 
-export const PlanListHeader = React.memo((props: Props) => {
+export const PlansRoutePlanListHeader = React.memo((props: Props) => {
 
     const {
         onClick,
@@ -68,10 +68,10 @@ export const PlanListHeader = React.memo((props: Props) => {
         modified
     } = visibleColumns || {};
 
-    const sortOptionsRef = useRef<SortOptions<PlanListColumn>>();
+    const sortOptionsRef = useRef<SortOptions<Column>>();
     sortOptionsRef.current = sortOptions;
 
-    const handleLabelClick = useCallback((e: MouseEvent, column: PlanListColumn): void => {
+    const handleLabelClick = useCallback((e: MouseEvent, column: Column): void => {
         if (e.type === 'contextmenu' || !onSortChange) {
             return;
         }
@@ -94,7 +94,7 @@ export const PlanListHeader = React.memo((props: Props) => {
                 {name &&
                     <DataTableListHeaderLabel
                         column='name'
-                        columnProperties={PlanColumnProperties.name}
+                        columnProperties={ColumnProperties.name}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
@@ -102,7 +102,7 @@ export const PlanListHeader = React.memo((props: Props) => {
                 {created &&
                     <DataTableListHeaderLabel
                         column='created'
-                        columnProperties={PlanColumnProperties.created}
+                        columnProperties={ColumnProperties.created}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
@@ -110,7 +110,7 @@ export const PlanListHeader = React.memo((props: Props) => {
                 {modified &&
                     <DataTableListHeaderLabel
                         column='modified'
-                        columnProperties={PlanColumnProperties.modified}
+                        columnProperties={ColumnProperties.modified}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
@@ -118,7 +118,7 @@ export const PlanListHeader = React.memo((props: Props) => {
                 {description &&
                     <DataTableListHeaderLabel
                         column='description'
-                        columnProperties={PlanColumnProperties.description}
+                        columnProperties={ColumnProperties.description}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />

@@ -1,5 +1,4 @@
-import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
-import { Box } from '@mui/material';
+import { Box, Icon } from '@mui/material';
 import { SystemStyleObject } from '@mui/system';
 import clsx from 'clsx';
 import React, { CSSProperties, MouseEvent, MouseEventHandler, ReactNode, useMemo } from 'react';
@@ -21,8 +20,9 @@ const StyleProps = () => ({
     justifyContent: 'center',
     '&>div': {
         display: 'flex',
-        '& .MuiSvgIcon-root': {
-            ml: 2
+        '& .MuiIcon-root': {
+            ml: 2,
+            fontSize: '1.25rem'
         }
     },
     '&.sortable': {
@@ -60,9 +60,9 @@ export const DataTableListHeaderLabel = React.memo(<T extends string>(props: Pro
     if (!sorted) {
         sortIcon = null;
     } else if (sortOptions.direction === 'asc') {
-        sortIcon = <ArrowUpward fontSize='small' />;
+        sortIcon = <Icon>arrow_upward</Icon>;
     } else {
-        sortIcon = <ArrowDownward fontSize='small' />;
+        sortIcon = <Icon>arrow_downward</Icon>;
     }
 
     const className = clsx(

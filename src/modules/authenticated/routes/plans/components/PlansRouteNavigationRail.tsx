@@ -1,7 +1,7 @@
-import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, DriveFileRenameOutline as DriveFileRenameOutlineIcon, FilterAlt as FilterAltIcon, FilterAltOutlined as FilterAltOutlinedIcon, PostAddOutlined as PostAddOutlinedIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
-import { Divider, IconButton, Tooltip } from '@mui/material';
+import { Divider, Icon, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
-import { NavigationRail } from '../../../../../components/navigation/navigation-rail/navigation-rail.component';
+import { IconOutlined } from '../../../../../components/icons';
+import { NavigationRail } from '../../../../../components/navigation/navigation-rail/NavigationRail';
 
 type Props = {
     filtersEnabled: boolean;
@@ -14,7 +14,7 @@ type Props = {
     onToggleFilters: () => void;
 };
 
-export const PlansNavigationRail = React.memo((props: Props) => {
+export const PlansRouteNavigationRail = React.memo((props: Props) => {
 
     const {
         filtersEnabled,
@@ -33,7 +33,10 @@ export const PlansNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleFilters}
-                        children={filtersEnabled ? <FilterAltIcon /> : <FilterAltOutlinedIcon />}
+                        children={filtersEnabled ?
+                            <Icon>filter_alt</Icon> :
+                            <IconOutlined>filter_alt</IconOutlined>
+                        }
                         size='large'
                         color={filtersEnabled ? 'primary' : undefined}
                     />
@@ -45,7 +48,7 @@ export const PlansNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onOpenColumnSettings}
-                            children={<ViewWeekOutlinedIcon />}
+                            children={<IconOutlined>view_week</IconOutlined>}
                             size='large'
                         />
                     </div>
@@ -58,7 +61,7 @@ export const PlansNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onAddPlan}
-                            children={<PostAddOutlinedIcon />}
+                            children={<IconOutlined>post_add</IconOutlined>}
                             size='large'
                         />
                     </div>
@@ -68,7 +71,7 @@ export const PlansNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onEditSelectedPlan}
-                        children={<DriveFileRenameOutlineIcon />}
+                        children={<IconOutlined>drive_file_rename_outline</IconOutlined>}
                         size='large'
                         disabled={!hasSelection}
                     />
@@ -79,7 +82,7 @@ export const PlansNavigationRail = React.memo((props: Props) => {
                     <IconButton
                         color='error'
                         onClick={onDeleteSelectedPlan}
-                        children={<DeleteForeverOutlinedIcon />}
+                        children={<IconOutlined>delete_forever</IconOutlined>}
                         size='large'
                         disabled={!hasSelection}
                     />

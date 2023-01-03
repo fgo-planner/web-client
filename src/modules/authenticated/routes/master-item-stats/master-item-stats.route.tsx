@@ -1,12 +1,11 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { MasterAccount } from '@fgo-planner/data-core';
-import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
-import { IconButton, Theme, Tooltip } from '@mui/material';
+import { Icon, IconButton, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail/NavigationRail';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
@@ -185,14 +184,19 @@ export const MasterItemStatsRoute = React.memo(() => {
                 <IconButton
                     component={Link}
                     to='../master/items'
-                    children={<FormatListBulletedIcon />}
-                    size='large' />
+                    children={<Icon>format_list_bulleted</Icon>}
+                    size='large' 
+                />
             </div>
         </Tooltip>,
         <Tooltip key='export' title='Download item stats' placement='right'>
             <div>
                 {/* TODO Implement this */}
-                <IconButton children={<GetAppIcon />} disabled size='large' />
+                <IconButton
+                    children={<Icon>get_app</Icon>}
+                    size='large'
+                    disabled
+                />
             </div>
         </Tooltip>
     ];

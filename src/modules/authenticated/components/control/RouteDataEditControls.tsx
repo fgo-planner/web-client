@@ -1,5 +1,4 @@
-import { Save as SaveIcon, Undo as UndoIcon, Sync as SyncIcon } from '@mui/icons-material';
-import { Button, IconButton, Theme } from '@mui/material';
+import { Button, Icon, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEventHandler, ReactNode } from 'react';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
@@ -131,7 +130,7 @@ export const RouteDataEditControls = React.memo((props: Props) => {
                         onClick={onReloadButtonClick}
                         disabled={disabled}
                     >
-                        <SyncIcon />
+                        <Icon>sync</Icon>
                     </IconButton>
                 )
             );
@@ -152,7 +151,7 @@ export const RouteDataEditControls = React.memo((props: Props) => {
                         onClick={onRevertButtonClick}
                         disabled={disabled}
                     >
-                        <UndoIcon />
+                        <Icon>undo</Icon>
                     </IconButton>
                 )
             );
@@ -175,7 +174,7 @@ export const RouteDataEditControls = React.memo((props: Props) => {
                     onClick={onSaveButtonClick}
                     disabled={disabled}
                 >
-                    <SaveIcon />
+                    <Icon>save</Icon>
                 </IconButton>
             );
         }

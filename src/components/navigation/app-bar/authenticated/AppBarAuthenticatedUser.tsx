@@ -6,9 +6,9 @@ import { BasicUser } from '../../../../services/data/user/user.service';
 import { BasicMasterAccounts, ModalOnCloseReason } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { AppBarMasterAccountAddButton } from './app-bar-master-account-add-button.component';
-import { AppBarMasterAccountSelect } from './app-bar-master-account-select.component';
-import { AppBarUserProfileMenu } from './app-bar-user-profile-menu.component';
+import { AppBarMasterAccountAddButton } from './AppBarMasterAccountAddButton';
+import { AppBarMasterAccountSelect } from './AppBarMasterAccountSelect';
+import { AppBarUserProfileMenu } from './AppBarUserProfileMenu';
 
 type Props = {
     currentUser: BasicUser;

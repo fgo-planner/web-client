@@ -1,5 +1,5 @@
 import { RgbaColor } from '@fgo-planner/data-core';
-import { Colorize as ColorizeIcon } from '@mui/icons-material';
+import { Icon } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import { colord, RgbColor } from 'colord';
 import React, { MouseEventHandler } from 'react';
@@ -34,6 +34,9 @@ const StyleProps = {
         mixBlendMode: 'difference',
         opacity: 0,
         transition: 'opacity 100ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+        '& .MuiIcon-root': {
+            fontSize: '1.75rem'
+        },
         '&:hover': {
             opacity: 0.69
         }
@@ -48,7 +51,7 @@ export const UserThemeColorSwatch = React.memo(({ color, allowEditAlpha, onClick
         onClick={onClick}
     >
         <div className={`${StyleClassPrefix}-color-picker-icon`}>
-            <ColorizeIcon fontSize='large' />
+            <Icon>colorize</Icon>
         </div>
     </Box>
 ));

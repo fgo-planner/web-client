@@ -3,7 +3,7 @@ import { SystemStyleObject, Theme } from '@mui/system';
 import React, { PropsWithChildren, useMemo } from 'react';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ComponentStyleProps, ModalOnCloseHandler } from '../../../../types';
-import { StyleClassPrefix as AppBarActionMenuItemStyleClassPrefix } from '../action-menu/app-bar-action-menu-item.component';
+import { StyleClassPrefix as AppBarActionMenuItemStyleClassPrefix } from './AppBarActionMenuItem';
 
 type Props = PropsWithChildren<{
     anchorEl?: Element | null;

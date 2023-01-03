@@ -70,6 +70,9 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                '& .MuiIcon-root': {
+                                    fontSize: '1.25rem'
+                                },
                                 '& img': {
                                     paddingRight: spacing(1),
                                     width: '18px',

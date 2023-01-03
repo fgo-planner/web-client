@@ -6,7 +6,7 @@ import { DataTableListStaticRow } from '../../../../../components/data-table-lis
 import { TruncateText } from '../../../../../components/text/truncate-text.component';
 import { PlanConstants } from '../../../../../constants';
 import { DateTimeFormatUtils } from '../../../../../utils/format/date-time-format.utils';
-import { PlanListVisibleColumns } from './plan-list-columns';
+import { PlansRoutePlanListVisibleColumns as VisibleColumns } from './PlansRoutePlanListColumn.type';
 
 type Props = {
     active: boolean;
@@ -14,12 +14,12 @@ type Props = {
     onContextMenu: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
     onDoubleClick: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
     plan: ImmutableBasicPlan;
-    visibleColumns: Readonly<PlanListVisibleColumns>;
+    visibleColumns: Readonly<VisibleColumns>;
 };
 
-export const StyleClassPrefix = 'PlanListRow';
+export const StyleClassPrefix = 'PlansRoutePlanListRow';
 
-export const PlanListRow = React.memo((props: Props) => {
+export const PlansRoutePlanListRow = React.memo((props: Props) => {
 
     const {
         active,

@@ -5,6 +5,7 @@ import React, { MouseEvent, useCallback, useContext, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
 import { NavigationDrawerActionItem as ActionItem, NavigationDrawerItem as Item, NavigationDrawerLinkItem as LinkItem, SxPropsFunction } from '../../../types';
+import { Icon } from '../../icons';
 
 type Props = {
     item: Item;
@@ -91,7 +92,7 @@ export const NavigationDrawerContentItem = React.memo(({ item }: Props) => {
 
     const {
         activeIcon,
-        icon,
+        activeIconVariant,
         label,
         tooltip
     } = item;
@@ -148,7 +149,8 @@ export const NavigationDrawerContentItem = React.memo(({ item }: Props) => {
         return tooltip ?? label;
     }, [expanded, label, tooltip]);
 
-    const Icon = (isLinkActive && activeIcon) || icon;
+    const icon = (isLinkActive && activeIcon) || item.icon;
+    const iconVariant = (isLinkActive && activeIconVariant) || item.iconVariant;
 
     const className = clsx(
         `${StyleClassPrefix}-root`,
@@ -170,7 +172,11 @@ export const NavigationDrawerContentItem = React.memo(({ item }: Props) => {
                     onClick={handleClick}
                     href={(item as LinkItem).route}
                 >
-                    <Icon className={`${StyleClassPrefix}-icon`} />
+                    <Icon
+                        className={`${StyleClassPrefix}-icon`}
+                        variant={iconVariant}
+                        children={icon}
+                    />
                     {expanded && <div className={`${StyleClassPrefix}-label`}>
                         {label}
                     </div>}

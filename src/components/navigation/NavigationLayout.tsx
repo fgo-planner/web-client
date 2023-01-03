@@ -1,16 +1,14 @@
-import { Theme } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { PropsWithChildren } from 'react';
 import { useActiveBreakpoints } from '../../hooks/user-interface/use-active-breakpoints.hook';
-import { SxPropsFunction } from '../../types';
 import { LoadingIndicatorOverlay } from '../utils/loading-indicator-overlay.component';
-import { AppBar } from './app-bar/app-bar.component';
-import { GlobalDialogs } from './global-dialogs-container.component';
-import { NavigationDrawerContainer } from './navigation-drawer/navigation-drawer-container.component';
+import { AppBar } from './app-bar/AppBar';
+import { GlobalDialogsContainer } from './GlobalDialogsContainer';
+import { NavigationDrawerContainer } from './navigation-drawer/NavigationDrawerContainer';
 
 const StyleClassPrefix = 'NavigationLayout';
 
-const StyleProps = (({ breakpoints, spacing }: Theme) => ({
+const StyleProps = {
     position: 'fixed',
     display: 'flex',
     flexDirection: 'column',
@@ -27,7 +25,7 @@ const StyleProps = (({ breakpoints, spacing }: Theme) => ({
         bgcolor: 'background.default',
         color: 'text.primary'
     }
-} as SystemStyleObject)) as SxPropsFunction;
+} as SystemStyleObject;
 
 export const NavigationLayout = React.memo(({ children }: PropsWithChildren<{}>) => {
 
@@ -44,7 +42,7 @@ export const NavigationLayout = React.memo(({ children }: PropsWithChildren<{}>)
                 </div>
             </NavigationDrawerContainer>
         </Box>
-        <GlobalDialogs />
+        <GlobalDialogsContainer />
         <LoadingIndicatorOverlay />
     </>;
 

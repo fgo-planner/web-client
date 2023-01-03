@@ -1,25 +1,24 @@
 import { ImmutableBasicPlan, ImmutableBasicPlanGroup, Plan } from '@fgo-planner/data-core';
-import { PostAddOutlined } from '@mui/icons-material';
 import { Button, IconButton, PaperProps, TextField, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
+import { IconOutlined } from '../../../../components/icons';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { PlanService } from '../../../../services/data/plan/plan.service';
 import { ThemeConstants } from '../../../../styles/theme-constants';
-import { BasicPlans, PlanType } from '../../../../types';
-import { ModalOnCloseReason } from '../../../../types';
+import { BasicPlans, ModalOnCloseReason, PlanType } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
-import { PlanAddDialog } from './components/plan-add-dialog.component';
-import { PlanListVisibleColumns } from './components/plan-list-columns';
-import { PlanList } from './components/plan-list.component';
-import { PlansNavigationRail } from './components/plans-navigation-rail.component';
+import { PlansRouteCreatePlanDialog } from './components/PlansRouteCreatePlanDialog';
+import { PlansRouteNavigationRail } from './components/PlansRouteNavigationRail';
+import { PlansRoutePlanList } from './components/PlansRoutePlanList';
+import { PlansRoutePlanListVisibleColumns } from './components/PlansRoutePlanListColumn.type';
 
 const AddPlanDialogPaperProps: PaperProps = {
     style: {
@@ -181,7 +180,7 @@ export const PlansRoute = React.memo(() => {
 
     const { sm, lg } = useActiveBreakpoints();
 
-    const visibleColumns = useMemo((): PlanListVisibleColumns => ({
+    const visibleColumns = useMemo((): PlansRoutePlanListVisibleColumns => ({
         name: true,
         created: lg,
         modified: lg,
@@ -281,7 +280,7 @@ export const PlansRoute = React.memo(() => {
                             Create Plan
                         </Button> :
                         <IconButton color='primary' onClick={handleAddPlan}>
-                            <PostAddOutlined />
+                            <IconOutlined>post_add</IconOutlined>
                         </IconButton>
                     }
                 </div>
@@ -295,7 +294,7 @@ export const PlansRoute = React.memo(() => {
                 </div>}
             </div>
             <div className={`${StyleClassPrefix}-lower-layout-container`}>
-                <PlansNavigationRail
+                <PlansRouteNavigationRail
                     filtersEnabled={filtersEnabled}
                     layout={sm ? 'column' : 'row'}
                     hasSelection={!!selectedRef.current}
@@ -306,7 +305,7 @@ export const PlansRoute = React.memo(() => {
                 />
                 <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                     {accountPlans &&
-                        <PlanList
+                        <PlansRoutePlanList
                             accountPlans={accountPlans}
                             visibleColumns={visibleColumns}
                             selectedId={selectedId}
@@ -318,7 +317,7 @@ export const PlansRoute = React.memo(() => {
                 </div>
             </div>
         </Box>
-        <PlanAddDialog
+        <PlansRouteCreatePlanDialog
             open={addPlanDialogOpen}
             PaperProps={AddPlanDialogPaperProps}
             masterAccountId={masterAccountIdRef.current}

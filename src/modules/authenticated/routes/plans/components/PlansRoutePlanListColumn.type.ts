@@ -1,16 +1,16 @@
 import { ImmutableRecord } from '@fgo-planner/common-core';
 import { DataTableListColumnProperties } from '../../../../../types';
 
-export type PlanListColumn =
+export type PlansRoutePlanListColumn =
     'name' |
     'description' |
     'created' |
     'modified';
 
-export type PlanListVisibleColumns = Record<PlanListColumn, boolean>;
+export type PlansRoutePlanListVisibleColumns = Record<PlansRoutePlanListColumn, boolean>;
 
 // TODO Convert widths to use theme spacing/rem.
-export const PlanColumnProperties: ImmutableRecord<PlanListColumn, DataTableListColumnProperties> = {
+export const PlansRoutePlanListColumnProperties: ImmutableRecord<PlansRoutePlanListColumn, DataTableListColumnProperties> = {
     name: {
         key: 'name',
         width: 300,

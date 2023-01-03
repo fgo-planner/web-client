@@ -1,9 +1,8 @@
-import { BarChart as BarChartIcon, Clear as ClearIcon, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, FilterAlt as FilterAltIcon, FilterAltOutlined as FilterAltOutlinedIcon, GroupAddOutlined, ImportExport as ImportExportIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, PersonOff, Reorder as ReorderIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
-import { Divider, IconButton, Tooltip } from '@mui/material';
+import { Divider, Icon, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { NavigationRail } from '../../../../../components/navigation/navigation-rail/navigation-rail.component';
-import { PersonOffOutlined as PersonOffOutlinedIcon } from '@mui/icons-material';
+import { IconOutlined } from '../../../../../components/icons';
+import { NavigationRail } from '../../../../../components/navigation/navigation-rail/NavigationRail';
 
 type Props = {
     dragDropMode: boolean;
@@ -50,7 +49,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onDragDropApply}
-                            children={<DoneIcon />}
+                            children={<Icon>done</Icon>}
                             size='large'
                         />
                     </div>
@@ -60,7 +59,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                         <IconButton
                             color='warning'
                             onClick={onDragDropCancel}
-                            children={<ClearIcon />}
+                            children={<Icon>clear</Icon>}
                             size='large'
                         />
                     </div>
@@ -75,7 +74,10 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleFilters}
-                        children={filtersEnabled ? <FilterAltIcon /> : <FilterAltOutlinedIcon />}
+                        children={filtersEnabled ?
+                            <Icon>filter_alt</Icon> :
+                            <IconOutlined>filter_alt</IconOutlined>
+                        }
                         size='large'
                         color={filtersEnabled ? 'primary' : undefined}
                     />
@@ -86,7 +88,10 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleShowUnsummonedServants}
-                        children={showUnsummonedServants ? <PersonOff /> : <PersonOffOutlinedIcon />}
+                        children={showUnsummonedServants ?
+                            <Icon>person_off</Icon> :
+                            <IconOutlined>person_off</IconOutlined>
+                        }
                         size='large'
                         color={showUnsummonedServants ? 'primary' : undefined}
                     />
@@ -98,7 +103,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onOpenColumnSettings}
-                            children={<ViewWeekOutlinedIcon />}
+                            children={<IconOutlined>view_week</IconOutlined>}
                             size='large'
                         />
                     </div>
@@ -109,7 +114,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onAddServant}
-                        children={<PersonAddAlt1OutlinedIcon />}
+                        children={<IconOutlined>person_add_alt_1</IconOutlined>}
                         size='large'
                     />
                 </div>
@@ -118,7 +123,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onMultiAddServant}
-                        children={<GroupAddOutlined />}
+                        children={<IconOutlined>group_add</IconOutlined>}
                         size='large'
                     />
                 </div>
@@ -129,7 +134,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onDragDropActivate}
-                            children={<ReorderIcon />}
+                            children={<IconOutlined>reorder</IconOutlined>}
                             size='large'
                         />
                     </div>
@@ -139,7 +144,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onEditSelectedServants}
-                        children={<ModeEditOutlinedIcon />}
+                        children={<IconOutlined>mode_edit</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
                     />
@@ -150,7 +155,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <IconButton
                         color='error'
                         onClick={onDeleteSelectedServants}
-                        children={<DeleteForeverOutlinedIcon />}
+                        children={<IconOutlined>delete_forever</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
                     />
@@ -162,7 +167,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <IconButton
                         component={Link}
                         to='stats'
-                        children={<BarChartIcon />}
+                        children={<Icon>bar_chart</Icon>}
                         size='large'
                     />
                 </div>
@@ -175,7 +180,7 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                         <IconButton
                             component={Link}
                             to='../master/data/import/servants'
-                            children={<ImportExportIcon />}
+                            children={<Icon>import_export</Icon>}
                             size='large'
                         />
                     </div>

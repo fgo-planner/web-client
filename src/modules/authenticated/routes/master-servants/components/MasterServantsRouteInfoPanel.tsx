@@ -1,6 +1,5 @@
 import { GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantAggregatedData } from '@fgo-planner/data-core';
-import { ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
-import { IconButton, Link, Theme, Tooltip } from '@mui/material';
+import { Icon, IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
@@ -212,8 +211,7 @@ const StyleProps = (theme: SystemTheme) => {
                 backgroundColor: 'initial',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'flex-start',
-                pt: 2
+                justifyContent: 'flex-start'
             },
             '&>:not(:first-of-type)': {
                 display: 'none'
@@ -264,7 +262,9 @@ export const MasterServantsRouteInfoPanel = React.memo((props: Props) => {
         <div className={`${StyleClassPrefix}-actions-container`}>
             <div>
                 <IconButton size='large' onClick={onOpenToggle}>
-                    {open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                    <Icon>
+                        {open ? 'chevron_right' : 'chevron_left'}
+                    </Icon>
                 </IconButton>
             </div>
             {/* Implement button to toggle edit mode */}

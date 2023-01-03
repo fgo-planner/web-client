@@ -48,7 +48,7 @@ const StyleProps = {
     }
 } as SystemStyleObject<Theme>;
 
-export const PlanAddDialog = React.memo((props: Props) => {
+export const PlansRouteCreatePlanDialog = React.memo((props: Props) => {
 
     const {
         masterAccountId,

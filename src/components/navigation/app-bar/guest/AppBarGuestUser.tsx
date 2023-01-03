@@ -1,5 +1,4 @@
-import { NightsStay as NightsStayIcon, VolumeOff as VolumeOffIcon, VolumeUp as VolumeUpIcon, WbSunny as WbSunnyIcon } from '@mui/icons-material';
-import { Button, IconButton } from '@mui/material';
+import { Button, Icon, IconButton } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
@@ -71,10 +70,14 @@ export const AppBarGuestUser = React.memo(() => {
     return (
         <Box sx={StyleProps}>
             <IconButton size='large' onClick={handleThemeModeToggle}>
-                {themeInfo?.themeMode === 'light' ? <WbSunnyIcon /> : <NightsStayIcon />}
+                <Icon>
+                    {themeInfo?.themeMode === 'light' ? 'wb_sunny' : 'nights_stay'}
+                </Icon>
             </IconButton>
             <IconButton size='large' onClick={handleBackgroundMusicButtonClick}>
-                {isBackgroundMusicPlaying ? <VolumeUpIcon /> : <VolumeOffIcon />}
+                <Icon>
+                    {isBackgroundMusicPlaying ? 'volume_up' : 'volume_off'}
+                </Icon>
             </IconButton>
             <Button variant='contained' onClick={handleLoginButtonClick}>
                 Log In

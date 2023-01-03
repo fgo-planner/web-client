@@ -1,6 +1,5 @@
 import { GameServantConstants, GameServantRarity } from '@fgo-planner/data-core';
-import { Replay as ReplayIcon } from '@mui/icons-material';
-import { Checkbox, IconButton, ListItemText, MenuItem, MenuProps, TextField, Tooltip } from '@mui/material';
+import { Checkbox, Icon, IconButton, ListItemText, MenuItem, MenuProps, TextField, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, ReactNode, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../components/input/input-field-container.component';
@@ -271,7 +270,7 @@ export const MasterServantStatsFilter = React.memo(({ onFilterChange }: Props) =
                 <div>
                     <IconButton
                         color='secondary'
-                        children={<ReplayIcon />}
+                        children={<Icon>replay</Icon>}
                         onClick={handleResetFilterClick}
                         size='large' />
                 </div>

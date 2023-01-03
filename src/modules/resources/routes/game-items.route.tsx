@@ -2,7 +2,7 @@ import React from 'react';
 import { DataTableListStaticRow } from '../../../components/data-table-list/data-table-list-static-row.component';
 import { ItemThumbnail } from '../../../components/item/ItemThumbnail';
 import { LayoutContentSection } from '../../../components/layout/layout-content-section.component';
-import { AppBarElevateOnScroll } from '../../../components/navigation/app-bar/app-bar-elevate-on-scroll.component';
+import { AppBarElevateOnScroll } from '../../../components/navigation/app-bar/AppBarElevateOnScroll';
 import { PageTitle } from '../../../components/text/page-title.component';
 import { useGameItemList } from '../../../hooks/data/use-game-item-list.hook';
 

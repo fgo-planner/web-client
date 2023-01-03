@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useMemo } from 'react';
 import { RouteObject, useRoutes } from 'react-router-dom';
 import { UAParser } from 'ua-parser-js';
-import { NavigationLayout } from './components/navigation/navigation-layout.component';
+import { NavigationLayout } from './components/navigation/NavigationLayout';
 import { LazyLoadFallback } from './components/route-fallback/lazy-load-fallback.component';
 import { ThemeProviderWrapper } from './components/theme/theme-provider-wrapper.component';
 import { RequireAuthentication } from './components/utils/require-authentication.component';

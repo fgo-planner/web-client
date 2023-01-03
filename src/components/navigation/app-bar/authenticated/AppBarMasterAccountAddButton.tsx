@@ -1,6 +1,5 @@
 import { BasicMasterAccount } from '@fgo-planner/data-core';
-import { PersonAdd as PersonAddIcon } from '@mui/icons-material';
-import { Button } from '@mui/material';
+import { Button, Icon } from '@mui/material';
 import { Fragment, PureComponent, ReactNode } from 'react';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
 import { ModalOnCloseReason } from '../../../../types';
@@ -47,7 +46,7 @@ export const AppBarMasterAccountAddButton = class extends PureComponent<Props, S
                     color='primary'
                     onClick={this._openDialog}
                 >
-                    <PersonAddIcon />
+                    <Icon>person_add</Icon>
                     <div className='pl-2'>
                         Add Account
                     </div>

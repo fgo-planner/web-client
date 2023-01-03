@@ -1,5 +1,5 @@
 import { ImmutableMasterServant } from '@fgo-planner/data-core';
-import { PersonOffOutlined as PersonOffOutlinedIcon } from '@mui/icons-material';
+import { IconOutlined } from '../../../../../../components/icons';
 import { AssetConstants } from '../../../../../../constants';
 
 type Props = {
@@ -25,7 +25,7 @@ export const MasterServantListRowNpLevel = ({ masterServant }: Props) => {
     if (!summoned) {
         return (
             <div className={`${StyleClassPrefix}-root`}>
-                <PersonOffOutlinedIcon color='disabled' fontSize='small' />
+                <IconOutlined color='disabled'>person_off</IconOutlined>
             </div>
         );
     }

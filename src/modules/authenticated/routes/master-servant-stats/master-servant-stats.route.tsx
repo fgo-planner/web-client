@@ -1,14 +1,13 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { MasterAccount } from '@fgo-planner/data-core';
-import { FormatListBulleted as FormatListBulletedIcon, GetApp as GetAppIcon } from '@mui/icons-material';
-import { IconButton, Tooltip } from '@mui/material';
+import { Icon, IconButton, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ServantClassIcon } from '../../../../components/servant/ServantClassIcon';
 import { LayoutContentSection } from '../../../../components/layout/layout-content-section.component';
-import { NavigationRail } from '../../../../components/navigation/navigation-rail/navigation-rail.component';
+import { NavigationRail } from '../../../../components/navigation/navigation-rail/NavigationRail';
+import { ServantClassIcon } from '../../../../components/servant/ServantClassIcon';
 import { PageTitle } from '../../../../components/text/page-title.component';
 import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
@@ -130,14 +129,19 @@ export const MasterServantStatsRoute = React.memo(() => {
                     <IconButton
                         component={Link}
                         to='../master/servants'
-                        children={<FormatListBulletedIcon />}
-                        size='large' />
+                        children={<Icon>format_list_bulleted</Icon>}
+                        size='large'
+                    />
                 </div>
             </Tooltip>,
             <Tooltip key='export' title='Download servant stats' placement='right'>
                 <div>
                     {/* TODO Implement this */}
-                    <IconButton children={<GetAppIcon />} disabled size='large' />
+                    <IconButton
+                        children={<Icon>get_app</Icon>}
+                        size='large'
+                        disabled
+                    />
                 </div>
             </Tooltip>
         ];

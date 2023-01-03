@@ -1,5 +1,4 @@
-import { LockOpen } from '@mui/icons-material';
-import { Theme } from '@mui/material';
+import { Icon, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React from 'react';
 import { HeaderLabel } from '../../../../components/text/header-label.component';
@@ -30,7 +29,10 @@ const StyleProps = (theme: SystemTheme) => {
             display: 'flex',
             justifyContent: 'center',
             width: 42,
-            px: 2
+            px: 2,
+            '& .MuiIcon-root': {
+                fontSize: '1.25rem'
+            }
         },
         [`& .${StyleClassPrefix}-thumbnail`]: {
             width: 96,
@@ -60,7 +62,7 @@ const StyleProps = (theme: SystemTheme) => {
 export const MasterSoundtracksListHeader = React.memo(() => (
     <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
         <HeaderLabel className={`${StyleClassPrefix}-unlocked-status`}>
-            <LockOpen fontSize='small' />
+            <Icon>lock_open</Icon>
         </HeaderLabel>
         <div className={`${StyleClassPrefix}-thumbnail`} />
         <HeaderLabel className={`${StyleClassPrefix}-preview`} />

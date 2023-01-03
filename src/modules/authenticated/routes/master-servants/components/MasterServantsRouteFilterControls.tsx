@@ -1,5 +1,4 @@
-import { FilterList, Replay } from '@mui/icons-material';
-import { IconButton, TextField, Theme, Tooltip } from '@mui/material';
+import { Icon, IconButton, TextField, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
@@ -93,7 +92,7 @@ export const MasterServantsRouteFilterControls = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         // onClick={}
-                        children={<FilterList />}
+                        children={<Icon>filter_list</Icon>}
                         size='large'
                     />
                 </div>
@@ -102,7 +101,7 @@ export const MasterServantsRouteFilterControls = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         // onClick={}
-                        children={<Replay />}
+                        children={<Icon>replay</Icon>}
                         size='large'
                     />
                 </div>

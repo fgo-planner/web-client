@@ -25,6 +25,15 @@ export const ComponentsOverrides: Components = {
             // }
         }
     },
+    MuiListItemIcon: {
+        styleOverrides: {
+            root: {
+                '& .MuiIcon-root': {
+                    fontSize: '1.25rem'
+                }
+            }
+        }
+    },
     MuiTab: {
         styleOverrides: {
             root: {

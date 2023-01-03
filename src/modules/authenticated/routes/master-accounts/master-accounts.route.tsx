@@ -1,7 +1,6 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { BasicMasterAccount } from '@fgo-planner/data-core';
-import { GroupAdd as GroupAddIcon } from '@mui/icons-material';
-import { Box, Button, IconButton, PaperProps, Theme } from '@mui/material';
+import { Box, Button, Icon, IconButton, PaperProps, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -152,7 +151,7 @@ export const MasterAccountsRoute = React.memo(() => {
                             Add Account
                         </Button> :
                         <IconButton color='primary' onClick={openAddAccountDialog}>
-                            <GroupAddIcon />
+                            <Icon>group_add</Icon>
                         </IconButton>
                     }
                 </div>

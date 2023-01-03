@@ -1,7 +1,6 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-core';
-import { Clear as ClearIcon, Save as SaveIcon } from '@mui/icons-material';
-import { Fab, Tooltip } from '@mui/material';
+import { Fab, Tooltip, Icon } from '@mui/material';
 import _ from 'lodash-es';
 import React, { Fragment, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -106,7 +105,7 @@ export const UserThemesEditRoute = React.memo(() => {
                     color='default'
                     onClick={handleCancelButtonClick}
                     disabled={isLoadingIndicatorActive}
-                    children={<ClearIcon />}
+                    children={<Icon>clear</Icon>}
                 />
             </div>
         </Tooltip>,
@@ -116,7 +115,7 @@ export const UserThemesEditRoute = React.memo(() => {
                     color='primary'
                     onClick={handleSaveButtonClick}
                     disabled={isLoadingIndicatorActive}
-                    children={<SaveIcon />}
+                    children={<Icon>save</Icon>}
                 />
             </div>
         </Tooltip>

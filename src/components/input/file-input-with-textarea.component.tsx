@@ -1,11 +1,10 @@
-
-import { FileCopy as FileCopyIcon, SvgIconComponent } from '@mui/icons-material';
 import { alpha, TextField } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { ChangeEvent, PropsWithChildren, PureComponent, ReactNode } from 'react';
 import Dropzone, { DropzoneRef, DropzoneState } from 'react-dropzone';
 import { ThemeConstants } from '../../styles/theme-constants';
-import { ComponentStyleProps } from '../../types';
+import { ComponentStyleProps, MaterialIconVariant } from '../../types';
+import { Icon } from '../icons';
 
 type Props = PropsWithChildren<{
     dropzoneRef?: React.RefObject<DropzoneRef>;
@@ -15,7 +14,8 @@ type Props = PropsWithChildren<{
     rowsMax?: number;
     label?: string;
     hideDragOverlayIcon?: boolean;
-    dragOverlayIcon?: SvgIconComponent;
+    dragOverlayIcon?: string;
+    dragOverlayIconVariant?: MaterialIconVariant;
     dragOverlayText?: string;
     value?: string;
     onValueChange?: (value: string) => void;
@@ -25,7 +25,7 @@ const DefaultTextareaVariant = 'outlined';
 
 const DefaultTextareaRows = 10;
 
-const DefaultDragOverlayIcon = FileCopyIcon;
+const DefaultDragOverlayIcon = 'file_copy';
 
 const DefaultDragOverlayText = 'Drop your file here';
 
@@ -136,13 +136,20 @@ export const FileInputWithTextarea = class extends PureComponent<Props> {
     }
 
     private _renderDragOverlay(): ReactNode {
-        const { dragOverlayText, dragOverlayIcon } = this.props;
-        const DragOverlayIcon = dragOverlayIcon ?? DefaultDragOverlayIcon;
+
+        const { 
+            dragOverlayIcon,
+            dragOverlayIconVariant,
+            dragOverlayText,
+        } = this.props;
+
         return (
             <div className={`${StyleClassPrefix}-drag-overlay`}>
-                <DragOverlayIcon className={`${StyleClassPrefix}-drag-overlay-icon`} />
+                <Icon className={`${StyleClassPrefix}-drag-overlay-icon`} variant={dragOverlayIconVariant}>
+                    {dragOverlayIcon || DefaultDragOverlayIcon}
+                </Icon>
                 <div className={`${StyleClassPrefix}-drag-overlay-text`}>
-                    {dragOverlayText ?? DefaultDragOverlayText}
+                    {dragOverlayText || DefaultDragOverlayText}
                 </div>
             </div>
         );

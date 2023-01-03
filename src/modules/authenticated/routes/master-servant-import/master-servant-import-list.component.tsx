@@ -1,7 +1,6 @@
 import { CollectionUtils, Functions } from '@fgo-planner/common-core';
 import { BatchMasterServantUpdate, InstantiatedServantBondLevel, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterServant, MasterServantAggregatedData, MasterServantUpdateUtils } from '@fgo-planner/data-core';
-import { Check as CheckIcon, Clear as ClearIcon } from '@mui/icons-material';
-import { Button, IconButton, Theme } from '@mui/material';
+import { Button, Icon, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
@@ -176,13 +175,13 @@ export const MasterServantImportList = React.memo((props: Props) => {
                     color='primary'
                     onClick={onCancel}
                 >
-                    <ClearIcon />
+                    <Icon>clear</Icon>
                 </IconButton>
                 <IconButton
                     color='primary'
                     onClick={handleSubmitButtonClick}
                 >
-                    <CheckIcon />
+                    <Icon>check</Icon>
                 </IconButton>
             </>}
         </div>

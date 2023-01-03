@@ -173,6 +173,9 @@ export const MasterServantList = React.memo((props: Props) => {
     }, [onSelectionChange, selectionResult]);
 
     const handleRowClick = useCallback((e: MouseEvent, index: number) => {
+        if (e.type === 'contextmenu') {
+            e.preventDefault();
+        }
         /**
          * Need to set timeout here so ensure that the `onDoubleClick` event get
          * processed before the `onClick` event.

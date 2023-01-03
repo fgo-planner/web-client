@@ -1,4 +1,4 @@
-import { DragIndicator as DragIndicatorIcon, SvgIconComponent } from '@mui/icons-material';
+import { Icon } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
 import { styled } from '@mui/system';
 import clsx from 'clsx';
@@ -16,7 +16,6 @@ type Props = PropsWithChildren<{
     borderTop?: boolean;
     draggableId: number;
     dragEnabled?: boolean;
-    dragHandleIcon?: SvgIconComponent;
     dragHandleVisible?: boolean;
     index: number;
     onDragOrderChange?: (sourceId: number, destinationId: number) => void;
@@ -34,8 +33,6 @@ type DragItem = {
 const handleDragHandleClick = EventHandlers.stopPropagation;
 
 const DragType = 'row';
-
-const DefaultDragHandleIcon = DragIndicatorIcon;
 
 const shouldForwardProp = (prop: PropertyKey): prop is keyof StyledFunctionProps => (
     prop !== 'classPrefix' &&
@@ -61,7 +58,6 @@ export const DataTableListDraggableRow = React.memo((props: Props) => {
         borderTop,
         draggableId,
         dragEnabled,
-        dragHandleIcon,
         dragHandleVisible,
         index,
         onDragOrderChange,
@@ -112,8 +108,6 @@ export const DataTableListDraggableRow = React.memo((props: Props) => {
         connectDrop(dragRef);
     }
 
-    const DragHandleIcon = dragHandleIcon ?? DefaultDragHandleIcon;
-
     const renderDragHandle = (): ReactNode => {
         if (!dragHandleVisible) {
             return null;
@@ -121,7 +115,7 @@ export const DataTableListDraggableRow = React.memo((props: Props) => {
         if (!dragEnabled) {
             return (
                 <div className={clsx(`${styleClassPrefix}-drag-handle`, 'disabled')}>
-                    <DragHandleIcon />
+                    <Icon>drag_indicator</Icon>
                 </div>
             );
         }
@@ -131,7 +125,7 @@ export const DataTableListDraggableRow = React.memo((props: Props) => {
                 className={`${styleClassPrefix}-drag-handle`}
                 onClick={handleDragHandleClick}
             >
-                <DragHandleIcon />
+                <Icon>drag_indicator</Icon>
             </div>
         );
     };

@@ -1,6 +1,6 @@
-import { DeleteForeverOutlined as DeleteForeverOutlinedIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon } from '@mui/icons-material';
 import { Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
+import { IconOutlined } from '../../../../../components/icons';
 import { Position2D } from '../../../../../types';
 import { EventHandlers } from '../../../../../utils/event-handlers';
 
@@ -87,7 +87,7 @@ export const MasterServantsRouteServantRowContextMenu = React.memo((props: Props
                     disabled={!selectedServantsCount}
                 >
                     <ListItemIcon>
-                        <ModeEditOutlinedIcon />
+                        <IconOutlined>mode_edit</IconOutlined>
                     </ListItemIcon>
                     <ListItemText>Edit selected</ListItemText>
                 </MenuItem>
@@ -96,14 +96,14 @@ export const MasterServantsRouteServantRowContextMenu = React.memo((props: Props
                     disabled={!selectedServantsCount}
                 >
                     <ListItemIcon>
-                        <DeleteForeverOutlinedIcon color='error' />
+                        <IconOutlined color='error'>delete_forever</IconOutlined>
                     </ListItemIcon>
                     <ListItemText>Delete selected</ListItemText>
                 </MenuItem>
                 <Divider />
                 <MenuItem onClick={handleAddServant}>
                     <ListItemIcon>
-                        <PersonAddAlt1OutlinedIcon />
+                        <IconOutlined>person_add_alt_1</IconOutlined>
                     </ListItemIcon>
                     <ListItemText>Add servant</ListItemText>
                 </MenuItem>

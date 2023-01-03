@@ -1,8 +1,8 @@
 import { InstantiatedServantAscensionLevel, InstantiatedServantConstants } from '@fgo-planner/data-core';
-import { WineBarOutlined } from '@mui/icons-material';
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
 import { ComponentStyleProps } from '../../../types';
+import { IconOutlined } from '../../icons';
 import { IconButtonText } from '../../text/icon-button-text.component';
 import { ServantEnhancementQuickToggleButtons } from './ServantEnhancementQuickToggleButtons';
 
@@ -60,7 +60,7 @@ export const ServantLevelQuickToggleButtons = React.memo((props: Props) => {
             onCenterButtonClick={handleCenterButtonClick}
 
             // Right button
-            rightButtonIcon={<WineBarOutlined />}
+            rightButtonIcon={<IconOutlined>wine_bar</IconOutlined>}
             rightButtonTooltip={'Set level to 100'}
             onRightButtonClick={handleRightButtonClick}
         />

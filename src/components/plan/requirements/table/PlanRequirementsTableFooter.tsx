@@ -1,9 +1,9 @@
 import { GameItemConstants } from '@fgo-planner/data-core';
-import { ModeEditOutlined as ModeEditOutlinedIcon } from '@mui/icons-material';
 import { IconButton, Tooltip } from '@mui/material';
 import React, { ReactNode } from 'react';
 import { PlanRequirements } from '../../../../types';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
+import { IconOutlined } from '../../../icons';
 import { PlanRequirementsTableFooterCell } from './PlanRequirementsTableFooterCell';
 import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 
@@ -89,7 +89,7 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
                     <IconButton
                         // color='info'
                         onClick={onEditMasterItems}
-                        children={<ModeEditOutlinedIcon />}
+                        children={<IconOutlined>mode_edit</IconOutlined>}
                         size='small'
                     />
                 </Tooltip>

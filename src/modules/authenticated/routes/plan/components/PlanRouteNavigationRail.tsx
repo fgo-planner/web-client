@@ -1,6 +1,6 @@
-import { Clear as ClearIcon, DataObject, DeleteForeverOutlined as DeleteForeverOutlinedIcon, Done as DoneIcon, FormatSize as FormatSizeIcon, GroupAddOutlined, HideImageOutlined as HideImageOutlinedIcon, HowToRegOutlined as HowToRegOutlinedIcon, ModeEditOutlined as ModeEditOutlinedIcon, PersonAddAlt1Outlined as PersonAddAlt1OutlinedIcon, Reorder as ReorderIcon, ViewWeekOutlined as ViewWeekOutlinedIcon } from '@mui/icons-material';
-import { Divider, IconButton, Tooltip } from '@mui/material';
+import { Divider, Icon, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
+import { IconOutlined } from '../../../../../components/icons';
 import { NavigationRail } from '../../../../../components/navigation/navigation-rail/NavigationRail';
 
 type Props = {
@@ -48,7 +48,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onDragDropApply}
-                            children={<DoneIcon />}
+                            children={<Icon>done</Icon>}
                             size='large'
                         />
                     </div>
@@ -58,7 +58,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                         <IconButton
                             color='warning'
                             onClick={onDragDropCancel}
-                            children={<ClearIcon />}
+                            children={<Icon>clear</Icon>}
                             size='large'
                         />
                     </div>
@@ -75,7 +75,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onOpenDisplaySettings}
-                            children={<ViewWeekOutlinedIcon />}
+                            children={<IconOutlined>view_week</IconOutlined>}
                             size='large'
                         />
                     </div>
@@ -86,7 +86,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onAddServant}
-                        children={<PersonAddAlt1OutlinedIcon />}
+                        children={<IconOutlined>person_add_alt_1</IconOutlined>}
                         size='large'
                     />
                 </div>
@@ -95,7 +95,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onMultiAddServant}
-                        children={<GroupAddOutlined />}
+                        children={<IconOutlined>group_add</IconOutlined>}
                         size='large'
                         disabled
                     />
@@ -107,7 +107,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onDragDropActivate}
-                            children={<ReorderIcon />}
+                            children={<Icon>reorder</Icon>}
                             size='large'
                             disabled
                         />
@@ -118,7 +118,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onEditSelectedServants}
-                        children={<ModeEditOutlinedIcon />}
+                        children={<IconOutlined>mode_edit</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
                     />
@@ -128,7 +128,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onMarkSelectedAsComplete}
-                        children={<HowToRegOutlinedIcon />}
+                        children={<IconOutlined>how_to_reg</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
                     />
@@ -139,7 +139,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                     <IconButton
                         color='error'
                         onClick={onDeleteSelectedServants}
-                        children={<DeleteForeverOutlinedIcon />}
+                        children={<IconOutlined>delete_forever</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
                     />
@@ -150,7 +150,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleRowheaderMode}
-                        children={<DataObject />}
+                        children={<IconOutlined>data_object</IconOutlined>}
                         size='large'
                     />
                 </div>
@@ -159,7 +159,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleCellSize}
-                        children={<FormatSizeIcon />}
+                        children={<IconOutlined>format_size</IconOutlined>}
                         size='large'
                     />
                 </div>
@@ -168,7 +168,7 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleShowUnused}
-                        children={<HideImageOutlinedIcon />}
+                        children={<IconOutlined>hide_image</IconOutlined>}
                         size='large'
                     />
                 </div>

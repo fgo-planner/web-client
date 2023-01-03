@@ -1,7 +1,6 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { GameSoundtrack } from '@fgo-planner/data-core';
-import { Pause as PauseIcon, PlayArrow as PlayArrowIcon } from '@mui/icons-material';
-import { Checkbox, IconButton } from '@mui/material';
+import { Checkbox, Icon, IconButton } from '@mui/material';
 import { isEmpty } from 'lodash-es';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
@@ -85,10 +84,9 @@ export const MasterSoundtracksListRow = React.memo((props: Props) => {
         return (
             <div className={`${StyleClassPrefix}-play-button`} onClick={handlePlayButtonClick}>
                 <IconButton color='primary' size='large'>
-                    {playing ?
-                        <PauseIcon /> :
-                        <PlayArrowIcon />
-                    }
+                    <Icon>
+                        {playing ? 'pause' : 'play_arrow'}
+                    </Icon>
                 </IconButton>
             </div>
         );

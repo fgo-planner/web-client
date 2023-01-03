@@ -1,5 +1,4 @@
-import { Equalizer as EqualizerIcon, GetApp, Publish as PublishIcon } from '@mui/icons-material';
-import { IconButton, Theme, Tooltip } from '@mui/material';
+import { Icon, IconButton, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useState } from 'react';
@@ -123,20 +122,29 @@ export const MasterItemsRoute = React.memo(() => {
                 <IconButton
                     component={Link}
                     to='stats'
-                    children={<EqualizerIcon />}
-                    size='large' />
+                    children={<Icon>equalizer</Icon>}
+                    size='large'
+                />
             </div>
         </Tooltip>,
         <Tooltip key='import' title='Upload item data' placement='right'>
             <div>
                 {/* TODO Implement this */}
-                <IconButton children={<PublishIcon />} disabled size='large' />
+                <IconButton
+                    children={<Icon>publish</Icon>}
+                    disabled
+                    size='large'
+                />
             </div>
         </Tooltip>,
         <Tooltip key='export' title='Download item data' placement='right'>
             <div>
                 {/* TODO Implement this */}
-                <IconButton children={<GetApp />} disabled size='large' />
+                <IconButton
+                    children={<Icon>get_app</Icon>}
+                    size='large'
+                    disabled
+                />
             </div>
         </Tooltip>
     ];

@@ -1,7 +1,6 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
-import { OpenInNew as OpenInNewIcon } from '@mui/icons-material';
-import { Avatar, AvatarProps } from '@mui/material';
+import { Avatar, AvatarProps, Icon } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
 import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -166,7 +165,7 @@ export const GameServantThumbnail = React.memo((props: Props) => {
                 {renderNewTabIndicator &&
                     <div className={`${StyleClassPrefix}-new-tab-indicator`}>
                         <div>
-                            <OpenInNewIcon />
+                            <Icon>open_in_new</Icon>
                         </div>
                     </div>
                 }

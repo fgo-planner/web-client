@@ -354,7 +354,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     /**
      * Prevent user from navigating away if data is dirty.
      */
-    useBlockNavigation(isPlanDataDirty, BlockNavigationHookOptions);
+    useBlockNavigation(isMasterAccountDataDirty || isPlanDataDirty, BlockNavigationHookOptions);
 
     /**
      * Whether there is an awaiting request to the back-end from this hook.

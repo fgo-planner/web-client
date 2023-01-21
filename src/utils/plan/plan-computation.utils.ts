@@ -1,6 +1,30 @@
 import { CollectionUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterServant, ImmutablePlan, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, PlanResources, PlanServant, PlanServantAggregatedData, PlanServantUtils, PlanUpcomingResources } from '@fgo-planner/data-core';
+import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, PlanResources, PlanServant, PlanServantAggregatedData, PlanServantUtils, PlanUpcomingResources } from '@fgo-planner/data-core';
 import { PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanEnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types';
+
+
+//#region Internal type definitions
+
+type Enabled = Readonly<{
+    ascensions: boolean;
+    skills: boolean;
+    appendSkills: boolean;
+    costumes: boolean;
+}>;
+
+type SkillEnhancements = Readonly<{
+    1?: Nullable<InstantiatedServantSkillLevel>;
+    2?: Nullable<InstantiatedServantSkillLevel>;
+    3?: Nullable<InstantiatedServantSkillLevel>;
+}>;
+
+type ServantEnhancements = Immutable<{
+    ascension?: Nullable<InstantiatedServantAscensionLevel>;
+    skills: SkillEnhancements;
+    appendSkills: SkillEnhancements;
+}>;
+
+//#endregion
 
 
 //#region Exported type definitions
@@ -31,7 +55,7 @@ export type MasterAccountData = Readonly<{
  */
 export type PlanData = Readonly<{
     planId: string;
-    enabled: ImmutablePlan['enabled'];
+    enabled: Enabled;
     servantsData: ReadonlyArray<PlanServantAggregatedData>;
     costumes: ReadonlySet<number>;
     upcomingResources: ImmutableArray<PlanUpcomingResources>;
@@ -52,31 +76,14 @@ export type ServantFulfillmentResult = {
 //#endregion
 
 
-//#region Internal type definitions
-
-type SkillEnhancements = Readonly<{
-    1?: Nullable<InstantiatedServantSkillLevel>;
-    2?: Nullable<InstantiatedServantSkillLevel>;
-    3?: Nullable<InstantiatedServantSkillLevel>;
-}>;
-
-type ServantEnhancements = Immutable<{
-    ascension?: Nullable<InstantiatedServantAscensionLevel>;
-    skills: SkillEnhancements;
-    appendSkills: SkillEnhancements;
-}>;
-
-//#endregion
-
-
 //#region Default values
 
-const DefaultOptions: Readonly<ComputationOptions> = {
+const DefaultOptions = {
     includeAscensions: true,
     includeSkills: true,
     includeAppendSkills: true,
     includeCostumes: true
-};
+} as const satisfies ComputationOptions;
 
 const DefaultTargetEnhancements: Immutable<ServantEnhancements> = {
     ascension: InstantiatedServantConstants.MaxAscensionLevel,
@@ -108,6 +115,7 @@ export function fulfillServant(
     planServantData: PlanServantAggregatedData,
     currentCostumes: ReadonlySet<number>,
     targetCostumes: ReadonlySet<number>,
+    options: ComputationOptions = DefaultOptions
 ): ServantFulfillmentResult | null {
 
     const {
@@ -200,12 +208,16 @@ export function fulfillServant(
         return null;
     }
 
+    const servantOptions = parseComputationOptions(planServant);
+    const mergedOptions = _mergeComputationOptions(options, servantOptions);
+
     const requirements = _computeServantEnhancementRequirements(
         gameServant,
         masterServant,
         currentCostumes,
         planServant,
-        targetCostumes
+        targetCostumes,
+        mergedOptions
     );
 
     return {
@@ -246,7 +258,7 @@ export function computePlanRequirements(
      * The computation options. If options override was not given, then use options
      * from target plan.
      */
-    const options = optionsOverride || _parseComputationOptions(targetPlanData);
+    const options = optionsOverride || parseComputationOptions(targetPlanData);
 
     /**
      * Run computations for previous plans in the group first.
@@ -308,7 +320,7 @@ function _computePlanRequirements(
          * Compute the options based on a merge of the plan and servant options.
          */
         /** */
-        const servantOptions = _parseComputationOptions(planServant);
+        const servantOptions = parseComputationOptions(planServant);
         const mergedOptions = _mergeComputationOptions(options, servantOptions);
         /**
          * Compute the deficit for the servant for the current plan.
@@ -504,7 +516,7 @@ function _computeServantEnhancementRequirements(
     currentCostumes: ReadonlySet<number>,
     targetEnhancements: Immutable<ServantEnhancements>,
     targetCostumes?: ReadonlySet<number>,
-    options = DefaultOptions
+    options: ComputationOptions = DefaultOptions
 ): EnhancementRequirements {
 
     const {
@@ -724,7 +736,7 @@ function _addPlanResources(target: PlanResources, source: Immutable<PlanResource
     target.qp += source.qp;
 }
 
-function _parseComputationOptions(data: PlanData | Immutable<PlanServant>): ComputationOptions {
+export function parseComputationOptions(data: { enabled: Enabled }): ComputationOptions {
     const {
         ascensions,
         skills,

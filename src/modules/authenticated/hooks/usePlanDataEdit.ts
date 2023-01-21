@@ -726,10 +726,11 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
 
     const fulfillPlanServants = useCallback((instanceIds: Iterable<number>, remove = false): void => {
         const currentServantsData = editData.servantsData;
+        const computationOptions = PlanComputationUtils.parseComputationOptions(editData);
 
         const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
-
         const requirements: Array<PlanEnhancementRequirements> = [];
+
         for (const servantData of currentServantsData) {
             if (!instanceIdSet.has(servantData.instanceId)) {
                 continue;
@@ -737,7 +738,8 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
             const fulfillmentResult = PlanComputationUtils.fulfillServant(
                 servantData,
                 masterAccountEditData.costumes,
-                editData.costumes
+                editData.costumes,
+                computationOptions
             );
             if (fulfillmentResult) {
                 updateMasterServants([servantData.instanceId], fulfillmentResult.update);

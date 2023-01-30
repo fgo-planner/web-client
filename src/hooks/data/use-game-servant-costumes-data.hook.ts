@@ -27,13 +27,13 @@ const transformCostumesList = (gameServants: ImmutableArray<GameServant>): Array
     /**
      * At this point, `gameServants` should contain at least one element.
      */
-    for (const servant of gameServants) {
-        const { costumes } = servant;
+    for (const gameServant of gameServants) {
+        const costumes = gameServant.costumes;
         for (const [id, costume] of Object.entries(costumes)) {
             const alwaysUnlocked = isEmpty(costume.materials.materials);
             result.push({
                 costumeId: Number(id),
-                servant,
+                gameServant,
                 costume,
                 alwaysUnlocked
             });

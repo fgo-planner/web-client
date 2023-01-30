@@ -106,7 +106,10 @@ const MasterServantImportRoute = React.memo(() => {
         }
         const result: Record<string, Immutable<GameServant>> = {};
         for (const servant of gameServantList) {
-            const name = servant.metadata.fgoManagerName;
+            /**
+             * FIXME Need to get FGO Manager names from the back-end.
+             */
+            const name = '';
             if (!name) {
                 continue;
             }

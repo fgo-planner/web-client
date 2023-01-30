@@ -2,7 +2,7 @@ import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { GameServantList, GameServantMap, Page, Pagination } from '../../../types';
+import { GameServantList, GameServantMap, Page, Pagination,HttpOptions } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
 
@@ -10,6 +10,12 @@ import { LockableFeature, UserInterfaceService } from '../../user-interface/user
 export class GameServantService {
 
     private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-servant`;
+
+    private readonly _ExcludeMetadataOptions = {
+        params: {
+            metadata: false
+        }
+    } as const satisfies HttpOptions;
 
     @Inject(UserInterfaceService)
     private readonly _userInterfaceService!: UserInterfaceService;
@@ -40,7 +46,7 @@ export class GameServantService {
              * may need to modify the caching system for servants so that servants are 
              * retrieved and cached only when needed.
              */
-            this._servantsCachePromise = Http.get<Array<GameServant>>(`${this._BaseUrl}`);
+            this._servantsCachePromise = Http.get<Array<GameServant>>(`${this._BaseUrl}`, this._ExcludeMetadataOptions);
             this._servantsCachePromise.then(cache => {
                 this._onServantsCacheLoaded(cache);
             }).catch(error => {
@@ -80,6 +86,9 @@ export class GameServantService {
         return this._servantsCacheMap;
     }
 
+    /**
+     * @deprecated Not used
+     */
     async getServantsPage(pagination: Pagination): Promise<Page<GameServant>> {
         const params = {
             page: pagination.page,

@@ -5,7 +5,7 @@ import { DataTableListStaticRow } from '../../../../components/data-table-list/d
 import { ItemQuantity } from '../../../../components/item/ItemQuantity';
 import { GameServantThumbnail } from '../../../../components/servant/ServantThumbnail';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
-import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
+import { useGameItemMap } from '../../../../hooks/data/useGameItemMap';
 
 type Props = {
     costumeData: GameServantCostumeAggregatedData;

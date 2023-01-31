@@ -14,13 +14,13 @@ export class GameItemService {
     @Inject(UserInterfaceService)
     private readonly _userInterfaceService!: UserInterfaceService;
 
-    private _cachedItems: Nullable<GameItemList>;
+    private _cachedItems?: GameItemList;
 
-    private _cachedItemsMap: Nullable<GameItemMap>;
+    private _cachedItemsMap?: GameItemMap;
 
-    private _cachedItemsCategoryMap: Nullable<GameItemCategoryMap>;
+    private _cachedItemsCategoryMap?: GameItemCategoryMap;
 
-    private _cachedItemsPromise: Nullable<Promise<GameItemList>>;
+    private _cachedItemsPromise?: Promise<GameItemList>;
 
     async getItem(id: number): Promise<Nullable<GameItem>> {
         return Http.get<Nullable<GameItem>>(`${this._BaseUrl}/${id}`);
@@ -50,9 +50,9 @@ export class GameItemService {
 
     /**
      * Synchronously returns the cached items list. If the data is not available,
-     * then returns null/undefined.
+     * then returns `undefined`.
      */
-    getItemsSync(): Nullable<GameItemList> {
+    getItemsSync(): GameItemList | undefined {
         return this._cachedItems;
     }
 
@@ -81,17 +81,17 @@ export class GameItemService {
 
     /**
      * Synchronously returns the cached items map data. If the data is not
-     * available, then returns null/undefined.
+     * available, then returns `undefined`.
      */
-    getItemsMapSync(): Nullable<GameItemMap> {
+    getItemsMapSync(): GameItemMap | undefined {
         return this._cachedItemsMap;
     }
 
     /**
      * Synchronously returns the cached item ID category map. f the data is not
-     * available, then returns null/undefined.
+     * available, then returns `undefined`.
      */
-    getItemCategoryMapSync(): Nullable<GameItemCategoryMap> {
+    getItemCategoryMapSync(): GameItemCategoryMap | undefined {
         return this._cachedItemsCategoryMap;
     }
 
@@ -109,7 +109,7 @@ export class GameItemService {
         this._cachedItems = data;
         this._generateAndCacheMap(data);
         this._generateAndCacheCategoryMap(data);
-        this._cachedItemsPromise = null;
+        this._cachedItemsPromise = undefined;
     }
 
     private _onItemsCacheLoadError(error: any): void {
@@ -120,8 +120,8 @@ export class GameItemService {
      * @deprecated Not needed
      */
     private _invalidateCaches(): void {
-        this._cachedItems = null;
-        this._cachedItemsMap = null;
+        this._cachedItems = undefined;
+        this._cachedItemsMap = undefined;
     }
 
     private _generateAndCacheMap(items: GameItemList): void {

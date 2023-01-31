@@ -4,7 +4,7 @@ import { ItemThumbnail } from '../../../components/item/ItemThumbnail';
 import { LayoutContentSection } from '../../../components/layout/layout-content-section.component';
 import { AppBarElevateOnScroll } from '../../../components/navigation/app-bar/AppBarElevateOnScroll';
 import { PageTitle } from '../../../components/text/page-title.component';
-import { useGameItemList } from '../../../hooks/data/use-game-item-list.hook';
+import { useGameItemList } from '../../../hooks/data/useGameItemList';
 
 const StyleClassPrefix = 'GameItems';
 

@@ -2,8 +2,8 @@ import { GameServantCostumeAggregatedData } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode } from 'react';
-import { useGameServantCostumesData } from '../../../../hooks/data/use-game-servant-costumes-data.hook';
-import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
+import { useGameServantCostumesData } from '../../../../hooks/data/useGameServantCostumesData';
+import { useGameServantList } from '../../../../hooks/data/useGameServantList';
 import { MasterServantCostumesListHeader } from './master-servant-costumes-list-header.component';
 import { MasterServantCostumesListRow, StyleClassPrefix as MasterServantCostumesListRowStyleClassPrefix } from './master-servant-costumes-list-row.component';
 

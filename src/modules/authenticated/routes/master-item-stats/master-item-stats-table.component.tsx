@@ -5,7 +5,7 @@ import React, { ReactNode, useMemo } from 'react';
 import { NumericFormat } from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { ItemThumbnail } from '../../../../components/item/ItemThumbnail';
-import { useGameItemCategoryMap } from '../../../../hooks/data/use-game-item-category-map.hook';
+import { useGameItemCategoryMap } from '../../../../hooks/data/useGameItemCategoryMap';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { GameItemCategory, GameItemMap } from '../../../../types';
 import { MasterItemStats, MasterItemStatsFilterOptions } from './master-item-stats.utils';

@@ -4,7 +4,7 @@ import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { ServantClassIcon } from '../../../../../../components/servant/ServantClassIcon';
-import { useGameServantList } from '../../../../../../hooks/data/use-game-servant-list.hook';
+import { useGameServantList } from '../../../../../../hooks/data/useGameServantList';
 import { useGameServantKeywordsMap } from '../../../../../../hooks/data/useGameServantKeywordsMap';
 import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 

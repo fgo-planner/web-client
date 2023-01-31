@@ -7,7 +7,7 @@ import React, { MouseEvent, useCallback, useEffect } from 'react';
 import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/PlanRequirementsTable';
-import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';

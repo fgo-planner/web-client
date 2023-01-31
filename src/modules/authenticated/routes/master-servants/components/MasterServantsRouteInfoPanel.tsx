@@ -6,7 +6,7 @@ import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react'
 import { DataPointListItem } from '../../../../../components/data-point-list/data-point-list-item.component';
 import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
 import { ServantBondIcon } from '../../../../../components/servant/ServantBondIcon';
-import { useGameItemMap } from '../../../../../hooks/data/use-game-item-map.hook';
+import { useGameItemMap } from '../../../../../hooks/data/useGameItemMap';
 import { ThemeConstants } from '../../../../../styles/theme-constants';
 import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';

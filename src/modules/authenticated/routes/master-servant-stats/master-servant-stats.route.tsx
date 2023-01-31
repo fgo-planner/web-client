@@ -9,7 +9,7 @@ import { LayoutContentSection } from '../../../../components/layout/layout-conte
 import { NavigationRail } from '../../../../components/navigation/navigation-rail/NavigationRail';
 import { ServantClassIcon } from '../../../../components/servant/ServantClassIcon';
 import { PageTitle } from '../../../../components/text/page-title.component';
-import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
 import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';

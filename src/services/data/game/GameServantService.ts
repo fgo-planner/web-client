@@ -2,7 +2,7 @@ import { Immutable, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
-import { GameServantList, GameServantMap, Page, Pagination,HttpOptions } from '../../../types';
+import { GameServantList, GameServantMap, HttpOptions, Page, Pagination } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
 
@@ -20,11 +20,11 @@ export class GameServantService {
     @Inject(UserInterfaceService)
     private readonly _userInterfaceService!: UserInterfaceService;
 
-    private _servantsCache: Nullable<GameServantList>;
+    private _servantsCache?: GameServantList;
 
-    private _servantsCacheMap: Nullable<GameServantMap>;
+    private _servantsCacheMap?: GameServantMap;
 
-    private _servantsCachePromise: Nullable<Promise<GameServantList>>;
+    private _servantsCachePromise?: Promise<GameServantList>;
 
     private _servantsKeywordsMap?: Record<number, string>;
 
@@ -68,9 +68,9 @@ export class GameServantService {
 
     /**
      * Synchronously returns the cached servants list. If the data is not available,
-     * then returns null/undefined.
+     * then returns `undefined`.
      */
-    getServantsSync(): Nullable<GameServantList> {
+    getServantsSync(): GameServantList | undefined {
         return this._servantsCache;
     }
 
@@ -88,9 +88,9 @@ export class GameServantService {
 
     /**
      * Synchronously returns the cached servants map data. If the data is not
-     * available, then returns null/undefined.
+     * available, then returns `undefined`.
      */
-    getServantsMapSync(): Nullable<GameServantMap> {
+    getServantsMapSync(): GameServantMap | undefined {
         return this._servantsCacheMap;
     }
 
@@ -151,10 +151,10 @@ export class GameServantService {
 
     private _onServantsCacheLoaded(data: GameServantList): void {
         this._generateCacheMap(this._servantsCache = data);
-        this._servantsCachePromise = null;
+        this._servantsCachePromise = undefined;
     }
 
-    private _onServantsCacheLoadError(error: any): void {
+    private _onServantsCacheLoadError(_: any): void {
         this._invalidateCache();
     }
 
@@ -162,8 +162,8 @@ export class GameServantService {
      * @deprecated Not needed
      */
     private _invalidateCache(): void {
-        this._servantsCache = null;
-        this._servantsCacheMap = null;
+        this._servantsCache = undefined;
+        this._servantsCacheMap = undefined;
     }
 
     private _generateCacheMap(servants: GameServantList): void {

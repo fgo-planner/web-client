@@ -7,9 +7,9 @@ import React, { useCallback, useEffect, useMemo, useReducer, useState } from 're
 import { Link } from 'react-router-dom';
 import { NavigationRail } from '../../../../components/navigation/navigation-rail/NavigationRail';
 import { PageTitle } from '../../../../components/text/page-title.component';
-import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
-import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
-import { useGameSoundtrackList } from '../../../../hooks/data/use-game-soundtrack-list.hook';
+import { useGameItemMap } from '../../../../hooks/data/useGameItemMap';
+import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
+import { useGameSoundtrackList } from '../../../../hooks/data/useGameSoundtrackList';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { StorageKeys } from '../../../../utils/storage/storage-keys';

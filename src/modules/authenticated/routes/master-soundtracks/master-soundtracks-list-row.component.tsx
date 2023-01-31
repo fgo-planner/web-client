@@ -6,7 +6,7 @@ import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { ItemQuantity } from '../../../../components/item/ItemQuantity';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
-import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
+import { useGameItemMap } from '../../../../hooks/data/useGameItemMap';
 
 type Props = {
     onChange: (id: number, value: boolean) => void;

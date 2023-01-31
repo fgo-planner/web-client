@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { useGameItemMap } from '../../../../hooks/data/use-game-item-map.hook';
+import { useGameItemMap } from '../../../../hooks/data/useGameItemMap';
 import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
 import { PlanRequirementsTableHeaderCell } from './PlanRequirementsTableHeaderCell';
 import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';

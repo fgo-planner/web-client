@@ -4,8 +4,8 @@ import { Fragment, PureComponent, ReactNode } from 'react';
 import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
 import { LoadingIndicator } from '../../../../../components/utils/loading-indicator.component';
 import { UnderConstruction } from '../../../../../components/utils/under-construction.component';
-import { GameItemService } from '../../../../../services/data/game/game-item.service';
-import { GameServantService } from '../../../../../services/data/game/game-servant.service';
+import { GameItemService } from '../../../../../services/data/game/GameItemService';
+import { GameServantService } from '../../../../../services/data/game/GameServantService';
 import { InjectablesContainer } from '../../../../../utils/dependency-injection/injectables-container';
 import { GameItemNotFound } from './game-item-not-found.component';
 

@@ -14,9 +14,9 @@ export class GameSoundtrackService {
     @Inject(UserInterfaceService)
     private readonly _userInterfaceService!: UserInterfaceService;
 
-    private _soundtracksCache: Nullable<GameSoundtrackList>;
+    private _soundtracksCache?: GameSoundtrackList;
 
-    private _soundtracksCachePromise: Nullable<Promise<GameSoundtrackList>>;
+    private _soundtracksCachePromise?: Promise<GameSoundtrackList>;
 
     async getSoundtrack(id: number): Promise<Nullable<GameSoundtrack>> {
         return Http.get<Nullable<GameSoundtrack>>(`${this._BaseUrl}/${id}`);
@@ -49,7 +49,7 @@ export class GameSoundtrackService {
      * Synchronously returns the cached soundtracks list. If the data is not available,
      * then returns null/undefined.
      */
-    getSoundtracksSync(): Nullable<GameSoundtrackList> {
+    getSoundtracksSync(): GameSoundtrackList | undefined {
         return this._soundtracksCache;
     }
 
@@ -65,15 +65,18 @@ export class GameSoundtrackService {
 
     private _onSoundtracksCacheLoaded(data: GameSoundtrackList): void {
         this._soundtracksCache = data;
-        this._soundtracksCachePromise = null;
+        this._soundtracksCachePromise = undefined;
     }
 
     private _onSoundtracksCacheLoadError(error: any): void {
         this._invalidateCache();
     }
 
+    /**
+     * @deprecated Not needed
+     */
     private _invalidateCache(): void {
-        this._soundtracksCache = null;
+        this._soundtracksCache = undefined;
     }
 
 }

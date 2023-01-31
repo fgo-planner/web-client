@@ -4,7 +4,7 @@ import { Button, Icon, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { ThemeConstants } from '../../../../styles/theme-constants';
 import { ModalOnCloseReason } from '../../../../types';

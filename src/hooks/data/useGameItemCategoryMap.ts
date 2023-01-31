@@ -1,17 +1,16 @@
-import { Nullable } from '@fgo-planner/common-core';
 import { useEffect, useState } from 'react';
-import { GameItemService } from '../../services/data/game/game-item.service';
+import { GameItemService } from '../../services/data/game/GameItemService';
 import { GameItemCategoryMap } from '../../types';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 /**
- * Returns a map of the loaded game item data from the `GameItemService` where
- * the key is the item ID, and the value is a readonly instance of the
- * corresponding `GameItem` object.
- * 
- * If the data is not yet available, then null/undefined is returned.
+ * Returns a readonly map of game item categories, where the key is the item
+ * category and the value is a set of item IDs that belong to the category.
+ *
+ * Data is fetched and returned asynchronously. Returns `undefined` if the data
+ * is not yet available.
  */
-export const useGameItemCategoryMap = (): Nullable<GameItemCategoryMap> => {
+export const useGameItemCategoryMap = (): GameItemCategoryMap | undefined => {
 
     const gameItemService = useInjectable(GameItemService);
 
@@ -19,8 +18,7 @@ export const useGameItemCategoryMap = (): Nullable<GameItemCategoryMap> => {
      * Initialize the state with the game item map data. If the data is not yet
      * available, then it is initialized as null/undefined and then retrieved later.
      */
-    const [gameItemCategoryMap, setGameItemCategoryMap] =
-        useState<Nullable<GameItemCategoryMap>>(() => gameItemService.getItemCategoryMapSync());
+    const [gameItemCategoryMap, setGameItemCategoryMap] = useState(() => gameItemService.getItemCategoryMapSync());
 
     /**
      * Retrieve game item category map if it wasn't available during initialization.

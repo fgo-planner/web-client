@@ -9,9 +9,9 @@ import { BackgroundMusicService } from './services/audio/background-music.servic
 import { SoundtrackPlayerService } from './services/audio/soundtrack-player.service';
 import { AuthenticationService } from './services/authentication/authentication.service';
 import { WebAuthenticationService } from './services/authentication/web-authentication.service';
-import { GameItemService } from './services/data/game/game-item.service';
-import { GameServantService } from './services/data/game/game-servant.service';
-import { GameSoundtrackService } from './services/data/game/game-soundtrack.service';
+import { GameItemService } from './services/data/game/GameItemService';
+import { GameServantService } from './services/data/game/GameServantService';
+import { GameSoundtrackService } from './services/data/game/GameSoundtrackService';
 import { MasterAccountChangeListenerService } from './services/data/master/MasterAccountChangeListenerService';
 import { MasterAccountService } from './services/data/master/master-account.service';
 import { ScheduledMasterAccountChangeListenerService } from './services/data/master/ScheduledMasterAccountChangeListenerService';

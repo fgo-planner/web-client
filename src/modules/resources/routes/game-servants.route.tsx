@@ -4,7 +4,7 @@ import { GameServantThumbnail } from '../../../components/servant/ServantThumbna
 import { LayoutContentSection } from '../../../components/layout/layout-content-section.component';
 import { AppBarElevateOnScroll } from '../../../components/navigation/app-bar/AppBarElevateOnScroll';
 import { PageTitle } from '../../../components/text/page-title.component';
-import { useGameServantList } from '../../../hooks/data/use-game-servant-list.hook';
+import { useGameServantList } from '../../../hooks/data/useGameServantList';
 
 const StyleClassPrefix = 'GameServants';
 

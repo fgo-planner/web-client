@@ -3,7 +3,7 @@ import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { useGameServantMap } from '../../../../hooks/data/use-game-servant-map.hook';
+import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
 import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';

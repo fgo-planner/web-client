@@ -1,12 +1,12 @@
-import { Array2D, Immutable, ImmutableRecord, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameServant, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
+import { Array2D, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { FgoManagerDataImport, MasterAccountImportData } from '@fgo-planner/transform-core';
 import { Options } from 'csv-parse';
 import { parse } from 'csv-parse/sync';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog } from '../../../../components/dialog/alert-dialog.component';
-import { useGameServantList } from '../../../../hooks/data/use-game-servant-list.hook';
+import { useFgoManagerNamesMap } from '../../../../hooks/data/useFgoManagerNamesMap';
 import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
 import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
 import { MasterAccountService } from '../../../../services/data/master/master-account.service';
@@ -59,7 +59,7 @@ const MasterServantImportRoute = React.memo(() => {
 
     const masterAccountService = useInjectable(MasterAccountService);
 
-    const gameServantList = useGameServantList();
+    const fgoManagerNamesMap = useFgoManagerNamesMap();
 
     const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
     const [parsedData, setParsedData] = useState<MasterAccountImportData>();
@@ -100,23 +100,8 @@ const MasterServantImportRoute = React.memo(() => {
         setImportStatusDialogOpen(true);
     }, [importStatus]);
 
-    const gameServantNameMap = useMemo((): ImmutableRecord<string, GameServant> | undefined => {
-        if (!gameServantList) {
-            return undefined;
-        }
-        const result: Record<string, Immutable<GameServant>> = {};
-        for (const servant of gameServantList) {
-            const name = servant.metadata.fgoManagerName;
-            if (!name) {
-                continue;
-            }
-            result[name] = servant;
-        }
-        return result;
-    }, [gameServantList]);
-
     const parseData = useCallback((csvContents: string): void => {
-        if (!gameServantNameMap) {
+        if (!fgoManagerNamesMap) {
             return;
         }
 
@@ -133,9 +118,9 @@ const MasterServantImportRoute = React.memo(() => {
         /**
          * Set timeout to allow the loading indicator to be rendered first.
          */
-        setTimeout(() => {
+        setTimeout(async () => {
             const data: Array2D<string> = parse(csvContents, CsvParseOptions);
-            const parsedData = FgoManagerDataImport.transformRosterSheetToMasterAccountImportData(data, gameServantNameMap);
+            const parsedData = FgoManagerDataImport.transformRosterSheetToMasterAccountImportData(data, fgoManagerNamesMap);
             if (!parsedData.servants?.length) {
                 setImportStatus('parseFail');
             } else {
@@ -145,7 +130,7 @@ const MasterServantImportRoute = React.memo(() => {
             resetLoadingIndicator();
         });
 
-    }, [gameServantNameMap, invokeLoadingIndicator, resetLoadingIndicator]);
+    }, [fgoManagerNamesMap, invokeLoadingIndicator, resetLoadingIndicator]);
 
     const cancelImport = useCallback((): void => {
         setParsedData(undefined);

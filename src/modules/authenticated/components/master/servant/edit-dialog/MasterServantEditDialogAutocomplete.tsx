@@ -40,7 +40,7 @@ const optionStyles = {
 };
 
 const generateOption = (servant: Immutable<GameServant>): ServantOption => {
-    const label = servant.metadata?.displayName || servant.name || String(servant._id);
+    const label = servant.displayName || servant.name || String(servant._id);
     return { label, servant };
 };
 

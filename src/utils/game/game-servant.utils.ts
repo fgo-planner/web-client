@@ -9,7 +9,7 @@ export class GameServantUtils {
     }
 
     static getDisplayedName(servant: Immutable<GameServant>): string {
-        return servant.metadata?.displayName || servant.name || String(servant._id);
+        return servant.displayName || servant.name || String(servant._id);
     }
 
     static convertToSimplifiedClass(servantClass: GameServantClass): GameServantClassSimplified {
@@ -59,8 +59,8 @@ export class GameServantUtils {
         let classes = new Set<GameServantClass>();
         let rarities = new Set<GameServantRarity>();
 
-        const searchTerms = searchTrimmed.split(/\s+/).filter(value => {
-            /*
+        const searchTerms = searchTrimmed.toLowerCase().split(/\s+/).filter(value => {
+            /**
              * Rarity filters. Only filters by rarity if the input is valid. Otherwise, it
              * will just act as another search term.
              */
@@ -72,7 +72,7 @@ export class GameServantUtils {
                 }
                 return true;
             }
-            /*
+            /**
              * Servant class filters. Only filters by class if the input is a valid class.
              * Otherwise, it will just act as another search term.
              */
@@ -101,7 +101,7 @@ export class GameServantUtils {
         classes: Set<GameServantClass>,
         rarities: Set<GameServantRarity>
     ): boolean {
-        /*
+        /**
          * Rarity and class filters are only applied if at least one value is given.
          */
         if (classes.size && !classes.has(servant.class)) {
@@ -110,18 +110,20 @@ export class GameServantUtils {
         if (rarities.size && !rarities.has(servant.rarity)) {
             return false;
         }
-        /*
+        /**
          * If there are no generic search terms, but at least one class or rarity was
          * given (and matched), then return true.
          */
         if (!searchTerms.length && (classes.size || rarities.size)) {
             return true;
         }
-        /*
+        /**
          * Generate a string of keywords for the servant.
+         * 
+         * TODO Retrieve keywords from map instead.
          */
-        const keywords = (servant.name + (servant.metadata?.displayName || '')).toLowerCase();
-        /*
+        const keywords = servant.name?.toLowerCase() || '';
+        /**
          * If any of the search terms are present in the keywords string, then it is
          * considered to be a match.
          */

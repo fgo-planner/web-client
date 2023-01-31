@@ -16,6 +16,8 @@ export class HttpUtils {
 
     private static readonly _ContentTypeHeader = 'Content-Type';
 
+    private static readonly _ParamsStartCharacter = '?';
+
     private static get _onUnauthorized() {
         return SubscribablesContainer.get(SubscriptionTopics.User.Unauthorized);
     }
@@ -33,7 +35,7 @@ export class HttpUtils {
     static async get<T = any>(url: string, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
         const { options, transformFunc } = this._parseArgs(arg1, arg2);
         if (options.params) {
-            url += `&${this._generateUrlParamsString(options.params)}`;
+            url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
         const headers = this._appendAuthorizationHeader();
         const init = {
@@ -52,7 +54,7 @@ export class HttpUtils {
     static async post<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
         const { options, transformFunc } = this._parseArgs(arg1, arg2);
         if (options.params) {
-            url += `&${this._generateUrlParamsString(options.params)}`;
+            url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
         const headers = {
             [this._ContentTypeHeader]: this._inferContentType(body)
@@ -78,7 +80,7 @@ export class HttpUtils {
     static async put<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
         const { options, transformFunc } = this._parseArgs(arg1, arg2);
         if (options.params) {
-            url += `&${this._generateUrlParamsString(options.params)}`;
+            url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
         const headers = {
             [this._ContentTypeHeader]: this._inferContentType(body)
@@ -104,7 +106,7 @@ export class HttpUtils {
     static async delete<T = any>(url: string, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
         const { options, transformFunc } = this._parseArgs(arg1, arg2);
         if (options.params) {
-            url += `&${this._generateUrlParamsString(options.params)}`;
+            url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
         const headers = this._appendAuthorizationHeader();
         const init = {

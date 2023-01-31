@@ -1,4 +1,4 @@
-import { GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantAggregatedData } from '@fgo-planner/data-core';
+import { ExternalLink, GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { Icon, IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -464,7 +464,10 @@ export const MasterServantsRouteInfoPanel = React.memo((props: Props) => {
         if (!renderChildren || activeServantsData.length !== 1) {
             return null;
         }
-        const links = activeServantsData[0].gameServant.metadata?.links;
+        /**
+         * FIXME Need to get links from back-end.
+         */
+        const links: Array<ExternalLink> = [];
         if (!links?.length) {
             return null;
         }

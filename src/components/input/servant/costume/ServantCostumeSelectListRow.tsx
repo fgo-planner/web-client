@@ -24,7 +24,7 @@ export const ServantCostumeSelectListRow = React.memo((props: Props) => {
             costumeId,
             alwaysUnlocked,
             costume,
-            servant
+            gameServant
         },
         disabled,
         index,
@@ -60,7 +60,7 @@ export const ServantCostumeSelectListRow = React.memo((props: Props) => {
                 <GameServantThumbnail
                     variant='square'
                     size={ServantThumbnailSize}
-                    gameServant={servant}
+                    gameServant={gameServant}
                     costumeId={costumeId}
                 />
             </div>

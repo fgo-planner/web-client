@@ -59,7 +59,7 @@ export class GameServantUtils {
         let classes = new Set<GameServantClass>();
         let rarities = new Set<GameServantRarity>();
 
-        const searchTerms = searchTrimmed.split(/\s+/).filter(value => {
+        const searchTerms = searchTrimmed.toLowerCase().split(/\s+/).filter(value => {
             /**
              * Rarity filters. Only filters by rarity if the input is valid. Otherwise, it
              * will just act as another search term.

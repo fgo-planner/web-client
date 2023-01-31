@@ -1,4 +1,4 @@
-import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { Immutable, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
@@ -25,6 +25,10 @@ export class GameServantService {
     private _servantsCacheMap: Nullable<GameServantMap>;
 
     private _servantsCachePromise: Nullable<Promise<GameServantList>>;
+
+    private _fgoManagerNamesMap?: Record<string, number>;
+
+    private _fgoManagerNamesMapPromise?: Promise<Record<string, number>>;
 
     async getServant(id: number): Promise<Nullable<GameServant>> {
         return Http.get<Nullable<GameServant>>(`${this._BaseUrl}/${id}`);
@@ -84,6 +88,25 @@ export class GameServantService {
      */
     getServantsMapSync(): Nullable<GameServantMap> {
         return this._servantsCacheMap;
+    }
+
+    async getFgoManagerNamesMap(): Promise<ReadonlyRecord<string, number>> {
+        if (this._fgoManagerNamesMap) {
+            return this._fgoManagerNamesMap;
+        }
+        if (this._fgoManagerNamesMapPromise) {
+            return this._fgoManagerNamesMapPromise;
+        }
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+        const url = `${this._BaseUrl}/metadata/fgo-manager-names`;
+        this._fgoManagerNamesMapPromise = Http.get<Record<string, number>>(url);
+        this._fgoManagerNamesMapPromise.then(data => {
+            this._fgoManagerNamesMap = data;
+            this._fgoManagerNamesMapPromise = undefined;
+        }).finally(() => {
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
+        });
+        return this._fgoManagerNamesMapPromise;
     }
 
     /**

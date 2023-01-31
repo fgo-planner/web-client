@@ -26,6 +26,10 @@ export class GameServantService {
 
     private _servantsCachePromise: Nullable<Promise<GameServantList>>;
 
+    private _servantsKeywordsMap?: Record<number, string>;
+
+    private _servantsKeywordsMapPromise?: Promise<Record<number, string>>;
+
     private _fgoManagerNamesMap?: Record<string, number>;
 
     private _fgoManagerNamesMapPromise?: Promise<Record<string, number>>;
@@ -88,6 +92,29 @@ export class GameServantService {
      */
     getServantsMapSync(): Nullable<GameServantMap> {
         return this._servantsCacheMap;
+    }
+
+    async getServantKeywordsMap(): Promise<ReadonlyRecord<number, string>> {
+        if (this._servantsKeywordsMap) {
+            return this._servantsKeywordsMap;
+        }
+        if (this._servantsKeywordsMapPromise) {
+            return this._servantsKeywordsMapPromise;
+        }
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+        const url = `${this._BaseUrl}/metadata/search-keywords`;
+        this._servantsKeywordsMapPromise = Http.get<Record<number, string>>(url);
+        this._servantsKeywordsMapPromise.then(data => {
+            this._servantsKeywordsMap = data;
+            this._servantsKeywordsMapPromise = undefined;
+        }).finally(() => {
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
+        });
+        return this._servantsKeywordsMapPromise;
+    }
+
+    getServantKeywordsMapSync(): ReadonlyRecord<number, string> | undefined {
+        return this._servantsKeywordsMap;
     }
 
     async getFgoManagerNamesMap(): Promise<ReadonlyRecord<string, number>> {

@@ -5,8 +5,10 @@ import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useGameServantKeywordsMap } from '../../../../../../hooks/data/useGameServantKeywordsMap';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
 import { SortDirection, SortOptions } from '../../../../../../types';
+import { DataAggregationUtils } from '../../../../../../utils/data-aggregation.utils';
 import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 import { MasterServantListColumn, MasterServantListVisibleColumns } from './master-servant-list-columns';
 import { MasterServantListHeader } from './master-servant-list-header.component';
@@ -54,6 +56,11 @@ const RootComponent = styled('div', StyledOptions)(MasterServantListStyle);
 
 export const MasterServantList = React.memo((props: Props) => {
 
+    /**
+     * TODO Make this optional.
+     */
+    const gameServantsKeywordsMap = useGameServantKeywordsMap();
+
     const {
         bondLevels,
         dragDropMode,
@@ -92,7 +99,12 @@ export const MasterServantList = React.memo((props: Props) => {
             result = result.filter(servantData => servantData.masterServant.summoned);
         }
         if (textFilter) {
-            result = GameServantUtils.filterServants(textFilter, result, servantData => servantData.gameServant);
+            result = GameServantUtils.filterServants(
+                gameServantsKeywordsMap || {},
+                textFilter, 
+                result, 
+                DataAggregationUtils.getGameServant
+            );
         }
         const end1 = window.performance.now();
         console.log(`Filtering completed in ${(end1 - start1).toFixed(2)}ms.`);
@@ -148,6 +160,7 @@ export const MasterServantList = React.memo((props: Props) => {
     }, [
         bondLevels,
         dragDropMode,
+        gameServantsKeywordsMap,
         masterServantsData,
         showUnsummonedServants,
         sortOptions?.direction,

@@ -4,6 +4,7 @@ import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { ServantClassIcon } from '../../../../../components/servant/ServantClassIcon';
+import { useGameServantKeywordsMap } from '../../../../../hooks/data/useGameServantKeywordsMap';
 import { AutocompleteOptionWithLabel } from '../../../../../types';
 import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
@@ -46,14 +47,6 @@ const getGameServant = (option: Option): Immutable<GameServant> => {
     return option.data.gameServant;
 };
 
-const filterOptions = (options: Array<Option>, state: FilterOptionsState<Option>): Array<Option> => {
-    const inputValue = state.inputValue.trim();
-    if (!inputValue) {
-        return options;
-    }
-    return GameServantUtils.filterServants(inputValue, options, getGameServant);
-};
-
 const isOptionSelected = (option: Option, value: Option): boolean => {
     return option.data.instanceId === value.data.instanceId;
 };
@@ -92,6 +85,8 @@ const renderInput = (params: any): ReactNode => {
 
 export const PlanRoutePlanServantEditDialogAutocomplete = React.memo((props: Props) => {
 
+    const gameServantsKeywordsMap = useGameServantKeywordsMap();
+
     const {
         availableServants = CollectionUtils.emptyArray(),
         disabled,
@@ -124,6 +119,19 @@ export const PlanRoutePlanServantEditDialogAutocomplete = React.memo((props: Pro
         }
         return generateOption(selectedServant);
     }, [options, selectedServant]);
+
+    const filterOptions = useCallback((options: Array<Option>, state: FilterOptionsState<Option>): Array<Option> => {
+        const inputValue = state.inputValue.trim();
+        if (!inputValue) {
+            return options;
+        }
+        return GameServantUtils.filterServants(
+            gameServantsKeywordsMap || {},
+            inputValue,
+            options,
+            getGameServant
+        );
+    }, [gameServantsKeywordsMap]);
 
     const handleChange = useCallback((_event: SyntheticEvent, value: Option | null): void => {
         if (value === null) {

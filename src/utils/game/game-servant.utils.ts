@@ -1,4 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameServant, GameServantClass, GameServantConstants, GameServantRarity } from '@fgo-planner/data-core';
 import { GameServantClassSimplified, GameServantList } from '../../types';
 
@@ -46,12 +46,27 @@ export class GameServantUtils {
         return undefined;
     }
 
-    static filterServants(search: string, servants: GameServantList): GameServantList;
+    static filterServants(
+        keywordsMap: ReadonlyRecord<number, string>,
+        searchString: string,
+        servants: GameServantList
+    ): GameServantList;
 
-    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction: (elem: T) => Immutable<GameServant>): Array<T>;
+    static filterServants<T>(
+        keywordsMap: ReadonlyRecord<number, string>,
+        searchString: string,
+        data: ReadonlyArray<T>,
+        mappingFunction: (elem: T) => Immutable<GameServant>
+    ): Array<T>;
 
-    static filterServants<T>(search: string, data: ReadonlyArray<T>, mappingFunction?: (elem: T) => Immutable<GameServant>): Array<T> {
-        const searchTrimmed = search.trim();
+    static filterServants<T>(
+        keywordsMap: ReadonlyRecord<number, string>,
+        searchString: string,
+        data: ReadonlyArray<T>,
+        mappingFunction?: (elem: T) => Immutable<GameServant>
+    ): Array<T> {
+
+        const searchTrimmed = searchString.trim();
         if (!searchTrimmed) {
             return [...data];
         }
@@ -91,11 +106,18 @@ export class GameServantUtils {
             } else {
                 servant = elem as any;
             }
-            return this._filterServant(servant, searchTerms, classes, rarities);
+            return this._filterServant(
+                keywordsMap,
+                servant,
+                searchTerms,
+                classes,
+                rarities
+            );
         });
     }
 
     private static _filterServant(
+        keywordsMap: ReadonlyRecord<number, string>,
         servant: Immutable<GameServant>,
         searchTerms: Array<string>,
         classes: Set<GameServantClass>,
@@ -122,17 +144,17 @@ export class GameServantUtils {
          * 
          * TODO Retrieve keywords from map instead.
          */
-        const keywords = servant.name?.toLowerCase() || '';
+        const keywords = keywordsMap[servant._id] || servant.name?.toLowerCase() || '';
         /**
-         * If any of the search terms are present in the keywords string, then it is
+         * All of the search terms must be present in the keywords string for it to be
          * considered to be a match.
          */
         for (const searchTerm of searchTerms) {
-            if (keywords.includes(searchTerm)) {
-                return true;
+            if (!keywords.includes(searchTerm)) {
+                return false;
             }
         }
-        return false;
+        return true;
     };
 
 }

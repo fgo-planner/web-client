@@ -5,6 +5,7 @@ import { SystemStyleObject, Theme } from '@mui/system';
 import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCallback, useEffect, useMemo } from 'react';
 import { ServantClassIcon } from '../../../../../../components/servant/ServantClassIcon';
 import { useGameServantList } from '../../../../../../hooks/data/use-game-servant-list.hook';
+import { useGameServantKeywordsMap } from '../../../../../../hooks/data/useGameServantKeywordsMap';
 import { GameServantUtils } from '../../../../../../utils/game/game-servant.utils';
 
 type Props = {
@@ -44,12 +45,8 @@ const generateOption = (servant: Immutable<GameServant>): ServantOption => {
     return { label, servant };
 };
 
-const filterOptions = (options: Array<ServantOption>, state: FilterOptionsState<ServantOption>): Array<ServantOption> => {
-    const inputValue = state.inputValue.trim();
-    if (!inputValue) {
-        return options;
-    }
-    return GameServantUtils.filterServants(inputValue, options, o => o.servant);
+const getGameServant = (option: ServantOption): Immutable<GameServant> => {
+    return option.servant;
 };
 
 const isOptionSelected = (option: ServantOption, value: ServantOption): boolean => {
@@ -84,6 +81,7 @@ const renderInput = (params: any): ReactNode => {
 export const MasterServantEditDialogAutocomplete = React.memo((props: Props) => {
 
     const gameServantList = useGameServantList();
+    const gameServantsKeywordsMap = useGameServantKeywordsMap();
 
     const {
         disabled,
@@ -117,6 +115,20 @@ export const MasterServantEditDialogAutocomplete = React.memo((props: Props) => 
         }
         return generateOption(selectedServant);
     }, [options, selectedServant]);
+
+    
+    const filterOptions = useCallback((options: Array<ServantOption>, state: FilterOptionsState<ServantOption>): Array<ServantOption> => {
+        const inputValue = state.inputValue.trim();
+        if (!inputValue) {
+            return options;
+        }
+        return GameServantUtils.filterServants(
+            gameServantsKeywordsMap || {},
+            inputValue,
+            options,
+            getGameServant
+        );
+    }, [gameServantsKeywordsMap]);
 
     const handleChange = useCallback((_: SyntheticEvent, value: ServantOption | null): void => {
         if (value === null) {

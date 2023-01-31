@@ -1,6 +1,7 @@
 import { Icon, IconButton, TextField, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, useCallback, useEffect } from 'react';
+import { useDebounce } from '../../../../../hooks/user-interface/useDebounce';
 
 export type MasterServantsFilter = {
     searchText: string;
@@ -10,6 +11,8 @@ type Props = {
     filtersEnabled: boolean;
     onFilterChange: (filter: MasterServantsFilter) => void
 };
+
+const SearchDebounceDelay = 250;
 
 const StyleClassPrefix = 'MasterServantsRouteFilterControls';
 
@@ -53,26 +56,30 @@ export const MasterServantsRouteFilterControls = React.memo((props: Props) => {
         onFilterChange
     } = props;
 
-    const [searchText, setSearchText] = useState<string>('');
+    const [
+        searchText,
+        debouncedSearchText,
+        setSearchText
+    ] = useDebounce<string>(SearchDebounceDelay, '');
 
     useEffect(() => {
         if (!filtersEnabled) {
             setSearchText('');
         }
-    }, [filtersEnabled]);
+    }, [filtersEnabled, setSearchText]);
 
     useEffect(() => {
         onFilterChange({
-            searchText
+            searchText: debouncedSearchText
         });
-    }, [onFilterChange, searchText]);
+    }, [debouncedSearchText, onFilterChange]);
 
     const handleSearchTextChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
         if (!filtersEnabled) {
             return;
         }
         setSearchText(event.target.value);
-    }, [filtersEnabled]);
+    }, [filtersEnabled, setSearchText]);
 
     if (!filtersEnabled) {
         return null;

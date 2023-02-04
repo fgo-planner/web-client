@@ -2,7 +2,7 @@ import { CSSInterpolation, Theme } from '@mui/material';
 import { DataTableListBaseRowStyle } from '../../../../../../components/data-table-list/data-table-list-base-row.style';
 import { DataTableListDraggableRowStyle } from '../../../../../../components/data-table-list/data-table-list-draggable-row.style';
 import { StyleClassPrefix as ServantSkillLevelStyleClassPrefix } from '../../../../../../components/servant/ServantSkillLevels';
-import { StyleClassPrefix as GameServantThumbnailStyleClassPrefix } from '../../../../../../components/servant/ServantThumbnail';
+import { StyleClassPrefix as ServantThumbnailStyleClassPrefix } from '../../../../../../components/servant/ServantThumbnail';
 import { StyledFunctionPropsWithTheme, StyledFunctionThemeProp } from '../../../../../../types';
 import { MasterServantColumnProperties } from './master-servant-list-columns';
 import { StyleClassPrefix as MasterServantListRowBondLevelStyleClassPrefix } from './master-servant-list-row-bond-level.component';
@@ -121,7 +121,7 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                     }
                 },
                 '&:not(.drag-drop-mode)': {
-                    [`& .${GameServantThumbnailStyleClassPrefix}-root`]: {
+                    [`& .${ServantThumbnailStyleClassPrefix}-root`]: {
                         paddingLeft: spacing(3)
                     },
                     [`& .${MasterServantListRowStyleClassPrefix}-sticky-content`]: {

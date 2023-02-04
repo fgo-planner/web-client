@@ -33,7 +33,7 @@ const DefaultStage = 2;
 
 const DefaultSize = 56;
 
-export const StyleClassPrefix = 'GameServantThumbnail';
+export const StyleClassPrefix = 'ServantThumbnail';
 
 type RootComponentProps = {
     renderNewTabIndicator?: boolean;
@@ -110,7 +110,7 @@ const RootComponent = styled('div', ContainerStyleOptions)<RootComponentProps>(
     NewTabIndicatorStyleProps
 );
 
-export const GameServantThumbnail = React.memo((props: Props) => {
+export const ServantThumbnail = React.memo((props: Props) => {
 
     const {
         costumeId,

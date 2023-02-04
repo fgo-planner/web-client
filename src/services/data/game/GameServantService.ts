@@ -3,6 +3,7 @@ import { GameServant } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
 import { GameServantList, GameServantMap, HttpOptions, Page, Pagination } from '../../../types';
+import { GameServantUtils } from '../../../utils/game/game-servant.utils';
 import { HttpUtils as Http } from '../../../utils/http.utils';
 import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
 
@@ -20,11 +21,11 @@ export class GameServantService {
     @Inject(UserInterfaceService)
     private readonly _userInterfaceService!: UserInterfaceService;
 
-    private _servantsCache?: GameServantList;
+    private _servantsList?: GameServantList;
 
-    private _servantsCacheMap?: GameServantMap;
+    private _servantsListMap?: GameServantMap;
 
-    private _servantsCachePromise?: Promise<GameServantList>;
+    private _servantsListPromise?: Promise<GameServantList>;
 
     private _servantsKeywordsMap?: Record<number, string>;
 
@@ -39,39 +40,36 @@ export class GameServantService {
     }
 
     /**
-     * Asynchronously returns the cached servants list. If the data is not
-     * available, returns a promise that resolves once the data is fetched and
-     * cached.
+     * Asynchronously returns the cached servants array, sorted by their
+     * `collectionNo` values. If the data is not available, returns a promise that
+     * resolves once the data is fetched and cached.
      */
     async getServants(): Promise<GameServantList> {
-        if (this._servantsCache) {
-            return this._servantsCache;
+        if (this._servantsList) {
+            return this._servantsList;
         }
-        if (!this._servantsCachePromise) {
-            const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
-            /**
-             * TODO Currently, every servant is retrieved and cached with this call. This
-             * may need to modify the caching system for servants so that servants are 
-             * retrieved and cached only when needed.
-             */
-            this._servantsCachePromise = Http.get<Array<GameServant>>(`${this._BaseUrl}`, this._ExcludeMetadataOptions);
-            this._servantsCachePromise.then(cache => {
-                this._onServantsCacheLoaded(cache);
-            }).catch(error => {
-                this._onServantsCacheLoadError(error);
-            }).finally(() => {
-                this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
-            });
+        if (this._servantsListPromise) {
+            return this._servantsListPromise;
         }
-        return this._servantsCachePromise;
+        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+        const promise = Http.get<Array<GameServant>>(`${this._BaseUrl}`, this._ExcludeMetadataOptions);
+        promise.then(data => {
+            this._onServantsLoaded(data);
+        }).catch(error => {
+            this._onServantsCacheLoadError(error);
+        }).finally(() => {
+            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
+        });
+        return this._servantsListPromise = promise;
     }
 
     /**
-     * Synchronously returns the cached servants list. If the data is not available,
-     * then returns `undefined`.
+     * Synchronously returns the cached servants array, sorted by their
+     * `collectionNo` values. If the data is not available, then returns
+     * `undefined`.
      */
     getServantsSync(): GameServantList | undefined {
-        return this._servantsCache;
+        return this._servantsList;
     }
 
     /**
@@ -80,10 +78,10 @@ export class GameServantService {
      * cached.
      */
     async getServantsMap(): Promise<GameServantMap> {
-        if (!this._servantsCacheMap) {
+        if (!this._servantsListMap) {
             await this.getServants();
         }
-        return this._servantsCacheMap!!;
+        return this._servantsListMap!!;
     }
 
     /**
@@ -91,7 +89,7 @@ export class GameServantService {
      * available, then returns `undefined`.
      */
     getServantsMapSync(): GameServantMap | undefined {
-        return this._servantsCacheMap;
+        return this._servantsListMap;
     }
 
     async getServantKeywordsMap(): Promise<ReadonlyRecord<number, string>> {
@@ -149,9 +147,10 @@ export class GameServantService {
         return Http.get<Page<GameServant>>(`${this._BaseUrl}/page`, { params });
     }
 
-    private _onServantsCacheLoaded(data: GameServantList): void {
-        this._generateCacheMap(this._servantsCache = data);
-        this._servantsCachePromise = undefined;
+    private _onServantsLoaded(data: Array<GameServant>): void {
+        data.sort(GameServantUtils.collectionNoSortFunction);
+        this._generateServantsMap(this._servantsList = data);
+        this._servantsListPromise = undefined;
     }
 
     private _onServantsCacheLoadError(_: any): void {
@@ -162,16 +161,16 @@ export class GameServantService {
      * @deprecated Not needed
      */
     private _invalidateCache(): void {
-        this._servantsCache = undefined;
-        this._servantsCacheMap = undefined;
+        this._servantsList = undefined;
+        this._servantsListMap = undefined;
     }
 
-    private _generateCacheMap(servants: GameServantList): void {
-        const cacheMap: Record<number, Immutable<GameServant>> = {};
+    private _generateServantsMap(servants: GameServantList): void {
+        const map: Record<number, Immutable<GameServant>> = {};
         for (const servant of servants) {
-            cacheMap[servant._id] = servant;
+            map[servant._id] = servant;
         }
-        this._servantsCacheMap = cacheMap;
+        this._servantsListMap = map;
     }
 
 }

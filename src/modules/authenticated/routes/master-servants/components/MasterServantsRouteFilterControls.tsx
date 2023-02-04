@@ -87,7 +87,6 @@ export const MasterServantsRouteFilterControls = React.memo((props: Props) => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            {/* TODO Add debounce */}
             <TextField
                 variant='outlined'
                 label='Search'

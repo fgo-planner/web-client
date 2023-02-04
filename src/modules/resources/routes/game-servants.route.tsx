@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataTableListStaticRow } from '../../../components/data-table-list/data-table-list-static-row.component';
-import { GameServantThumbnail } from '../../../components/servant/ServantThumbnail';
+import { ServantThumbnail } from '../../../components/servant/ServantThumbnail';
 import { LayoutContentSection } from '../../../components/layout/layout-content-section.component';
 import { AppBarElevateOnScroll } from '../../../components/navigation/app-bar/AppBarElevateOnScroll';
 import { PageTitle } from '../../../components/text/page-title.component';
@@ -19,7 +19,7 @@ export const GameServantsRoute = React.memo(() => {
                 {gameServants?.map((servant, index) => (
                     <DataTableListStaticRow key={index} borderTop={!!index}>
                         <div className='flex align-center'>
-                            <GameServantThumbnail
+                            <ServantThumbnail
                                 gameServant={servant}
                                 size={52}
                                 enableLink

@@ -7,9 +7,18 @@ export class GameServantUtils {
     private constructor () {
         
     }
+    
+    // TODO Make this generic for all `Entity` types and also move to library.
+    static getId(servant: Immutable<GameServant>): number {
+        return servant._id;
+    }
 
     static getDisplayedName(servant: Immutable<GameServant>): string {
         return servant.displayName || servant.name || String(servant._id);
+    }
+
+    static collectionNoSortFunction(a: Immutable<GameServant>, b: Immutable<GameServant>): number {
+        return a.collectionNo - b.collectionNo;
     }
 
     static convertToSimplifiedClass(servantClass: GameServantClass): GameServantClassSimplified {

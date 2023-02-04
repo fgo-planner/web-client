@@ -2,7 +2,7 @@ import { Immutable } from '@fgo-planner/common-core';
 import { PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
-import { GameServantThumbnail } from '../../../servant/ServantThumbnail';
+import { ServantThumbnail } from '../../../servant/ServantThumbnail';
 import { TruncateText } from '../../../text/truncate-text.component';
 import { PlanRequirementsTableServantRowEnhancementTargets } from './PlanRequirementsTableServantRowEnhancementTargets';
 
@@ -57,7 +57,7 @@ export const PlanRequirementsTableServantRowHeader: React.FC<Props> = (props: Pr
 
     return (
         <div className={`${StyleClassPrefix}-root`}>
-            <GameServantThumbnail
+            <ServantThumbnail
                 gameServant={gameServant}
                 size='3.25em'  // TODO Un-hardcode this
             />

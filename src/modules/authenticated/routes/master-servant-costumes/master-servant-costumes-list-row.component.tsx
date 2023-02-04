@@ -3,7 +3,7 @@ import { Checkbox } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListStaticRow } from '../../../../components/data-table-list/data-table-list-static-row.component';
 import { ItemQuantity } from '../../../../components/item/ItemQuantity';
-import { GameServantThumbnail } from '../../../../components/servant/ServantThumbnail';
+import { ServantThumbnail } from '../../../../components/servant/ServantThumbnail';
 import { TruncateText } from '../../../../components/text/truncate-text.component';
 import { useGameItemMap } from '../../../../hooks/data/useGameItemMap';
 
@@ -75,7 +75,7 @@ export const MasterServantCostumesListRow = React.memo((props: Props) => {
             borderBottom
         >
             {unlockedStatusNode}
-            <GameServantThumbnail
+            <ServantThumbnail
                 variant='rounded'
                 size={ServantThumbnailSize}
                 gameServant={gameServant}

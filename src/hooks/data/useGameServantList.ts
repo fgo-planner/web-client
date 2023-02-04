@@ -4,7 +4,8 @@ import { GameServantList } from '../../types';
 import { useInjectable } from '../dependency-injection/use-injectable.hook';
 
 /**
- * Returns a readonly array containing immutable instances of all game servants.
+ * Returns a readonly array containing immutable instances of all game servants,
+ * sorted by their `collectionNo` values.
  *
  * Data is fetched and returned asynchronously. Returns `undefined` if the data
  * is not yet available.

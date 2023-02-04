@@ -1,10 +1,16 @@
+import { CollectionUtils, Functions } from '@fgo-planner/common-core';
 import { MasterServantAggregatedData } from '@fgo-planner/data-core';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, FormGroup, InputLabel, PaperProps, Select, Switch, Typography } from '@mui/material';
-import React, { ChangeEvent, MouseEvent, ReactNode, useCallback, useRef, useState } from 'react';
+import { alpha, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, PaperProps, Switch, Theme, Typography } from '@mui/material';
+import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
+import React, { ChangeEvent, MouseEvent, useCallback, useRef, useState } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
+import { ServantSelectList, StyleClassPrefix as ServantSelectListStyleClassPrefix } from '../../../../../components/input/servant/select-list/ServantSelectList';
 import { useGameServantList } from '../../../../../hooks/data/useGameServantList';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
+import { ScrollbarStyleProps } from '../../../../../styles/scrollbar-style-props';
+import { ThemeConstants } from '../../../../../styles/theme-constants';
 import { DialogComponentProps } from '../../../../../types';
+import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
 
 export type MasterServantsRouteMultiAddDialogData = {
     gameIds: Array<number>,
@@ -25,8 +31,11 @@ const DialogHeight = 600;
 
 // This component does not need StyleClassPrefix.
 
-const DialogPaperProps = {
-    sx: {
+const DialogPaperStyleProps = (theme: Theme) => {
+
+    const { palette } = theme as Theme;
+
+    return  {
         width: DialogWidth,
         maxWidth: DialogWidth,
         height: DialogHeight,
@@ -38,23 +47,13 @@ const DialogPaperProps = {
             '& .MuiDialogContent-root': {
                 display: 'flex',
                 flexDirection: 'column',
-                '& .MuiFormControl-root': {
-                    flex: 1,
-                    width: '100%',
-                    my: 2,
-                    '& .MuiInputBase-root': {
-                        height: '100%',
-                        '& select': {
-                            height: '100%',
-                            boxSizing: 'border-box',
-                            px: 0,
-                            py: 2,
-                            '& option': {
-                                px: 4,
-                                py: 2
-                            }
-                        }
-                    }
+                height: '100%',
+                [`& .${ServantSelectListStyleClassPrefix}-root`]: {
+                    borderRadius: 1,
+                    borderWidth: 1,
+                    borderStyle: 'solid',
+                    borderColor: alpha(palette.text.primary, 0.23),
+                    overflowY: 'auto'
                 },
                 '& .quick-select-container': {
                     display: 'flex',
@@ -73,7 +72,14 @@ const DialogPaperProps = {
                 }
             }
         }
-    }
+    } as SystemStyleObject<SystemTheme>;
+};
+
+const DialogPaperProps = {
+    sx: [
+        ScrollbarStyleProps,
+        DialogPaperStyleProps
+    ]
 } as PaperProps;
 
 /**
@@ -96,7 +102,7 @@ export const MasterServantsRouteMultiAddDialog = React.memo((props: Props) => {
      */
     const dialogContentsRef = useRef<JSX.Element>();
 
-    const [selectedServants, setSelectedServants] = useState<Array<number>>([]);
+    const [selectedServantIds, setSelectedServantIds] = useState<ReadonlySet<number>>(CollectionUtils.emptySet);
 
     const [summoned, setSummoned] = useState<boolean>(DefaultSummonedState);
 
@@ -110,12 +116,12 @@ export const MasterServantsRouteMultiAddDialog = React.memo((props: Props) => {
         if (!gameServantList) {
             return;
         }
-        const selectedServants = gameServantList.map(({ _id: gameId }) => gameId);
-        setSelectedServants(selectedServants);
+        const selectedServantIds = new Set(gameServantList.map(GameServantUtils.getId));
+        setSelectedServantIds(selectedServantIds);
     }, [gameServantList]);
 
     const handleDeselectAll = useCallback(() => {
-        setSelectedServants([]);
+        setSelectedServantIds(CollectionUtils.emptySet());
     }, []);
 
     const handleSelectMissing = useCallback(() => {
@@ -123,45 +129,32 @@ export const MasterServantsRouteMultiAddDialog = React.memo((props: Props) => {
             return;
         }
         const masterServantGameIdsSet = new Set(masterServantsData.map(servantData => servantData.masterServant.gameId));
-        const selectedServants = gameServantList
+        const selectedServantIds = gameServantList
             .map(gameServant => gameServant._id)
             .filter(gameId => !masterServantGameIdsSet.has(gameId));
 
-        setSelectedServants(selectedServants);
+        setSelectedServantIds(new Set(selectedServantIds));
     }, [gameServantList, masterServantsData]);
-
-    const handleMultiSelectChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
-        const { options } = event.target;
-        const selectedServants = [] as Array<number>;
-        for (let i = 0, { length } = options; i < length; i++) {
-            const { selected, value } = options[i];
-            if (!selected) {
-                continue;
-            }
-            selectedServants.push(Number(value));
-        }
-        setSelectedServants(selectedServants);
-    }, []);
 
     const handleSummonedChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
         setSummoned(event.target.checked);
     }, []);
 
     const handleSubmitButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-        const gameIds = [...selectedServants];
-        setSelectedServants([]);
+        const gameIds = [...selectedServantIds];
+        setSelectedServantIds(CollectionUtils.emptySet());
         setSummoned(DefaultSummonedState);
         onClose(event, 'submit', { gameIds, summoned });
-    }, [onClose, selectedServants, summoned]);
+    }, [onClose, selectedServantIds, summoned]);
 
     const handleCancelButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-        setSelectedServants([]);
+        setSelectedServantIds(CollectionUtils.emptySet());
         setSummoned(DefaultSummonedState);
         onClose(event, 'cancel');
     }, [onClose]);
 
     const handleDialogClose = useCallback((event: any, reason: 'backdropClick' | 'escapeKeyDown'): void => {
-        setSelectedServants([]);
+        setSelectedServantIds(CollectionUtils.emptySet());
         setSummoned(DefaultSummonedState);
         onClose(event, reason);
     }, [onClose]);
@@ -172,41 +165,21 @@ export const MasterServantsRouteMultiAddDialog = React.memo((props: Props) => {
      * transition, even if the props were changed by the parent component.
      */
     if (open) {
-
-        let servantSelectOptions: ReactNode;
-        if (!gameServantList?.length) {
-            servantSelectOptions = <option>No servants available</option>;
-        } else {
-            // TODO Allow the user to sort list by either `gameId` or `collectionNo`.
-            servantSelectOptions = gameServantList.map(({ _id: gameId, name, rarity }) => (
-                <option key={gameId} value={gameId}>
-                    {`${rarity} \u2605 ${name}`}
-                </option>
-            ));
-        }
-
         dialogContentsRef.current = (
             <Typography component={'div'} className='contents-container'>
                 <DialogTitle>
                     Add Multiple Servants
                     {closeIconEnabled && <DialogCloseButton onClick={handleCancelButtonClick} />}
                 </DialogTitle>
-                <DialogContent>
-                    <FormControl>
-                        <InputLabel shrink>
-                            Select Servants
-                        </InputLabel>
-                        <Select
-                            multiple
-                            native
-                            value={selectedServants}
-                            // @ts-ignore Typings are not considering `native`
-                            onChange={handleMultiSelectChange}
-                            disabled={!gameServantList?.length}
-                        >
-                            {servantSelectOptions}
-                        </Select>
-                    </FormControl>
+                <DialogContent className={ThemeConstants.ClassScrollbarTrackBorder}>
+                    <ServantSelectList
+                        getGameServantFunction={Functions.identity}
+                        getIdFunction={GameServantUtils.getId}
+                        onSelectionChange={setSelectedServantIds}
+                        // showThumbnail
+                        selectedIds={selectedServantIds}
+                        servantsData={gameServantList}
+                    />
                     <div className='quick-select-container'>
                         <div>Quick Select: </div>
                         <Button onClick={handleDeselectAll}>
@@ -232,7 +205,7 @@ export const MasterServantsRouteMultiAddDialog = React.memo((props: Props) => {
                             />
                         </FormGroup>
                         <div className='selection-count'>
-                            {`${selectedServants.length} servants selected`}
+                            {`${selectedServantIds.size} servants selected`}
                         </div>
                     </div>
                 </DialogContent>

@@ -3,8 +3,8 @@ import { GameServant } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { alpha, Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useEffect } from 'react';
-import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
-import { ThemeConstants } from '../../../../styles/theme-constants';
+import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/useMultiSelectHelperForMouseEvent';
+import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { ServantSelectListRow, StyleClassPrefix as ServantSelectListRowStyleClassPrefix } from './ServantSelectListRow';
 
 type Props<T> = {

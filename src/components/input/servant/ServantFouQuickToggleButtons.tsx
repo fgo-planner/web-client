@@ -2,7 +2,7 @@ import { InstantiatedServantConstants } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React from 'react';
 import { ComponentStyleProps } from '../../../types';
-import { IconButtonText } from '../../text/icon-button-text.component';
+import { IconButtonText } from '../../text/IconButtonText';
 import { ServantEnhancementQuickToggleButtons } from './ServantEnhancementQuickToggleButtons';
 
 type Props = {

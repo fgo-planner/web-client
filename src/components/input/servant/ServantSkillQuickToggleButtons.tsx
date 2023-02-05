@@ -2,7 +2,7 @@ import { InstantiatedServantSkillLevel } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { MouseEventHandler, ReactNode } from 'react';
 import { ComponentStyleProps } from '../../../types';
-import { IconButtonText } from '../../text/icon-button-text.component';
+import { IconButtonText } from '../../text/IconButtonText';
 import { ServantEnhancementQuickToggleButtons } from './ServantEnhancementQuickToggleButtons';
 
 type SkillSet = 'skills' | 'appendSkills';

@@ -1,12 +1,12 @@
 import { InstantiatedServantBondLevel, InstantiatedServantNoblePhantasmLevel, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateIndeterminate as Indeterminate, InstantiatedServantUpdateNumber, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
-import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
+import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/InputFieldContainer';
 import { ServantBondInputField } from '../../../../../../components/input/servant/ServantBondInputField';
 import { ServantNpLevelInputField } from '../../../../../../components/input/servant/ServantNpLevelInputField';
 import { ServantSummonDateInputField } from '../../../../../../components/input/servant/ServantSummonDateInputField';
 import { ServantSummonedCheckbox } from '../../../../../../components/input/servant/ServantSummonedCheckbox';
-import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
+import { useForceUpdate } from '../../../../../../hooks/utils/useForceUpdate';
 
 type Props = {
     /**

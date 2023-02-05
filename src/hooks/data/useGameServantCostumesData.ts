@@ -2,7 +2,7 @@ import { CollectionUtils, ImmutableArray, Nullable } from '@fgo-planner/common-c
 import { GameServant, GameServantCostumeAggregatedData, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { useMemo } from 'react';
-import { DataAggregationUtils } from '../../utils/data-aggregation.utils';
+import { DataAggregationUtils } from '../../utils/DataAggregationUtils';
 
 export type UseGameServantCostumeListResult = {
     alwaysUnlockedIds: ReadonlySet<number>;

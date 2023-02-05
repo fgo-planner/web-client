@@ -1,9 +1,9 @@
 import { Button, Dialog, DialogActions, DialogTitle, PaperProps, SxProps, Typography } from '@mui/material';
 import { Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, useCallback, useRef } from 'react';
-import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
-import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { ScrollbarStyleProps } from '../../../../../styles/scrollbar-style-props';
+import { DialogCloseButton } from '../../../../../components/dialog/DialogCloseButton';
+import { useAutoResizeDialog } from '../../../../../hooks/user-interface/useAutoResizeDialog';
+import { ScrollbarStyleProps } from '../../../../../styles/ScrollbarStyleProps';
 import { DialogComponentProps } from '../../../../../types';
 import { PlanRoutePlanMasterItemsEditDialogContent } from './PlanRouteMasterItemsEditDialogContent';
 import { PlanRouteMasterItemsEditDialogData } from './PlanRouteMasterItemsEditDialogData.type';

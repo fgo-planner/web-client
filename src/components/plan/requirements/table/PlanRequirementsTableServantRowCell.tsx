@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
-import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
+import { DataTableGridCell } from '../../../data-table-grid/DataTableGridCell';
 import { PlanRequirementsTableUtils } from './PlanRequirementsTableUtils';
 
 type Props = {

@@ -2,7 +2,7 @@ import { Immutable } from '@fgo-planner/common-core';
 import { GameItem } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback } from 'react';
-import { DataTableGridCell } from '../../../data-table-grid/data-table-grid-cell.component';
+import { DataTableGridCell } from '../../../data-table-grid/DataTableGridCell';
 import { ItemThumbnail } from '../../../item/ItemThumbnail';
 
 type Props = {

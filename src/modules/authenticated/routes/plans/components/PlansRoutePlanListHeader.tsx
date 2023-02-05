@@ -3,17 +3,17 @@ import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, useCallback, useRef } from 'react';
-import { DataTableListHeaderLabel } from '../../../../../components/data-table-list/data-table-list-header-label.component';
-import { ThemeConstants } from '../../../../../styles/theme-constants';
+import { DataTableListHeaderLabel } from '../../../../../components/data-table-list/DataTableListHeaderLabel';
+import { ThemeConstants } from '../../../../../styles/ThemeConstants';
 import { SortDirection, SortOptions } from '../../../../../types';
-import { PlansRoutePlanListColumn as Column, PlansRoutePlanListColumnProperties as ColumnProperties, PlansRoutePlanListVisibleColumns as VisibleColumns } from './PlansRoutePlanListColumn.type';
+import { PlansRoutePlanListColumn } from './PlansRoutePlanListColumn';
 
 type Props = {
     onClick?: MouseEventHandler;
-    onSortChange?: (column?: Column, direction?: SortDirection) => void;
+    onSortChange?: (column?: PlansRoutePlanListColumn.Name, direction?: SortDirection) => void;
     sortEnabled?: boolean;
-    sortOptions?: SortOptions<Column>;
-    visibleColumns: ReadonlyPartial<VisibleColumns>;
+    sortOptions?: SortOptions<PlansRoutePlanListColumn.Name>;
+    visibleColumns: ReadonlyPartial<PlansRoutePlanListColumn.Visibility>;
     viewLayout?: any; // TODO Make use of this
 };
 
@@ -68,10 +68,10 @@ export const PlansRoutePlanListHeader = React.memo((props: Props) => {
         modified
     } = visibleColumns || {};
 
-    const sortOptionsRef = useRef<SortOptions<Column>>();
+    const sortOptionsRef = useRef<SortOptions<PlansRoutePlanListColumn.Name>>();
     sortOptionsRef.current = sortOptions;
 
-    const handleLabelClick = useCallback((e: MouseEvent, column: Column): void => {
+    const handleLabelClick = useCallback((e: MouseEvent, column: PlansRoutePlanListColumn.Name): void => {
         if (e.type === 'contextmenu' || !onSortChange) {
             return;
         }
@@ -94,7 +94,7 @@ export const PlansRoutePlanListHeader = React.memo((props: Props) => {
                 {name &&
                     <DataTableListHeaderLabel
                         column='name'
-                        columnProperties={ColumnProperties.name}
+                        columnProperties={PlansRoutePlanListColumn.Properties.name}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
@@ -102,7 +102,7 @@ export const PlansRoutePlanListHeader = React.memo((props: Props) => {
                 {created &&
                     <DataTableListHeaderLabel
                         column='created'
-                        columnProperties={ColumnProperties.created}
+                        columnProperties={PlansRoutePlanListColumn.Properties.created}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
@@ -110,7 +110,7 @@ export const PlansRoutePlanListHeader = React.memo((props: Props) => {
                 {modified &&
                     <DataTableListHeaderLabel
                         column='modified'
-                        columnProperties={ColumnProperties.modified}
+                        columnProperties={PlansRoutePlanListColumn.Properties.modified}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />
@@ -118,7 +118,7 @@ export const PlansRoutePlanListHeader = React.memo((props: Props) => {
                 {description &&
                     <DataTableListHeaderLabel
                         column='description'
-                        columnProperties={ColumnProperties.description}
+                        columnProperties={PlansRoutePlanListColumn.Properties.description}
                         sortOptions={sortOptions}
                         onClick={handleLabelClick}
                     />

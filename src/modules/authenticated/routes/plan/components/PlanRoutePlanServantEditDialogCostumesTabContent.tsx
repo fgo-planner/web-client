@@ -4,7 +4,7 @@ import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ServantCostumeSelectList } from '../../../../../components/input/servant/select-list/ServantCostumeSelectList';
-import { ThemeConstants } from '../../../../../styles/theme-constants';
+import { ThemeConstants } from '../../../../../styles/ThemeConstants';
 
 type Props = {
     costumesData: ReadonlyArray<GameServantCostumeAggregatedData>;

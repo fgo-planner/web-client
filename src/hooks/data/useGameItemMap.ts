@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { GameItemService } from '../../services/data/game/GameItemService';
 import { GameItemMap } from '../../types';
-import { useInjectable } from '../dependency-injection/use-injectable.hook';
+import { useInjectable } from '../dependency-injection/useInjectable';
 
 /**
  * Returns a readonly map of game items, where the key is the item ID and the

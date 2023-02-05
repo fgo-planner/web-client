@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { GameItemService } from '../../services/data/game/GameItemService';
 import { GameItemList } from '../../types';
-import { useInjectable } from '../dependency-injection/use-injectable.hook';
+import { useInjectable } from '../dependency-injection/useInjectable';
 
 /**
  * Returns a readonly array containing immutable instances of all game items.

@@ -1,8 +1,8 @@
 import { Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover } from '@mui/material';
 import React, { useCallback, useMemo } from 'react';
-import { IconOutlined } from '../../../../../components/icons';
+import { IconOutlined } from '../../../../../components/icons/IconOutlined';
 import { Position2D } from '../../../../../types';
-import { EventHandlers } from '../../../../../utils/event-handlers';
+import { EventHandlers } from '../../../../../utils/EventHandlers';
 
 type Props = {
     onAddServant: () => void;

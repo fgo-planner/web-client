@@ -2,8 +2,8 @@ import { InstantiatedServantAscensionLevel, InstantiatedServantConstants } from 
 import clsx from 'clsx';
 import React, { useCallback } from 'react';
 import { ComponentStyleProps } from '../../../types';
-import { IconOutlined } from '../../icons';
-import { IconButtonText } from '../../text/icon-button-text.component';
+import { IconOutlined } from '../../icons/IconOutlined';
+import { IconButtonText } from '../../text/IconButtonText';
 import { ServantEnhancementQuickToggleButtons } from './ServantEnhancementQuickToggleButtons';
 
 type Props = {

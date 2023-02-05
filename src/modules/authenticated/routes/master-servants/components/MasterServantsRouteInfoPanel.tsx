@@ -3,14 +3,14 @@ import { Icon, IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
-import { DataPointListItem } from '../../../../../components/data-point-list/data-point-list-item.component';
+import { DataPointListItem } from '../../../../../components/data-point-list/DataPointListItem';
 import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
 import { ServantBondIcon } from '../../../../../components/servant/ServantBondIcon';
 import { useGameItemMap } from '../../../../../hooks/data/useGameItemMap';
-import { ThemeConstants } from '../../../../../styles/theme-constants';
+import { ThemeConstants } from '../../../../../styles/ThemeConstants';
 import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types';
-import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
-import * as PlanComputationUtils from '../../../../../utils/plan/plan-computation.utils';
+import { GameServantUtils } from '../../../../../utils/game/GameServantUtils';
+import { PlanComputationUtils } from '../../../../../utils/plan/PlanComputationUtils';
 
 type Props = {
     activeServantsData: ReadonlyArray<MasterServantAggregatedData>;

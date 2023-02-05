@@ -2,7 +2,7 @@ import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import React, { MouseEventHandler } from 'react';
 import { Link } from 'react-router-dom';
 import { MaterialIconVariant } from '../../../../types';
-import { Icon } from '../../../icons';
+import { Icon } from '../../../icons/Icon';
 
 type Props = {
     icon: string;

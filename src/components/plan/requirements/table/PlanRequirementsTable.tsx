@@ -3,7 +3,7 @@ import { GameItemConstants, InstantiatedServantUtils, PlanServantAggregatedData 
 import { Box } from '@mui/system';
 import React, { CSSProperties, MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/useGameItemCategoryMap';
-import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/use-multi-select-helper-for-mouse-event.hook';
+import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/useMultiSelectHelperForMouseEvent';
 import { GameItemCategory, GameItemCategoryMap, PlanRequirements } from '../../../../types';
 import { PlanRequirementsTableFooter } from './PlanRequirementsTableFooter';
 import { PlanRequirementsTableHeader } from './PlanRequirementsTableHeader';

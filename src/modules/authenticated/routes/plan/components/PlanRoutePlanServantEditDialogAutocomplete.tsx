@@ -6,7 +6,7 @@ import React, { CSSProperties, HTMLAttributes, ReactNode, SyntheticEvent, useCal
 import { ServantClassIcon } from '../../../../../components/servant/ServantClassIcon';
 import { useGameServantKeywordsMap } from '../../../../../hooks/data/useGameServantKeywordsMap';
 import { AutocompleteOptionWithLabel } from '../../../../../types';
-import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
+import { GameServantUtils } from '../../../../../utils/game/GameServantUtils';
 
 type Props = {
     availableServants?: ReadonlyArray<MasterServantAggregatedData>;

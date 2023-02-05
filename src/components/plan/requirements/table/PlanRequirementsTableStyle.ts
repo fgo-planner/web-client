@@ -1,6 +1,6 @@
 import { Theme } from '@mui/material';
 import { alpha, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
-import { ThemeConstants } from '../../../../styles/theme-constants';
+import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { StyleClassPrefix as ServantSkillLevelStyleClassPrefix } from '../../../servant/ServantSkillLevels';
 import { StyleClassPrefix as FooterStyleClassPrefix } from './PlanRequirementsTableFooter';
 import { StyleClassPrefix as FooterCellStyleClassPrefix } from './PlanRequirementsTableFooterCell';

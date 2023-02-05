@@ -1,13 +1,13 @@
 import { Button, Icon, IconButton } from '@mui/material';
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { BackgroundMusicService } from '../../../../services/audio/background-music.service';
-import { ThemeService } from '../../../../services/user-interface/theme.service';
-import { UserInterfaceService } from '../../../../services/user-interface/user-interface.service';
+import { useInjectable } from '../../../../hooks/dependency-injection/useInjectable';
+import { BackgroundMusicService } from '../../../../services/audio/BackgroundMusicService';
+import { ThemeService } from '../../../../services/user-interface/ThemeService';
+import { UserInterfaceService } from '../../../../services/user-interface/UserInterfaceService';
 import { ThemeInfo } from '../../../../types';
-import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
+import { SubscribablesContainer } from '../../../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../../../utils/subscription/SubscriptionTopics';
 
 // This component does not need StyleClassPrefix.
 

@@ -4,21 +4,21 @@ import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
-import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
-import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
-import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
-import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/use-navigation-drawer-no-animations.hook';
-import { ThemeConstants } from '../../../../styles/theme-constants';
+import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/useSelectedInstancesHelper';
+import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
+import { useDragDropHelper } from '../../../../hooks/user-interface/useDragDropHelper';
+import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/useNavigationDrawerNoAnimations';
+import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { EditDialogAction, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
-import { DataAggregationUtils } from '../../../../utils/data-aggregation.utils';
+import { DataAggregationUtils } from '../../../../utils/DataAggregationUtils';
 import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
 import { RouteDataEditReloadOnStaleDataDialog } from '../../components/control/RouteDataEditReloadOnStaleDataDialog';
 import { RouteDataEditSaveOnStaleDataDialog } from '../../components/control/RouteDataEditSaveOnStaleDataDialog';
 import { MasterServantEditDialog } from '../../components/master/servant/edit-dialog/MasterServantEditDialog';
 import { MasterServantEditDialogData } from '../../components/master/servant/edit-dialog/MasterServantEditDialogData.type';
-import { MasterServantListColumn, MasterServantListVisibleColumns } from '../../components/master/servant/list/master-servant-list-columns';
-import { MasterServantList } from '../../components/master/servant/list/master-servant-list.component';
-import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/master-servant-list.style';
+import { MasterServantList } from '../../components/master/servant/list/MasterServantList';
+import { MasterServantListColumn } from '../../components/master/servant/list/MasterServantListColumn';
+import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/MasterServantListStyle';
 import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../../hooks/useMasterAccountDataEdit';
 import { MasterServantsRouteDeleteDialog, MasterServantsRouteDeleteDialogData } from './components/MasterServantsRouteDeleteDialog';
 import { MasterServantsFilter, MasterServantsRouteFilterControls } from './components/MasterServantsRouteFilterControls';
@@ -34,7 +34,7 @@ const MasterAccountDataEditOptions = {
     includeServants: true
 } as const satisfies MasterAccountDataEditHookOptions;
 
-const StyleClassPrefix = 'MasterServantsRoute';
+const StyleClassPrefix = 'MasterServantsRouteRoute';
 
 const StyleProps = (theme: SystemTheme) => {
 
@@ -150,7 +150,7 @@ export const MasterServantsRoute = React.memo(() => {
     } = useMasterServantsRouteModalState();
 
     // TODO Move this to user preferences
-    const [sortOptions, setSortOptions] = useState<SortOptions<MasterServantListColumn>>();
+    const [sortOptions, setSortOptions] = useState<SortOptions<MasterServantListColumn.Name>>();
 
     const {
         selectedData: selectedServantsData,
@@ -167,7 +167,7 @@ export const MasterServantsRoute = React.memo(() => {
     const { sm, md } = useActiveBreakpoints();
 
     // TODO Make this user configurable...
-    const visibleColumns = useMemo((): MasterServantListVisibleColumns => ({
+    const visibleColumns = useMemo((): MasterServantListColumn.Visibility => ({
         npLevel: sm,
         level: sm,
         bondLevel: sm,
@@ -302,7 +302,7 @@ export const MasterServantsRoute = React.memo(() => {
         }
     }, [openContextMenu]);
 
-    const handleSortChange = useCallback((column?: MasterServantListColumn, direction: SortDirection = 'asc'): void => {
+    const handleSortChange = useCallback((column?: MasterServantListColumn.Name, direction: SortDirection = 'asc'): void => {
         /**
          * Deselect servants when changing sort. This is consistent with Google Drive
          * behavior.

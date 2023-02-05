@@ -3,7 +3,7 @@ import { MasterServantAggregatedData, PlanServantAggregatedData } from '@fgo-pla
 import { alpha, DialogContent, Tab, Tabs } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme, Theme } from '@mui/system';
 import { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'react';
-import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/input-field-container.component';
+import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/InputFieldContainer';
 import { useGameServantCostumesData } from '../../../../../hooks/data/useGameServantCostumesData';
 import { EditDialogAction } from '../../../../../types';
 import { PlanRoutePlanServantEditDialogAutocomplete } from './PlanRoutePlanServantEditDialogAutocomplete';

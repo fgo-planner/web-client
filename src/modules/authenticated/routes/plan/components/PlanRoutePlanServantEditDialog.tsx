@@ -1,8 +1,8 @@
 import { PlanServantAggregatedData } from '@fgo-planner/data-core';
 import { Button, Dialog, DialogActions, DialogTitle, PaperProps, Typography } from '@mui/material';
 import React, { MouseEvent, useCallback, useRef } from 'react';
-import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
-import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
+import { DialogCloseButton } from '../../../../../components/dialog/DialogCloseButton';
+import { useAutoResizeDialog } from '../../../../../hooks/user-interface/useAutoResizeDialog';
 import { DialogComponentProps, EditDialogAction } from '../../../../../types';
 import { PlanRoutePlanServantEditDialogContent, PlanServantEditTab } from './PlanRoutePlanServantEditDialogContent';
 import { PlanRoutePlanServantEditDialogData } from './PlanRoutePlanServantEditDialogData.type';

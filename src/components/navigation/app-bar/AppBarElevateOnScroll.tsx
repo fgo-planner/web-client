@@ -1,9 +1,10 @@
 import { CSSInterpolation, styled } from '@mui/system';
 import React, { DOMAttributes, PropsWithChildren, useEffect, useRef, useState } from 'react';
-import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
-import { LockableFeature, UserInterfaceService } from '../../../services/user-interface/user-interface.service';
-import { ThemeConstants } from '../../../styles/theme-constants';
+import { useInjectable } from '../../../hooks/dependency-injection/useInjectable';
+import { UserInterfaceService } from '../../../services/user-interface/UserInterfaceService';
+import { ThemeConstants } from '../../../styles/ThemeConstants';
 import { ComponentStyleProps } from '../../../types';
+import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
 
 type Props = PropsWithChildren<{}> & ComponentStyleProps & DOMAttributes<HTMLDivElement>;
 
@@ -42,7 +43,7 @@ export const AppBarElevateOnScroll = React.memo((props: Props) => {
         return () => {
             setLockId(lockId => {
                 if (lockId) {
-                    userInterfaceService.releaseLock(LockableFeature.AppBarElevate, lockId);
+                    userInterfaceService.releaseLock(LockableUIFeature.AppBarElevate, lockId);
                 }
                 return lockId;
             });
@@ -62,9 +63,9 @@ export const AppBarElevateOnScroll = React.memo((props: Props) => {
             const scrollAmount = element.scrollTop;
             const shouldElevate = scrollAmount > ThemeConstants.AppBarElevatedScrollThreshold;
             if (shouldElevate && !lockId) {
-                lockId = userInterfaceService.requestLock(LockableFeature.AppBarElevate);
+                lockId = userInterfaceService.requestLock(LockableUIFeature.AppBarElevate);
             } else if (!shouldElevate && lockId) {
-                userInterfaceService.releaseLock(LockableFeature.AppBarElevate, lockId);
+                userInterfaceService.releaseLock(LockableUIFeature.AppBarElevate, lockId);
                 lockId = undefined;
             }
             return lockId;

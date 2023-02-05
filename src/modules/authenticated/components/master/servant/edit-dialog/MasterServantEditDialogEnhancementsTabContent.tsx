@@ -2,7 +2,7 @@ import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
 import { GameServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateNumber, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { useCallback } from 'react';
-import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/input-field-container.component';
+import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../../components/input/InputFieldContainer';
 import { ServantAscensionInputField } from '../../../../../../components/input/servant/ServantAscensionInputField';
 import { ServantFouInputField } from '../../../../../../components/input/servant/ServantFouInputField';
 import { ServantFouQuickToggleButtons } from '../../../../../../components/input/servant/ServantFouQuickToggleButtons';
@@ -10,7 +10,7 @@ import { ServantLevelInputField } from '../../../../../../components/input/serva
 import { ServantLevelQuickToggleButtons } from '../../../../../../components/input/servant/ServantLevelQuickToggleButtons';
 import { ServantSkillInputField } from '../../../../../../components/input/servant/ServantSkillInputField';
 import { ServantSkillQuickToggleButtons } from '../../../../../../components/input/servant/ServantSkillQuickToggleButtons';
-import { useForceUpdate } from '../../../../../../hooks/utils/use-force-update.hook';
+import { useForceUpdate } from '../../../../../../hooks/utils/useForceUpdate';
 
 type Props = {
     /**

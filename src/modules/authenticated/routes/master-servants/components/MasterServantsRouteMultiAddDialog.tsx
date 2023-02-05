@@ -3,14 +3,14 @@ import { MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { alpha, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, PaperProps, Switch, Theme, Typography } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, MouseEvent, useCallback, useRef, useState } from 'react';
-import { DialogCloseButton } from '../../../../../components/dialog/dialog-close-button.component';
+import { DialogCloseButton } from '../../../../../components/dialog/DialogCloseButton';
 import { ServantSelectList, StyleClassPrefix as ServantSelectListStyleClassPrefix } from '../../../../../components/input/servant/select-list/ServantSelectList';
 import { useGameServantList } from '../../../../../hooks/data/useGameServantList';
-import { useAutoResizeDialog } from '../../../../../hooks/user-interface/use-auto-resize-dialog.hook';
-import { ScrollbarStyleProps } from '../../../../../styles/scrollbar-style-props';
-import { ThemeConstants } from '../../../../../styles/theme-constants';
+import { useAutoResizeDialog } from '../../../../../hooks/user-interface/useAutoResizeDialog';
+import { ScrollbarStyleProps } from '../../../../../styles/ScrollbarStyleProps';
+import { ThemeConstants } from '../../../../../styles/ThemeConstants';
 import { DialogComponentProps } from '../../../../../types';
-import { GameServantUtils } from '../../../../../utils/game/game-servant.utils';
+import { GameServantUtils } from '../../../../../utils/game/GameServantUtils';
 
 export type MasterServantsRouteMultiAddDialogData = {
     gameIds: Array<number>,

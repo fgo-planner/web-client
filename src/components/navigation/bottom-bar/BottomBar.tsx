@@ -1,7 +1,7 @@
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { PropsWithChildren } from 'react';
-import { ThemeConstants } from '../../../styles/theme-constants';
+import { ThemeConstants } from '../../../styles/ThemeConstants';
 
 type Props = PropsWithChildren<{
     show?: boolean;

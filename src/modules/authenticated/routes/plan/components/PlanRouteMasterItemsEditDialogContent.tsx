@@ -3,9 +3,9 @@ import { alpha, DialogContent } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { SetStateAction, useCallback } from 'react';
-import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
-import { ThemeConstants } from '../../../../../styles/theme-constants';
-import { MasterItemList } from '../../master-items/master-item-list.component';
+import { useForceUpdate } from '../../../../../hooks/utils/useForceUpdate';
+import { ThemeConstants } from '../../../../../styles/ThemeConstants';
+import { MasterItemList } from '../../../components/master/item/list/MasterItemList';
 import { PlanRouteMasterItemsEditDialogData } from './PlanRouteMasterItemsEditDialogData.type';
 
 export type PlanServantEditTab = 'enhancements' | 'costumes';

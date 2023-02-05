@@ -2,7 +2,7 @@ import { InstantiatedServantUpdateBoolean } from '@fgo-planner/data-core';
 import { Checkbox, FormControlLabel, FormGroup } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { MouseEvent, useCallback } from 'react';
-import { FormUtils } from '../../../utils/form.utils';
+import { FormUtils } from '../../../utils/FormUtils';
 
 type Props = {
     disabled?: boolean;

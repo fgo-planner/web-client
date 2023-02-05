@@ -4,7 +4,7 @@ import { Checkbox } from '@mui/material';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useRef } from 'react';
 import { ServantThumbnail } from '../../../servant/ServantThumbnail';
-import { TruncateText } from '../../../text/truncate-text.component';
+import { TruncateText } from '../../../text/TruncateText';
 
 type Props = {
     disabled: boolean;

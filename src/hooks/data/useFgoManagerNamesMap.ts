@@ -2,7 +2,7 @@ import { Immutable, ImmutableRecord, ReadonlyRecord } from '@fgo-planner/common-
 import { GameServant } from '@fgo-planner/data-core';
 import { useEffect, useState } from 'react';
 import { GameServantService } from '../../services/data/game/GameServantService';
-import { useInjectable } from '../dependency-injection/use-injectable.hook';
+import { useInjectable } from '../dependency-injection/useInjectable';
 
 type DataPromises = [
     Promise<ReadonlyRecord<number, Immutable<GameServant>>>,

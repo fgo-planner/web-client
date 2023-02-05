@@ -3,7 +3,7 @@ import { GameItemConstants, PlanServantAggregatedData } from '@fgo-planner/data-
 import clsx from 'clsx';
 import React, { MouseEvent, ReactNode, useCallback } from 'react';
 import { PlanServantRequirements } from '../../../../types';
-import { DataTableGridRow } from '../../../data-table-grid/data-table-grid-row.component';
+import { DataTableGridRow } from '../../../data-table-grid/DataTableGridRow';
 import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
 import { PlanRequirementsTableServantRowCell } from './PlanRequirementsTableServantRowCell';
 import { PlanRequirementsTableServantRowHeader } from './PlanRequirementsTableServantRowHeader';

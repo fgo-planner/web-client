@@ -2,7 +2,7 @@ import { Theme } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
 import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import { PropsWithChildren } from 'react';
-import { ThemeConstants } from '../../../styles/theme-constants';
+import { ThemeConstants } from '../../../styles/ThemeConstants';
 
 type Props = PropsWithChildren<{
     /**

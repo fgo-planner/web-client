@@ -3,8 +3,8 @@ import { FilteringStyledOptions } from '@mui/styled-engine';
 import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { CSSProperties, useContext } from 'react';
-import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
-import { ThemeConstants } from '../../../styles/theme-constants';
+import { NavigationDrawerContext } from '../../../contexts/NavigationDrawerContext';
+import { ThemeConstants } from '../../../styles/ThemeConstants';
 import { NavigationDrawerContent as Content } from '../../../types';
 import { NavigationDrawerContent } from './NavigationDrawerContent';
 

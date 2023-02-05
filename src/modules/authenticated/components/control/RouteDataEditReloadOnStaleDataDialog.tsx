@@ -1,5 +1,5 @@
 import React from 'react';
-import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
+import { PromptDialog } from '../../../../components/dialog/PromptDialog';
 import { DialogComponentProps } from '../../../../types';
 
 type Props = Omit<DialogComponentProps, 'keepMounted' | 'onExited' | 'PaperProps'>;

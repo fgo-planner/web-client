@@ -1,7 +1,7 @@
 import { InstantiatedServantConstants, InstantiatedServantFouSet, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback } from 'react';
-import { FormUtils } from '../../../utils/form.utils';
+import { FormUtils } from '../../../utils/FormUtils';
 
 type Props = {
     disabled?: boolean;

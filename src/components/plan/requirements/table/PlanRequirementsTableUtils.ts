@@ -1,4 +1,4 @@
-import { NumberFormatUtils } from '../../../../utils/format/number-format-utils';
+import { NumberFormatUtils } from '../../../../utils/format/NumberFormatUtils';
 
 type FormattedCellValue = {
     title: string | undefined;

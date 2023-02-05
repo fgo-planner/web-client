@@ -2,14 +2,14 @@ import { CollectionUtils, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-pla
 import { GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantAggregatedData, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameServantMap } from '../../../hooks/data/useGameServantMap';
-import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
-import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
-import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
-import { MasterAccountService } from '../../../services/data/master/master-account.service';
+import { useInjectable } from '../../../hooks/dependency-injection/useInjectable';
+import { useLoadingIndicator } from '../../../hooks/user-interface/useLoadingIndicator';
+import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/useBlockNavigation';
+import { MasterAccountService } from '../../../services/data/master/MasterAccountService';
 import { GameServantMap } from '../../../types';
-import { DataAggregationUtils } from '../../../utils/data-aggregation.utils';
-import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
+import { DataAggregationUtils } from '../../../utils/DataAggregationUtils';
+import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
 import { DataEditUtils } from './DataEditUtils';
 
 

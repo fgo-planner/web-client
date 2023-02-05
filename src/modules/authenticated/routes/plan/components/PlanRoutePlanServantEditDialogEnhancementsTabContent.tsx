@@ -3,7 +3,7 @@ import { GameServant, ImmutableMasterServant, InstantiatedServantAscensionLevel,
 import { Checkbox } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback } from 'react';
-import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/input-field-container.component';
+import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/InputFieldContainer';
 import { ServantAscensionInputField } from '../../../../../components/input/servant/ServantAscensionInputField';
 import { ServantFouInputField } from '../../../../../components/input/servant/ServantFouInputField';
 import { ServantFouQuickToggleButtons } from '../../../../../components/input/servant/ServantFouQuickToggleButtons';
@@ -11,7 +11,7 @@ import { ServantLevelInputField } from '../../../../../components/input/servant/
 import { ServantLevelQuickToggleButtons } from '../../../../../components/input/servant/ServantLevelQuickToggleButtons';
 import { ServantSkillInputField } from '../../../../../components/input/servant/ServantSkillInputField';
 import { ServantSkillQuickToggleButtons } from '../../../../../components/input/servant/ServantSkillQuickToggleButtons';
-import { useForceUpdate } from '../../../../../hooks/utils/use-force-update.hook';
+import { useForceUpdate } from '../../../../../hooks/utils/useForceUpdate';
 import { PlanEnhancementCategory } from '../../../../../types';
 import { PlanRoutePlanServantEditDialogEnabledCheckbox } from './PlanRoutePlanServantEditDialogEnabledCheckbox';
 

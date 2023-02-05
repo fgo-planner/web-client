@@ -2,7 +2,7 @@ import { Immutable } from '@fgo-planner/common-core';
 import { GameServant, InstantiatedServantConstants, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import { BaseTextFieldProps, InputBaseComponentProps, TextField } from '@mui/material';
 import React, { ChangeEvent, FocusEvent, useCallback } from 'react';
-import { FormUtils } from '../../../utils/form.utils';
+import { FormUtils } from '../../../utils/FormUtils';
 
 type Props = {
     allowEmpty?: boolean;

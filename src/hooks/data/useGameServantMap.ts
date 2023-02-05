@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { GameServantService } from '../../services/data/game/GameServantService';
 import { GameServantMap } from '../../types';
-import { useInjectable } from '../dependency-injection/use-injectable.hook';
+import { useInjectable } from '../dependency-injection/useInjectable';
 
 /**
  * Returns a readonly map of game servants, where the key is the servant ID and

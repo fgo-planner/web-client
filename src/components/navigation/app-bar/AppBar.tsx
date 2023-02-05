@@ -1,29 +1,29 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { IconButton, Theme } from '@mui/material';
-import { Box, SystemStyleObject } from '@mui/system';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
-import { BasicUser, UserService } from '../../../services/data/user/user.service';
-import { UserInterfaceService } from '../../../services/user-interface/user-interface.service';
-import { ThemeConstants } from '../../../styles/theme-constants';
-import { SxPropsFunction } from '../../../types';
-import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
-import { IconOutlined } from '../../icons';
+import { useInjectable } from '../../../hooks/dependency-injection/useInjectable';
+import { BasicUser, UserService } from '../../../services/data/user/UserService';
+import { UserInterfaceService } from '../../../services/user-interface/UserInterfaceService';
+import { ThemeConstants } from '../../../styles/ThemeConstants';
+import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
+import { IconOutlined } from '../../icons/IconOutlined';
 import { AppBarAuthenticatedUser } from './authenticated/AppBarAuthenticatedUser';
 import { AppBarGuestUser } from './guest/AppBarGuestUser';
 
 const StyleClassPrefix = 'AppBar';
 
-const StyleProps = ((theme: Theme) => {
+const StyleProps = (theme: SystemTheme) => {
+
     const {
         breakpoints,
         palette,
         shadows,
         spacing
-    } = theme;
+    } = theme as Theme;
 
     return {
         height: spacing(ThemeConstants.AppBarHeightScale),
@@ -58,8 +58,8 @@ const StyleProps = ((theme: Theme) => {
             // boxShadow: 'none',
             height: spacing(ThemeConstants.AppBarHeightScaleCondensed)
         }    
-    } as SystemStyleObject;
-}) as SxPropsFunction;
+    } as SystemStyleObject<SystemTheme>;
+};
 
 /**
  * The app bar component.

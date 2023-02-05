@@ -4,21 +4,21 @@ import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PromptDialog } from '../../../../components/dialog/prompt-dialog.component';
-import { IconOutlined } from '../../../../components/icons';
-import { PageTitle } from '../../../../components/text/page-title.component';
-import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
-import { useLoadingIndicator } from '../../../../hooks/user-interface/use-loading-indicator.hook';
-import { PlanService } from '../../../../services/data/plan/plan.service';
-import { ThemeConstants } from '../../../../styles/theme-constants';
+import { PromptDialog } from '../../../../components/dialog/PromptDialog';
+import { IconOutlined } from '../../../../components/icons/IconOutlined';
+import { PageTitle } from '../../../../components/text/PageTitle';
+import { useInjectable } from '../../../../hooks/dependency-injection/useInjectable';
+import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
+import { useLoadingIndicator } from '../../../../hooks/user-interface/useLoadingIndicator';
+import { PlanService } from '../../../../services/data/plan/PlanService';
+import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { BasicPlans, ModalOnCloseReason, PlanType } from '../../../../types';
-import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
+import { SubscribablesContainer } from '../../../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../../../utils/subscription/SubscriptionTopics';
 import { PlansRouteCreatePlanDialog } from './components/PlansRouteCreatePlanDialog';
 import { PlansRouteNavigationRail } from './components/PlansRouteNavigationRail';
 import { PlansRoutePlanList } from './components/PlansRoutePlanList';
-import { PlansRoutePlanListVisibleColumns } from './components/PlansRoutePlanListColumn.type';
+import { PlansRoutePlanListColumn } from './components/PlansRoutePlanListColumn';
 
 const AddPlanDialogPaperProps: PaperProps = {
     style: {
@@ -38,7 +38,7 @@ const generateDeleteTargetDialogPrompt = (target: ImmutableBasicPlan | Immutable
     }
 };
 
-const StyleClassPrefix = 'Plans';
+const StyleClassPrefix = 'PlansRoute';
 
 const StyleProps = (theme: SystemTheme) => {
 
@@ -180,7 +180,7 @@ export const PlansRoute = React.memo(() => {
 
     const { sm, lg } = useActiveBreakpoints();
 
-    const visibleColumns = useMemo((): PlansRoutePlanListVisibleColumns => ({
+    const visibleColumns = useMemo((): PlansRoutePlanListColumn.Visibility => ({
         name: true,
         created: lg,
         modified: lg,

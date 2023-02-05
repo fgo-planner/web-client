@@ -1,11 +1,12 @@
 import { Immutable, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
-import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
-import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
+import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
+import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { GameServantList, GameServantMap, HttpOptions, Page, Pagination } from '../../../types';
-import { GameServantUtils } from '../../../utils/game/game-servant.utils';
-import { HttpUtils as Http } from '../../../utils/http.utils';
-import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
+import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
+import { GameServantUtils } from '../../../utils/game/GameServantUtils';
+import { HttpUtils as Http } from '../../../utils/HttpUtils';
+import { UserInterfaceService } from '../../user-interface/UserInterfaceService';
 
 @Injectable
 export class GameServantService {
@@ -51,14 +52,14 @@ export class GameServantService {
         if (this._servantsListPromise) {
             return this._servantsListPromise;
         }
-        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+        const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
         const promise = Http.get<Array<GameServant>>(`${this._BaseUrl}`, this._ExcludeMetadataOptions);
         promise.then(data => {
             this._onServantsLoaded(data);
         }).catch(error => {
             this._onServantsCacheLoadError(error);
         }).finally(() => {
-            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
+            this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
         });
         return this._servantsListPromise = promise;
     }
@@ -99,14 +100,14 @@ export class GameServantService {
         if (this._servantsKeywordsMapPromise) {
             return this._servantsKeywordsMapPromise;
         }
-        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+        const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
         const url = `${this._BaseUrl}/metadata/search-keywords`;
         this._servantsKeywordsMapPromise = Http.get<Record<number, string>>(url);
         this._servantsKeywordsMapPromise.then(data => {
             this._servantsKeywordsMap = data;
             this._servantsKeywordsMapPromise = undefined;
         }).finally(() => {
-            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
+            this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
         });
         return this._servantsKeywordsMapPromise;
     }
@@ -122,14 +123,14 @@ export class GameServantService {
         if (this._fgoManagerNamesMapPromise) {
             return this._fgoManagerNamesMapPromise;
         }
-        const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+        const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
         const url = `${this._BaseUrl}/metadata/fgo-manager-names`;
         this._fgoManagerNamesMapPromise = Http.get<Record<string, number>>(url);
         this._fgoManagerNamesMapPromise.then(data => {
             this._fgoManagerNamesMap = data;
             this._fgoManagerNamesMapPromise = undefined;
         }).finally(() => {
-            this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
+            this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
         });
         return this._fgoManagerNamesMapPromise;
     }

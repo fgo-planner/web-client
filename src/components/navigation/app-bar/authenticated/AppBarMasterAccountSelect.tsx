@@ -3,11 +3,11 @@ import { ImmutableBasicMasterAccount, MasterAccount } from '@fgo-planner/data-co
 import { MenuItem, TextField, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, ReactNode, useCallback, useEffect, useState } from 'react';
-import { useInjectable } from '../../../../hooks/dependency-injection/use-injectable.hook';
-import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { useInjectable } from '../../../../hooks/dependency-injection/useInjectable';
+import { MasterAccountService } from '../../../../services/data/master/MasterAccountService';
 import { BasicMasterAccounts } from '../../../../types';
-import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
+import { SubscribablesContainer } from '../../../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../../../utils/subscription/SubscriptionTopics';
 
 type Props = {
     masterAccountList: BasicMasterAccounts;

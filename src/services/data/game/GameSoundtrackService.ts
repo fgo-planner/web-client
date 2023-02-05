@@ -1,10 +1,11 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { GameSoundtrack } from '@fgo-planner/data-core';
-import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
-import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
+import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
+import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { GameSoundtrackList, Page, Pagination } from '../../../types';
-import { HttpUtils as Http } from '../../../utils/http.utils';
-import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
+import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
+import { HttpUtils as Http } from '../../../utils/HttpUtils';
+import {  UserInterfaceService } from '../../user-interface/UserInterfaceService';
 
 @Injectable
 export class GameSoundtrackService {
@@ -32,14 +33,14 @@ export class GameSoundtrackService {
             return this._soundtracksCache;
         }
         if (!this._soundtracksCachePromise) {
-            const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+            const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
             this._soundtracksCachePromise = Http.get<Array<GameSoundtrack>>(`${this._BaseUrl}`);
             this._soundtracksCachePromise.then(cache => {
                 this._onSoundtracksCacheLoaded(cache);
             }).catch(error => {
                 this._onSoundtracksCacheLoadError(error);
             }).finally(() => {
-                this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
+                this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
             });
         }
         return this._soundtracksCachePromise;

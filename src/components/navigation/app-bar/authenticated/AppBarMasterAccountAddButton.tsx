@@ -1,10 +1,10 @@
 import { BasicMasterAccount } from '@fgo-planner/data-core';
 import { Button, Icon } from '@mui/material';
 import { Fragment, PureComponent, ReactNode } from 'react';
-import { MasterAccountService } from '../../../../services/data/master/master-account.service';
+import { MasterAccountService } from '../../../../services/data/master/MasterAccountService';
 import { ModalOnCloseReason } from '../../../../types';
-import { InjectablesContainer } from '../../../../utils/dependency-injection/injectables-container';
-import { MasterAccountAddDialog } from '../../../master/account/master-account-add-dialog.component';
+import { InjectablesContainer } from '../../../../utils/dependency-injection/InjectablesContainer';
+import { MasterAccountAddDialog } from '../../../master/account/MasterAccountAddDialog';
 
 type Props = {
 

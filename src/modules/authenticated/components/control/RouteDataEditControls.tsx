@@ -1,9 +1,9 @@
 import { Button, Icon, IconButton, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEventHandler, ReactNode } from 'react';
-import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
-import { PageTitle } from '../../../../components/text/page-title.component';
-import { TruncateText } from '../../../../components/text/truncate-text.component';
+import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
+import { PageTitle } from '../../../../components/text/PageTitle';
+import { TruncateText } from '../../../../components/text/TruncateText';
 
 type Props = {
     dirtyDataMessage?: string;

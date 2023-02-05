@@ -2,7 +2,7 @@ import { InstantiatedServantUpdateBoolean } from '@fgo-planner/data-core';
 import { Checkbox, Tooltip } from '@mui/material';
 import React, { MouseEvent, useCallback } from 'react';
 import { PlanEnhancementCategory } from '../../../../../types';
-import { FormUtils } from '../../../../../utils/form.utils';
+import { FormUtils } from '../../../../../utils/FormUtils';
 
 type Props = {
     enhancement: PlanEnhancementCategory;

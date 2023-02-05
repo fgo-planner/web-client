@@ -1,10 +1,11 @@
 import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { GameItem, GameItemBackground, GameItemConstants } from '@fgo-planner/data-core';
-import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
-import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
+import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
+import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { GameItemCategory, GameItemCategoryMap, GameItemList, GameItemMap, Page, Pagination } from '../../../types';
-import { HttpUtils as Http } from '../../../utils/http.utils';
-import { LockableFeature, UserInterfaceService } from '../../user-interface/user-interface.service';
+import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
+import { HttpUtils as Http } from '../../../utils/HttpUtils';
+import { UserInterfaceService } from '../../user-interface/UserInterfaceService';
 
 @Injectable
 export class GameItemService {
@@ -35,14 +36,14 @@ export class GameItemService {
             return this._cachedItems;
         }
         if (!this._cachedItemsPromise) {
-            const lockId = this._userInterfaceService.requestLock(LockableFeature.LoadingIndicator);
+            const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
             this._cachedItemsPromise = Http.get<Array<GameItem>>(`${this._BaseUrl}`);
             this._cachedItemsPromise.then(cache => {
                 this._onItemsCacheLoaded(cache);
             }).catch(error => {
                 this._onItemsCacheLoadError(error);
             }).finally(() => {
-                this._userInterfaceService.releaseLock(LockableFeature.LoadingIndicator, lockId);
+                this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
             });
         }
         return this._cachedItemsPromise;

@@ -2,10 +2,10 @@ import { Nullable } from '@fgo-planner/common-core';
 import { PaperProps } from '@mui/material';
 import React, { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { GlobalDialog, GlobalDialogOpenAction, ModalOnCloseReason, NavigationBlockerDialogOpenAction, UserTokenPayload } from '../../types';
-import { SubscribablesContainer } from '../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../utils/subscription/subscription-topics';
-import { PromptDialog } from '../dialog/prompt-dialog.component';
-import { LoginDialog } from '../login/login-dialog.component';
+import { SubscribablesContainer } from '../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../utils/subscription/SubscriptionTopics';
+import { PromptDialog } from '../dialog/PromptDialog';
+import { LoginDialog } from '../login/LoginDialog';
 
 const LoginDialogPaperProps: PaperProps = {
     style: {

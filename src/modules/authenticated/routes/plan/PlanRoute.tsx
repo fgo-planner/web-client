@@ -8,13 +8,13 @@ import { PathPattern } from 'react-router';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { PlanRequirementsTable } from '../../../../components/plan/requirements/table/PlanRequirementsTable';
 import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
-import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/use-selected-instances-helper.hook';
-import { useActiveBreakpoints } from '../../../../hooks/user-interface/use-active-breakpoints.hook';
-import { useDragDropHelper } from '../../../../hooks/user-interface/use-drag-drop-helper.hook';
-import { ThemeConstants } from '../../../../styles/theme-constants';
+import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/useSelectedInstancesHelper';
+import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
+import { useDragDropHelper } from '../../../../hooks/user-interface/useDragDropHelper';
+import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { EditDialogAction, ModalOnCloseReason } from '../../../../types';
-import { SubscribablesContainer } from '../../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../../utils/subscription/subscription-topics';
+import { SubscribablesContainer } from '../../../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../../../utils/subscription/SubscriptionTopics';
 import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
 import { RouteDataEditReloadOnStaleDataDialog } from '../../components/control/RouteDataEditReloadOnStaleDataDialog';
 import { RouteDataEditSaveOnStaleDataDialog } from '../../components/control/RouteDataEditSaveOnStaleDataDialog';
@@ -41,7 +41,7 @@ const computeAvailableServants = (
     return masterServantData.filter(servantData => !planServantIdSet.has(servantData.instanceId));
 };
 
-const StyleClassPrefix = 'Plan';
+const StyleClassPrefix = 'PlanRoute';
 
 const StyleProps = (theme: SystemTheme) => {
 

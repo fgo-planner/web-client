@@ -1,7 +1,7 @@
 import { Menu, PaperProps, PopoverOrigin } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { PropsWithChildren, useMemo } from 'react';
-import { ThemeConstants } from '../../../../styles/theme-constants';
+import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { ComponentStyleProps, ModalOnCloseHandler } from '../../../../types';
 import { StyleClassPrefix as AppBarActionMenuItemStyleClassPrefix } from './AppBarActionMenuItem';
 

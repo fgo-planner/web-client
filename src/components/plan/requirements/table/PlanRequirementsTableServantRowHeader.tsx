@@ -3,7 +3,7 @@ import { PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 import { ServantThumbnail } from '../../../servant/ServantThumbnail';
-import { TruncateText } from '../../../text/truncate-text.component';
+import { TruncateText } from '../../../text/TruncateText';
 import { PlanRequirementsTableServantRowEnhancementTargets } from './PlanRequirementsTableServantRowEnhancementTargets';
 
 type Props = {

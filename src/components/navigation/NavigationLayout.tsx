@@ -1,7 +1,7 @@
 import { Box, SystemStyleObject } from '@mui/system';
 import React, { PropsWithChildren } from 'react';
-import { useActiveBreakpoints } from '../../hooks/user-interface/use-active-breakpoints.hook';
-import { LoadingIndicatorOverlay } from '../utils/loading-indicator-overlay.component';
+import { useActiveBreakpoints } from '../../hooks/user-interface/useActiveBreakpoints';
+import { LoadingIndicatorOverlay } from '../utils/LoadingIndicatorOverlay';
 import { AppBar } from './app-bar/AppBar';
 import { GlobalDialogsContainer } from './GlobalDialogsContainer';
 import { NavigationDrawerContainer } from './navigation-drawer/NavigationDrawerContainer';

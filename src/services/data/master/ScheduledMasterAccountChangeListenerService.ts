@@ -1,12 +1,12 @@
 import { CollectionUtils, Nullable, ObjectUtils } from '@fgo-planner/common-core';
 import { isEmpty } from 'lodash-es';
-import { Inject } from '../../../decorators/dependency-injection/inject.decorator';
-import { Injectable } from '../../../decorators/dependency-injection/injectable.decorator';
+import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
+import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { BasicMasterAccounts, MasterAccountChange, MasterAccountChanges, UserTokenPayload } from '../../../types';
-import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
+import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
 import { MasterAccountChangeListenerService } from './MasterAccountChangeListenerService';
-import { MasterAccountService } from './master-account.service';
+import { MasterAccountService } from './MasterAccountService';
 
 const _DefaultPollingInterval = 30000;
 

@@ -1,13 +1,13 @@
 import { CollectionUtils, DateTimeUtils, Immutable, ImmutableArray, Nullable, ReadonlyDate, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameItemConstants, ImmutablePlan, InstantiatedServantUtils, MasterItemConstants, MasterServantAggregatedData, MasterServantUpdate, Plan, PlanServant, PlanServantAggregatedData, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanUpcomingResources, PlanUtils } from '@fgo-planner/data-core';
 import React, { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
-import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
-import { useLoadingIndicator } from '../../../hooks/user-interface/use-loading-indicator.hook';
-import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/use-block-navigation.hook';
-import { PlanService } from '../../../services/data/plan/plan.service';
+import { useInjectable } from '../../../hooks/dependency-injection/useInjectable';
+import { useLoadingIndicator } from '../../../hooks/user-interface/useLoadingIndicator';
+import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/useBlockNavigation';
+import { PlanService } from '../../../services/data/plan/PlanService';
 import { PlanEnhancementRequirements, PlanRequirements } from '../../../types';
-import { DataAggregationUtils } from '../../../utils/data-aggregation.utils';
-import * as PlanComputationUtils from '../../../utils/plan/plan-computation.utils';
+import { DataAggregationUtils } from '../../../utils/DataAggregationUtils';
+import { PlanComputationUtils } from '../../../utils/plan/PlanComputationUtils';
 import { DataEditUtils } from './DataEditUtils';
 import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccountDataEdit } from './useMasterAccountDataEdit';
 

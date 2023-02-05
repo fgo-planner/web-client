@@ -1,11 +1,11 @@
 import { Button, Theme, Tooltip } from '@mui/material';
-import { Box, SystemStyleObject } from '@mui/system';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEvent, useCallback, useContext, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
-import { NavigationDrawerActionItem as ActionItem, NavigationDrawerItem as Item, NavigationDrawerLinkItem as LinkItem, SxPropsFunction } from '../../../types';
-import { Icon } from '../../icons';
+import { NavigationDrawerContext } from '../../../contexts/NavigationDrawerContext';
+import { NavigationDrawerActionItem as ActionItem, NavigationDrawerItem as Item, NavigationDrawerLinkItem as LinkItem } from '../../../types';
+import { Icon } from '../../icons/Icon';
 
 type Props = {
     item: Item;
@@ -17,13 +17,13 @@ const TooltipLeaveDelay = 0;
 
 const StyleClassPrefix = 'NavigationDrawerContentItem';
 
-const StyleProps = ((theme: Theme) => {
+const StyleProps = (theme: SystemTheme) => {
 
     const {
         palette,
         spacing,
         transitions
-    } = theme;
+    } = theme as Theme;
 
     return {
         width: '100%',
@@ -81,9 +81,8 @@ const StyleProps = ((theme: Theme) => {
         [`&.${StyleClassPrefix}-no-animations .${StyleClassPrefix}-icon`]: {
             transition: 'none !important'
         }
-    } as SystemStyleObject;
-    
-}) as SxPropsFunction;
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const NavigationDrawerContentItem = React.memo(({ item }: Props) => {
 

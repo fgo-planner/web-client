@@ -1,7 +1,7 @@
 import { User } from '@fgo-planner/data-core';
 import { MasterAccountChanges } from '../../../types';
-import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
+import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
 
 export type BasicUser = Pick<User, '_id' | 'username' | 'email'>;
 

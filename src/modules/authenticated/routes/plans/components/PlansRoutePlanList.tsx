@@ -3,7 +3,7 @@ import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
 import { BasicPlans, PlanType, SortDirection } from '../../../../../types';
-import { PlansRoutePlanListColumn as Column, PlansRoutePlanListColumnProperties as ColumnProperties, PlansRoutePlanListVisibleColumns as VisibleColumns } from './PlansRoutePlanListColumn.type';
+import { PlansRoutePlanListColumn } from './PlansRoutePlanListColumn';
 import { PlansRoutePlanListHeader } from './PlansRoutePlanListHeader';
 import { PlansRoutePlanListRow, StyleClassPrefix as RowStyleClassPrefix } from './PlansRoutePlanListRow';
 
@@ -13,9 +13,9 @@ type Props = {
     onRowClick: MouseEventHandler;
     onRowDoubleClick: MouseEventHandler;
     onSelectionChange: (target: ImmutableBasicPlan | ImmutableBasicPlanGroup | undefined, type: PlanType) => void;
-    onSortChange?: (column?: Column, direction?: SortDirection) => void;
+    onSortChange?: (column?: PlansRoutePlanListColumn.Name, direction?: SortDirection) => void;
     selectedId?: string;
-    visibleColumns: Readonly<VisibleColumns>;
+    visibleColumns: Readonly<PlansRoutePlanListColumn.Visibility>;
 };
 
 const StyleClassPrefix = 'PlansRoutePlanList';
@@ -47,7 +47,7 @@ const StyleProps = (theme: SystemTheme) => {
                     px: 2
                 },
                 [`& .${RowStyleClassPrefix}-name`]: {
-                    width: ColumnProperties.name.width,
+                    width: PlansRoutePlanListColumn.Properties.name.width,
                     fontWeight: 500,
                     [breakpoints.down('sm')]: {
                         width: '100%',
@@ -55,11 +55,11 @@ const StyleProps = (theme: SystemTheme) => {
                     }
                 },
                 [`& .${RowStyleClassPrefix}-created`]: {
-                    width: ColumnProperties.created.width,
+                    width: PlansRoutePlanListColumn.Properties.created.width,
                     textAlign: 'center'
                 },
                 [`& .${RowStyleClassPrefix}-modified`]: {
-                    width: ColumnProperties.modified.width,
+                    width: PlansRoutePlanListColumn.Properties.modified.width,
                     textAlign: 'center'
                 },
                 [`& .${RowStyleClassPrefix}-description`]: {

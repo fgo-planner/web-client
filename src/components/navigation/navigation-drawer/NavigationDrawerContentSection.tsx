@@ -2,8 +2,8 @@ import { Divider } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { useContext } from 'react';
-import { NavigationDrawerContext } from '../../../contexts/navigation-drawer.context';
-import { ThemeConstants } from '../../../styles/theme-constants';
+import { NavigationDrawerContext } from '../../../contexts/NavigationDrawerContext';
+import { ThemeConstants } from '../../../styles/ThemeConstants';
 import { NavigationDrawerSection as Section } from '../../../types';
 import { NavigationDrawerContentItem } from './NavigationDrawerContentItem';
 

@@ -1,7 +1,7 @@
 import { ReadonlyRecord } from '@fgo-planner/common-core';
 import { useEffect, useState } from 'react';
 import { GameServantService } from '../../services/data/game/GameServantService';
-import { useInjectable } from '../dependency-injection/use-injectable.hook';
+import { useInjectable } from '../dependency-injection/useInjectable';
 
 /**
  * Returns a readonly map of servant search keywords, where the key is the

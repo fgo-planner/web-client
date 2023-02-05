@@ -2,11 +2,11 @@ import { ImmutableBasicPlan } from '@fgo-planner/data-core';
 import { Link as MuiLink } from '@mui/material';
 import React, { MouseEvent, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { DataTableListStaticRow } from '../../../../../components/data-table-list/data-table-list-static-row.component';
-import { TruncateText } from '../../../../../components/text/truncate-text.component';
+import { DataTableListStaticRow } from '../../../../../components/data-table-list/DataTableListStaticRow';
+import { TruncateText } from '../../../../../components/text/TruncateText';
 import { PlanConstants } from '../../../../../constants';
-import { DateTimeFormatUtils } from '../../../../../utils/format/date-time-format.utils';
-import { PlansRoutePlanListVisibleColumns as VisibleColumns } from './PlansRoutePlanListColumn.type';
+import { DateTimeFormatUtils } from '../../../../../utils/format/DateTimeFormatUtils';
+import { PlansRoutePlanListColumn } from './PlansRoutePlanListColumn';
 
 type Props = {
     active: boolean;
@@ -14,7 +14,7 @@ type Props = {
     onContextMenu: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
     onDoubleClick: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
     plan: ImmutableBasicPlan;
-    visibleColumns: Readonly<VisibleColumns>;
+    visibleColumns: Readonly<PlansRoutePlanListColumn.Visibility>;
 };
 
 export const StyleClassPrefix = 'PlansRoutePlanListRow';

@@ -1,16 +1,16 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { MasterAccount } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
-import { Box, SystemStyleObject } from '@mui/system';
+import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
-import { NavigationDrawerContext, NavigationDrawerContextProps } from '../../../contexts/navigation-drawer.context';
-import { useInjectable } from '../../../hooks/dependency-injection/use-injectable.hook';
-import { AuthenticationService } from '../../../services/authentication/authentication.service';
-import { UserInterfaceService } from '../../../services/user-interface/user-interface.service';
-import { ThemeConstants } from '../../../styles/theme-constants';
-import { NavigationDrawerContent as Content, NavigationDrawerSection as Section, SxPropsFunction } from '../../../types';
-import { SubscribablesContainer } from '../../../utils/subscription/subscribables-container';
-import { SubscriptionTopics } from '../../../utils/subscription/subscription-topics';
+import { NavigationDrawerContext, NavigationDrawerContextProps } from '../../../contexts/NavigationDrawerContext';
+import { useInjectable } from '../../../hooks/dependency-injection/useInjectable';
+import { AuthenticationService } from '../../../services/authentication/AuthenticationService';
+import { UserInterfaceService } from '../../../services/user-interface/UserInterfaceService';
+import { ThemeConstants } from '../../../styles/ThemeConstants';
+import { NavigationDrawerContent as Content, NavigationDrawerSection as Section } from '../../../types';
+import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
+import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
 import { NavigationDrawerDesktop } from './NavigationDrawerDesktop';
 import { NavigationDrawerMobile } from './NavigationDrawerMobile';
 
@@ -122,25 +122,30 @@ const ResourceRoutesSection: Section = {
 
 const StyleClassPrefix = 'NavigationDrawerContainer';
 
-const StyleProps = (({ spacing }: Theme) => ({
-    display: 'flex',
-    height: '100%',
-    '& .MuiDrawer-root>.MuiPaper-root': {
-        /**
-         * Condensed app bar scaling is not needed because these rules only apply to
-         * desktop screen widths, where condensed app bar is never displayed.
-         */
-        top: spacing(ThemeConstants.AppBarHeightScale),
-        height: `calc(100% - ${spacing(ThemeConstants.AppBarHeightScale)})`
-    },
-    [`& .${StyleClassPrefix}-children`]: {
-        display: 'flex', // This is needed to correctly display app bar shadow
-        flexDirection: 'column',
-        flex: 1,
+const StyleProps = (theme: SystemTheme) => {
+
+    const { spacing } = theme as Theme;
+
+    return {
+        display: 'flex',
         height: '100%',
-        overflow: 'hidden' // Prevents app bar shadow from bleeding over to the drawer
-    }
-} as SystemStyleObject)) as SxPropsFunction;
+        '& .MuiDrawer-root>.MuiPaper-root': {
+            /**
+             * Condensed app bar scaling is not needed because these rules only apply to
+             * desktop screen widths, where condensed app bar is never displayed.
+             */
+            top: spacing(ThemeConstants.AppBarHeightScale),
+            height: `calc(100% - ${spacing(ThemeConstants.AppBarHeightScale)})`
+        },
+        [`& .${StyleClassPrefix}-children`]: {
+            display: 'flex', // This is needed to correctly display app bar shadow
+            flexDirection: 'column',
+            flex: 1,
+            height: '100%',
+            overflow: 'hidden' // Prevents app bar shadow from bleeding over to the drawer
+        }
+    } as SystemStyleObject<SystemTheme>;
+};
 
 export const NavigationDrawerContainer = React.memo((props: Props) => {
 

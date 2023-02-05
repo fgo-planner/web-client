@@ -1,6 +1,6 @@
 import { Divider, Icon, IconButton, Tooltip } from '@mui/material';
 import React from 'react';
-import { IconOutlined } from '../../../../../components/icons';
+import { IconOutlined } from '../../../../../components/icons/IconOutlined';
 import { NavigationRail } from '../../../../../components/navigation/navigation-rail/NavigationRail';
 
 type Props = {

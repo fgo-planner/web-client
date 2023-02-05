@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { GameSoundtrackService } from '../../services/data/game/GameSoundtrackService';
 import { GameSoundtrackList } from '../../types';
-import { useInjectable } from '../dependency-injection/use-injectable.hook';
+import { useInjectable } from '../dependency-injection/useInjectable';
 
 /**
  * Returns a readonly array containing immutable instances of all soundtracks.

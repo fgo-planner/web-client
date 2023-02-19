@@ -2,6 +2,7 @@
 
 #ide
 .vscode/
+.VSCodeCounter/
 
 # dependencies
 /node_modules

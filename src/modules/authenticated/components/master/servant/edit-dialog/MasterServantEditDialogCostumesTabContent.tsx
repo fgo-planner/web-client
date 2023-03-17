@@ -1,4 +1,3 @@
-import { CollectionUtils } from '@fgo-planner/common-core';
 import { GameServantCostumeAggregatedData, InstantiatedServantUpdateUtils, MasterServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -36,7 +35,7 @@ export const MasterServantEditDialogCostumesTabContent = React.memo((props: Prop
         }
     } = props;
 
-    const [selectedCostumeIds, setSelectedCostumeIds] = useState<ReadonlySet<number>>(CollectionUtils.emptySet);
+    const [selectedCostumeIds, setSelectedCostumeIds] = useState<ReadonlySet<number>>();
 
     useEffect((): void => {
         const selectedCostumeIds = InstantiatedServantUpdateUtils.convertFromCostumesMap(unlockedCostumes);
@@ -44,27 +43,29 @@ export const MasterServantEditDialogCostumesTabContent = React.memo((props: Prop
     }, [unlockedCostumes]);
 
     const handleSelectionChange = useCallback((selectedCostumeIds: ReadonlySet<number>): void => {
-        setSelectedCostumeIds(prevSelectedCostumeIds => {
-            // TODO Is this equality check even needed?
-            if (CollectionUtils.isSetsEqual(prevSelectedCostumeIds, selectedCostumeIds)) {
-                return prevSelectedCostumeIds;
+        for (const costumeId of selectedCostumeIds) {
+            unlockedCostumes.set(costumeId, true);
+        }
+        for (const costumeId of unlockedCostumes.keys()) {
+            if (!selectedCostumeIds.has(costumeId)) {
+                unlockedCostumes.set(costumeId, false);
             }
-            for (const costumeId of selectedCostumeIds) {
-                unlockedCostumes.set(costumeId, true);
-            }
-            for (const costumeId of unlockedCostumes.keys()) {
-                if (!selectedCostumeIds.has(costumeId)) {
-                    unlockedCostumes.set(costumeId, false);
-                }
-            }
-            return selectedCostumeIds;
-        });
+        }
+        setSelectedCostumeIds(selectedCostumeIds);
     }, [unlockedCostumes]);
 
     const classNames = clsx(
         `${StyleClassPrefix}-root`,
         ThemeConstants.ClassScrollbarTrackBorder
     );
+
+    /**
+     * This will be undefined on initial render. We return to avoid having the
+     * ServantCostumeSelectList component unintentionally deselecting all costumes.
+     */
+    if (!selectedCostumeIds) {
+        return null;
+    }
 
     return (
         <Box className={classNames} sx={StyleProps}>

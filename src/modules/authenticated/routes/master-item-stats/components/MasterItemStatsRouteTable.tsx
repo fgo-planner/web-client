@@ -5,6 +5,7 @@ import React, { ReactNode, useMemo } from 'react';
 import { NumericFormat } from 'react-number-format';
 import { DataTableListStaticRow } from '../../../../../components/data-table-list/DataTableListStaticRow';
 import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
+import { TruncateText } from '../../../../../components/text/TruncateText';
 import { useGameItemCategoryMap } from '../../../../../hooks/data/useGameItemCategoryMap';
 import { ThemeConstants } from '../../../../../styles/ThemeConstants';
 import { GameItemCategory, GameItemMap } from '../../../../../types';
@@ -87,10 +88,13 @@ const StyleProps = (theme: SystemTheme) => {
             display: 'flex',
             alignContent: 'center',
             alignItems: 'center',
-            minWidth: spacing(64), // 256px
+            width: spacing(72), // 288px
             [breakpoints.down('lg')]: {
-                minWidth: spacing(56)  // 224px
+                width: spacing(64)  // 256px
             },
+            '>:last-child': {
+                pl: 4
+            }
         },
         [`& .${StyleClassPrefix}-data-cell`]: {
             textAlign: 'center',
@@ -185,10 +189,10 @@ export const MasterItemStatsRouteTable = React.memo((props: Props) => {
                             showBackground
                             enableLink
                         />
-                        <div className='pl-4'>
+                        <TruncateText>
                             {/* TODO Make this a link */}
                             {gameItem.name}
-                        </div>
+                        </TruncateText>
                     </div>
                     <div className={`${StyleClassPrefix}-data-cell`}>
                         <NumericFormat

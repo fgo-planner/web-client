@@ -12,6 +12,7 @@ type Props = PropsWithChildren<{
     borderBottom?: boolean;
     skipStyle?: boolean
     stickyContent?: ReactNode;
+    styleClassPrefix?: string;
 }> & Pick<ComponentStyleProps, 'className' | 'style'> & DOMAttributes<HTMLDivElement>;
 
 export const StyleClassPrefix = 'DataTableListStaticRow';
@@ -38,23 +39,26 @@ export const DataTableListStaticRow = React.memo((props: Props) => {
         borderBottom,
         skipStyle,
         stickyContent,
+        styleClassPrefix = StyleClassPrefix,
         className,
         style,
         ...domAttributes
     } = props;
 
     const stickyContentNode: ReactNode = stickyContent && (
-        <div className={`${StyleClassPrefix}-sticky-content`}>
+        <div className={`${styleClassPrefix}-sticky-content`}>
             {stickyContent}
         </div>
     );
 
     const classNames = clsx(
         className,
-        `${StyleClassPrefix}-row`,
-        active && `${StyleClassPrefix}-active`,
-        borderTop && `${StyleClassPrefix}-border-top`,
-        borderBottom && `${StyleClassPrefix}-border-bottom`
+        `${styleClassPrefix}-root`,
+        // `${styleClassPrefix}-draggable`,
+        // isDragging && `${styleClassPrefix}-dragging`,
+        active && `${styleClassPrefix}-active`,
+        borderTop && `${styleClassPrefix}-border-top`,
+        borderBottom && `${styleClassPrefix}-border-bottom`
     );
 
     if (skipStyle) {
@@ -73,7 +77,7 @@ export const DataTableListStaticRow = React.memo((props: Props) => {
     return (
         <RootComponent
             className={classNames}
-            classPrefix={StyleClassPrefix}
+            classPrefix={styleClassPrefix}
             forRoot
             style={style}
             {...domAttributes}

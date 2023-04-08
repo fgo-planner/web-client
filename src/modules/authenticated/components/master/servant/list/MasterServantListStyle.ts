@@ -16,6 +16,8 @@ import { StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './Mast
 
 export const StyleClassPrefix = 'MasterServantList';
 
+export const MasterServantListRowHeight = 52;
+
 /**
  * For optimization purposes this entire style function contains style
  * properties for all of the `MasterServantList` children components.
@@ -37,6 +39,8 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
             overflow: 'auto',
             [`& .${StyleClassPrefix}-list`]: {
                 [`& .${MasterServantListRowStyleClassPrefix}-root`]: {
+                    display: 'flex',
+                    alignItems: 'center',
                     width: 'fit-content',
                     minWidth: '100%',
                     [`& .${MasterServantListRowStyleClassPrefix}-content`]: {

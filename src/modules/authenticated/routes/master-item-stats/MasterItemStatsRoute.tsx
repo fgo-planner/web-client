@@ -186,7 +186,7 @@ export const MasterItemStatsRoute = React.memo(() => {
                     component={Link}
                     to='../master/items'
                     children={<Icon>format_list_bulleted</Icon>}
-                    size='large' 
+                    size='large'
                 />
             </div>
         </Tooltip>,
@@ -219,14 +219,13 @@ export const MasterItemStatsRoute = React.memo(() => {
                     {navigationRailChildNodes}
                 </NavigationRail>
                 <div className={`${StyleClassPrefix}-main-content`}>
-
-                <div className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
-                    <MasterItemStatsRouteTable
-                        stats={stats}
-                        gameItemMap={gameItemMap}
-                        filter={filter}
-                    />
-                </div>
+                    <div className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
+                        <MasterItemStatsRouteTable
+                            stats={stats}
+                            gameItemMap={gameItemMap}
+                            filter={filter}
+                        />
+                    </div>
                 </div>
             </div>
         </Box>

@@ -493,15 +493,16 @@ export const MasterServantsRoute = React.memo(() => {
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <MasterServantList
-                            masterServantsData={dragDropData || servantsData}
                             bondLevels={bondLevels}
+                            dragDropMode={dragDropMode}
+                            masterServantsData={dragDropData || servantsData}
                             selectedInstanceIds={selectedServantsData.ids}
                             showHeader={sm}
-                            visibleColumns={visibleColumns}
-                            dragDropMode={dragDropMode}
-                            sortOptions={sortOptions}
                             showUnsummonedServants={showUnsummonedServants}
+                            sortOptions={sortOptions}
                             textFilter={servantFilter?.searchText}
+                            virtualList // TODO Make this configurable
+                            visibleColumns={visibleColumns}
                             onDragOrderChange={handleDragOrderChange}
                             onHeaderClick={handleHeaderClick}
                             onRowClick={handleRowClick}

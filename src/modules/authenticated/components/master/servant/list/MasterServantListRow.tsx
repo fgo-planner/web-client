@@ -1,11 +1,12 @@
 import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
 import { GameServant, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
 import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
-import { DataTableListDraggableRow } from '../../../../../../components/data-table-list/DataTableListDraggableRow';
+import { DataTableListStaticRow } from '../../../../../../components/data-table-list/DataTableListStaticRow';
 import { ServantThumbnail } from '../../../../../../components/servant/ServantThumbnail';
+import { MasterServantListColumn } from './MasterServantListColumn';
 import { MasterServantListRowLabel } from './MasterServantListRowLabel';
 import { MasterServantListRowStats } from './MasterServantListRowStats';
-import { MasterServantListColumn } from './MasterServantListColumn';
+import { MasterServantListRowHeight } from './MasterServantListStyle';
 
 type Props = {
     active?: boolean;
@@ -74,7 +75,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
 
     const servantThumbnailNode: ReactNode = (
         <ServantThumbnail
-            size={52}
+            size={MasterServantListRowHeight}
             gameServant={gameServant}
             stage={artStage}
             enableLink
@@ -99,17 +100,17 @@ export const MasterServantListRow = React.memo((props: Props) => {
     );
 
     return (
-        <DataTableListDraggableRow
+        <DataTableListStaticRow
             styleClassPrefix={StyleClassPrefix}
             skipStyle
-            draggableId={masterServant.instanceId}
-            index={index}
+            // draggableId={masterServant.instanceId}
+            // index={index}
             borderBottom={!lastRow}
             active={active}
             stickyContent={servantThumbnailNode}
-            dragHandleVisible={dragDropMode}
-            dragEnabled={dragDropMode}
-            onDragOrderChange={onDragOrderChange}
+            // dragHandleVisible={dragDropMode}
+            // dragEnabled={dragDropMode}
+            // onDragOrderChange={onDragOrderChange}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
             onContextMenu={handleContextMenu}
@@ -119,7 +120,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
                 {labelNode}
                 {statsNode}
             </div>
-        </DataTableListDraggableRow>
+        </DataTableListStaticRow>
     );
 
 }, shouldSkipUpdate);

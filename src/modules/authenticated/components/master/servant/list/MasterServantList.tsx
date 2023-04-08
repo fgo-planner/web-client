@@ -1,19 +1,17 @@
 import { CollectionUtils, ReadonlyRecord } from '@fgo-planner/common-core';
 import { InstantiatedServantBondLevel, InstantiatedServantUtils, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { MuiStyledOptions, styled } from '@mui/system';
-import clsx from 'clsx';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DataTableVirtual } from '../../../../../../components/data-table/DataTableVirtual';
 import { useGameServantKeywordsMap } from '../../../../../../hooks/data/useGameServantKeywordsMap';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/useMultiSelectHelperForMouseEvent';
 import { SortDirection, SortOptions } from '../../../../../../types';
 import { DataAggregationUtils } from '../../../../../../utils/DataAggregationUtils';
 import { GameServantUtils } from '../../../../../../utils/game/GameServantUtils';
+import { MasterServantListColumn } from './MasterServantListColumn';
 import { MasterServantListHeader } from './MasterServantListHeader';
 import { MasterServantListRow } from './MasterServantListRow';
-import { MasterServantListStyle, StyleClassPrefix } from './MasterServantListStyle';
-import { MasterServantListColumn } from './MasterServantListColumn';
+import { MasterServantListRowHeight, MasterServantListStyle, StyleClassPrefix } from './MasterServantListStyle';
 
 type Props = {
     bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
@@ -37,6 +35,7 @@ type Props = {
     showUnsummonedServants?: boolean; // TODO Combine this with the rest of filters.
     sortOptions?: SortOptions<MasterServantListColumn.Name>;
     textFilter?: string; // TODO Combine this with the rest of filters.
+    virtualList?: boolean;
     visibleColumns?: Readonly<MasterServantListColumn.Visibility>;
     viewLayout?: any; // TODO Make use of this
     onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
@@ -76,8 +75,11 @@ export const MasterServantList = React.memo((props: Props) => {
         showUnsummonedServants,
         sortOptions,
         textFilter,
+        virtualList,
         visibleColumns
     } = props;
+
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     /**
      * Due to the `onClick` event potentially firing before the `onDoubleClick` for
@@ -101,8 +103,8 @@ export const MasterServantList = React.memo((props: Props) => {
         if (textFilter) {
             result = GameServantUtils.filterServants(
                 gameServantsKeywordsMap || {},
-                textFilter, 
-                result, 
+                textFilter,
+                result,
                 DataAggregationUtils.getGameServant
             );
         }
@@ -240,7 +242,7 @@ export const MasterServantList = React.memo((props: Props) => {
 
     return (
         <RootComponent className={`${StyleClassPrefix}-root`}>
-            <div className={`${StyleClassPrefix}-list-container`}>
+            <div ref={scrollContainerRef} className={`${StyleClassPrefix}-list-container`}>
                 {showHeader && <MasterServantListHeader
                     sortEnabled
                     dragDropMode={dragDropMode}
@@ -249,11 +251,22 @@ export const MasterServantList = React.memo((props: Props) => {
                     onClick={onHeaderClick}
                     onSortChange={onSortChange}
                 />}
-                <div className={clsx(`${StyleClassPrefix}-list`, dragDropMode && 'drag-drop-mode')}>
+                {/* <div 
+                    className={clsx(`${StyleClassPrefix}-list`, dragDropMode && 'drag-drop-mode')}
+                >
                     <DndProvider backend={HTML5Backend}>
                         {displayedMasterServantsData.map(renderMasterServantRow)}
                     </DndProvider>
-                </div>
+                </div> */}
+                {<DataTableVirtual
+                    className={`${StyleClassPrefix}-list`}
+                    data={displayedMasterServantsData}
+                    disableVirtualization={!virtualList}
+                    renderFunction={renderMasterServantRow}
+                    rowBufferCount={16} // TODO make this configurable
+                    rowHeight={MasterServantListRowHeight}
+                    scrollContainerRef={scrollContainerRef}
+                />}
             </div>
         </RootComponent>
     );

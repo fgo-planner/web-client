@@ -1,6 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { PlanServantAggregatedData } from '@fgo-planner/data-core';
-import { Icon } from '@mui/material';
 import React, { useMemo } from 'react';
 import { IconOutlined } from '../../../icons/IconOutlined';
 

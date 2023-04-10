@@ -18,6 +18,8 @@ type Props = {
     index: number;
     options: PlanRequirementsTableOptionsInternal;
     planServantData: Immutable<PlanServantAggregatedData>;
+    targetCostumes: ReadonlySet<number>;
+    unlockedCostumes: ReadonlySet<number>;
     servantRequirements: PlanServantRequirements;
     onClick?: (e: MouseEvent, index: number) => void;
     onContextMenu?: (e: MouseEvent, index: number) => void;
@@ -44,6 +46,8 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
         },
         planServantData,
         servantRequirements,
+        targetCostumes,
+        unlockedCostumes,
         onClick,
         onContextMenu,
         onDoubleClick,
@@ -79,6 +83,8 @@ export const PlanRequirementsTableServantRow = React.memo((props: Props) => {
         <PlanRequirementsTableServantRowHeader
             planServantData={planServantData}
             servantRowHeaderMode={servantRowHeaderMode}
+            targetCostumes={targetCostumes}
+            unlockedCostumes={unlockedCostumes}
         />
     );
 

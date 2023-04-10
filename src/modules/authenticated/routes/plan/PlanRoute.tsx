@@ -130,9 +130,10 @@ export const PlanRoute = React.memo(() => {
 
     const {
         userPreferences: {
+            planServantEditDialogActiveTab,
             table: tableOptions
         },
-        // setServantEditDialogActiveTab,
+        setPlanServantEditDialogActiveTab,
         toggleCellSize,
         toggleRowHeaderMode,
         toggleShowEmptyColumns
@@ -222,7 +223,8 @@ export const PlanRoute = React.memo(() => {
             data: {
                 instanceId: IndeterminateValue,
                 update: PlanServantUpdateUtils.createNew(planEditData.costumes),
-                availableServants
+                availableServants,
+                unlockedCostumes: masterAccountEditData.costumes
             }
         };
         openPlanServantEditDialog(planServantEditDialogData);
@@ -243,11 +245,12 @@ export const PlanRoute = React.memo(() => {
             data: {
                 instanceId: IndeterminateValue,
                 update: PlanServantUpdateUtils.createFromExisting(selectedServants, planEditData.costumes),
-                availableServants: CollectionUtils.emptyArray()
+                availableServants: CollectionUtils.emptyArray(),
+                unlockedCostumes: masterAccountEditData.costumes
             }
         };
         openPlanServantEditDialog(planServantEditDialogData);
-    }, [openPlanServantEditDialog, planEditData, selectedServantsData]);
+    }, [masterAccountEditData, openPlanServantEditDialog, planEditData.costumes, selectedServantsData.instances]);
 
     const openDeleteServantDialog = useCallback((): void => {
         if (!selectedServantsData.instances.length) {
@@ -325,13 +328,6 @@ export const PlanRoute = React.memo(() => {
     const handleRowDoubleClick = useCallback(() => {
         openEditServantDialog();
     }, [openEditServantDialog]);
-
-    // const handleHeaderClick = useCallback((e: MouseEvent) => {
-    //     console.log('handleHeaderClick', e);
-    //     if (e.type === 'contextmenu') {
-    //         openContextMenu('header', e);
-    //     }
-    // }, [openContextMenu]);
 
     // const handleSortChange = useCallback((column?: MasterServantListColumn, direction: SortDirection = 'asc'): void => {
     //     /**
@@ -501,10 +497,12 @@ export const PlanRoute = React.memo(() => {
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <PlanRequirementsTable
+                            options={tableOptions}
                             planServantsData={planEditData.servantsData}
                             planRequirements={planRequirements}
                             selectedInstanceIds={selectedServantsData.ids}
-                            options={tableOptions}
+                            targetCostumes={planEditData.costumes}
+                            unlockedCostumes={masterAccountEditData.costumes}
                             onEditMasterItems={openEditItemsDialog}
                             onRowDoubleClick={handleRowDoubleClick}
                             onSelectionChange={updateServantSelection}
@@ -513,10 +511,10 @@ export const PlanRoute = React.memo(() => {
                 </div>
             </div>
             <PlanRoutePlanServantEditDialog
+                activeTab={planServantEditDialogActiveTab}
                 dialogData={activeDialogInfo.name === 'planServantEdit' ? activeDialogInfo.data : undefined}
                 targetPlanServantsData={selectedServantsData.instances}
-                activeTab='enhancements'
-                onTabChange={Functions.identity}
+                onTabChange={setPlanServantEditDialogActiveTab}
                 onClose={handleEditServantDialogClose}
             />
             <PlanRoutePlanServantDeleteDialog

@@ -24,6 +24,8 @@ type Props = {
      * Instance IDs of selected servants.
      */
     selectedInstanceIds?: ReadonlySet<number>;
+    targetCostumes: ReadonlySet<number>;
+    unlockedCostumes: ReadonlySet<number>;
     onEditMasterItems?: () => void;
     onRowClick?: MouseEventHandler;
     onRowDoubleClick?: MouseEventHandler;
@@ -92,6 +94,8 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         planRequirements,
         planServantsData,
         selectedInstanceIds = CollectionUtils.emptySet(),
+        targetCostumes,
+        unlockedCostumes,
         onEditMasterItems,
         onRowClick,
         onRowDoubleClick,
@@ -204,6 +208,8 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 options={internalTableOptions}
                 planServantData={planServantData}
                 servantRequirements={servantRequirements}
+                targetCostumes={targetCostumes}
+                unlockedCostumes={unlockedCostumes}
                 onClick={handleRowClick}
                 onContextMenu={handleRowClick}
                 onDoubleClick={onRowDoubleClick}

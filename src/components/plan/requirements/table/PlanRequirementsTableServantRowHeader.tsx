@@ -9,6 +9,8 @@ import { PlanRequirementsTableServantRowEnhancementTargets } from './PlanRequire
 type Props = {
     planServantData: Immutable<PlanServantAggregatedData>;
     servantRowHeaderMode: 'name' | 'targets' | 'toggle';
+    targetCostumes: ReadonlySet<number>;
+    unlockedCostumes: ReadonlySet<number>;
 };
 
 export const StyleClassPrefix = 'PlanRequirementsTableServantRowHeader';
@@ -23,7 +25,9 @@ export const PlanRequirementsTableServantRowHeader: React.FC<Props> = (props: Pr
 
     const {
         planServantData,
-        servantRowHeaderMode
+        servantRowHeaderMode,
+        targetCostumes,
+        unlockedCostumes
     } = props;
 
     const gameServant = planServantData.gameServant;
@@ -45,6 +49,8 @@ export const PlanRequirementsTableServantRowHeader: React.FC<Props> = (props: Pr
             <PlanRequirementsTableServantRowEnhancementTargets
                 className={contentNodeClassName}
                 planServantData={planServantData}
+                targetCostumes={targetCostumes}
+                unlockedCostumes={unlockedCostumes}
             />
         );
     } else {

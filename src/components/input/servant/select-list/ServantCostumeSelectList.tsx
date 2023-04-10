@@ -10,8 +10,13 @@ import { ServantCostumeSelectListRow, StyleClassPrefix as ServantCostumeSelectLi
 type Props = {
     costumesData?: ReadonlyArray<GameServantCostumeAggregatedData>;
     disabledCostumeIds?: ReadonlySet<number>;
-    onSelectionChange: (selectedCostumeIds: ReadonlySet<number>) => void;
     selectedCostumeIds: ReadonlySet<number>;
+    /**
+     * Any costumes in the `disabledCostumeIds` will show as selected despite being
+     * disabled.
+     */
+    showDisabledAsSelected?: boolean;
+    onSelectionChange: (selectedCostumeIds: ReadonlySet<number>) => void;
 };
 
 const NoCostumesMessage = 'No costumes available for the selected servant(s).';
@@ -73,8 +78,9 @@ export const ServantCostumeSelectList = React.memo((props: Props) => {
     const {
         costumesData = CollectionUtils.emptyArray(),
         disabledCostumeIds,
-        onSelectionChange,
-        selectedCostumeIds
+        selectedCostumeIds,
+        showDisabledAsSelected,
+        onSelectionChange
     } = props;
 
     const disabledIds = useMemo((): ReadonlySet<number> => {
@@ -107,16 +113,16 @@ export const ServantCostumeSelectList = React.memo((props: Props) => {
 
     const renderRow = (costumeData: GameServantCostumeAggregatedData, index: number): ReactNode => {
         const { costumeId } = costumeData;
-        const selected = selectedCostumeIds.has(costumeId);
-        const disabled = !!disabledCostumeIds?.has(costumeId);
+        const disabled = disabledCostumeIds?.has(costumeId);
+        const selected = selectedCostumeIds.has(costumeId) || (disabled && showDisabledAsSelected);
         return (
             <ServantCostumeSelectListRow
                 key={costumeId}
                 index={index}
                 costumeData={costumeData}
                 onClick={handleItemClick}
-                selected={selected}
-                disabled={disabled}
+                selected={!!selected}
+                disabled={!!disabled}
             />
         );
     };

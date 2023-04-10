@@ -37,6 +37,7 @@ type PlanEditData = PlanInfo & {
  * been modified.
  */
 type PlanEditDirtyData = {
+    costumes: boolean;
     info: boolean;
     servants: Set<number>;
     /**
@@ -251,6 +252,7 @@ const clonePlanDataForReference = (plan: Nullable<ImmutablePlan>): PlanEditRefer
 };
 
 const getDefaultPlanEditDirtyData = (): PlanEditDirtyData => ({
+    costumes: false,
     info: false,
     servants: new Set(),
     servantOrder: false,
@@ -258,6 +260,7 @@ const getDefaultPlanEditDirtyData = (): PlanEditDirtyData => ({
 });
 
 const hasDirtyData = (dirtyData: PlanEditDirtyData): boolean => !!(
+    dirtyData.costumes ||
     dirtyData.info ||
     dirtyData.servants.size ||
     dirtyData.servantOrder ||
@@ -348,6 +351,8 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     /**
      * Whether the base plan data has been modified externally (ie.
      * through another instance of the app).
+     * 
+     * TODO Implement this.
      */
     const [isPlanDataStale, setIsPlanDataStale] = useState<boolean>(false);
 

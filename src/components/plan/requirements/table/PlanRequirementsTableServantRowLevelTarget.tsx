@@ -29,7 +29,7 @@ export const PlanRequirementsTableServantRowLevelTarget: React.FC<Props> = (prop
                     ascensions: levelEnabled
                 },
                 level: target
-            },
+            }
         }
     } = props;
 

@@ -115,7 +115,7 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
      * `MasterServantAggregatedData`, and both arrays are meant to be readonly).
      */
     const [
-        targetMasterServantsData, 
+        targetMasterServantsData,
         setTargetMasterServantsData
     ] = useState<ReadonlyArray<MasterServantAggregatedData>>(CollectionUtils.emptyArray);
 
@@ -137,7 +137,7 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
      * from/to the respective tab).
      */
     /** */
-    const costumesData = useGameServantCostumesData(targetPlanServantsData);
+    const costumesData = useGameServantCostumesData(targetMasterServantsData);
 
     const servantSelectDisabled = action === EditDialogAction.Edit;
 
@@ -153,6 +153,10 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
             return;
         }
         data.instanceId = instanceId;
+        /**
+         * Clear costume selection when switching servants.
+         */
+        data.update.costumes.clear();
         // TODO Need to update ascension and level as needed.
         setTargetMasterServantsData([value]);
     }, [data, servantSelectDisabled]);
@@ -172,6 +176,7 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
             <PlanRoutePlanServantEditDialogCostumesTabContent
                 costumesData={costumesData}
                 planServantUpdate={data.update}
+                unlockedCostumes={data.unlockedCostumes}
             />
         );
     } else {
@@ -197,8 +202,14 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
             </div>
             <div className={`${StyleClassPrefix}-tabs-container`}>
                 <Tabs value={activeTab} onChange={handleActiveTabChange}>
-                    <Tab label='Enhancements' value='enhancements' />
-                    <Tab label='Costumes' value='costumes' disabled />
+                    <Tab
+                        label='Enhancements'
+                        value='enhancements'
+                    />
+                    <Tab
+                        label='Costumes'
+                        value='costumes'
+                    />
                 </Tabs>
             </div>
             <div className={`${StyleClassPrefix}-tabs-content-container`}>

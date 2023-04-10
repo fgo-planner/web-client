@@ -1,4 +1,3 @@
-import { CollectionUtils } from '@fgo-planner/common-core';
 import { GameServantCostumeAggregatedData, InstantiatedServantUpdateUtils, PlanServantUpdate } from '@fgo-planner/data-core';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -12,6 +11,10 @@ type Props = {
      * The servant update data. This object will be modified directly.
      */
     planServantUpdate: PlanServantUpdate;
+    /**
+     * Set of costumes IDs that are already unlocked.
+     */
+    unlockedCostumes: ReadonlySet<number>;
 };
 
 const StyleClassPrefix = 'PlanRoutePlanServantEditDialogCostumesTabContent';
@@ -32,32 +35,27 @@ export const PlanRoutePlanServantEditDialogCostumesTabContent = React.memo((prop
         costumesData,
         planServantUpdate: {
             costumes
-        }
+        },
+        unlockedCostumes
     } = props;
 
-    const [selectedCostumeIds, setSelectedCostumeIds] = useState<ReadonlySet<number>>(CollectionUtils.emptySet);
+    const [selectedCostumeIds, setSelectedCostumeIds] = useState<ReadonlySet<number>>();
 
     useEffect((): void => {
         const selectedCostumeIds = InstantiatedServantUpdateUtils.convertFromCostumesMap(costumes);
         setSelectedCostumeIds(selectedCostumeIds);
-    }, [costumes]);
+    }, [costumes, costumesData, unlockedCostumes]);
 
     const handleSelectionChange = useCallback((selectedCostumeIds: ReadonlySet<number>): void => {
-        // TODO Is this equality check even needed?
-        setSelectedCostumeIds(prevSelectedCostumeIds => {
-            if (CollectionUtils.isSetsEqual(prevSelectedCostumeIds, selectedCostumeIds)) {
-                return prevSelectedCostumeIds;
+        for (const costumeId of selectedCostumeIds) {
+            costumes.set(costumeId, true);
+        }
+        for (const costumeId of costumes.keys()) {
+            if (!selectedCostumeIds.has(costumeId)) {
+                costumes.set(costumeId, false);
             }
-            for (const costumeId of selectedCostumeIds) {
-                costumes.set(costumeId, true);
-            }
-            for (const costumeId of costumes.keys()) {
-                if (!selectedCostumeIds.has(costumeId)) {
-                    costumes.set(costumeId, false);
-                }
-            }
-            return selectedCostumeIds;
-        });
+        }
+        setSelectedCostumeIds(selectedCostumeIds);
     }, [costumes]);
 
     const classNames = clsx(
@@ -65,11 +63,20 @@ export const PlanRoutePlanServantEditDialogCostumesTabContent = React.memo((prop
         ThemeConstants.ClassScrollbarTrackBorder
     );
 
+    /**
+     * This can be undefined during initial render.
+     */
+    if (!selectedCostumeIds) {
+        return null;
+    }
+
     return (
         <Box className={classNames} sx={StyleProps}>
             <ServantCostumeSelectList
                 costumesData={costumesData}
+                disabledCostumeIds={unlockedCostumes}
                 selectedCostumeIds={selectedCostumeIds}
+                showDisabledAsSelected
                 onSelectionChange={handleSelectionChange}
             />
         </Box>

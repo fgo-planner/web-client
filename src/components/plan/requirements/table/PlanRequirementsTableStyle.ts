@@ -12,6 +12,7 @@ import { StyleClassPrefix as ServantRowEnhancementTargetsStyleClassPrefix } from
 import { StyleClassPrefix as ServantRowHeaderStyleClassPrefix } from './PlanRequirementsTableServantRowHeader';
 import { StyleClassPrefix as ServantRowSkillTargetsStyleClassPrefix } from './PlanRequirementsTableServantRowSkillTargets';
 import { StyleClassPrefix as ServantRowLevelTargetStyleClassPrefix } from './PlanRequirementsTableServantRowLevelTarget';
+import { StyleClassPrefix as ServantRowCostumeTargetStyleClassPrefix } from './PlanRequirementsTableServantRowCostumeTarget';
 import { StyleClassPrefix as ServantRowAscensionTargetStyleClassPrefix } from './PlanRequirementsTableServantRowAscensionTarget';
 
 /**
@@ -187,6 +188,20 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                             [`&.${ServantRowSkillTargetsStyleClassPrefix}-disabled`]: {
                                 color: palette.text.disabled
                             }
+                        },
+                        /**
+                         * PlanRequirementsTableServantRowCostumeTarget component
+                         */
+                        [`& .${ServantRowCostumeTargetStyleClassPrefix}-root`]: {
+                            '& .MuiIcon-root': {
+                                color: palette.secondary.main,
+                                fontSize: '1.5em',
+                                mr: 1
+                            },
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontSize: EnhancementTargetsFontSize,
+                            mr: 3
                         }
                     }
                 },

@@ -21,5 +21,11 @@ export type PlanRoutePlanServantEditDialogData = EditDialogData<{
      * Only used in add mode; this is ignored in edit mode.
      */
     availableServants: ReadonlyArray<MasterServantAggregatedData>;
-    
+
+    /**
+     * Set of costume IDs that are already unlocked. This is readonly and will not
+     * be modified.
+     */
+    unlockedCostumes: ReadonlySet<number>;
+
 }>;

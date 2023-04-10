@@ -4,11 +4,14 @@ import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 import { ComponentStyleProps } from '../../../../types';
 import { PlanRequirementsTableServantRowAscensionTarget } from './PlanRequirementsTableServantRowAscensionTarget';
+import { PlanRequirementsTableServantRowCostumeTarget } from './PlanRequirementsTableServantRowCostumeTarget';
 import { PlanRequirementsTableServantRowLevelTarget } from './PlanRequirementsTableServantRowLevelTarget';
 import { PlanRequirementsTableServantRowSkillTargets } from './PlanRequirementsTableServantRowSkillTargets';
 
 type Props = {
     planServantData: Immutable<PlanServantAggregatedData>;
+    targetCostumes: ReadonlySet<number>;
+    unlockedCostumes: ReadonlySet<number>;
 } & Pick<ComponentStyleProps, 'className'>;
 
 const ArrowCharacter = '\u279C';
@@ -25,6 +28,8 @@ export const PlanRequirementsTableServantRowEnhancementTargets: React.FC<Props> 
 
     const {
         planServantData,
+        targetCostumes,
+        unlockedCostumes,
         className
     } = props;
 
@@ -57,7 +62,11 @@ export const PlanRequirementsTableServantRowEnhancementTargets: React.FC<Props> 
                     arrowCharacter={arrowCharacterNode}
                     planServantData={planServantData}
                 />
-                {/* <div>test</div> */}
+                <PlanRequirementsTableServantRowCostumeTarget
+                    planServantData={planServantData}
+                    targetCostumes={targetCostumes}
+                    unlockedCostumes={unlockedCostumes}
+                />
                 <PlanRequirementsTableServantRowSkillTargets
                     arrowCharacter={arrowCharacterNode}
                     planServantData={planServantData}

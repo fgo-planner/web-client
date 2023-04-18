@@ -267,10 +267,7 @@ const hasDirtyData = (dirtyData: PlanEditDirtyData): boolean => !!(
     dirtyData.upcomingResources
 );
 
-const isPlanServantChanged = (
-    reference: Immutable<PlanServant> | undefined,
-    planServant: Immutable<PlanServant>
-): boolean => {
+const isPlanServantChanged = (reference: Immutable<PlanServant> | undefined, planServant: Immutable<PlanServant>): boolean => {
     if (!reference) {
         return true;
     }
@@ -285,6 +282,20 @@ const createNegativeItemUpdates = (requirements: PlanEnhancementRequirements): R
         itemUpdates[Number(key)] = (current: number) => Math.max(MasterItemConstants.MinQuantity, current - value.total);
     }
     return itemUpdates;
+};
+
+// TODO Move this to utilities class.
+const filterCostumes = (costumes: ReadonlySet<number>, planServantsData: ReadonlyArray<PlanServantAggregatedData>): Set<number> => {
+    const result = new Set<number>();
+    for (const { gameServant } of planServantsData) {
+        for (const key of Object.keys(gameServant.costumes)) {
+            const costumeId = Number(key);
+            if (costumes.has(costumeId)) {
+                result.add(costumeId);
+            }
+        }
+    }
+    return result;
 };
 
 //#endregion
@@ -692,7 +703,11 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     }, [editData, referenceData]);
 
     const deletePlanServants = useCallback((instanceIds: Iterable<number>): void => {
-        const currentServantsData = editData.servantsData;
+
+        const {
+            servantsData: currentServantsData,
+            costumes: currentCostumes
+        } = editData;
 
         const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
 
@@ -701,12 +716,18 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
          * is created to conform with the hook specifications.
          */
         const servantsData = currentServantsData.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
-
-        // TODO Also remove costume data if the last instance of the servant is removed.
+        
+        /**
+         * New object for the unlocked costumes data. A new set instance is created to
+         * conform with the hook specifications.
+         */
+        const costumes = filterCostumes(currentCostumes, servantsData);
 
         editData.servantsData = servantsData;
+        editData.costumes = costumes;
 
         const referenceServants = referenceData.servants;
+        const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
         const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceServants, servantsData);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
@@ -724,6 +745,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
             }
             return {
                 ...dirtyData,
+                costumes: isCostumesDirty,
                 servantOrder: isOrderDirty
             };
         });

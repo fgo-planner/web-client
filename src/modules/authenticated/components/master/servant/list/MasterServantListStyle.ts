@@ -1,6 +1,5 @@
 import { CSSInterpolation, Theme } from '@mui/material';
-import { DataTableListBaseRowStyle } from '../../../../../../components/data-table-list/DataTableListBaseRowStyle';
-import { DataTableListDraggableRowStyle } from '../../../../../../components/data-table-list/DataTableListDraggableRowStyle';
+import { DataTableListRowStyle } from '../../../../../../components/data-table-list/DataTableListRowStyle';
 import { StyleClassPrefix as ServantSkillLevelStyleClassPrefix } from '../../../../../../components/servant/ServantSkillLevels';
 import { StyleClassPrefix as ServantThumbnailStyleClassPrefix } from '../../../../../../components/servant/ServantThumbnail';
 import { StyledFunctionPropsWithTheme, StyledFunctionThemeProp } from '../../../../../../types';
@@ -143,8 +142,7 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
 
     return [
         baseStyle,
-        DataTableListBaseRowStyle(rowStyledProps),
-        DataTableListDraggableRowStyle(rowStyledProps)
+        DataTableListRowStyle(rowStyledProps)
     ];
     
 };

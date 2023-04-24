@@ -3,7 +3,7 @@ import { styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren, ReactNode } from 'react';
 import { ComponentStyleProps, StyledFunctionProps } from '../../types';
-import { DataTableListBaseRowStyle } from './DataTableListBaseRowStyle';
+import { DataTableListRowStyle } from './DataTableListRowStyle';
 
 // TODO Add prop for cursor style.
 type Props = PropsWithChildren<{
@@ -12,7 +12,7 @@ type Props = PropsWithChildren<{
     borderBottom?: boolean;
     disablePointerEvents?: boolean;
     id?: string;
-    skipStyle?: boolean
+    noStyling?: boolean
     stickyContent?: ReactNode;
     styleClassPrefix?: string;
 }> & Pick<ComponentStyleProps, 'className' | 'style'> & DOMAttributes<HTMLDivElement>;
@@ -30,7 +30,7 @@ const StyledOptions = {
     shouldForwardProp
 } as FilteringStyledOptions<StyledFunctionProps>;
 
-const RootComponent = styled('div', StyledOptions)<StyledFunctionProps>(DataTableListBaseRowStyle);
+const RootComponent = styled('div', StyledOptions)<StyledFunctionProps>(DataTableListRowStyle);
 
 export const DataTableListRow = React.memo((props: Props) => {
 
@@ -41,7 +41,7 @@ export const DataTableListRow = React.memo((props: Props) => {
         borderBottom,
         disablePointerEvents,
         id,
-        skipStyle,
+        noStyling,
         stickyContent,
         styleClassPrefix = StyleClassPrefix,
         className,
@@ -64,7 +64,7 @@ export const DataTableListRow = React.memo((props: Props) => {
         disablePointerEvents && `${styleClassPrefix}-no-pointer-events`
     );
 
-    if (skipStyle) {
+    if (noStyling) {
         return (
             <div
                 id={id}

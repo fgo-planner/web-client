@@ -1,7 +1,7 @@
 import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { DataTableListStaticRow } from '../../../../../components/data-table-list/DataTableListStaticRow';
+import { DataTableListRow } from '../../../../../components/data-table-list/DataTableListRow';
 import { MasterAccountFriendId } from '../../../../../components/master/account/MasterAccountFriendId';
 import { TruncateText } from '../../../../../components/text/TruncateText';
 import { DateTimeFormatUtils } from '../../../../../utils/format/DateTimeFormatUtils';
@@ -30,7 +30,7 @@ export const MasterAccountsRouteAccountListRow = React.memo((props: Props) => {
     } = visibleColumns;
 
     return (
-        <DataTableListStaticRow className={`${StyleClassPrefix}-root`} borderBottom>
+        <DataTableListRow className={`${StyleClassPrefix}-root`} borderBottom>
             <TruncateText className={`${StyleClassPrefix}-name`}>
                 <Link to={`../master/settings?account-id=${account._id}`}>
                     {account.name || <i>{`Account ${index + 1}`}</i>}
@@ -48,7 +48,7 @@ export const MasterAccountsRouteAccountListRow = React.memo((props: Props) => {
             {modified && <div className={`${StyleClassPrefix}-modified`}>
                 {DateTimeFormatUtils.formatForDataTable(account.updatedAt)}
             </div>}
-        </DataTableListStaticRow>
+        </DataTableListRow>
     );
 
 });

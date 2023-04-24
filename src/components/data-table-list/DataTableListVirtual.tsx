@@ -105,10 +105,27 @@ export const DataTableListVirtual = React.memo(<T,>(props: Props<T>) => {
 
     }, [computeVirtualProps, disableVirtualization, initialized, scrollContainerRef]);
 
+    const renderRow = (elem: T, index: number): ReactNode => {
+        if (dropTargetIndex === index) {
+            return <>
+                <DataTableListDropTargetIndicator key={-1} />
+                {renderFunction(elem, index)}
+            </>;
+        }
+        if (dropTargetIndex === data.length && index === data.length - 1) {
+            return <>
+                {renderFunction(elem, index)}
+                <DataTableListDropTargetIndicator key={-1} />
+            </>;
+        }
+        return renderFunction(elem, index);
+    };
+
+    // TODO Maybe create separate component for non-virtualized list.
     if (disableVirtualization) {
         return (
             <div className={className}>
-                {data.map(renderFunction)}
+                {data.map(renderRow)}
             </div>
         );
     }
@@ -117,19 +134,7 @@ export const DataTableListVirtual = React.memo(<T,>(props: Props<T>) => {
         if (index < startIndex || index > (startIndex + renderedRowsCount)) {
             return null;
         }
-        if (dropTargetIndex === index) {
-            return <>
-                <DataTableListDropTargetIndicator key='i' />
-                {renderFunction(elem, index)}
-            </>;
-        }
-        if (dropTargetIndex === data.length && index === data.length - 1) {
-            return <>
-                {renderFunction(elem, index)}
-                <DataTableListDropTargetIndicator key='i' />
-            </>;
-        }
-        return renderFunction(elem, index);
+        return renderRow(elem, index);
     };
 
     /**

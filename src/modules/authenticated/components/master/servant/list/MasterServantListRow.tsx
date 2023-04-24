@@ -108,7 +108,6 @@ export const MasterServantListRow = React.memo((props: Props) => {
                 draggable
             >
                 <Icon>drag_indicator</Icon>
-                {index}
             </div>
         }
         {servantThumbnailNode}
@@ -137,7 +136,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
             borderBottom={!lastRow}
             disablePointerEvents={disablePointerEvents}
             id={id}
-            skipStyle
+            noStyling
             stickyContent={stickyContentNode}
             styleClassPrefix={StyleClassPrefix}
             onClick={handleClick}

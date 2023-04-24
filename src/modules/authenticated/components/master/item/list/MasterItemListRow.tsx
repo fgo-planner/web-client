@@ -2,7 +2,7 @@ import { Immutable, MathUtils } from '@fgo-planner/common-core';
 import { GameItem, GameItemConstants, MasterAccountConstants, MasterItemConstants } from '@fgo-planner/data-core';
 import { TextField } from '@mui/material';
 import React, { ChangeEvent, KeyboardEvent, KeyboardEventHandler, SetStateAction, useCallback, useMemo, useRef, useState } from 'react';
-import { DataTableListStaticRow } from '../../../../../../components/data-table-list/DataTableListStaticRow';
+import { DataTableListRow } from '../../../../../../components/data-table-list/DataTableListRow';
 import { NumberFormatUtils } from '../../../../../../utils/format/NumberFormatUtils';
 import { MasterItemListRowLabel } from './MasterItemListRowLabel';
 
@@ -92,7 +92,7 @@ export const MasterItemListRow = React.memo((props: Props) => {
     );
 
     return (
-        <DataTableListStaticRow
+        <DataTableListRow
             className={`${StyleClassPrefix}-root`}
             onClick={handleRowClick}
             active={active}
@@ -103,7 +103,7 @@ export const MasterItemListRow = React.memo((props: Props) => {
             <div>
                 {itemQuantityInputNode}
             </div>
-        </DataTableListStaticRow>
+        </DataTableListRow>
     );
 
 });

@@ -115,6 +115,15 @@ export const MasterServantsRoute = React.memo(() => {
     } = useDragDropState<MasterServantAggregatedData>();
 
     /**
+     * Need to exit drag-drop mode whenever the `masterAccountEditData` reference
+     * changes. This should only happen when the user switches accounts or reverts
+     * the edit data.
+     */
+    useEffect(() => {
+        endDragDrop();
+    }, [endDragDrop, masterAccountEditData]);
+
+    /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
      * rearrange the default ordering of the list. As such, when in drag-drop mode,
      * the full list in the current default order is visible, regardless of any
@@ -501,7 +510,7 @@ export const MasterServantsRoute = React.memo(() => {
                             showUnsummonedServants={showUnsummonedServants}
                             sortOptions={sortOptions}
                             textFilter={servantFilter?.searchText}
-                            virtualList // TODO Make this configurable
+                            virtualList={false} // TODO Make this configurable
                             visibleColumns={visibleColumns}
                             onDragOrderChange={handleDragOrderChange}
                             onHeaderClick={handleHeaderClick}

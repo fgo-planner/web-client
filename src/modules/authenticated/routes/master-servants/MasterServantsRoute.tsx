@@ -6,7 +6,7 @@ import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from 're
 import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/useSelectedInstancesHelper';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
-import { useDragDropHelper } from '../../../../hooks/user-interface/useDragDropHelper';
+import { useDragDropState } from '../../../../hooks/user-interface/useDragDropState';
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/useNavigationDrawerNoAnimations';
 import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { EditDialogAction, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
@@ -112,7 +112,7 @@ export const MasterServantsRoute = React.memo(() => {
         startDragDrop,
         endDragDrop,
         handleDragOrderChange
-    } = useDragDropHelper<MasterServantAggregatedData>(InstantiatedServantUtils.getInstanceId);
+    } = useDragDropState<MasterServantAggregatedData>();
 
     /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
@@ -271,11 +271,11 @@ export const MasterServantsRoute = React.memo(() => {
     }, [deselectAllServants, masterAccountEditData, startDragDrop]);
 
     const handleDragDropApply = useCallback(() => {
-        const updatedInstanceIdOrder = endDragDrop();
-        if (!updatedInstanceIdOrder) {
+        const updatedServantOrder = endDragDrop();
+        if (!updatedServantOrder) {
             return;
         }
-        updateServantOrder(updatedInstanceIdOrder);
+        updateServantOrder(updatedServantOrder.map(InstantiatedServantUtils.getInstanceId));
     }, [endDragDrop, updateServantOrder]);
 
     const handleDragDropCancel = useCallback(() => {

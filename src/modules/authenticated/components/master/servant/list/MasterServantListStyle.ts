@@ -50,7 +50,7 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                         alignContent: 'center',
                         alignItems: 'center',
                         textAlign: 'center',
-                        height: 52,
+                        height: MasterServantListRowHeight,
                         fontSize: '0.875rem',
                         [`& .${MasterServantListRowLabelStyleClassPrefix}-root`]: {
                             display: 'flex',

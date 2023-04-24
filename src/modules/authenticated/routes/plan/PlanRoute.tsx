@@ -10,7 +10,7 @@ import { PlanRequirementsTable } from '../../../../components/plan/requirements/
 import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/useSelectedInstancesHelper';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
-import { useDragDropHelper } from '../../../../hooks/user-interface/useDragDropHelper';
+import { useDragDropState } from '../../../../hooks/user-interface/useDragDropState';
 import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { EditDialogAction, ModalOnCloseReason } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/SubscribablesContainer';
@@ -166,7 +166,7 @@ export const PlanRoute = React.memo(() => {
         startDragDrop,
         endDragDrop,
         handleDragOrderChange
-    } = useDragDropHelper<Immutable<PlanServantAggregatedData>>(InstantiatedServantUtils.getInstanceId);
+    } = useDragDropState<Immutable<PlanServantAggregatedData>>();
 
     /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
@@ -303,11 +303,11 @@ export const PlanRoute = React.memo(() => {
     }, [deselectAllServants, planEditData, startDragDrop]);
 
     const handleDragDropApply = useCallback(() => {
-        const updatedInstanceIdOrder = endDragDrop();
-        if (!updatedInstanceIdOrder) {
+        const updatedServantOrder = endDragDrop();
+        if (!updatedServantOrder) {
             return;
         }
-        updatePlanServantOrder(updatedInstanceIdOrder);
+        updatePlanServantOrder(updatedServantOrder.map(InstantiatedServantUtils.getInstanceId));
     }, [endDragDrop, updatePlanServantOrder]);
 
     const handleDragDropCancel = useCallback(() => {

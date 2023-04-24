@@ -1,9 +1,15 @@
 import React, { ReactNode, RefObject, useCallback, useEffect, useState } from 'react';
 import { ComponentStyleProps } from '../../types';
+import { DataTableListDropTargetIndicator } from './DataTableListDropTargetIndicator';
 
 type Props<T> = {
     data: ReadonlyArray<T>;
     disableVirtualization?: boolean;
+    /**
+     * Displays the `DataTableListDropTargetIndicator` component before the row at
+     * the given index. The indicator is hidden if `undefined`.
+     */
+    dropTargetIndex?: number;
     renderFunction: (data: T, index: number) => ReactNode;
     rowBufferCount?: number;
     rowHeight: number;
@@ -12,17 +18,12 @@ type Props<T> = {
 
 const DefaultRowBufferCount = 5;
 
-/**
- * Wrapping this component in React.memo is unnecessary because a re-render of
- * the parent components will most likely trigger a re-render of this component
- * anyways.
- */
-/** */
-export const DataTableVirtual = <T,>(props: Props<T>) => {
+export const DataTableListVirtual = React.memo(<T,>(props: Props<T>) => {
 
     const {
         data,
         disableVirtualization,
+        dropTargetIndex,
         renderFunction,
         rowBufferCount,
         rowHeight,
@@ -116,6 +117,18 @@ export const DataTableVirtual = <T,>(props: Props<T>) => {
         if (index < startIndex || index > (startIndex + renderedRowsCount)) {
             return null;
         }
+        if (dropTargetIndex === index) {
+            return <>
+                <DataTableListDropTargetIndicator key='i' />
+                {renderFunction(elem, index)}
+            </>;
+        }
+        if (dropTargetIndex === data.length && index === data.length - 1) {
+            return <>
+                {renderFunction(elem, index)}
+                <DataTableListDropTargetIndicator key='i' />
+            </>;
+        }
         return renderFunction(elem, index);
     };
 
@@ -132,4 +145,4 @@ export const DataTableVirtual = <T,>(props: Props<T>) => {
         </div>
     );
 
-};
+}) as <T> (props: Props<T>) => JSX.Element;

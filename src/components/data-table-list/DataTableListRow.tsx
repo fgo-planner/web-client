@@ -10,12 +10,14 @@ type Props = PropsWithChildren<{
     active?: boolean;
     borderTop?: boolean;
     borderBottom?: boolean;
+    disablePointerEvents?: boolean;
+    id?: string;
     skipStyle?: boolean
     stickyContent?: ReactNode;
     styleClassPrefix?: string;
 }> & Pick<ComponentStyleProps, 'className' | 'style'> & DOMAttributes<HTMLDivElement>;
 
-export const StyleClassPrefix = 'DataTableListStaticRow';
+export const StyleClassPrefix = 'DataTableListRow';
 
 const shouldForwardProp = (prop: PropertyKey): prop is keyof StyledFunctionProps => (
     prop !== 'classPrefix' &&
@@ -30,16 +32,15 @@ const StyledOptions = {
 
 const RootComponent = styled('div', StyledOptions)<StyledFunctionProps>(DataTableListBaseRowStyle);
 
-/**
- * @deprecated Use `DataTableListRow` instead.
- */
-export const DataTableListStaticRow = React.memo((props: Props) => {
+export const DataTableListRow = React.memo((props: Props) => {
 
     const {
         children,
         active,
         borderTop,
         borderBottom,
+        disablePointerEvents,
+        id,
         skipStyle,
         stickyContent,
         styleClassPrefix = StyleClassPrefix,
@@ -57,16 +58,16 @@ export const DataTableListStaticRow = React.memo((props: Props) => {
     const classNames = clsx(
         className,
         `${styleClassPrefix}-root`,
-        // `${styleClassPrefix}-draggable`,
-        // isDragging && `${styleClassPrefix}-dragging`,
         active && `${styleClassPrefix}-active`,
         borderTop && `${styleClassPrefix}-border-top`,
-        borderBottom && `${styleClassPrefix}-border-bottom`
+        borderBottom && `${styleClassPrefix}-border-bottom`,
+        disablePointerEvents && `${styleClassPrefix}-no-pointer-events`
     );
 
     if (skipStyle) {
         return (
             <div
+                id={id}
                 className={classNames}
                 style={style}
                 {...domAttributes}
@@ -79,6 +80,7 @@ export const DataTableListStaticRow = React.memo((props: Props) => {
 
     return (
         <RootComponent
+            id={id}
             className={classNames}
             classPrefix={styleClassPrefix}
             forRoot

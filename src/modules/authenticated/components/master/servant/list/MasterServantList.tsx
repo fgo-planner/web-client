@@ -1,16 +1,18 @@
 import { CollectionUtils, ReadonlyRecord } from '@fgo-planner/common-core';
 import { InstantiatedServantBondLevel, InstantiatedServantUtils, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { MuiStyledOptions, styled } from '@mui/system';
-import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
-import { DataTableVirtual } from '../../../../../../components/data-table/DataTableVirtual';
+import clsx from 'clsx';
+import React, { DragEvent, DragEventHandler, MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
+import { DataTableListVirtual } from '../../../../../../components/data-table-list/DataTableListVirtual';
 import { useGameServantKeywordsMap } from '../../../../../../hooks/data/useGameServantKeywordsMap';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/useMultiSelectHelperForMouseEvent';
+import { useDragDropEventHandlers } from '../../../../../../hooks/user-interface/useDragDropEventHandlers';
 import { SortDirection, SortOptions } from '../../../../../../types';
 import { DataAggregationUtils } from '../../../../../../utils/DataAggregationUtils';
 import { GameServantUtils } from '../../../../../../utils/game/GameServantUtils';
 import { MasterServantListColumn } from './MasterServantListColumn';
 import { MasterServantListHeader } from './MasterServantListHeader';
-import { MasterServantListRow } from './MasterServantListRow';
+import { MasterServantListRow, StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './MasterServantListRow';
 import { MasterServantListRowHeight, MasterServantListStyle, StyleClassPrefix } from './MasterServantListStyle';
 
 type Props = {
@@ -38,13 +40,15 @@ type Props = {
     virtualList?: boolean;
     visibleColumns?: Readonly<MasterServantListColumn.Visibility>;
     viewLayout?: any; // TODO Make use of this
-    onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
+    onDragOrderChange?: (sourceIndex: number, destinationIndex: number) => void;
     onHeaderClick?: MouseEventHandler;
     onRowClick?: MouseEventHandler;
     onRowDoubleClick?: MouseEventHandler;
     onSelectionChange?: (selectedInstanceIds: ReadonlySet<number>) => void;
     onSortChange?: (column?: MasterServantListColumn.Name, direction?: SortDirection) => void;
 };
+
+const ListRowIdPrefix = `${MasterServantListRowStyleClassPrefix}-`;
 
 const StyledOptions = {
     skipSx: true,
@@ -171,6 +175,18 @@ export const MasterServantList = React.memo((props: Props) => {
     ]);
 
     const {
+        destinationIndex,
+        handleDragEnter,
+        handleDragLeave,
+        handleDragOver,
+        handleRowDragEnd,
+        handleRowDragStart,
+    } = useDragDropEventHandlers(
+        ListRowIdPrefix,
+        scrollContainerRef
+    );
+
+    const {
         selectionResult,
         handleItemClick
     } = useMultiSelectHelperForMouseEvent(
@@ -208,10 +224,27 @@ export const MasterServantList = React.memo((props: Props) => {
         });
     }, [handleItemClick, onRowClick]);
 
-    const handleRowDoubleClick = useCallback((e: MouseEvent, index: number) => {
+    const handleRowDoubleClick = useCallback((event: MouseEvent, index: number):void => {
         blockedRowClickIndex.current = index;
-        onRowDoubleClick?.(e);
+        onRowDoubleClick?.(event);
     }, [onRowDoubleClick]);
+
+    const handleDragStart = useMemo((): ((event: DragEvent, index: number) => void) | undefined => {
+        if (!dragDropMode) {
+            return undefined;
+        }
+        return handleRowDragStart;
+    }, [dragDropMode, handleRowDragStart]);
+
+    const handleDragEnd = useMemo((): DragEventHandler | undefined => {
+        if (!dragDropMode || !onDragOrderChange) {
+            return undefined;
+        }
+        return (event: DragEvent): void => {
+            const { sourceIndex, destinationIndex } = handleRowDragEnd(event);
+            onDragOrderChange(sourceIndex, destinationIndex);
+        };
+    }, [dragDropMode, handleRowDragEnd, onDragOrderChange]);
 
 
     //#region Component rendering
@@ -225,14 +258,17 @@ export const MasterServantList = React.memo((props: Props) => {
         return (
             <MasterServantListRow
                 key={instanceId}
-                index={index}
-                gameServant={masterServantData.gameServant}
+                active={active}
                 bond={bondLevel}
+                disablePointerEvents={destinationIndex !== undefined}
+                dragDropMode={dragDropMode}
+                gameServant={masterServantData.gameServant}
+                idPrefix={ListRowIdPrefix}
+                index={index}
                 masterServant={masterServant}
                 visibleColumns={visibleColumns}
-                active={active}
-                dragDropMode={dragDropMode}
-                onDragOrderChange={onDragOrderChange}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
                 onClick={handleRowClick}
                 onContextMenu={handleRowClick}
                 onDoubleClick={handleRowDoubleClick}
@@ -242,7 +278,14 @@ export const MasterServantList = React.memo((props: Props) => {
 
     return (
         <RootComponent className={`${StyleClassPrefix}-root`}>
-            <div ref={scrollContainerRef} className={`${StyleClassPrefix}-list-container`}>
+            <div
+                ref={scrollContainerRef}
+                className={`${StyleClassPrefix}-list-container`}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDragEnd}
+            >
                 {showHeader && <MasterServantListHeader
                     sortEnabled
                     dragDropMode={dragDropMode}
@@ -251,17 +294,11 @@ export const MasterServantList = React.memo((props: Props) => {
                     onClick={onHeaderClick}
                     onSortChange={onSortChange}
                 />}
-                {/* <div 
-                    className={clsx(`${StyleClassPrefix}-list`, dragDropMode && 'drag-drop-mode')}
-                >
-                    <DndProvider backend={HTML5Backend}>
-                        {displayedMasterServantsData.map(renderMasterServantRow)}
-                    </DndProvider>
-                </div> */}
-                {<DataTableVirtual
-                    className={`${StyleClassPrefix}-list`}
+                {<DataTableListVirtual
+                    className={clsx(`${StyleClassPrefix}-list`, destinationIndex && `${StyleClassPrefix}-dragging`)}
                     data={displayedMasterServantsData}
                     disableVirtualization={!virtualList}
+                    dropTargetIndex={destinationIndex}
                     renderFunction={renderMasterServantRow}
                     rowBufferCount={16} // TODO make this configurable
                     rowHeight={MasterServantListRowHeight}

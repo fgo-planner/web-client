@@ -19,15 +19,19 @@ type DragDropHelperHookResult<T> = {
      * @return An array of the IDs in the updated order, or `undefined` if
      * called while drag-drop mode is not active.
      */
-    endDragDrop: () => Array<number> | undefined;
+    endDragDrop: () => Array<T> | undefined;
     /**
-     * Handles the drag order change event from `react-dnd`. This should be
-     * passed to the `DataTableListDraggableRow` or similar component.
+     * Moves the element with at the source index to the destination index.
      */
-    handleDragOrderChange: (sourceId: number, destinationId: number) => void;
+    handleDragOrderChange: (sourceIndex: number, destinationIndex: number) => void;
 };
 
-export const useDragDropHelper = <T>(getIdFunction: (value: T) => number): DragDropHelperHookResult<T> => {
+/**
+ * Keeps track of the data state while drag-drop mode is active. Assumes the
+ * data itself is not modified (other than the order) until the drag-drop
+ * operation is terminated (applied or cancelled).
+ */
+export const useDragDropState = <T>(): DragDropHelperHookResult<T> => {
 
     const [dragDropData, setDragDropData] = useState<Array<T>>();
 
@@ -36,32 +40,28 @@ export const useDragDropHelper = <T>(getIdFunction: (value: T) => number): DragD
         setDragDropData(dragDropData);
     }, []);
 
-    const endDragDrop = useCallback((): Array<number> | undefined => {
-        const resultContainer: { result?: Array<number> } = {};
+    const endDragDrop = useCallback((): Array<T> | undefined => {
+        const resultContainer: { result?: Array<T> } = {};
         setDragDropData((dragDropData: Array<T> | undefined): undefined => {
             if (dragDropData) {
-                resultContainer.result = dragDropData.map(getIdFunction);
+                resultContainer.result = dragDropData;
             }
             return undefined;
         });
         return resultContainer.result;
-    }, [getIdFunction]);
+    }, []);
 
-    const handleDragOrderChange = useCallback((sourceId: number, destinationId: number): void => {
+    const handleDragOrderChange = useCallback((sourceIndex: number, destinationIndex: number): void => {
         setDragDropData((dragDropData: Array<T> | undefined): Array<T> | undefined => {
             if (!dragDropData?.length) {
                 return dragDropData;
             }
-            console.log(sourceId, destinationId);
-            if (sourceId === destinationId) {
+            if (sourceIndex === destinationIndex) {
                 return dragDropData;
             }
-            const sourceIndex = dragDropData.findIndex((value: T) => getIdFunction(value) === sourceId);
-            const destinationIndex = dragDropData.findIndex((value: T) => getIdFunction(value) === destinationId);
-            const updatedDragDropData = CollectionUtils.moveElement([...dragDropData], sourceIndex, destinationIndex);
-            return updatedDragDropData;
+            return CollectionUtils.moveElement([...dragDropData], sourceIndex, destinationIndex);
         });
-    }, [getIdFunction]);
+    }, []);
 
     return {
         dragDropData,

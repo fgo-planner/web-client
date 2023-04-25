@@ -1,26 +1,30 @@
 import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
 import { GameServant, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
-import React, { DOMAttributes, MouseEvent, ReactNode, useCallback } from 'react';
-import { DataTableListDraggableRow } from '../../../../../../components/data-table-list/DataTableListDraggableRow';
+import { Icon } from '@mui/material';
+import React, { DOMAttributes, DragEvent, DragEventHandler, MouseEvent, ReactNode, useCallback, useMemo } from 'react';
+import { DataTableListRow } from '../../../../../../components/data-table-list/DataTableListRow';
 import { ServantThumbnail } from '../../../../../../components/servant/ServantThumbnail';
+import { MasterServantListColumn } from './MasterServantListColumn';
 import { MasterServantListRowLabel } from './MasterServantListRowLabel';
 import { MasterServantListRowStats } from './MasterServantListRowStats';
-import { MasterServantListColumn } from './MasterServantListColumn';
+import { MasterServantListRowHeight } from './MasterServantListStyle';
 
 type Props = {
     active?: boolean;
     bond: InstantiatedServantBondLevel | undefined;
+    disablePointerEvents?: boolean;
     dragDropMode?: boolean;
     gameServant: Immutable<GameServant> | undefined; // Not optional, but possible to be undefined.
+    idPrefix?: string;
     index: number;
     lastRow?: boolean;
     masterServant: ImmutableMasterServant;
     visibleColumns?: Readonly<MasterServantListColumn.Visibility>;
-    onClick: (e: MouseEvent, index: number) => void;
-    onContextMenu?: (e: MouseEvent, index: number) => void;
-    onDoubleClick: (e: MouseEvent, index: number) => void;
-    onDragOrderChange?: (sourceInstanceId: number, destinationInstanceId: number) => void;
-} & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu' | 'onDoubleClick'>;
+    onClick: (event: MouseEvent, index: number) => void;
+    onContextMenu?: (event: MouseEvent, index: number) => void;
+    onDoubleClick: (event: MouseEvent, index: number) => void;
+    onDragStart?: (event: DragEvent, instanceId: number) => void;
+} & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu' | 'onDoubleClick' | 'onDragStart'>;
 
 const shouldSkipUpdate = (prevProps: Readonly<Props>, nextProps: Readonly<Props>): boolean => {
     if (!ObjectUtils.isShallowEquals(prevProps, nextProps)) {
@@ -37,8 +41,10 @@ export const MasterServantListRow = React.memo((props: Props) => {
     const {
         active,
         bond,
+        disablePointerEvents,
         dragDropMode,
         gameServant,
+        idPrefix,
         index,
         lastRow,
         masterServant,
@@ -46,7 +52,8 @@ export const MasterServantListRow = React.memo((props: Props) => {
         onClick,
         onContextMenu,
         onDoubleClick,
-        onDragOrderChange,
+        onDragEnd,
+        onDragStart,
         ...domAttributes
     } = props;
 
@@ -62,6 +69,15 @@ export const MasterServantListRow = React.memo((props: Props) => {
         onDoubleClick?.(e, index);
     }, [index, onDoubleClick]);
 
+    const handleDragStart = useMemo((): DragEventHandler | undefined => {
+        if (!dragDropMode || !onDragStart) {
+            return undefined;
+        }
+        return (event: DragEvent): void => {
+            onDragStart(event, index);
+        };
+    }, [dragDropMode, index, onDragStart]);
+
     if (!gameServant) {
         return (
             <div className={`${StyleClassPrefix}-root`}>
@@ -74,7 +90,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
 
     const servantThumbnailNode: ReactNode = (
         <ServantThumbnail
-            size={52}
+            size={MasterServantListRowHeight}
             gameServant={gameServant}
             stage={artStage}
             enableLink
@@ -82,6 +98,20 @@ export const MasterServantListRow = React.memo((props: Props) => {
             showOpenInNewTabIndicator
         />
     );
+
+    const stickyContentNode: ReactNode = <>
+        {dragDropMode &&
+            <div
+                className={`${StyleClassPrefix}-drag-handle`}
+                onClick={console.log}
+                onDragStart={handleDragStart}
+                draggable
+            >
+                <Icon>drag_indicator</Icon>
+            </div>
+        }
+        {servantThumbnailNode}
+    </>;
 
     const labelNode: ReactNode = (
         <MasterServantListRowLabel
@@ -98,18 +128,17 @@ export const MasterServantListRow = React.memo((props: Props) => {
         />
     );
 
+    const id = idPrefix && `${idPrefix}${index}`;
+
     return (
-        <DataTableListDraggableRow
-            styleClassPrefix={StyleClassPrefix}
-            skipStyle
-            draggableId={masterServant.instanceId}
-            index={index}
-            borderBottom={!lastRow}
+        <DataTableListRow
             active={active}
-            stickyContent={servantThumbnailNode}
-            dragHandleVisible={dragDropMode}
-            dragEnabled={dragDropMode}
-            onDragOrderChange={onDragOrderChange}
+            borderBottom={!lastRow}
+            disablePointerEvents={disablePointerEvents}
+            id={id}
+            noStyling
+            stickyContent={stickyContentNode}
+            styleClassPrefix={StyleClassPrefix}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
             onContextMenu={handleContextMenu}
@@ -119,7 +148,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
                 {labelNode}
                 {statsNode}
             </div>
-        </DataTableListDraggableRow>
+        </DataTableListRow>
     );
 
 }, shouldSkipUpdate);

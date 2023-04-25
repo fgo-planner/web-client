@@ -2,7 +2,7 @@ import { ImmutableBasicPlan } from '@fgo-planner/data-core';
 import { Link as MuiLink } from '@mui/material';
 import React, { MouseEvent, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { DataTableListStaticRow } from '../../../../../components/data-table-list/DataTableListStaticRow';
+import { DataTableListRow } from '../../../../../components/data-table-list/DataTableListRow';
 import { TruncateText } from '../../../../../components/text/TruncateText';
 import { PlanConstants } from '../../../../../constants';
 import { DateTimeFormatUtils } from '../../../../../utils/format/DateTimeFormatUtils';
@@ -49,7 +49,7 @@ export const PlansRoutePlanListRow = React.memo((props: Props) => {
     }, [onDoubleClick, plan]);
 
     return (
-        <DataTableListStaticRow
+        <DataTableListRow
             className={`${StyleClassPrefix}-root`}
             borderBottom
             active={active}
@@ -71,7 +71,7 @@ export const PlansRoutePlanListRow = React.memo((props: Props) => {
             {description && <TruncateText className={`${StyleClassPrefix}-description`}>
                 {plan.description || '-'}
             </TruncateText>}
-        </DataTableListStaticRow>
+        </DataTableListRow>
     );
 
 });

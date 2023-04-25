@@ -6,7 +6,7 @@ import { StyledFunctionPropsWithTheme } from '../../types';
 export const DefaultStyleClassPrefix = 'DataTableListRow';
 
 // TODO Add class for pointer cursor.
-export const DataTableListBaseRowStyle = (props: StyledFunctionPropsWithTheme) => {
+export const DataTableListRowStyle = (props: StyledFunctionPropsWithTheme) => {
 
     const {
         classPrefix = DefaultStyleClassPrefix,
@@ -15,10 +15,12 @@ export const DataTableListBaseRowStyle = (props: StyledFunctionPropsWithTheme) =
     } = props;
 
     const {
-        palette
+        palette,
+        spacing
     } = theme as Theme;
 
     const style = {
+        boxSizing: 'content-box',
         '&:hover': {
             backgroundColor: alpha(palette.text.primary, ThemeConstants.HoverAlpha)
         },
@@ -31,18 +33,34 @@ export const DataTableListBaseRowStyle = (props: StyledFunctionPropsWithTheme) =
         [`&.${classPrefix}-border-top`]: {
             borderTopWidth: 1,
             borderTopStyle: 'solid',
-            borderTopColor: palette.divider,
+            borderTopColor: palette.divider
         },
         [`&.${classPrefix}-border-bottom`]: {
             borderBottomWidth: 1,
             borderBottomStyle: 'solid',
-            borderBottomColor: palette.divider,
+            borderBottomColor: palette.divider
+        },
+        [`&.${classPrefix}-no-pointer-events`]: {
+            '> *': {
+                pointerEvents: 'none'
+            }
         },
         [`& .${classPrefix}-sticky-content`]: {
             backgroundColor: palette.background.paper,
             position: 'sticky',
             left: 0,
-            zIndex: 1  // 1 should be enough for now
+            zIndex: 1,  // 1 should be enough for now
+            display: 'flex',
+            alignItems: 'center',
+            [`& .${classPrefix}-drag-handle`]: {
+                cursor: 'grab',
+                margin: spacing(0, 2),
+                opacity: 0.5,
+                '&.disabled': {
+                    cursor: 'initial',
+                    color: palette.text.disabled
+                }
+            }
         }
     } as CSSInterpolation;
 

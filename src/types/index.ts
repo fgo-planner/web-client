@@ -22,6 +22,7 @@ export * from './dto/EditDialogData.type';
 export * from './dto/NavigationDrawerContent.type';
 export * from './dto/PageMetadata.type';
 export * from './dto/ThemeInfo.type';
+export * from './dto/VirtualListState.type';
 export * from './game/item/GameItemCategory.enum';
 export * from './game/item/GameItemCategoryMap.type';
 export * from './game/item/GameItemList.type';

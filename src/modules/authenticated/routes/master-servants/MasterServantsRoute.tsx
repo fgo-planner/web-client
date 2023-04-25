@@ -6,7 +6,7 @@ import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from 're
 import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/useSelectedInstancesHelper';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
-import { useDragDropHelper } from '../../../../hooks/user-interface/useDragDropHelper';
+import { useDragDropState } from '../../../../hooks/user-interface/useDragDropState';
 import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interface/useNavigationDrawerNoAnimations';
 import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { EditDialogAction, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
@@ -112,7 +112,16 @@ export const MasterServantsRoute = React.memo(() => {
         startDragDrop,
         endDragDrop,
         handleDragOrderChange
-    } = useDragDropHelper<MasterServantAggregatedData>(InstantiatedServantUtils.getInstanceId);
+    } = useDragDropState<MasterServantAggregatedData>();
+
+    /**
+     * Need to exit drag-drop mode whenever the `masterAccountEditData` reference
+     * changes. This should only happen when the user switches accounts or reverts
+     * the edit data.
+     */
+    useEffect(() => {
+        endDragDrop();
+    }, [endDragDrop, masterAccountEditData]);
 
     /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
@@ -271,11 +280,11 @@ export const MasterServantsRoute = React.memo(() => {
     }, [deselectAllServants, masterAccountEditData, startDragDrop]);
 
     const handleDragDropApply = useCallback(() => {
-        const updatedInstanceIdOrder = endDragDrop();
-        if (!updatedInstanceIdOrder) {
+        const updatedServantOrder = endDragDrop();
+        if (!updatedServantOrder) {
             return;
         }
-        updateServantOrder(updatedInstanceIdOrder);
+        updateServantOrder(updatedServantOrder.map(InstantiatedServantUtils.getInstanceId));
     }, [endDragDrop, updateServantOrder]);
 
     const handleDragDropCancel = useCallback(() => {
@@ -493,15 +502,16 @@ export const MasterServantsRoute = React.memo(() => {
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <MasterServantList
-                            masterServantsData={dragDropData || servantsData}
                             bondLevels={bondLevels}
+                            dragDropMode={dragDropMode}
+                            masterServantsData={dragDropData || servantsData}
                             selectedInstanceIds={selectedServantsData.ids}
                             showHeader={sm}
-                            visibleColumns={visibleColumns}
-                            dragDropMode={dragDropMode}
-                            sortOptions={sortOptions}
                             showUnsummonedServants={showUnsummonedServants}
+                            sortOptions={sortOptions}
                             textFilter={servantFilter?.searchText}
+                            virtualList={false} // TODO Make this configurable
+                            visibleColumns={visibleColumns}
                             onDragOrderChange={handleDragOrderChange}
                             onHeaderClick={handleHeaderClick}
                             onRowClick={handleRowClick}

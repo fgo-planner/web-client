@@ -3,18 +3,21 @@ import { styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren, ReactNode } from 'react';
 import { ComponentStyleProps, StyledFunctionProps } from '../../types';
-import { DataTableListBaseRowStyle } from './DataTableListBaseRowStyle';
+import { DataTableListRowStyle } from './DataTableListRowStyle';
 
 // TODO Add prop for cursor style.
 type Props = PropsWithChildren<{
     active?: boolean;
     borderTop?: boolean;
     borderBottom?: boolean;
-    skipStyle?: boolean
+    disablePointerEvents?: boolean;
+    id?: string;
+    noStyling?: boolean
     stickyContent?: ReactNode;
+    styleClassPrefix?: string;
 }> & Pick<ComponentStyleProps, 'className' | 'style'> & DOMAttributes<HTMLDivElement>;
 
-export const StyleClassPrefix = 'DataTableListStaticRow';
+export const StyleClassPrefix = 'DataTableListRow';
 
 const shouldForwardProp = (prop: PropertyKey): prop is keyof StyledFunctionProps => (
     prop !== 'classPrefix' &&
@@ -27,39 +30,44 @@ const StyledOptions = {
     shouldForwardProp
 } as FilteringStyledOptions<StyledFunctionProps>;
 
-const RootComponent = styled('div', StyledOptions)<StyledFunctionProps>(DataTableListBaseRowStyle);
+const RootComponent = styled('div', StyledOptions)<StyledFunctionProps>(DataTableListRowStyle);
 
-export const DataTableListStaticRow = React.memo((props: Props) => {
+export const DataTableListRow = React.memo((props: Props) => {
 
     const {
         children,
         active,
         borderTop,
         borderBottom,
-        skipStyle,
+        disablePointerEvents,
+        id,
+        noStyling,
         stickyContent,
+        styleClassPrefix = StyleClassPrefix,
         className,
         style,
         ...domAttributes
     } = props;
 
     const stickyContentNode: ReactNode = stickyContent && (
-        <div className={`${StyleClassPrefix}-sticky-content`}>
+        <div className={`${styleClassPrefix}-sticky-content`}>
             {stickyContent}
         </div>
     );
 
     const classNames = clsx(
         className,
-        `${StyleClassPrefix}-row`,
-        active && `${StyleClassPrefix}-active`,
-        borderTop && `${StyleClassPrefix}-border-top`,
-        borderBottom && `${StyleClassPrefix}-border-bottom`
+        `${styleClassPrefix}-root`,
+        active && `${styleClassPrefix}-active`,
+        borderTop && `${styleClassPrefix}-border-top`,
+        borderBottom && `${styleClassPrefix}-border-bottom`,
+        disablePointerEvents && `${styleClassPrefix}-no-pointer-events`
     );
 
-    if (skipStyle) {
+    if (noStyling) {
         return (
             <div
+                id={id}
                 className={classNames}
                 style={style}
                 {...domAttributes}
@@ -72,8 +80,9 @@ export const DataTableListStaticRow = React.memo((props: Props) => {
 
     return (
         <RootComponent
+            id={id}
             className={classNames}
-            classPrefix={StyleClassPrefix}
+            classPrefix={styleClassPrefix}
             forRoot
             style={style}
             {...domAttributes}

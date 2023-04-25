@@ -1,6 +1,5 @@
 import { CSSInterpolation, Theme } from '@mui/material';
-import { DataTableListBaseRowStyle } from '../../../../../../components/data-table-list/DataTableListBaseRowStyle';
-import { DataTableListDraggableRowStyle } from '../../../../../../components/data-table-list/DataTableListDraggableRowStyle';
+import { DataTableListRowStyle } from '../../../../../../components/data-table-list/DataTableListRowStyle';
 import { StyleClassPrefix as ServantSkillLevelStyleClassPrefix } from '../../../../../../components/servant/ServantSkillLevels';
 import { StyleClassPrefix as ServantThumbnailStyleClassPrefix } from '../../../../../../components/servant/ServantThumbnail';
 import { StyledFunctionPropsWithTheme, StyledFunctionThemeProp } from '../../../../../../types';
@@ -15,6 +14,8 @@ import { StyleClassPrefix as MasterServantListRowSummonDateStyleClassPrefix } fr
 import { StyleClassPrefix as MasterServantListRowStyleClassPrefix } from './MasterServantListRow';
 
 export const StyleClassPrefix = 'MasterServantList';
+
+export const MasterServantListRowHeight = 52;
 
 /**
  * For optimization purposes this entire style function contains style
@@ -37,6 +38,8 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
             overflow: 'auto',
             [`& .${StyleClassPrefix}-list`]: {
                 [`& .${MasterServantListRowStyleClassPrefix}-root`]: {
+                    display: 'flex',
+                    alignItems: 'center',
                     width: 'fit-content',
                     minWidth: '100%',
                     [`& .${MasterServantListRowStyleClassPrefix}-content`]: {
@@ -46,7 +49,7 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                         alignContent: 'center',
                         alignItems: 'center',
                         textAlign: 'center',
-                        height: 52,
+                        height: MasterServantListRowHeight,
                         fontSize: '0.875rem',
                         [`& .${MasterServantListRowLabelStyleClassPrefix}-root`]: {
                             display: 'flex',
@@ -139,8 +142,7 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
 
     return [
         baseStyle,
-        DataTableListBaseRowStyle(rowStyledProps),
-        DataTableListDraggableRowStyle(rowStyledProps)
+        DataTableListRowStyle(rowStyledProps)
     ];
     
 };

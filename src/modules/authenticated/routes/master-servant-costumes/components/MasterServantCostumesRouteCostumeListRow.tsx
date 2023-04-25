@@ -1,7 +1,7 @@
 import { GameServantCostumeAggregatedData } from '@fgo-planner/data-core';
 import { Checkbox } from '@mui/material';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
-import { DataTableListStaticRow } from '../../../../../components/data-table-list/DataTableListStaticRow';
+import { DataTableListRow } from '../../../../../components/data-table-list/DataTableListRow';
 import { ItemQuantity } from '../../../../../components/item/ItemQuantity';
 import { ServantThumbnail } from '../../../../../components/servant/ServantThumbnail';
 import { TruncateText } from '../../../../../components/text/TruncateText';
@@ -70,7 +70,7 @@ export const MasterServantCostumesRouteCostumeListRow = React.memo((props: Props
     }, [alwaysUnlocked, gameItemMap, materials.materials]);
 
     return (
-        <DataTableListStaticRow
+        <DataTableListRow
             className={`${StyleClassPrefix}-root`}
             borderBottom
         >
@@ -92,7 +92,7 @@ export const MasterServantCostumesRouteCostumeListRow = React.memo((props: Props
             <div className={`${StyleClassPrefix}-unlock-materials`}>
                 {unlockMaterialNodes}
             </div>
-        </DataTableListStaticRow>
+        </DataTableListRow>
     );
 
 });

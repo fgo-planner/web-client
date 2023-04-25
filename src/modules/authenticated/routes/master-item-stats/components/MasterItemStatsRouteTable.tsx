@@ -3,7 +3,7 @@ import { Box, Theme, Tooltip } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode, useMemo } from 'react';
 import { NumericFormat } from 'react-number-format';
-import { DataTableListStaticRow } from '../../../../../components/data-table-list/DataTableListStaticRow';
+import { DataTableListRow } from '../../../../../components/data-table-list/DataTableListRow';
 import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
 import { TruncateText } from '../../../../../components/text/TruncateText';
 import { useGameItemCategoryMap } from '../../../../../hooks/data/useGameItemCategoryMap';
@@ -180,7 +180,7 @@ export const MasterItemStatsRouteTable = React.memo((props: Props) => {
         const { inventory, used, cost, debt } = stat;
 
         return (
-            <DataTableListStaticRow key={itemId} borderBottom={index !== itemIds.length - 1}>
+            <DataTableListRow key={itemId} borderBottom={index !== itemIds.length - 1}>
                 <div className={`${StyleClassPrefix}-data-row`}>
                     <div className={`${StyleClassPrefix}-label-cell`}>
                         <ItemThumbnail
@@ -230,7 +230,7 @@ export const MasterItemStatsRouteTable = React.memo((props: Props) => {
                         />
                     </div>
                 </div>
-            </DataTableListStaticRow>
+            </DataTableListRow>
         );
     };
 

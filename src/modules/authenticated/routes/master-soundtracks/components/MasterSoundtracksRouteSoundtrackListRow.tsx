@@ -3,7 +3,7 @@ import { GameSoundtrack } from '@fgo-planner/data-core';
 import { Checkbox, Icon, IconButton } from '@mui/material';
 import { isEmpty } from 'lodash-es';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
-import { DataTableListStaticRow } from '../../../../../components/data-table-list/DataTableListStaticRow';
+import { DataTableListRow } from '../../../../../components/data-table-list/DataTableListRow';
 import { ItemQuantity } from '../../../../../components/item/ItemQuantity';
 import { TruncateText } from '../../../../../components/text/TruncateText';
 import { useGameItemMap } from '../../../../../hooks/data/useGameItemMap';
@@ -93,7 +93,7 @@ export const MasterSoundtracksRouteSoundtrackListRow = React.memo((props: Props)
     }, [playing, handlePlayButtonClick]);
 
     return (
-        <DataTableListStaticRow
+        <DataTableListRow
             key={soundtrackId}
             className={`${StyleClassPrefix}-root`}
             borderBottom
@@ -113,7 +113,7 @@ export const MasterSoundtracksRouteSoundtrackListRow = React.memo((props: Props)
             <div className={`${StyleClassPrefix}-unlock-material`}>
                 {unlockMaterialNode}
             </div>
-        </DataTableListStaticRow>
+        </DataTableListRow>
     );
 
 });

@@ -11,6 +11,7 @@ import { useNavigationDrawerNoAnimations } from '../../../../hooks/user-interfac
 import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { EditDialogAction, ModalOnCloseReason, SortDirection, SortOptions } from '../../../../types';
 import { DataAggregationUtils } from '../../../../utils/DataAggregationUtils';
+import { MasterAccountUtils } from '../../../../utils/master/MasterAccountUtils';
 import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
 import { RouteDataEditReloadOnStaleDataDialog } from '../../components/control/RouteDataEditReloadOnStaleDataDialog';
 import { RouteDataEditSaveOnStaleDataDialog } from '../../components/control/RouteDataEditSaveOnStaleDataDialog';
@@ -167,7 +168,7 @@ export const MasterServantsRoute = React.memo(() => {
         deselectAll: deselectAllServants,
         updateSelection: updateServantSelection
     } = useSelectedInstancesHelper(
-        masterAccountEditData.servantsData,
+        masterAccountEditData.aggregatedServants,
         InstantiatedServantUtils.getInstanceId
     );
 
@@ -203,12 +204,13 @@ export const MasterServantsRoute = React.memo(() => {
             costumes
         } = masterAccountEditData;
 
-        const gameId = MasterServantConstants.DefaultServantId;
+        const servantId = MasterServantConstants.DefaultServantId;
+        const unlockedCostumes = MasterAccountUtils.unlockedCostumesMapToIdSet(costumes);
         const masterServantEditDialogData: MasterServantEditDialogData = {
             action: EditDialogAction.Add,
             data: {
-                gameId,
-                update: MasterServantUpdateUtils.createNew(gameId, bondLevels, costumes),
+                servantId,
+                update: MasterServantUpdateUtils.createNew(servantId, bondLevels, unlockedCostumes),
                 bondLevels
             }
         };
@@ -226,11 +228,12 @@ export const MasterServantsRoute = React.memo(() => {
             costumes
         } = masterAccountEditData;
 
+        const unlockedCostumes = MasterAccountUtils.unlockedCostumesMapToIdSet(costumes);
         const masterServantEditDialogData: MasterServantEditDialogData = {
             action: EditDialogAction.Edit,
             data: {
-                gameId: IndeterminateValue,
-                update: MasterServantUpdateUtils.createFromExisting(selectedServants, bondLevels, costumes),
+                servantId: IndeterminateValue,
+                update: MasterServantUpdateUtils.createFromExisting(selectedServants, bondLevels, unlockedCostumes),
                 bondLevels
             }
         };
@@ -276,7 +279,7 @@ export const MasterServantsRoute = React.memo(() => {
          * Deselect servants...servant selection is not allowed in drag-drop mode.
          */
         deselectAllServants();
-        startDragDrop(masterAccountEditData.servantsData);
+        startDragDrop(masterAccountEditData.aggregatedServants);
     }, [deselectAllServants, masterAccountEditData, startDragDrop]);
 
     const handleDragDropApply = useCallback(() => {
@@ -392,10 +395,10 @@ export const MasterServantsRoute = React.memo(() => {
         _reason: any,
         data?: MasterServantsRouteMultiAddDialogData
     ): void => {
-        if (data && data.gameIds.length) {
+        if (data && data.servantIds.length) {
             const servantData = MasterServantUpdateUtils.createNew();
             servantData.summoned = InstantiatedServantUpdateUtils.fromBoolean(data.summoned);
-            addServants(data.gameIds, servantData);
+            addServants(data.servantIds, servantData);
         }
         closeActiveDialog();
     }, [addServants, closeActiveDialog]);
@@ -414,8 +417,8 @@ export const MasterServantsRoute = React.memo(() => {
             return;
         }
         if (data.action === EditDialogAction.Add) {
-            const { gameId, update } = data.data;
-            addServant(gameId, update);
+            const { servantId, update } = data.data;
+            addServant(servantId, update);
         } else {
             applyUpdateToSelectedServants(data.data.update);
         }
@@ -459,7 +462,7 @@ export const MasterServantsRoute = React.memo(() => {
     const selectedServantsCount = selectedServantsData.ids.size;
 
     const {
-        servantsData,
+        aggregatedServants,
         bondLevels,
         costumes
     } = masterAccountEditData;
@@ -504,7 +507,7 @@ export const MasterServantsRoute = React.memo(() => {
                         <MasterServantList
                             bondLevels={bondLevels}
                             dragDropMode={dragDropMode}
-                            masterServantsData={dragDropData || servantsData}
+                            masterServantsData={dragDropData || aggregatedServants}
                             selectedInstanceIds={selectedServantsData.ids}
                             showHeader={sm}
                             showUnsummonedServants={showUnsummonedServants}
@@ -545,7 +548,7 @@ export const MasterServantsRoute = React.memo(() => {
             />
             <MasterServantsRouteMultiAddDialog
                 open={activeDialogInfo.name === 'masterServantMultiAdd'}
-                masterServantsData={masterAccountEditData.servantsData}
+                masterServantsData={masterAccountEditData.aggregatedServants}
                 onClose={handleMultiAddServantDialogClose}
             />
             <MasterServantsRouteDeleteDialog

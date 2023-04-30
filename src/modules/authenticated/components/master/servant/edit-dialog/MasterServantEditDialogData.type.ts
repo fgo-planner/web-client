@@ -8,7 +8,7 @@ export type MasterServantEditDialogData = EditDialogData<{
      * The servant ID when adding a master servant. This is not used when editing
      * existing servants.
      */
-    gameId: number;
+    servantId: number;
 
     /**
      * The update data that is directly modified by the dialog.

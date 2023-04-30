@@ -48,12 +48,16 @@ export const MasterServantCostumesRoute = React.memo(() => {
     const [reloadDialogOpen, setReloadDialogOpen] = useState<boolean>(false);
     const [saveDialogOpen, setSaveDialogOpen] = useState<boolean>(false);
 
-    const handleCostumeChange = useCallback((costumeId: number, unlocked: boolean): void => {
-        let updatedCostumes: Array<number>;
-        if (unlocked) {
-            updatedCostumes = [...masterAccountEditData.costumes, costumeId];
-        } else {
-            updatedCostumes = [...masterAccountEditData.costumes].filter(id => id !== costumeId);
+    const handleCostumeChange = useCallback((costumeId: number, unlocked?: boolean, noCostUnlock?: boolean): void => {
+        const updatedCostumes = { ...masterAccountEditData.costumes };
+        if (unlocked !== undefined) {
+            if (unlocked) {
+                updatedCostumes[costumeId] = !!noCostUnlock;
+            } else {
+                delete updatedCostumes[costumeId];
+            }
+        } else if (noCostUnlock !== undefined) {
+            updatedCostumes[costumeId] = noCostUnlock;
         }
         updateCostumes(updatedCostumes);
     }, [masterAccountEditData, updateCostumes]);

@@ -30,10 +30,10 @@ export namespace DataAggregationUtils {
         masterServant: ImmutableMasterServant,
         gameServantMap: GameServantMap
     ): MasterServantAggregatedData | null {
-        const gameId = masterServant.gameId;
-        const gameServant = gameServantMap[gameId];
+        const servantId = masterServant.servantId;
+        const gameServant = gameServantMap[servantId];
         if (!gameServant) {
-            console.warn(`Servant gameId=${gameId} could not be found.`);
+            console.warn(`Servant servantId=${servantId} could not be found.`);
             return null;
         }
         return {

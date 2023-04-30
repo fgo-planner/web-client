@@ -23,8 +23,8 @@ export function useFgoManagerNamesMap(): ImmutableRecord<string, GameServant> | 
         Promise.all(dataPromises).then(resolvedData => {
             const [gameServantsMap, fgoManagerNamesMap] = resolvedData;
             const map: Record<string, Immutable<GameServant>> = {};
-            for (const [fgoManagerName, gameId] of Object.entries(fgoManagerNamesMap)) {
-                const gameServant = gameServantsMap[gameId];
+            for (const [fgoManagerName, servantId] of Object.entries(fgoManagerNamesMap)) {
+                const gameServant = gameServantsMap[servantId];
                 if (!gameServant) {
                     continue;
                 }

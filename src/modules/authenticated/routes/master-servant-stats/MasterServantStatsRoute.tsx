@@ -109,10 +109,11 @@ export const MasterServantStatsRoute = React.memo(() => {
     }, [gameServantMap, masterAccount, filter]);
 
     const hasUnsummonedServants: boolean = useMemo(() => {
-        if (!masterAccount?.servants.length) {
+        const servantsData = masterAccount?.servants;
+        if (!servantsData?.servants.length) {
             return false;
         }
-        for (const { summoned } of masterAccount.servants) {
+        for (const { summoned } of servantsData.servants) {
             if (summoned) {
                 return true;
             }

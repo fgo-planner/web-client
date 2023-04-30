@@ -13,6 +13,7 @@ import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActive
 import { useDragDropState } from '../../../../hooks/user-interface/useDragDropState';
 import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { EditDialogAction, ModalOnCloseReason } from '../../../../types';
+import { MasterAccountUtils } from '../../../../utils/master/MasterAccountUtils';
 import { SubscribablesContainer } from '../../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../../utils/subscription/SubscriptionTopics';
 import { RouteDataEditControls } from '../../components/control/RouteDataEditControls';
@@ -157,7 +158,7 @@ export const PlanRoute = React.memo(() => {
         deselectAll: deselectAllServants,
         updateSelection: updateServantSelection
     } = useSelectedInstancesHelper(
-        planEditData.servantsData, 
+        planEditData.aggregatedServants, 
         InstantiatedServantUtils.getInstanceId
     );
 
@@ -217,21 +218,21 @@ export const PlanRoute = React.memo(() => {
     // }, [deletePlanServants, selectedServantsData]);
 
     const openAddServantDialog = useCallback((): void => {
-        const availableServants = computeAvailableServants(planEditData.servantsData, masterAccountEditData.servantsData);
+        const availableServants = computeAvailableServants(planEditData.aggregatedServants, masterAccountEditData.aggregatedServants);
         const planServantEditDialogData: PlanRoutePlanServantEditDialogData = {
             action: EditDialogAction.Add,
             data: {
                 instanceId: IndeterminateValue,
                 update: PlanServantUpdateUtils.createNew(planEditData.costumes),
                 availableServants,
-                unlockedCostumes: masterAccountEditData.costumes
+                unlockedCostumes: MasterAccountUtils.unlockedCostumesMapToIdSet(masterAccountEditData.costumes)
             }
         };
         openPlanServantEditDialog(planServantEditDialogData);
     }, [masterAccountEditData, openPlanServantEditDialog, planEditData]);
 
     const openMultiAddServantDialog = useCallback((): void => {
-        const availableServants = computeAvailableServants(planEditData.servantsData, masterAccountEditData.servantsData);
+        const availableServants = computeAvailableServants(planEditData.aggregatedServants, masterAccountEditData.aggregatedServants);
         openPlanServantMultiAddDialog(availableServants);
     }, [masterAccountEditData, openPlanServantMultiAddDialog, planEditData]);
 
@@ -246,7 +247,7 @@ export const PlanRoute = React.memo(() => {
                 instanceId: IndeterminateValue,
                 update: PlanServantUpdateUtils.createFromExisting(selectedServants, planEditData.costumes),
                 availableServants: CollectionUtils.emptyArray(),
-                unlockedCostumes: masterAccountEditData.costumes
+                unlockedCostumes: MasterAccountUtils.unlockedCostumesMapToIdSet(masterAccountEditData.costumes)
             }
         };
         openPlanServantEditDialog(planServantEditDialogData);
@@ -299,7 +300,7 @@ export const PlanRoute = React.memo(() => {
          * Deselect servants...servant selection is not allowed in drag-drop mode.
          */
         deselectAllServants();
-        startDragDrop(planEditData.servantsData);
+        startDragDrop(planEditData.aggregatedServants);
     }, [deselectAllServants, planEditData, startDragDrop]);
 
     const handleDragDropApply = useCallback(() => {
@@ -498,7 +499,7 @@ export const PlanRoute = React.memo(() => {
                     <div className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <PlanRequirementsTable
                             options={tableOptions}
-                            planServantsData={planEditData.servantsData}
+                            planServantsData={planEditData.aggregatedServants}
                             planRequirements={planRequirements}
                             selectedInstanceIds={selectedServantsData.ids}
                             targetCostumes={planEditData.costumes}

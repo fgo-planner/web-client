@@ -1,4 +1,4 @@
-import { PlanResources } from '@fgo-planner/data-core';
+import { Resources } from '@fgo-planner/data-core';
 import { PlanEnhancementRequirements } from './PlanEnhancementRequirements.type';
 import { PlanServantRequirements } from './PlanServantRequirements.type';
 
@@ -38,15 +38,15 @@ export type PlanRequirements = {
         /**
          * The master's current resources.
          */
-        current: PlanResources;
+        current: Resources;
         /**
          * The final computed deficit.
          */
-        deficit: PlanResources;
+        deficit: Resources;
         /**
          * Upcoming resources.
          */
-        upcoming: PlanResources;
+        upcoming: Resources;
     }
 
 };

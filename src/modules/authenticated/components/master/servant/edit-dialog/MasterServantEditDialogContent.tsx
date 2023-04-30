@@ -29,11 +29,11 @@ type Props = {
      * servants being edited.
      * 
      * If a single servant is being edited, this array should contain exactly one
-     * `MasterServant`, whose `gameId` value matches that of the given
+     * `MasterServant`, whose `servantId` value matches that of the given
      * `masterServantUpdate`.
      *
      * If multiple servants are being edited, this array should contain all the
-     * target `MasterServant`, and `masterServantUpdate.gameId` should be set to the
+     * target `MasterServant`, and `masterServantUpdate.servantId` should be set to the
      * indeterminate value.
      * 
      * Only used in edit mode; this is ignored in add mode.
@@ -163,11 +163,11 @@ export const MasterServantEditDialogContent = (props: Props) => {
         if (servantSelectDisabled) {
             return;
         }
-        const gameId = value._id;
-        if (data.gameId === gameId) {
+        const servantId = value._id;
+        if (data.servantId === servantId) {
             return;
         }
-        data.gameId = gameId;
+        data.servantId = servantId;
         const { bondLevels, update } = data;
         const { ascension, level } = update;
         /**
@@ -179,7 +179,7 @@ export const MasterServantEditDialogContent = (props: Props) => {
         /**
          * Also update the bond level.
          */
-        update.bondLevel = bondLevels[gameId];
+        update.bondLevel = bondLevels[servantId];
         setTargetGameServantsData([value]);
     }, [servantSelectDisabled, data]);
 

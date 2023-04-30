@@ -1,5 +1,5 @@
 import { CollectionUtils, ImmutableArray, Nullable } from '@fgo-planner/common-core';
-import { GameServant, GameServantCostumeAggregatedData, MasterServantAggregatedData } from '@fgo-planner/data-core';
+import { GameServant, GameServantConstants, GameServantCostumeAggregatedData, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { useMemo } from 'react';
 import { DataAggregationUtils } from '../../utils/DataAggregationUtils';
@@ -29,13 +29,16 @@ const transformCostumesList = (gameServants: ImmutableArray<GameServant>): Array
      */
     for (const gameServant of gameServants) {
         const costumes = gameServant.costumes;
-        for (const [id, costume] of Object.entries(costumes)) {
+        for (const [key, costume] of Object.entries(costumes)) {
+            const costumeId = Number(key);
             const alwaysUnlocked = isEmpty(costume.materials.materials);
+            const noCostUnlockAvailable = GameServantConstants.NoCostCostumeOptions.has(costumeId);
             result.push({
-                costumeId: Number(id),
-                gameServant,
+                alwaysUnlocked,
                 costume,
-                alwaysUnlocked
+                costumeId,
+                gameServant,
+                noCostUnlockAvailable
             });
         }
     }

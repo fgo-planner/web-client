@@ -143,20 +143,20 @@ export const MasterServantList = React.memo((props: Props) => {
                     paramB = masterServantB.fouAtk || -1;
                     break;
                 case 'bondLevel':
-                    paramA = bondLevels[masterServantA.gameId] || -1;
-                    paramB = bondLevels[masterServantB.gameId] || -1;
+                    paramA = bondLevels[masterServantA.servantId] || -1;
+                    paramB = bondLevels[masterServantB.servantId] || -1;
                     break;
                 case 'summonDate':
                     paramA = masterServantA.summonDate?.getTime() || -1;
                     paramB = masterServantB.summonDate?.getTime() || -1;
                     break;
                 default:
-                    paramA = masterServantA.gameId;
-                    paramB = masterServantB.gameId;
+                    paramA = masterServantA.servantId;
+                    paramB = masterServantB.servantId;
             }
             if (paramA === paramB) {
-                paramA = masterServantA.gameId;
-                paramB = masterServantB.gameId;
+                paramA = masterServantA.servantId;
+                paramB = masterServantB.servantId;
             }
             return direction === 'asc' ? paramA - paramB : paramB - paramA;
         });
@@ -251,8 +251,8 @@ export const MasterServantList = React.memo((props: Props) => {
 
     const renderMasterServantRow = (masterServantData: MasterServantAggregatedData, index: number): ReactNode => {
         const masterServant = masterServantData.masterServant;
-        const { gameId, instanceId } = masterServant;
-        const bondLevel = bondLevels[gameId];
+        const { servantId, instanceId } = masterServant;
+        const bondLevel = bondLevels[servantId];
         const active = selectedInstanceIds?.has(instanceId);
 
         return (

@@ -1,3 +1,4 @@
+import { ReadonlyRecord } from '@fgo-planner/common-core';
 import { ExternalLink, GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { Icon, IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -10,6 +11,7 @@ import { useGameItemMap } from '../../../../../hooks/data/useGameItemMap';
 import { ThemeConstants } from '../../../../../styles/ThemeConstants';
 import { PlanEnhancementRequirements as EnhancementRequirements } from '../../../../../types';
 import { GameServantUtils } from '../../../../../utils/game/GameServantUtils';
+import { MasterAccountUtils } from '../../../../../utils/master/MasterAccountUtils';
 import { PlanComputationUtils } from '../../../../../utils/plan/PlanComputationUtils';
 
 type Props = {
@@ -24,7 +26,7 @@ type Props = {
     onStatsChange?: (data: any) => void;
     open?: boolean;
     statsOptions?: PlanComputationUtils.ComputationOptions;
-    unlockedCostumes: Iterable<number>;
+    unlockedCostumes: ReadonlyRecord<number, boolean>;
 };
 
 const hasDebt = (enhancementRequirements: EnhancementRequirements): boolean => {
@@ -249,7 +251,7 @@ export const MasterServantsRouteInfoPanel = React.memo((props: Props) => {
                 const result = PlanComputationUtils.computeServantEnhancementRequirements(
                     activeServant.gameServant,
                     activeServant.masterServant,
-                    unlockedCostumes, 
+                    MasterAccountUtils.unlockedCostumesMapToIdSet(unlockedCostumes), 
                     statsOptions
                 );
                 results.push(result);
@@ -373,7 +375,7 @@ export const MasterServantsRouteInfoPanel = React.memo((props: Props) => {
                     className={`${StyleClassPrefix}-servant-stat`}
                     label='Bond'
                     labelWidth={ServantStatLabelWidth}
-                    value={renderBondLevel(bondLevels[masterServant.gameId])}
+                    value={renderBondLevel(bondLevels[masterServant.servantId])}
                 />
             </div>
             <div className={`${StyleClassPrefix}-divider`} />

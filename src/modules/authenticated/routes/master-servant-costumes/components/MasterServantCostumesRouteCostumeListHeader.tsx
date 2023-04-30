@@ -1,6 +1,7 @@
 import { Icon, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React from 'react';
+import { IconOutlined } from '../../../../../components/icons/IconOutlined';
 import { HeaderLabel } from '../../../../../components/text/HeaderLabel';
 import { TruncateText } from '../../../../../components/text/TruncateText';
 
@@ -48,6 +49,15 @@ const StyleProps = (theme: SystemTheme) => {
                 maxWidth: spacing(8),  // 32px
             }
         },
+        [`& .${StyleClassPrefix}-no-cost-status`]: {
+            display: 'flex',
+            justifyContent: 'center',
+            minWidth: 42,
+            px: 2,
+            '& .MuiIcon-root': {
+                fontSize: '1.25rem'
+            }
+        },
         [`& .${StyleClassPrefix}-unlock-materials`]: {
             minWidth: spacing(75),  // 300px
             pr: 8,
@@ -71,6 +81,9 @@ export const MasterServantCostumesRouteCostumeListHeader = React.memo(() => (
         </HeaderLabel>
         <HeaderLabel className={`${StyleClassPrefix}-name`}>
             <TruncateText>Costume Name</TruncateText>
+        </HeaderLabel>
+        <HeaderLabel className={`${StyleClassPrefix}-no-cost-status`}>
+            <Icon>money_off</Icon>
         </HeaderLabel>
         <HeaderLabel className={`${StyleClassPrefix}-unlock-materials`}>
             Unlock Materials

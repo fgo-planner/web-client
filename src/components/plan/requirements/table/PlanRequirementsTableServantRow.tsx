@@ -1,4 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameItemConstants, PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { MouseEvent, ReactNode, useCallback } from 'react';
@@ -19,7 +19,7 @@ type Props = {
     options: PlanRequirementsTableOptionsInternal;
     planServantData: Immutable<PlanServantAggregatedData>;
     targetCostumes: ReadonlySet<number>;
-    unlockedCostumes: ReadonlySet<number>;
+    unlockedCostumes: ReadonlyRecord<number, boolean>;
     servantRequirements: PlanServantRequirements;
     onClick?: (e: MouseEvent, index: number) => void;
     onContextMenu?: (e: MouseEvent, index: number) => void;

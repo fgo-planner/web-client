@@ -121,10 +121,10 @@ export const MasterServantImportRouteServantList = React.memo((props: Props) => 
         for (const parsedServant of parsedServants) {
             const bondLevel = parsedServant.bondLevel;
             if (bondLevel != null && bondLevel !== IndeterminateValue) {
-                bondLevels[parsedServant.gameId] = bondLevel;
+                bondLevels[parsedServant.servantId] = bondLevel;
             }
             const masterServant = MasterServantUpdateUtils.toMasterServant(instanceId++, parsedServant, bondLevels);
-            masterServant.gameId = parsedServant.gameId;
+            masterServant.servantId = parsedServant.servantId;
             masterServants.push(masterServant);
         }
         const masterServantsData = DataAggregationUtils.aggregateDataForMasterServants(masterServants, gameServantMap);

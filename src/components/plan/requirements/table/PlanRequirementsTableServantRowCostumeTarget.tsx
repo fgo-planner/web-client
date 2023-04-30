@@ -1,4 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { PlanServantAggregatedData } from '@fgo-planner/data-core';
 import React, { useMemo } from 'react';
 import { IconOutlined } from '../../../icons/IconOutlined';
@@ -6,7 +6,7 @@ import { IconOutlined } from '../../../icons/IconOutlined';
 type Props = {
     planServantData: Immutable<PlanServantAggregatedData>;
     targetCostumes: ReadonlySet<number>;
-    unlockedCostumes: ReadonlySet<number>;
+    unlockedCostumes: ReadonlyRecord<number, boolean>;
 };
 
 export const StyleClassPrefix = 'PlanRequirementsTableServantRowCostumeTarget';
@@ -31,7 +31,7 @@ export const PlanRequirementsTableServantRowCostumeTarget: React.FC<Props> = (pr
         let count = 0;
         for (const key of Object.keys(gameServant.costumes)) {
             const costumeId = Number(key);
-            if (targetCostumes.has(costumeId) && !unlockedCostumes.has(costumeId)) {
+            if (targetCostumes.has(costumeId) && unlockedCostumes[costumeId] === undefined) {
                 count++;
             }
         }

@@ -7,6 +7,7 @@ import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/ut
 import { PlanService } from '../../../services/data/plan/PlanService';
 import { PlanEnhancementRequirements, PlanRequirements } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/DataAggregationUtils';
+import { MasterAccountUtils } from '../../../utils/master/MasterAccountUtils';
 import { PlanComputationUtils } from '../../../utils/plan/PlanComputationUtils';
 import { DataEditUtils } from './DataEditUtils';
 import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccountDataEdit } from './useMasterAccountDataEdit';
@@ -16,7 +17,7 @@ import { MasterAccountDataEditHookOptions, MasterAccountEditData, useMasterAccou
 /**
  * Return data forwarded from the `useMasterAccountDataEdit`.
  */
-type PartialMasterAccountEditData = Pick<MasterAccountEditData, 'costumes' | 'items' | 'qp' | 'servantsData'>;
+type PartialMasterAccountEditData = Pick<MasterAccountEditData, 'aggregatedServants' | 'costumes' | 'items' | 'qp'>;
 
 type PlanInfo = {
     name: string;
@@ -27,7 +28,7 @@ type PlanInfo = {
 };
 
 type PlanEditData = PlanInfo & {
-    servantsData: ReadonlyArray<PlanServantAggregatedData>;
+    aggregatedServants: ReadonlyArray<PlanServantAggregatedData>;
     costumes: ReadonlySet<number>;
     upcomingResources: ImmutableArray<PlanUpcomingResources>;
 };
@@ -52,7 +53,7 @@ type PlanEditDirtyData = {
  * Contains unmodified plan data, slightly restructured for more efficient
  * comparison against current edit data to determine what has been modified.
  */
-type PlanEditReferenceData = Readonly<Omit<PlanEditData, 'servantsData'> & {
+type PlanEditReferenceData = Readonly<Omit<PlanEditData, 'aggregatedServants'> & {
     servants: ReadonlyMap<number, Immutable<PlanServant>>;
 }>;
 
@@ -173,7 +174,7 @@ const getDefaultPlanEditData = (): PlanEditData => ({
         costumes: true
     },
     // shared: false,
-    servantsData: [],
+    aggregatedServants: [],
     costumes: CollectionUtils.emptySet(),
     upcomingResources: []
 });
@@ -197,7 +198,7 @@ const clonePlanDataForEdit = (
         upcomingResources
     } = plan;
 
-    const servantsData = DataAggregationUtils.aggregateDataForPlanServants(
+    const aggregatedServants = DataAggregationUtils.aggregateDataForPlanServants(
         planServants.map(PlanServantUtils.clone),
         masterServantMap
     );
@@ -209,7 +210,7 @@ const clonePlanDataForEdit = (
         enabled: {
             ...enabled
         },
-        servantsData,
+        aggregatedServants,
         costumes: new Set(costumes),
         upcomingResources: upcomingResources.map(PlanUtils.clonePlanUpcomingResources)
     };
@@ -386,7 +387,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     /**
      * Map of master servants by its instance ID.
      */
-    const masterServantsDataMapRefRef = useRef<ReadonlyMap<number, MasterServantAggregatedData>>(CollectionUtils.emptyMap());
+    const aggregatedMasterServantsMapRef = useRef<ReadonlyMap<number, MasterServantAggregatedData>>(CollectionUtils.emptyMap());
 
     /**
      * Rebuilds the master servants Map every time the source array instance
@@ -394,34 +395,34 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
      * master servant instances.
      */
     useEffect((): void => {
-        const masterServantsDataMapRef = CollectionUtils.mapIterableToMap(
-            masterAccountEditData.servantsData,
+        const aggregatedMasterServantsMap = CollectionUtils.mapIterableToMap(
+            masterAccountEditData.aggregatedServants,
             InstantiatedServantUtils.getInstanceId
         );
-        masterServantsDataMapRefRef.current = masterServantsDataMapRef;
+        aggregatedMasterServantsMapRef.current = aggregatedMasterServantsMap;
 
         /**
-         * The updated `servantsData` array. A new array instance is created to conform
-         * with the hook specifications.
+         * The updated `aggregatedServants` array. A new array instance is created to
+         * conform with the hook specifications.
          */
-        const servantsData: Array<PlanServantAggregatedData> = [];
-        for (const servantData of editData.servantsData) {
-            const masterServantData = masterServantsDataMapRef.get(servantData.instanceId);
-            if (!masterServantData) {
+        const aggregatedServants: Array<PlanServantAggregatedData> = [];
+        for (const aggregatedPlanServant of editData.aggregatedServants) {
+            const aggregatedMasterServant = aggregatedMasterServantsMap.get(aggregatedPlanServant.instanceId);
+            if (!aggregatedMasterServant) {
                 continue;
             }
-            servantsData.push({
-                ...masterServantData,
-                planServant: servantData.planServant
+            aggregatedServants.push({
+                ...aggregatedMasterServant,
+                planServant: aggregatedPlanServant.planServant
             });
         }
-        editData.servantsData = servantsData;
+        editData.aggregatedServants = aggregatedServants;
 
         /**
          * No need to trigger re-rendering here via state update, etc. The recomputation
          * of the plan in the `useEffect` below should take care of it.
          */
-    }, [editData, masterAccountEditData.servantsData]);
+    }, [editData, masterAccountEditData.aggregatedServants]);
 
     const [planRequirements, setPlanRequirements] = useState<PlanRequirements>(PlanComputationUtils.instantiatePlanRequirements);
 
@@ -439,22 +440,22 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
             {
                 planId,
                 enabled: editData.enabled,
-                servantsData: editData.servantsData,
+                aggregatedServants: editData.aggregatedServants,
                 upcomingResources: editData.upcomingResources,
                 costumes: editData.costumes
             },
             {
                 items: masterAccountEditData.items,
                 qp: masterAccountEditData.qp,
-                costumes: masterAccountEditData.costumes,
+                costumes: MasterAccountUtils.unlockedCostumesMapToIdSet(masterAccountEditData.costumes)
             }
             // TODO Add previous plans
         );
         setPlanRequirements(planRequirements);
     }, [
+        editData.aggregatedServants,
         editData.costumes,
         editData.enabled,
-        editData.servantsData,
         editData.upcomingResources,
         masterAccountEditData.costumes,
         masterAccountEditData.items,
@@ -466,7 +467,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
      * Processes the plan data fetched from API server.
      */
     const handlePlanLoad = useCallback((plan: Plan): void => {
-        const editData = clonePlanDataForEdit(plan, masterServantsDataMapRefRef.current);
+        const editData = clonePlanDataForEdit(plan, aggregatedMasterServantsMapRef.current);
         const referenceData = clonePlanDataForReference(plan);
         setEditData(editData);
         setReferenceData(referenceData);
@@ -517,14 +518,14 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     const addPlanServants = useCallback((instanceIds: Iterable<number>, servantData: PlanServantUpdate): void => {
 
         const {
-            servantsData: currentServantsData,
+            aggregatedServants: currentServants,
             costumes: currentCostumes
         } = editData;
 
         /**
          * The set of instance IDs that already exist in the plan.
          */
-        const existingInstanceIds = new Set(currentServantsData.map(InstantiatedServantUtils.getInstanceId));
+        const existingInstanceIds = new Set(currentServants.map(InstantiatedServantUtils.getInstanceId));
 
         /**
          * New object for the target costumes data. A new set instance is created to
@@ -536,7 +537,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
          * Contains the new plan servants (wrapped in a `PlanServantAggregatedData`
          * object) being added to the plan.
          */
-        const newServantsData: Array<PlanServantAggregatedData> = [];
+        const newServants: Array<PlanServantAggregatedData> = [];
 
         /**
          * Construct new instance of a `PlanServant` object for each `instanceId` and
@@ -552,37 +553,37 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
             }
             const newServant = DataAggregationUtils.aggregateDataForPlanServant(
                 PlanServantUtils.instantiate(instanceId),
-                masterServantsDataMapRefRef.current
+                aggregatedMasterServantsMapRef.current
             );
             if (!newServant) {
                 continue;
             }
             PlanServantUpdateUtils.applyToPlanServant(servantData, newServant.planServant, costumes);
-            newServantsData.push(newServant);
+            newServants.push(newServant);
         }
 
         /**
          * If no new servants are being added (due to all instance IDs being skipped, or
          * missing source data), then return without doing anything else.
          */
-        if (!newServantsData.length) {
+        if (!newServants.length) {
             return;
         }
 
         /**
-         * Updated `servantsData` array. A new array instance is created to conform with
-         * the hook specifications.
+         * Updated `aggregatedServants` array. A new array instance is created to
+         * conform with the hook specifications.
          */
-        const servantsData = [...currentServantsData, ...newServantsData];
+        const aggregatedServants = [...currentServants, ...newServants];
 
-        editData.servantsData = servantsData;
+        editData.aggregatedServants = aggregatedServants;
         editData.costumes = costumes;
 
         const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
-            for (const servantData of newServantsData) {
-                dirtyServants.add(servantData.instanceId);
+            for (const { instanceId } of newServants) {
+                dirtyServants.add(instanceId);
             }
             return {
                 ...dirtyData,
@@ -599,17 +600,17 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     const updatePlanServants = useCallback((instanceIds: Iterable<number>, update: PlanServantUpdate): void => {
 
         const {
-            servantsData: currentServantsData,
+            aggregatedServants: currentServants,
             costumes: currentCostumes
         } = editData;
 
         const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
 
         /**
-         * New `servantsData` array. A new array instance is created to conform with the
-         * hook specifications.
+         * New `aggregatedServants` array. A new array instance is created to conform
+         * with the hook specifications.
          */
-        const servantsData: Array<PlanServantAggregatedData> = [];
+        const aggregatedServants: Array<PlanServantAggregatedData> = [];
 
         /**
          * New object for the unlocked costumes data. A new set instance is created to
@@ -622,14 +623,14 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
          */
         const isDirties: Record<number, boolean> = {};
 
-        for (const servantData of currentServantsData) {
+        for (const servantData of currentServants) {
             const instanceId = servantData.instanceId;
             /**
              * If the servant is not an update target, then just push to new array and
              * continue.
              */
             if (!instanceIdSet.has(instanceId)) {
-                servantsData.push(servantData);
+                aggregatedServants.push(servantData);
                 continue;
             }
             /**
@@ -646,13 +647,13 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
             const isDirty = isPlanServantChanged(referenceServant, targetPlanServant);
             isDirties[instanceId] = isDirty;
 
-            servantsData.push({
+            aggregatedServants.push({
                 ...servantData,
                 planServant: targetPlanServant
             });
         }
 
-        editData.servantsData = servantsData;
+        editData.aggregatedServants = aggregatedServants;
         editData.costumes = costumes;
 
         const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
@@ -674,28 +675,28 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     }, [editData, referenceData]);
 
     const updatePlanServantOrder = useCallback((instanceIds: ReadonlyArray<number>): void => {
-        const currentServantsData = editData.servantsData;
+        const currentServants = editData.aggregatedServants;
 
         /**
-         * New `servantsData` array. A new array instance is created to conform with the
+         * New `aggregatedServants` array. A new array instance is created to conform with the
          * hook specifications.
          */
-        const servantsData: Array<PlanServantAggregatedData> = [];
+        const aggregatedServants: Array<PlanServantAggregatedData> = [];
 
         /**
          * TODO This is an n^2 operation, may need some optimizations if servant list
          * gets too big.
          */
         for (const instanceId of instanceIds) {
-            const index = currentServantsData.findIndex(servant => servant.instanceId === instanceId);
+            const index = currentServants.findIndex(servant => servant.instanceId === instanceId);
             if (index !== -1) {
-                servantsData.push(currentServantsData[index]);
+                aggregatedServants.push(currentServants[index]);
             }
         }
 
-        editData.servantsData = servantsData;
+        editData.aggregatedServants = aggregatedServants;
 
-        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceData.servants, servantsData);
+        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceData.servants, aggregatedServants);
         setDirtyData(dirtyData => ({
             ...dirtyData,
             servantOrder: isOrderDirty
@@ -705,7 +706,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     const deletePlanServants = useCallback((instanceIds: Iterable<number>): void => {
 
         const {
-            servantsData: currentServantsData,
+            aggregatedServants: currentServants,
             costumes: currentCostumes
         } = editData;
 
@@ -715,20 +716,20 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
          * Updated servants array with the specified IDs removed. A new array instance
          * is created to conform with the hook specifications.
          */
-        const servantsData = currentServantsData.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
-        
+        const newServants = currentServants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
+
         /**
          * New object for the unlocked costumes data. A new set instance is created to
          * conform with the hook specifications.
          */
-        const costumes = filterCostumes(currentCostumes, servantsData);
+        const costumes = filterCostumes(currentCostumes, newServants);
 
-        editData.servantsData = servantsData;
+        editData.aggregatedServants = newServants;
         editData.costumes = costumes;
 
         const referenceServants = referenceData.servants;
         const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
-        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceServants, servantsData);
+        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceServants, newServants);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
             for (const instanceId of instanceIds) {
@@ -752,19 +753,19 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     }, [editData, referenceData]);
 
     const fulfillPlanServants = useCallback((instanceIds: Iterable<number>, remove = false): void => {
-        const currentServantsData = editData.servantsData;
+        const currentServants = editData.aggregatedServants;
         const computationOptions = PlanComputationUtils.parseComputationOptions(editData);
 
         const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
         const requirements: Array<PlanEnhancementRequirements> = [];
 
-        for (const servantData of currentServantsData) {
+        for (const servantData of currentServants) {
             if (!instanceIdSet.has(servantData.instanceId)) {
                 continue;
             }
             const fulfillmentResult = PlanComputationUtils.fulfillServant(
                 servantData,
-                masterAccountEditData.costumes,
+                MasterAccountUtils.unlockedCostumesMapToIdSet(masterAccountEditData.costumes),
                 editData.costumes,
                 computationOptions
             );
@@ -800,7 +801,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
             revertMasterAccountChanges();
         }
         if (isPlanDataDirty) {
-            const editData = clonePlanDataForEdit(plan, masterServantsDataMapRefRef.current);
+            const editData = clonePlanDataForEdit(plan, aggregatedMasterServantsMapRef.current);
             setEditData(editData);
             setDirtyData(getDefaultPlanEditDirtyData());
         }
@@ -853,7 +854,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
                     enabled: {
                         ...editData.enabled
                     },
-                    servants: editData.servantsData.map(servantData => servantData.planServant),
+                    servants: editData.aggregatedServants.map(servantData => servantData.planServant),
                     costumes: [
                         ...editData.costumes
                     ],

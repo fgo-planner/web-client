@@ -81,7 +81,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
     if (!gameServant) {
         return (
             <div className={`${StyleClassPrefix}-root`}>
-                Unknown servant ID {masterServant.gameId};
+                Unknown servant ID {masterServant.servantId};
             </div>
         );
     }

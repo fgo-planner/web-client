@@ -1,4 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
@@ -11,7 +11,7 @@ import { PlanRequirementsTableServantRowSkillTargets } from './PlanRequirementsT
 type Props = {
     planServantData: Immutable<PlanServantAggregatedData>;
     targetCostumes: ReadonlySet<number>;
-    unlockedCostumes: ReadonlySet<number>;
+    unlockedCostumes: ReadonlyRecord<number, boolean>;
 } & Pick<ComponentStyleProps, 'className'>;
 
 const ArrowCharacter = '\u279C';

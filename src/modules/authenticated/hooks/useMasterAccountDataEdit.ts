@@ -8,6 +8,7 @@ import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/ut
 import { MasterAccountService } from '../../../services/data/master/MasterAccountService';
 import { GameServantMap } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/DataAggregationUtils';
+import { MasterAccountUtils } from '../../../utils/master/MasterAccountUtils';
 import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
 import { DataEditUtils } from './DataEditUtils';
@@ -47,12 +48,12 @@ export type MasterAccountDataEditHookOptions = Readonly<{
  * be created whenever the respective data is changed.
  */
 export type MasterAccountEditData = {
+    aggregatedServants: ReadonlyArray<MasterServantAggregatedData>;
     bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
-    costumes: ReadonlySet<number>;
+    costumes: ReadonlyRecord<number, boolean>;
     items: ReadonlyRecord<number, number>;
     lastServantInstanceId: number;
     qp: number;
-    servantsData: ReadonlyArray<MasterServantAggregatedData>;
     soundtracks: ReadonlySet<number>;
 };
 
@@ -80,7 +81,7 @@ type MasterAccountEditDirtyData = {
  */
 type MasterAccountEditReferenceData = {
     bondLevels: ReadonlyRecord<number, InstantiatedServantBondLevel>;
-    costumes: ReadonlySet<number>;
+    costumes: ReadonlyRecord<number, boolean>;
     items: ReadonlyRecord<number, number>;
     lastServantInstanceId: number;
     qp: number;
@@ -104,54 +105,56 @@ type MasterAccountDataEditHookCommon = {
      * through another instance of the app).
      */
     isDataStale: boolean;
-    reloadData: () => Promise<void>;
-    revertChanges: () => void;
-    persistChanges: () => Promise<void>;
+    reloadData(): Promise<void>;
+    revertChanges(): void;
+    persistChanges(): Promise<void>;
 };
 
 type MasterAccountUpdateFunctions = {
     /**
-     * Directly sets the unlocked costumes IDs. An alternative way to updating the
-     * unlocked costumes is through the `MasterServantUpdate` object.
+     * Update unlocked costumes by directly providing a map where the key is the
+     * costume ID and the value is whether the costume was unlocked for free. An
+     * alternative way to updating the unlocked costumes is through the
+     * `MasterServantUpdate` object.
      */
-    updateCostumes: (costumeIds: Iterable<number>) => void;
+    updateCostumes(costumesMap: Record<number, boolean>): void;
     /**
      * Updates the quantity of a single inventory item.
      */
-    updateItem: (itemId: number, action: SetStateAction<number>) => void;
+    updateItem(itemId: number, action: SetStateAction<number>): void;
     /**
      * Updates the quantities of inventory items.
      */
-    updateItems: (items: ReadonlyRecord<number, SetStateAction<number>>) => void;
-    updateQp: (action: SetStateAction<number>) => void;
+    updateItems(items: ReadonlyRecord<number, SetStateAction<number>>): void;
+    updateQp(action: SetStateAction<number>): void;
     /**
      * Adds a single servant using the given `MasterServantUpdate` object.
      * 
      * Calls the `addServants` function internally. 
      */
-    addServant: (gameId: number, servantData: MasterServantUpdate) => void;
+    addServant(servantId: number, servantData: MasterServantUpdate): void;
     /**
      * Batch adds servants. Each added servant will be instantiated using the given
      * `MasterServantUpdate` object.
      */
-    addServants: (gameIds: Iterable<number>, servantData: MasterServantUpdate) => void;
+    addServants(servantIds: Iterable<number>, servantData: MasterServantUpdate): void;
     /**
      * Updates the servants with the corresponding `instanceIds` using the given
      * `MasterServantUpdate` object.
      */
-    updateServants: (instanceIds: Iterable<number>, update: MasterServantUpdate) => void;
+    updateServants(instanceIds: Iterable<number>, update: MasterServantUpdate): void;
     /**
      * Updates the servant ordering based on an array of `instanceId` values.
      * Assumes that the array contains a corresponding `instanceId` value for each
      * servant. Missing `instanceId` values will result in the corresponding servant
      * being removed.
      */
-    updateServantOrder: (instanceIds: ReadonlyArray<number>) => void;
+    updateServantOrder(instanceIds: ReadonlyArray<number>): void;
     /**
      * Deletes the servants with the corresponding `instanceIds`.
      */
-    deleteServants: (instanceIds: Iterable<number>) => void;
-    updateSoundtracks: (soundtrackIds: Iterable<number>) => void;
+    deleteServants(instanceIds: Iterable<number>): void;
+    updateSoundtracks(soundtrackIds: Iterable<number>): void;
 };
 
 type MasterAccountDataEditHookResult = MasterAccountDataEditHookCommon & {
@@ -167,7 +170,7 @@ type MasterAccountDataEditHookResultItemsSubset = MasterAccountDataEditHookCommo
 } & Pick<MasterAccountUpdateFunctions, 'updateItem' | 'updateQp'>;
 
 type MasterAccountDataEditHookResultServantsSubset = MasterAccountDataEditHookCommon & {
-    masterAccountEditData: Pick<MasterAccountEditData, 'bondLevels' | 'servantsData'>;
+    masterAccountEditData: Pick<MasterAccountEditData, 'aggregatedServants' | 'bondLevels'>;
 } & Pick<MasterAccountUpdateFunctions, 'addServant' | 'addServants' | 'updateServants' | 'updateServantOrder' | 'deleteServants'>;
 
 type MasterAccountDataEditHookResultSoundtracksSubset = MasterAccountDataEditHookCommon & {
@@ -194,12 +197,12 @@ const BlockNavigationHookOptions: UseBlockNavigationOptions = {
 //#region Internal helper/utility functions
 
 const getDefaultMasterAccountEditData = (): MasterAccountEditData => ({
+    aggregatedServants: CollectionUtils.emptyArray(),
     bondLevels: {},
-    costumes: CollectionUtils.emptySet(),
-    lastServantInstanceId: 0,
+    costumes: {},
     items: {},
+    lastServantInstanceId: 0,
     qp: 0,
-    servantsData: CollectionUtils.emptyArray(),
     soundtracks: CollectionUtils.emptySet()
 });
 
@@ -216,7 +219,7 @@ const cloneMasterAccountDataForEdit = (
     }
 
     if (options.includeCostumes) {
-        result.costumes = new Set(masterAccount.costumes);
+        result.costumes = MasterAccountUtils.generateUnlockedCostumesMap(masterAccount.costumes);
     }
     if (options.includeItems) {
         result.items = {
@@ -225,17 +228,18 @@ const cloneMasterAccountDataForEdit = (
         result.qp = masterAccount.resources.qp;
     }
     if (options.includeServants) {
+        const servantsData = masterAccount.servants;
         result.bondLevels = {
-            ...masterAccount.bondLevels
+            ...servantsData.bondLevels
         };
-        result.servantsData = DataAggregationUtils.aggregateDataForMasterServants(
-            masterAccount.servants.map(MasterServantUtils.clone),
+        result.aggregatedServants = DataAggregationUtils.aggregateDataForMasterServants(
+            servantsData.servants.map(MasterServantUtils.clone),
             gameServantMap
         );
-        result.lastServantInstanceId = masterAccount.lastServantInstanceId;
+        result.lastServantInstanceId = servantsData.lastServantInstanceId;
     }
     if (options.includeSoundtracks) {
-        result.soundtracks = new Set(masterAccount.soundtracks);
+        result.soundtracks = new Set(masterAccount.soundtracks.unlocked);
     }
 
     return result;
@@ -243,7 +247,7 @@ const cloneMasterAccountDataForEdit = (
 
 const getDefaultMasterAccountReferenceData = (): MasterAccountEditReferenceData => ({
     bondLevels: {},
-    costumes: CollectionUtils.emptySet(),
+    costumes: {},
     items: {},
     lastServantInstanceId: 0,
     qp: 0,
@@ -268,22 +272,23 @@ const cloneMasterAccountDataForReference = (
      */
 
     if (options.includeCostumes) {
-        result.costumes = new Set(masterAccount.costumes);
+        result.costumes = MasterAccountUtils.generateUnlockedCostumesMap(masterAccount.costumes);
     }
     if (options.includeItems) {
         result.items = masterAccount.resources.items;
         result.qp = masterAccount.resources.qp;
     }
     if (options.includeServants) {
-        result.bondLevels = masterAccount.bondLevels;
+        const servantsData = masterAccount.servants;
+        result.bondLevels = servantsData.bondLevels;
         result.servants = CollectionUtils.mapIterableToMap(
-            masterAccount.servants,
+            servantsData.servants,
             InstantiatedServantUtils.getInstanceId
         );
-        result.lastServantInstanceId = masterAccount.lastServantInstanceId;
+        result.lastServantInstanceId = servantsData.lastServantInstanceId;
     }
     if (options.includeSoundtracks) {
-        result.soundtracks = new Set(masterAccount.soundtracks);
+        result.soundtracks = new Set(masterAccount.soundtracks.unlocked);
     }
 
     return result;
@@ -557,17 +562,12 @@ export function useMasterAccountDataEdit(
 
     //#region Local create, update, delete functions
 
-    const updateCostumes = useCallback((costumeIds: Iterable<number>): void => {
+    const updateCostumes = useCallback((costumesMap: Record<number, boolean>): void => {
         if (!includeCostumes) {
             return;
         }
-        /**
-         * Construct a new `Set` here instead of using `DataEditUtils.toSet` to remove
-         * the possibility the passed `costumeIds` (if it is a `Set`) from being
-         * modified externally.
-         */
-        editData.costumes = new Set(costumeIds);
-        const isDirty = !CollectionUtils.isSetsEqual(editData.costumes, referenceData.costumes);
+        editData.costumes = { ...costumesMap };
+        const isDirty = !ObjectUtils.isShallowEquals(editData.costumes, referenceData.costumes);
         setDirtyData(dirtyData => ({
             ...dirtyData,
             costumes: isDirty
@@ -681,12 +681,12 @@ export function useMasterAccountDataEdit(
         editData.items = updatedItems;
     }, [editData, getReferenceItemQuantity, getUpdatedItemQuantity, includeItems, updateQp]);
 
-    const addServants = useCallback((gameIds: Iterable<number>, servantData: MasterServantUpdate): void => {
+    const addServants = useCallback((servantIds: Iterable<number>, servantData: MasterServantUpdate): void => {
         if (!includeServants || !gameServantMap) {
             return;
         }
         const {
-            servantsData: currentServantsData,
+            aggregatedServants: currentServantsData,
             bondLevels: currentBondLevels,
             costumes: currentCostumes
         } = editData;
@@ -700,10 +700,14 @@ export function useMasterAccountDataEdit(
         const bondLevels = { ...currentBondLevels };
 
         /**
-         * New object for the unlocked costumes data. A new set instance instance is
-         * created to conform with the hook specifications.
+         * New object for the unlocked costumes data. A new object instance is created
+         * to conform with the hook specifications.
          */
-        const costumes = new Set(currentCostumes);
+        const costumes = { ...currentCostumes };
+        /**
+         * Set of unlocked costume IDs.
+         */
+        const costumeIds = MasterAccountUtils.unlockedCostumesMapToIdSet(costumes);
 
         /**
          * Contains the new master servants (wrapped in a `MasterServantAggregatedData`
@@ -712,14 +716,14 @@ export function useMasterAccountDataEdit(
         const newServantsData: Array<MasterServantAggregatedData> = [];
 
         /**
-         * Construct new instance of a `MasterServant` object for each `gameId` and
+         * Construct new instance of a `MasterServant` object for each `servantId` and
          * add to the array. Unlocked costumes are also updated during this process.
          */
-        for (const gameId of gameIds) {
+        for (const servantId of servantIds) {
             const newServant = MasterServantUtils.instantiate(++lastServantInstanceId);
-            
-            MasterServantUpdateUtils.applyToMasterServant(servantData, newServant, bondLevels, costumes);
-            newServant.gameId = gameId;
+
+            MasterServantUpdateUtils.applyToMasterServant(servantData, newServant, bondLevels, costumeIds);
+            newServant.servantId = servantId;
 
             const newServantData = DataAggregationUtils.aggregateDataForMasterServant(newServant, gameServantMap);
             if (!newServantData) {
@@ -734,13 +738,13 @@ export function useMasterAccountDataEdit(
          */
         const servantsData = [...currentServantsData, ...newServantsData];
 
-        editData.servantsData = servantsData;
+        editData.aggregatedServants = servantsData;
         editData.lastServantInstanceId = lastServantInstanceId;
         editData.bondLevels = bondLevels;
         editData.costumes = costumes;
 
         const isBondLevelsDirty = !ObjectUtils.isShallowEquals(referenceData.bondLevels, bondLevels);
-        const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
+        const isCostumesDirty = !ObjectUtils.isShallowEquals(referenceData.costumes, costumes);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
             for (const servantData of newServantsData) {
@@ -755,8 +759,8 @@ export function useMasterAccountDataEdit(
         });
     }, [editData, gameServantMap, includeServants, referenceData]);
 
-    const addServant = useCallback((gameId: number, servantData: MasterServantUpdate): void => {
-        addServants([gameId], servantData);
+    const addServant = useCallback((servantId: number, servantData: MasterServantUpdate): void => {
+        addServants([servantId], servantData);
     }, [addServants]);
 
     const updateServants = useCallback((instanceIds: Iterable<number>, update: MasterServantUpdate): void => {
@@ -764,7 +768,7 @@ export function useMasterAccountDataEdit(
             return;
         }
         const {
-            servantsData: currentServantsData,
+            aggregatedServants: currentServantsData,
             bondLevels: currentBondLevels,
             costumes: currentCostumes
         } = editData;
@@ -784,10 +788,14 @@ export function useMasterAccountDataEdit(
         const bondLevels = { ...currentBondLevels };
 
         /**
-         * New object for the unlocked costumes data. A new set instance is created to
-         * conform with the hook specifications.
+         * New object for the unlocked costumes data. A new object instance is created
+         * to conform with the hook specifications.
          */
-        const costumes = new Set(currentCostumes);
+        const costumes = { ...currentCostumes };
+        /**
+         * Set of unlocked costume IDs.
+         */
+        const costumeIds = MasterAccountUtils.unlockedCostumesMapToIdSet(costumes);
 
         /**
          * Keeps track of the dirty states of the updated servants.
@@ -812,7 +820,7 @@ export function useMasterAccountDataEdit(
             /**
              * Apply update to the target servant. Unlocked costumes are also updated here.
              */
-            MasterServantUpdateUtils.applyToMasterServant(update, targetServant, bondLevels, costumes);
+            MasterServantUpdateUtils.applyToMasterServant(update, targetServant, bondLevels, costumeIds);
 
             const referenceServant = referenceData.servants.get(instanceId);
             const isDirty = isMasterServantChanged(referenceServant, targetServant);
@@ -824,12 +832,12 @@ export function useMasterAccountDataEdit(
             });
         }
 
-        editData.servantsData = servantsData;
+        editData.aggregatedServants = servantsData;
         editData.bondLevels = bondLevels;
         editData.costumes = costumes;
 
         const isBondLevelsDirty = !ObjectUtils.isShallowEquals(referenceData.bondLevels, bondLevels);
-        const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
+        const isCostumesDirty = !ObjectUtils.isShallowEquals(referenceData.costumes, costumes);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
             for (const [key, isDirty] of Object.entries(isDirties)) {
@@ -852,28 +860,28 @@ export function useMasterAccountDataEdit(
         if (!includeServants) {
             return;
         }
-        const currentServantsData = editData.servantsData;
+        const currentServants = editData.aggregatedServants;
 
         /**
-         * New `servantsData` array. A new array instance is created to conform with the
-         * hook specifications.
+         * New array for the updated servants order. A new array instance is created to
+         * conform with the hook specifications.
          */
-        const servantsData: Array<MasterServantAggregatedData> = [];
+        const updatedServants: Array<MasterServantAggregatedData> = [];
 
         /**
          * TODO This is an n^2 operation, may need some optimizations if servant list
          * gets too big.
          */
         for (const instanceId of instanceIds) {
-            const index = currentServantsData.findIndex(servant => servant.instanceId === instanceId);
+            const index = currentServants.findIndex(servant => servant.instanceId === instanceId);
             if (index !== -1) {
-                servantsData.push(currentServantsData[index]);
+                updatedServants.push(currentServants[index]);
             }
         }
 
-        editData.servantsData = servantsData;
+        editData.aggregatedServants = updatedServants;
 
-        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceData.servants, servantsData);
+        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceData.servants, updatedServants);
         setDirtyData(dirtyData => ({
             ...dirtyData,
             servantOrder: isOrderDirty
@@ -884,7 +892,7 @@ export function useMasterAccountDataEdit(
         if (!includeServants) {
             return;
         }
-        const currentServantsData = editData.servantsData;
+        const currentServants = editData.aggregatedServants;
 
         const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
 
@@ -892,7 +900,7 @@ export function useMasterAccountDataEdit(
          * Updated servants array with the specified IDs removed. A new array instance
          * is created to conform with the hook specifications.
          */
-        const servantsData = currentServantsData.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
+        const servantsData = currentServants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
 
         /**
          * If the last servant in terms of `instanceId` was deleted during this
@@ -916,7 +924,7 @@ export function useMasterAccountDataEdit(
 
         // TODO Also remove bond/costume data if the last instance of the servant is removed.
 
-        editData.servantsData = servantsData;
+        editData.aggregatedServants = servantsData;
         editData.lastServantInstanceId = lastServantInstanceId;
 
         const referenceServants = referenceData.servants;
@@ -1003,32 +1011,36 @@ export function useMasterAccountDataEdit(
             if (includeItems && (dirtyData.items.size || dirtyData.qp)) {
                 update.resources = {
                     ...masterAccount.resources,
-                    items: {
-                        ...editData.items
-                    },
+                    items: { ...editData.items },
                     qp: editData.qp
                 };
             }
-            if (includeServants) {
-                if (dirtyData.servants.size || dirtyData.servantOrder) {
-                    update.servants = editData.servantsData.map(DataAggregationUtils.getMasterServant) as Array<MasterServant>;
-                    update.lastServantInstanceId = editData.lastServantInstanceId;
-                }
-                if (dirtyData.bondLevels) {
-                    update.bondLevels = {
-                        ...editData.bondLevels
-                    };
-                }
+            if (includeServants && (dirtyData.servants.size || dirtyData.servantOrder || dirtyData.bondLevels)) {
+                update.servants = {
+                    servants: editData.aggregatedServants.map(DataAggregationUtils.getMasterServant) as Array<MasterServant>,
+                    lastServantInstanceId: editData.lastServantInstanceId,
+                    bondLevels: { ...editData.bondLevels }
+                };
             }
             if (includeCostumes && dirtyData.costumes) {
-                update.costumes = [
-                    ...editData.costumes
-                ];
+                const unlocked: Array<number> = [];
+                const noCostUnlock: Array<number> = [];
+                for (const [key, value] of Object.entries(editData.costumes)) {
+                    const costumeId = Number(key);
+                    unlocked.push(costumeId);
+                    if (value) {
+                        noCostUnlock.push(costumeId);
+                    }
+                }
+                update.costumes = {
+                    unlocked,
+                    noCostUnlock
+                };
             }
             if (includeSoundtracks && dirtyData.soundtracks) {
-                update.soundtracks = [
-                    ...editData.soundtracks
-                ];
+                update.soundtracks = {
+                    unlocked: [...editData.soundtracks]
+                };
             }
             await masterAccountService.updateAccount(update);
         } finally {

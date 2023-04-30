@@ -1,4 +1,4 @@
-import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
+import { CollectionUtils, Functions, Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameItemConstants, InstantiatedServantUtils, PlanServantAggregatedData } from '@fgo-planner/data-core';
 import { Box } from '@mui/system';
 import React, { CSSProperties, MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
@@ -25,7 +25,7 @@ type Props = {
      */
     selectedInstanceIds?: ReadonlySet<number>;
     targetCostumes: ReadonlySet<number>;
-    unlockedCostumes: ReadonlySet<number>;
+    unlockedCostumes: ReadonlyRecord<number, boolean>;
     onEditMasterItems?: () => void;
     onRowClick?: MouseEventHandler;
     onRowDoubleClick?: MouseEventHandler;

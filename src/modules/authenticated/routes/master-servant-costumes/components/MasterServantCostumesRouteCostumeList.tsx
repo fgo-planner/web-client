@@ -1,3 +1,4 @@
+import { ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameServantCostumeAggregatedData } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -8,8 +9,8 @@ import { MasterServantCostumesRouteCostumeListHeader } from './MasterServantCost
 import { MasterServantCostumesRouteCostumeListRow, StyleClassPrefix as MasterServantCostumesRouteCostumeListRowStyleClassPrefix } from './MasterServantCostumesRouteCostumeListRow';
 
 type Props = {
-    onChange: (costumeId: number, unlocked: boolean) => void;
-    unlockedCostumes: ReadonlySet<number>;
+    onChange(costumeId: number, unlocked?: boolean, noCostUnlock?: boolean): void;
+    unlockedCostumes: ReadonlyRecord<number, boolean>;
 };
 
 const StyleClassPrefix = 'MasterServantCostumesRouteCostumeList';
@@ -51,6 +52,11 @@ const StyleProps = (theme: SystemTheme) => {
                         maxWidth: spacing(8),  // 32px
                     }
                 },
+                [`& .${MasterServantCostumesRouteCostumeListRowStyleClassPrefix}-no-cost-status`]: {
+                    minWidth: 42,
+                    px: 2,
+                    textAlign: 'center',
+                },
                 [`& .${MasterServantCostumesRouteCostumeListRowStyleClassPrefix}-unlock-materials`]: {
                     display: 'flex',
                     justifyContent: 'flex-end',
@@ -83,14 +89,16 @@ export const MasterServantCostumesRouteCostumeList = React.memo(({ onChange, unl
 
     const renderCostumeRow = (costumeData: GameServantCostumeAggregatedData): ReactNode => {
         const { costumeId } = costumeData;
-        const unlocked = unlockedCostumes.has(costumeId);
+        const noCostUnlock = unlockedCostumes[costumeId];
+        const unlocked = noCostUnlock !== undefined;
         return (
             <MasterServantCostumesRouteCostumeListRow
                 key={costumeId}
                 costumeData={costumeData}
+                noCostUnlock={noCostUnlock}
+                openLinksInNewTab
                 unlocked={unlocked}
                 onChange={onChange}
-                openLinksInNewTab
             />
         );
     };

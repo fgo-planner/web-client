@@ -143,16 +143,18 @@ const MasterServantImportRoute = React.memo(() => {
         }
         invokeLoadingIndicator();
 
-        const bondLevels = { ...masterAccount.bondLevels };
+        const currentServantsData = masterAccount.servants;
+
+        const bondLevels = { ...currentServantsData.bondLevels };
         /**
          * Existing bond levels are always merged with imported data, regardless of the
          * selected action.
          */
-        for (const { gameId, bondLevel } of parsedData.servants) {
+        for (const { servantId, bondLevel } of parsedData.servants) {
             if (bondLevel == null) {
-                delete bondLevels[gameId];
+                delete bondLevels[servantId];
             } else if (bondLevel !== IndeterminateValue) {
-                bondLevels[gameId] = bondLevel;
+                bondLevels[servantId] = bondLevel;
             }
         }
 
@@ -161,11 +163,9 @@ const MasterServantImportRoute = React.memo(() => {
          */
         const update: MasterAccountUpdate = {
             _id: masterAccount._id,
-            bondLevels
         };
 
-        const startInstanceId = masterAccount.lastServantInstanceId + 1;
-
+        const startInstanceId = currentServantsData.lastServantInstanceId + 1;
         /**
          * Generate the servant update data depending on the selected action.
          */
@@ -174,7 +174,7 @@ const MasterServantImportRoute = React.memo(() => {
              * Clone the existing servants, just in case the update fails.
              */
             /** */
-            const servants = masterAccount.servants.map(servant => MasterServantUtils.clone(servant));
+            const servants = currentServantsData.servants.map(servant => MasterServantUtils.clone(servant));
             /**
              * Merge the parsed servants into the existing servants.
              */
@@ -186,8 +186,11 @@ const MasterServantImportRoute = React.memo(() => {
                 bondLevels
             );
 
-            update.servants = servants;
-            update.lastServantInstanceId = lastServantInstanceId;
+            update.servants = {
+                servants,
+                lastServantInstanceId,
+                bondLevels
+            };
 
         } else {
             let instanceId = startInstanceId;
@@ -197,16 +200,21 @@ const MasterServantImportRoute = React.memo(() => {
                 masterServants.push(masterServant);
             }
 
+            let servants;
             if (existingAction === ExistingAction.Append) {
-                update.servants = [
-                    ...masterAccount.servants,
+                servants = [
+                    ...currentServantsData.servants,
                     ...masterServants
                 ];
             } else {
-                update.servants = masterServants;
+                servants = masterServants;
             }
 
-            update.lastServantInstanceId = instanceId;
+            update.servants = {
+                servants,
+                lastServantInstanceId: instanceId,
+                bondLevels
+            };
         }
 
         try {
@@ -242,7 +250,7 @@ const MasterServantImportRoute = React.memo(() => {
             return (
                 <MasterServantImportRouteServantList
                     parsedServants={parsedData.servants}
-                    hasExistingServants={!!masterAccount?.servants.length}
+                    hasExistingServants={!!masterAccount?.servants.servants.length}
                     onSubmit={finalizeImport}
                     onCancel={cancelImport}
                 />
@@ -257,7 +265,7 @@ const MasterServantImportRoute = React.memo(() => {
                 disableSubmit={isLoadingIndicatorActive}
             />
         );
-    }, [cancelImport, finalizeImport, isLoadingIndicatorActive, masterAccount?.servants.length, parseData, parsedData]);
+    }, [cancelImport, finalizeImport, isLoadingIndicatorActive, masterAccount, parseData, parsedData]);
 
     const importStatusDialog = useMemo((): ReactNode => {
         const message = ImportStatusMessages[importStatus];

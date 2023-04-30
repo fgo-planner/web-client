@@ -1,4 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { PlanServantAggregatedData } from '@fgo-planner/data-core';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
@@ -10,7 +10,7 @@ type Props = {
     planServantData: Immutable<PlanServantAggregatedData>;
     servantRowHeaderMode: 'name' | 'targets' | 'toggle';
     targetCostumes: ReadonlySet<number>;
-    unlockedCostumes: ReadonlySet<number>;
+    unlockedCostumes: ReadonlyRecord<number, boolean>;
 };
 
 export const StyleClassPrefix = 'PlanRequirementsTableServantRowHeader';

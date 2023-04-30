@@ -1,5 +1,5 @@
 import { CollectionUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, PlanResources, PlanServant, PlanServantAggregatedData, PlanServantUtils, PlanUpcomingResources } from '@fgo-planner/data-core';
+import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, PlanServant, PlanServantAggregatedData, PlanServantUtils, PlanUpcomingResources, Resources } from '@fgo-planner/data-core';
 import { PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanEnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types';
 
 
@@ -58,7 +58,7 @@ export namespace PlanComputationUtils {
     export type PlanData = Readonly<{
         planId: string;
         enabled: Enabled;
-        servantsData: ReadonlyArray<PlanServantAggregatedData>;
+        aggregatedServants: ReadonlyArray<PlanServantAggregatedData>;
         costumes: ReadonlySet<number>;
         upcomingResources: ImmutableArray<PlanUpcomingResources>;
     }>;
@@ -306,12 +306,12 @@ export namespace PlanComputationUtils {
         isTargetPlan = false
     ): void {
 
-        for (const planServantData of planData.servantsData) {
+        for (const aggregatedServant of planData.aggregatedServants) {
             const {
                 gameServant,
                 masterServant,
                 planServant
-            } = planServantData;
+            } = aggregatedServant;
             /**
              * Skip the servant if it is not enabled.
              */
@@ -701,10 +701,10 @@ export namespace PlanComputationUtils {
     }
 
     /**
-     * Takes an array of `PlanResources` and returns a new `PlanResources`
-     * containing the sum of all the values.
+     * Takes an array of `Resources` and returns a new `Resources` containing the
+     * sum of all the values.
      */
-    function _sumPlanResources(resources: ImmutableArray<PlanResources>): PlanResources {
+    function _sumPlanResources(resources: ImmutableArray<Resources>): Resources {
         const result = _instantiatePlanResources();
         for (const enhancementRequirements of resources) {
             _addPlanResources(result, enhancementRequirements);
@@ -713,10 +713,9 @@ export namespace PlanComputationUtils {
     }
 
     /**
-     * Adds the values from the source `PlanResources` to the target
-     * `PlanResources`.
+     * Adds the values from the source `Resources` to the target `Resources`.
      */
-    function _addPlanResources(target: PlanResources, source: Immutable<PlanResources>): void {
+    function _addPlanResources(target: Resources, source: Immutable<Resources>): void {
         const targetEmbers = target.embers;
         for (const [key, value] of Object.entries(source.embers)) {
             const rarity = Number(key) as GameEmberRarity;
@@ -809,7 +808,7 @@ export namespace PlanComputationUtils {
         };
     }
 
-    function _instantiatePlanResources(): PlanResources {
+    function _instantiatePlanResources(): Resources {
         return {
             embers: {},
             items: {},

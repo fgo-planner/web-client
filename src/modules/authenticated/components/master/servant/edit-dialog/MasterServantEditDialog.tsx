@@ -24,11 +24,11 @@ type Props = {
      * servants being edited.
      *
      * If a single servant is being edited, this array should contain exactly one
-     * `MasterServant`, whose `gameId` value matches that of the given
+     * `MasterServant`, whose `servantId` value matches that of the given
      * `masterServantUpdate`.
      *
      * If multiple servants are being edited, this array should contain all the
-     * target `MasterServant`, and `masterServantUpdate.gameId` should be set to the
+     * target `MasterServant`, and `masterServantUpdate.servantId` should be set to the
      * indeterminate value.
      *
      * If inactive (`masterServantUpdate` is `undefined`), this should be set to an

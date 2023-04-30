@@ -9,7 +9,8 @@ import { useGameItemMap } from '../../../../../hooks/data/useGameItemMap';
 
 type Props = {
     costumeData: GameServantCostumeAggregatedData;
-    onChange: (costumeId: number, unlocked: boolean) => void;
+    noCostUnlock?: boolean;
+    onChange: (costumeId: number, unlocked?: boolean, noCostUnlock?: boolean) => void;
     openLinksInNewTab?: boolean;
     unlocked?: boolean;
 };
@@ -29,8 +30,10 @@ export const MasterServantCostumesRouteCostumeListRow = React.memo((props: Props
                 materials,
                 name,
             },
-            gameServant
+            gameServant,
+            noCostUnlockAvailable
         },
+        noCostUnlock,
         onChange,
         openLinksInNewTab,
         unlocked
@@ -42,11 +45,24 @@ export const MasterServantCostumesRouteCostumeListRow = React.memo((props: Props
         onChange(costumeId, event.target.checked);
     }, [costumeId, onChange]);
 
+    const handleNoCostCheckboxChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
+        onChange(costumeId, undefined, event.target.checked);
+    }, [costumeId, onChange]);
+
     const unlockedStatusNode: ReactNode = (
         <div className={`${StyleClassPrefix}-unlocked-status`}>
             {!alwaysUnlocked && <Checkbox
                 checked={unlocked}
                 onChange={handleUnlockCheckboxChange}
+            />}
+        </div>
+    );
+
+    const noCostStatusNode: ReactNode = (
+        <div className={`${StyleClassPrefix}-unlocked-status`}>
+            {!alwaysUnlocked && noCostUnlockAvailable && <Checkbox
+                checked={noCostUnlock}
+                onChange={handleNoCostCheckboxChange}
             />}
         </div>
     );
@@ -89,6 +105,7 @@ export const MasterServantCostumesRouteCostumeListRow = React.memo((props: Props
             <TruncateText className={`${StyleClassPrefix}-name`}>
                 {name}
             </TruncateText>
+            {noCostStatusNode}
             <div className={`${StyleClassPrefix}-unlock-materials`}>
                 {unlockMaterialNodes}
             </div>

@@ -275,7 +275,7 @@ export class MasterAccountService {
     }
 
     private _transformMasterAccount(masterAccount: MasterAccount): MasterAccount {
-        for (const masterServant of masterAccount.servants) {
+        for (const masterServant of masterAccount.servants.servants) {
             this._transformMasterServant(masterServant);
         }
         return Http.stringTimestampsToDate(masterAccount);

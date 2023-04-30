@@ -15,13 +15,15 @@ export namespace MasterServantStatsUtils {
     ): MasterServantStatsRouteTypes.StatsGroupedByRarity {
         const start = window.performance.now();
 
+        const servantsData = masterAccount.servants;
+
         const statsByRarity = _instantiateStatsGroupedByRarity();
-        if (!masterAccount.servants.length) {
+        if (!servantsData.servants.length) {
             return statsByRarity;
         }
 
         const masterServantIds = new Set<number>();
-        for (const masterServant of masterAccount.servants) {
+        for (const masterServant of servantsData.servants) {
             /*
              * Skip servant if it is not summoned.
              */
@@ -29,7 +31,7 @@ export namespace MasterServantStatsUtils {
                 continue;
             }
 
-            const servantId = masterServant.gameId;
+            const servantId = masterServant.servantId;
             const servant = gameServantMap[servantId];
             if (!servant) {
                 // TODO Log/throw error
@@ -47,7 +49,7 @@ export namespace MasterServantStatsUtils {
                 isUnique = true;
             }
 
-            _populateStats(statsByRarity, servant.rarity, masterServant, masterAccount.bondLevels, isUnique);
+            _populateStats(statsByRarity, servant.rarity, masterServant, servantsData.bondLevels, isUnique);
         }
         _computeStatAverages(statsByRarity);
 
@@ -67,16 +69,17 @@ export namespace MasterServantStatsUtils {
         masterAccount: MasterAccount,
         filter: MasterServantStatsRouteTypes.FilterOptions
     ): MasterServantStatsRouteTypes.StatsGroupedByClass {
-
         const start = window.performance.now();
 
+        const servantsData = masterAccount.servants;
+
         const statsByClass = _instantiateStatsGroupedByClass();
-        if (!masterAccount.servants.length) {
+        if (!servantsData.servants.length) {
             return statsByClass;
         }
 
         const masterServantIds = new Set<number>();
-        for (const masterServant of masterAccount.servants) {
+        for (const masterServant of servantsData.servants) {
             /*
              * Skip servant if it is not summoned.
              */
@@ -84,7 +87,7 @@ export namespace MasterServantStatsUtils {
                 continue;
             }
 
-            const servantId = masterServant.gameId;
+            const servantId = masterServant.servantId;
             const servant = gameServantMap[servantId];
             if (!servant) {
                 // TODO Log/throw error
@@ -103,7 +106,7 @@ export namespace MasterServantStatsUtils {
             }
 
             const simplifiedClass = GameServantUtils.convertToSimplifiedClass(servant.class);
-            _populateStats(statsByClass, simplifiedClass, masterServant, masterAccount.bondLevels, isUnique);
+            _populateStats(statsByClass, simplifiedClass, masterServant, servantsData.bondLevels, isUnique);
         }
         _computeStatAverages(statsByClass);
 
@@ -216,7 +219,7 @@ export namespace MasterServantStatsUtils {
          * they should have the same bond level anyways.
          */
         if (isUnique) {
-            _populateBondStats(stats, key, bondLevelMap[masterServant.gameId]);
+            _populateBondStats(stats, key, bondLevelMap[masterServant.servantId]);
         }
 
     }

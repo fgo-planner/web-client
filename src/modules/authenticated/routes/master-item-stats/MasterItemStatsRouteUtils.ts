@@ -2,6 +2,7 @@ import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
 import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantConstants, MasterServant } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { GameServantMap, GameSoundtrackList } from '../../../../types';
+import { MasterAccountUtils } from '../../../../utils/master/MasterAccountUtils';
 import { MasterItemStatsRouteTypes } from './MasterItemStatsRouteTypes';
 
 export namespace MasterItemStatsRouteUtils {
@@ -28,15 +29,17 @@ export namespace MasterItemStatsRouteUtils {
         _populateInventory(stats, masterAccount);
 
         const masterServantIds = new Set<number>();
-        const unlockedCostumes = new Set<number>(masterAccount.costumes); // TODO Only populate this when `includeCostumes` is true
+        const unlockedCostumesMap = includeCostumes ? MasterAccountUtils.generateUnlockedCostumesMap(masterAccount.costumes) : {};
 
-        for (const masterServant of masterAccount.servants) {
+        console.log(unlockedCostumesMap)
+
+        for (const masterServant of masterAccount.servants.servants) {
 
             if (!masterServant.summoned && !includeUnsummonedServants) {
                 continue;
             }
 
-            const servantId = masterServant.gameId;
+            const servantId = masterServant.servantId;
             const servant = gameServantMap[servantId];
             if (!servant) {
                 // TODO Log/throw error
@@ -55,14 +58,14 @@ export namespace MasterItemStatsRouteUtils {
                 masterServant,
                 includeAppendSkills,
                 includeLores,
-                unlockedCostumes,
+                unlockedCostumesMap,
                 includeCostumes,
                 isUnique
             );
         }
 
         if (includeSoundtracks) {
-            const unlockedSoundtracks = new Set<number>(masterAccount.soundtracks);
+            const unlockedSoundtracks = new Set<number>(masterAccount.soundtracks.unlocked);
             _updateForSoundtracks(
                 stats,
                 gameSoundtrackList,
@@ -95,7 +98,7 @@ export namespace MasterItemStatsRouteUtils {
         masterServant: ImmutableMasterServant,
         includeAppendSkills: boolean,
         includeLores: boolean,
-        unlockedCostumes: Set<number>,
+        unlockedCostumesMap: Record<number, boolean>,
         includeCostumes: boolean,
         isUnique: boolean
     ): void {
@@ -117,8 +120,18 @@ export namespace MasterItemStatsRouteUtils {
         if (isUnique && includeCostumes) {
             for (const [key, costume] of Object.entries(servant.costumes)) {
                 const costumeId = Number(key);
-                const costumeUnlocked = unlockedCostumes.has(costumeId);
-                _updateForServantEnhancement(stats, costume.materials, 1, costumeUnlocked ? 1 : 0);
+                const noCostUnlock = unlockedCostumesMap[costumeId];
+                if (noCostUnlock === undefined) {
+                    // Costume not yet unlocked
+                    _updateForServantEnhancement(stats, costume.materials, 1, 0);
+                } else if (noCostUnlock) {
+                    // Costume unlocked for free
+                    console.debug(`costume ${costume.collectionNo} unlocked for free`)
+                    _updateForServantEnhancement(stats, costume.materials, 1, 0, true);
+                } else {
+                    // Costume unlocked normally
+                    _updateForServantEnhancement(stats, costume.materials, 1, 1);
+                }
             }
         }
     }

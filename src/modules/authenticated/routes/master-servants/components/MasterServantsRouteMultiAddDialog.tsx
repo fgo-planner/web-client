@@ -13,7 +13,7 @@ import { DialogComponentProps } from '../../../../../types';
 import { GameServantUtils } from '../../../../../utils/game/GameServantUtils';
 
 export type MasterServantsRouteMultiAddDialogData = {
-    gameIds: Array<number>,
+    servantIds: Array<number>,
     summoned: boolean
 };
 
@@ -128,10 +128,10 @@ export const MasterServantsRouteMultiAddDialog = React.memo((props: Props) => {
         if (!gameServantList) {
             return;
         }
-        const masterServantGameIdsSet = new Set(masterServantsData.map(servantData => servantData.masterServant.gameId));
+        const masterServantGameIdsSet = new Set(masterServantsData.map(servantData => servantData.masterServant.servantId));
         const selectedServantIds = gameServantList
             .map(gameServant => gameServant._id)
-            .filter(gameId => !masterServantGameIdsSet.has(gameId));
+            .filter(servantId => !masterServantGameIdsSet.has(servantId));
 
         setSelectedServantIds(new Set(selectedServantIds));
     }, [gameServantList, masterServantsData]);
@@ -141,10 +141,10 @@ export const MasterServantsRouteMultiAddDialog = React.memo((props: Props) => {
     }, []);
 
     const handleSubmitButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
-        const gameIds = [...selectedServantIds];
+        const servantIds = [...selectedServantIds];
         setSelectedServantIds(CollectionUtils.emptySet());
         setSummoned(DefaultSummonedState);
-        onClose(event, 'submit', { gameIds, summoned });
+        onClose(event, 'submit', { servantIds, summoned });
     }, [onClose, selectedServantIds, summoned]);
 
     const handleCancelButtonClick = useCallback((event: MouseEvent<HTMLButtonElement>): void => {

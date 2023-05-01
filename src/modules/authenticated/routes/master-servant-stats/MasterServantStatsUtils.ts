@@ -1,6 +1,6 @@
 import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { GameServant, GameServantClass, InstantiatedServantBondLevel, InstantiatedServantConstants, MasterAccount, MasterServant } from '@fgo-planner/data-core';
-import { GameServantMap } from '../../../../types';
+import { GameServantClassSimplified, GameServantMap } from '../../../../types';
 import { GameServantUtils } from '../../../../utils/game/GameServantUtils';
 import { MasterServantStatsRouteTypes } from './MasterServantStatsRouteTypes';
 
@@ -542,7 +542,7 @@ export namespace MasterServantStatsUtils {
             [GameServantClass.Caster]: 0,
             [GameServantClass.Assassin]: 0,
             [GameServantClass.Berserker]: 0,
-            'Extra': 0,
+            [GameServantClassSimplified.Extra]: 0,
             overall: 0
         };
     }

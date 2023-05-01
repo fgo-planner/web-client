@@ -4,9 +4,9 @@ import { Tooltip, TooltipProps } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../constants';
-import { ComponentStyleProps } from '../../types';
+import { ComponentStyleProps, GameServantClassSimplified } from '../../types';
 
-type ClassIconName = GameServantClass | 'Extra' | 'All';
+type ClassIconName = GameServantClass | typeof GameServantClassSimplified.Extra;
 
 type Props = {
     servantClass: ClassIconName;
@@ -18,35 +18,12 @@ type Props = {
 
 const ClassIconBaseUrl = AssetConstants.ServantClassIconBaseUrl;
 
+// TODO Maybe move this to GameServantConstants
+const ExtraClassNumber = 1002;
+
 const ClassNameMap: ReadonlyRecord<ClassIconName, string> = {
     ...GameServantConstants.ClassDisplayNameMap,
-    'Extra': 'Extra',
-    'All': 'All'
-};
-
-const ClassNumberMap: ReadonlyRecord<ClassIconName, number> = {
-    [GameServantClass.Saber]: 1,
-    [GameServantClass.Archer]: 2,
-    [GameServantClass.Lancer]: 3,
-    [GameServantClass.Rider]: 4,
-    [GameServantClass.Caster]: 5,
-    [GameServantClass.Assassin]: 6,
-    [GameServantClass.Berserker]: 7,
-    [GameServantClass.Shielder]: 8,
-    [GameServantClass.Ruler]: 9,
-    [GameServantClass.AlterEgo]: 10,
-    [GameServantClass.Avenger]: 11,
-    [GameServantClass.MoonCancer]: 23,
-    [GameServantClass.Foreigner]: 25,
-    [GameServantClass.BeastI]: 22,
-    [GameServantClass.BeastII]: 20,
-    [GameServantClass.BeastIIIR]: 24,
-    [GameServantClass.BeastIIIL]: 26,
-    [GameServantClass.BeastFalse]: 27,
-    [GameServantClass.Pretender]: 28,
-    [GameServantClass.Unknown]: 12,
-    'Extra': 1002,
-    'All': 0 // TODO Find the code for this
+    [GameServantClassSimplified.Extra]: GameServantClassSimplified.Extra
 };
 
 const RarityColorMap: ReadonlyRecord<GameServantRarity, number> = {
@@ -89,7 +66,13 @@ export const ServantClassIcon = React.memo((props: Props) => {
         height: size || DefaultSize
     }), [size]);
 
-    const classNumber = ClassNumberMap[servantClass] || DefaultClassNumber;
+    const classNumber = useMemo((): number => {
+        if (servantClass === GameServantClassSimplified.Extra) {
+            return ExtraClassNumber;
+        }
+        return GameServantConstants.ClassNumberMap[servantClass as GameServantClass] || DefaultClassNumber;
+    }, [servantClass]);
+
     const rarityColor = RarityColorMap[rarity] ?? DefaultRarityColor;
     const imageUrl = `${ClassIconBaseUrl}/class${rarityColor}_${classNumber}.png`;
 
@@ -110,7 +93,7 @@ export const ServantClassIcon = React.memo((props: Props) => {
 
     if (tooltip) {
         return (
-            <Tooltip title={ClassNameMap[servantClass] ?? ''} placement={tooltipPlacement}>
+            <Tooltip title={ClassNameMap[servantClass] || servantClass} placement={tooltipPlacement}>
                 {iconNode}
             </Tooltip>
         );

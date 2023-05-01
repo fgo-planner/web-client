@@ -34,7 +34,9 @@ const StyleProps = (theme: SystemTheme) => {
                 height: 52,
                 display: 'flex',
                 alignItems: 'center',
-                fontSize: '0.875rem',
+                [`& .${MasterServantCostumesRouteCostumeListRowStyleClassPrefix}-text`]: {
+                    fontSize: '0.875rem'
+                },
                 [`& .${MasterServantCostumesRouteCostumeListRowStyleClassPrefix}-unlocked-status`]: {
                     minWidth: 42,
                     px: 2,
@@ -60,8 +62,11 @@ const StyleProps = (theme: SystemTheme) => {
                 [`& .${MasterServantCostumesRouteCostumeListRowStyleClassPrefix}-unlock-materials`]: {
                     display: 'flex',
                     justifyContent: 'flex-end',
-                    minWidth: spacing(75),  // 300px
+                    minWidth: 300,
                     pr: 8,
+                    '>div': {
+                        fontSize: '0.875rem'
+                    },
                     [breakpoints.down('sm')]: {
                         pr: 6
                     }
@@ -89,7 +94,7 @@ export const MasterServantCostumesRouteCostumeList = React.memo(({ onChange, unl
 
     const renderCostumeRow = (costumeData: GameServantCostumeAggregatedData): ReactNode => {
         const { costumeId } = costumeData;
-        const noCostUnlock = unlockedCostumes[costumeId];
+        const noCostUnlock = !!unlockedCostumes[costumeId];
         const unlocked = noCostUnlock !== undefined;
         return (
             <MasterServantCostumesRouteCostumeListRow

@@ -54,9 +54,11 @@ const StyleProps = (theme: SystemTheme) => {
                 height: 52,
                 display: 'flex',
                 alignItems: 'center',
-                fontSize: '0.875rem',
                 '&:not(:hover) .play-icon': {
                     opacity: 0
+                },
+                [`& .${MasterSoundtracksRouteSoundtrackListRowStyleClassPrefix}-text`]: {
+                    fontSize: '0.875rem'
                 },
                 [`& .${MasterSoundtracksRouteSoundtrackListRowStyleClassPrefix}-unlocked-status`]: {
                     width: 42,
@@ -78,13 +80,17 @@ const StyleProps = (theme: SystemTheme) => {
                     width: spacing(14)  // 56px
                 },
                 [`& .${MasterSoundtracksRouteSoundtrackListRowStyleClassPrefix}-title`]: {
-                    flex: '1 1'
+                    flex: '1 1',
+                    minWidth: 0
                 },
                 [`& .${MasterSoundtracksRouteSoundtrackListRowStyleClassPrefix}-unlock-material`]: {
                     display: 'flex',
                     justifyContent: 'flex-end',
                     minWidth: spacing(20),  // 80px
                     pr: 8,
+                    '>div': {
+                        fontSize: '0.875rem'
+                    },
                     [breakpoints.down('sm')]: {
                         pr: 6
                     }

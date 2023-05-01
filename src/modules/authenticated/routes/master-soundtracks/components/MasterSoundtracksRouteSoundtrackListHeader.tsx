@@ -61,17 +61,22 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const MasterSoundtracksRouteSoundtrackListHeader = React.memo(() => (
     <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-        <HeaderLabel className={`${StyleClassPrefix}-unlocked-status`}>
-            <Icon>lock_open</Icon>
-        </HeaderLabel>
+        <div className={`${StyleClassPrefix}-unlocked-status`}>
+            <HeaderLabel>
+                <Icon>lock_open</Icon>
+            </HeaderLabel>
+        </div>
         <div className={`${StyleClassPrefix}-thumbnail`} />
-        <HeaderLabel className={`${StyleClassPrefix}-preview`} />
-        <HeaderLabel className={`${StyleClassPrefix}-title`}>
-            <TruncateText>Track Title</TruncateText>
-        </HeaderLabel>
-        <HeaderLabel className={`${StyleClassPrefix}-unlock-material`}>
-            Unlock Material
-        </HeaderLabel>
+        <div className={`${StyleClassPrefix}-preview`} />
+        <div className={`${StyleClassPrefix}-title`}>
+            <HeaderLabel>
+                <TruncateText>Track Title</TruncateText>
+            </HeaderLabel>
+        </div>
+        <div className={`${StyleClassPrefix}-unlock-material`}>
+            <HeaderLabel>
+                Unlock Material
+            </HeaderLabel>
+        </div>
     </Box>
-)
-);
+));

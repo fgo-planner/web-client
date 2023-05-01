@@ -100,11 +100,15 @@ export const MasterServantCostumesRouteCostumeListRow = React.memo((props: Props
                 openLinkInNewTab={openLinksInNewTab}
             />
             <div className={`${StyleClassPrefix}-collection-no`}>
-                {collectionNo}
+                <div className={`${StyleClassPrefix}-text`}>
+                    {collectionNo}
+                </div>
             </div>
-            <TruncateText className={`${StyleClassPrefix}-name`}>
-                {name}
-            </TruncateText>
+            <div className={`${StyleClassPrefix}-name`}>
+                <TruncateText className={`${StyleClassPrefix}-text`}>
+                    {name}
+                </TruncateText>
+            </div>
             {noCostStatusNode}
             <div className={`${StyleClassPrefix}-unlock-materials`}>
                 {unlockMaterialNodes}

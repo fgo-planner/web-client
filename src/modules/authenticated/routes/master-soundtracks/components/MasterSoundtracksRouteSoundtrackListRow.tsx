@@ -107,9 +107,11 @@ export const MasterSoundtracksRouteSoundtrackListRow = React.memo((props: Props)
                 />
             </div>
             {playButtonNode}
-            <TruncateText className={`${StyleClassPrefix}-title`}>
-                {name}
-            </TruncateText>
+            <div className={`${StyleClassPrefix}-title`}>
+                <TruncateText className={`${StyleClassPrefix}-text`}>
+                    {name}
+                </TruncateText>
+            </div>
             <div className={`${StyleClassPrefix}-unlock-material`}>
                 {unlockMaterialNode}
             </div>

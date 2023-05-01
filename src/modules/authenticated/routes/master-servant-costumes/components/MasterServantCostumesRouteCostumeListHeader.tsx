@@ -1,7 +1,6 @@
 import { Icon, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React from 'react';
-import { IconOutlined } from '../../../../../components/icons/IconOutlined';
 import { HeaderLabel } from '../../../../../components/text/HeaderLabel';
 import { TruncateText } from '../../../../../components/text/TruncateText';
 
@@ -59,7 +58,7 @@ const StyleProps = (theme: SystemTheme) => {
             }
         },
         [`& .${StyleClassPrefix}-unlock-materials`]: {
-            minWidth: spacing(75),  // 300px
+            minWidth: 300,
             pr: 8,
             textAlign: 'right',
             [breakpoints.down('sm')]: {
@@ -72,21 +71,31 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const MasterServantCostumesRouteCostumeListHeader = React.memo(() => (
     <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-        <HeaderLabel className={`${StyleClassPrefix}-unlocked-status`}>
-            <Icon>lock_open</Icon>
-        </HeaderLabel>
+        <div className={`${StyleClassPrefix}-unlocked-status`}>
+            <HeaderLabel>
+                <Icon>lock_open</Icon>
+            </HeaderLabel>
+        </div>
         <div className={`${StyleClassPrefix}-thumbnail`} />
-        <HeaderLabel className={`${StyleClassPrefix}-collection-no`}>
-            ID
-        </HeaderLabel>
-        <HeaderLabel className={`${StyleClassPrefix}-name`}>
-            <TruncateText>Costume Name</TruncateText>
-        </HeaderLabel>
-        <HeaderLabel className={`${StyleClassPrefix}-no-cost-status`}>
-            <Icon>money_off</Icon>
-        </HeaderLabel>
-        <HeaderLabel className={`${StyleClassPrefix}-unlock-materials`}>
-            Unlock Materials
-        </HeaderLabel>
+        <div className={`${StyleClassPrefix}-collection-no`}>
+            <HeaderLabel>
+                ID
+            </HeaderLabel>
+        </div>
+        <div className={`${StyleClassPrefix}-name`}>
+            <HeaderLabel>
+                <TruncateText>Costume Name</TruncateText>
+            </HeaderLabel>
+        </div>
+        <div className={`${StyleClassPrefix}-no-cost-status`}>
+            <HeaderLabel>
+                <Icon>money_off</Icon>
+            </HeaderLabel>
+        </div>
+        <div className={`${StyleClassPrefix}-unlock-materials`}>
+            <HeaderLabel>
+                Unlock Materials
+            </HeaderLabel>
+        </div>
     </Box>
 ));

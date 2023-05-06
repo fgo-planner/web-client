@@ -1,8 +1,9 @@
 import { Theme } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled } from '@mui/system';
 import { PropsWithChildren } from 'react';
 import { ThemeConstants } from '../../../styles/ThemeConstants';
+import { StyledFunctionThemeProp } from '../../../types';
 
 type Props = PropsWithChildren<{
     /**
@@ -22,7 +23,7 @@ const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
     prop !== 'border'
 );
 
-const StyleOptions = {
+const StyledOptions = {
     name: StyleClassPrefix,
     shouldForwardProp,
     slot: 'root',
@@ -30,12 +31,12 @@ const StyleOptions = {
     skipVariantsResolver: true
 } as MuiStyledOptions & FilteringStyledOptions<Props>;
 
-const StyleProps = (props: Props & { theme: SystemTheme }) => ({
+const BaseStyleProps = (props: Props & StyledFunctionThemeProp) => ({
     display: 'flex',
     alignItems: 'center'
 } as CSSInterpolation);
 
-const LayoutStyleProps = (props: Props & { theme: SystemTheme }) => {
+const LayoutStyleProps = (props: Props & StyledFunctionThemeProp) => {
 
     const {
         layout,
@@ -76,7 +77,7 @@ const LayoutStyleProps = (props: Props & { theme: SystemTheme }) => {
     
 };
 
-const BorderStyleProps = (props: Props & { theme: SystemTheme }) => {
+const BorderStyleProps = (props: Props & StyledFunctionThemeProp) => {
 
     const {
         border,
@@ -105,8 +106,8 @@ const BorderStyleProps = (props: Props & { theme: SystemTheme }) => {
     } as CSSInterpolation;
 };
 
-export const NavigationRail = styled('div', StyleOptions)<Props>(
-    StyleProps,
+export const NavigationRail = styled('div', StyledOptions)<Props>(
+    BaseStyleProps,
     LayoutStyleProps,
     BorderStyleProps
 );

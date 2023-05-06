@@ -8,7 +8,16 @@ export function useSubscribable<T>(topic: SubscriptionTopic<T>): Subject<T>;
 export function useSubscribable<T = any>(param: SubscriptionTopic<T> | string): Subject<T> {
     const subscribable = useMemo(() => SubscribablesContainer.get<T>(param as any), [param]);
     if (!subscribable) {
-        throw new Error(/* TODO Add error message */);
+        const description = getDescriptionString(param);
+        throw new Error(`Could not find subscribable ${description}`);
     }
     return subscribable;
+}
+
+function getDescriptionString<T = any>(param: SubscriptionTopic<T> | string): string {
+    if (typeof param === 'string') {
+        return `topicName=${param}`;
+    } else {
+        return String(param);
+    }
 }

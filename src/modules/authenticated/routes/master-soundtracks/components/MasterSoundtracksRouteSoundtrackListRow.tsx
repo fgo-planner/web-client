@@ -71,7 +71,7 @@ export const MasterSoundtracksRouteSoundtrackListRow = React.memo((props: Props)
          */
         const [key, quantity] = Object.entries(material)[0];
         const itemId = Number(key);
-        const unlockMaterial = gameItemMap[itemId];
+        const unlockMaterial = gameItemMap.get(itemId);
         if (!unlockMaterial) {
             return null;
         }

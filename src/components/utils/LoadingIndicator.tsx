@@ -1,6 +1,11 @@
 import { CircularProgress } from '@mui/material';
-import React, { CSSProperties, useMemo } from 'react';
+import { FilteringStyledOptions } from '@mui/styled-engine';
+import { CSSInterpolation, MuiStyledOptions, styled } from '@mui/system';
+import clsx from 'clsx';
+import React from 'react';
 import { useActiveBreakpoints } from '../../hooks/user-interface/useActiveBreakpoints';
+import { ThemeConstants } from '../../styles/ThemeConstants';
+import { StyledFunctionThemeProp } from '../../types';
 
 type Props = {
     visible?: boolean;
@@ -15,43 +20,79 @@ const CircularProgressThickness = 3.7;
  */
 const DefaultZIndex = 1337;
 
-const styles = {
-    root: {
+const IndicatorSizeLarge = 160;
+const IndicatorSizeMedium = 150;
+const IndicatorSizeSmall = 120;
+
+const StyleClassPrefix = 'LoadingIndicator';
+
+const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
+    prop !== 'zIndex' &&
+    prop !== 'visible'
+);
+
+const StyledOptions = {
+    shouldForwardProp,
+    skipSx: true,
+    skipVariantsResolver: true
+} as MuiStyledOptions & FilteringStyledOptions<Props>;
+
+const StyleProps = (props: Props & StyledFunctionThemeProp) => {
+
+    const { zIndex = DefaultZIndex } = props;
+
+    return {
         display: 'flex',
         justifyContent: 'center',
         width: '100%',
         height: '100%',
         position: 'absolute',
-        top: 0
-    } as CSSProperties,
-    progressContainer: {
-        paddingTop: '25vh'
-    } as CSSProperties
+        top: 0,
+        zIndex,
+        [`& .${StyleClassPrefix}-progress-container`]: {
+            paddingTop: '25vh'
+        }
+    } as CSSInterpolation;
 };
 
-// TODO Un-hardcode values
+const RootComponent = styled('div', StyledOptions)<Props>(StyleProps);
 
-export const LoadingIndicator = React.memo(({ visible, zIndex }: Props) => {
+export const LoadingIndicator = React.memo((props: Props) => {
 
-    // TODO Move these to sx prop
+    const {
+        visible,
+        zIndex
+    } = props;
+
     const { sm, md } = useActiveBreakpoints();
-    const indicatorSize = md ? 160 : sm ? 150 : 120;
 
-    const rootStyle = useMemo(() => ({
-        ...styles.root,
-        zIndex: zIndex ?? DefaultZIndex
-    }), [zIndex]);
-    
     if (visible === false) {
         return null;
     }
 
-    return (
-        <div className='backdrop-blur' style={rootStyle}>
-            <div style={styles.progressContainer}>
-                <CircularProgress size={indicatorSize} thickness={CircularProgressThickness} />
-            </div>
-        </div>
+    let indicatorSize: number;
+    if (md) {
+        indicatorSize = IndicatorSizeLarge;
+    } else if (sm) {
+        indicatorSize = IndicatorSizeMedium;
+    } else {
+        indicatorSize = IndicatorSizeSmall;
+    }
+
+    const classNames = clsx(
+        `${StyleClassPrefix}-root`,
+        ThemeConstants.ClassBackdropBlur
     );
-    
+
+    return (
+        <RootComponent className={classNames} zIndex={zIndex}>
+            <div className={`${StyleClassPrefix}-progress-container`}>
+                <CircularProgress
+                    size={indicatorSize}
+                    thickness={CircularProgressThickness}
+                />
+            </div>
+        </RootComponent>
+    );
+
 });

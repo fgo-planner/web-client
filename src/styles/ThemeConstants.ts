@@ -104,6 +104,8 @@ export namespace ThemeConstants {
 
     //#region Style class names
 
+    export const ClassBackdropBlur = 'backdrop-blur';
+
     export const ClassScrollbarTrackBorder = 'scrollbar-track-border';
 
     export const ClassScrollbarHidden = 'scrollbar-hidden';

@@ -1,6 +1,6 @@
 import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
 import { GameServant, ImmutableMasterServant, MasterServantAggregatedData, PlanServant, PlanServantAggregatedData } from '@fgo-planner/data-core';
-import { GameServantMap } from '../types';
+import { GameServantMap } from './game/GameServantMap';
 
 export namespace DataAggregationUtils {
 
@@ -31,9 +31,8 @@ export namespace DataAggregationUtils {
         gameServantMap: GameServantMap
     ): MasterServantAggregatedData | null {
         const servantId = masterServant.servantId;
-        const gameServant = gameServantMap[servantId];
+        const gameServant = gameServantMap.get(servantId);
         if (!gameServant) {
-            console.warn(`Servant servantId=${servantId} could not be found.`);
             return null;
         }
         return {

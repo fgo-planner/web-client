@@ -1,6 +1,7 @@
 import { Theme } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { CSSInterpolation, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, styled } from '@mui/system';
+import { StyledFunctionThemeProp } from '../../types';
 
 type Props = {
     backgroundColor?: string;
@@ -21,7 +22,7 @@ const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
     prop !== 'color'
 );
 
-const StyleOptions = {
+const StyledOptions = {
     name: StyleClassPrefix,
     slot: 'root',
     skipSx: true,
@@ -29,7 +30,7 @@ const StyleOptions = {
     shouldForwardProp
 } as FilteringStyledOptions<Props>;
 
-const StyleProps = (props: Props & { theme: SystemTheme }) => {
+const Style = (props: Props & StyledFunctionThemeProp) => {
 
     const {
         backgroundColor,
@@ -56,4 +57,4 @@ const StyleProps = (props: Props & { theme: SystemTheme }) => {
     } as CSSInterpolation;
 };
 
-export const DataTableGridCell = styled('div', StyleOptions)<Props>(StyleProps);
+export const DataTableGridCell = styled('div', StyledOptions)<Props>(Style);

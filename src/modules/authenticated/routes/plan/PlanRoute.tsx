@@ -460,7 +460,7 @@ export const PlanRoute = React.memo(() => {
     /**
      * These can be undefined during the initial render.
      */
-    if (!gameServantMap || !masterAccountId || !planRequirements) {
+    if (!gameServantMap || !masterAccountId) {
         return null;
     }
 

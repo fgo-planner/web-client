@@ -2,12 +2,12 @@ import { MuiStyledOptions, styled } from '@mui/system';
 
 const StyleClassPrefix = 'FabContainer';
 
-const StyleOptions = {
+const StyledOptions = {
     name: StyleClassPrefix,
     slot: 'root'
 } as MuiStyledOptions;
 
-export const FabContainer = styled('div', StyleOptions)(({ theme }) => ({
+export const FabContainer = styled('div', StyledOptions)(({ theme }) => ({
     display: 'flex',
     alignItems: 'flex-end',
     position: 'fixed',

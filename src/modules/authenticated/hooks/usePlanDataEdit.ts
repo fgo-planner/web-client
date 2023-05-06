@@ -154,7 +154,7 @@ const BlockNavigationHookOptions: UseBlockNavigationOptions = {
 const MasterAccountDataEditOptions = {
     blockNavigationOnDirtyData: false,
     includeCostumes: true,
-    includeItems: true,
+    includeResources: true,
     includeServants: true,
     skipProcessOnActiveAccountChange: true
 } as const satisfies MasterAccountDataEditHookOptions;
@@ -283,20 +283,6 @@ const createNegativeItemUpdates = (requirements: PlanEnhancementRequirements): R
         itemUpdates[Number(key)] = (current: number) => Math.max(MasterItemConstants.MinQuantity, current - value.total);
     }
     return itemUpdates;
-};
-
-// TODO Move this to utilities class.
-const filterCostumes = (costumes: ReadonlySet<number>, planServantsData: ReadonlyArray<PlanServantAggregatedData>): Set<number> => {
-    const result = new Set<number>();
-    for (const { gameServant } of planServantsData) {
-        for (const key of Object.keys(gameServant.costumes)) {
-            const costumeId = Number(key);
-            if (costumes.has(costumeId)) {
-                result.add(costumeId);
-            }
-        }
-    }
-    return result;
 };
 
 //#endregion
@@ -716,20 +702,19 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
          * Updated servants array with the specified IDs removed. A new array instance
          * is created to conform with the hook specifications.
          */
-        const newServants = currentServants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
+        const servantsData = currentServants.filter(({ instanceId }) => !instanceIdSet.has(instanceId));
+        editData.aggregatedServants = servantsData;
 
         /**
          * New object for the unlocked costumes data. A new set instance is created to
          * conform with the hook specifications.
          */
-        const costumes = filterCostumes(currentCostumes, newServants);
-
-        editData.aggregatedServants = newServants;
+        const costumes = DataEditUtils.filterCostumesSet(currentCostumes, servantsData);
         editData.costumes = costumes;
 
         const referenceServants = referenceData.servants;
         const isCostumesDirty = !CollectionUtils.isSetsEqual(referenceData.costumes, costumes);
-        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceServants, newServants);
+        const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceServants, servantsData);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
             for (const instanceId of instanceIds) {

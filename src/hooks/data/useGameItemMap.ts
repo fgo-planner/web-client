@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { GameItemService } from '../../services/data/game/GameItemService';
-import { GameItemMap } from '../../types';
+import { GameItemMap } from '../../utils/game/GameItemMap';
 import { useInjectable } from '../dependency-injection/useInjectable';
 
 /**

@@ -6,8 +6,8 @@ import { useInjectable } from '../../../hooks/dependency-injection/useInjectable
 import { useLoadingIndicator } from '../../../hooks/user-interface/useLoadingIndicator';
 import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/useBlockNavigation';
 import { MasterAccountService } from '../../../services/data/master/MasterAccountService';
-import { GameServantMap } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/DataAggregationUtils';
+import { GameServantMap } from '../../../utils/game/GameServantMap';
 import { MasterAccountUtils } from '../../../utils/master/MasterAccountUtils';
 import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
@@ -25,7 +25,7 @@ export type MasterAccountDataEditHookOptions = Readonly<{
      */
     blockNavigationOnDirtyData?: boolean;
     includeCostumes?: boolean;
-    includeItems?: boolean;
+    includeResources?: boolean;
     includeServants?: boolean;
     includeSoundtracks?: boolean;
     /**
@@ -152,8 +152,13 @@ type MasterAccountUpdateFunctions = {
     updateServantOrder(instanceIds: ReadonlyArray<number>): void;
     /**
      * Deletes the servants with the corresponding `instanceIds`.
+     *
+     * @param instanceIds The instance IDs of the servants to be deleted.
+     * @param resetBondAndCostumes (optional) Whether to also reset bond and
+     * unlocked costumes for a servant if the last instance of the servant is
+     * removed.
      */
-    deleteServants(instanceIds: Iterable<number>): void;
+    deleteServants(instanceIds: Iterable<number>, resetBondAndCostumes?: boolean): void;
     updateSoundtracks(soundtrackIds: Iterable<number>): void;
 };
 
@@ -165,7 +170,7 @@ type MasterAccountDataEditHookResultCostumesSubset = MasterAccountDataEditHookCo
     masterAccountEditData: Pick<MasterAccountEditData, 'costumes'>;
 } & Pick<MasterAccountUpdateFunctions, 'updateCostumes'>;
 
-type MasterAccountDataEditHookResultItemsSubset = MasterAccountDataEditHookCommon & {
+type MasterAccountDataEditHookResultResourcesSubset = MasterAccountDataEditHookCommon & {
     masterAccountEditData: Pick<MasterAccountEditData, 'items' | 'qp'>;
 } & Pick<MasterAccountUpdateFunctions, 'updateItem' | 'updateQp'>;
 
@@ -221,7 +226,7 @@ const cloneMasterAccountDataForEdit = (
     if (options.includeCostumes) {
         result.costumes = MasterAccountUtils.generateUnlockedCostumesMap(masterAccount.costumes);
     }
-    if (options.includeItems) {
+    if (options.includeResources) {
         result.items = {
             ...masterAccount.resources.items
         };
@@ -274,7 +279,7 @@ const cloneMasterAccountDataForReference = (
     if (options.includeCostumes) {
         result.costumes = MasterAccountUtils.generateUnlockedCostumesMap(masterAccount.costumes);
     }
-    if (options.includeItems) {
+    if (options.includeResources) {
         result.items = masterAccount.resources.items;
         result.qp = masterAccount.resources.qp;
     }
@@ -339,7 +344,7 @@ const isMasterServantChanged = (
 export function useMasterAccountDataEdit(
     options: MasterAccountDataEditHookOptions & {
         includeCostumes: true;
-        includeItems?: false;
+        includeResources?: false;
         includeServants?: false;
         includeSoundtracks?: false;
     }
@@ -354,11 +359,11 @@ export function useMasterAccountDataEdit(
 export function useMasterAccountDataEdit(
     options: MasterAccountDataEditHookOptions & {
         includeCostumes?: false;
-        includeItems: true;
+        includeResources: true;
         includeServants?: false;
         includeSoundtracks?: false;
     }
-): MasterAccountDataEditHookResultItemsSubset;
+): MasterAccountDataEditHookResultResourcesSubset;
 /**
  * Utility hook that manages the state of the master account data during
  * editing. Returns the current state of the data and functions that can be
@@ -369,7 +374,7 @@ export function useMasterAccountDataEdit(
 export function useMasterAccountDataEdit(
     options: MasterAccountDataEditHookOptions & {
         includeCostumes: true;
-        includeItems?: false;
+        includeResources?: false;
         includeServants: true;
         includeSoundtracks?: false;
     }
@@ -384,7 +389,7 @@ export function useMasterAccountDataEdit(
 export function useMasterAccountDataEdit(
     options: MasterAccountDataEditHookOptions & {
         includeCostumes?: false;
-        includeItems?: false;
+        includeResources?: false;
         includeServants?: false;
         includeSoundtracks: true;
     }
@@ -417,7 +422,7 @@ export function useMasterAccountDataEdit(
     const {
         blockNavigationOnDirtyData = true,
         includeCostumes,
-        includeItems,
+        includeResources,
         includeServants,
         includeSoundtracks,
         skipProcessOnActiveAccountChange
@@ -478,10 +483,10 @@ export function useMasterAccountDataEdit(
      */
     const includeOptions = useMemo((): MasterAccountDataEditHookOptions => ({
         includeCostumes,
-        includeItems,
+        includeResources,
         includeServants,
         includeSoundtracks
-    }), [includeCostumes, includeItems, includeServants, includeSoundtracks]);
+    }), [includeCostumes, includeResources, includeServants, includeSoundtracks]);
 
     /**
      * Master account available changes subscription.
@@ -575,7 +580,7 @@ export function useMasterAccountDataEdit(
     }, [editData, referenceData.costumes, includeCostumes]);
 
     const updateQp = useCallback((action: SetStateAction<number>): void => {
-        if (!includeItems) {
+        if (!includeResources) {
             return;
         }
         const amount = DataEditUtils.getUpdatedValue(action, editData.qp);
@@ -588,7 +593,7 @@ export function useMasterAccountDataEdit(
             ...dirtyData,
             qp: isDirty
         }));
-    }, [editData, referenceData.qp, includeItems]);
+    }, [editData, referenceData.qp, includeResources]);
 
     /**
      * For internal use only by this hook. Returns the updated item quantity as a
@@ -617,7 +622,7 @@ export function useMasterAccountDataEdit(
     }, [referenceData]);
 
     const updateItem = useCallback((itemId: number, action: SetStateAction<number>): void => {
-        if (!includeItems) {
+        if (!includeResources) {
             return;
         }
         if (itemId === GameItemConstants.QpItemId) {
@@ -641,10 +646,10 @@ export function useMasterAccountDataEdit(
             }
             return { ...dirtyData };
         });
-    }, [editData, getReferenceItemQuantity, getUpdatedItemQuantity, includeItems, updateQp]);
+    }, [editData, getReferenceItemQuantity, getUpdatedItemQuantity, includeResources, updateQp]);
 
     const updateItems = useCallback((items: ReadonlyRecord<number, SetStateAction<number>>): void => {
-        if (!includeItems) {
+        if (!includeResources) {
             return;
         }
         const updatedItems = { ...editData.items };
@@ -679,7 +684,7 @@ export function useMasterAccountDataEdit(
             return { ...dirtyData };
         });
         editData.items = updatedItems;
-    }, [editData, getReferenceItemQuantity, getUpdatedItemQuantity, includeItems, updateQp]);
+    }, [editData, getReferenceItemQuantity, getUpdatedItemQuantity, includeResources, updateQp]);
 
     const addServants = useCallback((servantIds: Iterable<number>, servantData: MasterServantUpdate): void => {
         if (!includeServants || !gameServantMap) {
@@ -888,11 +893,16 @@ export function useMasterAccountDataEdit(
         }));
     }, [editData, referenceData, includeServants]);
 
-    const deleteServants = useCallback((instanceIds: Iterable<number>): void => {
+    const deleteServants = useCallback((instanceIds: Iterable<number>, resetBondAndCostumes = false): void => {
         if (!includeServants) {
             return;
         }
-        const currentServants = editData.aggregatedServants;
+
+        const {
+            aggregatedServants: currentServants,
+            bondLevels: currentBondLevels,
+            costumes: currentCostumes
+        } = editData;
 
         const instanceIdSet = CollectionUtils.toReadonlySet(instanceIds);
 
@@ -922,13 +932,27 @@ export function useMasterAccountDataEdit(
             lastServantInstanceId--;
         }
 
-        // TODO Also remove bond/costume data if the last instance of the servant is removed.
-
         editData.aggregatedServants = servantsData;
         editData.lastServantInstanceId = lastServantInstanceId;
 
+        if (resetBondAndCostumes) {
+            /**
+             * New object for the unlocked costumes data. A new set instance is created to
+             * conform with the hook specifications.
+             */
+            editData.costumes = DataEditUtils.filterCostumesMap(currentCostumes, servantsData);
+
+            /**
+             * New object for the bond levels. A new set instance is created to conform with
+             * the hook specifications.
+             */
+            editData.bondLevels = DataEditUtils.filterBondLevels(currentBondLevels, servantsData);
+        }
+
         const referenceServants = referenceData.servants;
         const isOrderDirty = DataEditUtils.isServantsOrderChanged(referenceServants, servantsData);
+        const isBondLevelsDirty = !ObjectUtils.isShallowEquals(referenceData.bondLevels, editData.bondLevels);
+        const isCostumesDirty = !ObjectUtils.isShallowEquals(referenceData.costumes, editData.costumes);
         setDirtyData(dirtyData => {
             const dirtyServants = dirtyData.servants;
             for (const instanceId of instanceIds) {
@@ -945,6 +969,8 @@ export function useMasterAccountDataEdit(
             }
             return {
                 ...dirtyData,
+                bondLevels: isBondLevelsDirty,
+                costumes: isCostumesDirty,
                 servantOrder: isOrderDirty
             };
         });
@@ -1008,7 +1034,7 @@ export function useMasterAccountDataEdit(
              * included. For example, if only the `qp` value was update, the rest of the
              * `resources` object will still have to be included in the update.
              */
-            if (includeItems && (dirtyData.items.size || dirtyData.qp)) {
+            if (includeResources && (dirtyData.items.size || dirtyData.qp)) {
                 update.resources = {
                     ...masterAccount.resources,
                     items: { ...editData.items },
@@ -1052,7 +1078,7 @@ export function useMasterAccountDataEdit(
         editData,
         dirtyData,
         includeCostumes,
-        includeItems,
+        includeResources,
         includeServants,
         includeSoundtracks,
         invokeLoadingIndicator,

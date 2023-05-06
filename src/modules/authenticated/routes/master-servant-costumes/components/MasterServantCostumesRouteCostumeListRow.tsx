@@ -74,7 +74,7 @@ export const MasterServantCostumesRouteCostumeListRow = React.memo((props: Props
         const nodes: Array<JSX.Element> = [];
         for (const [key, quantity] of Object.entries(materials.materials)) {
             const itemId = Number(key);
-            const unlockMaterial = gameItemMap[itemId];
+            const unlockMaterial = gameItemMap.get(itemId);
             if (!unlockMaterial) {
                 continue;
             }

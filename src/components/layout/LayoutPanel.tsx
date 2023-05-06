@@ -10,12 +10,12 @@ type Props = PropsWithChildren<{
 
 export const StyleClassPrefix = 'LayoutPanel';
 
-const StyleOptions = {
+const StyledOptions = {
     skipSx: true,
     skipVariantsResolver: true
 } as MuiStyledOptions & FilteringStyledOptions<Props>;
 
-const RootComponent = styled('div', StyleOptions)(({ theme }) => ({
+const RootComponent = styled('div', StyledOptions)(({ theme }) => ({
     backgroundColor: theme.palette.background.paper,
     borderRadius: theme.spacing(4),
     overflow: 'hidden'

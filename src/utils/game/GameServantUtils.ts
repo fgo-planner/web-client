@@ -1,4 +1,4 @@
-import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { Immutable } from '@fgo-planner/common-core';
 import { GameServant, GameServantClass, GameServantConstants, GameServantRarity } from '@fgo-planner/data-core';
 import { GameServantClassSimplified, GameServantList } from '../../types';
 
@@ -56,20 +56,20 @@ export class GameServantUtils {
     }
 
     static filterServants(
-        keywordsMap: ReadonlyRecord<number, string>,
+        keywordsMap: ReadonlyMap<number, string>,
         searchString: string,
         servants: GameServantList
     ): GameServantList;
 
     static filterServants<T>(
-        keywordsMap: ReadonlyRecord<number, string>,
+        keywordsMap: ReadonlyMap<number, string>,
         searchString: string,
         data: ReadonlyArray<T>,
         mappingFunction: (elem: T) => Immutable<GameServant>
     ): Array<T>;
 
     static filterServants<T>(
-        keywordsMap: ReadonlyRecord<number, string>,
+        keywordsMap: ReadonlyMap<number, string>,
         searchString: string,
         data: ReadonlyArray<T>,
         mappingFunction?: (elem: T) => Immutable<GameServant>
@@ -126,7 +126,7 @@ export class GameServantUtils {
     }
 
     private static _filterServant(
-        keywordsMap: ReadonlyRecord<number, string>,
+        keywordsMap: ReadonlyMap<number, string>,
         servant: Immutable<GameServant>,
         searchTerms: Array<string>,
         classes: Set<GameServantClass>,
@@ -153,7 +153,7 @@ export class GameServantUtils {
          * 
          * TODO Retrieve keywords from map instead.
          */
-        const keywords = keywordsMap[servant._id] || servant.name?.toLowerCase() || '';
+        const keywords = keywordsMap.get(servant._id) || servant.name?.toLowerCase() || '';
         /**
          * All of the search terms must be present in the keywords string for it to be
          * considered to be a match.

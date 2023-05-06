@@ -1,9 +1,10 @@
-import { Immutable, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { CollectionUtils, Nullable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
-import { GameServantList, GameServantMap, HttpOptions, Page, Pagination } from '../../../types';
+import { GameServantList, HttpOptions, Page, Pagination } from '../../../types';
 import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
+import { GameServantMap } from '../../../utils/game/GameServantMap';
 import { GameServantUtils } from '../../../utils/game/GameServantUtils';
 import { HttpUtils as Http } from '../../../utils/HttpUtils';
 import { UserInterfaceService } from '../../user-interface/UserInterfaceService';
@@ -22,19 +23,19 @@ export class GameServantService {
     @Inject(UserInterfaceService)
     private readonly _userInterfaceService!: UserInterfaceService;
 
-    private _servantsList?: GameServantList;
+    private _servantList?: GameServantList;
 
-    private _servantsListMap?: GameServantMap;
+    private _servantMap?: GameServantMap;
 
-    private _servantsListPromise?: Promise<GameServantList>;
+    private _servantListPromise?: Promise<GameServantList>;
 
-    private _servantsKeywordsMap?: Record<number, string>;
+    private _servantKeywordsMap?: Map<number, string>;
 
-    private _servantsKeywordsMapPromise?: Promise<Record<number, string>>;
+    private _servantKeywordsMapPromise?: Promise<Map<number, string>>;
 
-    private _fgoManagerNamesMap?: Record<string, number>;
+    private _fgoManagerNamesMap?: Map<string, number>;
 
-    private _fgoManagerNamesMapPromise?: Promise<Record<string, number>>;
+    private _fgoManagerNamesMapPromise?: Promise<Map<string, number>>;
 
     async getServant(id: number): Promise<Nullable<GameServant>> {
         return Http.get<Nullable<GameServant>>(`${this._BaseUrl}/${id}`);
@@ -46,22 +47,22 @@ export class GameServantService {
      * resolves once the data is fetched and cached.
      */
     async getServants(): Promise<GameServantList> {
-        if (this._servantsList) {
-            return this._servantsList;
+        if (this._servantList) {
+            return this._servantList;
         }
-        if (this._servantsListPromise) {
-            return this._servantsListPromise;
+        if (this._servantListPromise) {
+            return this._servantListPromise;
         }
         const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
         const promise = Http.get<Array<GameServant>>(`${this._BaseUrl}`, this._ExcludeMetadataOptions);
         promise.then(data => {
             this._onServantsLoaded(data);
         }).catch(error => {
-            this._onServantsCacheLoadError(error);
+            this._onServantsLoadError(error);
         }).finally(() => {
             this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
         });
-        return this._servantsListPromise = promise;
+        return this._servantListPromise = promise;
     }
 
     /**
@@ -70,7 +71,7 @@ export class GameServantService {
      * `undefined`.
      */
     getServantsSync(): GameServantList | undefined {
-        return this._servantsList;
+        return this._servantList;
     }
 
     /**
@@ -79,10 +80,10 @@ export class GameServantService {
      * cached.
      */
     async getServantsMap(): Promise<GameServantMap> {
-        if (!this._servantsListMap) {
+        if (!this._servantMap) {
             await this.getServants();
         }
-        return this._servantsListMap!!;
+        return this._servantMap!!;
     }
 
     /**
@@ -90,33 +91,33 @@ export class GameServantService {
      * available, then returns `undefined`.
      */
     getServantsMapSync(): GameServantMap | undefined {
-        return this._servantsListMap;
+        return this._servantMap;
     }
 
-    async getServantKeywordsMap(): Promise<ReadonlyRecord<number, string>> {
-        if (this._servantsKeywordsMap) {
-            return this._servantsKeywordsMap;
+    async getServantKeywordsMap(): Promise<ReadonlyMap<number, string>> {
+        if (this._servantKeywordsMap) {
+            return this._servantKeywordsMap;
         }
-        if (this._servantsKeywordsMapPromise) {
-            return this._servantsKeywordsMapPromise;
+        if (this._servantKeywordsMapPromise) {
+            return this._servantKeywordsMapPromise;
         }
         const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
         const url = `${this._BaseUrl}/metadata/search-keywords`;
-        this._servantsKeywordsMapPromise = Http.get<Record<number, string>>(url);
-        this._servantsKeywordsMapPromise.then(data => {
-            this._servantsKeywordsMap = data;
-            this._servantsKeywordsMapPromise = undefined;
+        const httpPromise = Http.get<Record<number, string>>(url);
+        this._servantKeywordsMapPromise = httpPromise.then(data => {
+            this._servantKeywordsMapPromise = undefined;
+            return this._servantKeywordsMap = CollectionUtils.objectToMap(data, Number);
         }).finally(() => {
             this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
         });
-        return this._servantsKeywordsMapPromise;
+        return this._servantKeywordsMapPromise;
     }
 
-    getServantKeywordsMapSync(): ReadonlyRecord<number, string> | undefined {
-        return this._servantsKeywordsMap;
+    getServantKeywordsMapSync(): ReadonlyMap<number, string> | undefined {
+        return this._servantKeywordsMap;
     }
 
-    async getFgoManagerNamesMap(): Promise<ReadonlyRecord<string, number>> {
+    async getFgoManagerNamesMap(): Promise<ReadonlyMap<string, number>> {
         if (this._fgoManagerNamesMap) {
             return this._fgoManagerNamesMap;
         }
@@ -125,10 +126,10 @@ export class GameServantService {
         }
         const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
         const url = `${this._BaseUrl}/metadata/fgo-manager-names`;
-        this._fgoManagerNamesMapPromise = Http.get<Record<string, number>>(url);
-        this._fgoManagerNamesMapPromise.then(data => {
-            this._fgoManagerNamesMap = data;
+        const httpPromise = Http.get<Record<string, number>>(url);
+        this._fgoManagerNamesMapPromise = httpPromise.then(data => {
             this._fgoManagerNamesMapPromise = undefined;
+            return this._fgoManagerNamesMap = CollectionUtils.objectToMap(data);
         }).finally(() => {
             this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
         });
@@ -150,11 +151,11 @@ export class GameServantService {
 
     private _onServantsLoaded(data: Array<GameServant>): void {
         data.sort(GameServantUtils.collectionNoSortFunction);
-        this._generateServantsMap(this._servantsList = data);
-        this._servantsListPromise = undefined;
+        this._servantMap = new GameServantMap(this._servantList = data);
+        this._servantListPromise = undefined;
     }
 
-    private _onServantsCacheLoadError(_: any): void {
+    private _onServantsLoadError(_: any): void {
         this._invalidateCache();
     }
 
@@ -162,16 +163,8 @@ export class GameServantService {
      * @deprecated Not needed
      */
     private _invalidateCache(): void {
-        this._servantsList = undefined;
-        this._servantsListMap = undefined;
-    }
-
-    private _generateServantsMap(servants: GameServantList): void {
-        const map: Record<number, Immutable<GameServant>> = {};
-        for (const servant of servants) {
-            map[servant._id] = servant;
-        }
-        this._servantsListMap = map;
+        this._servantList = undefined;
+        this._servantMap = undefined;
     }
 
 }

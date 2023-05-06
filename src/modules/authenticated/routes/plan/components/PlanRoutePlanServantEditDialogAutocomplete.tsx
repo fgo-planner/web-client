@@ -126,7 +126,7 @@ export const PlanRoutePlanServantEditDialogAutocomplete = React.memo((props: Pro
             return options;
         }
         return GameServantUtils.filterServants(
-            gameServantsKeywordsMap || {},
+            gameServantsKeywordsMap || CollectionUtils.emptyMap(),
             inputValue,
             options,
             getGameServant

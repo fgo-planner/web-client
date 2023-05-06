@@ -1,7 +1,7 @@
 import { CSSInterpolation, MuiStyledOptions, styled } from '@mui/system';
 import { ThemeConstants } from '../../styles/ThemeConstants';
 
-const StyleOptions = {
+const StyledOptions = {
     skipSx: true,
     skipVariantsResolver: true
 } as MuiStyledOptions;
@@ -15,4 +15,4 @@ const StyleProps = {
     userSelect: 'none'
 } as CSSInterpolation;
 
-export const HeaderLabel = styled('div', StyleOptions)(StyleProps);
+export const HeaderLabel = styled('div', StyledOptions)(StyleProps);

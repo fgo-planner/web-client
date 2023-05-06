@@ -1,10 +1,6 @@
 import { CollectionUtils } from '@fgo-planner/common-core';
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-type SelectedData<T, ID> = {
-    ids: ReadonlySet<ID>;
-    instances: ReadonlyArray<T>
-};
+import { SelectedData } from '../../../types';
 
 type SelectedInstancesHelperHookResult<T, ID> = {
     /**

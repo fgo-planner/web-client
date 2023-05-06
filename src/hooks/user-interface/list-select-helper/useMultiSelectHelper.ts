@@ -28,10 +28,7 @@ const removeUnselectableIds = <ID>(selectedIds: Set<ID>, disabledIds?: ReadonlyS
     if (!disabledIds) {
         return;
     }
-    // TODO Move this to CollectionUtils
-    for (const unselectableId of disabledIds) {
-        selectedIds.delete(unselectableId);
-    }
+    CollectionUtils.removeAll(selectedIds, disabledIds);
 };
 
 /**

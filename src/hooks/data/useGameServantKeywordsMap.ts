@@ -1,4 +1,3 @@
-import { ReadonlyRecord } from '@fgo-planner/common-core';
 import { useEffect, useState } from 'react';
 import { GameServantService } from '../../services/data/game/GameServantService';
 import { useInjectable } from '../dependency-injection/useInjectable';
@@ -10,7 +9,7 @@ import { useInjectable } from '../dependency-injection/useInjectable';
  * Data is fetched and returned asynchronously. Returns `undefined` if the data
  * is not yet available.
  */
-export function useGameServantKeywordsMap(): ReadonlyRecord<number, string> | undefined {
+export function useGameServantKeywordsMap(): ReadonlyMap<number, string> | undefined {
 
     const gameServantService = useInjectable(GameServantService);
 

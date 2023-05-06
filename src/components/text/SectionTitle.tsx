@@ -1,13 +1,14 @@
 import { Theme } from '@mui/material';
-import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled } from '@mui/system';
 import { ThemeConstants } from '../../styles/ThemeConstants';
+import { StyledFunctionThemeProp } from '../../types';
 
-const StyleOptions = {
+const StyledOptions = {
     skipSx: true,
     skipVariantsResolver: true
 } as MuiStyledOptions;
 
-const StyleProps = (props: { theme: SystemTheme }) => {
+const StyleProps = (props: StyledFunctionThemeProp) => {
 
     const { spacing } = props.theme as Theme;
 
@@ -21,4 +22,4 @@ const StyleProps = (props: { theme: SystemTheme }) => {
     } as CSSInterpolation;
 };
 
-export const SectionTitle = styled('div', StyleOptions)(StyleProps);
+export const SectionTitle = styled('div', StyledOptions)(StyleProps);

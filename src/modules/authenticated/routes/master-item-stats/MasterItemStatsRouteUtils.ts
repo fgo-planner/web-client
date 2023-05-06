@@ -1,7 +1,8 @@
 import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
 import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantConstants, MasterServant } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
-import { GameServantMap, GameSoundtrackList } from '../../../../types';
+import { GameSoundtrackList } from '../../../../types';
+import { GameServantMap } from '../../../../utils/game/GameServantMap';
 import { MasterAccountUtils } from '../../../../utils/master/MasterAccountUtils';
 import { MasterItemStatsRouteTypes } from './MasterItemStatsRouteTypes';
 
@@ -31,8 +32,6 @@ export namespace MasterItemStatsRouteUtils {
         const masterServantIds = new Set<number>();
         const unlockedCostumesMap = includeCostumes ? MasterAccountUtils.generateUnlockedCostumesMap(masterAccount.costumes) : {};
 
-        console.log(unlockedCostumesMap)
-
         for (const masterServant of masterAccount.servants.servants) {
 
             if (!masterServant.summoned && !includeUnsummonedServants) {
@@ -40,9 +39,8 @@ export namespace MasterItemStatsRouteUtils {
             }
 
             const servantId = masterServant.servantId;
-            const servant = gameServantMap[servantId];
+            const servant = gameServantMap.get(servantId);
             if (!servant) {
-                // TODO Log/throw error
                 continue;
             }
 
@@ -126,7 +124,6 @@ export namespace MasterItemStatsRouteUtils {
                     _updateForServantEnhancement(stats, costume.materials, 1, 0);
                 } else if (noCostUnlock) {
                     // Costume unlocked for free
-                    console.debug(`costume ${costume.collectionNo} unlocked for free`)
                     _updateForServantEnhancement(stats, costume.materials, 1, 0, true);
                 } else {
                     // Costume unlocked normally

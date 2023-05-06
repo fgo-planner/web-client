@@ -3,7 +3,7 @@ import { ExternalLink, GameServantClass, GameServantConstants, ImmutableMasterSe
 import { Icon, IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { DataPointListItem } from '../../../../../components/data-point-list/DataPointListItem';
 import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
 import { ServantBondIcon } from '../../../../../components/servant/ServantBondIcon';
@@ -402,7 +402,11 @@ export const MasterServantsRouteInfoPanel = React.memo((props: Props) => {
                 } = requirements;
 
                 const itemId = Number(key);
-                const gameItem = gameItemMap[itemId];
+                const gameItem = gameItemMap.get(itemId);
+
+                if (!gameItem) {
+                    return null;
+                }
 
                 const label = (
                     <div className={`${StyleClassPrefix}-material-stat-label`}>
@@ -414,14 +418,14 @@ export const MasterServantsRouteInfoPanel = React.memo((props: Props) => {
                 );
 
                 const tooltip = (
-                    <Fragment>
+                    <>
                         <div>{gameItem.name}</div>
                         {!!ascensions && <div>Ascensions: {ascensions}</div>}
                         {!!skills && <div>Skills: {skills}</div>}
                         {!!appendSkills && <div>Append skills: {appendSkills}</div>}
                         {!!costumes && <div>Costumes: {costumes}</div>}
                         <div>Total: {total}</div>
-                    </Fragment>
+                    </>
                 );
 
                 return (

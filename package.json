@@ -7,7 +7,7 @@
     "@date-io/date-fns": "^2.16.0",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@fgo-planner/common-core": "^0.1.2",
+    "@fgo-planner/common-core": "^0.1.3",
     "@fgo-planner/data-core": "^0.6.0",
     "@fgo-planner/transform-core": "^0.6.0",
     "@mui/material": "^5.10.8",

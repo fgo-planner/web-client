@@ -3,7 +3,7 @@ import { InstantiatedServantBondLevel, InstantiatedServantUtils, MasterServantAg
 import { MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { DragEvent, DragEventHandler, MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
-import { DataTableListVirtual } from '../../../../../../components/data-table-list/DataTableListVirtual';
+import { DataTableList } from '../../../../../../components/data-table-list/DataTableList';
 import { useGameServantKeywordsMap } from '../../../../../../hooks/data/useGameServantKeywordsMap';
 import { useMultiSelectHelperForMouseEvent } from '../../../../../../hooks/user-interface/list-select-helper/useMultiSelectHelperForMouseEvent';
 import { useDragDropEventHandlers } from '../../../../../../hooks/user-interface/useDragDropEventHandlers';
@@ -106,7 +106,7 @@ export const MasterServantList = React.memo((props: Props) => {
         }
         if (textFilter) {
             result = GameServantUtils.filterServants(
-                gameServantsKeywordsMap || {},
+                gameServantsKeywordsMap || CollectionUtils.emptyMap(),
                 textFilter,
                 result,
                 DataAggregationUtils.getGameServant
@@ -249,7 +249,7 @@ export const MasterServantList = React.memo((props: Props) => {
 
     //#region Component rendering
 
-    const renderMasterServantRow = (masterServantData: MasterServantAggregatedData, index: number): ReactNode => {
+    const renderMasterServantRow = useCallback((masterServantData: MasterServantAggregatedData, index: number): ReactNode => {
         const masterServant = masterServantData.masterServant;
         const { servantId, instanceId } = masterServant;
         const bondLevel = bondLevels[servantId];
@@ -274,7 +274,17 @@ export const MasterServantList = React.memo((props: Props) => {
                 onDoubleClick={handleRowDoubleClick}
             />
         );
-    };
+    }, [
+        bondLevels,
+        destinationIndex,
+        dragDropMode,
+        handleDragEnd,
+        handleDragStart,
+        handleRowClick,
+        handleRowDoubleClick,
+        selectedInstanceIds,
+        visibleColumns
+    ]);
 
     return (
         <RootComponent className={`${StyleClassPrefix}-root`}>
@@ -294,16 +304,16 @@ export const MasterServantList = React.memo((props: Props) => {
                     onClick={onHeaderClick}
                     onSortChange={onSortChange}
                 />}
-                {<DataTableListVirtual
+                <DataTableList
                     className={clsx(`${StyleClassPrefix}-list`, destinationIndex && `${StyleClassPrefix}-dragging`)}
                     data={displayedMasterServantsData}
-                    disableVirtualization={!virtualList}
                     dropTargetIndex={destinationIndex}
-                    renderFunction={renderMasterServantRow}
-                    rowBufferCount={16} // TODO make this configurable
                     rowHeight={MasterServantListRowHeight}
+                    rowRenderFunction={renderMasterServantRow}
                     scrollContainerRef={scrollContainerRef}
-                />}
+                    virtual={virtualList}
+                    virtualRowBuffer={16} // TODO make this configurable
+                />
             </div>
         </RootComponent>
     );

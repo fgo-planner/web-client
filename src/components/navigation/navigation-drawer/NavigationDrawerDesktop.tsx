@@ -1,11 +1,11 @@
 import { Theme } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { CSSProperties, useContext } from 'react';
 import { NavigationDrawerContext } from '../../../contexts/NavigationDrawerContext';
 import { ThemeConstants } from '../../../styles/ThemeConstants';
-import { NavigationDrawerContent as Content } from '../../../types';
+import { NavigationDrawerContent as Content, StyledFunctionThemeProp } from '../../../types';
 import { NavigationDrawerContent } from './NavigationDrawerContent';
 
 type Props = {
@@ -26,13 +26,14 @@ const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => {
     );
 };
 
-const StyleOptions = {
+const StyledOptions = {
     shouldForwardProp,
     skipSx: true,
     skipVariantsResolver: true
 } as MuiStyledOptions & FilteringStyledOptions<Props>;
 
-const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
+const BaseStyleProps = (props: RootComponentProps & StyledFunctionThemeProp) => {
+
     const {
         palette,
         spacing
@@ -57,7 +58,7 @@ const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
     } as CSSInterpolation;
 };
 
-const CondensedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
+const CondensedStyleProps = (props: RootComponentProps & StyledFunctionThemeProp) => {
     const {
         animationsDisabled,
         expanded,
@@ -79,7 +80,7 @@ const CondensedStyleProps = (props: RootComponentProps & { theme: SystemTheme })
     return properties as CSSInterpolation;
 };
 
-const ExpandedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
+const ExpandedStyleProps = (props: RootComponentProps & StyledFunctionThemeProp) => {
     const {
         animationsDisabled,
         expanded,
@@ -111,8 +112,8 @@ const ExpandedStyleProps = (props: RootComponentProps & { theme: SystemTheme }) 
     return properties as CSSInterpolation;
 };
 
-const RootComponent = styled('div', StyleOptions)<RootComponentProps>(
-    StyleProps,
+const RootComponent = styled('div', StyledOptions)<RootComponentProps>(
+    BaseStyleProps,
     CondensedStyleProps,
     ExpandedStyleProps
 );

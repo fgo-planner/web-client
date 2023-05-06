@@ -1,6 +1,7 @@
 import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { GameServant, GameServantClass, InstantiatedServantBondLevel, InstantiatedServantConstants, MasterAccount, MasterServant } from '@fgo-planner/data-core';
-import { GameServantClassSimplified, GameServantMap } from '../../../../types';
+import { GameServantClassSimplified } from '../../../../types';
+import { GameServantMap } from '../../../../utils/game/GameServantMap';
 import { GameServantUtils } from '../../../../utils/game/GameServantUtils';
 import { MasterServantStatsRouteTypes } from './MasterServantStatsRouteTypes';
 
@@ -32,9 +33,8 @@ export namespace MasterServantStatsUtils {
             }
 
             const servantId = masterServant.servantId;
-            const servant = gameServantMap[servantId];
+            const servant = gameServantMap.get(servantId);
             if (!servant) {
-                // TODO Log/throw error
                 continue;
             }
 
@@ -88,9 +88,8 @@ export namespace MasterServantStatsUtils {
             }
 
             const servantId = masterServant.servantId;
-            const servant = gameServantMap[servantId];
+            const servant = gameServantMap.get(servantId);
             if (!servant) {
-                // TODO Log/throw error
                 continue;
             }
 

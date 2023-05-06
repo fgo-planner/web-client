@@ -35,7 +35,10 @@ export const PlanRequirementsTableHeader = React.memo((props: Props) => {
     );
 
     const renderItemCell = (itemId: number): ReactNode => {
-        const gameItem = gameItemMap[itemId];
+        const gameItem = gameItemMap.get(itemId);
+        if (!gameItem) {
+            return null;
+        }
         return (
             <PlanRequirementsTableHeaderCell
                 key={itemId}

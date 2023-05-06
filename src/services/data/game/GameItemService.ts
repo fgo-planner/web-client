@@ -1,9 +1,10 @@
-import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { Nullable } from '@fgo-planner/common-core';
 import { GameItem, GameItemBackground, GameItemConstants } from '@fgo-planner/data-core';
 import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
-import { GameItemCategory, GameItemCategoryMap, GameItemList, GameItemMap, Page, Pagination } from '../../../types';
+import { GameItemCategory, GameItemCategoryMap, GameItemList, Page, Pagination } from '../../../types';
 import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
+import { GameItemMap } from '../../../utils/game/GameItemMap';
 import { HttpUtils as Http } from '../../../utils/HttpUtils';
 import { UserInterfaceService } from '../../user-interface/UserInterfaceService';
 
@@ -15,13 +16,13 @@ export class GameItemService {
     @Inject(UserInterfaceService)
     private readonly _userInterfaceService!: UserInterfaceService;
 
-    private _cachedItems?: GameItemList;
+    private _itemList?: GameItemList;
 
-    private _cachedItemsMap?: GameItemMap;
+    private _itemMap?: GameItemMap;
 
-    private _cachedItemsCategoryMap?: GameItemCategoryMap;
+    private _itemCategoryMap?: GameItemCategoryMap;
 
-    private _cachedItemsPromise?: Promise<GameItemList>;
+    private _itemListPromise?: Promise<GameItemList>;
 
     async getItem(id: number): Promise<Nullable<GameItem>> {
         return Http.get<Nullable<GameItem>>(`${this._BaseUrl}/${id}`);
@@ -32,21 +33,21 @@ export class GameItemService {
      * returns a promise that resolves once the data is fetched and cached.
      */
     async getItems(): Promise<GameItemList> {
-        if (this._cachedItems) {
-            return this._cachedItems;
+        if (this._itemList) {
+            return this._itemList;
         }
-        if (!this._cachedItemsPromise) {
+        if (!this._itemListPromise) {
             const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
-            this._cachedItemsPromise = Http.get<Array<GameItem>>(`${this._BaseUrl}`);
-            this._cachedItemsPromise.then(cache => {
-                this._onItemsCacheLoaded(cache);
+            this._itemListPromise = Http.get<Array<GameItem>>(`${this._BaseUrl}`);
+            this._itemListPromise.then(cache => {
+                this._onItemsLoaded(cache);
             }).catch(error => {
-                this._onItemsCacheLoadError(error);
+                this._onItemsLoadError(error);
             }).finally(() => {
                 this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
             });
         }
-        return this._cachedItemsPromise;
+        return this._itemListPromise;
     }
 
     /**
@@ -54,7 +55,7 @@ export class GameItemService {
      * then returns `undefined`.
      */
     getItemsSync(): GameItemList | undefined {
-        return this._cachedItems;
+        return this._itemList;
     }
 
     /**
@@ -63,10 +64,10 @@ export class GameItemService {
      * cached.
      */
     async getItemsMap(): Promise<GameItemMap> {
-        if (!this._cachedItemsMap) {
+        if (!this._itemMap) {
             await this.getItems();
         }
-        return this._cachedItemsMap!!;
+        return this._itemMap!!;
     }
 
     /**
@@ -74,10 +75,10 @@ export class GameItemService {
      * category are sorted by its `priority` value.
      */
     async getItemCategoryMap(): Promise<GameItemCategoryMap> {
-        if (!this._cachedItemsCategoryMap) {
+        if (!this._itemCategoryMap) {
             await this.getItems();
         }
-        return this._cachedItemsCategoryMap!!;
+        return this._itemCategoryMap!!;
     }
 
     /**
@@ -85,7 +86,7 @@ export class GameItemService {
      * available, then returns `undefined`.
      */
     getItemsMapSync(): GameItemMap | undefined {
-        return this._cachedItemsMap;
+        return this._itemMap;
     }
 
     /**
@@ -93,7 +94,7 @@ export class GameItemService {
      * available, then returns `undefined`.
      */
     getItemCategoryMapSync(): GameItemCategoryMap | undefined {
-        return this._cachedItemsCategoryMap;
+        return this._itemCategoryMap;
     }
 
     async getItemsPage(pagination: Pagination): Promise<Page<GameItem>> {
@@ -106,14 +107,14 @@ export class GameItemService {
         return Http.get<Page<GameItem>>(`${this._BaseUrl}/page`, { params });
     }
 
-    private _onItemsCacheLoaded(data: GameItemList): void {
-        this._cachedItems = data;
-        this._generateAndCacheMap(data);
-        this._generateAndCacheCategoryMap(data);
-        this._cachedItemsPromise = undefined;
+    private _onItemsLoaded(data: GameItemList): void {
+        this._itemList = data;
+        this._itemMap = new GameItemMap(data);
+        this._itemCategoryMap = this._generateAndCategoryMap(data);
+        this._itemListPromise = undefined;
     }
 
-    private _onItemsCacheLoadError(error: any): void {
+    private _onItemsLoadError(error: any): void {
         this._invalidateCaches();
     }
 
@@ -121,19 +122,11 @@ export class GameItemService {
      * @deprecated Not needed
      */
     private _invalidateCaches(): void {
-        this._cachedItems = undefined;
-        this._cachedItemsMap = undefined;
+        this._itemList = undefined;
+        this._itemMap = undefined;
     }
 
-    private _generateAndCacheMap(items: GameItemList): void {
-        const map: Record<number, Immutable<GameItem>> = {};
-        for (const item of items) {
-            map[item._id] = item;
-        }
-        this._cachedItemsMap = map;
-    }
-
-    private _generateAndCacheCategoryMap(items: GameItemList): void {
+    private _generateAndCategoryMap(items: GameItemList): Record<GameItemCategory, Set<number>> {
         const categoryMap: Record<GameItemCategory, Set<number>> = {
             [GameItemCategory.AscensionStatues]: new Set(),
             [GameItemCategory.SkillGems]: new Set(),
@@ -152,7 +145,7 @@ export class GameItemService {
                 categoryMap[category].add(itemId);
             }
         }
-        this._cachedItemsCategoryMap = categoryMap;
+        return categoryMap;
     }
 
     private _getItemCategory(itemId: number, background: GameItemBackground): GameItemCategory | null {

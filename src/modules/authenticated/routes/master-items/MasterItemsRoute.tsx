@@ -14,7 +14,7 @@ import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../.
 import { MasterItemList } from '../../components/master/item/list/MasterItemList';
 
 const MasterAccountDataEditOptions = {
-    includeItems: true
+    includeResources: true
 } as const satisfies MasterAccountDataEditHookOptions;
 
 const StyleClassPrefix = 'MasterItemsRoute';

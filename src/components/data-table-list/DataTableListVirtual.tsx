@@ -1,32 +1,27 @@
-import React, { ReactNode, RefObject, useCallback, useEffect, useState } from 'react';
+import { ReactNode, RefObject, useCallback, useEffect, useState } from 'react';
 import { ComponentStyleProps } from '../../types';
-import { DataTableListDropTargetIndicator } from './DataTableListDropTargetIndicator';
 
 type Props<T> = {
     data: ReadonlyArray<T>;
-    disableVirtualization?: boolean;
-    /**
-     * Displays the `DataTableListDropTargetIndicator` component before the row at
-     * the given index. The indicator is hidden if `undefined`.
-     */
-    dropTargetIndex?: number;
-    renderFunction: (data: T, index: number) => ReactNode;
-    rowBufferCount?: number;
+    rowBuffer?: number;
     rowHeight: number;
+    rowRenderFunction(data: T, index: number): ReactNode;
     scrollContainerRef: RefObject<HTMLElement>;
 } & Pick<ComponentStyleProps, 'className'>;
 
 const DefaultRowBufferCount = 5;
 
-export const DataTableListVirtual = React.memo(<T,>(props: Props<T>) => {
+/**
+ * Intended to be used internally by `DataTableList`. Do not use as standalone
+ * component, use `DataTableList` instead with `virtual` prop set to `true`.
+ */
+export const DataTableListVirtual = <T,>(props: Props<T>): JSX.Element => {
 
     const {
         data,
-        disableVirtualization,
-        dropTargetIndex,
-        renderFunction,
-        rowBufferCount,
+        rowBuffer = DefaultRowBufferCount,
         rowHeight,
+        rowRenderFunction,
         scrollContainerRef,
         className
     } = props;
@@ -38,25 +33,20 @@ export const DataTableListVirtual = React.memo(<T,>(props: Props<T>) => {
     const [renderedRowsCount, setRenderedRowsCount] = useState<number>(0);
 
     const computeVirtualProps = useCallback((element: Element): void => {
-        const buffer = rowBufferCount || DefaultRowBufferCount;
         /**
          * Total rows rendered = leading buffer rows + actual visible rows + trailing
          * buffer rows
          */
-        const renderedRowsCount = Math.ceil(element.clientHeight / rowHeight) + 2 * buffer;
+        const renderedRowsCount = Math.ceil(element.clientHeight / rowHeight) + 2 * rowBuffer;
         /**
          * Start index = start of actual visible rows - leading buffer rows
          */
-        const startIndex = Math.max(Math.floor(element.scrollTop / rowHeight) - buffer, 0);
+        const startIndex = Math.max(Math.floor(element.scrollTop / rowHeight) - rowBuffer, 0);
         setStartIndex(startIndex);
         setRenderedRowsCount(renderedRowsCount);
-    }, [rowBufferCount, rowHeight]);
+    }, [rowBuffer, rowHeight]);
 
     useEffect(() => {
-        if (disableVirtualization) {
-            return;
-        }
-
         const element = scrollContainerRef.current;
         if (!element) {
             return;
@@ -103,38 +93,13 @@ export const DataTableListVirtual = React.memo(<T,>(props: Props<T>) => {
             resizeObserver.disconnect();
         };
 
-    }, [computeVirtualProps, disableVirtualization, initialized, scrollContainerRef]);
-
-    const renderRow = (elem: T, index: number): ReactNode => {
-        if (dropTargetIndex === index) {
-            return <>
-                <DataTableListDropTargetIndicator key={-1} />
-                {renderFunction(elem, index)}
-            </>;
-        }
-        if (dropTargetIndex === data.length && index === data.length - 1) {
-            return <>
-                {renderFunction(elem, index)}
-                <DataTableListDropTargetIndicator key={-1} />
-            </>;
-        }
-        return renderFunction(elem, index);
-    };
-
-    // TODO Maybe create separate component for non-virtualized list.
-    if (disableVirtualization) {
-        return (
-            <div className={className}>
-                {data.map(renderRow)}
-            </div>
-        );
-    }
+    }, [computeVirtualProps, initialized, scrollContainerRef]);
 
     const renderVirtualRow = (elem: T, index: number): ReactNode => {
         if (index < startIndex || index > (startIndex + renderedRowsCount)) {
             return null;
         }
-        return renderRow(elem, index);
+        return rowRenderFunction(elem, index);
     };
 
     /**
@@ -150,4 +115,4 @@ export const DataTableListVirtual = React.memo(<T,>(props: Props<T>) => {
         </div>
     );
 
-}) as <T> (props: Props<T>) => JSX.Element;
+};

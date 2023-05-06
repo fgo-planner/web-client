@@ -29,7 +29,7 @@ const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
     prop !== 'condensed'
 );
 
-const StyleOptions = {
+const StyledOptions = {
     skipSx: true,
     skipVariantsResolver: true,
     shouldForwardProp
@@ -54,7 +54,7 @@ const StyleProps = (props: RootComponentProps & StyledFunctionPropsWithTheme): C
     } as CSSInterpolation;
 };
 
-const RootComponent = styled('div', StyleOptions)<RootComponentProps>(StyleProps);
+const RootComponent = styled('div', StyledOptions)<RootComponentProps>(StyleProps);
 
 export const ServantSkillLevel = React.memo((props: Props) => {
 

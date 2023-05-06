@@ -8,7 +8,8 @@ import { ItemThumbnail } from '../../../../../components/item/ItemThumbnail';
 import { TruncateText } from '../../../../../components/text/TruncateText';
 import { useGameItemCategoryMap } from '../../../../../hooks/data/useGameItemCategoryMap';
 import { ThemeConstants } from '../../../../../styles/ThemeConstants';
-import { GameItemCategory, GameItemMap } from '../../../../../types';
+import { GameItemCategory } from '../../../../../types';
+import { GameItemMap } from '../../../../../utils/game/GameItemMap';
 import { MasterItemStatsRouteTypes } from '../MasterItemStatsRouteTypes';
 
 type Props = {
@@ -170,10 +171,9 @@ export const MasterItemStatsRouteTable = React.memo((props: Props) => {
     }, [includeUnsummonedServants, includeSoundtracks]);
 
     const renderItem = (itemId: number, index: number): ReactNode => {
-        const gameItem = gameItemMap[itemId];
+        const gameItem = gameItemMap.get(itemId);
         const stat = stats[itemId];
         if (!gameItem || !stat) {
-            // TODO Throw exception
             return null;
         }
 

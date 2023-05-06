@@ -1,12 +1,13 @@
-import { Immutable, ImmutableRecord, ReadonlyRecord } from '@fgo-planner/common-core';
+import { Immutable, ImmutableRecord } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { useEffect, useState } from 'react';
 import { GameServantService } from '../../services/data/game/GameServantService';
+import { GameServantMap } from '../../utils/game/GameServantMap';
 import { useInjectable } from '../dependency-injection/useInjectable';
 
 type DataPromises = [
-    Promise<ReadonlyRecord<number, Immutable<GameServant>>>,
-    Promise<ReadonlyRecord<string, number>>
+    Promise<GameServantMap>,
+    Promise<ReadonlyMap<string, number>>
 ];
 
 export function useFgoManagerNamesMap(): ImmutableRecord<string, GameServant> | undefined {
@@ -21,10 +22,10 @@ export function useFgoManagerNamesMap(): ImmutableRecord<string, GameServant> | 
             gameServantService.getFgoManagerNamesMap()
         ];
         Promise.all(dataPromises).then(resolvedData => {
-            const [gameServantsMap, fgoManagerNamesMap] = resolvedData;
+            const [gameServantMap, fgoManagerNamesMap] = resolvedData;
             const map: Record<string, Immutable<GameServant>> = {};
             for (const [fgoManagerName, servantId] of Object.entries(fgoManagerNamesMap)) {
-                const gameServant = gameServantsMap[servantId];
+                const gameServant = gameServantMap.get(servantId);
                 if (!gameServant) {
                     continue;
                 }

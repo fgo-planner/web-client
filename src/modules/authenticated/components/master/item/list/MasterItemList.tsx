@@ -123,9 +123,9 @@ export const MasterItemList = React.memo((props: Props) => {
     }
 
     const renderItemRow = (itemId: number): ReactNode => {
-        const gameItem = gameItemMap[itemId];
+        const gameItem = gameItemMap.get(itemId);
         if (!gameItem) {
-            return;
+            return null;
         }
         const quantity = itemId === GameItemConstants.QpItemId ? qp : itemQuantities[itemId] || 0;
         return (

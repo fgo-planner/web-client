@@ -160,7 +160,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
 
 
     //#region Input event handlers
-    
+
     const handleRowClick = useCallback((e: MouseEvent, index: number) => {
         handleItemClick(e, index);
         onRowClick?.(e);
@@ -185,13 +185,16 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
 
     //#region Component rendering
 
-    const servantsRequirements = planRequirements.requirements.servants;
+    const requirements = planRequirements.requirements.servants;
 
     const renderServantRow = (planServantData: PlanServantAggregatedData, index: number): ReactNode => {
         const instanceId = planServantData.instanceId;
-        const servantRequirements = servantsRequirements[instanceId];
+        const servantRequirements = requirements[instanceId];
         if (!servantRequirements) {
-            // TODO Log this
+            /**
+             * No need to log/throw error here since it's expected to be null during initial
+             * render.
+             */
             return null;
         }
         const active = selectedInstanceIds?.has(instanceId);

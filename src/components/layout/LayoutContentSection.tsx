@@ -3,7 +3,7 @@ import { CSSInterpolation, MuiStyledOptions, styled, SystemStyleObject, Theme } 
 import clsx from 'clsx';
 import React, { DOMAttributes, PropsWithChildren } from 'react';
 import { ThemeConstants } from '../../styles/ThemeConstants';
-import { ComponentStyleProps } from '../../types';
+import { ComponentStyleProps, StyledFunctionThemeProp } from '../../types';
 import { LayoutPanel, StyleClassPrefix as LayoutPanelStyleClassPrefix } from './LayoutPanel';
 
 type Props = PropsWithChildren<{
@@ -23,19 +23,19 @@ const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => {
     );
 };
 
-const StyleOptions = {
+const StyledOptions = {
     shouldForwardProp,
     skipVariantsResolver: true
 } as MuiStyledOptions & FilteringStyledOptions<Props>;
 
-const StyleProps = (props: Props & { theme: Theme }) => {
+const StyleProps = (props: Props & StyledFunctionThemeProp) => {
     return {
         overflow: 'hidden',
         boxSizing: 'border-box'
     } as CSSInterpolation;
 };
 
-const AutoContentsHeightStyleProps = (props: Props & { theme: Theme }) => {
+const AutoContentsHeightStyleProps = (props: Props & StyledFunctionThemeProp) => {
     const { autoContentHeight } = props;
     let contentsProps: SystemStyleObject<Theme>;
     if (!autoContentHeight) {
@@ -74,7 +74,7 @@ const LayoutStyleProps = (props: Props & { theme: Theme }) => {
     } as CSSInterpolation;
 };
 
-const RootComponent = styled('div', StyleOptions)<Props>(
+const RootComponent = styled('div', StyledOptions)<Props>(
     StyleProps,
     AutoContentsHeightStyleProps,
     FullHeightStyleProps,

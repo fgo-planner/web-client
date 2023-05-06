@@ -20,7 +20,7 @@ const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
     prop !== 'sx'
 );
 
-const StyleOptions = {
+const StyledOptions = {
     name: StyleClassPrefix,
     slot: 'root',
     skipVariantsResolver: true,
@@ -56,7 +56,7 @@ const StyleProps = (props: Props & StyledFunctionThemeProp) => {
     } as CSSInterpolation;
 };
 
-const RootComponent = styled('div', StyleOptions)<Props>(StyleProps);
+const RootComponent = styled('div', StyledOptions)<Props>(StyleProps);
 
 export const DataTableGridRow = React.memo((props: Props) => {
 

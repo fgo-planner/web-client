@@ -2,11 +2,12 @@ import { Immutable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { Avatar, AvatarProps, Icon } from '@mui/material';
 import { FilteringStyledOptions } from '@mui/styled-engine';
-import { CSSInterpolation, MuiStyledOptions, styled, Theme as SystemTheme } from '@mui/system';
+import { CSSInterpolation, MuiStyledOptions, styled } from '@mui/system';
 import clsx from 'clsx';
 import React, { MouseEventHandler, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { AssetConstants } from '../../constants';
+import { StyledFunctionThemeProp } from '../../types';
 
 type Props = {
     costumeId?: number;
@@ -45,13 +46,13 @@ const shouldForwardProp = (prop: PropertyKey): prop is keyof Props => (
     prop !== 'renderNewTabIndicator'
 );
 
-const ContainerStyleOptions = {
+const ContainerStyledOptions = {
     skipSx: true,
     skipVariantsResolver: true,
     shouldForwardProp
 } as MuiStyledOptions & FilteringStyledOptions<RootComponentProps>;
 
-const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
+const StyleProps = (props: RootComponentProps & StyledFunctionThemeProp) => {
 
     const { size } = props;
 
@@ -69,7 +70,7 @@ const StyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
     } as CSSInterpolation;
 };
 
-const NewTabIndicatorStyleProps = (props: RootComponentProps & { theme: SystemTheme }) => {
+const NewTabIndicatorStyleProps = (props: RootComponentProps & StyledFunctionThemeProp) => {
 
     const {
         renderNewTabIndicator,
@@ -105,7 +106,7 @@ const NewTabIndicatorStyleProps = (props: RootComponentProps & { theme: SystemTh
     } as CSSInterpolation;
 };
 
-const RootComponent = styled('div', ContainerStyleOptions)<RootComponentProps>(
+const RootComponent = styled('div', ContainerStyledOptions)<RootComponentProps>(
     StyleProps,
     NewTabIndicatorStyleProps
 );

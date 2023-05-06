@@ -1,4 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { CollectionUtils, Immutable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
 import { Autocomplete, FilterOptionsState, TextField } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
@@ -123,7 +123,7 @@ export const MasterServantEditDialogAutocomplete = React.memo((props: Props) => 
             return options;
         }
         return GameServantUtils.filterServants(
-            gameServantsKeywordsMap || {},
+            gameServantsKeywordsMap || CollectionUtils.emptyMap(),
             inputValue,
             options,
             getGameServant

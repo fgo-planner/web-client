@@ -14,10 +14,7 @@ export const DataTableListRowStyle = (props: StyledFunctionPropsWithTheme) => {
         theme
     } = props;
 
-    const {
-        palette,
-        spacing
-    } = theme as Theme;
+    const { palette } = theme as Theme;
 
     const style = {
         boxSizing: 'content-box',
@@ -51,16 +48,7 @@ export const DataTableListRowStyle = (props: StyledFunctionPropsWithTheme) => {
             left: 0,
             zIndex: 1,  // 1 should be enough for now
             display: 'flex',
-            alignItems: 'center',
-            [`& .${classPrefix}-drag-handle`]: {
-                cursor: 'grab',
-                margin: spacing(0, 2),
-                opacity: 0.5,
-                '&.disabled': {
-                    cursor: 'initial',
-                    color: palette.text.disabled
-                }
-            }
+            alignItems: 'center'
         }
     } as CSSInterpolation;
 

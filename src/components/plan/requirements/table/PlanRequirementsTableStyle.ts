@@ -7,18 +7,23 @@ import { StyleClassPrefix as FooterCellStyleClassPrefix } from './PlanRequiremen
 import { StyleClassPrefix as HeaderStyleClassPrefix } from './PlanRequirementsTableHeader';
 import { StyleClassPrefix as HeaderCellStyleClassPrefix } from './PlanRequirementsTableHeaderCell';
 import { StyleClassPrefix as ServantRowStyleClassPrefix } from './PlanRequirementsTableServantRow';
+import { StyleClassPrefix as ServantRowAscensionTargetStyleClassPrefix } from './PlanRequirementsTableServantRowAscensionTarget';
 import { StyleClassPrefix as ServantRowCellStyleClassPrefix } from './PlanRequirementsTableServantRowCell';
+import { StyleClassPrefix as ServantRowCostumeTargetStyleClassPrefix } from './PlanRequirementsTableServantRowCostumeTarget';
 import { StyleClassPrefix as ServantRowEnhancementTargetsStyleClassPrefix } from './PlanRequirementsTableServantRowEnhancementTargets';
 import { StyleClassPrefix as ServantRowHeaderStyleClassPrefix } from './PlanRequirementsTableServantRowHeader';
-import { StyleClassPrefix as ServantRowSkillTargetsStyleClassPrefix } from './PlanRequirementsTableServantRowSkillTargets';
 import { StyleClassPrefix as ServantRowLevelTargetStyleClassPrefix } from './PlanRequirementsTableServantRowLevelTarget';
-import { StyleClassPrefix as ServantRowCostumeTargetStyleClassPrefix } from './PlanRequirementsTableServantRowCostumeTarget';
-import { StyleClassPrefix as ServantRowAscensionTargetStyleClassPrefix } from './PlanRequirementsTableServantRowAscensionTarget';
+import { StyleClassPrefix as ServantRowSkillTargetsStyleClassPrefix } from './PlanRequirementsTableServantRowSkillTargets';
 
 /**
  * 360px at 16px font-size
  */
 const StickyColumnWidth = '22.5em';
+
+/**
+ * 37px at 16px font-size. This needs to be in rem due to display size scaling.
+ */
+const DragHandleWidth = '2.3125rem';
 
 const EnhancementTargetsFontSize = '0.8125em';
 
@@ -61,7 +66,7 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
             [`& .${HeaderStyleClassPrefix}-root`]: {
                 position: 'sticky',
                 top: 0,
-                zIndex: 3,
+                zIndex: 5,
                 [`& .${HeaderStyleClassPrefix}-sticky-content`]: {
                     width: StickyColumnWidth,
                     height: '100%',
@@ -248,7 +253,7 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
             [`& .${FooterStyleClassPrefix}-root`]: {
                 position: 'sticky',
                 bottom: 0,
-                zIndex: 3,
+                zIndex: 5,
                 [`& .${FooterStyleClassPrefix}-sticky-content`]: {
                     display: 'flex',
                     alignItems: 'center',
@@ -289,9 +294,15 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
                     }
                 }
             }
+        },
+        [`&.${StyleClassPrefix}-drag-drop-mode`]: {
+            // eslint-disable-next-line max-len
+            [`& .${HeaderStyleClassPrefix}-sticky-content, .${ServantRowHeaderStyleClassPrefix}-root, .${FooterStyleClassPrefix}-sticky-content`]: {
+                width: `calc(${StickyColumnWidth} + ${DragHandleWidth}) !important`
+            },
         }
     };
 
     return baseStyle;
-    
+
 };

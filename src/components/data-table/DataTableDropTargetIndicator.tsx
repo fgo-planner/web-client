@@ -21,7 +21,7 @@ const StyleProps = (props: StyledFunctionPropsWithTheme) => {
         width: '100%',
         position: 'relative',
         top: -Thickness / 2,
-        zIndex: 2,
+        zIndex: 3,
         '>div': {
             pointerEvents: 'none',
             height: Thickness,
@@ -33,7 +33,7 @@ const StyleProps = (props: StyledFunctionPropsWithTheme) => {
 
 export const RootComponent = styled('div', StyledOptions)(StyleProps);
 
-export const DataTableListDropTargetIndicator: React.FC = () => (
+export const DataTableDropTargetIndicator: React.FC = () => (
     <RootComponent>
         <div />
     </RootComponent>

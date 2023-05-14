@@ -1,8 +1,8 @@
 import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
 import { GameServant, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
-import { Icon } from '@mui/material';
 import React, { DOMAttributes, DragEvent, DragEventHandler, MouseEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListRow } from '../../../../../../components/data-table-list/DataTableListRow';
+import { DataTableDragHandle } from '../../../../../../components/data-table/DataTableDragHandle';
 import { ServantThumbnail } from '../../../../../../components/servant/ServantThumbnail';
 import { MasterServantListColumn } from './MasterServantListColumn';
 import { MasterServantListRowLabel } from './MasterServantListRowLabel';
@@ -101,14 +101,9 @@ export const MasterServantListRow = React.memo((props: Props) => {
 
     const stickyContentNode: ReactNode = <>
         {dragDropMode &&
-            <div
-                className={`${StyleClassPrefix}-drag-handle`}
-                onClick={console.log}
+            <DataTableDragHandle
                 onDragStart={handleDragStart}
-                draggable
-            >
-                <Icon>drag_indicator</Icon>
-            </div>
+            />
         }
         {servantThumbnailNode}
     </>;

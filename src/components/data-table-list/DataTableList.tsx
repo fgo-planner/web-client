@@ -1,6 +1,6 @@
 import React, { ReactNode, RefObject, useCallback } from 'react';
 import { ComponentStyleProps } from '../../types';
-import { DataTableListDropTargetIndicator } from './DataTableListDropTargetIndicator';
+import { DataTableDropTargetIndicator } from '../data-table/DataTableDropTargetIndicator';
 import { DataTableListVirtual } from './DataTableListVirtual';
 
 type VirtualListProps = {
@@ -24,7 +24,7 @@ type VirtualListProps = {
 type Props<T> = {
     data: ReadonlyArray<T>;
     /**
-     * Displays the `DataTableListDropTargetIndicator` component before the row at
+     * Displays the `DataTableDropTargetIndicator` component before the row at
      * the given index. The indicator is hidden if `undefined`.
      */
     dropTargetIndex?: number;
@@ -44,18 +44,18 @@ export const DataTableList = React.memo(<T,>(props: Props<T>) => {
 
     const renderRow = useCallback((elem: T, index: number): ReactNode => {
         if (dropTargetIndex === index) {
-            return <>
-                <DataTableListDropTargetIndicator key={-1} />
-                {rowRenderFunction(elem, index)}
-            </>;
+            return [
+                <DataTableDropTargetIndicator key={-1} />,
+                rowRenderFunction(elem, index)
+            ];
+        } else if (dropTargetIndex === data.length && index === data.length - 1) {
+            return [
+                rowRenderFunction(elem, index),
+                <DataTableDropTargetIndicator key={-1} />
+            ];
+        } else {
+            return rowRenderFunction(elem, index);
         }
-        if (dropTargetIndex === data.length && index === data.length - 1) {
-            return <>
-                {rowRenderFunction(elem, index)}
-                <DataTableListDropTargetIndicator key={-1} />
-            </>;
-        }
-        return rowRenderFunction(elem, index);
     }, [data.length, dropTargetIndex, rowRenderFunction]);
 
     if (virtual) {

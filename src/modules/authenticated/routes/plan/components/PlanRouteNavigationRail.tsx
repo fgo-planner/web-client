@@ -109,7 +109,6 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                             onClick={onDragDropActivate}
                             children={<Icon>reorder</Icon>}
                             size='large'
-                            disabled
                         />
                     </div>
                 </Tooltip>

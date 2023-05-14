@@ -123,7 +123,7 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                         }
                     }
                 },
-                '&:not(.drag-drop-mode)': {
+                [`&:not(.${StyleClassPrefix}-drag-drop-mode)`]: {
                     [`& .${ServantThumbnailStyleClassPrefix}-root`]: {
                         paddingLeft: spacing(3)
                     },
@@ -144,5 +144,5 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
         baseStyle,
         DataTableListRowStyle(rowStyledProps)
     ];
-    
+
 };

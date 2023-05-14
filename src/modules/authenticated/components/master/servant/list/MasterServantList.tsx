@@ -269,7 +269,6 @@ export const MasterServantList = React.memo((props: Props) => {
                 masterServant={masterServant}
                 visibleColumns={visibleColumns}
                 onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
                 onClick={handleRowClick}
                 onContextMenu={handleRowClick}
                 onDoubleClick={handleRowDoubleClick}
@@ -279,13 +278,17 @@ export const MasterServantList = React.memo((props: Props) => {
         bondLevels,
         destinationIndex,
         dragDropMode,
-        handleDragEnd,
         handleDragStart,
         handleRowClick,
         handleRowDoubleClick,
         selectedInstanceIds,
         visibleColumns
     ]);
+
+    const listClassNames = clsx(
+        `${StyleClassPrefix}-list`,
+        dragDropMode && `${StyleClassPrefix}-drag-drop-mode`
+    );
 
     return (
         <RootComponent className={`${StyleClassPrefix}-root`}>
@@ -306,7 +309,7 @@ export const MasterServantList = React.memo((props: Props) => {
                     onSortChange={onSortChange}
                 />}
                 <DataTableList
-                    className={clsx(`${StyleClassPrefix}-list`, destinationIndex && `${StyleClassPrefix}-dragging`)}
+                    className={listClassNames}
                     data={displayedMasterServantsData}
                     dropTargetIndex={destinationIndex}
                     rowHeight={MasterServantListRowHeight}

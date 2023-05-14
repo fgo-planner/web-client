@@ -1,18 +1,26 @@
 import { CollectionUtils, Functions, Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { GameItemConstants, InstantiatedServantUtils, PlanServantAggregatedData } from '@fgo-planner/data-core';
 import { Box } from '@mui/system';
-import React, { CSSProperties, MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import clsx from 'clsx';
+import React, { CSSProperties, DragEvent, DragEventHandler, MouseEvent, MouseEventHandler, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGameItemCategoryMap } from '../../../../hooks/data/useGameItemCategoryMap';
 import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interface/list-select-helper/useMultiSelectHelperForMouseEvent';
+import { useDragDropEventHandlers } from '../../../../hooks/user-interface/useDragDropEventHandlers';
 import { GameItemCategory, GameItemCategoryMap, PlanRequirements } from '../../../../types';
+import { DataTableDropTargetIndicator } from '../../../data-table/DataTableDropTargetIndicator';
 import { PlanRequirementsTableFooter } from './PlanRequirementsTableFooter';
 import { PlanRequirementsTableHeader } from './PlanRequirementsTableHeader';
 import { PlanRequirementsTableOptions } from './PlanRequirementsTableOptions.type';
 import { PlanRequirementsTableOptionsInternal } from './PlanRequirementsTableOptionsInternal.type';
-import { PlanRequirementsTableServantRow } from './PlanRequirementsTableServantRow';
+import { PlanRequirementsTableServantRow, StyleClassPrefix as PlanRequirementsTableServantRowStyleClassPrefix } from './PlanRequirementsTableServantRow';
 import { PlanRequirementsTableStyle } from './PlanRequirementsTableStyle';
 
 type Props = {
+    /**
+     * Whether drag-drop mode is active. Row highlighting will not be displayed for
+     * selected servants.
+     */
+    dragDropMode?: boolean;
     options: PlanRequirementsTableOptions;
     /**
      * The computed requirements for the plan.
@@ -26,16 +34,19 @@ type Props = {
     selectedInstanceIds?: ReadonlySet<number>;
     targetCostumes: ReadonlySet<number>;
     unlockedCostumes: ReadonlyRecord<number, boolean>;
-    onEditMasterItems?: () => void;
+    onDragOrderChange?(sourceIndex: number, destinationIndex: number): void;
+    onEditMasterItems?(): void;
     onRowClick?: MouseEventHandler;
     onRowDoubleClick?: MouseEventHandler;
-    onSelectionChange?: (selectedInstanceIds: ReadonlySet<number>) => void;
+    onSelectionChange?(selectedInstanceIds: ReadonlySet<number>): void;
 };
 
 type HoverState = {
     rowIndex?: number;
     itemId?: number;
 };
+
+const TableRowIdPrefix = `${PlanRequirementsTableServantRowStyleClassPrefix}-`;
 
 const CellSizeCondensed = 0.8125;
 const CellSizeNormal = 1.0;
@@ -90,17 +101,33 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     const gameItemCategoryMap = useGameItemCategoryMap();
 
     const {
+        dragDropMode,
         options,
         planRequirements,
         planServantsData,
         selectedInstanceIds = CollectionUtils.emptySet(),
         targetCostumes,
         unlockedCostumes,
+        onDragOrderChange,
         onEditMasterItems,
         onRowClick,
         onRowDoubleClick,
         onSelectionChange
     } = props;
+
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    const {
+        destinationIndex,
+        handleDragEnter,
+        handleDragLeave,
+        handleDragOver,
+        handleRowDragEnd,
+        handleRowDragStart,
+    } = useDragDropEventHandlers(
+        TableRowIdPrefix,
+        scrollContainerRef
+    );
 
     const {
         selectionResult,
@@ -180,6 +207,23 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         });
     }, []);
 
+    const handleDragStart = useMemo((): ((event: DragEvent, index: number) => void) | undefined => {
+        if (!dragDropMode) {
+            return undefined;
+        }
+        return handleRowDragStart;
+    }, [dragDropMode, handleRowDragStart]);
+
+    const handleDragEnd = useMemo((): DragEventHandler | undefined => {
+        if (!dragDropMode || !onDragOrderChange) {
+            return undefined;
+        }
+        return (event: DragEvent): void => {
+            const { sourceIndex, destinationIndex } = handleRowDragEnd(event);
+            onDragOrderChange(sourceIndex, destinationIndex);
+        };
+    }, [dragDropMode, handleRowDragEnd, onDragOrderChange]);
+
     //#endregion
 
 
@@ -187,7 +231,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
 
     const requirements = planRequirements.requirements.servants;
 
-    const renderServantRow = (planServantData: PlanServantAggregatedData, index: number): ReactNode => {
+    const renderPlanServantRow = (planServantData: PlanServantAggregatedData, index: number): ReactNode => {
         const instanceId = planServantData.instanceId;
         const servantRequirements = requirements[instanceId];
         if (!servantRequirements) {
@@ -197,16 +241,18 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
              */
             return null;
         }
-        const active = selectedInstanceIds?.has(instanceId);
+        const active = !dragDropMode && selectedInstanceIds?.has(instanceId);
         const hover = hoverState.rowIndex === index;
 
-        return (
+        const planServantRowNode = (
             <PlanRequirementsTableServantRow
                 key={instanceId}
                 active={active}
+                borderTop={!!index}
+                dragDropMode={dragDropMode}
                 hover={hover}
                 hoverItemId={hoverState.itemId}
-                borderTop={!!index}
+                idPrefix={TableRowIdPrefix}
                 index={index}
                 options={internalTableOptions}
                 planServantData={planServantData}
@@ -216,16 +262,41 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                 onClick={handleRowClick}
                 onContextMenu={handleRowClick}
                 onDoubleClick={onRowDoubleClick}
+                onDragStart={handleDragStart}
                 onHover={handleHover}
             />
         );
+
+        if (destinationIndex === index) {
+            return [
+                <DataTableDropTargetIndicator key={-1} />,
+                planServantRowNode
+            ];
+        } else if (destinationIndex === planServantsData.length && index === planServantsData.length - 1) {
+            return [
+                planServantRowNode,
+                <DataTableDropTargetIndicator key={-1} />
+            ];
+        } else {
+            return planServantRowNode;
+        }
     };
 
+    const classNames = clsx(
+        `${StyleClassPrefix}-root`,
+        dragDropMode && `${StyleClassPrefix}-drag-drop-mode`
+    );
+
     return (
-        <Box className={`${StyleClassPrefix}-root`} sx={PlanRequirementsTableStyle}>
+        <Box className={classNames} sx={PlanRequirementsTableStyle}>
             <div
+                ref={scrollContainerRef}
                 className={`${StyleClassPrefix}-table-container`}
                 style={scalingStyle}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDragEnd}
                 onMouseLeave={handleTableContainerMouseLeave}
             >
                 <PlanRequirementsTableHeader
@@ -233,7 +304,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
                     options={internalTableOptions}
                     onHover={handleHover}
                 />
-                {planServantsData.map(renderServantRow)}
+                {planServantsData.map(renderPlanServantRow)}
                 <PlanRequirementsTableFooter
                     hoverItemId={hoverState.itemId}
                     planRequirements={planRequirements}

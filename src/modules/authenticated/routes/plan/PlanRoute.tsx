@@ -1,4 +1,4 @@
-import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
+import { CollectionUtils, Functions } from '@fgo-planner/common-core';
 import { GameItemConstants, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, InstantiatedServantUtils, MasterServantAggregatedData, PlanServantAggregatedData, PlanServantUpdate, PlanServantUpdateUtils } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -167,7 +167,7 @@ export const PlanRoute = React.memo(() => {
         startDragDrop,
         endDragDrop,
         handleDragOrderChange
-    } = useDragDropState<Immutable<PlanServantAggregatedData>>();
+    } = useDragDropState<PlanServantAggregatedData>();
 
     /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
@@ -498,12 +498,14 @@ export const PlanRoute = React.memo(() => {
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={clsx(`${StyleClassPrefix}-table-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
                         <PlanRequirementsTable
+                            dragDropMode={dragDropMode}
                             options={tableOptions}
-                            planServantsData={planEditData.aggregatedServants}
                             planRequirements={planRequirements}
+                            planServantsData={dragDropData || planEditData.aggregatedServants}
                             selectedInstanceIds={selectedServantsData.ids}
                             targetCostumes={planEditData.costumes}
                             unlockedCostumes={masterAccountEditData.costumes}
+                            onDragOrderChange={handleDragOrderChange}
                             onEditMasterItems={openEditItemsDialog}
                             onRowDoubleClick={handleRowDoubleClick}
                             onSelectionChange={updateServantSelection}

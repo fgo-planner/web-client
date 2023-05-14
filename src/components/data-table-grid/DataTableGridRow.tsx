@@ -8,6 +8,7 @@ import { ComponentStyleProps, StyledFunctionThemeProp } from '../../types';
 type Props = PropsWithChildren<{
     borderBottom?: boolean;
     borderTop?: boolean;
+    id?: string;
     stickyContent?: ReactNode;
 }> & ComponentStyleProps & DOMAttributes<HTMLDivElement>;
 
@@ -64,6 +65,7 @@ export const DataTableGridRow = React.memo((props: Props) => {
         children,
         borderTop,
         borderBottom,
+        id,
         stickyContent,
         className,
         style,
@@ -80,6 +82,7 @@ export const DataTableGridRow = React.memo((props: Props) => {
     return (
         <RootComponent
             className={classNames}
+            id={id}
             style={style}
             sx={sx}
             {...domAttributes}

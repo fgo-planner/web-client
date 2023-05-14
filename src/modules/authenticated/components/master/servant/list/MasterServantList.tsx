@@ -20,7 +20,8 @@ type Props = {
     /**
      * Whether drag-drop mode is active. Drag-drop mode is intended for the user to
      * rearrange the default ordering of the list. As such, when in drag-drop mode,
-     * the list will be displayed without any sorting applied.
+     * the list will be displayed without any sorting applied. In addition, row
+     * highlighting will not be displayed for selected servants.
      */
     dragDropMode?: boolean;
     /**
@@ -40,12 +41,12 @@ type Props = {
     virtualList?: boolean;
     visibleColumns?: Readonly<MasterServantListColumn.Visibility>;
     viewLayout?: any; // TODO Make use of this
-    onDragOrderChange?: (sourceIndex: number, destinationIndex: number) => void;
+    onDragOrderChange?(sourceIndex: number, destinationIndex: number): void;
     onHeaderClick?: MouseEventHandler;
     onRowClick?: MouseEventHandler;
     onRowDoubleClick?: MouseEventHandler;
-    onSelectionChange?: (selectedInstanceIds: ReadonlySet<number>) => void;
-    onSortChange?: (column?: MasterServantListColumn.Name, direction?: SortDirection) => void;
+    onSelectionChange?(selectedInstanceIds: ReadonlySet<number>): void;
+    onSortChange?(column?: MasterServantListColumn.Name, direction?: SortDirection): void;
 };
 
 const ListRowIdPrefix = `${MasterServantListRowStyleClassPrefix}-`;
@@ -68,19 +69,19 @@ export const MasterServantList = React.memo((props: Props) => {
         bondLevels,
         dragDropMode,
         masterServantsData,
-        onDragOrderChange,
-        onHeaderClick,
-        onRowClick,
-        onRowDoubleClick,
-        onSelectionChange,
-        onSortChange,
         selectedInstanceIds = CollectionUtils.emptySet(),
         showHeader,
         showUnsummonedServants,
         sortOptions,
         textFilter,
         virtualList,
-        visibleColumns
+        visibleColumns,
+        onDragOrderChange,
+        onHeaderClick,
+        onRowClick,
+        onRowDoubleClick,
+        onSelectionChange,
+        onSortChange
     } = props;
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -253,7 +254,7 @@ export const MasterServantList = React.memo((props: Props) => {
         const masterServant = masterServantData.masterServant;
         const { servantId, instanceId } = masterServant;
         const bondLevel = bondLevels[servantId];
-        const active = selectedInstanceIds?.has(instanceId);
+        const active = !dragDropMode && selectedInstanceIds?.has(instanceId);
 
         return (
             <MasterServantListRow

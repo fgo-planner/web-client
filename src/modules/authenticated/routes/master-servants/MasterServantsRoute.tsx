@@ -275,12 +275,8 @@ export const MasterServantsRoute = React.memo(() => {
     }, [openMasterServantMultiAddDialog]);
 
     const handleDragDropActivate = useCallback(() => {
-        /**
-         * Deselect servants...servant selection is not allowed in drag-drop mode.
-         */
-        deselectAllServants();
         startDragDrop(masterAccountEditData.aggregatedServants);
-    }, [deselectAllServants, masterAccountEditData, startDragDrop]);
+    }, [masterAccountEditData, startDragDrop]);
 
     const handleDragDropApply = useCallback(() => {
         const updatedServantOrder = endDragDrop();

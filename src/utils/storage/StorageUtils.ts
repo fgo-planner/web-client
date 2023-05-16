@@ -1,4 +1,7 @@
 import { Nullable, Supplier } from '@fgo-planner/common-core';
+import { Schema, Validator } from 'jsonschema';
+import { StorageKeyReadError } from '../../errors/StorageKeyRead.error';
+import { StorageKeyValidationError } from '../../errors/StorageKeyValidation.error';
 import { StorageKey, StorageType, StorageValueType } from './StorageKey';
 
 export namespace StorageUtils {
@@ -31,7 +34,12 @@ export namespace StorageUtils {
         if (valueType === 'string') {
             return value as T; // T should be string
         }
-        const typedValue = JSON.parse(value);
+        let typedValue: T;
+        try {
+            typedValue = JSON.parse(value);
+        } catch (e) {
+            throw new StorageKeyReadError(storageKey, { cause: e });
+        }
         /**
          * Check if the type of the retrieved value matches the type defined in the
          * `StorageKey` before returning.
@@ -49,6 +57,18 @@ export namespace StorageUtils {
             return _setDefaultValue(key, storage, defaultValueSupplier);
         }
         return null;
+    }
+
+    export function getItemWithValidation<T extends object>(storageKey: StorageKey<T>, validator: Validator, schema: Schema): T | null {
+        const localStorageData = getItem<T>(storageKey);
+        if (localStorageData !== null) {
+            const validationResult = validator.validate(localStorageData, schema);
+            console.debug(validationResult);
+            if (!validationResult.valid) {
+                throw new StorageKeyValidationError(storageKey);
+            }
+        }
+        return localStorageData;
     }
 
     /**

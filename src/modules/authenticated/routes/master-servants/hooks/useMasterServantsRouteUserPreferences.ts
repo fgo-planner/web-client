@@ -1,35 +1,29 @@
 import { Immutable } from '@fgo-planner/common-core';
+import { Schema, Validator } from 'jsonschema';
+import { merge } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
+import { StorageKeyReadError } from '../../../../../errors/StorageKeyRead.error';
+import { StorageKeyValidationError } from '../../../../../errors/StorageKeyValidation.error';
 import { StorageKeys } from '../../../../../utils/storage/StorageKeys';
 import { StorageUtils } from '../../../../../utils/storage/StorageUtils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../../../utils/subscription/SubscriptionTopics';
-import { MasterServantEditTab } from '../../../components/master/servant/edit-dialog/MasterServantEditDialogContent';
+import { MasterServantEditDialogTab } from '../../../components/master/servant/edit-dialog/MasterServantEditDialogTab.enum';
 
-//#region Default values
 
-const FiltersEnabledDefault = false;
-
-const InfoPanelOpenDefault = true;
-
-const ServantEditDialogActiveTabDefault = 'general';
-
-const ShowUnsummonedServantsDefault = true;
-
-//#endregion
-
+//#region Type definitions
 
 /**
  * User preferences for the master servants route that are stored locally.
  */
-type MasterServantsLocalUserPreferences = {
+type MasterServantsRouteLocalUserPreferences = {
     filtersEnabled: boolean;
     infoPanelOpen: boolean;
-    servantEditDialogActiveTab: MasterServantEditTab;
+    servantEditDialogActiveTab: MasterServantEditDialogTab;
     showUnsummonedServants: boolean;
 };
 
-export type MasterServantsRouteUserPreferences = MasterServantsLocalUserPreferences & {
+export type MasterServantsRouteUserPreferences = MasterServantsRouteLocalUserPreferences & {
     // TODO
 };
 
@@ -38,12 +32,40 @@ export type MasterServantsRouteUserPreferencesHookResult = {
      * An object containing the user preferences for the route.
      */
     userPreferences: Immutable<MasterServantsRouteUserPreferences>;
-
-    setServantEditDialogActiveTab: (tab: MasterServantEditTab) => void;
-    toggleFilters: () => void;
-    toggleInfoPanelOpen: () => void;
-    toggleShowUnsummonedServants: () => void;
+    setServantEditDialogActiveTab(tab: MasterServantEditDialogTab): void;
+    toggleFilters(): void;
+    toggleInfoPanelOpen(): void;
+    toggleShowUnsummonedServants(): void;
 };
+
+//#endregion
+
+
+//#region Schema definition and validator
+
+const LocalUserPreferencesSchema: Schema = {
+    properties: {
+        filtersEnabled: {
+            type: 'boolean',
+            required: false
+        },
+        infoPanelOpen: {
+            type: 'boolean',
+            required: false
+        },
+        servantEditDialogActiveTab: {
+            type: 'string',
+            enum: Object.keys(MasterServantEditDialogTab),
+            required: false
+        },
+        showUnsummonedServants: {
+            type: 'boolean',
+            required: false
+        }
+    }
+};
+
+const LocalUserPreferencesValidator = new Validator();
 
 //#endregion
 
@@ -52,11 +74,11 @@ export type MasterServantsRouteUserPreferencesHookResult = {
 
 const StorageKey = StorageKeys.LocalUserPreference.Route.MasterServants;
 
-const getDefaultLocalUserPreferences = (): MasterServantsLocalUserPreferences => ({
-    filtersEnabled: FiltersEnabledDefault,
-    infoPanelOpen: InfoPanelOpenDefault,
-    servantEditDialogActiveTab: ServantEditDialogActiveTabDefault,
-    showUnsummonedServants: ShowUnsummonedServantsDefault
+const getDefaultLocalUserPreferences = (): MasterServantsRouteLocalUserPreferences => ({
+    filtersEnabled: false,
+    infoPanelOpen: true,
+    servantEditDialogActiveTab: MasterServantEditDialogTab.General,
+    showUnsummonedServants: true
 });
 
 const getDefaultUserPreferences = (): MasterServantsRouteUserPreferences => ({
@@ -64,26 +86,29 @@ const getDefaultUserPreferences = (): MasterServantsRouteUserPreferences => ({
 });
 
 const readUserPreferencesFromLocalStorage = (): MasterServantsRouteUserPreferences => {
+    let localStorageData;
     try {
-        const localStorageData = StorageUtils.getItem<Partial<MasterServantsLocalUserPreferences>>(
+        localStorageData = StorageUtils.getItemWithValidation<Partial<MasterServantsRouteUserPreferences>>(
             StorageKey, 
-            getDefaultLocalUserPreferences
+            LocalUserPreferencesValidator,
+            LocalUserPreferencesSchema
         );
-        // const accountSpecificData = getLocalStorageAccountSpecificData(localStorageData, masterAccountId);
-        return {
-            filtersEnabled: localStorageData.filtersEnabled ?? FiltersEnabledDefault,
-            infoPanelOpen: localStorageData.infoPanelOpen ?? InfoPanelOpenDefault,
-            servantEditDialogActiveTab: localStorageData.servantEditDialogActiveTab || ServantEditDialogActiveTabDefault,
-            showUnsummonedServants: localStorageData.showUnsummonedServants ?? ShowUnsummonedServantsDefault
-        };
     } catch (e) {
-        console.error(`Error reading ${StorageKey.key} value from local storage, using default value.`);
-        return getDefaultUserPreferences();
+        if (e instanceof StorageKeyReadError || e instanceof StorageKeyValidationError) {
+            console.warn(`${e.message}, using default values`);
+        } else {
+            console.warn(e);
+        }
     }
+    const result = getDefaultLocalUserPreferences();
+    if (localStorageData) {
+        merge(result, localStorageData);
+    }
+    return result;
 };
 
 const writeUserPreferencesToLocalStorage = (userPreferences: MasterServantsRouteUserPreferences): MasterServantsRouteUserPreferences => {
-    StorageUtils.setItem<MasterServantsLocalUserPreferences>(StorageKey, userPreferences);
+    StorageUtils.setItem<MasterServantsRouteLocalUserPreferences>(StorageKey, userPreferences);
     return userPreferences;
 };
 
@@ -121,7 +146,7 @@ export const useMasterServantsRouteUserPreferences = (): MasterServantsRouteUser
         setUserPreferences(userPreferences);
     }, []);
 
-    const setServantEditDialogActiveTab = useCallback((tab: MasterServantEditTab): void => {
+    const setServantEditDialogActiveTab = useCallback((tab: MasterServantEditDialogTab): void => {
         setUserPreferences(userPreferences => {
             return writeUserPreferencesToLocalStorage({
                 ...userPreferences,

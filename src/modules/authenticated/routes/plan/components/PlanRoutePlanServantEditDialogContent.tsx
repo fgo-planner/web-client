@@ -6,15 +6,14 @@ import { ReactNode, SyntheticEvent, useCallback, useEffect, useState } from 'rea
 import { InputFieldContainer, StyleClassPrefix as InputFieldContainerStyleClassPrefix } from '../../../../../components/input/InputFieldContainer';
 import { useGameServantCostumesData } from '../../../../../hooks/data/useGameServantCostumesData';
 import { EditDialogAction } from '../../../../../types';
+import { PlanRouteMasterItemsEditDialogTab } from './PlanRouteMasterItemsEditDialogTab.enum';
 import { PlanRoutePlanServantEditDialogAutocomplete } from './PlanRoutePlanServantEditDialogAutocomplete';
 import { PlanRoutePlanServantEditDialogCostumesTabContent } from './PlanRoutePlanServantEditDialogCostumesTabContent';
 import { PlanRoutePlanServantEditDialogData } from './PlanRoutePlanServantEditDialogData.type';
 import { PlanRoutePlanServantEditDialogEnhancementsTabContent } from './PlanRoutePlanServantEditDialogEnhancementsTabContent';
 
-export type PlanServantEditTab = 'enhancements' | 'costumes';
-
 type Props = {
-    activeTab: PlanServantEditTab;
+    activeTab: PlanRouteMasterItemsEditDialogTab;
     /**
      * DTO containing the dialog data that will be returned to the parent component
      * on dialog close. Data contained in this object may be modified directly.
@@ -27,7 +26,7 @@ type Props = {
      * Only used in edit mode; this is ignored in add mode.
      */
     targetPlanServantsData: ReadonlyArray<PlanServantAggregatedData>;
-    onTabChange: (tab: PlanServantEditTab) => void;
+    onTabChange: (tab: PlanRouteMasterItemsEditDialogTab) => void;
 };
 
 export const StyleClassPrefix = 'PlanRoutePlanServantEditDialogContent';
@@ -161,7 +160,7 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
         setTargetMasterServantsData([value]);
     }, [data, servantSelectDisabled]);
 
-    const handleActiveTabChange = useCallback((_event: SyntheticEvent, value: PlanServantEditTab): void => {
+    const handleActiveTabChange = useCallback((_event: SyntheticEvent, value: PlanRouteMasterItemsEditDialogTab): void => {
         onTabChange(value);
     }, [onTabChange]);
 
@@ -171,7 +170,7 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
     //#region Component rendering
 
     let tabsContentNode: ReactNode;
-    if (activeTab === 'costumes') {
+    if (activeTab === PlanRouteMasterItemsEditDialogTab.Costumes) {
         tabsContentNode = (
             <PlanRoutePlanServantEditDialogCostumesTabContent
                 costumesData={costumesData}
@@ -203,12 +202,12 @@ export const PlanRoutePlanServantEditDialogContent: React.FC<Props> = (props: Pr
             <div className={`${StyleClassPrefix}-tabs-container`}>
                 <Tabs value={activeTab} onChange={handleActiveTabChange}>
                     <Tab
-                        label='Enhancements'
-                        value='enhancements'
+                        label={PlanRouteMasterItemsEditDialogTab.Enhancements}
+                        value={PlanRouteMasterItemsEditDialogTab.Enhancements}
                     />
                     <Tab
-                        label='Costumes'
-                        value='costumes'
+                        label={PlanRouteMasterItemsEditDialogTab.Costumes}
+                        value={PlanRouteMasterItemsEditDialogTab.Costumes}
                     />
                 </Tabs>
             </div>

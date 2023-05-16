@@ -6,11 +6,12 @@ import { DialogCloseButton } from '../../../../../../components/dialog/DialogClo
 import { useAutoResizeDialog } from '../../../../../../hooks/user-interface/useAutoResizeDialog';
 import { ScrollbarStyleProps } from '../../../../../../styles/ScrollbarStyleProps';
 import { DialogComponentProps, EditDialogAction } from '../../../../../../types';
-import { MasterServantEditDialogContent, MasterServantEditTab } from './MasterServantEditDialogContent';
+import { MasterServantEditDialogContent } from './MasterServantEditDialogContent';
 import { MasterServantEditDialogData } from './MasterServantEditDialogData.type';
+import { MasterServantEditDialogTab } from './MasterServantEditDialogTab.enum';
 
 type Props = {
-    activeTab: MasterServantEditTab;
+    activeTab: MasterServantEditDialogTab;
     /**
      * DTO containing the dialog data that will be returned to the parent component
      * on dialog close. Data contained in this object may be modified directly.
@@ -18,7 +19,7 @@ type Props = {
      * If this is `undefined`, then the dialog will remain closed.
      */
     dialogData?: MasterServantEditDialogData;
-    onTabChange: (tab: MasterServantEditTab) => void;
+    onTabChange: (tab: MasterServantEditDialogTab) => void;
     /**
      * Array containing the source `MasterServantAggregatedData` objects for the
      * servants being edited.

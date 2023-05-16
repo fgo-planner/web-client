@@ -1,57 +1,42 @@
 import { Immutable } from '@fgo-planner/common-core';
+import { Schema, Validator } from 'jsonschema';
+import { merge } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
+import { PlanRequirementsTableCellSize } from '../../../../../components/plan/requirements/table/PlanRequirementsTableCellSize.enum';
 import { PlanRequirementsTableOptions } from '../../../../../components/plan/requirements/table/PlanRequirementsTableOptions.type';
+import { PlanRequirementsTableServantRowHeaderLayout } from '../../../../../components/plan/requirements/table/PlanRequirementsTableServantRowHeaderLayout.enum';
+import { StorageKeyReadError } from '../../../../../errors/StorageKeyRead.error';
+import { StorageKeyValidationError } from '../../../../../errors/StorageKeyValidation.error';
 import { StorageKeys } from '../../../../../utils/storage/StorageKeys';
 import { StorageUtils } from '../../../../../utils/storage/StorageUtils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../../../utils/subscription/SubscriptionTopics';
-import { MasterServantEditTab } from '../../../components/master/servant/edit-dialog/MasterServantEditDialogContent';
-import { PlanServantEditTab } from '../components/PlanRoutePlanServantEditDialogContent';
+import { MasterServantEditDialogTab } from '../../../components/master/servant/edit-dialog/MasterServantEditDialogTab.enum';
+import { PlanRouteMasterItemsEditDialogTab } from '../components/PlanRouteMasterItemsEditDialogTab.enum';
+
+
+//#region Type definitions
 
 /**
  * User preferences for the plan route that are stored locally.
  */
-type PlanLocalUserPreferences = Immutable<{
-    masterServantEditDialogActiveTab: MasterServantEditTab;
-    planServantEditDialogActiveTab: PlanServantEditTab;
+type PlanRouteLocalUserPreferences = Immutable<{
+    masterServantEditDialogActiveTab: MasterServantEditDialogTab;
+    planServantEditDialogActiveTab: PlanRouteMasterItemsEditDialogTab;
     table: PlanRequirementsTableOptions;
 }>;
 
-const DefaultTableValues = {
-    layout: {
-        cells: 'normal',
-        rowHeader: 'name'
-    },
-    displayItems: {
-        empty: true,
-        statues: true,
-        gems: true,
-        lores: true,
-        grails: true,
-        embers: true,
-        fous: true,
-        qp: true
-    }
-} as const satisfies PlanRequirementsTableOptions;
-
-const DefaultValues: PlanLocalUserPreferences = {
-    masterServantEditDialogActiveTab: 'enhancements',
-    planServantEditDialogActiveTab: 'enhancements',
-    table: DefaultTableValues
-};
-
-export type PlanUserPreferences = PlanLocalUserPreferences & {
+export type PlanRouteUserPreferences = PlanRouteLocalUserPreferences & {
     // TODO
 };
 
-export type PlanUserPreferencesHookResult = {
+export type PlanRouteUserPreferencesHookResult = {
     /**
      * An object containing the user preferences for the route.
      */
-    userPreferences: Immutable<PlanUserPreferences>;
-
-    setMasterServantEditDialogActiveTab: (tab: MasterServantEditTab) => void;
-    setPlanServantEditDialogActiveTab: (tab: PlanServantEditTab) => void;
+    userPreferences: Immutable<PlanRouteUserPreferences>;
+    setMasterServantEditDialogActiveTab: (tab: MasterServantEditDialogTab) => void;
+    setPlanServantEditDialogActiveTab: (tab: PlanRouteMasterItemsEditDialogTab) => void;
     toggleCellSize: () => void;
     toggleRowHeaderMode: () => void;
     toggleShowEmptyColumns: () => void;
@@ -60,35 +45,147 @@ export type PlanUserPreferencesHookResult = {
 //#endregion
 
 
+//#region Schema definition and validator
+
+const LocalUserPreferencesSchema: Schema = {
+    properties: {
+        masterServantEditDialogActiveTab: {
+            type: 'string',
+            enum: Object.keys(PlanRouteMasterItemsEditDialogTab),
+            required: false
+        },
+        planServantEditDialogActiveTab: {
+            type: 'string',
+            enum: Object.keys(PlanRouteMasterItemsEditDialogTab),
+            required: false
+        },
+        table: {
+            properties: {
+                layout: {
+                    $ref: '/table/layout'
+                },
+                displayItems: {
+                    $ref: '/table/displayItems'
+                }
+            }
+        }
+    }
+};
+
+const LocalUserPreferencesTableLayoutSchema: Schema = {
+    id: '/table/layout',
+    properties: {
+        cells: {
+            type: 'string',
+            enum: Object.keys(PlanRequirementsTableCellSize),  
+            required: false
+        },
+        rowHeader: {
+            type: 'string',
+            enum: Object.keys(PlanRequirementsTableServantRowHeaderLayout), 
+            required: false
+        }
+    }
+};
+
+const LocalUserPreferencesTableDisplayItemsSchema: Schema = {
+    id: '/table/displayItems',
+    properties: {
+        empty: {
+            type: 'boolean',
+            required: false
+        },
+        statues: {
+            type: 'boolean',
+            required: false
+        },
+        gems: {
+            type: 'boolean',
+            required: false
+        },
+        lores: {
+            type: 'boolean',
+            required: false
+        },
+        grails: {
+            type: 'boolean',
+            required: false
+        },
+        embers: {
+            type: 'boolean',
+            required: false
+        },
+        fous: {
+            type: 'boolean',
+            required: false
+        },
+        qp: {
+            type: 'boolean',
+            required: false
+        }
+    }
+};
+
+const LocalUserPreferencesValidator = new Validator();
+LocalUserPreferencesValidator.addSchema(LocalUserPreferencesTableLayoutSchema);
+LocalUserPreferencesValidator.addSchema(LocalUserPreferencesTableDisplayItemsSchema);
+
+//#endregion
+
+
 //#region Internal helper functions
 
 const StorageKey = StorageKeys.LocalUserPreference.Route.Plan;
 
-const getDefaultLocalUserPreferences = (): PlanLocalUserPreferences => ({
-    ...DefaultValues
+const getDefaultLocalUserPreferences = (): PlanRouteLocalUserPreferences => ({
+    masterServantEditDialogActiveTab: MasterServantEditDialogTab.Enhancements,
+    planServantEditDialogActiveTab: PlanRouteMasterItemsEditDialogTab.Enhancements,
+    table: {
+        layout: {
+            cells: PlanRequirementsTableCellSize.Normal,
+            rowHeader: PlanRequirementsTableServantRowHeaderLayout.Name
+        },
+        displayItems: {
+            empty: true,
+            statues: true,
+            gems: true,
+            lores: true,
+            grails: true,
+            embers: true,
+            fous: true,
+            qp: true
+        }
+    }
 });
 
-const getDefaultUserPreferences = (): PlanUserPreferences => ({
+const getDefaultUserPreferences = (): PlanRouteUserPreferences => ({
     ...getDefaultLocalUserPreferences()
 });
 
-const readFromLocalStorage = (): PlanUserPreferences => {
+const readFromLocalStorage = (): PlanRouteLocalUserPreferences => {
+    let localStorageData;
     try {
-        const localStorageData = StorageUtils.getItem<Partial<PlanLocalUserPreferences>>(
+        localStorageData = StorageUtils.getItemWithValidation<Partial<PlanRouteLocalUserPreferences>>(
             StorageKey, 
-            getDefaultLocalUserPreferences
+            LocalUserPreferencesValidator,
+            LocalUserPreferencesSchema
         );
-        // const accountSpecificData = getLocalStorageAccountSpecificData(localStorageData, masterAccountId);
-        // TODO Implement JSON schema validation.
-        return localStorageData as any;
     } catch (e) {
-        console.error(`Error reading ${StorageKey.key} value from local storage, using default value.`);
-        return getDefaultUserPreferences();
+        if (e instanceof StorageKeyReadError || e instanceof StorageKeyValidationError) {
+            console.warn(`${e.message}, using default values`);
+        } else {
+            console.warn(e);
+        }
     }
+    const result = getDefaultLocalUserPreferences();
+    if (localStorageData) {
+        merge(result, localStorageData);
+    }
+    return result;
 };
 
-const writeToLocalStorage = (userPreferences: PlanUserPreferences): PlanUserPreferences => {
-    StorageUtils.setItem<PlanLocalUserPreferences>(StorageKey, userPreferences);
+const writeToLocalStorage = (userPreferences: PlanRouteUserPreferences): PlanRouteUserPreferences => {
+    StorageUtils.setItem<PlanRouteLocalUserPreferences>(StorageKey, userPreferences);
     return userPreferences;
 };
 
@@ -102,9 +199,9 @@ const writeToLocalStorage = (userPreferences: PlanUserPreferences): PlanUserPref
  * This is intended to be used only within the `Plan` route component,
  * do not use inside any other component!
  */
-export const usePlanRouteUserPreferences = (): PlanUserPreferencesHookResult => {
+export const usePlanRouteUserPreferences = (): PlanRouteUserPreferencesHookResult => {
 
-    const [userPreferences, setUserPreferences] = useState<PlanUserPreferences>(getDefaultUserPreferences);
+    const [userPreferences, setUserPreferences] = useState<PlanRouteUserPreferences>(getDefaultUserPreferences);
 
     /**
      * Load global user preferences.
@@ -126,7 +223,7 @@ export const usePlanRouteUserPreferences = (): PlanUserPreferencesHookResult => 
         setUserPreferences(userPreferences);
     }, []);
 
-    const setMasterServantEditDialogActiveTab = useCallback((tab: MasterServantEditTab): void => {
+    const setMasterServantEditDialogActiveTab = useCallback((tab: MasterServantEditDialogTab): void => {
         setUserPreferences(userPreferences => {
             return writeToLocalStorage({
                 ...userPreferences,
@@ -135,7 +232,7 @@ export const usePlanRouteUserPreferences = (): PlanUserPreferencesHookResult => 
         });
     }, []);
 
-    const setPlanServantEditDialogActiveTab = useCallback((tab: PlanServantEditTab): void => {
+    const setPlanServantEditDialogActiveTab = useCallback((tab: PlanRouteMasterItemsEditDialogTab): void => {
         setUserPreferences(userPreferences => {
             return writeToLocalStorage({
                 ...userPreferences,
@@ -147,13 +244,16 @@ export const usePlanRouteUserPreferences = (): PlanUserPreferencesHookResult => 
     const toggleCellSize = useCallback((): void => {
         setUserPreferences(userPreferences => {
             const currentValue = userPreferences.table.layout.cells;
+            const nextValue = currentValue === PlanRequirementsTableCellSize.Condensed ?
+                PlanRequirementsTableCellSize.Normal :
+                PlanRequirementsTableCellSize.Condensed;
             return writeToLocalStorage({
                 ...userPreferences,
                 table: {
                     ...userPreferences.table,
                     layout: {
                         ...userPreferences.table.layout,
-                        cells: currentValue === 'condensed' ? 'normal' : 'condensed'
+                        cells: nextValue
                     }
                 }
             });
@@ -179,13 +279,16 @@ export const usePlanRouteUserPreferences = (): PlanUserPreferencesHookResult => 
     const toggleRowHeaderMode = useCallback((): void => {
         setUserPreferences(userPreferences => {
             const currentValue = userPreferences.table.layout.rowHeader;
+            const nextValue = currentValue === PlanRequirementsTableServantRowHeaderLayout.Name ?
+                PlanRequirementsTableServantRowHeaderLayout.Targets :
+                PlanRequirementsTableServantRowHeaderLayout.Name;
             return writeToLocalStorage({
                 ...userPreferences,
                 table: {
                     ...userPreferences.table,
                     layout: {
                         ...userPreferences.table.layout,
-                        rowHeader: currentValue === 'name' ? 'targets' : 'name'
+                        rowHeader: nextValue
                     }
                 }
             });

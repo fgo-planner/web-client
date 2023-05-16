@@ -11,17 +11,16 @@ import { MasterServantEditDialogCostumesTabContent } from './MasterServantEditDi
 import { MasterServantEditDialogData } from './MasterServantEditDialogData.type';
 import { MasterServantEditDialogEnhancementsTabContent } from './MasterServantEditDialogEnhancementsTabContent';
 import { MasterServantEditDialogGeneralTabContent } from './MasterServantEditDialogGeneralTabContent';
-
-export type MasterServantEditTab = 'general' | 'enhancements' | 'costumes';
+import { MasterServantEditDialogTab } from './MasterServantEditDialogTab.enum';
 
 type Props = {
-    activeTab: MasterServantEditTab;
+    activeTab: MasterServantEditDialogTab;
     /**
      * DTO containing the dialog data that will be returned to the parent component
      * on dialog close. Data contained in this object may be modified directly.
      */
     dialogData: MasterServantEditDialogData;
-    onTabChange: (tab: MasterServantEditTab) => void;
+    onTabChange: (tab: MasterServantEditDialogTab) => void;
     readonly?: boolean;
     showAppendSkills?: boolean;
     /**
@@ -183,7 +182,7 @@ export const MasterServantEditDialogContent = (props: Props) => {
         setTargetGameServantsData([value]);
     }, [servantSelectDisabled, data]);
 
-    const handleActiveTabChange = useCallback((_event: SyntheticEvent, value: MasterServantEditTab): void => {
+    const handleActiveTabChange = useCallback((_event: SyntheticEvent, value: MasterServantEditDialogTab): void => {
         onTabChange(value);
     }, [onTabChange]);
 
@@ -193,14 +192,14 @@ export const MasterServantEditDialogContent = (props: Props) => {
     //#region Component rendering
 
     let tabsContentNode: ReactNode;
-    if (activeTab === 'costumes') {
+    if (activeTab === MasterServantEditDialogTab.Costumes) {
         tabsContentNode = (
             <MasterServantEditDialogCostumesTabContent
                 costumesData={costumesData}
                 masterServantUpdate={data.update}
             />
         );
-    } else if (activeTab === 'enhancements') {
+    } else if (activeTab === MasterServantEditDialogTab.Enhancements) {
         tabsContentNode = (
             <MasterServantEditDialogEnhancementsTabContent
                 masterServantUpdate={data.update}
@@ -233,16 +232,16 @@ export const MasterServantEditDialogContent = (props: Props) => {
             <div className={`${StyleClassPrefix}-tabs-container`}>
                 <Tabs value={activeTab} onChange={handleActiveTabChange}>
                     <Tab
-                        label='General'
-                        value='general'
+                        label={MasterServantEditDialogTab.General}
+                        value={MasterServantEditDialogTab.General}
                     />
                     <Tab
-                        label='Enhancements'
-                        value='enhancements'
+                        label={MasterServantEditDialogTab.Enhancements}
+                        value={MasterServantEditDialogTab.Enhancements}
                     />
                     <Tab
-                        label='Costumes'
-                        value='costumes'
+                        label={MasterServantEditDialogTab.Costumes}
+                        value={MasterServantEditDialogTab.Costumes}
                     />
                 </Tabs>
             </div>

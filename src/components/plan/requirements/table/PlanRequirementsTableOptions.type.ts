@@ -1,8 +1,11 @@
+import { PlanRequirementsTableCellSize } from './PlanRequirementsTableCellSize.enum';
+import { PlanRequirementsTableServantRowHeaderLayout } from './PlanRequirementsTableServantRowHeaderLayout.enum';
+
 export type PlanRequirementsTableOptions = {
 
     layout: {
-        cells: 'condensed' | 'normal';
-        rowHeader: 'name' | 'targets' | 'toggle';
+        cells: PlanRequirementsTableCellSize;
+        rowHeader: PlanRequirementsTableServantRowHeaderLayout;
     }
 
     displayItems: {

@@ -1,7 +1,7 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { UserPreferences, UserWebClientTheme } from '@fgo-planner/data-core';
 import { Fab, Icon, Tooltip } from '@mui/material';
-import _ from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
 import React, { Fragment, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FabContainer } from '../../../../components/fab/FabContainer';
@@ -47,7 +47,7 @@ export const UserThemesEditRoute = React.memo(() => {
             if (!userTheme) {
                 return defaultTheme;
             } else {
-                return Object.assign(defaultTheme, _.cloneDeep(userTheme));
+                return Object.assign(defaultTheme, cloneDeep(userTheme));
             }
         };
 

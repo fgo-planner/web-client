@@ -1,6 +1,6 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { Schema, Validator } from 'jsonschema';
-import { merge } from 'lodash-es';
+import { cloneDeep, merge } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { StorageKeyReadError } from '../../../../../errors/StorageKeyRead.error';
 import { StorageKeyValidationError } from '../../../../../errors/StorageKeyValidation.error';
@@ -148,37 +148,33 @@ export const useMasterServantsRouteUserPreferences = (): MasterServantsRouteUser
 
     const setServantEditDialogActiveTab = useCallback((tab: MasterServantEditDialogTab): void => {
         setUserPreferences(userPreferences => {
-            return writeUserPreferencesToLocalStorage({
-                ...userPreferences,
-                servantEditDialogActiveTab: tab
-            });
+            const updated = cloneDeep(userPreferences);
+            updated.servantEditDialogActiveTab = tab;
+            return writeUserPreferencesToLocalStorage(updated);
         });
     }, []);
 
     const toggleFilters = useCallback((): void => {
         setUserPreferences(userPreferences => {
-            return writeUserPreferencesToLocalStorage({
-                ...userPreferences,
-                filtersEnabled: !userPreferences.filtersEnabled
-            });
+            const updated = cloneDeep(userPreferences);
+            updated.filtersEnabled = !userPreferences.filtersEnabled;
+            return writeUserPreferencesToLocalStorage(updated);
         });
     }, []);
 
     const toggleInfoPanelOpen = useCallback((): void => {
         setUserPreferences(userPreferences => {
-            return writeUserPreferencesToLocalStorage({
-                ...userPreferences,
-                infoPanelOpen: !userPreferences.infoPanelOpen
-            });
+            const updated = cloneDeep(userPreferences);
+            updated.infoPanelOpen = !userPreferences.infoPanelOpen;
+            return writeUserPreferencesToLocalStorage(updated);
         });
     }, []);
 
     const toggleShowUnsummonedServants = useCallback((): void => {
         setUserPreferences(userPreferences => {
-            return writeUserPreferencesToLocalStorage({
-                ...userPreferences,
-                showUnsummonedServants: !userPreferences.showUnsummonedServants
-            });
+            const updated = cloneDeep(userPreferences);
+            updated.showUnsummonedServants = !userPreferences.showUnsummonedServants;
+            return writeUserPreferencesToLocalStorage(updated);
         });
     }, []);
 

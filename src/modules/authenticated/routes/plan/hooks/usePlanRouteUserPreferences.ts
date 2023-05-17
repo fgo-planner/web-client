@@ -1,6 +1,6 @@
 import { Immutable } from '@fgo-planner/common-core';
 import { Schema, Validator } from 'jsonschema';
-import { merge } from 'lodash-es';
+import { cloneDeep, merge } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { PlanRequirementsTableCellSize } from '../../../../../components/plan/requirements/table/PlanRequirementsTableCellSize.enum';
 import { PlanRequirementsTableOptions } from '../../../../../components/plan/requirements/table/PlanRequirementsTableOptions.type';
@@ -20,11 +20,11 @@ import { PlanRouteMasterItemsEditDialogTab } from '../components/PlanRouteMaster
 /**
  * User preferences for the plan route that are stored locally.
  */
-type PlanRouteLocalUserPreferences = Immutable<{
+type PlanRouteLocalUserPreferences = {
     masterServantEditDialogActiveTab: MasterServantEditDialogTab;
     planServantEditDialogActiveTab: PlanRouteMasterItemsEditDialogTab;
     table: PlanRequirementsTableOptions;
-}>;
+};
 
 export type PlanRouteUserPreferences = PlanRouteLocalUserPreferences & {
     // TODO
@@ -162,7 +162,7 @@ const getDefaultUserPreferences = (): PlanRouteUserPreferences => ({
     ...getDefaultLocalUserPreferences()
 });
 
-const readFromLocalStorage = (): PlanRouteLocalUserPreferences => {
+const readUserPreferencesFromLocalStorage = (): PlanRouteLocalUserPreferences => {
     let localStorageData;
     try {
         localStorageData = StorageUtils.getItemWithValidation<Partial<PlanRouteLocalUserPreferences>>(
@@ -184,7 +184,7 @@ const readFromLocalStorage = (): PlanRouteLocalUserPreferences => {
     return result;
 };
 
-const writeToLocalStorage = (userPreferences: PlanRouteUserPreferences): PlanRouteUserPreferences => {
+const writeUserPreferencesToLocalStorage = (userPreferences: PlanRouteUserPreferences): PlanRouteUserPreferences => {
     StorageUtils.setItem<PlanRouteLocalUserPreferences>(StorageKey, userPreferences);
     return userPreferences;
 };
@@ -219,25 +219,23 @@ export const usePlanRouteUserPreferences = (): PlanRouteUserPreferencesHookResul
     }, []);
 
     useEffect(() => {
-        const userPreferences = readFromLocalStorage();
+        const userPreferences = readUserPreferencesFromLocalStorage();
         setUserPreferences(userPreferences);
     }, []);
 
     const setMasterServantEditDialogActiveTab = useCallback((tab: MasterServantEditDialogTab): void => {
         setUserPreferences(userPreferences => {
-            return writeToLocalStorage({
-                ...userPreferences,
-                masterServantEditDialogActiveTab: tab
-            });
+            const updated = cloneDeep(userPreferences);
+            updated.masterServantEditDialogActiveTab = tab;
+            return writeUserPreferencesToLocalStorage(updated);
         });
     }, []);
 
     const setPlanServantEditDialogActiveTab = useCallback((tab: PlanRouteMasterItemsEditDialogTab): void => {
         setUserPreferences(userPreferences => {
-            return writeToLocalStorage({
-                ...userPreferences,
-                planServantEditDialogActiveTab: tab
-            });
+            const updated = cloneDeep(userPreferences);
+            updated.planServantEditDialogActiveTab = tab;
+            return writeUserPreferencesToLocalStorage(updated);
         });
     }, []);
 
@@ -247,32 +245,17 @@ export const usePlanRouteUserPreferences = (): PlanRouteUserPreferencesHookResul
             const nextValue = currentValue === PlanRequirementsTableCellSize.Condensed ?
                 PlanRequirementsTableCellSize.Normal :
                 PlanRequirementsTableCellSize.Condensed;
-            return writeToLocalStorage({
-                ...userPreferences,
-                table: {
-                    ...userPreferences.table,
-                    layout: {
-                        ...userPreferences.table.layout,
-                        cells: nextValue
-                    }
-                }
-            });
+            const updated = cloneDeep(userPreferences);
+            updated.table.layout.cells = nextValue;
+            return writeUserPreferencesToLocalStorage(updated);
         });
     }, []);
 
     const toggleShowEmptyColumns = useCallback((): void => {
         setUserPreferences(userPreferences => {
-            const currentValue = userPreferences.table.displayItems.empty;
-            return writeToLocalStorage({
-                ...userPreferences,
-                table: {
-                    ...userPreferences.table,
-                    displayItems: {
-                        ...userPreferences.table.displayItems,
-                        empty: !currentValue
-                    }
-                }
-            });
+            const updated = cloneDeep(userPreferences);
+            updated.table.displayItems.empty = !userPreferences.table.displayItems.empty;
+            return writeUserPreferencesToLocalStorage(updated);
         });
     }, []);
 
@@ -282,16 +265,9 @@ export const usePlanRouteUserPreferences = (): PlanRouteUserPreferencesHookResul
             const nextValue = currentValue === PlanRequirementsTableServantRowHeaderLayout.Name ?
                 PlanRequirementsTableServantRowHeaderLayout.Targets :
                 PlanRequirementsTableServantRowHeaderLayout.Name;
-            return writeToLocalStorage({
-                ...userPreferences,
-                table: {
-                    ...userPreferences.table,
-                    layout: {
-                        ...userPreferences.table.layout,
-                        rowHeader: nextValue
-                    }
-                }
-            });
+            const updated = cloneDeep(userPreferences);
+            updated.table.layout.rowHeader = nextValue;
+            return writeUserPreferencesToLocalStorage(updated);
         });
     }, []);
 

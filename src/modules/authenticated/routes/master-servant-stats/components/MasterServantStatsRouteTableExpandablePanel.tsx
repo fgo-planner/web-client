@@ -2,6 +2,7 @@ import { Accordion, AccordionDetails, AccordionSummary, alpha } from '@mui/mater
 import { SystemStyleObject, Theme } from '@mui/system';
 import clsx from 'clsx';
 import React, { CSSProperties, PropsWithChildren, ReactNode, useCallback, useMemo, useState } from 'react';
+import { ThemeConstants } from '../../../../../styles/ThemeConstants';
 import { StyleUtils } from '../../../../../utils/StyleUtils';
 
 type Props = PropsWithChildren<{
@@ -149,7 +150,7 @@ export const MasterServantStatsRouteTableExpandablePanel = React.memo((props: Pr
             square
         >
             <AccordionSummary>
-                <div className='full-width'>
+                <div className={ThemeConstants.ClassFullWidth}>
                     <div className={headerRowClassName}>
                         <div className={clsx(`${StyleClassPrefix}-row-label`, 'truncate')}>
                             {header.label}
@@ -163,7 +164,7 @@ export const MasterServantStatsRouteTableExpandablePanel = React.memo((props: Pr
                 </div>
             </AccordionSummary>
             <AccordionDetails>
-                <div className='full-width'>
+                <div className={ThemeConstants.ClassFullWidth}>
                     {rows?.map(row => renderDetailRow(row))}
                 </div>
             </AccordionDetails>

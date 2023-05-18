@@ -5,6 +5,7 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import clsx from 'clsx';
 import React, { FocusEvent, KeyboardEvent, useCallback, useRef } from 'react';
+import { ThemeConstants } from '../../../styles/ThemeConstants';
 
 type Props = {
     disabled?: boolean;
@@ -149,7 +150,7 @@ export const ServantSummonDateInputField = React.memo((props: Props) => {
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
-                className={clsx(`${StyleClassPrefix}-root`, 'full-width')}
+                className={clsx(`${StyleClassPrefix}-root`, ThemeConstants.ClassFullWidth)}
                 label={label || DefaultLabel}
                 format={DateFormat}
                 value={dateValue}

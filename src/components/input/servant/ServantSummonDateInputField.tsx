@@ -1,24 +1,23 @@
 import { DateTimeUtils } from '@fgo-planner/common-core';
 import { InstantiatedServantUpdateIndeterminate as Indeterminate, InstantiatedServantUpdateIndeterminateValue as IndeterminateValue } from '@fgo-planner/data-core';
-import { BaseTextFieldProps, TextField, TextFieldProps } from '@mui/material';
-import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { TextField, TextFieldProps } from '@mui/material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import clsx from 'clsx';
-import React, { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useRef } from 'react';
+import React, { FocusEvent, KeyboardEvent, useCallback, useRef } from 'react';
 
 type Props = {
     disabled?: boolean;
     label?: string;
     multiEditMode?: boolean;
-    onBlur?: (event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>) => void;
-    onChange: (value: number | Indeterminate | null, pushChanges: boolean) => void;
     /**
      * The servant's summoning date in number of milliseconds since the ECMAScript
      * epoch. This is expected to be truncated such that the UTC hours and lower
      * units are all zero.
      */
     value: number | Indeterminate | null;
-    variant?: BaseTextFieldProps['variant'];
+    onBlur?(event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void;
+    onChange(value: number | Indeterminate | null): void;
 };
 
 const DefaultLabel = 'Summon Date';
@@ -27,12 +26,15 @@ const DefaultLabel = 'Summon Date';
  * Exact match of the date format that is displayed in game.
  */
 const DateFormat = 'yyyy-MM-dd';
-/**
- * The input mask that corresponds to the `yyyy-MM-dd` date format.
- */
-const DateFormatMask = '____-__-__';
 
 const IndeterminateDisplayText = '?';
+
+const IndeterminateTextField: React.FC<TextFieldProps> = (props: TextFieldProps) => (
+    <TextField
+        {...props}
+        value={IndeterminateDisplayText}
+    />
+);
 
 /**
  * Transforms the given date value into a value that can be used by the date
@@ -81,9 +83,10 @@ export const ServantSummonDateInputField = React.memo((props: Props) => {
         multiEditMode,
         onBlur,
         onChange,
-        value,
-        variant
+        value
     } = props;
+
+    const inputRef = useRef<HTMLInputElement>(null);
 
     /**
      * Cache of the latest date value returned by the onChange event from the date
@@ -93,47 +96,32 @@ export const ServantSummonDateInputField = React.memo((props: Props) => {
 
     const isIndeterminate = value === IndeterminateValue;
 
+    const focusInput = useCallback((): void => {
+        inputRef.current && inputRef.current.focus();
+    }, []);
+
     /**
-     * This function only handles changes from the calendar picker, or if the user
-     * deletes the entire text value from the field. We only cache the change for
-     * later use if `keyboardInputValue` is not falsy.
+     * This function only handles changes from the calendar picker.
      */
-    const handleDatePickerChange = useCallback((date: Date | null, keyboardInputValue?: string): void => {
+    const handleDatePickerChange = useCallback((date: Date | null): void => {
         lastDatePickerChangeValueRef.current = date;
-        if (!!keyboardInputValue) {
-            return;
-        }
         const transformedValue = transformDateFromPicker(date);
-        onChange(transformedValue, true);
+        onChange(transformedValue);
     }, [onChange]);
 
-    /**
-     * This function only handles changes from the input field.
-     */
-    const handleInputChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
-        /*
-         * If the value is currently indeterminate, push a change with value of
-         * undefined to allow the user to continue typing normally.
-         */
-        if (isIndeterminate) {
-            onChange(null, true);
-        }
-    }, [isIndeterminate, onChange]);
-
     const handleIndeterminateInput = useCallback((event: KeyboardEvent<HTMLInputElement>): void => {
-        /*
-         * Ignore the event if only a single servant is being edited, or if the key
-         * pressed was not the `?` key.
-        */
-        if (!multiEditMode || event.key !== '?') {
-            return;
+        if (multiEditMode && event.key === '?') {
+            onChange(IndeterminateValue);
+            setTimeout(focusInput);
+            /**
+             * Prevent the onChange event from firing again.
+             */
+            event.preventDefault();
+        } else if (isIndeterminate) {
+            onChange(null);
+            setTimeout(focusInput);
         }
-        onChange(IndeterminateValue, true);
-        /*
-         * Prevent the onChange event from firing again.
-         */
-        event.preventDefault();
-    }, [multiEditMode, onChange]);
+    }, [focusInput, isIndeterminate, multiEditMode, onChange]);
 
     const handleBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         let transformedValue: number | Indeterminate | null;
@@ -142,44 +130,40 @@ export const ServantSummonDateInputField = React.memo((props: Props) => {
         } else {
             transformedValue = transformDateFromPicker(lastDatePickerChangeValueRef.current);
         }
-        onChange(transformedValue, false);
+        if (transformedValue == null) {
+            setTimeout(() => {
+                if (inputRef.current) {
+                    inputRef.current.value = '';
+                }
+            });
+        }
+
+        onChange(transformedValue);
         onBlur?.(event);
     }, [isIndeterminate, onBlur, onChange]);
 
-    const renderInput = useCallback((textFieldProps: TextFieldProps): JSX.Element => {
-        const { inputProps } = textFieldProps;
-        if (inputProps) {
-            if (multiEditMode && isIndeterminate) {
-                // textFieldProps.inputProps.type = 'text';
-                inputProps.value = IndeterminateDisplayText;
-            }
-        }
-        return (
-            <TextField
-                {...textFieldProps}
-                variant={variant}
-            />
-        );
-    }, [isIndeterminate, multiEditMode, variant]);
-
     const dateValue = transformDateValueForInput(value);
+
+    // TODO Find a way to input indeterminate value in mobile mode.
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DesktopDatePicker
+            <DatePicker
                 className={clsx(`${StyleClassPrefix}-root`, 'full-width')}
                 label={label || DefaultLabel}
-                inputFormat={DateFormat}
-                mask={DateFormatMask}
+                format={DateFormat}
                 value={dateValue}
-                // TODO Add showTodayButton when it is added to DesktopDatePicker
+                inputRef={inputRef}
                 onChange={handleDatePickerChange}
-                InputProps={{
-                    onBlur: handleBlur,
-                    onChange: handleInputChange,
-                    onKeyPress: handleIndeterminateInput
+                slotProps={{
+                    textField: {
+                        onBlur: handleBlur,
+                        onKeyPress: handleIndeterminateInput
+                    }
                 }}
-                renderInput={renderInput}
+                slots={{
+                    textField: isIndeterminate ? IndeterminateTextField : TextField
+                }}
                 disabled={disabled}
             />
         </LocalizationProvider>

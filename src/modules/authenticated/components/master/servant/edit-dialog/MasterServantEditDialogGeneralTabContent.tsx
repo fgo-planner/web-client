@@ -77,7 +77,7 @@ export const MasterServantEditDialogGeneralTabContent = React.memo((props: Props
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);
 
-    const handleSummonDateInputChange = useCallback((value: number | Indeterminate | null ): void => {
+    const handleSummonDateInputChange = useCallback((value: number | Indeterminate | null): void => {
         masterServantUpdate.summonDate = value;
         forceUpdate();
     }, [forceUpdate, masterServantUpdate]);

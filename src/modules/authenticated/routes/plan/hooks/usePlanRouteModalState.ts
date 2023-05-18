@@ -1,7 +1,7 @@
 import { MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { useCallback } from 'react';
 import { ContextMenuStateHookResult, useContextMenuState } from '../../../../../hooks/user-interface/useContextMenuState';
-import { DefaultDialogInfo, useDialogState } from '../../../../../hooks/user-interface/useDialogState';
+import { DefaultDialog, useDialogState } from '../../../../../hooks/user-interface/useDialogState';
 import { MasterServantEditDialogData } from '../../../components/master/servant/edit-dialog/MasterServantEditDialogData.type';
 import { PlanRouteMasterItemsEditDialogData } from '../components/PlanRouteMasterItemsEditDialogData.type';
 import { PlanRoutePlanServantDeleteDialogData } from '../components/PlanRoutePlanServantDeleteDialog';
@@ -18,7 +18,7 @@ export type PlanRouteDialog =
     'reloadOnStaleData' |
     'saveOnStaleData';
 
-export type PlanRouteOpenDialogInfo = {
+export type PlanRouteOpenDialog = {
     name: 'reloadOnStaleData' | 'saveOnStaleData';
 } | {
     name: 'masterItemsEdit';
@@ -37,8 +37,10 @@ export type PlanRouteOpenDialogInfo = {
     data: ReadonlyArray<MasterServantAggregatedData>;
 };
 
-export type PlanRouteModalStateHookResult = ContextMenuStateHookResult<PlanRouteContextMenu> & {
-    activeDialogInfo: Readonly<DefaultDialogInfo | PlanRouteOpenDialogInfo>;
+export type PlanRouteModalStateHookResult = {
+    
+} & {
+    activeDialog: Readonly<DefaultDialog | PlanRouteOpenDialog>;
     closeActiveDialog(): void;
     openMasterItemsEditDialog(data: PlanRouteMasterItemsEditDialogData): void;
     openMasterServantEditDialog(data: MasterServantEditDialogData): void;
@@ -52,22 +54,22 @@ export type PlanRouteModalStateHookResult = ContextMenuStateHookResult<PlanRoute
 export function usePlanRouteModalState(): PlanRouteModalStateHookResult {
 
     const {
-        activeDialogInfo,
+        activeDialog,
         closeActiveDialog,
         openDialog
-    } = useDialogState<PlanRouteDialog, PlanRouteOpenDialogInfo>();
+    } = useDialogState<PlanRouteDialog, PlanRouteOpenDialog>();
 
-    const {
-        activeContextMenu,
-        contextMenuPosition,
-        closeActiveContextMenu,
-        openContextMenu
-    } = useContextMenuState<PlanRouteContextMenu>();
+    // const {
+    //     activeContextMenu,
+    //     contextMenuPosition,
+    //     closeActiveContextMenu,
+    //     openContextMenu
+    // } = useContextMenuState<PlanRouteContextMenu>();
 
-    const _openDialog = useCallback((data: DefaultDialogInfo | PlanRouteOpenDialogInfo): void => {
-        closeActiveContextMenu();
+    const _openDialog = useCallback((data: DefaultDialog | PlanRouteOpenDialog): void => {
+        // closeActiveContextMenu();
         openDialog(data);
-    }, [closeActiveContextMenu, openDialog]);
+    }, [openDialog]);
 
     const openMasterItemsEditDialog = useCallback((data: PlanRouteMasterItemsEditDialogData): void => {
         _openDialog({ name: 'masterItemsEdit', data });
@@ -98,12 +100,12 @@ export function usePlanRouteModalState(): PlanRouteModalStateHookResult {
     }, [_openDialog]);
 
     return {
-        activeContextMenu,
-        activeDialogInfo,
-        contextMenuPosition,
-        closeActiveContextMenu,
+        // activeContextMenu,
+        activeDialog,
+        // contextMenuPosition,
+        // closeActiveContextMenu,
         closeActiveDialog,
-        openContextMenu,
+        // openContextMenu,
         openMasterItemsEditDialog,
         openMasterServantEditDialog,
         openPlanServantDeleteDialog,

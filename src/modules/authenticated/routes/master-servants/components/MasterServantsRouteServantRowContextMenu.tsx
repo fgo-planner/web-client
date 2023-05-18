@@ -1,27 +1,19 @@
-import { Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover } from '@mui/material';
-import React, { useCallback, useMemo } from 'react';
+import { Divider, ListItemIcon, ListItemText, MenuItem, MenuList, Popover, PopoverPosition } from '@mui/material';
+import React, { useCallback } from 'react';
 import { IconOutlined } from '../../../../../components/icons/IconOutlined';
-import { Position2D } from '../../../../../types';
-import { EventHandlers } from '../../../../../utils/EventHandlers';
+import { useContextMenuProps } from '../../../../../hooks/user-interface/useContextMenuProps';
 
 type Props = {
-    onAddServant: () => void;
-    onClose: () => void;
-    onDeleteSelectedServants: () => void;
-    onDeselectAllServants: () => void;
-    onEditSelectedServants: () => void;
-    onSelectAllServants: () => void;
     open: boolean;
-    position: Position2D;
+    position: PopoverPosition;
     selectedServantsCount: number;
+    onAddServant(): void;
+    onClose(): void;
+    onDeleteSelectedServants(): void;
+    onDeselectAllServants(): void;
+    onEditSelectedServants(): void;
+    onSelectAllServants(): void;
 };
-
-/**
- * For some reason, setting the transition duration zero may result in the
- * popover being displayed in the top-left corder of the window (0, 0) for a
- * brief moment when it is opened. Setting the duration to 1 fixes this.
- */
-const TransitionDuration = 1;
 
 export const MasterServantsRouteServantRowContextMenu = React.memo((props: Props) => {
 
@@ -36,6 +28,8 @@ export const MasterServantsRouteServantRowContextMenu = React.memo((props: Props
         position,
         selectedServantsCount,
     } = props;
+
+    const { backdropProps } = useContextMenuProps(onClose);
 
     const handleAddServant = useCallback(() => {
         onClose();
@@ -62,23 +56,12 @@ export const MasterServantsRouteServantRowContextMenu = React.memo((props: Props
         onDeselectAllServants();
     }, [onClose, onDeselectAllServants]);
 
-    const anchorPosition = useMemo(() => {
-        const [left, top] = position;
-        return { top, left };
-    }, [position]);
-
-    const backdropProps = useMemo(() => ({
-        onContextMenu: EventHandlers.preventDefault,
-        style: { opacity: 0 }
-    }), []);
-
     return (
         <Popover
             open={open}
             anchorReference='anchorPosition'
-            anchorPosition={anchorPosition}
+            anchorPosition={position}
             BackdropProps={backdropProps}
-            transitionDuration={TransitionDuration}
             onClose={onClose}
         >
             <MenuList dense>

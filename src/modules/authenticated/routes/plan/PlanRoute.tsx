@@ -141,7 +141,7 @@ export const PlanRoute = React.memo(() => {
     } = usePlanRouteUserPreferences();
 
     const {
-        activeDialogInfo,
+        activeDialog,
         closeActiveDialog,
         openMasterItemsEditDialog,
         openMasterServantEditDialog,
@@ -515,25 +515,25 @@ export const PlanRoute = React.memo(() => {
             </div>
             <PlanRoutePlanServantEditDialog
                 activeTab={planServantEditDialogActiveTab}
-                dialogData={activeDialogInfo.name === 'planServantEdit' ? activeDialogInfo.data : undefined}
+                dialogData={activeDialog.name === 'planServantEdit' ? activeDialog.data : undefined}
                 targetPlanServantsData={selectedServantsData.instances}
                 onTabChange={setPlanServantEditDialogActiveTab}
                 onClose={handleEditServantDialogClose}
             />
             <PlanRoutePlanServantDeleteDialog
-                dialogData={activeDialogInfo.name === 'planServantDelete' ? activeDialogInfo.data : undefined}
+                dialogData={activeDialog.name === 'planServantDelete' ? activeDialog.data : undefined}
                 onClose={handleDeleteServantDialogClose}
             />
             <PlanRouteMasterItemsEditDialog
-                dialogData={activeDialogInfo.name === 'masterItemsEdit' ? activeDialogInfo.data : undefined}
+                dialogData={activeDialog.name === 'masterItemsEdit' ? activeDialog.data : undefined}
                 onClose={handleEditItemsDialogClose}
             />
             <RouteDataEditReloadOnStaleDataDialog
-                open={activeDialogInfo.name === 'reloadOnStaleData'}
+                open={activeDialog.name === 'reloadOnStaleData'}
                 onClose={handleReloadDataDialogClose}
             />
             <RouteDataEditSaveOnStaleDataDialog
-                open={activeDialogInfo.name === 'saveOnStaleData'}
+                open={activeDialog.name === 'saveOnStaleData'}
                 onClose={handleSaveDataDialogClose}
             />
         </Box>

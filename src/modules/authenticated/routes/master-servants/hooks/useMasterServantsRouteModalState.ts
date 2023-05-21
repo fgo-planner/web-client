@@ -6,15 +6,15 @@ import { MasterServantEditDialogData } from '../../../components/master/servant/
 import { MasterServantsRouteColumnSettingsDialogData } from '../components/MasterServantsRouteColumnSettingsDialog';
 import { MasterServantsRouteDeleteDialogData } from '../components/MasterServantsRouteDeleteDialog';
 
-export type MasterServantRouteContextMenu =
+type MasterServantsRouteContextMenuName =
     'header' |
     'row';
 
-export type MasterServantRouteContextMenuData = {
-    name: MasterServantRouteContextMenu;
+type MasterServantsRouteContextMenu = {
+    name: MasterServantsRouteContextMenuName;
 };
 
-export type MasterServantRouteDialog =
+type MasterServantsRouteDialogName =
     'columnSettings' |
     'masterServantDelete' |
     'masterServantEdit' |
@@ -22,7 +22,7 @@ export type MasterServantRouteDialog =
     'reloadOnStaleData' |
     'saveOnStaleData';
 
-export type MasterServantRouteDialogData = {
+type MasterServantsRouteDialog = {
     name: 'masterServantMultiAdd' | 'reloadOnStaleData' | 'saveOnStaleData';
 } | {
     name: 'columnSettings',
@@ -36,13 +36,13 @@ export type MasterServantRouteDialogData = {
 };
 
 export type MasterServantsRouteModalStateHookResult = {
-    activeContextMenu: Readonly<DefaultContextMenu | MasterServantRouteContextMenuData>;
+    activeContextMenu: Readonly<DefaultContextMenu | MasterServantsRouteContextMenu>;
     contextMenuPosition: PopoverPosition;
     closeActiveContextMenu(): void;
     openHeaderContextMenu(event: MouseEvent): void;
     openServantRowContextMenu(event: MouseEvent): void;
 } & {
-    activeDialog: Readonly<DefaultDialog | MasterServantRouteDialogData>;
+    activeDialog: Readonly<DefaultDialog | MasterServantsRouteDialog>;
     closeActiveDialog(): void;
     openColumnSettingsDialog(data: MasterServantsRouteColumnSettingsDialogData): void;
     openMasterServantDeleteDialog(data: MasterServantsRouteDeleteDialogData): void;
@@ -58,19 +58,19 @@ export function useMasterServantsRouteModalState(): MasterServantsRouteModalStat
         activeDialog,
         closeActiveDialog,
         openDialog
-    } = useDialogState<MasterServantRouteDialog, MasterServantRouteDialogData>();
+    } = useDialogState<MasterServantsRouteDialogName, MasterServantsRouteDialog>();
 
     const {
         activeContextMenu,
         contextMenuPosition,
         closeActiveContextMenu,
         openContextMenu
-    } = useContextMenuState<MasterServantRouteContextMenu, MasterServantRouteContextMenuData>();
+    } = useContextMenuState<MasterServantsRouteContextMenuName, MasterServantsRouteContextMenu>();
 
 
     //#region Dialogs
 
-    const _openDialog = useCallback((data: DefaultDialog | MasterServantRouteDialogData): void => {
+    const _openDialog = useCallback((data: DefaultDialog | MasterServantsRouteDialog): void => {
         closeActiveContextMenu();
         openDialog(data);
     }, [closeActiveContextMenu, openDialog]);

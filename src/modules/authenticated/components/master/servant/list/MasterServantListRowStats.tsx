@@ -13,7 +13,7 @@ type Props = {
     active?: boolean;
     bond: InstantiatedServantBondLevel | undefined;
     masterServant: ImmutableMasterServant;
-    visibleColumns?: Readonly<MasterServantListColumn.Visibility>;
+    visibleColumns: Readonly<MasterServantListColumn.Visibility>;
 } & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu'>;
 
 const shouldSkipUpdate = (prevProps: Readonly<Props>, nextProps: Readonly<Props>): boolean => {
@@ -43,7 +43,7 @@ export const MasterServantListRowStats = React.memo((props: Props) => {
         appendSkills,
         bondLevel,
         summonDate
-    } = visibleColumns || {};
+    } = visibleColumns;
 
     return (
         <div className={`${StyleClassPrefix}-root`}>

@@ -3,6 +3,7 @@ import { MouseEvent, useCallback } from 'react';
 import { DefaultContextMenu, useContextMenuState } from '../../../../../hooks/user-interface/useContextMenuState';
 import { DefaultDialog, useDialogState } from '../../../../../hooks/user-interface/useDialogState';
 import { MasterServantEditDialogData } from '../../../components/master/servant/edit-dialog/MasterServantEditDialogData.type';
+import { MasterServantsRouteColumnSettingsDialogData } from '../components/MasterServantsRouteColumnSettingsDialog';
 import { MasterServantsRouteDeleteDialogData } from '../components/MasterServantsRouteDeleteDialog';
 
 export type MasterServantRouteContextMenu =
@@ -14,6 +15,7 @@ export type MasterServantRouteContextMenuData = {
 };
 
 export type MasterServantRouteDialog =
+    'columnSettings' |
     'masterServantDelete' |
     'masterServantEdit' |
     'masterServantMultiAdd' |
@@ -22,6 +24,9 @@ export type MasterServantRouteDialog =
 
 export type MasterServantRouteDialogData = {
     name: 'masterServantMultiAdd' | 'reloadOnStaleData' | 'saveOnStaleData';
+} | {
+    name: 'columnSettings',
+    data: MasterServantsRouteColumnSettingsDialogData;
 } | {
     name: 'masterServantDelete';
     data: MasterServantsRouteDeleteDialogData;
@@ -39,6 +44,7 @@ export type MasterServantsRouteModalStateHookResult = {
 } & {
     activeDialog: Readonly<DefaultDialog | MasterServantRouteDialogData>;
     closeActiveDialog(): void;
+    openColumnSettingsDialog(data: MasterServantsRouteColumnSettingsDialogData): void;
     openMasterServantDeleteDialog(data: MasterServantsRouteDeleteDialogData): void;
     openMasterServantEditDialog(data: MasterServantEditDialogData): void;
     openMasterServantMultiAddDialog(): void;
@@ -68,6 +74,10 @@ export function useMasterServantsRouteModalState(): MasterServantsRouteModalStat
         closeActiveContextMenu();
         openDialog(data);
     }, [closeActiveContextMenu, openDialog]);
+
+    const openColumnSettingsDialog = useCallback((data: MasterServantsRouteColumnSettingsDialogData): void => {
+        _openDialog({ name: 'columnSettings', data });
+    }, [_openDialog]);
 
     const openMasterServantDeleteDialog = useCallback((data: MasterServantsRouteDeleteDialogData): void => {
         _openDialog({ name: 'masterServantDelete', data });
@@ -112,6 +122,7 @@ export function useMasterServantsRouteModalState(): MasterServantsRouteModalStat
         closeActiveContextMenu,
         closeActiveDialog,
         openHeaderContextMenu,
+        openColumnSettingsDialog,
         openMasterServantDeleteDialog,
         openMasterServantEditDialog,
         openMasterServantMultiAddDialog,

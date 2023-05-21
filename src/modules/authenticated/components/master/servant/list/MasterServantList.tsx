@@ -24,6 +24,7 @@ type Props = {
      * highlighting will not be displayed for selected servants.
      */
     dragDropMode?: boolean;
+    hideStatColumns?: boolean;
     /**
      * The list of servants to be displayed. Filtering should be already applied to
      * the list by the parent component. The only transformation handled by this
@@ -39,7 +40,7 @@ type Props = {
     sortOptions?: SortOptions<MasterServantListColumn.Name>;
     textFilter?: string; // TODO Combine this with the rest of filters.
     virtualList?: boolean;
-    visibleColumns?: Readonly<MasterServantListColumn.Visibility>;
+    visibleColumns: Readonly<MasterServantListColumn.Visibility>;
     viewLayout?: any; // TODO Make use of this
     onDragOrderChange?(sourceIndex: number, destinationIndex: number): void;
     onHeaderClick?: MouseEventHandler;
@@ -68,6 +69,7 @@ export const MasterServantList = React.memo((props: Props) => {
     const {
         bondLevels,
         dragDropMode,
+        hideStatColumns,
         masterServantsData,
         selectedInstanceIds = CollectionUtils.emptySet(),
         showHeader,
@@ -264,6 +266,7 @@ export const MasterServantList = React.memo((props: Props) => {
                 disablePointerEvents={destinationIndex !== undefined}
                 dragDropMode={dragDropMode}
                 gameServant={masterServantData.gameServant}
+                hideStatColumns={hideStatColumns}
                 idPrefix={ListRowIdPrefix}
                 index={index}
                 masterServant={masterServant}
@@ -281,6 +284,7 @@ export const MasterServantList = React.memo((props: Props) => {
         handleDragStart,
         handleRowClick,
         handleRowDoubleClick,
+        hideStatColumns,
         selectedInstanceIds,
         visibleColumns
     ]);

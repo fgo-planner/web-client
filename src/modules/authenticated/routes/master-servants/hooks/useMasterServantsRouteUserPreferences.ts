@@ -1,14 +1,16 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
 import { Schema, Validator } from 'jsonschema';
-import { cloneDeep, merge } from 'lodash-es';
+import { merge } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { StorageKeyReadError } from '../../../../../errors/StorageKeyRead.error';
 import { StorageKeyValidationError } from '../../../../../errors/StorageKeyValidation.error';
+import { JsonSchemas } from '../../../../../utils/JsonSchemas';
 import { StorageKeys } from '../../../../../utils/storage/StorageKeys';
 import { StorageUtils } from '../../../../../utils/storage/StorageUtils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../../../utils/subscription/SubscriptionTopics';
 import { MasterServantEditDialogTab } from '../../../components/master/servant/edit-dialog/MasterServantEditDialogTab.enum';
+import { MasterServantListColumn } from '../../../components/master/servant/list/MasterServantListColumn';
 
 
 //#region Type definitions
@@ -21,6 +23,7 @@ type MasterServantsRouteLocalUserPreferences = {
     infoPanelOpen: boolean;
     servantEditDialogActiveTab: MasterServantEditDialogTab;
     showUnsummonedServants: boolean;
+    visibleColumns: MasterServantListColumn.Visibility;  // TODO Maybe store this globally
 };
 
 export type MasterServantsRouteUserPreferences = MasterServantsRouteLocalUserPreferences & {
@@ -33,6 +36,7 @@ export type MasterServantsRouteUserPreferencesHookResult = {
      */
     userPreferences: Immutable<MasterServantsRouteUserPreferences>;
     setServantEditDialogActiveTab(tab: MasterServantEditDialogTab): void;
+    setVisibleColumns(visibleColumns: MasterServantListColumn.Visibility): void;
     toggleFilters(): void;
     toggleInfoPanelOpen(): void;
     toggleShowUnsummonedServants(): void;
@@ -45,27 +49,37 @@ export type MasterServantsRouteUserPreferencesHookResult = {
 
 const LocalUserPreferencesSchema: Schema = {
     properties: {
-        filtersEnabled: {
-            type: 'boolean',
-            required: false
-        },
-        infoPanelOpen: {
-            type: 'boolean',
-            required: false
-        },
+        filtersEnabled: JsonSchemas.OptionalBoolean,
+        infoPanelOpen: JsonSchemas.OptionalBoolean,
         servantEditDialogActiveTab: {
             type: 'string',
             enum: Object.keys(MasterServantEditDialogTab),
             required: false
         },
-        showUnsummonedServants: {
-            type: 'boolean',
+        showUnsummonedServants: JsonSchemas.OptionalBoolean,
+        visibleColumns: {
+            $ref: '/visibleColumns',
             required: false
         }
     }
 };
 
+const LocalUserPreferencesVisibleColumnsSchema: Schema = {
+    id: '/visibleColumns',
+    properties: {
+        npLevel: JsonSchemas.OptionalBoolean,
+        level: JsonSchemas.OptionalBoolean,
+        bondLevel: JsonSchemas.OptionalBoolean,
+        fouHp: JsonSchemas.OptionalBoolean,
+        fouAtk: JsonSchemas.OptionalBoolean,
+        skills: JsonSchemas.OptionalBoolean,
+        appendSkills: JsonSchemas.OptionalBoolean,
+        summonDate: JsonSchemas.OptionalBoolean
+    }
+};
+
 const LocalUserPreferencesValidator = new Validator();
+LocalUserPreferencesValidator.addSchema(LocalUserPreferencesVisibleColumnsSchema);
 
 //#endregion
 
@@ -78,7 +92,17 @@ const getDefaultLocalUserPreferences = (): MasterServantsRouteLocalUserPreferenc
     filtersEnabled: false,
     infoPanelOpen: true,
     servantEditDialogActiveTab: MasterServantEditDialogTab.General,
-    showUnsummonedServants: true
+    showUnsummonedServants: true,
+    visibleColumns: {
+        npLevel: true,
+        level: true,
+        bondLevel: true,
+        fouHp: true,
+        fouAtk: true,
+        skills: true,
+        appendSkills: true,
+        summonDate: true
+    }
 });
 
 const getDefaultUserPreferences = (): MasterServantsRouteUserPreferences => ({
@@ -89,7 +113,7 @@ const readUserPreferencesFromLocalStorage = (): MasterServantsRouteUserPreferenc
     let localStorageData;
     try {
         localStorageData = StorageUtils.getItemWithValidation<Partial<MasterServantsRouteUserPreferences>>(
-            StorageKey, 
+            StorageKey,
             LocalUserPreferencesValidator,
             LocalUserPreferencesSchema
         );
@@ -148,39 +172,56 @@ export const useMasterServantsRouteUserPreferences = (): MasterServantsRouteUser
 
     const setServantEditDialogActiveTab = useCallback((tab: MasterServantEditDialogTab): void => {
         setUserPreferences(userPreferences => {
-            const updated = cloneDeep(userPreferences);
-            updated.servantEditDialogActiveTab = tab;
-            return writeUserPreferencesToLocalStorage(updated);
+            return writeUserPreferencesToLocalStorage({
+                ...userPreferences,
+                servantEditDialogActiveTab: tab
+            });
+        });
+    }, []);
+
+    const setVisibleColumns = useCallback((visibleColumns: MasterServantListColumn.Visibility): void => {
+        setUserPreferences(userPreferences => {
+            if (ObjectUtils.isShallowEquals(userPreferences.visibleColumns, visibleColumns)) {
+                return userPreferences;
+            }
+            return writeUserPreferencesToLocalStorage({
+                ...userPreferences,
+                visibleColumns
+            });
         });
     }, []);
 
     const toggleFilters = useCallback((): void => {
         setUserPreferences(userPreferences => {
-            const updated = cloneDeep(userPreferences);
-            updated.filtersEnabled = !userPreferences.filtersEnabled;
-            return writeUserPreferencesToLocalStorage(updated);
+            return writeUserPreferencesToLocalStorage({
+                ...userPreferences,
+                filtersEnabled: !userPreferences.filtersEnabled
+            });
         });
     }, []);
 
     const toggleInfoPanelOpen = useCallback((): void => {
         setUserPreferences(userPreferences => {
-            const updated = cloneDeep(userPreferences);
-            updated.infoPanelOpen = !userPreferences.infoPanelOpen;
-            return writeUserPreferencesToLocalStorage(updated);
+            return writeUserPreferencesToLocalStorage({
+                ...userPreferences,
+                infoPanelOpen: !userPreferences.infoPanelOpen
+            });
         });
     }, []);
 
     const toggleShowUnsummonedServants = useCallback((): void => {
         setUserPreferences(userPreferences => {
-            const updated = cloneDeep(userPreferences);
-            updated.showUnsummonedServants = !userPreferences.showUnsummonedServants;
-            return writeUserPreferencesToLocalStorage(updated);
+            return writeUserPreferencesToLocalStorage({
+                ...userPreferences,
+                showUnsummonedServants: !userPreferences.showUnsummonedServants
+            });
         });
     }, []);
 
     return {
         userPreferences,
         setServantEditDialogActiveTab,
+        setVisibleColumns,
         toggleFilters,
         toggleInfoPanelOpen,
         toggleShowUnsummonedServants

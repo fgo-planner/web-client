@@ -7,6 +7,7 @@ import { PlanRequirementsTableOptions } from '../../../../../components/plan/req
 import { PlanRequirementsTableServantRowHeaderLayout } from '../../../../../components/plan/requirements/table/PlanRequirementsTableServantRowHeaderLayout.enum';
 import { StorageKeyReadError } from '../../../../../errors/StorageKeyRead.error';
 import { StorageKeyValidationError } from '../../../../../errors/StorageKeyValidation.error';
+import { JsonSchemas } from '../../../../../utils/JsonSchemas';
 import { StorageKeys } from '../../../../../utils/storage/StorageKeys';
 import { StorageUtils } from '../../../../../utils/storage/StorageUtils';
 import { SubscribablesContainer } from '../../../../../utils/subscription/SubscribablesContainer';
@@ -62,10 +63,12 @@ const LocalUserPreferencesSchema: Schema = {
         table: {
             properties: {
                 layout: {
-                    $ref: '/table/layout'
+                    $ref: '/table/layout',
+                    required: false
                 },
                 displayItems: {
-                    $ref: '/table/displayItems'
+                    $ref: '/table/displayItems',
+                    required: false
                 }
             }
         }
@@ -91,38 +94,14 @@ const LocalUserPreferencesTableLayoutSchema: Schema = {
 const LocalUserPreferencesTableDisplayItemsSchema: Schema = {
     id: '/table/displayItems',
     properties: {
-        empty: {
-            type: 'boolean',
-            required: false
-        },
-        statues: {
-            type: 'boolean',
-            required: false
-        },
-        gems: {
-            type: 'boolean',
-            required: false
-        },
-        lores: {
-            type: 'boolean',
-            required: false
-        },
-        grails: {
-            type: 'boolean',
-            required: false
-        },
-        embers: {
-            type: 'boolean',
-            required: false
-        },
-        fous: {
-            type: 'boolean',
-            required: false
-        },
-        qp: {
-            type: 'boolean',
-            required: false
-        }
+        empty: JsonSchemas.OptionalBoolean,
+        statues: JsonSchemas.OptionalBoolean,
+        gems: JsonSchemas.OptionalBoolean,
+        lores: JsonSchemas.OptionalBoolean,
+        grails: JsonSchemas.OptionalBoolean,
+        embers: JsonSchemas.OptionalBoolean,
+        fous: JsonSchemas.OptionalBoolean,
+        qp: JsonSchemas.OptionalBoolean
     }
 };
 

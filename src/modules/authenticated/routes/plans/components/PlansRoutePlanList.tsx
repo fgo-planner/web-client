@@ -1,8 +1,8 @@
-import { ImmutableBasicPlan, ImmutableBasicPlanGroup } from '@fgo-planner/data-core';
+import { BasicPlans, ImmutableBasicPlan, ImmutableBasicPlanGroup, PlanType } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { MouseEvent, MouseEventHandler, ReactNode, useCallback } from 'react';
-import { BasicPlans, PlanType, SortDirection } from '../../../../../types';
+import { SortDirection } from '../../../../../types';
 import { PlansRoutePlanListColumn } from './PlansRoutePlanListColumn';
 import { PlansRoutePlanListHeader } from './PlansRoutePlanListHeader';
 import { PlansRoutePlanListRow, StyleClassPrefix as RowStyleClassPrefix } from './PlansRoutePlanListRow';
@@ -88,12 +88,12 @@ export const PlansRoutePlanList = React.memo((props: Props) => {
     } = props;
 
     const handlePlanRowClick = useCallback((e: MouseEvent, plan: ImmutableBasicPlan) => {
-        onSelectionChange(plan, 'plan');
+        onSelectionChange(plan, PlanType.Plan);
         onRowClick(e);
     }, [onRowClick, onSelectionChange]);
     
     const handlePlanGroupRowClick = useCallback((e: MouseEvent, plan: ImmutableBasicPlanGroup) => {
-        onSelectionChange(plan, 'group');
+        onSelectionChange(plan, PlanType.Group);
         onRowClick(e);
     }, [onRowClick, onSelectionChange]);
 

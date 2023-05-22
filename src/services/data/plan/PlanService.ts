@@ -1,6 +1,5 @@
-import { Plan, PlanGroup } from '@fgo-planner/data-core';
+import { BasicPlans, Plan, PlanGroup } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
-import { BasicPlans } from '../../../types';
 import { HttpUtils as Http } from '../../../utils/HttpUtils';
 
 @Injectable
@@ -62,6 +61,7 @@ export class PlanService {
         for (const plan of accountPlans.plans) {
             this._transformPlan(plan);
         }
+        Http.stringTimestampsToDate(accountPlans.planList);
         return accountPlans;
     }
 

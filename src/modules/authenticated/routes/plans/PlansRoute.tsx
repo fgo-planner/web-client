@@ -1,4 +1,4 @@
-import { ImmutableBasicPlan, ImmutableBasicPlanGroup, Plan } from '@fgo-planner/data-core';
+import { BasicPlans, ImmutableBasicPlan, ImmutableBasicPlanGroup, Plan, PlanType } from '@fgo-planner/data-core';
 import { Button, IconButton, PaperProps, TextField, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -12,7 +12,7 @@ import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActive
 import { useLoadingIndicator } from '../../../../hooks/user-interface/useLoadingIndicator';
 import { PlanService } from '../../../../services/data/plan/PlanService';
 import { ThemeConstants } from '../../../../styles/ThemeConstants';
-import { BasicPlans, ModalOnCloseReason, PlanType } from '../../../../types';
+import { ModalOnCloseReason } from '../../../../types';
 import { SubscribablesContainer } from '../../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../../utils/subscription/SubscriptionTopics';
 import { PlansRouteCreatePlanDialog } from './components/PlansRouteCreatePlanDialog';
@@ -249,7 +249,7 @@ export const PlansRoute = React.memo(() => {
     }, []);
 
     const handleRowDoubleClick = useCallback((): void => {
-        if (!selectedRef.current || selectedRef.current.type === 'group') {
+        if (!selectedRef.current || selectedRef.current.type === PlanType.Group) {
             return;
         }
         const planId = selectedRef.current.target._id!;

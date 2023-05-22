@@ -38,7 +38,6 @@ export * from './http/HttpResponseType.type';
 export * from './master/account/BasicMasterAccounts.type';
 export * from './master/account/MasterAccountChanges.type';
 export * from './MaterialIconVariant.type';
-export * from './plan/BasicPlans.type';
 export * from './plan/PlanEnhancementCategory.type';
 export * from './plan/requirements/PlanEnhancementItemRequirements.type';
 export * from './plan/requirements/PlanEnhancementRequirements.type';

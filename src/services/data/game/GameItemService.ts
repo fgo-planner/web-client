@@ -1,20 +1,14 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { GameItem, GameItemBackground, GameItemConstants } from '@fgo-planner/data-core';
-import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { GameItemCategory, GameItemCategoryMap, GameItemList, Page, Pagination } from '../../../types';
 import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
 import { GameItemMap } from '../../../utils/game/GameItemMap';
 import { HttpUtils as Http } from '../../../utils/HttpUtils';
-import { UserInterfaceService } from '../../user-interface/UserInterfaceService';
+import { DataService } from '../DataService';
 
 @Injectable
-export class GameItemService {
-
-    private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-item`;
-
-    @Inject(UserInterfaceService)
-    private readonly _userInterfaceService!: UserInterfaceService;
+export class GameItemService extends DataService {
 
     private _itemList?: GameItemList;
 
@@ -23,6 +17,10 @@ export class GameItemService {
     private _itemCategoryMap?: GameItemCategoryMap;
 
     private _itemListPromise?: Promise<GameItemList>;
+
+    constructor() {
+        super(`${process.env.REACT_APP_REST_ENDPOINT}/game-item`);
+    }
 
     async getItem(id: number): Promise<Nullable<GameItem>> {
         return Http.get<Nullable<GameItem>>(`${this._BaseUrl}/${id}`);
@@ -39,8 +37,8 @@ export class GameItemService {
         if (!this._itemListPromise) {
             const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
             this._itemListPromise = Http.get<Array<GameItem>>(`${this._BaseUrl}`);
-            this._itemListPromise.then(cache => {
-                this._onItemsLoaded(cache);
+            this._itemListPromise.then(data => {
+                this._onItemsLoaded(data);
             }).catch(error => {
                 this._onItemsLoadError(error);
             }).finally(() => {

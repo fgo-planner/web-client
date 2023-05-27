@@ -10,8 +10,6 @@ import { BasicUser, UserService } from './UserService';
 @Injectable
 export class WebUserService extends UserService {
 
-    private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user`;
-
     private _currentUserToken: Nullable<UserTokenPayload>;
 
     private _currentBasicUserPromise: Nullable<Promise<BasicUser>>;
@@ -21,7 +19,7 @@ export class WebUserService extends UserService {
     }
     
     constructor() {
-        super();
+        super(`${process.env.REACT_APP_REST_ENDPOINT}/user`);
 
         /**
          * This class is meant to last the lifetime of the application; no need to

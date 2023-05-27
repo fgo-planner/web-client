@@ -99,19 +99,25 @@ export class HttpUtils {
         return this._parseResponseBody(response, options, transformFunc) as any;
     }
 
-    static async delete<T = any>(url: string): Promise<T>;
-    static async delete<T = any>(url: string, options: HttpOptions): Promise<T>;
-    static async delete<T = any>(url: string, transformFunc: TransformFunc<T>): Promise<T>;
-    static async delete<T = any>(url: string, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
-    static async delete<T = any>(url: string, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
+    /* eslint-disable max-len */
+    static async delete<T = any>(url: string, body?: RequestBody): Promise<T>;
+    static async delete<T = any>(url: string, body: RequestBody | undefined, options: HttpOptions): Promise<T>;
+    static async delete<T = any>(url: string, body: RequestBody | undefined, transformFunc: TransformFunc<T>): Promise<T>;
+    static async delete<T = any>(url: string, body: RequestBody | undefined, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
+    static async delete<T = any>(url: string, body?: RequestBody, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
+    /* eslint-enable max-len */
         const { options, transformFunc } = this._parseArgs(arg1, arg2);
         if (options.params) {
             url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
         const headers = this._appendAuthorizationHeader();
+        if (typeof body === 'object') {
+            body = JSON.stringify(body);
+        }
         const init = {
             method: 'DELETE',
             credentials: 'include',
+            body,
             headers
         } as RequestInit;
         const response = await this._fetch(url, init);

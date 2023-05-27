@@ -1,6 +1,5 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { MasterAccount, MasterAccountUpdate, MasterServant } from '@fgo-planner/data-core';
-import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { BasicMasterAccounts, UserTokenPayload } from '../../../types';
 import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
@@ -9,15 +8,10 @@ import { StorageKeys } from '../../../utils/storage/StorageKeys';
 import { StorageUtils } from '../../../utils/storage/StorageUtils';
 import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
-import { UserInterfaceService } from '../../user-interface/UserInterfaceService';
+import { DataService } from '../DataService';
 
 @Injectable
-export class MasterAccountService {
-
-    private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/user/master-account`;
-
-    @Inject(UserInterfaceService)
-    private readonly _userInterfaceService!: UserInterfaceService;
+export class MasterAccountService extends DataService {
 
     private _currentMasterAccount: Nullable<MasterAccount>;
 
@@ -37,6 +31,8 @@ export class MasterAccountService {
     }
 
     constructor() {
+        super(`${process.env.REACT_APP_REST_ENDPOINT}/user/master-account`);
+
         /**
          * Updates the active master account ID in local storage every time the app
          * instance is focused.
@@ -81,12 +77,8 @@ export class MasterAccountService {
     }
 
     async getAccount(id: string): Promise<MasterAccount> {
-        const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
-        try {
-            return await Http.get<MasterAccount>(`${this._BaseUrl}/${id}`, this._transformMasterAccount.bind(this));
-        } finally  {
-            this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
-        }
+        const promise = Http.get<MasterAccount>(`${this._BaseUrl}/${id}`, this._transformMasterAccount.bind(this));
+        return this._fetchWithLoadingIndicator(promise);
     }
 
     async updateAccount(masterAccount: MasterAccountUpdate): Promise<MasterAccount> {

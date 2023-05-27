@@ -1,23 +1,21 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { GameSoundtrack } from '@fgo-planner/data-core';
-import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { GameSoundtrackList, Page, Pagination } from '../../../types';
 import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
 import { HttpUtils as Http } from '../../../utils/HttpUtils';
-import {  UserInterfaceService } from '../../user-interface/UserInterfaceService';
+import { DataService } from '../DataService';
 
 @Injectable
-export class GameSoundtrackService {
-
-    private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-soundtrack`;
-
-    @Inject(UserInterfaceService)
-    private readonly _userInterfaceService!: UserInterfaceService;
+export class GameSoundtrackService extends DataService {
 
     private _soundtracksCache?: GameSoundtrackList;
 
     private _soundtracksCachePromise?: Promise<GameSoundtrackList>;
+
+    constructor() {
+        super(`${process.env.REACT_APP_REST_ENDPOINT}/game-soundtrack`);
+    }
 
     async getSoundtrack(id: number): Promise<Nullable<GameSoundtrack>> {
         return Http.get<Nullable<GameSoundtrack>>(`${this._BaseUrl}/${id}`);

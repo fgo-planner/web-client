@@ -1,27 +1,21 @@
 import { CollectionUtils, Nullable } from '@fgo-planner/common-core';
 import { GameServant } from '@fgo-planner/data-core';
-import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { GameServantList, HttpOptions, Page, Pagination } from '../../../types';
 import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
 import { GameServantMap } from '../../../utils/game/GameServantMap';
 import { GameServantUtils } from '../../../utils/game/GameServantUtils';
 import { HttpUtils as Http } from '../../../utils/HttpUtils';
-import { UserInterfaceService } from '../../user-interface/UserInterfaceService';
+import { DataService } from '../DataService';
 
 @Injectable
-export class GameServantService {
-
-    private readonly _BaseUrl = `${process.env.REACT_APP_REST_ENDPOINT}/game-servant`;
+export class GameServantService extends DataService {
 
     private readonly _ExcludeMetadataOptions = {
         params: {
             metadata: false
         }
     } as const satisfies HttpOptions;
-
-    @Inject(UserInterfaceService)
-    private readonly _userInterfaceService!: UserInterfaceService;
 
     private _servantList?: GameServantList;
 
@@ -36,6 +30,10 @@ export class GameServantService {
     private _fgoManagerNamesMap?: Map<string, number>;
 
     private _fgoManagerNamesMapPromise?: Promise<Map<string, number>>;
+
+    constructor() {
+        super(`${process.env.REACT_APP_REST_ENDPOINT}/game-servant`);
+    }
 
     async getServant(id: number): Promise<Nullable<GameServant>> {
         return Http.get<Nullable<GameServant>>(`${this._BaseUrl}/${id}`);

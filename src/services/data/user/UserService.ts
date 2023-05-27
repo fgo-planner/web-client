@@ -1,9 +1,10 @@
 import { Nullable } from '@fgo-planner/common-core';
 import { User, UserPreferences } from '@fgo-planner/data-core';
+import { DataService } from '../DataService';
 
 export type BasicUser = Pick<User, '_id' | 'username' | 'email'>;
 
-export abstract class UserService {
+export abstract class UserService extends DataService {
 
     protected _currentBasicUser: Nullable<BasicUser>;
 

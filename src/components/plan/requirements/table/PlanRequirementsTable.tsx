@@ -8,6 +8,7 @@ import { useMultiSelectHelperForMouseEvent } from '../../../../hooks/user-interf
 import { useDragDropEventHandlers } from '../../../../hooks/user-interface/useDragDropEventHandlers';
 import { GameItemCategory, GameItemCategoryMap, PlanRequirements } from '../../../../types';
 import { DataTableDropTargetIndicator } from '../../../data-table/DataTableDropTargetIndicator';
+import { PlanRequirementsTableCellSize } from './PlanRequirementsTableCellSize.enum';
 import { PlanRequirementsTableFooter } from './PlanRequirementsTableFooter';
 import { PlanRequirementsTableHeader } from './PlanRequirementsTableHeader';
 import { PlanRequirementsTableOptions } from './PlanRequirementsTableOptions.type';
@@ -179,7 +180,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
     }, [displayedItems, options]);
 
     const scalingStyle = useMemo((): CSSProperties => {
-        const scale = options.layout.cells === 'condensed' ? CellSizeCondensed : CellSizeNormal;
+        const scale = options.layout.cells === PlanRequirementsTableCellSize.Condensed ? CellSizeCondensed : CellSizeNormal;
         return {
             fontSize: `${scale}rem`
         } as CSSProperties;

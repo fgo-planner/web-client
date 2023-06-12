@@ -15,11 +15,12 @@ type Props = {
     disablePointerEvents?: boolean;
     dragDropMode?: boolean;
     gameServant: Immutable<GameServant> | undefined; // Not optional, but possible to be undefined.
+    hideStatColumns?: boolean;
     idPrefix?: string;
     index: number;
     lastRow?: boolean;
     masterServant: ImmutableMasterServant;
-    visibleColumns?: Readonly<MasterServantListColumn.Visibility>;
+    visibleColumns: Readonly<MasterServantListColumn.Visibility>;
     onClick: (event: MouseEvent, index: number) => void;
     onContextMenu?: (event: MouseEvent, index: number) => void;
     onDoubleClick: (event: MouseEvent, index: number) => void;
@@ -44,6 +45,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
         disablePointerEvents,
         dragDropMode,
         gameServant,
+        hideStatColumns,
         idPrefix,
         index,
         lastRow,
@@ -114,7 +116,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
         />
     );
 
-    const statsNode: ReactNode = (
+    const statsNode: ReactNode = !hideStatColumns && (
         <MasterServantListRowStats
             active={active}
             bond={bond}

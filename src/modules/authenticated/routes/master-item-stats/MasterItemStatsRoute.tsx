@@ -146,6 +146,7 @@ export const MasterItemStatsRoute = React.memo(() => {
      * Load initial filter options from local storage. 
      */
     const initialFilterOptions = useMemo((): MasterItemStatsRouteTypes.FilterOptions => {
+        // TODO Create hook for reading/writing preferences
         const localStorageData = StorageUtils.getItem<Partial<MasterItemStatsLocalUserPreferences>>(
             StorageKeys.LocalUserPreference.Route.MasterItemStats,
             getDefaultLocalUserPreferences

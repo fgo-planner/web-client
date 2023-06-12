@@ -106,9 +106,13 @@ export namespace ThemeConstants {
 
     export const ClassBackdropBlur = 'backdrop-blur';
 
-    export const ClassScrollbarTrackBorder = 'scrollbar-track-border';
+    export const ClassFullHeight = 'full-height';
+
+    export const ClassFullWidth = 'full-width';
 
     export const ClassScrollbarHidden = 'scrollbar-hidden';
+
+    export const ClassScrollbarTrackBorder = 'scrollbar-track-border';
 
     //#endregion
 

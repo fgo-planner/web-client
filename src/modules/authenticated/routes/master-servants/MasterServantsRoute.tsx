@@ -2,7 +2,7 @@ import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, Inst
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { MouseEvent, useCallback, useEffect, useState } from 'react';
 import { useGameServantMap } from '../../../../hooks/data/useGameServantMap';
 import { useSelectedInstancesHelper } from '../../../../hooks/user-interface/list-select-helper/useSelectedInstancesHelper';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
@@ -21,8 +21,10 @@ import { MasterServantList } from '../../components/master/servant/list/MasterSe
 import { MasterServantListColumn } from '../../components/master/servant/list/MasterServantListColumn';
 import { StyleClassPrefix as MasterServantListStyleClassPrefix } from '../../components/master/servant/list/MasterServantListStyle';
 import { MasterAccountDataEditHookOptions, useMasterAccountDataEdit } from '../../hooks/useMasterAccountDataEdit';
+import { MasterServantsRouteColumnSettingsDialog, MasterServantsRouteColumnSettingsDialogData } from './components/MasterServantsRouteColumnSettingsDialog';
 import { MasterServantsRouteDeleteDialog, MasterServantsRouteDeleteDialogData } from './components/MasterServantsRouteDeleteDialog';
 import { MasterServantsFilter, MasterServantsRouteFilterControls } from './components/MasterServantsRouteFilterControls';
+import { MasterServantsRouteHeaderContextMenu } from './components/MasterServantsRouteHeaderContextMenu';
 import { MasterServantsRouteInfoPanel } from './components/MasterServantsRouteInfoPanel';
 import { MasterServantsRouteMultiAddDialog, MasterServantsRouteMultiAddDialogData } from './components/MasterServantsRouteMultiAddDialog';
 import { MasterServantsRouteNavigationRail } from './components/MasterServantsRouteNavigationRail';
@@ -137,9 +139,11 @@ export const MasterServantsRoute = React.memo(() => {
             filtersEnabled,
             infoPanelOpen,
             servantEditDialogActiveTab,
-            showUnsummonedServants
+            showUnsummonedServants,
+            visibleColumns
         },
         setServantEditDialogActiveTab,
+        setVisibleColumns,
         toggleFilters,
         toggleInfoPanelOpen,
         toggleShowUnsummonedServants
@@ -147,16 +151,18 @@ export const MasterServantsRoute = React.memo(() => {
 
     const {
         activeContextMenu,
-        activeDialogInfo,
+        activeDialog,
         contextMenuPosition,
         closeActiveContextMenu,
         closeActiveDialog,
-        openContextMenu,
+        openColumnSettingsDialog,
+        openHeaderContextMenu,
         openMasterServantDeleteDialog,
         openMasterServantEditDialog,
         openMasterServantMultiAddDialog,
         openReloadOnStaleDataDialog,
-        openSaveOnStaleDataDialog
+        openSaveOnStaleDataDialog,
+        openServantRowContextMenu
     } = useMasterServantsRouteModalState();
 
     // TODO Move this to user preferences
@@ -175,18 +181,6 @@ export const MasterServantsRoute = React.memo(() => {
     const [servantFilter, setServantFilter] = useState<MasterServantsFilter>();
 
     const { sm, md } = useActiveBreakpoints();
-
-    // TODO Make this user configurable...
-    const visibleColumns = useMemo((): MasterServantListColumn.Visibility => ({
-        npLevel: sm,
-        level: sm,
-        bondLevel: sm,
-        fouHp: sm,
-        fouAtk: sm,
-        skills: sm,
-        appendSkills: sm,
-        summonDate: sm
-    }), [sm]);
 
 
     //#region Internal helper functions
@@ -295,20 +289,20 @@ export const MasterServantsRoute = React.memo(() => {
 
     //#region Servant list event handlers
 
-    const handleRowClick = useCallback((e: MouseEvent): void => {
-        if (e.type === 'contextmenu') {
-            openContextMenu('row', e);
+    const handleRowClick = useCallback((event: MouseEvent): void => {
+        if (event.type === 'contextmenu') {
+            openServantRowContextMenu(event);
         }
-    }, [openContextMenu]);
+    }, [openServantRowContextMenu]);
 
     const handleRowDoubleClick = openEditServantDialog;
 
-    const handleHeaderClick = useCallback((e: MouseEvent) => {
-        console.log('handleHeaderClick', e);
-        if (e.type === 'contextmenu') {
-            openContextMenu('header', e);
+    const handleHeaderClick = useCallback((event: MouseEvent) => {
+        console.log('handleHeaderClick', event);
+        if (event.type === 'contextmenu') {
+            openHeaderContextMenu(event);
         }
-    }, [openContextMenu]);
+    }, [openHeaderContextMenu]);
 
     const handleSortChange = useCallback((column?: MasterServantListColumn.Name, direction: SortDirection = 'asc'): void => {
         /**
@@ -341,6 +335,10 @@ export const MasterServantsRoute = React.memo(() => {
     const handleEditSelectedServants = openEditServantDialog;
 
     const handleDeleteSelectedServants = openDeleteServantDialog;
+
+    const handleOpenColumnSettings = useCallback((): void => {
+        openColumnSettingsDialog({ visibleColumns });
+    }, [openColumnSettingsDialog, visibleColumns]);
 
     //#endregion
 
@@ -439,6 +437,22 @@ export const MasterServantsRoute = React.memo(() => {
         deleteServants(data.targetMasterServantsData.map(InstantiatedServantUtils.getInstanceId));
     }, [closeActiveDialog, deleteServants]);
 
+    const handleColumnSettingsDialogClose = useCallback((
+        _event: MouseEvent,
+        _reason: ModalOnCloseReason,
+        data?: MasterServantsRouteColumnSettingsDialogData
+    ): void => {
+        closeActiveDialog();
+        /**
+         * Close the dialog without taking any further action if the changes were
+         * cancelled (if `data` is undefined, then the changes were cancelled).
+         */
+        if (!data) {
+            return;
+        }
+        setVisibleColumns(data.visibleColumns);
+    }, [closeActiveDialog, setVisibleColumns]);
+
     // const handleFilterChange = useCallback((filter: MasterServantsFilter): void => {
     //     setServantFilter(filter);
     // }, []);
@@ -488,13 +502,13 @@ export const MasterServantsRoute = React.memo(() => {
                     showUnsummonedServants={showUnsummonedServants}
                     selectedServantsCount={selectedServantsCount}
                     onAddServant={handleAddServant}
-                    onMultiAddServant={handleMultiAddServant}
                     onDeleteSelectedServants={handleDeleteSelectedServants}
                     onDragDropActivate={handleDragDropActivate}
                     onDragDropApply={handleDragDropApply}
                     onDragDropCancel={handleDragDropCancel}
                     onEditSelectedServants={handleEditSelectedServants}
-                    onOpenColumnSettings={() => { }}
+                    onMultiAddServant={handleMultiAddServant}
+                    onOpenColumnSettings={handleOpenColumnSettings}
                     onToggleFilters={toggleFilters}
                     onToggleShowUnsummonedServants={toggleShowUnsummonedServants}
                 />
@@ -503,6 +517,7 @@ export const MasterServantsRoute = React.memo(() => {
                         <MasterServantList
                             bondLevels={bondLevels}
                             dragDropMode={dragDropMode}
+                            hideStatColumns={!sm}
                             masterServantsData={dragDropData || aggregatedServants}
                             selectedInstanceIds={selectedServantsData.ids}
                             showHeader={sm}
@@ -536,39 +551,49 @@ export const MasterServantsRoute = React.memo(() => {
                 </div>
             </div>
             <MasterServantEditDialog
-                dialogData={activeDialogInfo.name === 'masterServantEdit' ? activeDialogInfo.data : undefined}
+                dialogData={activeDialog.name === 'masterServantEdit' ? activeDialog.data : undefined}
                 targetMasterServantsData={selectedServantsData.instances}
                 activeTab={servantEditDialogActiveTab}
                 onTabChange={setServantEditDialogActiveTab}
                 onClose={handleEditServantDialogClose}
             />
             <MasterServantsRouteMultiAddDialog
-                open={activeDialogInfo.name === 'masterServantMultiAdd'}
+                open={activeDialog.name === 'masterServantMultiAdd'}
                 masterServantsData={masterAccountEditData.aggregatedServants}
                 onClose={handleMultiAddServantDialogClose}
             />
             <MasterServantsRouteDeleteDialog
-                dialogData={activeDialogInfo.name === 'masterServantDelete' ? activeDialogInfo.data : undefined}
+                dialogData={activeDialog.name === 'masterServantDelete' ? activeDialog.data : undefined}
                 onClose={handleDeleteServantDialogClose}
             />
             <RouteDataEditReloadOnStaleDataDialog
-                open={activeDialogInfo.name === 'reloadOnStaleData'}
+                open={activeDialog.name === 'reloadOnStaleData'}
                 onClose={handleReloadDataDialogClose}
             />
             <RouteDataEditSaveOnStaleDataDialog
-                open={activeDialogInfo.name === 'saveOnStaleData'}
+                open={activeDialog.name === 'saveOnStaleData'}
                 onClose={handleSaveDataDialogClose}
             />
+            <MasterServantsRouteColumnSettingsDialog
+                dialogData={activeDialog.name === 'columnSettings' ? activeDialog.data : undefined}
+                onClose={handleColumnSettingsDialogClose}
+            />
+            <MasterServantsRouteHeaderContextMenu
+                open={activeContextMenu.name === 'header'}
+                position={contextMenuPosition}
+                onClose={closeActiveContextMenu}
+                onOpenColumnSettings={handleOpenColumnSettings}
+            />
             <MasterServantsRouteServantRowContextMenu
-                open={activeContextMenu === 'row'}
+                open={activeContextMenu.name === 'row'}
                 position={contextMenuPosition}
                 selectedServantsCount={selectedServantsCount}
                 onAddServant={handleAddServant}
+                onClose={closeActiveContextMenu}
                 onDeleteSelectedServants={handleDeleteSelectedServants}
+                onDeselectAllServants={handleDeselectAllServants}
                 onEditSelectedServants={handleEditSelectedServants}
                 onSelectAllServants={handleSelectAllServants}
-                onDeselectAllServants={handleDeselectAllServants}
-                onClose={closeActiveContextMenu}
             />
         </Box>
     );

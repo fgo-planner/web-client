@@ -1,26 +1,26 @@
 import { useCallback, useState } from 'react';
 
-export type DefaultDialogInfo = {
+export type DefaultDialog = {
     name: undefined;
 };
 
-export type ActiveDialogInfo<NAMES extends string> = {
+export type ActiveDialog<NAMES extends string> = {
     name: NAMES;
     data?: any;
 };
 
-export type DialogStateHookResult<NAMES extends string, T extends ActiveDialogInfo<NAMES>> = {
+export type DialogStateHookResult<NAMES extends string, T extends ActiveDialog<NAMES>> = {
 
-    activeDialogInfo: Readonly<DefaultDialogInfo | T>;
+    activeDialog: Readonly<DefaultDialog | T>;
 
     closeActiveDialog(): void;
 
-    openDialog(data: DefaultDialogInfo | T): void;
+    openDialog(data: DefaultDialog | T): void;
 
 };
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-const DefaultDialogInfo = {
+const DefaultDialog = {
     name: undefined
 } as const;
 
@@ -29,25 +29,23 @@ const DefaultDialogInfo = {
  * route component level. Each instance hook will only allow at most one managed
  * dialog to be open at a time.
  */
-export function useDialogState<NAMES extends string, T extends ActiveDialogInfo<NAMES>>(): DialogStateHookResult<NAMES, T> {
+export function useDialogState<NAMES extends string, T extends ActiveDialog<NAMES>>(): DialogStateHookResult<NAMES, T> {
 
-    type DialogInfo = Readonly<DefaultDialogInfo | T>;
-
-    const [activeDialogInfo, setActiveDialogInfo] = useState<DialogInfo>(DefaultDialogInfo);
+    const [activeDialog, setActiveDialog] = useState<Readonly<DefaultDialog | T>>(DefaultDialog);
 
     const closeActiveDialog = useCallback((): void => {
-        setActiveDialogInfo(prevOpenDialogInfo => {
-            if (prevOpenDialogInfo.name === undefined) {
-                return prevOpenDialogInfo;
+        setActiveDialog(prevOpenDialog => {
+            if (prevOpenDialog.name === undefined) {
+                return prevOpenDialog;
             }
-            return DefaultDialogInfo;
+            return DefaultDialog;
         });
     }, []);
 
     return {
-        activeDialogInfo,
+        activeDialog,
         closeActiveDialog,
-        openDialog: setActiveDialogInfo
+        openDialog: setActiveDialog
     }; 
 
 };

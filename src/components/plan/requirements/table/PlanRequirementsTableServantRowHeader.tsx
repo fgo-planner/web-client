@@ -6,11 +6,12 @@ import { DataTableDragHandle } from '../../../data-table/DataTableDragHandle';
 import { ServantThumbnail } from '../../../servant/ServantThumbnail';
 import { TruncateText } from '../../../text/TruncateText';
 import { PlanRequirementsTableServantRowEnhancementTargets } from './PlanRequirementsTableServantRowEnhancementTargets';
+import { PlanRequirementsTableServantRowHeaderLayout } from './PlanRequirementsTableServantRowHeaderLayout.enum';
 
 type Props = {
     dragDropMode?: boolean;
     planServantData: Immutable<PlanServantAggregatedData>;
-    servantRowHeaderMode: 'name' | 'targets' | 'toggle';
+    servantRowHeaderMode: PlanRequirementsTableServantRowHeaderLayout;
     targetCostumes: ReadonlySet<number>;
     unlockedCostumes: ReadonlyRecord<number, boolean>;
     onDragStart?: DragEventHandler;
@@ -49,13 +50,13 @@ export const PlanRequirementsTableServantRowHeader: React.FC<Props> = (props: Pr
     );
 
     let contentNode: ReactNode;
-    if (servantRowHeaderMode === 'toggle') {
+    if (servantRowHeaderMode === PlanRequirementsTableServantRowHeaderLayout.Toggle) {
         contentNode = (
             <div className={contentNodeClassName}>
                 toggle
             </div>
         );
-    } else if (servantRowHeaderMode === 'targets') {
+    } else if (servantRowHeaderMode === PlanRequirementsTableServantRowHeaderLayout.Targets) {
         contentNode = (
             <PlanRequirementsTableServantRowEnhancementTargets
                 className={contentNodeClassName}

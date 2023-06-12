@@ -4,11 +4,12 @@ import React, { MouseEvent, useCallback, useRef } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/DialogCloseButton';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/useAutoResizeDialog';
 import { DialogComponentProps, EditDialogAction } from '../../../../../types';
-import { PlanRoutePlanServantEditDialogContent, PlanServantEditTab } from './PlanRoutePlanServantEditDialogContent';
+import { PlanRouteMasterItemsEditDialogTab } from './PlanRouteMasterItemsEditDialogTab.enum';
+import { PlanRoutePlanServantEditDialogContent } from './PlanRoutePlanServantEditDialogContent';
 import { PlanRoutePlanServantEditDialogData } from './PlanRoutePlanServantEditDialogData.type';
 
 type Props = {
-    activeTab: PlanServantEditTab;
+    activeTab: PlanRouteMasterItemsEditDialogTab;
     /**
      * DTO containing the dialog data that will be returned to the parent component
      * on dialog close. Data contained in this object may be modified directly.
@@ -16,7 +17,7 @@ type Props = {
      * If this is `undefined`, then the dialog will remain closed.
      */
     dialogData?: PlanRoutePlanServantEditDialogData;
-    onTabChange: (tab: PlanServantEditTab) => void;
+    onTabChange: (tab: PlanRouteMasterItemsEditDialogTab) => void;
     /**
      * Array containing the source `PlanServantAggregatedData` objects for the
      * servants being edited.

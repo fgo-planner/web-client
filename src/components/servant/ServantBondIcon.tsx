@@ -1,6 +1,7 @@
 import { InstantiatedServantBondLevel } from '@fgo-planner/data-core';
 import React, { CSSProperties, useMemo } from 'react';
 import { AssetConstants } from '../../constants';
+import { ThemeConstants } from '../../styles/ThemeConstants';
 
 type Props = {
     bond: InstantiatedServantBondLevel;
@@ -23,7 +24,7 @@ export const ServantBondIcon = React.memo(({ bond, size }: Props) => {
     return (
         <div style={sizeStyle}>
             <img
-                className='full-width full-height'
+                className={`${ThemeConstants.ClassFullWidth} ${ThemeConstants.ClassFullHeight}`}
                 src={imageUrl}
                 alt={`Bond ${bond}`}
             />

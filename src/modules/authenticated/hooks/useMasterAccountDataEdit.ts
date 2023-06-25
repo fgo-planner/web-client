@@ -1,5 +1,5 @@
-import { CollectionUtils, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameItemConstants, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantAggregatedData, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
+import { CollectionUtils, Immutable, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameItemConstants, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, UpdateMasterAccount, MasterServant, MasterServantAggregatedData, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameServantMap } from '../../../hooks/data/useGameServantMap';
 import { useInjectable } from '../../../hooks/dependency-injection/useInjectable';
@@ -88,7 +88,7 @@ type MasterAccountEditReferenceData = {
     /**
      * Use a `Map` for this to maintain order of insertion.
      */
-    servants: ReadonlyMap<number, ImmutableMasterServant>;
+    servants: ReadonlyMap<number, Immutable<MasterServant>>;
     soundtracks: ReadonlySet<number>;
 };
 
@@ -110,7 +110,7 @@ type MasterAccountDataEditHookCommon = {
     persistChanges(): Promise<void>;
 };
 
-type MasterAccountUpdateFunctions = {
+type UpdateMasterAccountFunctions = {
     /**
      * Update unlocked costumes by directly providing a map where the key is the
      * costume ID and the value is whether the costume was unlocked for free. An
@@ -164,23 +164,23 @@ type MasterAccountUpdateFunctions = {
 
 type MasterAccountDataEditHookResult = MasterAccountDataEditHookCommon & {
     masterAccountEditData: MasterAccountEditData;
-} & MasterAccountUpdateFunctions;
+} & UpdateMasterAccountFunctions;
 
 type MasterAccountDataEditHookResultCostumesSubset = MasterAccountDataEditHookCommon & {
     masterAccountEditData: Pick<MasterAccountEditData, 'costumes'>;
-} & Pick<MasterAccountUpdateFunctions, 'updateCostumes'>;
+} & Pick<UpdateMasterAccountFunctions, 'updateCostumes'>;
 
 type MasterAccountDataEditHookResultResourcesSubset = MasterAccountDataEditHookCommon & {
     masterAccountEditData: Pick<MasterAccountEditData, 'items' | 'qp'>;
-} & Pick<MasterAccountUpdateFunctions, 'updateItem' | 'updateQp'>;
+} & Pick<UpdateMasterAccountFunctions, 'updateItem' | 'updateQp'>;
 
 type MasterAccountDataEditHookResultServantsSubset = MasterAccountDataEditHookCommon & {
     masterAccountEditData: Pick<MasterAccountEditData, 'aggregatedServants' | 'bondLevels'>;
-} & Pick<MasterAccountUpdateFunctions, 'addServant' | 'addServants' | 'updateServants' | 'updateServantOrder' | 'deleteServants'>;
+} & Pick<UpdateMasterAccountFunctions, 'addServant' | 'addServants' | 'updateServants' | 'updateServantOrder' | 'deleteServants'>;
 
 type MasterAccountDataEditHookResultSoundtracksSubset = MasterAccountDataEditHookCommon & {
     masterAccountEditData: Pick<MasterAccountEditData, 'soundtracks'>;
-} & Pick<MasterAccountUpdateFunctions, 'updateSoundtracks'>;
+} & Pick<UpdateMasterAccountFunctions, 'updateSoundtracks'>;
 
 //#endregion
 
@@ -212,7 +212,7 @@ const getDefaultMasterAccountEditData = (): MasterAccountEditData => ({
 });
 
 const cloneMasterAccountDataForEdit = (
-    masterAccount: Nullable<ImmutableMasterAccount>,
+    masterAccount: Nullable<Immutable<MasterAccount>>,
     gameServantMap: GameServantMap,
     options: MasterAccountDataEditHookOptions
 ): MasterAccountEditData => {
@@ -261,7 +261,7 @@ const getDefaultMasterAccountReferenceData = (): MasterAccountEditReferenceData 
 });
 
 const cloneMasterAccountDataForReference = (
-    masterAccount: Nullable<ImmutableMasterAccount>,
+    masterAccount: Nullable<Immutable<MasterAccount>>,
     options: MasterAccountDataEditHookOptions
 ): Readonly<MasterAccountEditReferenceData> => {
 
@@ -320,8 +320,8 @@ const hasDirtyData = (dirtyData: MasterAccountEditDirtyData): boolean => !!(
 );
 
 const isMasterServantChanged = (
-    reference: ImmutableMasterServant | undefined,
-    masterServant: ImmutableMasterServant
+    reference: Immutable<MasterServant> | undefined,
+    masterServant: Immutable<MasterServant>
 ): boolean => {
     if (!reference) {
         return true;
@@ -431,7 +431,7 @@ export function useMasterAccountDataEdit(
     /**
      * The original master account data.
      */
-    const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
 
     /**
      * The current master account ID.
@@ -1025,7 +1025,7 @@ export function useMasterAccountDataEdit(
         invokeLoadingIndicator();
         setAwaitingRequest(true);
         try {
-            const update: MasterAccountUpdate = {
+            const update: UpdateMasterAccount = {
                 _id: masterAccount._id
             };
             /**

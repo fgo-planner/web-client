@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-core';
-import { ImmutableMasterAccount } from '@fgo-planner/data-core';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { MasterAccount } from '@fgo-planner/data-core';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { PageTitle } from '../../../../components/text/PageTitle';
@@ -16,15 +16,15 @@ export const MasterSettingsRoute = React.memo(() => {
 
     const [searchParams] = useSearchParams();
     const accountIdParam = searchParams.get(AccountIdParam);
-    
+
     const masterAccountService = useInjectable(MasterAccountService);
-    
+
     /**
      * Whether the initialization routine for the component has been completed. 
      */
     const [initialized, setInitialized] = useState(false);
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
 
     /**
      * Master account change subscription.
@@ -65,7 +65,7 @@ export const MasterSettingsRoute = React.memo(() => {
         return null;
     }
 
-    
+
 
     return <>
         <PageTitle>

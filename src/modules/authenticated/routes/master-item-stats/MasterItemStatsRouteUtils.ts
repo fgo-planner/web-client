@@ -1,5 +1,5 @@
 import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
-import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterAccount, ImmutableMasterServant, InstantiatedServantConstants, MasterServant } from '@fgo-planner/data-core';
+import { GameItemConstants, GameServant, GameServantEnhancement, GameServantSkillMaterials, InstantiatedServantConstants, MasterAccount, MasterServant } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { GameSoundtrackList } from '../../../../types';
 import { GameServantMap } from '../../../../utils/game/GameServantMap';
@@ -11,7 +11,7 @@ export namespace MasterItemStatsRouteUtils {
     export function generateStats(
         gameServantMap: GameServantMap,
         gameSoundtrackList: GameSoundtrackList,
-        masterAccount: ImmutableMasterAccount,
+        masterAccount: Immutable<MasterAccount>,
         filter: MasterItemStatsRouteTypes.FilterOptions
     ): MasterItemStatsRouteTypes.ItemStats {
 
@@ -77,7 +77,7 @@ export namespace MasterItemStatsRouteUtils {
         return stats;
     }
 
-    function _populateInventory(stats: Record<number, MasterItemStatsRouteTypes.ItemStat>, { resources }: ImmutableMasterAccount): void {
+    function _populateInventory(stats: Record<number, MasterItemStatsRouteTypes.ItemStat>, { resources }: Immutable<MasterAccount>): void {
         const { items, qp } = resources;
         for (const [key, quantity] of Object.entries(items)) {
             const itemId = Number(key);
@@ -93,7 +93,7 @@ export namespace MasterItemStatsRouteUtils {
     function _updateForServant(
         stats: Record<number, MasterItemStatsRouteTypes.ItemStat>,
         servant: Immutable<GameServant>,
-        masterServant: ImmutableMasterServant,
+        masterServant: Immutable<MasterServant>,
         includeAppendSkills: boolean,
         includeLores: boolean,
         unlockedCostumesMap: Record<number, boolean>,

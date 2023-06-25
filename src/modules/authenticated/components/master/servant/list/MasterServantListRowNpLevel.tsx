@@ -1,9 +1,10 @@
-import { ImmutableMasterServant } from '@fgo-planner/data-core';
+import { Immutable } from '@fgo-planner/common-core';
+import { MasterServant } from '@fgo-planner/data-core';
 import { IconOutlined } from '../../../../../../components/icons/IconOutlined';
 import { AssetConstants } from '../../../../../../constants';
 
 type Props = {
-    masterServant: ImmutableMasterServant;
+    masterServant: Immutable<MasterServant>;
 };
 
 export const StyleClassPrefix = 'MasterServantListRowNpLevel';

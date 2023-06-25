@@ -1,4 +1,5 @@
-import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
+import { Immutable } from '@fgo-planner/common-core';
+import { BasicMasterAccount } from '@fgo-planner/data-core';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { DataTableListRow } from '../../../../../components/data-table-list/DataTableListRow';
@@ -8,7 +9,7 @@ import { DateTimeFormatUtils } from '../../../../../utils/format/DateTimeFormatU
 import { MasterAccountsRouteAccountListColumn } from './MasterAccountsRouteAccountListColumn';
 
 type Props = {
-    account: ImmutableBasicMasterAccount;
+    account: Immutable<BasicMasterAccount>;
     index: number;
     visibleColumns: Readonly<MasterAccountsRouteAccountListColumn.Visibility>;
 };

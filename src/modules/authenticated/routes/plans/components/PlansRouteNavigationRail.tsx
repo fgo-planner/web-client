@@ -39,6 +39,7 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                         }
                         size='large'
                         color={filtersEnabled ? 'primary' : undefined}
+                        disabled  // Temporary
                     />
                 </div>
             </Tooltip>
@@ -50,6 +51,7 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                             onClick={onOpenColumnSettings}
                             children={<IconOutlined>view_week</IconOutlined>}
                             size='large'
+                            disabled  // Temporary
                         />
                     </div>
                 </Tooltip>
@@ -58,6 +60,18 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
             {/* This one is fine to hide based on breakpoint/layout. */}
             {layout !== 'row' &&
                 <Tooltip key='add' title='Create plan' placement='right'>
+                    <div>
+                        <IconButton
+                            onClick={onAddPlan}
+                            children={<IconOutlined>post_add</IconOutlined>}
+                            size='large'
+                        />
+                    </div>
+                </Tooltip>
+            }
+            {/* This one is fine to hide based on breakpoint/layout. */}
+            {layout !== 'row' &&
+                <Tooltip key='add-group' title='Create plan group' placement='right'>
                     <div>
                         <IconButton
                             onClick={onAddPlan}

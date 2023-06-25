@@ -1,4 +1,4 @@
-import { BasicPlans, Plan, PlanGroup } from '@fgo-planner/data-core';
+import { BasicPlan, CreatePlan, Plan, PlanGrouping, UpdatePlan, UpdatePlanGrouping } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { HttpUtils as Http } from '../../../utils/HttpUtils';
 import { DataService } from '../DataService';
@@ -10,75 +10,61 @@ export class PlanService extends DataService {
         super(`${process.env.REACT_APP_REST_ENDPOINT}/user/planner`);
     }
 
-    async addPlan(plan: Partial<Plan>): Promise<Plan> {
-        const promise = Http.put<Plan>(`${this._BaseUrl}/plan`, plan, this._transformPlan);
-        return this._fetchWithLoadingIndicator(promise);
-    }
+    //#region Plan
 
-    async addPlanGroup(planGroup: Partial<PlanGroup>): Promise<PlanGroup> {
-        const promise = Http.put<PlanGroup>(`${this._BaseUrl}/group`, planGroup, this._transformPlanGroup);
+    async createPlan(plan: CreatePlan): Promise<Plan> {
+        const promise = Http.put<Plan>(`${this._BaseUrl}/plan`, plan);
         return this._fetchWithLoadingIndicator(promise);
     }
 
     async getPlan(id: string): Promise<Plan> {
-        const promise = Http.get<Plan>(`${this._BaseUrl}/plan/${id}`, this._transformPlan);
+        const promise = Http.get<Plan>(`${this._BaseUrl}/plan/${id}`);
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    async getPlanGroup(id: string): Promise<PlanGroup> {
-        const promise = Http.get<PlanGroup>(`${this._BaseUrl}/group/${id}`, this._transformPlanGroup);
+    async getPlansForAccount(accountId: string): Promise<Array<BasicPlan>> {
+        const promise = Http.get<Array<BasicPlan>>(`${this._BaseUrl}/plans/${accountId}`);
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    async updatePlan(plan: Partial<Plan>): Promise<Plan> {
-        const promise = Http.post<Plan>(`${this._BaseUrl}/plan`, plan, this._transformPlan);
+    async updatePlan(plan: UpdatePlan): Promise<Plan> {
+        const promise = Http.post<Plan>(`${this._BaseUrl}/plan`, plan);
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    async updatePlanGroup(planGroup: Partial<PlanGroup>): Promise<PlanGroup> {
-        const promise = Http.post<PlanGroup>(`${this._BaseUrl}/group`, planGroup, this._transformPlanGroup);
+    async deletePlan(accountId: string, planId: string): Promise<number> {
+        return this.deletePlans(accountId, [planId]);
+    }
+
+    async deletePlans(accountId: string, planIds: Array<string>): Promise<number> {
+        const promise = Http.delete<number>(`${this._BaseUrl}/plan`, { accountId, planIds });
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    async deletePlan(planId: string): Promise<number> {
-        return this.deletePlans([planId]);
-    }
+    //#endregion
 
-    async deletePlans(planIds: Array<string>): Promise<number> {
-        const promise = Http.delete<number>(`${this._BaseUrl}/plan`, { planIds });
+
+    //#region Plan grouping
+
+    async getPlanGroupingForAccount(accountId: string): Promise<PlanGrouping> {
+        const promise = Http.get<PlanGrouping>(`${this._BaseUrl}/plan-grouping/${accountId}`);
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    async deletePlanGroup(id: string): Promise<boolean> {
-        const promise = Http.delete<boolean>(`${this._BaseUrl}/group/${id}`);
+    async updatePlanGrouping(planGrouping: UpdatePlanGrouping): Promise<PlanGrouping> {
+        const promise = Http.post<PlanGrouping>(`${this._BaseUrl}/plan-grouping`, planGrouping);
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    async getForAccount(accountId: string): Promise<BasicPlans> {
-        const promise = Http.get<BasicPlans>(`${this._BaseUrl}/account/${accountId}`, this._transformAccountPlans.bind(this));
+    async deletePlanGroup(accountId: string, planGroupId: string, deletePlans: boolean): Promise<number> {
+        return this.deletePlanGroups(accountId, [planGroupId], deletePlans);
+    }
+
+    async deletePlanGroups(accountId: string, planGroupIds: Array<string>, deletePlans: boolean): Promise<number> {
+        const promise = Http.delete<number>(`${this._BaseUrl}/plan-grouping`, { accountId, planGroupIds, deletePlans });
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    private _transformPlanGroup(planGroup: PlanGroup): PlanGroup {
-        return Http.stringTimestampsToDate(planGroup);
-    }
-
-    private _transformPlan(plan: Plan): Plan {
-        if (plan.targetDate) {
-            plan.targetDate = new Date(plan.targetDate);
-        }
-        return Http.stringTimestampsToDate(plan);
-    }
-
-    private _transformAccountPlans(accountPlans: any): BasicPlans {
-        for (const planGroup of accountPlans.planGroups) {
-            this._transformPlanGroup(planGroup);
-        }
-        for (const plan of accountPlans.plans) {
-            this._transformPlan(plan);
-        }
-        Http.stringTimestampsToDate(accountPlans.planList);
-        return accountPlans;
-    }
+    //#endregion
 
 }

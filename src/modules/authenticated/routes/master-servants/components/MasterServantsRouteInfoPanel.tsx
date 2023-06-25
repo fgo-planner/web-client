@@ -1,5 +1,5 @@
-import { ReadonlyRecord } from '@fgo-planner/common-core';
-import { ExternalLink, GameServantClass, GameServantConstants, ImmutableMasterServant, InstantiatedServantBondLevel, MasterServantAggregatedData } from '@fgo-planner/data-core';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { ExternalLink, GameServantClass, GameServantConstants, MasterServant, InstantiatedServantBondLevel, MasterServantAggregatedData } from '@fgo-planner/data-core';
 import { Icon, IconButton, Link, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -33,7 +33,7 @@ const hasDebt = (enhancementRequirements: EnhancementRequirements): boolean => {
     return enhancementRequirements.qp > 0;
 };
 
-const renderFouLevels = (masterServant: ImmutableMasterServant): JSX.Element => {
+const renderFouLevels = (masterServant: Immutable<MasterServant>): JSX.Element => {
     const { fouAtk, fouHp } = masterServant;
     return (
         <div className={`${StyleClassPrefix}-skill-level-stat`}>
@@ -44,7 +44,7 @@ const renderFouLevels = (masterServant: ImmutableMasterServant): JSX.Element => 
     );
 };
 
-const renderSkillLevels = (masterServant: ImmutableMasterServant, stat: 'skills' | 'appendSkills'): JSX.Element => {
+const renderSkillLevels = (masterServant: Immutable<MasterServant>, stat: 'skills' | 'appendSkills'): JSX.Element => {
     const skills = masterServant[stat];
     return (
         <div className={`${StyleClassPrefix}-skill-level-stat`}>
@@ -57,7 +57,7 @@ const renderSkillLevels = (masterServant: ImmutableMasterServant, stat: 'skills'
     );
 };
 
-const renderNpLevel = (masterServant: ImmutableMasterServant): string | number => {
+const renderNpLevel = (masterServant: Immutable<MasterServant>): string | number => {
     return masterServant.summoned ? masterServant.np : 'Not summoned';
 };
 
@@ -251,7 +251,7 @@ export const MasterServantsRouteInfoPanel = React.memo((props: Props) => {
                 const result = PlanComputationUtils.computeServantEnhancementRequirements(
                     activeServant.gameServant,
                     activeServant.masterServant,
-                    MasterAccountUtils.unlockedCostumesMapToIdSet(unlockedCostumes), 
+                    MasterAccountUtils.unlockedCostumesMapToIdSet(unlockedCostumes),
                     statsOptions
                 );
                 results.push(result);

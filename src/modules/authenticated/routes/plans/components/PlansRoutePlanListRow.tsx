@@ -1,6 +1,7 @@
-import { ImmutableBasicPlan } from '@fgo-planner/data-core';
+import { Immutable } from '@fgo-planner/common-core';
+import { BasicPlan } from '@fgo-planner/data-core';
 import { Link as MuiLink } from '@mui/material';
-import React, { MouseEvent, useCallback } from 'react';
+import React, { MouseEvent, ReactNode, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { DataTableListRow } from '../../../../../components/data-table-list/DataTableListRow';
 import { TruncateText } from '../../../../../components/text/TruncateText';
@@ -10,11 +11,18 @@ import { PlansRoutePlanListColumn } from './PlansRoutePlanListColumn';
 
 type Props = {
     active: boolean;
-    onClick: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
-    onContextMenu: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
-    onDoubleClick: (e: MouseEvent, plan: ImmutableBasicPlan) => void;
-    plan: ImmutableBasicPlan;
+    plan: Immutable<BasicPlan>;
     visibleColumns: Readonly<PlansRoutePlanListColumn.Visibility>;
+    onClick(event: MouseEvent, plan: Immutable<BasicPlan>): void;
+    onContextMenu(event: MouseEvent, plan: Immutable<BasicPlan>): void;
+    onDoubleClick(event: MouseEvent, plan: Immutable<BasicPlan>): void;
+};
+
+type RowText = {
+    name: ReactNode;
+    createdAt: string | undefined;
+    updatedAt: string | undefined;
+    description: string;
 };
 
 export const StyleClassPrefix = 'PlansRoutePlanListRow';
@@ -23,30 +31,31 @@ export const PlansRoutePlanListRow = React.memo((props: Props) => {
 
     const {
         active,
+        plan,
+        visibleColumns,
         onClick,
         onContextMenu,
-        onDoubleClick,
-        plan, 
-        visibleColumns
+        onDoubleClick
     } = props;
 
-    const {
-        created,
-        modified,
-        description
-    } = visibleColumns;
+    const handleClick = useCallback((event: MouseEvent): void => {
+        onClick(event, plan);
+    }, [plan, onClick]);
 
-    const handleClick = useCallback((e: MouseEvent): void => {
-        onClick(e, plan);
-    }, [onClick, plan]);
+    const handleContextMenu = useCallback((event: MouseEvent): void => {
+        onContextMenu(event, plan);
+    }, [plan, onContextMenu]);
 
-    const handleContextMenu = useCallback((e: MouseEvent): void => {
-        onContextMenu(e, plan);
-    }, [onContextMenu, plan]);
+    const handleDoubleClick = useCallback((event: MouseEvent): void => {
+        onDoubleClick(event, plan);
+    }, [plan, onDoubleClick]);
 
-    const handleDoubleClick = useCallback((e: MouseEvent): void => {
-        onDoubleClick(e, plan);
-    }, [onDoubleClick, plan]);
+    const rowText = useMemo((): RowText => ({
+        name: plan.name || <i>{PlanConstants.MissingNamePlaceholder}</i>,
+        description: plan.description || '-',
+        createdAt: DateTimeFormatUtils.formatForDataTable(plan.createdAt),
+        updatedAt: DateTimeFormatUtils.formatForDataTable(plan.updatedAt)
+    }), [plan]);
 
     return (
         <DataTableListRow
@@ -58,19 +67,36 @@ export const PlansRoutePlanListRow = React.memo((props: Props) => {
             onDoubleClick={handleDoubleClick}
         >
             <TruncateText className={`${StyleClassPrefix}-name`}>
-                <MuiLink component={Link} to={`${plan._id}`} underline='none'>
-                    {plan.name || <i>{PlanConstants.MissingNamePlaceholder}</i>}
+                <MuiLink
+                    className={`${StyleClassPrefix}-text`}
+                    component={Link}
+                    to={`${plan._id}`}
+                    underline='none'
+                >
+                    {rowText.name}
                 </MuiLink>
             </TruncateText>
-            {created && <div className={`${StyleClassPrefix}-created`}>
-                {DateTimeFormatUtils.formatForDataTable(plan.createdAt)}
-            </div>}
-            {modified && <div className={`${StyleClassPrefix}-modified`}>
-                {DateTimeFormatUtils.formatForDataTable(plan.updatedAt)}
-            </div>}
-            {description && <TruncateText className={`${StyleClassPrefix}-description`}>
-                {plan.description || '-'}
-            </TruncateText>}
+            {visibleColumns.created &&
+                <div className={`${StyleClassPrefix}-created`}>
+                    <div className={`${StyleClassPrefix}-text`}>
+                        {rowText.createdAt}
+                    </div>
+                </div>
+            }
+            {visibleColumns.modified &&
+                <div className={`${StyleClassPrefix}-modified`}>
+                    <div className={`${StyleClassPrefix}-text`}>
+                        {rowText.updatedAt}
+                    </div>
+                </div>
+            }
+            {visibleColumns.description &&
+                <TruncateText className={`${StyleClassPrefix}-description`}>
+                    <div className={`${StyleClassPrefix}-text`}>
+                        {rowText.description}
+                    </div>
+                </TruncateText>
+            }
         </DataTableListRow>
     );
 

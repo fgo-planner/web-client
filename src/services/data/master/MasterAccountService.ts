@@ -1,5 +1,5 @@
 import { Nullable } from '@fgo-planner/common-core';
-import { MasterAccount, MasterAccountUpdate, MasterServant } from '@fgo-planner/data-core';
+import { MasterAccount, UpdateMasterAccount } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { BasicMasterAccounts, UserTokenPayload } from '../../../types';
 import { LockableUIFeature } from '../../../types/dto/LockableUIFeature.enum';
@@ -58,7 +58,7 @@ export class MasterAccountService extends DataService {
         const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
         let account: MasterAccount;
         try {
-            account = await Http.put<MasterAccount>(`${this._BaseUrl}`, masterAccount, this._transformMasterAccount.bind(this));
+            account = await Http.put<MasterAccount>(`${this._BaseUrl}`, masterAccount);
             await this._updateMasterAccountList(); // Reload account list
         } finally {
             this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
@@ -73,19 +73,19 @@ export class MasterAccountService extends DataService {
          * be called by the `FixedIntervalMasterAccountChangeListener` in the
          * background.
          */
-        return Http.get<BasicMasterAccounts>(`${this._BaseUrl}/current-user`, Http.stringTimestampsToDate);
+        return Http.get<BasicMasterAccounts>(`${this._BaseUrl}/current-user`);
     }
 
     async getAccount(id: string): Promise<MasterAccount> {
-        const promise = Http.get<MasterAccount>(`${this._BaseUrl}/${id}`, this._transformMasterAccount.bind(this));
+        const promise = Http.get<MasterAccount>(`${this._BaseUrl}/${id}`);
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    async updateAccount(masterAccount: MasterAccountUpdate): Promise<MasterAccount> {
+    async updateAccount(masterAccount: UpdateMasterAccount): Promise<MasterAccount> {
         const lockId = this._userInterfaceService.requestLock(LockableUIFeature.LoadingIndicator);
         let updated: MasterAccount;
         try {
-            updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount, this._transformMasterAccount.bind(this));
+            updated = await Http.post<MasterAccount>(`${this._BaseUrl}`, masterAccount);
             await this._updateMasterAccountList(); // Reload account list
         } finally {
             this._userInterfaceService.releaseLock(LockableUIFeature.LoadingIndicator, lockId);
@@ -264,21 +264,6 @@ export class MasterAccountService extends DataService {
         if (session) {
             StorageUtils.setItem(StorageKeys.User.ActiveMasterAccountId, accountId);
         }
-    }
-
-    private _transformMasterAccount(masterAccount: MasterAccount): MasterAccount {
-        for (const masterServant of masterAccount.servants.servants) {
-            this._transformMasterServant(masterServant);
-        }
-        return Http.stringTimestampsToDate(masterAccount);
-    }
-
-    private _transformMasterServant(masterServant: MasterServant): MasterServant {
-        const summonDate = masterServant.summonDate;
-        if (summonDate != null) {
-            masterServant.summonDate = new Date(summonDate);
-        }
-        return masterServant;
     }
 
 }

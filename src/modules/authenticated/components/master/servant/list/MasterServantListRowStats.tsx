@@ -1,5 +1,5 @@
-import { ObjectUtils } from '@fgo-planner/common-core';
-import { ImmutableMasterServant, InstantiatedServantBondLevel } from '@fgo-planner/data-core';
+import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
+import { InstantiatedServantBondLevel, MasterServant } from '@fgo-planner/data-core';
 import React, { DOMAttributes } from 'react';
 import { ServantSkillLevel } from '../../../../../../components/servant/ServantSkillLevels';
 import { MasterServantListRowBondLevel } from './MasterServantListRowBondLevel';
@@ -12,7 +12,7 @@ import { MasterServantListRowSummonDate } from './MasterServantListRowSummonDate
 type Props = {
     active?: boolean;
     bond: InstantiatedServantBondLevel | undefined;
-    masterServant: ImmutableMasterServant;
+    masterServant: Immutable<MasterServant>;
     visibleColumns: Readonly<MasterServantListColumn.Visibility>;
 } & Omit<DOMAttributes<HTMLDivElement>, 'onClick' | 'onContextMenu'>;
 

@@ -1,5 +1,5 @@
 import { CollectionUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, MasterServantUpdate, MasterServantUpdateUtils, PlanServant, PlanServantAggregatedData, PlanServantUtils, PlanUpcomingResources, Resources } from '@fgo-planner/data-core';
+import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, MasterServant, MasterServantUpdate, MasterServantUpdateUtils, PlanServant, PlanServantAggregatedData, PlanServantUtils, PlanResources, Resources } from '@fgo-planner/data-core';
 import { PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanEnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types';
 
 
@@ -60,7 +60,7 @@ export namespace PlanComputationUtils {
         enabled: Enabled;
         aggregatedServants: ReadonlyArray<PlanServantAggregatedData>;
         costumes: ReadonlySet<number>;
-        upcomingResources: ImmutableArray<PlanUpcomingResources>;
+        upcomingResources: ImmutableArray<PlanResources>;
     }>;
 
     export type ServantFulfillmentResult = {
@@ -368,7 +368,7 @@ export namespace PlanComputationUtils {
     function _computePlanServantRequirements(
         result: PlanRequirements,
         gameServant: Immutable<GameServant>,
-        masterServant: ImmutableMasterServant,
+        masterServant: Immutable<MasterServant>,
         planServant: Immutable<PlanServant>,
         currentCostumes: ReadonlySet<number>,
         targetCostumes: ReadonlySet<number>,
@@ -823,7 +823,7 @@ export namespace PlanComputationUtils {
      */
     function _instantiatePlanServantRequirements(
         planServant: Immutable<PlanServant>,
-        masterServant: ImmutableMasterServant
+        masterServant: Immutable<MasterServant>
     ): PlanServantRequirements {
 
         const current = InstantiatedServantUtils.instantiateEnhancements();

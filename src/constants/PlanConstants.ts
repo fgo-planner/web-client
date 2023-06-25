@@ -1,9 +1,8 @@
 export namespace PlanConstants {
-    
-    export const DefaultName = 'New Plan';
-
+    export const DefaultPlanName = 'New Plan';
+    export const EmptyGroupPlaceholder = 'This group does not contain any plans';
+    export const MissingGroupNamePlaceholder = 'Unnamed Group';
     export const MissingNamePlaceholder = 'Unnamed Plan';
-
-    export const EmptyPlanListPlaceholder = 'No Plans Found';
-
+    export const UngroupedGroupId = 'ungrouped';
+    export const UngroupedGroupName = 'Default Group';
 }

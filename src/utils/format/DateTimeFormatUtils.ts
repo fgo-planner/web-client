@@ -4,21 +4,33 @@ import { format } from 'date-fns';
 export namespace DateTimeFormatUtils {
 
     type AnyDate = Date | ReadonlyDate;
-    
+
     // const DataTableFormat = 'MMM dd, yyyy hh:mm:ss a';
     const DataTableFormat = 'yyyy-MM-dd hh:mm:ss a';
-    
+
     const SummonDateFormat = 'yyyy-MM-dd';
-    
-    export function formatForDataTable(date: Nullable<AnyDate | number>): string {
+
+    export function formatForDataTable(date: Nullable<AnyDate | string | number>): string {
         if (date == null) {
+            return '';
+        }
+        if (typeof date === 'string') {
+            date = new Date(date);
+        }
+        if (isNaN(date as number)) {
             return '';
         }
         return format(date as number | Date, DataTableFormat);
     }
 
-    export function formatSummonDate(date: Nullable<AnyDate | number>): string {
+    export function formatSummonDate(date: Nullable<AnyDate | string | number>): string {
         if (date == null) {
+            return '';
+        }
+        if (typeof date === 'string') {
+            date = new Date(date);
+        }
+        if (isNaN(date as number)) {
             return '';
         }
         /**

@@ -1,4 +1,5 @@
-import { ImmutableBasicMasterAccount } from '@fgo-planner/data-core';
+import { Immutable } from '@fgo-planner/common-core';
+import { BasicMasterAccount } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ReactNode } from 'react';
@@ -79,7 +80,7 @@ export const MasterAccountsRouteAccountList = React.memo((props: Props) => {
         visibleColumns
     } = props;
 
-    const renderAccountRow = (account: ImmutableBasicMasterAccount, index: number): ReactNode => {
+    const renderAccountRow = (account: Immutable<BasicMasterAccount>, index: number): ReactNode => {
         return (
             <MasterAccountsRouteAccountListRow
                 key={account._id}

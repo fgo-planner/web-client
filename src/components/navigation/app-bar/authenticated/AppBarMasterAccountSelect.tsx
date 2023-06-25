@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-core';
-import { ImmutableBasicMasterAccount, MasterAccount } from '@fgo-planner/data-core';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-core';
 import { MenuItem, TextField, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, ReactNode, useCallback, useEffect, useState } from 'react';
@@ -67,7 +67,7 @@ export const AppBarMasterAccountSelect = React.memo(({ masterAccountList }: Prop
         });
     }, [masterAccountService]);
 
-    const renderSelectOption = (account: ImmutableBasicMasterAccount, index: number): ReactNode => {
+    const renderSelectOption = (account: Immutable<BasicMasterAccount>, index: number): ReactNode => {
         let itemLabel = account.name || `Account ${index + 1}`;
         if (account.friendId) {
             itemLabel += ` (${account.friendId})`;

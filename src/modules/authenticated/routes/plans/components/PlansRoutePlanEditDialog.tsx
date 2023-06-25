@@ -1,5 +1,5 @@
 import { Plan } from '@fgo-planner/data-core';
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, TextField, Typography } from '@mui/material';
+import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, PaperProps, TextField, Typography } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
@@ -11,9 +11,13 @@ import { PlanService } from '../../../../../services/data/plan/PlanService';
 import { DialogComponentProps } from '../../../../../types';
 import { FormUtils } from '../../../../../utils/FormUtils';
 
+export type PlansRoutePlanEditDialogData = {
+    accountId: string;
+};
+
 type Props = {
-    masterAccountId: string | undefined;
-} & DialogComponentProps<Plan>;
+    dialogData?: PlansRoutePlanEditDialogData;
+} & Omit<DialogComponentProps<Plan>, 'open' | 'PaperProps'>;
 
 type FormData = {
     name: string;
@@ -22,7 +26,7 @@ type FormData = {
     shared: boolean;
 };
 
-const FormId = 'create-plan-form';
+const FormId = 'plan-edit-form';
 
 const formikConfig: Omit<FormikConfig<FormData>, 'onSubmit'> = {
     initialValues: {
@@ -35,7 +39,7 @@ const formikConfig: Omit<FormikConfig<FormData>, 'onSubmit'> = {
     validateOnBlur: true
 };
 
-const StyleClassPrefix = 'LoginDialog';
+const StyleClassPrefix = 'PlansRoutePlanEditDialog';
 
 const StyleProps = {
     [`& .${StyleClassPrefix}-error-message`]: {
@@ -48,14 +52,19 @@ const StyleProps = {
     }
 } as SystemStyleObject<Theme>;
 
-export const PlansRouteCreatePlanDialog = React.memo((props: Props) => {
+const DialogPaperProps: PaperProps = {
+    style: {
+        minWidth: 360
+    }
+};
+
+export const PlansRoutePlanEditDialog = React.memo((props: Props) => {
 
     const {
-        masterAccountId,
+        dialogData,
+        onClose,
         ...dialogProps
     } = props;
-
-    const onClose = dialogProps.onClose;
 
     const {
         fullScreen,
@@ -69,6 +78,8 @@ export const PlansRouteCreatePlanDialog = React.memo((props: Props) => {
     const [errorMessage, setErrorMessage] = useState<string>();
     const [, setIsMounted] = useState<boolean>(true);
 
+    const open = !!dialogData;
+
     useEffect(() => {
         return () => {
             setIsMounted(false);
@@ -80,15 +91,15 @@ export const PlansRouteCreatePlanDialog = React.memo((props: Props) => {
     }, [onClose]);
 
     const submit = useCallback(async (values: FormData): Promise<void> => {
-        if (!masterAccountId) {
+        if (!dialogData) {
             return;
         }
         setIsSubmitting(true);
         setErrorMessage(undefined);
         try {
-            const plan = await planService.addPlan({
+            const plan = await planService.createPlan({
+                accountId: dialogData.accountId,
                 ...values,
-                accountId: masterAccountId
             });
             setIsSubmitting(false);
             onClose({}, 'submit', plan);
@@ -96,7 +107,7 @@ export const PlansRouteCreatePlanDialog = React.memo((props: Props) => {
             setIsSubmitting(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [masterAccountId, onClose, planService]);
+    }, [dialogData, onClose, planService]);
 
     const renderForm = (): ReactNode => (
         <Formik {...formikConfig} onSubmit={submit}>
@@ -179,8 +190,10 @@ export const PlansRouteCreatePlanDialog = React.memo((props: Props) => {
         <Dialog
             {...dialogProps}
             className={`${StyleClassPrefix}-root`}
-            sx={StyleProps}
             fullScreen={fullScreen}
+            open={open}
+            PaperProps={DialogPaperProps}
+            sx={StyleProps}
         >
             <Typography component={'div'}>
                 <DialogTitle>
@@ -208,7 +221,7 @@ export const PlansRouteCreatePlanDialog = React.memo((props: Props) => {
                         color='primary'
                         form={FormId}
                         type='submit'
-                        disabled={isSubmitting || !masterAccountId}
+                        disabled={isSubmitting}
                     >
                         Create
                     </Button>

@@ -1,5 +1,5 @@
 import { Array2D, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
-import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterAccount, MasterAccountUpdate, MasterServant, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
+import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterAccount, UpdateMasterAccount, MasterServant, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { FgoManagerDataImport, MasterAccountImportData } from '@fgo-planner/transform-core';
 import { Options } from 'csv-parse';
 import { parse } from 'csv-parse/sync';
@@ -161,7 +161,7 @@ const MasterServantImportRoute = React.memo(() => {
         /**
          * The update payload.
          */
-        const update: MasterAccountUpdate = {
+        const update: UpdateMasterAccount = {
             _id: masterAccount._id,
         };
 

@@ -1,8 +1,9 @@
-import { ImmutableMasterServant } from '@fgo-planner/data-core';
+import { Immutable } from '@fgo-planner/common-core';
+import { MasterServant } from '@fgo-planner/data-core';
 import { AssetConstants } from '../../../../../../constants';
 
 type Props = {
-    masterServant: ImmutableMasterServant;
+    masterServant: Immutable<MasterServant>;
 };
 
 export const StyleClassPrefix = 'MasterServantListRowLevel';
@@ -16,9 +17,9 @@ export const StyleClassPrefix = 'MasterServantListRowLevel';
  */
 export const MasterServantListRowLevel = ({ masterServant }: Props) => {
 
-    const { 
-        ascension, 
-        level 
+    const {
+        ascension,
+        level
     } = masterServant;
 
     const iconUrl = ascension ? AssetConstants.ServantAscensionOnIcon : AssetConstants.ServantAscensionOffIcon;

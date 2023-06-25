@@ -1,41 +1,44 @@
-import { BasicPlans, ImmutableBasicPlan, ImmutableBasicPlanGroup, Plan, PlanType } from '@fgo-planner/data-core';
-import { Button, IconButton, PaperProps, TextField, Theme } from '@mui/material';
+import { Immutable } from '@fgo-planner/common-core';
+import { BasicPlan, Plan, PlanGroup, PlanGroupAggregatedData } from '@fgo-planner/data-core';
+import { Button, IconButton, TextField, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
-import React, { MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { MouseEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PromptDialog } from '../../../../components/dialog/PromptDialog';
 import { IconOutlined } from '../../../../components/icons/IconOutlined';
 import { PageTitle } from '../../../../components/text/PageTitle';
-import { useInjectable } from '../../../../hooks/dependency-injection/useInjectable';
+import { PlanConstants } from '../../../../constants';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
-import { useLoadingIndicator } from '../../../../hooks/user-interface/useLoadingIndicator';
-import { PlanService } from '../../../../services/data/plan/PlanService';
 import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { ModalOnCloseReason } from '../../../../types';
-import { SubscribablesContainer } from '../../../../utils/subscription/SubscribablesContainer';
-import { SubscriptionTopics } from '../../../../utils/subscription/SubscriptionTopics';
-import { PlansRouteCreatePlanDialog } from './components/PlansRouteCreatePlanDialog';
+import { usePlansDataEdit } from '../../hooks/usePlansDataEdit';
+import { PlanListItem } from './components/PlanListItem.type';
 import { PlansRouteNavigationRail } from './components/PlansRouteNavigationRail';
+import { PlansRoutePlanEditDialog } from './components/PlansRoutePlanEditDialog';
 import { PlansRoutePlanList } from './components/PlansRoutePlanList';
 import { PlansRoutePlanListColumn } from './components/PlansRoutePlanListColumn';
-
-const AddPlanDialogPaperProps: PaperProps = {
-    style: {
-        minWidth: 360
-    }
-};
+import { usePlansRouteModalState } from './hooks/usePlansRouteModalState';
 
 const DeleteTargetDialogTitle = 'Delete Plan?';
 
-const generateDeleteTargetDialogPrompt = (target: ImmutableBasicPlan | ImmutableBasicPlanGroup): string => {
-    const { name } = target;
-    let prompt = 'Are you sure you want to delete';
-    if (name) {
-        return `${prompt} '${name}'?`;
-    } else {
-        return `${prompt} the plan?`;
-    }
+const generateDeleteTargetDialogPrompt = (target: Immutable<BasicPlan | PlanGroup>): string => {
+    // const { name } = target;
+    // let prompt = 'Are you sure you want to delete';
+    // if (name) {
+    //     return `${prompt} '${name}'?`;
+    // } else {
+    //     return `${prompt} the plan?`;
+    // }
+    return 'FIXME';
+};
+
+const isPlanGroup = (item: PlanListItem): item is PlanGroupAggregatedData => {
+    return !!(item as PlanGroupAggregatedData).plans;
+};
+
+const isUngroupedPlanGroup = (item: PlanListItem): item is typeof PlanConstants.UngroupedGroupId => {
+    return typeof item === 'string';
 };
 
 const StyleClassPrefix = 'PlansRoute';
@@ -117,66 +120,36 @@ const StyleProps = (theme: SystemTheme) => {
 
 export const PlansRoute = React.memo(() => {
 
-    const {
-        invokeLoadingIndicator,
-        resetLoadingIndicator
-    } = useLoadingIndicator();
-
     const navigate = useNavigate();
 
-    const planService = useInjectable(PlanService);
-
-    const [accountPlans, setAccountPlans] = useState<BasicPlans>();
+    const {
+        planGroupingAggregatedData,
+        createPlan,
+        deletePlans
+    } = usePlansDataEdit();
 
     const [selectedId, setSelectedId] = useState<string>();
-    const selectedRef = useRef<{ type: PlanType; target: ImmutableBasicPlan | ImmutableBasicPlanGroup; }>();
+    const selectedRef = useRef<PlanListItem>();
 
     const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
 
     const [deleteTargetDialogPrompt, setDeleteTargetDialogPrompt] = useState<string>();
 
+    const {
+        activeContextMenu,
+        activeDialog,
+        contextMenuPosition,
+        closeActiveContextMenu,
+        closeActiveDialog,
+        openHeaderContextMenu,
+        openPlanDeleteDialog,
+        openPlanEditDialog,
+        openPlanGroupRowContextMenu,
+        openPlanRowContextMenu
+    } = usePlansRouteModalState();
+
     // TODO Load/save this from user preferences
     const [filtersEnabled, setFiltersEnabled] = useState<boolean>(false);
-
-    const masterAccountIdRef = useRef<string>();
-
-    const loadPlansForAccount = useCallback(async () => {
-        const masterAccountId = masterAccountIdRef.current;
-        if (!masterAccountId) {
-            return setAccountPlans(undefined);
-        }
-        invokeLoadingIndicator();
-
-        setSelectedId(undefined);
-        selectedRef.current = undefined;
-        setAddPlanDialogOpen(false);
-        setDeleteTargetDialogPrompt(undefined);
-
-        try {
-            const accountPlans = await planService.getForAccount(masterAccountId);
-            setAccountPlans(accountPlans);
-        } catch (e) {
-            // TODO Handle error
-        }
-        resetLoadingIndicator();
-    }, [invokeLoadingIndicator, planService, resetLoadingIndicator]);
-
-    /*
-     * Master account change subscription.
-     */
-    useEffect(() => {
-        const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
-            .get(SubscriptionTopics.User.CurrentMasterAccountChange)
-            .subscribe(masterAccount => {
-                const masterAccountId = masterAccount?._id;
-                if (masterAccountId !== masterAccountIdRef.current) {
-                    masterAccountIdRef.current = masterAccountId;
-                    loadPlansForAccount();
-                }
-            });
-
-        return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
-    }, [loadPlansForAccount]);
 
     const { sm, lg } = useActiveBreakpoints();
 
@@ -191,12 +164,9 @@ export const PlansRoute = React.memo(() => {
         setAddPlanDialogOpen(true);
     }, []);
 
-    const handleAddPlanDialogClose = useCallback((event: any, reason: ModalOnCloseReason, data?: Plan): void => {
+    const handleAddPlanDialogClose = useCallback((_event: any, reason: ModalOnCloseReason, _data?: Plan): void => {
         setAddPlanDialogOpen(false);
-        if (reason === 'submit') {
-            loadPlansForAccount();
-        }
-    }, [loadPlansForAccount]);
+    }, []);
 
     const handleOpenEditTargetDialog = useCallback((): void => {
         if (!selectedRef.current) {
@@ -206,33 +176,29 @@ export const PlansRoute = React.memo(() => {
     }, []);
 
     const handleOpenDeleteTargetDialog = useCallback((): void => {
-        if (!accountPlans || !selectedId) {
-            return;
-        }
-        // TODO Include planGroups
-        const plan = accountPlans.plans.find(plan => plan._id === selectedId);
-        if (!plan) {
-            console.warn(`Could not find plan id=${selectedId}`);
-            return;
-        }
-        const prompt = generateDeleteTargetDialogPrompt(plan);
-        setDeleteTargetDialogPrompt(prompt);
-    }, [accountPlans, selectedId]);
+        // if (!planList || !selectedId) {
+        //     return;
+        // }
+        // // TODO Include planGroups
+        // const plan = planMap.get(selectedId);
+        // if (!plan) {
+        //     console.warn(`Could not find plan id=${selectedId}`);
+        //     return;
+        // }
+        // const prompt = generateDeleteTargetDialogPrompt(plan);
+        // setDeleteTargetDialogPrompt(prompt);
+    }, []);
 
     const handleDeleteTargetDialogClose = useCallback(async (event: any, reason: ModalOnCloseReason): Promise<void> => {
-        if (!selectedId) {
-            return;
-        }
-        if (reason === 'submit') {
+        if (reason === 'submit' && selectedId) {
             try {
-                await planService.deletePlan(selectedId);
-                loadPlansForAccount();
+                await deletePlans(selectedId);
             } catch (e) {
                 console.error(e);
             }
         }
         setDeleteTargetDialogPrompt(undefined);
-    }, [loadPlansForAccount, planService, selectedId]);
+    }, [deletePlans, selectedId]);
 
     // TODO move this to user preferences hook
     const toggleFilters = useCallback(() => {
@@ -249,20 +215,26 @@ export const PlansRoute = React.memo(() => {
     }, []);
 
     const handleRowDoubleClick = useCallback((): void => {
-        if (!selectedRef.current || selectedRef.current.type === PlanType.Group) {
+        const target = selectedRef.current;
+        if (!target || isPlanGroup(target) || isUngroupedPlanGroup(target)) {
             return;
         }
-        const planId = selectedRef.current.target._id!;
+        const planId = target._id!;
         navigate(planId);
     }, [navigate]);
 
-    const handleSelectionChange = useCallback((target: ImmutableBasicPlan | ImmutableBasicPlanGroup | undefined, type: PlanType): void => {
+    const handleSelectionChange = useCallback((target: PlanListItem | undefined): void => {
         if (!target) {
             selectedRef.current = undefined;
+            setSelectedId(undefined);
         } else {
-            selectedRef.current = { type, target };
+            selectedRef.current = target;
+            if (isUngroupedPlanGroup(target)) {
+                // The ungrouped group is not allowed to be selected.
+                return;
+            }
+            setSelectedId(target._id);
         }
-        setSelectedId(target?._id);
     }, []);
 
     //#endregion
@@ -304,11 +276,11 @@ export const PlansRoute = React.memo(() => {
                     onToggleFilters={toggleFilters}
                 />
                 <div className={clsx(`${StyleClassPrefix}-list-container`, ThemeConstants.ClassScrollbarTrackBorder)}>
-                    {accountPlans &&
+                    {planGroupingAggregatedData &&
                         <PlansRoutePlanList
-                            accountPlans={accountPlans}
-                            visibleColumns={visibleColumns}
+                            planGrouping={planGroupingAggregatedData}
                             selectedId={selectedId}
+                            visibleColumns={visibleColumns}
                             onRowClick={handleRowClick}
                             onRowDoubleClick={handleRowDoubleClick}
                             onSelectionChange={handleSelectionChange}
@@ -317,10 +289,8 @@ export const PlansRoute = React.memo(() => {
                 </div>
             </div>
         </Box>
-        <PlansRouteCreatePlanDialog
-            open={addPlanDialogOpen}
-            PaperProps={AddPlanDialogPaperProps}
-            masterAccountId={masterAccountIdRef.current}
+        <PlansRoutePlanEditDialog
+            dialogData={activeDialog.name === 'planEdit' ? activeDialog.data : undefined}
             onClose={handleAddPlanDialogClose}
         />
         <PromptDialog

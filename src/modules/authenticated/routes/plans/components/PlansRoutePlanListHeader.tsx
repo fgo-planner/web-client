@@ -39,8 +39,9 @@ const StyleProps = (theme: SystemTheme) => {
         zIndex: 2,  // This needs to be higher than the .sticky-content in the rows
         [`& .${StyleClassPrefix}-content`]: {
             display: 'flex',
-            pl: 3,
+            pl: 4,
             py: 4,
+            ml: 10,
             [breakpoints.down('sm')]: {
                 justifyContent: 'flex-start',
                 pl: 4,

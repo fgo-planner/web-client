@@ -124,10 +124,11 @@ export const MasterServantList = React.memo((props: Props) => {
         const direction = sortOptions.direction;
         const start2 = window.performance.now();
         // TODO Move this to utilities class.
+        const multiplier = direction === 'asc' ? 1 : -1;
         result = [...result].sort((a, b): number => {
             const masterServantA = a.masterServant;
             const masterServantB = b.masterServant;
-            let paramA: number, paramB: number;
+            let paramA: number | string, paramB: number | string;
             switch (sort) {
                 case 'npLevel':
                     paramA = masterServantA.np;
@@ -150,8 +151,8 @@ export const MasterServantList = React.memo((props: Props) => {
                     paramB = bondLevels[masterServantB.servantId] || -1;
                     break;
                 case 'summonDate':
-                    paramA = masterServantA.summonDate?.getTime() || -1;
-                    paramB = masterServantB.summonDate?.getTime() || -1;
+                    paramA = masterServantA.summonDate || '';
+                    paramB = masterServantB.summonDate || '';
                     break;
                 default:
                     paramA = masterServantA.servantId;
@@ -161,7 +162,7 @@ export const MasterServantList = React.memo((props: Props) => {
                 paramA = masterServantA.servantId;
                 paramB = masterServantB.servantId;
             }
-            return direction === 'asc' ? paramA - paramB : paramB - paramA;
+            return multiplier * (paramA > paramB ? 1 : -1);
         });
         const end2 = window.performance.now();
         console.log(`Sorting by ${sort} ${direction} completed in ${(end2 - start2).toFixed(2)}ms.`);
@@ -227,7 +228,7 @@ export const MasterServantList = React.memo((props: Props) => {
         });
     }, [handleItemClick, onRowClick]);
 
-    const handleRowDoubleClick = useCallback((event: MouseEvent, index: number):void => {
+    const handleRowDoubleClick = useCallback((event: MouseEvent, index: number): void => {
         blockedRowClickIndex.current = index;
         onRowDoubleClick?.(event);
     }, [onRowDoubleClick]);

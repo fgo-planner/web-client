@@ -1,5 +1,5 @@
 import { Immutable, ImmutableArray } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, MasterServantAggregatedData, PlanServant, PlanServantAggregatedData } from '@fgo-planner/data-core';
+import { GameServant, MasterServant, MasterServantAggregatedData, PlanServant, PlanServantAggregatedData } from '@fgo-planner/data-core';
 import { GameServantMap } from './game/GameServantMap';
 
 export namespace DataAggregationUtils {
@@ -8,12 +8,12 @@ export namespace DataAggregationUtils {
         return data.gameServant;
     };
 
-    export function getMasterServant(data: MasterServantAggregatedData): ImmutableMasterServant {
+    export function getMasterServant(data: MasterServantAggregatedData): Immutable<MasterServant> {
         return data.masterServant;
     };
 
     export function aggregateDataForMasterServants(
-        masterServants: ReadonlyArray<ImmutableMasterServant>,
+        masterServants: ReadonlyArray<Immutable<MasterServant>>,
         gameServantMap: GameServantMap
     ): Array<MasterServantAggregatedData> {
         const result: Array<MasterServantAggregatedData> = [];
@@ -27,7 +27,7 @@ export namespace DataAggregationUtils {
     }
 
     export function aggregateDataForMasterServant(
-        masterServant: ImmutableMasterServant,
+        masterServant: Immutable<MasterServant>,
         gameServantMap: GameServantMap
     ): MasterServantAggregatedData | null {
         const servantId = masterServant.servantId;

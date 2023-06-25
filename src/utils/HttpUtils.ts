@@ -1,14 +1,10 @@
-import { Function, Nullable } from '@fgo-planner/common-core';
-import { EntityWithTimestamps } from '@fgo-planner/data-core';
+import { Nullable } from '@fgo-planner/common-core';
 import { HttpOptions, HttpResponseError, HttpResponseType } from '../types';
 import { JwtUtils } from './JwtUtils';
 import { SubscribablesContainer } from './subscription/SubscribablesContainer';
 import { SubscriptionTopics } from './subscription/SubscriptionTopics';
 
 type RequestBody = string | Record<string, unknown>;
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-type TransformFunc<T> = Function<any, T>;
 
 export class HttpUtils {
 
@@ -22,18 +18,13 @@ export class HttpUtils {
         return SubscribablesContainer.get(SubscriptionTopics.User.Unauthorized);
     }
 
-    private constructor () {
-        
-    }
+    private constructor() {
 
-    //#region HTTP request methods
+    }
 
     static async get<T = any>(url: string): Promise<T>;
     static async get<T = any>(url: string, options: HttpOptions): Promise<T>;
-    static async get<T = any>(url: string, transformFunc: TransformFunc<T>): Promise<T>;
-    static async get<T = any>(url: string, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
-    static async get<T = any>(url: string, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
-        const { options, transformFunc } = this._parseArgs(arg1, arg2);
+    static async get<T = any>(url: string, options: HttpOptions = {}): Promise<T> {
         if (options.params) {
             url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
@@ -44,15 +35,12 @@ export class HttpUtils {
             headers
         } as RequestInit;
         const response = await this._fetch(url, init);
-        return this._parseResponseBody<T>(response, options, transformFunc) as any;
+        return this._parseResponseBody<T>(response, options) as any;
     }
 
     static async post<T = any>(url: string, body: RequestBody): Promise<T>;
     static async post<T = any>(url: string, body: RequestBody, options: HttpOptions): Promise<T>;
-    static async post<T = any>(url: string, body: RequestBody, transformFunc: TransformFunc<T>): Promise<T>;
-    static async post<T = any>(url: string, body: RequestBody, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
-    static async post<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
-        const { options, transformFunc } = this._parseArgs(arg1, arg2);
+    static async post<T = any>(url: string, body: RequestBody, options: HttpOptions = {}): Promise<T> {
         if (options.params) {
             url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
@@ -70,15 +58,12 @@ export class HttpUtils {
             headers
         } as RequestInit;
         const response = await this._fetch(url, init);
-        return this._parseResponseBody(response, options, transformFunc) as any;
+        return this._parseResponseBody(response, options) as any;
     }
 
     static async put<T = any>(url: string, body: RequestBody): Promise<T>;
     static async put<T = any>(url: string, body: RequestBody, options: HttpOptions): Promise<T>;
-    static async put<T = any>(url: string, body: RequestBody, transformFunc: TransformFunc<T>): Promise<T>;
-    static async put<T = any>(url: string, body: RequestBody, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
-    static async put<T = any>(url: string, body: RequestBody, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
-        const { options, transformFunc } = this._parseArgs(arg1, arg2);
+    static async put<T = any>(url: string, body: RequestBody, options: HttpOptions = {}): Promise<T> {
         if (options.params) {
             url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
@@ -96,17 +81,12 @@ export class HttpUtils {
             headers
         } as RequestInit;
         const response = await this._fetch(url, init);
-        return this._parseResponseBody(response, options, transformFunc) as any;
+        return this._parseResponseBody(response, options) as any;
     }
 
-    /* eslint-disable max-len */
     static async delete<T = any>(url: string, body?: RequestBody): Promise<T>;
     static async delete<T = any>(url: string, body: RequestBody | undefined, options: HttpOptions): Promise<T>;
-    static async delete<T = any>(url: string, body: RequestBody | undefined, transformFunc: TransformFunc<T>): Promise<T>;
-    static async delete<T = any>(url: string, body: RequestBody | undefined, options: HttpOptions, transformFunc: TransformFunc<T>): Promise<T>;
-    static async delete<T = any>(url: string, body?: RequestBody, arg1?: HttpOptions | TransformFunc<T>, arg2?: TransformFunc<T>): Promise<T> {
-    /* eslint-enable max-len */
-        const { options, transformFunc } = this._parseArgs(arg1, arg2);
+    static async delete<T = any>(url: string, body?: RequestBody, options: HttpOptions = {}): Promise<T> {
         if (options.params) {
             url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
@@ -121,7 +101,7 @@ export class HttpUtils {
             headers
         } as RequestInit;
         const response = await this._fetch(url, init);
-        return this._parseResponseBody(response, options, transformFunc) as any;
+        return this._parseResponseBody(response, options) as any;
     }
 
     private static _inferContentType(body: RequestBody): string {
@@ -163,12 +143,7 @@ export class HttpUtils {
         }
     }
 
-    private static async _parseResponseBody<T>(
-        response: Response, 
-        options: HttpOptions, 
-        transformFunc?: TransformFunc<T>
-    ): Promise<string | T> {
-
+    private static async _parseResponseBody<T>(response: Response, options: HttpOptions): Promise<string | T> {
         const contentType = response.headers.get(this._ContentTypeHeader);
         const { responseType, ignoreUnauthorized } = options;
         let inferredResponseType: HttpResponseType;
@@ -186,11 +161,7 @@ export class HttpUtils {
             }
             throw error;
         }
-        const body = await this._getResponseBody<T>(response, inferredResponseType);
-        if (!transformFunc) {
-            return body;
-        }
-        return transformFunc(body);
+        return await this._getResponseBody<T>(response, inferredResponseType);
     }
 
     private static async _getResponseBody<T = any>(response: Response, responseType: HttpResponseType): Promise<string | T> {
@@ -220,64 +191,4 @@ export class HttpUtils {
         this._onUnauthorized.next(error);
     }
 
-    private static _parseArgs<T>(
-        arg1?: HttpOptions | TransformFunc<T>,
-        arg2?: TransformFunc<T>
-    ): { options: HttpOptions, transformFunc?: TransformFunc<T> } {
-
-        let options: HttpOptions = {};
-        let transformFunc: TransformFunc<T> | undefined = undefined;
-        
-        if (typeof arg1 === 'object') {
-            options = arg1;
-            transformFunc = arg2;
-        } else if (typeof arg1 === 'function') {
-            transformFunc = arg1;
-        } 
-
-        return { options, transformFunc };
-    }
-
-    //#endregion
-
-
-    //#region HTTP response methods
-    
-    /**
-     * Converts the string values of response entity timestamps fields (`createdAt`
-     * and `updatedAt`) into `Date` values.
-     */
-    static stringTimestampsToDate<T extends EntityWithTimestamps<ID>, ID>(entity: T): T;
-    /**
-     * Converts the string values of response entity timestamps fields (`createdAt`
-     * and `updatedAt`) into `Date` values.
-     */
-    static stringTimestampsToDate<T extends EntityWithTimestamps<ID>, ID>(entities: Array<T>): Array<T>;
-    static stringTimestampsToDate<T extends EntityWithTimestamps<ID>, ID>(entity: T | Array<T>): T | Array<T> {
-        if (Array.isArray(entity)) {
-            entity.forEach(this._stringTimestampsToDate);
-            return entity;
-        } else {
-            return this._stringTimestampsToDate(entity);
-        }
-    }
-    
-    private static _stringTimestampsToDate<T extends EntityWithTimestamps<ID>, ID>(entity: T): T {
-        if (entity.createdAt) {
-            entity.createdAt = new Date(entity.createdAt);
-        }
-        if (entity.updatedAt) {
-            entity.updatedAt = new Date(entity.updatedAt);
-        }
-        return entity;
-    }
-
-    //#endregion
-
 }
-
-//#region Bind static functions
-
-HttpUtils.stringTimestampsToDate = HttpUtils.stringTimestampsToDate.bind(HttpUtils);
-
-//#endregion

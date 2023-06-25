@@ -1,5 +1,5 @@
 import { Immutable, ObjectUtils } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, InstantiatedServantBondLevel, InstantiatedServantUtils } from '@fgo-planner/data-core';
+import { GameServant, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterServant } from '@fgo-planner/data-core';
 import React, { DOMAttributes, DragEvent, DragEventHandler, MouseEvent, ReactNode, useCallback, useMemo } from 'react';
 import { DataTableListRow } from '../../../../../../components/data-table-list/DataTableListRow';
 import { DataTableDragHandle } from '../../../../../../components/data-table/DataTableDragHandle';
@@ -19,7 +19,7 @@ type Props = {
     idPrefix?: string;
     index: number;
     lastRow?: boolean;
-    masterServant: ImmutableMasterServant;
+    masterServant: Immutable<MasterServant>;
     visibleColumns: Readonly<MasterServantListColumn.Visibility>;
     onClick: (event: MouseEvent, index: number) => void;
     onContextMenu?: (event: MouseEvent, index: number) => void;
@@ -59,17 +59,26 @@ export const MasterServantListRow = React.memo((props: Props) => {
         ...domAttributes
     } = props;
 
-    const handleClick = useCallback((e: MouseEvent): void => {
-        onClick?.(e, index);
-    }, [index, onClick]);
+    const handleClick = useCallback(
+        (e: MouseEvent): void => {
+            onClick?.(e, index);
+        },
+        [index, onClick]
+    );
 
-    const handleContextMenu = useCallback((e: MouseEvent): void => {
-        onContextMenu?.(e, index);
-    }, [index, onContextMenu]);
+    const handleContextMenu = useCallback(
+        (e: MouseEvent): void => {
+            onContextMenu?.(e, index);
+        },
+        [index, onContextMenu]
+    );
 
-    const handleDoubleClick = useCallback((e: MouseEvent): void => {
-        onDoubleClick?.(e, index);
-    }, [index, onDoubleClick]);
+    const handleDoubleClick = useCallback(
+        (e: MouseEvent): void => {
+            onDoubleClick?.(e, index);
+        },
+        [index, onDoubleClick]
+    );
 
     const handleDragStart = useMemo((): DragEventHandler | undefined => {
         if (!dragDropMode || !onDragStart) {
@@ -81,11 +90,7 @@ export const MasterServantListRow = React.memo((props: Props) => {
     }, [dragDropMode, index, onDragStart]);
 
     if (!gameServant) {
-        return (
-            <div className={`${StyleClassPrefix}-root`}>
-                Unknown servant ID {masterServant.servantId};
-            </div>
-        );
+        return <div className={`${StyleClassPrefix}-root`}>Unknown servant ID {masterServant.servantId};</div>;
     }
 
     const artStage = InstantiatedServantUtils.getArtStage(masterServant.ascension);
@@ -101,28 +106,17 @@ export const MasterServantListRow = React.memo((props: Props) => {
         />
     );
 
-    const stickyContentNode: ReactNode = <>
-        {dragDropMode &&
-            <DataTableDragHandle
-                onDragStart={handleDragStart}
-            />
-        }
-        {servantThumbnailNode}
-    </>;
-
-    const labelNode: ReactNode = (
-        <MasterServantListRowLabel
-            gameServant={gameServant}
-        />
+    const stickyContentNode: ReactNode = (
+        <>
+            {dragDropMode && <DataTableDragHandle onDragStart={handleDragStart} />}
+            {servantThumbnailNode}
+        </>
     );
 
+    const labelNode: ReactNode = <MasterServantListRowLabel gameServant={gameServant} />;
+
     const statsNode: ReactNode = !hideStatColumns && (
-        <MasterServantListRowStats
-            active={active}
-            bond={bond}
-            masterServant={masterServant}
-            visibleColumns={visibleColumns}
-        />
+        <MasterServantListRowStats active={active} bond={bond} masterServant={masterServant} visibleColumns={visibleColumns} />
     );
 
     const id = idPrefix && `${idPrefix}${index}`;
@@ -147,5 +141,4 @@ export const MasterServantListRow = React.memo((props: Props) => {
             </div>
         </DataTableListRow>
     );
-
 }, shouldSkipUpdate);

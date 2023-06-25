@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { GameServant, ImmutableMasterServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateNumber, MasterServantAggregatedData, PlanServantUpdate } from '@fgo-planner/data-core';
+import { GameServant, MasterServant, InstantiatedServantAscensionLevel, InstantiatedServantFouSet, InstantiatedServantSkillLevel, InstantiatedServantSkillSet, InstantiatedServantSkillSlot, InstantiatedServantUpdateBoolean, InstantiatedServantUpdateNumber, MasterServantAggregatedData, PlanServantUpdate } from '@fgo-planner/data-core';
 import { Checkbox } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
 import React, { useCallback } from 'react';
@@ -171,7 +171,7 @@ export const PlanRoutePlanServantEditDialogEnhancementsTabContent = React.memo((
     const multiEditMode = targetMasterServantsData.length > 1;
 
     let targetGameServant: Immutable<GameServant> | undefined;
-    let targetMasterServant: ImmutableMasterServant | undefined;
+    let targetMasterServant: Immutable<MasterServant> | undefined;
     if (!multiEditMode) {
         /**
          * This can be empty during the initial render.
@@ -196,7 +196,7 @@ export const PlanRoutePlanServantEditDialogEnhancementsTabContent = React.memo((
 
     // TODO Add a flag to enable/disable fous
     const enableFousCheckbox = (
-         <Checkbox disabled />
+        <Checkbox disabled />
     );
 
     const enableSkillsCheckbox = (

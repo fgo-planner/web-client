@@ -1,9 +1,8 @@
-import { ReadonlyDate } from '@fgo-planner/common-core';
 import React from 'react';
 import { DateTimeFormatUtils } from '../../../../../../utils/format/DateTimeFormatUtils';
 
 type Props = {
-    date?: ReadonlyDate; 
+    date?: string;
 };
 
 export const StyleClassPrefix = 'MasterServantListRowSummonDate';

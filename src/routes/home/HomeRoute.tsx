@@ -1,5 +1,5 @@
-import { Nullable } from '@fgo-planner/common-core';
-import { ImmutableMasterAccount } from '@fgo-planner/data-core';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
+import { MasterAccount } from '@fgo-planner/data-core';
 import { SystemStyleObject, Theme } from '@mui/system';
 import React, { Fragment, ReactNode, useEffect, useMemo, useState } from 'react';
 import { MasterAccountFriendId } from '../../components/master/account/MasterAccountFriendId';
@@ -19,7 +19,7 @@ const StyleClassPrefix = 'HomeRoute';
 
 export const HomeRoute = React.memo(() => {
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<ImmutableMasterAccount>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
 
     /*
      * Master account change subscription.

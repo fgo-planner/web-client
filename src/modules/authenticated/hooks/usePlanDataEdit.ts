@@ -1,5 +1,5 @@
-import { CollectionUtils, DateTimeUtils, Immutable, ImmutableArray, Nullable, ReadonlyDate, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameItemConstants, ImmutablePlan, InstantiatedServantUtils, MasterItemConstants, MasterServantAggregatedData, MasterServantUpdate, Plan, PlanServant, PlanServantAggregatedData, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanUpcomingResources, PlanUtils } from '@fgo-planner/data-core';
+import { CollectionUtils, Immutable, ImmutableArray, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { GameItemConstants, InstantiatedServantUtils, MasterItemConstants, MasterServantAggregatedData, MasterServantUpdate, Plan, PlanServant, PlanServantAggregatedData, PlanServantUpdate, PlanServantUpdateUtils, PlanServantUtils, PlanResources, PlanUtils } from '@fgo-planner/data-core';
 import React, { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import { useInjectable } from '../../../hooks/dependency-injection/useInjectable';
 import { useLoadingIndicator } from '../../../hooks/user-interface/useLoadingIndicator';
@@ -22,15 +22,16 @@ type PartialMasterAccountEditData = Pick<MasterAccountEditData, 'aggregatedServa
 type PlanInfo = {
     name: string;
     description: string;
-    targetDate?: ReadonlyDate;
-    enabled: ImmutablePlan['enabled'];
+    startDate?: string;
+    endDate?: string;
+    enabled: Immutable<Plan['enabled']>;
     // shared: boolean;
 };
 
 type PlanEditData = PlanInfo & {
     aggregatedServants: ReadonlyArray<PlanServantAggregatedData>;
     costumes: ReadonlySet<number>;
-    upcomingResources: ImmutableArray<PlanUpcomingResources>;
+    upcomingResources: ImmutableArray<PlanResources>;
 };
 
 /**
@@ -129,8 +130,8 @@ type PlanDataEditHookResult = {
      */
     deletePlanServants(instanceIds: Iterable<number>): void;
     fulfillPlanServants(instanceIds: Iterable<number>, remove?: boolean): void;
-    addUpcomingResources(resources: PlanUpcomingResources): void;
-    updateUpcomingResources(index: number, resources: PlanUpcomingResources): void;
+    addUpcomingResources(resources: PlanResources): void;
+    updateUpcomingResources(index: number, resources: PlanResources): void;
     deleteUpcomingResources(index: number): void;
     reloadData(): Promise<void>;
     revertChanges(): void;
@@ -180,7 +181,7 @@ const getDefaultPlanEditData = (): PlanEditData => ({
 });
 
 const clonePlanDataForEdit = (
-    plan: Nullable<ImmutablePlan>,
+    plan: Nullable<Immutable<Plan>>,
     masterServantMap: ReadonlyMap<number, MasterServantAggregatedData>
 ): PlanEditData => {
 
@@ -189,12 +190,13 @@ const clonePlanDataForEdit = (
     }
 
     const {
-        name,
-        description,
-        targetDate,
-        enabled,
-        servants: planServants,
         costumes,
+        description,
+        enabled,
+        endDate,
+        name,
+        servants: planServants,
+        startDate,
         upcomingResources
     } = plan;
 
@@ -204,15 +206,16 @@ const clonePlanDataForEdit = (
     );
 
     return {
-        name,
+        aggregatedServants,
+        costumes: new Set(costumes),
         description,
-        targetDate,
         enabled: {
             ...enabled
         },
-        aggregatedServants,
-        costumes: new Set(costumes),
-        upcomingResources: upcomingResources.map(PlanUtils.clonePlanUpcomingResources)
+        endDate,
+        name,
+        startDate,
+        upcomingResources: upcomingResources.map(PlanUtils.clonePlanResources)
     };
 };
 
@@ -221,7 +224,7 @@ const getDefaultPlanReferenceData = (): PlanEditReferenceData => ({
     servants: CollectionUtils.emptyMap()
 });
 
-const clonePlanDataForReference = (plan: Nullable<ImmutablePlan>): PlanEditReferenceData => {
+const clonePlanDataForReference = (plan: Nullable<Immutable<Plan>>): PlanEditReferenceData => {
     if (!plan) {
         return getDefaultPlanReferenceData();
     }
@@ -229,7 +232,8 @@ const clonePlanDataForReference = (plan: Nullable<ImmutablePlan>): PlanEditRefer
     const {
         name,
         description,
-        targetDate,
+        startDate,
+        endDate,
         enabled,
         servants,
         costumes,
@@ -244,7 +248,8 @@ const clonePlanDataForReference = (plan: Nullable<ImmutablePlan>): PlanEditRefer
     return {
         name,
         description,
-        targetDate,
+        startDate,
+        endDate,
         enabled,
         servants: CollectionUtils.mapIterableToMap(servants, InstantiatedServantUtils.getInstanceId),
         costumes: new Set(costumes),
@@ -323,7 +328,7 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     /**
      * The original plan data.
      */
-    const [plan, setPlan] = useState<Nullable<ImmutablePlan>>();
+    const [plan, setPlan] = useState<Nullable<Immutable<Plan>>>();
 
     /**
      * A copy of the plan data for editing.
@@ -490,7 +495,8 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
     const updatePlanInfo = useCallback((planInfo: PlanInfo): void => {
         editData.name = planInfo.name;
         editData.description = planInfo.description;
-        editData.targetDate = DateTimeUtils.cloneDate(planInfo.targetDate);
+        editData.startDate = planInfo.startDate;
+        editData.endDate = planInfo.endDate;
         editData.enabled = {
             ...planInfo.enabled
         };
@@ -769,11 +775,11 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
         }
     }, [deletePlanServants, editData, masterAccountEditData, updateMasterItems, updateMasterServants]);
 
-    const addUpcomingResources = useCallback((resources: PlanUpcomingResources): void => {
+    const addUpcomingResources = useCallback((resources: PlanResources): void => {
         // TODO Implement this
     }, []);
 
-    const updateUpcomingResources = useCallback((index: number, resources: PlanUpcomingResources): void => {
+    const updateUpcomingResources = useCallback((index: number, resources: PlanResources): void => {
         // TODO Implement this
     }, []);
 
@@ -835,7 +841,8 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
                     name: editData.name,
                     description: editData.description,
                     shared: plan.shared,  // TODO Change this to editData.shared
-                    targetDate: editData.targetDate as Date,
+                    startDate: editData.startDate,
+                    endDate: editData.endDate,
                     enabled: {
                         ...editData.enabled
                     },

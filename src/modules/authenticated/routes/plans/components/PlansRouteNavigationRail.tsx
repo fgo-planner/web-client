@@ -7,11 +7,12 @@ type Props = {
     filtersEnabled: boolean;
     hasSelection: boolean;
     layout: 'row' | 'column';
-    onAddPlan: () => void;
-    onDeleteSelectedPlan: () => void;
-    onEditSelectedPlan?: () => void;
-    onOpenColumnSettings?: () => void;
-    onToggleFilters: () => void;
+    onCreatePlan(): void;
+    onCreatePlanGroup(): void;
+    onDeleteSelectedPlan(): void;
+    onEditSelectedPlan?(): void;
+    onOpenColumnSettings?(): void;
+    onToggleFilters(): void;
 };
 
 export const PlansRouteNavigationRail = React.memo((props: Props) => {
@@ -20,7 +21,7 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
         filtersEnabled,
         hasSelection,
         layout,
-        onAddPlan,
+        onCreatePlan,
         onDeleteSelectedPlan,
         onEditSelectedPlan,
         onOpenColumnSettings,
@@ -62,7 +63,7 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                 <Tooltip key='add' title='Create plan' placement='right'>
                     <div>
                         <IconButton
-                            onClick={onAddPlan}
+                            onClick={onCreatePlan}
                             children={<IconOutlined>post_add</IconOutlined>}
                             size='large'
                         />
@@ -74,8 +75,8 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                 <Tooltip key='add-group' title='Create plan group' placement='right'>
                     <div>
                         <IconButton
-                            onClick={onAddPlan}
-                            children={<IconOutlined>post_add</IconOutlined>}
+                            onClick={onCreatePlan}
+                            children={<IconOutlined>create_new_folder</IconOutlined>}
                             size='large'
                         />
                     </div>

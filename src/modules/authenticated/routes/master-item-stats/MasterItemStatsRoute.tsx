@@ -1,4 +1,4 @@
-import { Nullable } from '@fgo-planner/common-core';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { MasterAccount } from '@fgo-planner/data-core';
 import { Icon, IconButton, Theme, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -125,7 +125,7 @@ export const MasterItemStatsRoute = React.memo(() => {
 
     const { sm } = useActiveBreakpoints();
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
 
     const gameServantMap = useGameServantMap();
     const gameItemMap = useGameItemMap();

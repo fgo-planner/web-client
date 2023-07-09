@@ -1,8 +1,9 @@
 import { CollectionUtils, Nullable, ObjectUtils } from '@fgo-planner/common-core';
+import { BasicMasterAccount, EntityUtils } from '@fgo-planner/data-core';
 import { isEmpty } from 'lodash-es';
 import { Inject } from '../../../decorators/dependency-injection/Inject.decorator';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
-import { BasicMasterAccounts, MasterAccountChange, MasterAccountChanges, UserTokenPayload } from '../../../types';
+import { BasicMasterAccounts, MasterAccountChanges, MasterAccountChangeType, UserTokenPayload } from '../../../types';
 import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
 import { MasterAccountChangeListenerService } from './MasterAccountChangeListenerService';
@@ -96,7 +97,7 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
             return;
         }
         const changes = this._findChanges(this._currentMasterAccountList, data);
-        if (isEmpty(changes)) {
+        if (!this._hasChanges(changes)) {
             console.debug('No account changes found');
         } else {
             console.debug('Account changes found', changes);
@@ -111,12 +112,12 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
         if (!currentAccounts.length && !updatedAccounts.length) {
             return {};
         } else if (!currentAccounts.length) {
-            return CollectionUtils.mapIterableToObject(updatedAccounts, account => account._id, () => 'Created');
+            return CollectionUtils.mapIterableToObject(updatedAccounts, account => account._id, () => MasterAccountChangeType.Created);
         } else if (!updatedAccounts.length) {
-            return CollectionUtils.mapIterableToObject(currentAccounts, account => account._id, () => 'Deleted');
+            return CollectionUtils.mapIterableToObject(currentAccounts, account => account._id, () => MasterAccountChangeType.Deleted);
         }
 
-        const result = {} as Record<string, MasterAccountChange>;
+        const result = {} as Record<string, MasterAccountChangeType>;
         /**
          * Currently, there is no way to change the master account order for a user, so
          * any additional or missing IDs will be a result of an account being added or
@@ -132,15 +133,17 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
             for (let j = 0; j < updatedAccounts.length; j++) {
                 const updatedAccount = updatedAccounts[j];
                 if (accountId === updatedAccount._id) {
-                    if (!ObjectUtils.isShallowEquals(currentAccount, updatedAccount)) {
-                        result[accountId] = 'Updated';
+                    if (this._isUpdated(currentAccount, updatedAccount)) {
+                        result[accountId] = MasterAccountChangeType.Updated;
+                    } else {
+                        result[accountId] = MasterAccountChangeType.None;
                     }
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                result[accountId] = 'Deleted';
+                result[accountId] = MasterAccountChangeType.Deleted;
             }
         }
 
@@ -163,7 +166,7 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
                 }
             }
             if (!found) {
-                result[accountId] = 'Created';
+                result[accountId] = MasterAccountChangeType.Created;
             }
         }
 
@@ -186,6 +189,25 @@ export class ScheduledMasterAccountChangeListenerService extends MasterAccountCh
     private _handleMasterAccountListChange(masterAccountList: Nullable<BasicMasterAccounts>): void {
         this._currentMasterAccountList = masterAccountList;
         this._publishAvailableChanges({});  // Reset changes
+    }
+
+    private _isUpdated(currentAccount: BasicMasterAccount, updatedAccount: BasicMasterAccount): boolean {
+        if (ObjectUtils.isShallowEquals(currentAccount, updatedAccount)) {
+            return false;
+        }
+        return EntityUtils.isMoreRecent(currentAccount, updatedAccount);
+    }
+
+    private _hasChanges(changes: MasterAccountChanges): boolean {
+        if (isEmpty(changes)) {
+            return false;
+        }
+        for (const change of Object.values(changes)) {
+            if (change !== MasterAccountChangeType.None) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

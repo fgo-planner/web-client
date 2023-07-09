@@ -1,5 +1,5 @@
-import { Immutable, Nullable } from '@fgo-planner/common-core';
-import { BasicMasterAccount, MasterAccount } from '@fgo-planner/data-core';
+import { Immutable } from '@fgo-planner/common-core';
+import { BasicMasterAccount } from '@fgo-planner/data-core';
 import { MenuItem, TextField, Theme } from '@mui/material';
 import { SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import React, { ChangeEvent, CSSProperties, ReactNode, useCallback, useEffect, useState } from 'react';
@@ -46,7 +46,7 @@ export const AppBarMasterAccountSelect = React.memo(({ masterAccountList }: Prop
     useEffect(() => {
         const onCurrentMasterAccountChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopics.User.CurrentMasterAccountChange)
-            .subscribe((masterAccount: Nullable<MasterAccount>) => {
+            .subscribe(masterAccount => {
                 setCurrentMasterAccountId(masterAccount?._id || '');
             });
 

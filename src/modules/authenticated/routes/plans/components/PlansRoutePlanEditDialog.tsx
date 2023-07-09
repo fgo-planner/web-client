@@ -1,23 +1,12 @@
-import { Plan } from '@fgo-planner/data-core';
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, PaperProps, TextField, Typography } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { DialogCloseButton } from '../../../../../components/dialog/DialogCloseButton';
 import { InputFieldContainer } from '../../../../../components/input/InputFieldContainer';
-import { useInjectable } from '../../../../../hooks/dependency-injection/useInjectable';
 import { useAutoResizeDialog } from '../../../../../hooks/user-interface/useAutoResizeDialog';
-import { PlanService } from '../../../../../services/data/plan/PlanService';
 import { DialogComponentProps } from '../../../../../types';
 import { FormUtils } from '../../../../../utils/FormUtils';
-
-export type PlansRoutePlanEditDialogData = {
-    accountId: string;
-};
-
-type Props = {
-    dialogData?: PlansRoutePlanEditDialogData;
-} & Omit<DialogComponentProps<Plan>, 'open' | 'PaperProps'>;
 
 type FormData = {
     name: string;
@@ -25,6 +14,17 @@ type FormData = {
     autoUpdate: boolean;
     shared: boolean;
 };
+
+export type PlansRoutePlanEditDialogData = {
+    /**
+     * Function that makes the backend API call to create or update the plan.
+     */
+    submitAction(data: FormData): Promise<void>;
+};
+
+type Props = {
+    dialogData?: PlansRoutePlanEditDialogData;
+} & Omit<DialogComponentProps, 'open' | 'PaperProps'>;
 
 const FormId = 'plan-edit-form';
 
@@ -72,8 +72,6 @@ export const PlansRoutePlanEditDialog = React.memo((props: Props) => {
         actionButtonVariant
     } = useAutoResizeDialog(props);
 
-    const planService = useInjectable(PlanService);
-
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>();
     const [, setIsMounted] = useState<boolean>(true);
@@ -97,17 +95,14 @@ export const PlansRoutePlanEditDialog = React.memo((props: Props) => {
         setIsSubmitting(true);
         setErrorMessage(undefined);
         try {
-            const plan = await planService.createPlan({
-                accountId: dialogData.accountId,
-                ...values,
-            });
+            await dialogData.submitAction(values);
             setIsSubmitting(false);
-            onClose({}, 'submit', plan);
+            onClose({}, 'submit');
         } catch (e: any) {
             setIsSubmitting(false);
             setErrorMessage(e.message || String(e));
         }
-    }, [dialogData, onClose, planService]);
+    }, [dialogData, onClose]);
 
     const renderForm = (): ReactNode => (
         <Formik {...formikConfig} onSubmit={submit}>

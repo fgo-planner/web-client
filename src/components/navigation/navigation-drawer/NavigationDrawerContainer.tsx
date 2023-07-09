@@ -1,4 +1,4 @@
-import { Nullable } from '@fgo-planner/common-core';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { MasterAccount } from '@fgo-planner/data-core';
 import { Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
@@ -160,7 +160,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
     const [open, setOpen] = useState<boolean>(false);
     const [animationsDisabled, setAnimationsDisabled] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
 
     /**
      * User change subscription.

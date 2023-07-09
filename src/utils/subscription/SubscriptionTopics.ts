@@ -1,4 +1,4 @@
-import { Functions, Nullable } from '@fgo-planner/common-core';
+import { Functions, Immutable, Nullable } from '@fgo-planner/common-core';
 import { MasterAccount, UserPreferences } from '@fgo-planner/data-core';
 import { BasicMasterAccounts, GlobalDialogOpenAction, HttpResponseError, MasterAccountChanges, PageMetadata, ThemeInfo, UserTokenPayload } from '../../types';
 import { SubscriptionTopic } from './SubscriptionTopic';
@@ -13,9 +13,9 @@ const Audio = {
 
 const User = {
 
-    CurrentMasterAccountChange: SubscriptionTopic.forBehaviorSubject<Nullable<MasterAccount>>(Functions.nullSupplier),
+    CurrentMasterAccountChange: SubscriptionTopic.forBehaviorSubject<Nullable<Immutable<MasterAccount>>>(Functions.nullSupplier),
 
-    CurrentUserChange: SubscriptionTopic.forBehaviorSubject<Nullable<UserTokenPayload>>(Functions.nullSupplier),
+    CurrentUserChange: SubscriptionTopic.forBehaviorSubject<Nullable<Immutable<UserTokenPayload>>>(Functions.nullSupplier),
 
     // TODO Wrap UserPreferences with Immutable<>
     CurrentUserPreferencesChange: SubscriptionTopic.forBehaviorSubject<Nullable<UserPreferences>>(Functions.nullSupplier),
@@ -39,9 +39,9 @@ const UserInterface = {
     MetadataChange: SubscriptionTopic.forReplaySubject<PageMetadata>(),
 
     // NavigationDrawerContentChange: SubscriptionTopic.forReplaySubject<Nullable<NavigationDrawerContent>>(),
-    
+
     NavigationDrawerOpenChange: SubscriptionTopic.forReplaySubject<boolean>(),
-    
+
     NavigationDrawerNoAnimationsChange: SubscriptionTopic.forReplaySubject<boolean>(),
 
     ThemeChange: SubscriptionTopic.forReplaySubject<ThemeInfo>()

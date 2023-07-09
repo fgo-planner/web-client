@@ -1,4 +1,4 @@
-import { Nullable } from '@fgo-planner/common-core';
+import { Immutable, Nullable } from '@fgo-planner/common-core';
 import { MasterAccount } from '@fgo-planner/data-core';
 import { Icon, IconButton, Tooltip } from '@mui/material';
 import { Box, SystemStyleObject, Theme } from '@mui/system';
@@ -73,7 +73,7 @@ const StyleProps = (theme: Theme) => ({
             flex: 1,
             [`& .${MasterServantStatsRouteTableStyleClassPrefix}-root`]: {
                 height: '100%',
-                overflow:'auto'
+                overflow: 'auto'
             }
         }
     }
@@ -81,7 +81,7 @@ const StyleProps = (theme: Theme) => ({
 
 export const MasterServantStatsRoute = React.memo(() => {
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
     const [filter, setFilter] = useState<MasterServantStatsRouteFilterControlsResult>();
 
     const gameServantMap = useGameServantMap();

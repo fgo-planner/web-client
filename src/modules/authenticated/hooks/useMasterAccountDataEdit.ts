@@ -1,11 +1,12 @@
 import { CollectionUtils, Immutable, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameItemConstants, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, UpdateMasterAccount, MasterServant, MasterServantAggregatedData, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
+import { GameItemConstants, InstantiatedServantBondLevel, InstantiatedServantUtils, MasterAccount, MasterServant, MasterServantAggregatedData, MasterServantUpdate, MasterServantUpdateUtils, MasterServantUtils, UpdateMasterAccount } from '@fgo-planner/data-core';
 import { SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGameServantMap } from '../../../hooks/data/useGameServantMap';
 import { useInjectable } from '../../../hooks/dependency-injection/useInjectable';
 import { useLoadingIndicator } from '../../../hooks/user-interface/useLoadingIndicator';
 import { useBlockNavigation, UseBlockNavigationOptions } from '../../../hooks/utils/useBlockNavigation';
 import { MasterAccountService } from '../../../services/data/master/MasterAccountService';
+import { MasterAccountChangeType } from '../../../types';
 import { DataAggregationUtils } from '../../../utils/DataAggregationUtils';
 import { GameServantMap } from '../../../utils/game/GameServantMap';
 import { MasterAccountUtils } from '../../../utils/master/MasterAccountUtils';
@@ -500,9 +501,12 @@ export function useMasterAccountDataEdit(
             .get(SubscriptionTopics.User.MasterAccountChangesAvailable)
             .subscribe(masterAccountChanges => {
                 const currentAccountStatus = masterAccountChanges[masterAccountId];
-                if (currentAccountStatus === undefined) {
+                if (!currentAccountStatus) {
+                    console.debug(`Current master account id=${masterAccountId} was not found in the updated account list.`);
                     setIsDataStale(false);
-                } else if (currentAccountStatus === 'Updated') {
+                } else if (currentAccountStatus === MasterAccountChangeType.None) {
+                    setIsDataStale(false);
+                } else if (currentAccountStatus === MasterAccountChangeType.Updated) {
                     if (!isDataDirty) {
                         console.debug(`Changes found for the current master account id=${masterAccountId}, automatically reloading data.`);
                         /**
@@ -517,12 +521,9 @@ export function useMasterAccountDataEdit(
                          */
                         setIsDataStale(true);
                     }
-                } else if (currentAccountStatus === 'Deleted') {
+                } else if (currentAccountStatus === MasterAccountChangeType.Deleted) {
                     // TODO Handle case of deleted account.
                 }
-                /**
-                 * The `Created` status should not be possible here.
-                 */
             });
 
         return () => onMasterAccountChangesAvailableSubscription.unsubscribe();
@@ -540,7 +541,7 @@ export function useMasterAccountDataEdit(
          * Whether or not to process the next `MasterAccount` data that comes in from
          * the observable.
          */
-        const shouldProcessNext = (nextMasterAccount: Nullable<MasterAccount>): boolean => {
+        const shouldProcessNext = (nextMasterAccount: Nullable<Immutable<MasterAccount>>): boolean => {
             if (!skipProcessOnActiveAccountChange || !masterAccountId) {
                 return true;
             }

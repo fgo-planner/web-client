@@ -1,5 +1,5 @@
 import { Immutable } from '@fgo-planner/common-core';
-import { BasicPlan, Plan, PlanGroup, PlanGroupAggregatedData } from '@fgo-planner/data-core';
+import { BasicPlan, PlanGroup, PlanGroupAggregatedData } from '@fgo-planner/data-core';
 import { Button, IconButton, TextField, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -12,12 +12,12 @@ import { PlanConstants } from '../../../../constants';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
 import { ThemeConstants } from '../../../../styles/ThemeConstants';
 import { ModalOnCloseReason } from '../../../../types';
-import { usePlansDataEdit } from '../../hooks/usePlansDataEdit';
 import { PlanListItem } from './components/PlanListItem.type';
 import { PlansRouteNavigationRail } from './components/PlansRouteNavigationRail';
 import { PlansRoutePlanEditDialog } from './components/PlansRoutePlanEditDialog';
 import { PlansRoutePlanList } from './components/PlansRoutePlanList';
 import { PlansRoutePlanListColumn } from './components/PlansRoutePlanListColumn';
+import { usePlansDataEdit } from './hooks/usePlansDataEdit';
 import { usePlansRouteModalState } from './hooks/usePlansRouteModalState';
 
 const DeleteTargetDialogTitle = 'Delete Plan?';
@@ -131,8 +131,6 @@ export const PlansRoute = React.memo(() => {
     const [selectedId, setSelectedId] = useState<string>();
     const selectedRef = useRef<PlanListItem>();
 
-    const [addPlanDialogOpen, setAddPlanDialogOpen] = useState<boolean>(false);
-
     const [deleteTargetDialogPrompt, setDeleteTargetDialogPrompt] = useState<string>();
 
     const {
@@ -160,13 +158,13 @@ export const PlansRoute = React.memo(() => {
         description: sm
     }), [lg, sm]);
 
-    const handleAddPlan = useCallback((): void => {
-        setAddPlanDialogOpen(true);
-    }, []);
+    const handleCreatePlan = useCallback((): void => {
+        openPlanEditDialog({ submitAction: createPlan });
+    }, [createPlan, openPlanEditDialog]);
 
-    const handleAddPlanDialogClose = useCallback((_event: any, reason: ModalOnCloseReason, _data?: Plan): void => {
-        setAddPlanDialogOpen(false);
-    }, []);
+    const handleEditPlanDialogClose = useCallback((_event: any, _reason: ModalOnCloseReason): void => {
+        closeActiveDialog();
+    }, [closeActiveDialog]);
 
     const handleOpenEditTargetDialog = useCallback((): void => {
         if (!selectedRef.current) {
@@ -248,10 +246,10 @@ export const PlansRoute = React.memo(() => {
                         Plans
                     </PageTitle>
                     {sm ?
-                        <Button variant='contained' onClick={handleAddPlan}>
+                        <Button variant='contained' onClick={handleCreatePlan}>
                             Create Plan
                         </Button> :
-                        <IconButton color='primary' onClick={handleAddPlan}>
+                        <IconButton color='primary' onClick={handleCreatePlan}>
                             <IconOutlined>post_add</IconOutlined>
                         </IconButton>
                     }
@@ -270,7 +268,8 @@ export const PlansRoute = React.memo(() => {
                     filtersEnabled={filtersEnabled}
                     layout={sm ? 'column' : 'row'}
                     hasSelection={!!selectedRef.current}
-                    onAddPlan={handleAddPlan}
+                    onCreatePlan={handleCreatePlan}
+                    onCreatePlanGroup={handleCreatePlan}
                     onEditSelectedPlan={handleOpenEditTargetDialog}
                     onDeleteSelectedPlan={handleOpenDeleteTargetDialog}
                     onToggleFilters={toggleFilters}
@@ -291,7 +290,7 @@ export const PlansRoute = React.memo(() => {
         </Box>
         <PlansRoutePlanEditDialog
             dialogData={activeDialog.name === 'planEdit' ? activeDialog.data : undefined}
-            onClose={handleAddPlanDialogClose}
+            onClose={handleEditPlanDialogClose}
         />
         <PromptDialog
             open={!!deleteTargetDialogPrompt}

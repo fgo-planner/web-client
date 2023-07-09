@@ -11,7 +11,7 @@ export namespace MasterServantStatsUtils {
 
     export function generateStatsGroupedByRarity(
         gameServantMap: GameServantMap,
-        masterAccount: MasterAccount,
+        masterAccount: Immutable<MasterAccount>,
         filter: MasterServantStatsRouteTypes.FilterOptions
     ): MasterServantStatsRouteTypes.StatsGroupedByRarity {
         const start = window.performance.now();
@@ -66,7 +66,7 @@ export namespace MasterServantStatsUtils {
 
     export function generateStatsGroupedByClass(
         gameServantMap: GameServantMap,
-        masterAccount: MasterAccount,
+        masterAccount: Immutable<MasterAccount>,
         filter: MasterServantStatsRouteTypes.FilterOptions
     ): MasterServantStatsRouteTypes.StatsGroupedByClass {
         const start = window.performance.now();

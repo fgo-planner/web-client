@@ -1,4 +1,4 @@
-import { Array2D, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
+import { Array2D, Immutable, Nullable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { InstantiatedServantUpdateIndeterminateValue as IndeterminateValue, MasterAccount, UpdateMasterAccount, MasterServant, MasterServantUpdateUtils, MasterServantUtils } from '@fgo-planner/data-core';
 import { FgoManagerDataImport, MasterAccountImportData } from '@fgo-planner/transform-core';
 import { Options } from 'csv-parse';
@@ -61,7 +61,7 @@ const MasterServantImportRoute = React.memo(() => {
 
     const fgoManagerNamesMap = useFgoManagerNamesMap();
 
-    const [masterAccount, setMasterAccount] = useState<Nullable<MasterAccount>>();
+    const [masterAccount, setMasterAccount] = useState<Nullable<Immutable<MasterAccount>>>();
     const [parsedData, setParsedData] = useState<MasterAccountImportData>();
     const [importStatus, setImportStatus] = useState<ImportStatus>('none');
     const [importStatusDialogOpen, setImportStatusDialogOpen] = useState<boolean>(false);

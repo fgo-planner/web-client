@@ -37,6 +37,8 @@ export * from './http/HttpResponseError.type';
 export * from './http/HttpResponseType.type';
 export * from './master/account/BasicMasterAccounts.type';
 export * from './master/account/MasterAccountChanges.type';
+export * from './master/account/MasterAccountChangeType.enum';
+export * from './master/account/MasterAccountMetadata.type';
 export * from './MaterialIconVariant.type';
 export * from './plan/PlanEnhancementCategory.type';
 export * from './plan/requirements/PlanEnhancementItemRequirements.type';

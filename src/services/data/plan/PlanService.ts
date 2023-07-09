@@ -1,4 +1,4 @@
-import { BasicPlan, CreatePlan, Plan, PlanGrouping, UpdatePlan, UpdatePlanGrouping } from '@fgo-planner/data-core';
+import { BasicPlan, CreatePlan, CreatePlanGroup, Plan, PlanGrouping, UpdatePlan, UpdatePlanGrouping } from '@fgo-planner/data-core';
 import { Injectable } from '../../../decorators/dependency-injection/Injectable.decorator';
 import { HttpUtils as Http } from '../../../utils/HttpUtils';
 import { DataService } from '../DataService';
@@ -12,8 +12,8 @@ export class PlanService extends DataService {
 
     //#region Plan
 
-    async createPlan(plan: CreatePlan): Promise<Plan> {
-        const promise = Http.put<Plan>(`${this._BaseUrl}/plan`, plan);
+    async createPlan(createPlan: CreatePlan): Promise<Plan> {
+        const promise = Http.put<Plan>(`${this._BaseUrl}/plan`, createPlan);
         return this._fetchWithLoadingIndicator(promise);
     }
 
@@ -27,8 +27,8 @@ export class PlanService extends DataService {
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    async updatePlan(plan: UpdatePlan): Promise<Plan> {
-        const promise = Http.post<Plan>(`${this._BaseUrl}/plan`, plan);
+    async updatePlan(updatePlan: UpdatePlan): Promise<Plan> {
+        const promise = Http.post<Plan>(`${this._BaseUrl}/plan`, updatePlan);
         return this._fetchWithLoadingIndicator(promise);
     }
 
@@ -51,8 +51,13 @@ export class PlanService extends DataService {
         return this._fetchWithLoadingIndicator(promise);
     }
 
-    async updatePlanGrouping(planGrouping: UpdatePlanGrouping): Promise<PlanGrouping> {
-        const promise = Http.post<PlanGrouping>(`${this._BaseUrl}/plan-grouping`, planGrouping);
+    async updatePlanGrouping(updatePlanGrouping: UpdatePlanGrouping): Promise<PlanGrouping> {
+        const promise = Http.post<PlanGrouping>(`${this._BaseUrl}/plan-grouping`, updatePlanGrouping);
+        return this._fetchWithLoadingIndicator(promise);
+    }
+
+    async createPlanGroup(createPlanGroup: CreatePlanGroup): Promise<PlanGrouping> {
+        const promise = Http.put<PlanGrouping>(`${this._BaseUrl}/plan-grouping`, createPlanGroup);
         return this._fetchWithLoadingIndicator(promise);
     }
 

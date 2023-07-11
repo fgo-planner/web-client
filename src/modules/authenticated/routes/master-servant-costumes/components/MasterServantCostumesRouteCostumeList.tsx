@@ -94,7 +94,7 @@ export const MasterServantCostumesRouteCostumeList = React.memo(({ onChange, unl
 
     const renderCostumeRow = (costumeData: GameServantCostumeAggregatedData): ReactNode => {
         const { costumeId } = costumeData;
-        const noCostUnlock = !!unlockedCostumes[costumeId];
+        const noCostUnlock = unlockedCostumes[costumeId];
         const unlocked = noCostUnlock !== undefined;
         return (
             <MasterServantCostumesRouteCostumeListRow

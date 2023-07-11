@@ -5,7 +5,7 @@ export namespace MasterAccountUtils {
 
     /**
      * Generates a map for the unlocked costumes whether the ky is the costume ID
-     * and the value is a boolean indicating whether the costume as unlocked for
+     * and the value is a boolean indicating whether the costume was unlocked for
      * free.
      */
     export function generateUnlockedCostumesMap(costumes: Immutable<MasterCostumes>): Record<number, boolean> {

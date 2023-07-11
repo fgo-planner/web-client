@@ -1,4 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
+import { Immutable, ReadonlyRecord } from '@fgo-planner/common-core';
 import { MasterCostumes } from '@fgo-planner/data-core';
 
 export namespace MasterAccountUtils {
@@ -16,8 +16,23 @@ export namespace MasterAccountUtils {
         return result;
     }
 
-    export function unlockedCostumesMapToIdSet(costumesMap: Record<number, boolean>): Set<number> {
+    export function unlockedCostumesMapToIdSet(costumesMap: ReadonlyRecord<number, boolean>): Set<number> {
         return new Set(Object.keys(costumesMap).map(Number));
+    }
+
+    export function mergeCostumesIdSetToMap(costumesMap: Record<number, boolean>, costumeIds: Set<number>): Record<number, boolean> {
+        for (const key of Object.keys(costumesMap)) {
+            const costumeId = Number(key);
+            if (!costumeIds.has(costumeId)) {
+                delete costumesMap[costumeId];
+            }
+        }
+        for (const costumeId of costumeIds) {
+            if (costumesMap[costumeId] === undefined) {
+                costumesMap[costumeId] = false;
+            }
+        }
+        return costumesMap;
     }
 
 }

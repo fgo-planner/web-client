@@ -747,7 +747,7 @@ export function useMasterAccountDataEdit(
         editData.aggregatedServants = servantsData;
         editData.lastServantInstanceId = lastServantInstanceId;
         editData.bondLevels = bondLevels;
-        editData.costumes = costumes;
+        editData.costumes = MasterAccountUtils.mergeCostumesIdSetToMap(costumes, costumeIds);
 
         const isBondLevelsDirty = !ObjectUtils.isShallowEquals(referenceData.bondLevels, bondLevels);
         const isCostumesDirty = !ObjectUtils.isShallowEquals(referenceData.costumes, costumes);
@@ -840,7 +840,7 @@ export function useMasterAccountDataEdit(
 
         editData.aggregatedServants = servantsData;
         editData.bondLevels = bondLevels;
-        editData.costumes = costumes;
+        editData.costumes = MasterAccountUtils.mergeCostumesIdSetToMap(costumes, costumeIds);
 
         const isBondLevelsDirty = !ObjectUtils.isShallowEquals(referenceData.bondLevels, bondLevels);
         const isCostumesDirty = !ObjectUtils.isShallowEquals(referenceData.costumes, costumes);

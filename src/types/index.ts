@@ -20,6 +20,7 @@ export * from './dto/DataTableListColumnProperties.type';
 export * from './dto/EditDialogAction.enum';
 export * from './dto/EditDialogData.type';
 export * from './dto/NavigationDrawerContent.type';
+export * from './dto/OmitAccountId.type';
 export * from './dto/PageMetadata.type';
 export * from './dto/SelectedData.type';
 export * from './dto/ThemeInfo.type';

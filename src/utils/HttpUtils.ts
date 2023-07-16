@@ -91,6 +91,9 @@ export class HttpUtils {
             url += `${this._ParamsStartCharacter}${this._generateUrlParamsString(options.params)}`;
         }
         const headers = this._appendAuthorizationHeader();
+        if (body) {
+            headers[this._ContentTypeHeader] = this._inferContentType(body);
+        }
         if (typeof body === 'object') {
             body = JSON.stringify(body);
         }

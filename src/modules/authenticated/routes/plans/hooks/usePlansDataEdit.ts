@@ -1,24 +1,26 @@
 import { CollectionUtils, Functions, Immutable } from '@fgo-planner/common-core';
 import { EntityUtils } from '@fgo-planner/data-core';
-import { BasicPlan, CreatePlan, CreatePlanGroup, PlanGroup, PlanGroupAggregatedData, PlanGrouping, PlanGroupingAggregatedData, UpdatePlanGrouping } from '@fgo-planner/data-types';
+import { BasicPlan, CreatePlan, CreatePlanGroup, Entity, PlanGroup, PlanGroupAggregatedData, PlanGrouping, PlanGroupingAggregatedData, UpdatePlan, UpdatePlanGrouping } from '@fgo-planner/data-types';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useInjectable } from '../../../../../hooks/dependency-injection/useInjectable';
 import { MasterAccountService } from '../../../../../services/data/master/MasterAccountService';
 import { PlanService } from '../../../../../services/data/plan/PlanService';
-import { MasterAccountChangeType, MasterAccountMetadata } from '../../../../../types';
+import { MasterAccountChangeType, MasterAccountMetadata, OmitAccountId } from '../../../../../types';
 import { SubscribablesContainer } from '../../../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../../../utils/subscription/SubscriptionTopics';
 
 //#region Type definitions
 
-type OmitAccountId<T> = Omit<T, 'accountId'>;
+type UpdatePlanGroup = OmitAccountId<Entity & CreatePlanGroup>;
 
 export type PlansDataEditHookResult = {
     planGroupingAggregatedData: PlanGroupingAggregatedData | undefined;
     createPlan(createPlan: OmitAccountId<CreatePlan>): Promise<void>;
-    deletePlans(planIds: Iterable<string>): Promise<void>;
-    updatePlanGrouping(planGrouping: OmitAccountId<UpdatePlanGrouping>): Promise<void>;
     createPlanGroup(createPlanGroup: OmitAccountId<CreatePlanGroup>): Promise<void>;
+    deletePlans(planIds: Iterable<string>): Promise<void>;
+    updatePlan(updatePlan: OmitAccountId<UpdatePlan>): Promise<void>;
+    updatePlanGroup(planGroup: UpdatePlanGroup): Promise<void>;
+    updatePlanGrouping(planGrouping: OmitAccountId<UpdatePlanGrouping>): Promise<void>;
 };
 
 //#endregion
@@ -132,14 +134,13 @@ export const usePlansDataEdit = (): PlansDataEditHookResult => {
      * Master account available changes subscription.
      */
     useEffect(() => {
-        const masterAccountId = masterAccountMetadataRef.current?._id;
-        if (!masterAccountId) {
-            return;
-        }
-
         const onMasterAccountChangesAvailableSubscription = SubscribablesContainer
             .get(SubscriptionTopics.User.MasterAccountChangesAvailable)
             .subscribe(masterAccountChanges => {
+                const masterAccountId = masterAccountMetadataRef.current?._id;
+                if (!masterAccountId) {
+                    return;
+                }
                 const currentAccountStatus = masterAccountChanges[masterAccountId];
                 if (!currentAccountStatus) {
                     console.debug(`Current master account id=${masterAccountId} was not found in the updated account list.`);
@@ -190,12 +191,22 @@ export const usePlansDataEdit = (): PlansDataEditHookResult => {
         return () => onCurrentMasterAccountChangeSubscription.unsubscribe();
     }, [updatePlanGroupingAggregatedData]);
 
-    const createPlan = useCallback(async (plan: OmitAccountId<CreatePlan>): Promise<void> => {
+    const createPlan = useCallback(async (createPlan: OmitAccountId<CreatePlan>): Promise<void> => {
         const accountId = masterAccountMetadataRef.current?._id;
         if (!accountId) {
             return;
         }
-        await planService.createPlan({ accountId, ...plan });
+        await planService.createPlan({ accountId, ...createPlan });
+        loadPlanGroupingAggregatedData(accountId);
+    }, [loadPlanGroupingAggregatedData, planService]);
+
+
+    const updatePlan = useCallback(async (updatePlan: OmitAccountId<UpdatePlan>): Promise<void> => {
+        const accountId = masterAccountMetadataRef.current?._id;
+        if (!accountId) {
+            return;
+        }
+        await planService.updatePlan({ accountId, ...updatePlan });
         loadPlanGroupingAggregatedData(accountId);
     }, [loadPlanGroupingAggregatedData, planService]);
 
@@ -208,15 +219,6 @@ export const usePlansDataEdit = (): PlansDataEditHookResult => {
         loadPlanGroupingAggregatedData(accountId);
     }, [loadPlanGroupingAggregatedData, planService]);
 
-    const updatePlanGrouping = useCallback(async (planGrouping: OmitAccountId<UpdatePlanGrouping>): Promise<void> => {
-        const accountId = masterAccountMetadataRef.current?._id;
-        if (!accountId) {
-            return;
-        }
-        const updated = await planService.updatePlanGrouping({ accountId, ...planGrouping });
-        updatePlanGroupingAggregatedData(accountId, updated);
-    }, [updatePlanGroupingAggregatedData, planService]);
-
     const createPlanGroup = useCallback(async (planGroup: OmitAccountId<CreatePlanGroup>): Promise<void> => {
         const accountId = masterAccountMetadataRef.current?._id;
         if (!accountId) {
@@ -226,12 +228,39 @@ export const usePlansDataEdit = (): PlansDataEditHookResult => {
         updatePlanGroupingAggregatedData(accountId, planGrouping);
     }, [updatePlanGroupingAggregatedData, planService]);
 
+    const updatePlanGroup = useCallback(async (updatePlanGroup: Entity & OmitAccountId<CreatePlanGroup>): Promise<void> => {
+        const accountId = masterAccountMetadataRef.current?._id;
+        if (!accountId || !planGroupingAggregatedData) {
+            return;
+        }
+        let planGrouping = disaggregatePlanGroupingData(planGroupingAggregatedData);
+        const group = planGrouping.groups.find(group => group._id === updatePlanGroup._id);
+        if (!group) {
+            return;
+        }
+        group.name = updatePlanGroup.name;
+        group.description = updatePlanGroup.description;
+        planGrouping = await planService.updatePlanGrouping({ accountId, ...planGrouping });
+        updatePlanGroupingAggregatedData(accountId, planGrouping);
+    }, [planGroupingAggregatedData, planService, updatePlanGroupingAggregatedData]);
+
+    const updatePlanGrouping = useCallback(async (planGrouping: OmitAccountId<UpdatePlanGrouping>): Promise<void> => {
+        const accountId = masterAccountMetadataRef.current?._id;
+        if (!accountId) {
+            return;
+        }
+        const updated = await planService.updatePlanGrouping({ accountId, ...planGrouping });
+        updatePlanGroupingAggregatedData(accountId, updated);
+    }, [updatePlanGroupingAggregatedData, planService]);
+
     return {
         planGroupingAggregatedData,
         createPlan,
+        createPlanGroup,
         deletePlans,
-        updatePlanGrouping,
-        createPlanGroup
+        updatePlan,
+        updatePlanGroup,
+        updatePlanGrouping
     };
 
 };

@@ -22,6 +22,7 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
         hasSelection,
         layout,
         onCreatePlan,
+        onCreatePlanGroup,
         onDeleteSelectedPlan,
         onEditSelectedPlan,
         onOpenColumnSettings,
@@ -78,7 +79,7 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                 <Tooltip key='add-group' title='Create plan group' placement='right'>
                     <div>
                         <IconButton
-                            onClick={onCreatePlan}
+                            onClick={onCreatePlanGroup}
                             size='large'
                         >
                             <IconOutlined>create_new_folder</IconOutlined>

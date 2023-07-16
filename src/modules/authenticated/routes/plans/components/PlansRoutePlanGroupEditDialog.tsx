@@ -1,5 +1,5 @@
-import { CreatePlan, UpdatePlan } from '@fgo-planner/data-core';
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup, PaperProps, TextField, Typography } from '@mui/material';
+import { CreatePlanGroup, Entity } from '@fgo-planner/data-core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, PaperProps, TextField, Typography } from '@mui/material';
 import { SystemStyleObject, Theme } from '@mui/system';
 import { Formik, FormikConfig, FormikProps } from 'formik';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
@@ -10,42 +10,38 @@ import { DialogComponentProps, EditDialogAction, OmitAccountId } from '../../../
 import { FormUtils } from '../../../../../utils/FormUtils';
 
 type FormData = {
-    autoUpdate: boolean;
     description: string;
     name: string;
-    shared: boolean;
 };
 
-export type PlansRoutePlanEditDialogData = {
+export type PlansRoutePlanGroupEditDialogData = {
     action: EditDialogAction;
+    plans: Array<string>;
 } & ({
     action: typeof EditDialogAction.Add;
-    groupId: string | undefined;
-    createPlan(createPlan: OmitAccountId<CreatePlan>): Promise<void>;
+    createPlanGroup(createPlanGroup: OmitAccountId<CreatePlanGroup>): Promise<void>;
 } | {
     action: typeof EditDialogAction.Edit;
-    planId: string;
-    updatePlan(updatePlan: OmitAccountId<UpdatePlan>): Promise<void>;
+    planGroupId: string;
+    updatePlanGroup(updatePlanGroup: OmitAccountId<Entity & CreatePlanGroup>): Promise<void>;
 });
 
 type Props = {
-    dialogData?: PlansRoutePlanEditDialogData;
+    dialogData?: PlansRoutePlanGroupEditDialogData;
 } & Omit<DialogComponentProps, 'open' | 'PaperProps'>;
 
 const FormId = 'plan-edit-form';
 
 const formikConfig: Omit<FormikConfig<FormData>, 'onSubmit'> = {
     initialValues: {
-        autoUpdate: false,
         description: '',
-        name: '',
-        shared: false
+        name: ''
     },
     // validationSchema: ValidationSchema,
     validateOnBlur: true
 };
 
-const StyleClassPrefix = 'PlansRoutePlanEditDialog';
+const StyleClassPrefix = 'PlansRoutePlanGroupEditDialog';
 
 const StyleProps = {
     [`& .${StyleClassPrefix}-error-message`]: {
@@ -64,7 +60,7 @@ const DialogPaperProps: PaperProps = {
     }
 };
 
-export const PlansRoutePlanEditDialog = React.memo((props: Props) => {
+export const PlansRoutePlanGroupEditDialog = React.memo((props: Props) => {
 
     const {
         dialogData,
@@ -102,15 +98,16 @@ export const PlansRoutePlanEditDialog = React.memo((props: Props) => {
         setErrorMessage(undefined);
         try {
             if (dialogData.action == EditDialogAction.Add) {
-                const { groupId, createPlan } = dialogData;
-                await createPlan({
-                    groupId,
+                const { plans, createPlanGroup } = dialogData;
+                await createPlanGroup({
+                    plans,
                     ...values
                 });
             } else {
-                const { planId, updatePlan } = dialogData;
-                await updatePlan({
-                    _id: planId,
+                const { planGroupId, plans, updatePlanGroup } = dialogData;
+                await updatePlanGroup({
+                    _id: planGroupId,
+                    plans,
                     ...values
                 });
             }
@@ -169,30 +166,6 @@ export const PlansRoutePlanEditDialog = React.memo((props: Props) => {
                                 helperText={touchedErrors.description}
                             />
                         </InputFieldContainer>
-                        <FormGroup>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        name='autoUpdate'
-                                        checked={values.autoUpdate}
-                                        onChange={handleChange}
-                                    />
-                                }
-                                label='Auto-update'
-                            />
-                        </FormGroup>
-                        <FormGroup>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        name='shared'
-                                        checked={values.shared}
-                                        onChange={handleChange}
-                                    />
-                                }
-                                label='Shared'
-                            />
-                        </FormGroup>
                     </form>
                 );
             }}
@@ -210,7 +183,7 @@ export const PlansRoutePlanEditDialog = React.memo((props: Props) => {
         >
             <Typography component={'div'}>
                 <DialogTitle>
-                    Create Plan
+                    Create Group
                     {closeIconEnabled && <DialogCloseButton onClick={cancel} />}
                 </DialogTitle>
                 <DialogContent>

@@ -3,6 +3,7 @@ import { MouseEvent, useCallback } from 'react';
 import { DefaultContextMenu, useContextMenuState } from '../../../../../hooks/user-interface/useContextMenuState';
 import { DefaultDialog, useDialogState } from '../../../../../hooks/user-interface/useDialogState';
 import { PlansRoutePlanEditDialogData } from '../components/PlansRoutePlanEditDialog';
+import { PlansRoutePlanGroupEditDialogData } from '../components/PlansRoutePlanGroupEditDialog';
 
 export type PlansRouteContextMenu =
     'header' |
@@ -14,14 +15,18 @@ export type PlansRouteContextMenuData = {
 };
 
 export type PlansRouteDialog =
+    'planDelete' |
     'planEdit' |
-    'planDelete';
+    'planGroupEdit';
 
 export type PlansRouteDialogData = {
     name: 'planDelete';
 } | {
     name: 'planEdit',
     data: PlansRoutePlanEditDialogData;
+} | {
+    name: 'planGroupEdit',
+    data: PlansRoutePlanGroupEditDialogData;
 };
 
 export type PlansRouteModalStateHookResult = {
@@ -35,6 +40,7 @@ export type PlansRouteModalStateHookResult = {
     activeDialog: Readonly<DefaultDialog | PlansRouteDialogData>;
     closeActiveDialog(): void;
     openPlanEditDialog(data: PlansRoutePlanEditDialogData): void;
+    openPlanGroupEditDialog(data: PlansRoutePlanGroupEditDialogData): void;
     openPlanDeleteDialog(): void;
 };
 
@@ -64,6 +70,11 @@ export function usePlansRouteModalState(): PlansRouteModalStateHookResult {
     const openPlanEditDialog = useCallback((data: PlansRoutePlanEditDialogData): void => {
         _openDialog({ name: 'planEdit', data });
     }, [_openDialog]);
+
+    const openPlanGroupEditDialog = useCallback((data: PlansRoutePlanGroupEditDialogData): void => {
+        _openDialog({ name: 'planGroupEdit', data });
+    }, [_openDialog]);
+
 
     const openPlanDeleteDialog = useCallback((): void => {
         _openDialog({ name: 'planDelete' });
@@ -98,6 +109,7 @@ export function usePlansRouteModalState(): PlansRouteModalStateHookResult {
         openHeaderContextMenu,
         openPlanDeleteDialog,
         openPlanEditDialog,
+        openPlanGroupEditDialog,
         openPlanGroupRowContextMenu,
         openPlanRowContextMenu
     };

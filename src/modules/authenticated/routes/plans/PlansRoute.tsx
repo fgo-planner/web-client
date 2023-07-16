@@ -1,5 +1,4 @@
-import { Immutable } from '@fgo-planner/common-core';
-import { BasicPlan, PlanGroup, PlanGroupAggregatedData } from '@fgo-planner/data-core';
+import { BasicPlan, PlanGroupAggregatedData, PlanGroupingAggregatedData } from '@fgo-planner/data-core';
 import { Button, IconButton, TextField, Theme } from '@mui/material';
 import { Box, SystemStyleObject, Theme as SystemTheme } from '@mui/system';
 import clsx from 'clsx';
@@ -11,10 +10,11 @@ import { PageTitle } from '../../../../components/text/PageTitle';
 import { PlanConstants } from '../../../../constants';
 import { useActiveBreakpoints } from '../../../../hooks/user-interface/useActiveBreakpoints';
 import { ThemeConstants } from '../../../../styles/ThemeConstants';
-import { ModalOnCloseReason } from '../../../../types';
+import { EditDialogAction, ModalOnCloseReason } from '../../../../types';
 import { PlanListItem } from './components/PlanListItem.type';
 import { PlansRouteNavigationRail } from './components/PlansRouteNavigationRail';
 import { PlansRoutePlanEditDialog } from './components/PlansRoutePlanEditDialog';
+import { PlansRoutePlanGroupEditDialog } from './components/PlansRoutePlanGroupEditDialog';
 import { PlansRoutePlanList } from './components/PlansRoutePlanList';
 import { PlansRoutePlanListColumn } from './components/PlansRoutePlanListColumn';
 import { usePlansDataEdit } from './hooks/usePlansDataEdit';
@@ -22,23 +22,45 @@ import { usePlansRouteModalState } from './hooks/usePlansRouteModalState';
 
 const DeleteTargetDialogTitle = 'Delete Plan?';
 
-const generateDeleteTargetDialogPrompt = (target: Immutable<BasicPlan | PlanGroup>): string => {
-    // const { name } = target;
-    // let prompt = 'Are you sure you want to delete';
-    // if (name) {
-    //     return `${prompt} '${name}'?`;
-    // } else {
-    //     return `${prompt} the plan?`;
-    // }
-    return 'FIXME';
-};
-
 const isPlanGroup = (item: PlanListItem): item is PlanGroupAggregatedData => {
     return !!(item as PlanGroupAggregatedData).plans;
 };
 
 const isUngroupedPlanGroup = (item: PlanListItem): item is typeof PlanConstants.UngroupedGroupId => {
     return typeof item === 'string';
+};
+
+const generateDeleteTargetDialogPrompt = (target: PlanListItem): string => {
+    if (isUngroupedPlanGroup(target)) {
+        throw Error('The default group cannot be deleted');
+    }
+    let prompt = 'Are you sure you want to delete';
+    if (isPlanGroup(target)) {
+        prompt += 'the plan group';
+    } else {
+        prompt += 'the plan';
+    }
+    const name = target.name;
+    if (name) {
+        prompt += ` '${name}'`;
+    }
+    return `${prompt}?`;
+};
+
+const findPlan = (planGroupingAggregatedData: PlanGroupingAggregatedData, planId: string): BasicPlan | undefined => {
+    for (const plan of planGroupingAggregatedData.ungrouped) {
+        if (plan._id === planId) {
+            return plan;
+        }
+    }
+    for (const planGroup of planGroupingAggregatedData.groups) {
+        for (const plan of planGroup.plans) {
+            if (plan._id === planId) {
+                return plan;
+            }
+        }
+    }
+    return undefined;
 };
 
 const StyleClassPrefix = 'PlansRoute';
@@ -112,10 +134,10 @@ const StyleProps = (theme: SystemTheme) => {
 // TODO Implement configurable column visibility
 // TODO Implement filter/search
 // TODO Add pagination
-// TODO Implement plan grouping (maybe display each group as a folder that can be navigated into).
 // TODO Maybe add info panel
 // TODO Maybe implement drag-drop
 // TODO Implement multi-select
+// TODO Implement multi-delete
 // TODO Add context menus
 
 export const PlansRoute = React.memo(() => {
@@ -125,6 +147,7 @@ export const PlansRoute = React.memo(() => {
     const {
         planGroupingAggregatedData,
         createPlan,
+        createPlanGroup,
         deletePlans
     } = usePlansDataEdit();
 
@@ -142,6 +165,7 @@ export const PlansRoute = React.memo(() => {
         openHeaderContextMenu,
         openPlanDeleteDialog,
         openPlanEditDialog,
+        openPlanGroupEditDialog,
         openPlanGroupRowContextMenu,
         openPlanRowContextMenu
     } = usePlansRouteModalState();
@@ -159,10 +183,26 @@ export const PlansRoute = React.memo(() => {
     }), [lg, sm]);
 
     const handleCreatePlan = useCallback((): void => {
-        openPlanEditDialog({ submitAction: createPlan });
+        openPlanEditDialog({
+            action: EditDialogAction.Add,
+            groupId: undefined,
+            createPlan
+        });
     }, [createPlan, openPlanEditDialog]);
 
     const handleEditPlanDialogClose = useCallback((_event: any, _reason: ModalOnCloseReason): void => {
+        closeActiveDialog();
+    }, [closeActiveDialog]);
+
+    const handleCreatePlanGroup = useCallback((): void => {
+        openPlanGroupEditDialog({
+            action: EditDialogAction.Add,
+            plans: [],
+            createPlanGroup
+        });
+    }, [createPlanGroup, openPlanGroupEditDialog]);
+
+    const handleEditPlanGroupDialogClose = useCallback((_event: any, _reason: ModalOnCloseReason): void => {
         closeActiveDialog();
     }, [closeActiveDialog]);
 
@@ -174,23 +214,22 @@ export const PlansRoute = React.memo(() => {
     }, []);
 
     const handleOpenDeleteTargetDialog = useCallback((): void => {
-        // if (!planList || !selectedId) {
-        //     return;
-        // }
-        // // TODO Include planGroups
-        // const plan = planMap.get(selectedId);
-        // if (!plan) {
-        //     console.warn(`Could not find plan id=${selectedId}`);
-        //     return;
-        // }
-        // const prompt = generateDeleteTargetDialogPrompt(plan);
-        // setDeleteTargetDialogPrompt(prompt);
-    }, []);
+        if (!planGroupingAggregatedData || !selectedId) {
+            return;
+        }
+        const plan = findPlan(planGroupingAggregatedData, selectedId);
+        if (!plan) {
+            console.warn(`Could not find plan id=${selectedId}`);
+            return;
+        }
+        const prompt = generateDeleteTargetDialogPrompt(plan);
+        setDeleteTargetDialogPrompt(prompt);
+    }, [planGroupingAggregatedData, selectedId]);
 
     const handleDeleteTargetDialogClose = useCallback(async (event: any, reason: ModalOnCloseReason): Promise<void> => {
         if (reason === 'submit' && selectedId) {
             try {
-                await deletePlans(selectedId);
+                await deletePlans([selectedId]);
             } catch (e) {
                 console.error(e);
             }
@@ -269,7 +308,7 @@ export const PlansRoute = React.memo(() => {
                     layout={sm ? 'column' : 'row'}
                     hasSelection={!!selectedRef.current}
                     onCreatePlan={handleCreatePlan}
-                    onCreatePlanGroup={handleCreatePlan}
+                    onCreatePlanGroup={handleCreatePlanGroup}
                     onEditSelectedPlan={handleOpenEditTargetDialog}
                     onDeleteSelectedPlan={handleOpenDeleteTargetDialog}
                     onToggleFilters={toggleFilters}
@@ -291,6 +330,10 @@ export const PlansRoute = React.memo(() => {
         <PlansRoutePlanEditDialog
             dialogData={activeDialog.name === 'planEdit' ? activeDialog.data : undefined}
             onClose={handleEditPlanDialogClose}
+        />
+        <PlansRoutePlanGroupEditDialog
+            dialogData={activeDialog.name === 'planGroupEdit' ? activeDialog.data : undefined}
+            onClose={handleEditPlanGroupDialogClose}
         />
         <PromptDialog
             open={!!deleteTargetDialogPrompt}

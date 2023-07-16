@@ -63,7 +63,7 @@ export const DataTableList = React.memo(<T,>(props: Props<T>) => {
         const {
             virtualRowBuffer,
             rowHeight,
-            scrollContainerRef,
+            scrollContainerRef
         } = props;
 
         return (

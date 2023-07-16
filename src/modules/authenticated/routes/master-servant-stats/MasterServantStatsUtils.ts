@@ -421,7 +421,7 @@ export namespace MasterServantStatsUtils {
             }
         }
 
-    };
+    }
 
     //#endregion
 
@@ -508,7 +508,7 @@ export namespace MasterServantStatsUtils {
                 15: instantiate()
             },
             bondLevelValuesCount: instantiate(),
-            averageBondLevel: instantiate(),
+            averageBondLevel: instantiate()
         };
     }
 

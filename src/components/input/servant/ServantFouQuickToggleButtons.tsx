@@ -40,17 +40,17 @@ export const ServantFouQuickToggleButtons = React.memo((props: Props) => {
             disabled={disabled}
 
             // Left button
-            leftButtonIcon={<IconButtonText children={0} />}
+            leftButtonIcon={<IconButtonText>0</IconButtonText>}
             leftButtonTooltip={`Set both to ${InstantiatedServantConstants.MinFou}`}
             onLeftButtonClick={() => onClick(InstantiatedServantConstants.MinFou)}
 
             // Center button
-            centerButtonIcon={<IconButtonText children='1k' />}
+            centerButtonIcon={<IconButtonText>1k</IconButtonText>}
             centerButtonTooltip='Set both to 1000'
             onCenterButtonClick={() => onClick(1000)}
 
             // Right button
-            rightButtonIcon={<IconButtonText textDecoration='overline' children='2k' />}
+            rightButtonIcon={<IconButtonText textDecoration='overline'>2k</IconButtonText>}
             rightButtonTooltip={`Set both to ${InstantiatedServantConstants.MaxFou}`}
             onRightButtonClick={() => onClick(InstantiatedServantConstants.MaxFou)}
         />

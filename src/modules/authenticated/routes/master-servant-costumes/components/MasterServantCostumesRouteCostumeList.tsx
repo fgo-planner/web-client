@@ -40,7 +40,7 @@ const StyleProps = (theme: SystemTheme) => {
                 [`& .${MasterServantCostumesRouteCostumeListRowStyleClassPrefix}-unlocked-status`]: {
                     minWidth: 42,
                     px: 2,
-                    textAlign: 'center',
+                    textAlign: 'center'
                 },
                 [`& .${MasterServantCostumesRouteCostumeListRowStyleClassPrefix}-collection-no`]: {
                     width: 64,
@@ -51,13 +51,13 @@ const StyleProps = (theme: SystemTheme) => {
                     minWidth: 0,
                     [breakpoints.down('sm')]: {
                         visibility: 'hidden',
-                        maxWidth: spacing(8),  // 32px
+                        maxWidth: spacing(8)  // 32px
                     }
                 },
                 [`& .${MasterServantCostumesRouteCostumeListRowStyleClassPrefix}-no-cost-status`]: {
                     minWidth: 42,
                     px: 2,
-                    textAlign: 'center',
+                    textAlign: 'center'
                 },
                 [`& .${MasterServantCostumesRouteCostumeListRowStyleClassPrefix}-unlock-materials`]: {
                     display: 'flex',

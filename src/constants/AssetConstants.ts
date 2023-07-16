@@ -27,7 +27,7 @@ export namespace AssetConstants {
         [GameItemBackground.Bronze]: `${_InternalThumbnailAssetsBaseUrl}/item_bg_bronze.png`,
         [GameItemBackground.Silver]: `${_InternalThumbnailAssetsBaseUrl}/item_bg_silver.png`,
         [GameItemBackground.Gold]: `${_InternalThumbnailAssetsBaseUrl}/item_bg_gold.png`,
-        [GameItemBackground.QPReward]: `${_InternalThumbnailAssetsBaseUrl}/item_bg_qp.png`,
+        [GameItemBackground.QPReward]: `${_InternalThumbnailAssetsBaseUrl}/item_bg_qp.png`
     };
 
     export const ServantActiveSkillIconUrl = `${_InternalIconAssetsBaseUrl}/skills_active.png`;

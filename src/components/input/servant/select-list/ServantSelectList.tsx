@@ -54,7 +54,7 @@ const StyleProps = (theme: SystemTheme) => {
                 backgroundColor: alpha(palette.primary.main, ThemeConstants.ActiveAlpha),
                 '&:hover': {
                     backgroundColor: alpha(palette.primary.main, ThemeConstants.ActiveHoverAlpha)
-                },
+                }
             },
             [`&.${ServantSelectListRowStyleClassPrefix}-disabled`]: {
                 cursor: 'default',

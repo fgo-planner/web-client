@@ -98,18 +98,20 @@ export const MasterServantsRouteFilterControls = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         // onClick={}
-                        children={<Icon>filter_list</Icon>}
                         size='large'
-                    />
+                    >
+                        <Icon>filter_list</Icon>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Tooltip key='reset' title='Reset filters' placement='top'>
                 <div>
                     <IconButton
                         // onClick={}
-                        children={<Icon>replay</Icon>}
                         size='large'
-                    />
+                    >
+                        <Icon>replay</Icon>
+                    </IconButton>
                 </div>
             </Tooltip>
             {/* <Tooltip key='unsummoned' title='Toggle un-summoned servants' placement='top'>

@@ -59,7 +59,7 @@ const DialogPaperStyleProps = (theme: SystemTheme) => {
         },
         [breakpoints.up('sm')]: {
             width: DialogWidth,
-            maxWidth: DialogWidth,
+            maxWidth: DialogWidth
         }
     } as SystemStyleObject<SystemTheme>;
 };

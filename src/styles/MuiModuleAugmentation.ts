@@ -5,6 +5,6 @@ declare module '@mui/material/styles' {
     interface PaletteOptions {
         drawer?: PaletteOptions['primary'];
     }
-};
+}
 
 export {};

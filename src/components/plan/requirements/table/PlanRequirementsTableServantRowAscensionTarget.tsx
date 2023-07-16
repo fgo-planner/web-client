@@ -30,7 +30,7 @@ export const PlanRequirementsTableServantRowAscensionTarget: React.FC<Props> = (
                     ascensions: ascensionEnabled
                 },
                 ascension: target
-            },
+            }
         }
     } = props;
 
@@ -43,7 +43,7 @@ export const PlanRequirementsTableServantRowAscensionTarget: React.FC<Props> = (
 
     const className = clsx(
         `${StyleClassPrefix}-root`,
-        !enabled && `${StyleClassPrefix}-disabled`,
+        !enabled && `${StyleClassPrefix}-disabled`
     );
 
     return (

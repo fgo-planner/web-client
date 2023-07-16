@@ -40,7 +40,7 @@ export const UserThemesEditRouteBackgroundImage = React.memo(({ url, onChange }:
         setUrlInputValue(value);
     }, []);
 
-    const handleUrlInputBlur = useCallback((event: FocusEvent<HTMLInputElement>): void => {
+    const handleUrlInputBlur = useCallback((_event: FocusEvent<HTMLInputElement>): void => {
         onChange && onChange(urlInputValue);
     }, [onChange, urlInputValue]);
 

@@ -131,19 +131,21 @@ export const MasterServantStatsRoute = React.memo(() => {
                     <IconButton
                         component={Link}
                         to='../master/servants'
-                        children={<Icon>format_list_bulleted</Icon>}
                         size='large'
-                    />
+                    >
+                        <Icon>format_list_bulleted</Icon>
+                    </IconButton>
                 </div>
             </Tooltip>,
             <Tooltip key='export' title='Download servant stats' placement='right'>
                 <div>
                     {/* TODO Implement this */}
                     <IconButton
-                        children={<Icon>get_app</Icon>}
                         size='large'
                         disabled
-                    />
+                    >
+                        <Icon>get_app</Icon>
+                    </IconButton>
                 </div>
             </Tooltip>
         ];
@@ -184,7 +186,7 @@ export const MasterServantStatsRoute = React.memo(() => {
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
             <PageTitle>Servant Stats</PageTitle>
             <div className={`${StyleClassPrefix}-contents`}>
-                <NavigationRail children={navigationRailChildNodes} />
+                <NavigationRail>{navigationRailChildNodes}</NavigationRail>
                 <div className={`${StyleClassPrefix}-main-content`}>
                     <div className={`${StyleClassPrefix}-filter-controls-row`}>
                         <MasterServantStatsRouteFilterControls onFilterChange={setFilter}></MasterServantStatsRouteFilterControls>

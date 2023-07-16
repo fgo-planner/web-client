@@ -38,7 +38,7 @@ const StyleProps = {
             xs: 0,
             sm: 2
         },
-        backgroundColor: (theme: Theme) => theme.palette.background.paper,
+        backgroundColor: (theme: Theme) => theme.palette.background.paper
     },
     [`& .${LoginFormStyleClassPrefix}-root`]: {
         px: 8,

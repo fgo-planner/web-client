@@ -83,7 +83,7 @@ export const MasterServantImportRouteFileInput = React.memo(({ onSubmit, disable
                         variant='contained'
                         color='primary'
                         onClick={handleSubmitButtonClick}
-                        disabled={!hasImportData}
+                        disabled={!hasImportData || disableSubmit}
                     >
                         Parse Data
                     </Button>

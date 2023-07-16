@@ -8,6 +8,7 @@ import { useInjectable } from '../../../hooks/dependency-injection/useInjectable
 import { BasicUser, UserService } from '../../../services/data/user/UserService';
 import { UserInterfaceService } from '../../../services/user-interface/UserInterfaceService';
 import { ThemeConstants } from '../../../styles/ThemeConstants';
+import { asSync } from '../../../utils/asSync';
 import { SubscribablesContainer } from '../../../utils/subscription/SubscribablesContainer';
 import { SubscriptionTopics } from '../../../utils/subscription/SubscriptionTopics';
 import { IconOutlined } from '../../icons/IconOutlined';
@@ -57,7 +58,7 @@ const StyleProps = (theme: SystemTheme) => {
             // bgcolor: palette.drawer?.main,
             // boxShadow: 'none',
             height: spacing(ThemeConstants.AppBarHeightScaleCondensed)
-        }    
+        }
     } as SystemStyleObject<SystemTheme>;
 };
 
@@ -78,7 +79,7 @@ export const AppBar = React.memo(() => {
     useEffect(() => {
         const onCurrentUserChangeSubscription = SubscribablesContainer
             .get(SubscriptionTopics.User.CurrentUserChange)
-            .subscribe(async (userInfo) => {
+            .subscribe(asSync(async (userInfo) => {
                 if (userInfo) {
                     try {
                         const currentUser = await userService.getCurrentUser();
@@ -89,7 +90,7 @@ export const AppBar = React.memo(() => {
                 } else {
                     setCurrentUser(null);
                 }
-            });
+            }));
 
         return () => onCurrentUserChangeSubscription.unsubscribe();
     }, [userService]);

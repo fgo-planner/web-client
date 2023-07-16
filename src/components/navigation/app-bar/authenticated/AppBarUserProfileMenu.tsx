@@ -53,7 +53,7 @@ const StyleProps = {
     [`& .${StyleClassPrefix}-email`]: {
         fontFamily: ThemeConstants.FontFamilyRoboto,
         fontSize: '0.875rem',
-        color: 'text.secondary',
+        color: 'text.secondary'
     }
 } as SystemStyleObject<Theme>;
 

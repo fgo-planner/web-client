@@ -64,7 +64,7 @@ export const ServantEnhancementQuickToggleButtons: React.FC<Props> = (props: Pro
                         onClick={onLeftButtonClick}
                         tabIndex={tabIndex}
                         disabled={disabled}
-                        >
+                    >
                         {leftButtonIcon}
                     </IconButton>
                 </div>

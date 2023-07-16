@@ -28,7 +28,7 @@ export const MasterServantCostumesRouteCostumeListRow = React.memo((props: Props
             costume: {
                 collectionNo,
                 materials,
-                name,
+                name
             },
             gameServant,
             noCostUnlockAvailable

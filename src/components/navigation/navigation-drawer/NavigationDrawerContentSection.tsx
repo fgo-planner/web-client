@@ -16,7 +16,7 @@ const StyleClassPrefix = 'NavigationDrawerContentSection';
 
 const StyleProps = (theme: Theme) => ({
     [`&.${StyleClassPrefix}-condensed`]: {
-        width: theme.spacing(ThemeConstants.NavigationDrawerCondensedWidthScale),
+        width: theme.spacing(ThemeConstants.NavigationDrawerCondensedWidthScale)
     },
     [`&.${StyleClassPrefix}-expanded`]: {
         width: theme.spacing(ThemeConstants.NavigationDrawerExpandedWidthScale)

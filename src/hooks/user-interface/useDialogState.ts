@@ -46,6 +46,6 @@ export function useDialogState<NAMES extends string, T extends ActiveDialog<NAME
         activeDialog,
         closeActiveDialog,
         openDialog: setActiveDialog
-    }; 
+    };
 
-};
+}

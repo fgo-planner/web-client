@@ -12,7 +12,7 @@ export namespace DataEditUtils {
             return action(previousValue);
         }
         return action;
-    };
+    }
 
     export function isServantsOrderChanged(
         reference: ReadonlyMap<number, InstantiatedServant>,
@@ -28,7 +28,7 @@ export namespace DataEditUtils {
             }
         }
         return false;
-    };
+    }
 
     /**
      * Returns a new `Set` containing only the costume IDs of the servants that are
@@ -48,7 +48,7 @@ export namespace DataEditUtils {
             }
         }
         return result;
-    };
+    }
 
     /**
      * Returns a new unlocked costumes map instance containing only the costume IDs
@@ -69,7 +69,7 @@ export namespace DataEditUtils {
             }
         }
         return result;
-    };
+    }
 
     /**
      * Returns a new bond level map instance containing only the servant IDs of the
@@ -88,6 +88,6 @@ export namespace DataEditUtils {
             }
         }
         return result;
-    };
+    }
 
 }

@@ -904,6 +904,6 @@ export function usePlanDataEdit(planId: string | undefined): PlanDataEditHookRes
         persistChanges
     };
 
-};
+}
 
 //#endregion

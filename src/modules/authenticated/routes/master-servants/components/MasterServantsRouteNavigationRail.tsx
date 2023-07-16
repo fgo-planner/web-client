@@ -49,9 +49,10 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onDragDropApply}
-                            children={<Icon>done</Icon>}
                             size='large'
-                        />
+                        >
+                            <Icon>done</Icon>
+                        </IconButton>
                     </div>
                 </Tooltip>
                 <Tooltip key='cancel' title='Cancel order changes' placement='right'>
@@ -59,9 +60,10 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                         <IconButton
                             color='warning'
                             onClick={onDragDropCancel}
-                            children={<Icon>clear</Icon>}
                             size='large'
-                        />
+                        >
+                            <Icon>clear</Icon>
+                        </IconButton>
                     </div>
                 </Tooltip>
             </NavigationRail>
@@ -74,13 +76,14 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleFilters}
-                        children={filtersEnabled ?
+                        size='large'
+                        color={filtersEnabled ? 'primary' : undefined}
+                    >
+                        {filtersEnabled ?
                             <Icon>filter_alt</Icon> :
                             <IconOutlined>filter_alt</IconOutlined>
                         }
-                        size='large'
-                        color={filtersEnabled ? 'primary' : undefined}
-                    />
+                    </IconButton>
                 </div>
             </Tooltip>
             {/* TODO Move this to display and/or filter settings. */}
@@ -88,13 +91,14 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleShowUnsummonedServants}
-                        children={showUnsummonedServants ?
+                        size='large'
+                        color={showUnsummonedServants ? 'primary' : undefined}
+                    >
+                        {showUnsummonedServants ?
                             <Icon>person_off</Icon> :
                             <IconOutlined>person_off</IconOutlined>
                         }
-                        size='large'
-                        color={showUnsummonedServants ? 'primary' : undefined}
-                    />
+                    </IconButton>
                 </div>
             </Tooltip>
             {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
@@ -103,9 +107,10 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onOpenColumnSettings}
-                            children={<IconOutlined>view_week</IconOutlined>}
                             size='large'
-                        />
+                        >
+                            <IconOutlined>view_week</IconOutlined>
+                        </IconButton>
                     </div>
                 </Tooltip>
             }
@@ -114,18 +119,20 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onAddServant}
-                        children={<IconOutlined>person_add_alt_1</IconOutlined>}
                         size='large'
-                    />
+                    >
+                        <IconOutlined>person_add_alt_1</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Tooltip key='multi-add' title='Add multiple servants' placement='right'>
                 <div>
                     <IconButton
                         onClick={onMultiAddServant}
-                        children={<IconOutlined>group_add</IconOutlined>}
                         size='large'
-                    />
+                    >
+                        <IconOutlined>group_add</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
@@ -134,9 +141,10 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onDragDropActivate}
-                            children={<IconOutlined>reorder</IconOutlined>}
                             size='large'
-                        />
+                        >
+                            <IconOutlined>reorder</IconOutlined>
+                        </IconButton>
                     </div>
                 </Tooltip>
             }
@@ -144,10 +152,11 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onEditSelectedServants}
-                        children={<IconOutlined>mode_edit</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
-                    />
+                    >
+                        <IconOutlined>mode_edit</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Tooltip key='delete' title='Delete selected' placement='right'>
@@ -155,10 +164,11 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <IconButton
                         color='error'
                         onClick={onDeleteSelectedServants}
-                        children={<IconOutlined>delete_forever</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
-                    />
+                    >
+                        <IconOutlined>delete_forever</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Divider />
@@ -167,9 +177,10 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                     <IconButton
                         component={Link}
                         to='stats'
-                        children={<Icon>bar_chart</Icon>}
                         size='large'
-                    />
+                    >
+                        <Icon>bar_chart</Icon>
+                    </IconButton>
                 </div>
             </Tooltip>
             {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
@@ -180,9 +191,10 @@ export const MasterServantsRouteNavigationRail = React.memo((props: Props) => {
                         <IconButton
                             component={Link}
                             to='../master/data/import/servants'
-                            children={<Icon>import_export</Icon>}
                             size='large'
-                        />
+                        >
+                            <Icon>import_export</Icon>
+                        </IconButton>
                     </div>
                 </Tooltip>
             }

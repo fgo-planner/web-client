@@ -15,7 +15,7 @@ export const ScrollbarStyleProps = (({ palette, spacing }: Theme) => ({
         height: spacing(ThemeConstants.ScrollbarWidthScale)
     },
     '& *::-webkit-scrollbar-corner': {
-        backgroundColor: palette.background.paper,
+        backgroundColor: palette.background.paper
     },
     '& *::-webkit-scrollbar-thumb': {
         /**
@@ -32,7 +32,7 @@ export const ScrollbarStyleProps = (({ palette, spacing }: Theme) => ({
             borderTopColor: palette.divider,
             borderLeftWidth: 1,
             borderLeftStyle: 'solid',
-            borderLeftColor: palette.divider,
+            borderLeftColor: palette.divider
         }
     },
     [`& .${ThemeConstants.ClassScrollbarHidden}`]: {

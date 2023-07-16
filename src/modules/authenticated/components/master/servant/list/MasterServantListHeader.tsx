@@ -96,7 +96,7 @@ export const MasterServantListHeader = React.memo((props: Props) => {
         onSortChange(column, direction);
     }, [onSortChange]);
 
-    const resetSort = useCallback((e: MouseEvent): void => {
+    const resetSort = useCallback((_event: MouseEvent): void => {
         onSortChange?.();
     }, [onSortChange]);
 

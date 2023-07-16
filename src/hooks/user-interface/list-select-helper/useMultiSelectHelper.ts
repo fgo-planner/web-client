@@ -228,4 +228,4 @@ export function useMultiSelectHelper<T, ID = number>(
         selectionResult
     };
 
-};
+}

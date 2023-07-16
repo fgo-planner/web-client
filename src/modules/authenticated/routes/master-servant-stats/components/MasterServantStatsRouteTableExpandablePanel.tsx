@@ -34,7 +34,7 @@ const StyleProps = (theme: Theme) => ({
             display: 'none'
         },
         '&.Mui-expanded': {
-            margin: 'auto',
+            margin: 'auto'
         }
     },
     '& .MuiAccordionSummary-root': {
@@ -68,12 +68,12 @@ const StyleProps = (theme: Theme) => ({
         '&.border-top': {
             borderTopWidth: 1,
             borderTopStyle: 'solid',
-            borderTopColor: 'divider',
+            borderTopColor: 'divider'
         },
         '&.border-bottom': {
             borderBottomWidth: 1,
             borderBottomStyle: 'solid',
-            borderBottomColor: 'divider',
+            borderBottomColor: 'divider'
         },
         '&.not-expandable': {
             cursor: 'default'
@@ -125,8 +125,9 @@ export const MasterServantStatsRouteTableExpandablePanel = React.memo((props: Pr
                 <div className={clsx(`${StyleClassPrefix}-row-label`, 'truncate')}>
                     {rowData.label}
                 </div>
-                {rowData.values.map(value => (
-                    <div style={dataCellStyle}>
+                {rowData.values.map((value, index) => (
+                    // Using index as key here should be okay
+                    <div key={index} style={dataCellStyle}>
                         {value}
                     </div>
                 ))}
@@ -138,7 +139,7 @@ export const MasterServantStatsRouteTableExpandablePanel = React.memo((props: Pr
         `${StyleClassPrefix}-row`,
         !rows && 'not-expandable',
         borderTop && 'border-top',
-        borderBottom && 'border-bottom',
+        borderBottom && 'border-bottom'
     );
 
     return (
@@ -155,8 +156,9 @@ export const MasterServantStatsRouteTableExpandablePanel = React.memo((props: Pr
                         <div className={clsx(`${StyleClassPrefix}-row-label`, 'truncate')}>
                             {header.label}
                         </div>
-                        {header.values.map(value => (
-                            <div style={dataCellStyle}>
+                        {header.values.map((value, index) => (
+                            // Using index as key here should be okay
+                            <div key={index} style={dataCellStyle}>
                                 {value}
                             </div>
                         ))}

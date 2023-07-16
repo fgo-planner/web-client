@@ -57,7 +57,7 @@ export const ServantClassIcon = React.memo((props: Props) => {
         size,
         sx,
         tooltip,
-        tooltipPlacement,
+        tooltipPlacement
     } = props;
 
     const sizeStyle = useMemo((): CSSProperties => ({

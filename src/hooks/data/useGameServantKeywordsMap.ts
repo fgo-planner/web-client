@@ -31,4 +31,4 @@ export function useGameServantKeywordsMap(): ReadonlyMap<number, string> | undef
 
     return keywordsMap;
 
-};
+}

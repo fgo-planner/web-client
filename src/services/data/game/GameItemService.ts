@@ -112,7 +112,7 @@ export class GameItemService extends DataService {
         this._itemListPromise = undefined;
     }
 
-    private _onItemsLoadError(error: any): void {
+    private _onItemsLoadError(_error: any): void {
         this._invalidateCaches();
     }
 

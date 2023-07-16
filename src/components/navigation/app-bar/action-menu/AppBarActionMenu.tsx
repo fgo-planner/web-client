@@ -22,7 +22,7 @@ const MenuTransformOrigin: PopoverOrigin = {
 
 export const StyleClassPrefix = 'AppBarActionMenu';
 
-const StyleProps = (theme: Theme) => ({
+const StyleProps = {
     [`& .${AppBarActionMenuItemStyleClassPrefix}-root`]: {
         height: 40,
         '& .MuiListItemIcon-root': {
@@ -34,7 +34,7 @@ const StyleProps = (theme: Theme) => ({
             fontSize: '0.875rem'
         }
     }
-} as SystemStyleObject<Theme>);
+} as SystemStyleObject<Theme>;
 
 export const AppBarActionMenu = React.memo((props: Props) => {
 

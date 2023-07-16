@@ -57,7 +57,7 @@ export const AppBarAuthenticatedUser = React.memo(({ currentUser }: Props) => {
         setProfileMenuAnchorEl(event.currentTarget);
     }, []);
 
-    const handleProfileMenuClose = useCallback((event: {}, reason: ModalOnCloseReason): void => {
+    const handleProfileMenuClose = useCallback((_event: {}, _reason: ModalOnCloseReason): void => {
         setProfileMenuAnchorEl(null);
     }, []);
 

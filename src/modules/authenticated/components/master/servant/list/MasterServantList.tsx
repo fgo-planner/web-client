@@ -184,7 +184,7 @@ export const MasterServantList = React.memo((props: Props) => {
         handleDragLeave,
         handleDragOver,
         handleRowDragEnd,
-        handleRowDragStart,
+        handleRowDragStart
     } = useDragDropEventHandlers(
         ListRowIdPrefix,
         scrollContainerRef

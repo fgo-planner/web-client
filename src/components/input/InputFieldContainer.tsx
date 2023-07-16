@@ -30,7 +30,7 @@ export const InputFieldContainer = React.memo((props: Props) => {
         width,
         flex,
         height: size === 'small' ? HeightSmall : HeightMedium,
-        boxSizing: 'border-box',
+        boxSizing: 'border-box'
     }), [flex, size, width]);
 
     return (

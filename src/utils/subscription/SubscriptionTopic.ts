@@ -43,4 +43,4 @@ export class SubscriptionTopic<T = any> {
         return new SubscriptionTopic<T>(true, initialValueSupplier);
     }
 
-};
+}

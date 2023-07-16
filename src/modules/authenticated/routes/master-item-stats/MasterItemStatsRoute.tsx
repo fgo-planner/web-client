@@ -107,7 +107,7 @@ const StyleProps = (theme: SystemTheme) => {
                     [breakpoints.down('md')]: {
                         display: 'none'
                     }
-                },
+                }
             },
             [breakpoints.down('sm')]: {
                 flexDirection: 'column',
@@ -186,19 +186,21 @@ export const MasterItemStatsRoute = React.memo(() => {
                 <IconButton
                     component={Link}
                     to='../master/items'
-                    children={<Icon>format_list_bulleted</Icon>}
                     size='large'
-                />
+                >
+                    <Icon>format_list_bulleted</Icon>
+                </IconButton>
             </div>
         </Tooltip>,
         <Tooltip key='export' title='Download item stats' placement='right'>
             <div>
                 {/* TODO Implement this */}
                 <IconButton
-                    children={<Icon>get_app</Icon>}
                     size='large'
                     disabled
-                />
+                >
+                    <Icon>get_app</Icon>
+                </IconButton>
             </div>
         </Tooltip>
     ];

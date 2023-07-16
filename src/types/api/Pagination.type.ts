@@ -26,5 +26,5 @@ export type Pagination = {
      * The total number of elements available.
      */
     total?: number;
-    
+
 };

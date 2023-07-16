@@ -50,7 +50,7 @@ export const ServantFouInputField = React.memo((props: Props) => {
         value,
         variant,
         onBlur,
-        onChange,
+        onChange
     } = props;
 
     const handleChange = useCallback((event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {

@@ -58,7 +58,7 @@ export const PlanRequirementsTableServantRowSkillTargets: React.FC<Props> = (pro
             `${StyleClassPrefix}-root`,
             !skill1TargetActionable && `${StyleClassPrefix}-skill1-disabled`,
             !skill2TargetActionable && `${StyleClassPrefix}-skill2-disabled`,
-            !skill3TargetActionable && `${StyleClassPrefix}-skill3-disabled`,
+            !skill3TargetActionable && `${StyleClassPrefix}-skill3-disabled`
         );
     }
 

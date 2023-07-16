@@ -34,14 +34,15 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleFilters}
-                        children={filtersEnabled ?
-                            <Icon>filter_alt</Icon> :
-                            <IconOutlined>filter_alt</IconOutlined>
-                        }
                         size='large'
                         color={filtersEnabled ? 'primary' : undefined}
                         disabled  // Temporary
-                    />
+                    >
+                        {filtersEnabled ?
+                            <Icon>filter_alt</Icon> :
+                            <IconOutlined>filter_alt</IconOutlined>
+                        }
+                    </IconButton>
                 </div>
             </Tooltip>
             {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
@@ -50,10 +51,11 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onOpenColumnSettings}
-                            children={<IconOutlined>view_week</IconOutlined>}
                             size='large'
                             disabled  // Temporary
-                        />
+                        >
+                            <IconOutlined>view_week</IconOutlined>
+                        </IconButton>
                     </div>
                 </Tooltip>
             }
@@ -64,9 +66,10 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onCreatePlan}
-                            children={<IconOutlined>post_add</IconOutlined>}
                             size='large'
-                        />
+                        >
+                            <IconOutlined>post_add</IconOutlined>
+                        </IconButton>
                     </div>
                 </Tooltip>
             }
@@ -76,9 +79,10 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onCreatePlan}
-                            children={<IconOutlined>create_new_folder</IconOutlined>}
                             size='large'
-                        />
+                        >
+                            <IconOutlined>create_new_folder</IconOutlined>
+                        </IconButton>
                     </div>
                 </Tooltip>
             }
@@ -86,10 +90,11 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onEditSelectedPlan}
-                        children={<IconOutlined>drive_file_rename_outline</IconOutlined>}
                         size='large'
                         disabled={!hasSelection}
-                    />
+                    >
+                        <IconOutlined>drive_file_rename_outline</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Tooltip key='delete' title='Delete selected' placement='right'>
@@ -97,10 +102,11 @@ export const PlansRouteNavigationRail = React.memo((props: Props) => {
                     <IconButton
                         color='error'
                         onClick={onDeleteSelectedPlan}
-                        children={<IconOutlined>delete_forever</IconOutlined>}
                         size='large'
                         disabled={!hasSelection}
-                    />
+                    >
+                        <IconOutlined>delete_forever</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
         </NavigationRail>

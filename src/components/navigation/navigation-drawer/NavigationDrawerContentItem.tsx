@@ -174,8 +174,9 @@ export const NavigationDrawerContentItem = React.memo(({ item }: Props) => {
                     <Icon
                         className={`${StyleClassPrefix}-icon`}
                         variant={iconVariant}
-                        children={icon}
-                    />
+                    >
+                        {icon}
+                    </Icon>
                     {expanded && <div className={`${StyleClassPrefix}-label`}>
                         {label}
                     </div>}

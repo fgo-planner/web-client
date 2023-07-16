@@ -27,7 +27,7 @@ const StyleProps = (theme: Theme) => ({
     textDecoration: 'none',
     [theme.breakpoints.down('md')]: {
         flex: '100%',
-        maxWidth: '100%',
+        maxWidth: '100%'
     },
     [`& .${StyleClassPrefix}-content`]: {
         display: 'flex',
@@ -87,8 +87,9 @@ export const HomeRouteLink = React.memo((props: Props) => {
                 className={`${StyleClassPrefix}-root`}
                 sx={StyleProps}
                 to={to}
-                children={contentNode}
-            />
+            >
+                {contentNode}
+            </Box>
         );
     }
 
@@ -97,8 +98,9 @@ export const HomeRouteLink = React.memo((props: Props) => {
             className={`${StyleClassPrefix}-root`}
             sx={StyleProps}
             onClick={onClick}
-            children={contentNode}
-        />
+        >
+            {contentNode}
+        </Box>
     );
 
 });

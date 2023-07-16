@@ -299,7 +299,7 @@ export const PlanRequirementsTableStyle = (theme: SystemTheme): SystemStyleObjec
             // eslint-disable-next-line max-len
             [`& .${HeaderStyleClassPrefix}-sticky-content, .${ServantRowHeaderStyleClassPrefix}-root, .${FooterStyleClassPrefix}-sticky-content`]: {
                 width: `calc(${StickyColumnWidth} + ${DragHandleWidth}) !important`
-            },
+            }
         }
     };
 

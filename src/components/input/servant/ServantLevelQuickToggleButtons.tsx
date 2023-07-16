@@ -50,12 +50,12 @@ export const ServantLevelQuickToggleButtons = React.memo((props: Props) => {
             disabled={disabled}
 
             // Left button
-            leftButtonIcon={<IconButtonText children={1} />}
+            leftButtonIcon={<IconButtonText>1</IconButtonText>}
             leftButtonTooltip={`Set level to ${InstantiatedServantConstants.MinLevel}`}
             onLeftButtonClick={handleLeftButtonClick}
 
             // Center button
-            centerButtonIcon={<IconButtonText children={maxNaturalLevel} />}
+            centerButtonIcon={<IconButtonText>{maxNaturalLevel}</IconButtonText>}
             centerButtonTooltip={`Set level to ${maxNaturalLevel}`}
             onCenterButtonClick={handleCenterButtonClick}
 

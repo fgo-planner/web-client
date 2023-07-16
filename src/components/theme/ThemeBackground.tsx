@@ -28,7 +28,7 @@ export const ThemeBackground = React.memo((props: Props) => {
         const style: CSSProperties = {};
         if (imageUrl) {
             style.backgroundImage = `url('${imageUrl}')`;
-        };
+        }
         if (blur) {
             style.backdropFilter = `blur(${blur}px)`;
         }

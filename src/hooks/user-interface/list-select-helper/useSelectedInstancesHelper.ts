@@ -100,4 +100,4 @@ export function useSelectedInstancesHelper<T, ID = number>(
         updateSelection
     };
 
-};
+}

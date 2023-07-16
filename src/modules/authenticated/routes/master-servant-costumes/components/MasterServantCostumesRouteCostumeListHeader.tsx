@@ -45,7 +45,7 @@ const StyleProps = (theme: SystemTheme) => {
             textAlign: 'left',
             [breakpoints.down('sm')]: {
                 visibility: 'hidden',
-                maxWidth: spacing(8),  // 32px
+                maxWidth: spacing(8)  // 32px
             }
         },
         [`& .${StyleClassPrefix}-no-cost-status`]: {

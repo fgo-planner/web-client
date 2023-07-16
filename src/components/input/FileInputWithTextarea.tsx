@@ -59,7 +59,7 @@ const StyleProps = (theme: Theme) => ({
     },
     [`& .${StyleClassPrefix}-drag-overlay-text`]: {
         fontFamily: ThemeConstants.FontFamilyGoogleSans,
-        fontSize: '2rem',
+        fontSize: '2rem'
         // color: theme.palette.text.secondary
     }
 } as SystemStyleObject<Theme>);
@@ -140,7 +140,7 @@ export const FileInputWithTextarea = class extends PureComponent<Props> {
         const { 
             dragOverlayIcon,
             dragOverlayIconVariant,
-            dragOverlayText,
+            dragOverlayText
         } = this.props;
 
         return (

@@ -269,9 +269,11 @@ export const MasterServantStatsRouteFilterControls = React.memo(({ onFilterChang
                 <div>
                     <IconButton
                         color='secondary'
-                        children={<Icon>replay</Icon>}
                         onClick={handleResetFilterClick}
-                        size='large' />
+                        size='large'
+                    >
+                        <Icon>replay</Icon>
+                    </IconButton>
                 </div>
             </Tooltip>
         </Box>

@@ -48,9 +48,10 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onDragDropApply}
-                            children={<Icon>done</Icon>}
                             size='large'
-                        />
+                        >
+                            <Icon>done</Icon>
+                        </IconButton>
                     </div>
                 </Tooltip>
                 <Tooltip key='cancel' title='Cancel order changes' placement='right'>
@@ -58,9 +59,10 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                         <IconButton
                             color='warning'
                             onClick={onDragDropCancel}
-                            children={<Icon>clear</Icon>}
                             size='large'
-                        />
+                        >
+                            <Icon>clear</Icon>
+                        </IconButton>
                     </div>
                 </Tooltip>
             </NavigationRail>
@@ -75,9 +77,10 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onOpenDisplaySettings}
-                            children={<IconOutlined>view_week</IconOutlined>}
                             size='large'
-                        />
+                        >
+                            <IconOutlined>view_week</IconOutlined>
+                        </IconButton>
                     </div>
                 </Tooltip>
             }
@@ -86,19 +89,21 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onAddServant}
-                        children={<IconOutlined>person_add_alt_1</IconOutlined>}
                         size='large'
-                    />
+                    >
+                        <IconOutlined>person_add_alt_1</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Tooltip key='multi-add' title='Add multiple servants (not available yet)' placement='right'>
                 <div>
                     <IconButton
                         onClick={onMultiAddServant}
-                        children={<IconOutlined>group_add</IconOutlined>}
                         size='large'
                         disabled
-                    />
+                    >
+                        <IconOutlined>group_add</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             {/* TODO Hide based on mobile browser instead of by breakpoint/layout. */}
@@ -107,9 +112,10 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                     <div>
                         <IconButton
                             onClick={onDragDropActivate}
-                            children={<Icon>reorder</Icon>}
                             size='large'
-                        />
+                        >
+                            <Icon>reorder</Icon>
+                        </IconButton>
                     </div>
                 </Tooltip>
             }
@@ -117,20 +123,22 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onEditSelectedServants}
-                        children={<IconOutlined>mode_edit</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
-                    />
+                    >
+                        <IconOutlined>mode_edit</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Tooltip key='mark-complete' title='Mark as complete' placement='right'>
                 <div>
                     <IconButton
                         onClick={onMarkSelectedAsComplete}
-                        children={<IconOutlined>how_to_reg</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
-                    />
+                    >
+                        <IconOutlined>how_to_reg</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Tooltip key='delete' title='Delete selected' placement='right'>
@@ -138,10 +146,11 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                     <IconButton
                         color='error'
                         onClick={onDeleteSelectedServants}
-                        children={<IconOutlined>delete_forever</IconOutlined>}
                         size='large'
                         disabled={!selectedServantsCount}
-                    />
+                    >
+                        <IconOutlined>delete_forever</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Divider />
@@ -149,27 +158,30 @@ export const PlanRouteNavigationRail = React.memo((props: Props) => {
                 <div>
                     <IconButton
                         onClick={onToggleRowheaderMode}
-                        children={<IconOutlined>data_object</IconOutlined>}
                         size='large'
-                    />
+                    >
+                        <IconOutlined>data_object</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Tooltip key='toggle-size' title='Toggle display size' placement='right'>
                 <div>
                     <IconButton
                         onClick={onToggleCellSize}
-                        children={<IconOutlined>format_size</IconOutlined>}
                         size='large'
-                    />
+                    >
+                        <IconOutlined>format_size</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
             <Tooltip key='toggle-empty-columns' title='Toggle empty columns' placement='right'>
                 <div>
                     <IconButton
                         onClick={onToggleShowUnused}
-                        children={<IconOutlined>hide_image</IconOutlined>}
                         size='large'
-                    />
+                    >
+                        <IconOutlined>hide_image</IconOutlined>
+                    </IconButton>
                 </div>
             </Tooltip>
         </NavigationRail>

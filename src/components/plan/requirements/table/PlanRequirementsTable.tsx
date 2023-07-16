@@ -124,7 +124,7 @@ export const PlanRequirementsTable = React.memo((props: Props) => {
         handleDragLeave,
         handleDragOver,
         handleRowDragEnd,
-        handleRowDragStart,
+        handleRowDragStart
     } = useDragDropEventHandlers(
         TableRowIdPrefix,
         scrollContainerRef

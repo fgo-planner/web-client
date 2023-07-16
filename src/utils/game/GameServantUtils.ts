@@ -4,10 +4,10 @@ import { GameServantClassSimplified, GameServantList } from '../../types';
 
 export class GameServantUtils {
 
-    private constructor () {
-        
+    private constructor() {
+
     }
-    
+
     // TODO Make this generic for all `Entity` types and also move to library.
     static getId(servant: Immutable<GameServant>): number {
         return servant._id;
@@ -80,8 +80,8 @@ export class GameServantUtils {
             return [...data];
         }
 
-        let classes = new Set<GameServantClass>();
-        let rarities = new Set<GameServantRarity>();
+        const classes = new Set<GameServantClass>();
+        const rarities = new Set<GameServantRarity>();
 
         const searchTerms = searchTrimmed.toLowerCase().split(/\s+/).filter(value => {
             /**
@@ -101,7 +101,7 @@ export class GameServantUtils {
              * Otherwise, it will just act as another search term.
              */
             const servantClass = this.parseClass(value);
-            if (!!servantClass) {
+            if (servantClass) {
                 classes.add(servantClass);
                 return false;
             }
@@ -164,6 +164,6 @@ export class GameServantUtils {
             }
         }
         return true;
-    };
+    }
 
 }

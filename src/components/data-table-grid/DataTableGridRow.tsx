@@ -39,12 +39,12 @@ const StyleProps = (props: Props & StyledFunctionThemeProp) => {
         '&.border-top': {
             borderTopWidth: 1,
             borderTopStyle: 'solid',
-            borderTopColor: palette.divider,
+            borderTopColor: palette.divider
         },
         '&.border-bottom': {
             borderBottomWidth: 1,
             borderBottomStyle: 'solid',
-            borderBottomColor: palette.divider,
+            borderBottomColor: palette.divider
         },
         '& .sticky-content': {
             position: 'sticky',

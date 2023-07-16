@@ -31,7 +31,7 @@ const StyledOptions = {
     skipVariantsResolver: true
 } as MuiStyledOptions & FilteringStyledOptions<Props>;
 
-const BaseStyleProps = (props: Props & StyledFunctionThemeProp) => ({
+const BaseStyleProps = (_props: Props & StyledFunctionThemeProp) => ({
     display: 'flex',
     alignItems: 'center'
 } as CSSInterpolation);
@@ -74,7 +74,7 @@ const LayoutStyleProps = (props: Props & StyledFunctionThemeProp) => {
             display: 'none'
         }
     } as CSSInterpolation;
-    
+
 };
 
 const BorderStyleProps = (props: Props & StyledFunctionThemeProp) => {
@@ -95,14 +95,14 @@ const BorderStyleProps = (props: Props & StyledFunctionThemeProp) => {
         return {
             borderRightWidth: 1,
             borderRightStyle: 'solid',
-            borderRightColor: palette.divider,
+            borderRightColor: palette.divider
         } as CSSInterpolation;
     }
-    
+
     return {
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
-        borderBottomColor: palette.divider,
+        borderBottomColor: palette.divider
     } as CSSInterpolation;
 };
 

@@ -7,8 +7,8 @@ export class InjectablesContainer {
 
     private static readonly _Injectables = new Map<InjectableToken | undefined, Record<string, any>>();
 
-    private constructor () {
-        
+    private constructor() {
+
     }
 
     static registerInjectables(...injectablesDefinitions: Array<InjectableDefinition>) {
@@ -77,4 +77,4 @@ export class InjectablesContainer {
         return map;
     }
 
-};
+}

@@ -135,6 +135,7 @@ export class HttpUtils {
     }
 
     private static async _fetch(url: string, init: RequestInit): Promise<Response> {
+        // eslint-disable-next-line no-useless-catch
         try {
             return await fetch(url, init);
         } catch (e: any) {
@@ -179,7 +180,7 @@ export class HttpUtils {
         return {
             status: response.status,
             statusText: response.statusText,
-            message,
+            message
         };
     }
 

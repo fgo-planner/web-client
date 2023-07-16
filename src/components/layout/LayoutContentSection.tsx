@@ -28,7 +28,7 @@ const StyledOptions = {
     skipVariantsResolver: true
 } as MuiStyledOptions & FilteringStyledOptions<Props>;
 
-const StyleProps = (props: Props & StyledFunctionThemeProp) => {
+const StyleProps = (_props: Props & StyledFunctionThemeProp) => {
     return {
         overflow: 'hidden',
         boxSizing: 'border-box'

@@ -97,7 +97,7 @@ export namespace PlanComputationUtils {
         appendSkills: {
             1: InstantiatedServantConstants.MaxSkillLevel,
             2: InstantiatedServantConstants.MaxSkillLevel,
-            3: InstantiatedServantConstants.MaxSkillLevel,
+            3: InstantiatedServantConstants.MaxSkillLevel
         }
     };
 
@@ -298,6 +298,7 @@ export namespace PlanComputationUtils {
         return result;
     }
 
+    // eslint-disable-next-line no-inner-declarations
     function _computePlanRequirements(
         result: PlanRequirements,
         planData: PlanData,
@@ -774,7 +775,7 @@ export namespace PlanComputationUtils {
                 servants: {},
                 targetPlan: _instantiateEnhancementRequirements(),
                 previousPlans: {},
-                group: _instantiateEnhancementRequirements(),
+                group: _instantiateEnhancementRequirements()
             },
             resources: {
                 current: _instantiatePlanResources(),

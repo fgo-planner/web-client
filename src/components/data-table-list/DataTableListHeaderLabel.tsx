@@ -42,7 +42,7 @@ export const DataTableListHeaderLabel = React.memo(<T extends string>(props: Pro
             sortable
         },
         onClick,
-        sortOptions,
+        sortOptions
     } = props;
 
     const handleClick = useMemo((): MouseEventHandler | undefined => {

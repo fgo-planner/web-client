@@ -158,6 +158,7 @@ export const useMasterServantsRouteUserPreferences = (): MasterServantsRouteUser
     useEffect(() => {
         const subscription = SubscribablesContainer
             .get(SubscriptionTopics.User.CurrentUserPreferencesChange)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .subscribe((userPreferences) => {
                 // TODO Do something with this.
             });

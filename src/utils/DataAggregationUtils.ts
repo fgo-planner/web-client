@@ -6,11 +6,11 @@ export namespace DataAggregationUtils {
 
     export function getGameServant(data: MasterServantAggregatedData): Immutable<GameServant> {
         return data.gameServant;
-    };
+    }
 
     export function getMasterServant(data: MasterServantAggregatedData): Immutable<MasterServant> {
         return data.masterServant;
-    };
+    }
 
     export function aggregateDataForMasterServants(
         masterServants: ReadonlyArray<Immutable<MasterServant>>,

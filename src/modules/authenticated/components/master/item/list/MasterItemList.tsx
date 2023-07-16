@@ -114,7 +114,7 @@ export const MasterItemList = React.memo((props: Props) => {
                     GameItemConstants.GrailItemId,
                     GameItemConstants.QpItemId
                 ]
-            },
+            }
         ];
     }, [gameItemCategoryMap]);
 

@@ -7,7 +7,7 @@ import clsx from 'clsx';
  */
 export const IconSharp: React.FC<IconProps> = (props: IconProps): JSX.Element => {
 
-    let {
+    const {
         className,
         ...iconProps
     } = props;
@@ -18,5 +18,5 @@ export const IconSharp: React.FC<IconProps> = (props: IconProps): JSX.Element =>
             className={clsx(className, 'material-icons-sharp')}
         />
     );
-    
+
 };

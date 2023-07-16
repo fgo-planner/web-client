@@ -50,7 +50,7 @@ export class MasterAccountService extends DataService {
         setTimeout(() => {
             SubscribablesContainer
                 .get(SubscriptionTopics.User.CurrentUserChange)
-                .subscribe(this._handleCurrentUserChange.bind(this));
+                .subscribe(userInfo => void this._handleCurrentUserChange(userInfo));
         });
     }
 

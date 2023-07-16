@@ -37,4 +37,4 @@ export function useFgoManagerNamesMap(): ReadonlyMap<string, Immutable<GameServa
 
     return map;
 
-};
+}

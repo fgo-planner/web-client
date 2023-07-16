@@ -15,6 +15,7 @@ import { SubscriptionTopics } from '../../../../utils/subscription/SubscriptionT
 import { MasterServantImportExistingAction as ExistingAction } from './MasterServantImportExistingAction.enum';
 import { MasterServantImportRouteFileInput } from './components/MasterServantImportRouteFileInput';
 import { MasterServantImportRouteServantList } from './components/MasterServantImportRouteServantList';
+import { asSync } from '../../../../utils/asSync';
 
 console.log('MasterServantImportRoute loaded');
 
@@ -118,7 +119,7 @@ const MasterServantImportRoute = React.memo(() => {
         /**
          * Set timeout to allow the loading indicator to be rendered first.
          */
-        setTimeout(async () => {
+        setTimeout(asSync(async () => {
             const data: Array2D<string> = parse(csvContents, CsvParseOptions);
             const parsedData = FgoManagerDataImport.transformRosterSheetToMasterAccountImportData(data, fgoManagerNamesMap);
             if (!parsedData.servants?.length) {
@@ -128,7 +129,7 @@ const MasterServantImportRoute = React.memo(() => {
                 setParsedData(parsedData);
             }
             resetLoadingIndicator();
-        });
+        }));
 
     }, [fgoManagerNamesMap, invokeLoadingIndicator, resetLoadingIndicator]);
 
@@ -162,7 +163,7 @@ const MasterServantImportRoute = React.memo(() => {
          * The update payload.
          */
         const update: UpdateMasterAccount = {
-            _id: masterAccount._id,
+            _id: masterAccount._id
         };
 
         const startInstanceId = currentServantsData.lastServantInstanceId + 1;

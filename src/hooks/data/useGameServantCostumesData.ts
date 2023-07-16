@@ -67,4 +67,4 @@ export function useGameServantCostumesData(data: Nullable<InputData>): ReadonlyA
         return transformCostumesList(gameServants);
     }, [data]);
 
-};
+}

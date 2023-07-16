@@ -99,4 +99,4 @@ export function useMultiSelectHelperForMouseEvent<T, ID = number>(
         handleItemClick
     };
 
-};
+}

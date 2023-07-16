@@ -63,7 +63,7 @@ const StyleProps = (theme: SystemTheme) => {
                 [`& .${MasterSoundtracksRouteSoundtrackListRowStyleClassPrefix}-unlocked-status`]: {
                     width: 42,
                     px: 2,
-                    textAlign: 'center',
+                    textAlign: 'center'
                 },
                 [`& .${MasterSoundtracksRouteSoundtrackListRowStyleClassPrefix}-thumbnail`]: {
                     width: 96,

@@ -17,7 +17,7 @@ export class WebUserService extends UserService {
     private get _onCurrentUserPreferencesChange() {
         return SubscribablesContainer.get(SubscriptionTopics.User.CurrentUserPreferencesChange);
     }
-    
+
     constructor() {
         super(`${process.env.REACT_APP_REST_ENDPOINT}/user`);
 
@@ -27,7 +27,7 @@ export class WebUserService extends UserService {
          */
         SubscribablesContainer
             .get(SubscriptionTopics.User.CurrentUserChange)
-            .subscribe(this._handleCurrentUserChange.bind(this));
+            .subscribe(userInfo => void this._handleCurrentUserChange(userInfo));
     }
 
     async register(data: { username: string, password: string, email?: string, friendId?: string }): Promise<User> {

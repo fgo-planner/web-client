@@ -104,7 +104,7 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                                 width: MasterServantListColumn.Properties.fouHp.width
                             },
                             [`& .${ServantSkillLevelStyleClassPrefix}-root`]: {
-                                width: MasterServantListColumn.Properties.skills.width,
+                                width: MasterServantListColumn.Properties.skills.width
                             },
                             [`& .${MasterServantListRowBondLevelStyleClassPrefix}-root`]: {
                                 width: MasterServantListColumn.Properties.bondLevel.width,
@@ -119,7 +119,7 @@ export const MasterServantListStyle = ({ theme }: StyledFunctionThemeProp): Arra
                             },
                             [`& .${MasterServantListRowSummonDateStyleClassPrefix}-root`]: {
                                 width: MasterServantListColumn.Properties.summonDate.width
-                            },
+                            }
                         }
                     }
                 },

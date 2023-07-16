@@ -1,15 +1,29 @@
 {
     "extends": [
-        "react-app"
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
+        "plugin:react/jsx-runtime"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
         },
-        "ecmaVersion": 2018
+        "ecmaVersion": 2018,
+        "project": "./tsconfig.json"
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        },
+        "componentWrapperFunctions": [{ "property": "styled" }]
     },
     "rules": {
+        "comma-dangle": ["warn", "never"],
+        "eol-last": ["warn", "always"],
+        "indent": ["warn", 4, { "SwitchCase": 1 }],
         "max-len": [
             "warn",
             {
@@ -18,14 +32,17 @@
                 "ignoreUrls": true
             }
         ],
-        "quotes": [
+        "no-constant-condition": [
             "warn",
-            "single"
+            {
+                "checkLoops": false
+            }
         ],
-        "react/jsx-indent-props": [
-            2,
-            "first"
-        ],
+        "no-extra-semi": "warn",
+        "quotes": ["warn", "single"],
+        "react/display-name": "off",
+        "react/jsx-indent-props": [2, "first"],
+        "react/no-children-prop": "warn",
         "@typescript-eslint/ban-types": [
             "error",
             {
@@ -35,45 +52,53 @@
                 }
             }
         ],
+        "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/indent": [
             "warn",
             4,
             {
-                "ignoredNodes": [
-                    "JSXElement *",
-                    "JSXElement"
-                ],
+                "ignoredNodes": ["JSXElement *", "JSXElement"],
                 "SwitchCase": 1
             }
         ],
-        "@typescript-eslint/semi": [
-            "warn",
-            "always"
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-extra-non-null-assertion": "off",
+        "@typescript-eslint/no-misused-promises": [
+            "error",
+            {
+                "checksVoidReturn": {
+                    "attributes": false
+                }
+            }
         ],
-        "@typescript-eslint/explicit-function-return-type": "off",
-        "@typescript-eslint/no-explicit-any": "off"
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/no-unused-vars": [
+            "warn",
+            {
+                "argsIgnorePattern": "^_",
+                "destructuredArrayIgnorePattern": "^_",
+                "ignoreRestSiblings": true
+            }
+        ],
+        "@typescript-eslint/semi": ["warn", "always"]
     },
     "overrides": [
         {
-            "files": [
-                "config/**",
-                "scripts/**"
-            ],
+            "files": ["*Utils.ts"],
             "rules": {
-                "@typescript-eslint/indent": [
-                    "warn",
-                    2
-                ]
+                "no-inner-declarations": "off"
             }
         },
         {
-            "files": [
-                "*.enum.ts"
-            ],
+            "files": ["config/**", "scripts/**"],
             "rules": {
-                "@typescript-eslint/no-redeclare": [
-                    "off"
-                ]
+                "@typescript-eslint/indent": ["warn", 2]
+            }
+        },
+        {
+            "files": ["*.enum.ts"],
+            "rules": {
+                "@typescript-eslint/no-redeclare": ["off"]
             }
         }
     ]

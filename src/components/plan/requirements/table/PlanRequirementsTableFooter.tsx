@@ -89,9 +89,10 @@ export const PlanRequirementsTableFooter = React.memo((props: Props) => {
                     <IconButton
                         // color='info'
                         onClick={onEditMasterItems}
-                        children={<IconOutlined>mode_edit</IconOutlined>}
                         size='small'
-                    />
+                    >
+                        <IconOutlined>mode_edit</IconOutlined>
+                    </IconButton>
                 </Tooltip>
             }
             <span>Inventory</span>

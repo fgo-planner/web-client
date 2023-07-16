@@ -67,7 +67,7 @@ export class GameSoundtrackService extends DataService {
         this._soundtracksCachePromise = undefined;
     }
 
-    private _onSoundtracksCacheLoadError(error: any): void {
+    private _onSoundtracksCacheLoadError(_dialogerror: any): void {
         this._invalidateCache();
     }
 

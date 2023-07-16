@@ -76,7 +76,7 @@ const StyleProps = (theme: SystemTheme) => {
                     [breakpoints.down('md')]: {
                         display: 'none'
                     }
-                },
+                }
             },
             [breakpoints.down('sm')]: {
                 flexDirection: 'column',

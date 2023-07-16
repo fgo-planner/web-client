@@ -21,7 +21,7 @@ export const AppBarActionMenuItem = React.memo((props: Props) => {
         iconVariant,
         label,
         onClick,
-        to,
+        to
     } = props;
 
     return (

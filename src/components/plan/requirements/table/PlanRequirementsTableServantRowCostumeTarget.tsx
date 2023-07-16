@@ -47,7 +47,7 @@ export const PlanRequirementsTableServantRowCostumeTarget: React.FC<Props> = (pr
             <IconOutlined>theater_comedy</IconOutlined>
             <div>
                 {targetCostumesCount}
-                </div>
+            </div>
         </div>
     );
 

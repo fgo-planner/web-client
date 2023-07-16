@@ -83,7 +83,7 @@ export class UserInterfaceService {
             this._pushChange(subject, false);
         }
     }
-    
+
     private _getSubjectForLockableUIFeature(feature: LockableUIFeature): Subject<boolean> {
         switch (feature) {
             case LockableUIFeature.AppBarElevate:
@@ -147,7 +147,7 @@ export class UserInterfaceService {
         return true;
     }
 
-    private _canGlobalDialogBeOpened(dialog: GlobalDialog): boolean {
+    private _canGlobalDialogBeOpened(_dialog: GlobalDialog): boolean {
         for (const state of this._GlobalDialogOpenStates.values()) {
             if (state) {
                 return false;

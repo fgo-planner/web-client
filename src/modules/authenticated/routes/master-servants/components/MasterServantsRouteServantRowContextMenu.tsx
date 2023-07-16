@@ -26,7 +26,7 @@ export const MasterServantsRouteServantRowContextMenu = React.memo((props: Props
         onSelectAllServants,
         open,
         position,
-        selectedServantsCount,
+        selectedServantsCount
     } = props;
 
     const { backdropProps } = useContextMenuProps(onClose);

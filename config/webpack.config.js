@@ -734,18 +734,7 @@ module.exports = function (webpackEnv) {
           cacheLocation: path.resolve(
             paths.appNodeModules,
             '.cache/.eslintcache'
-          ),
-          // ESLint class options
-          cwd: paths.appPath,
-          resolvePluginsRelativeTo: __dirname,
-          baseConfig: {
-            extends: [require.resolve('eslint-config-react-app/base')],
-            rules: {
-              ...(!hasJsxRuntime && {
-                'react/react-in-jsx-scope': 'error',
-              }),
-            },
-          },
+          )
         }),
       /**
        * Additional polyfills for Webpack 5.

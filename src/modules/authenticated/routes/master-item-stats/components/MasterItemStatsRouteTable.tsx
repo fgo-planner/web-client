@@ -83,7 +83,7 @@ const StyleProps = (theme: SystemTheme) => {
             alignItems: 'center',
             height: 52,
             pl: 4,
-            fontSize: '0.875rem',
+            fontSize: '0.875rem'
         },
         [`& .${StyleClassPrefix}-label-cell`]: {
             display: 'flex',

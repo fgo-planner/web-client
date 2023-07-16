@@ -161,7 +161,7 @@ const StyleProps = (theme: SystemTheme) => {
                 pt: 2,
                 pb: 4,
                 [`& .${StyleClassPrefix}-servant-stat`]: {
-                    justifyContent: 'space-between',
+                    justifyContent: 'space-between'
                 },
                 [`& .${StyleClassPrefix}-servant-stats-delimiter`]: {
                     width: '1rem'
@@ -169,7 +169,7 @@ const StyleProps = (theme: SystemTheme) => {
                 [`& .${StyleClassPrefix}-skill-level-stat`]: {
                     display: 'flex',
                     textAlign: 'center',
-                    alignItems: 'center',
+                    alignItems: 'center'
                 },
                 [`& .${StyleClassPrefix}-bond-level-stat`]: {
                     display: 'flex',
@@ -483,8 +483,8 @@ export const MasterServantsRouteInfoPanel = React.memo((props: Props) => {
                     Links
                 </div>
                 {links.map(({ label, url }, index) => (
-                    <div className={`${StyleClassPrefix}-external-link`}>
-                        <Link key={index} color='secondary' href={url} target='_blank'>
+                    <div key={index} className={`${StyleClassPrefix}-external-link`}>
+                        <Link color='secondary' href={url} target='_blank'>
                             {label}
                         </Link>
                     </div>

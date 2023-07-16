@@ -113,7 +113,7 @@ export const LoginDialog = React.memo((props: Props) => {
 
     const {
         fullScreen,
-        closeIconEnabled,
+        closeIconEnabled
     } = useAutoResizeDialog(props);
 
     const login = useCallback(async (values: UserCredentials): Promise<void> => {

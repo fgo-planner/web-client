@@ -20,7 +20,7 @@ export const StyleClassPrefix = 'LoginForm';
 
 export const LoginForm = React.memo((props: Props) => {
 
-    const { formId, onSubmit, } = props;
+    const { formId, onSubmit } = props;
 
     const formikConfigRef = useRef<FormikConfig<UserCredentials>>({
         initialValues: {

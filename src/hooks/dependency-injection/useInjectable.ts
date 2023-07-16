@@ -11,7 +11,7 @@ export function useInjectable<T>(param1: InjectableToken<T> | string, param2?: s
         throw new Error(`Could not find injectable ${description}`);
     }
     return injectable;
-};
+}
 
 function getDescriptionString<T = any>(param1: InjectableToken<T> | string, param2?: string): string {
     if (typeof param1 === 'string') {

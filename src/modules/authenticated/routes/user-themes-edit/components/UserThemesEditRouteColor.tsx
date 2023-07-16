@@ -93,7 +93,7 @@ export const UserThemesEditRouteColor = React.memo((props: Props) => {
         setSwatchDisplayColor(newColor);
     }, [color]);
 
-    const handleColorPickerClose = useCallback((event: {}, reason: ModalOnCloseReason): void => {
+    const handleColorPickerClose = useCallback((_event: {}, _reason: ModalOnCloseReason): void => {
         setColorPickerAnchorEl(null);
     }, []);
 
@@ -123,7 +123,7 @@ export const UserThemesEditRouteColor = React.memo((props: Props) => {
         setSwatchDisplayColor(newColor);
     }, [allowEditAlpha, color]);
 
-    const handleColorInputFieldBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
+    const handleColorInputFieldBlur = useCallback((_event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         setColorInputValue(toHexDisplayValue(color));
     }, [color]);
 
@@ -138,7 +138,7 @@ export const UserThemesEditRouteColor = React.memo((props: Props) => {
         setSwatchDisplayColor({ ...color });
     }, [allowEditAlpha, color]);
 
-    const handleAlphaInputFieldBlur = useCallback((event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
+    const handleAlphaInputFieldBlur = useCallback((_event: FocusEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
         if (!allowEditAlpha) {
             return;
         }

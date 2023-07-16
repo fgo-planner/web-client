@@ -96,7 +96,7 @@ export const RouteDataEditControls = React.memo((props: Props) => {
         title,
         onReloadButtonClick,
         onRevertButtonClick,
-        onSaveButtonClick,
+        onSaveButtonClick
     } = props;
 
     const { sm, md } = useActiveBreakpoints();

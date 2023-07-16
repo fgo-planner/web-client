@@ -122,29 +122,32 @@ export const MasterItemsRoute = React.memo(() => {
                 <IconButton
                     component={Link}
                     to='stats'
-                    children={<Icon>equalizer</Icon>}
                     size='large'
-                />
+                >
+                    <Icon>equalizer</Icon>
+                </IconButton>
             </div>
         </Tooltip>,
         <Tooltip key='import' title='Upload item data' placement='right'>
             <div>
                 {/* TODO Implement this */}
                 <IconButton
-                    children={<Icon>publish</Icon>}
                     disabled
                     size='large'
-                />
+                >
+                    <Icon>publish</Icon>
+                </IconButton>
             </div>
         </Tooltip>,
         <Tooltip key='export' title='Download item data' placement='right'>
             <div>
                 {/* TODO Implement this */}
                 <IconButton
-                    children={<Icon>get_app</Icon>}
                     size='large'
                     disabled
-                />
+                >
+                    <Icon>get_app</Icon>
+                </IconButton>
             </div>
         </Tooltip>
     ];

@@ -92,7 +92,7 @@ const ModuleRoutes = [
                 <MasterServantImportRoute />
             </Suspense>
         )
-    },
+    }
 ];
 
 const AuthenticatedModule = React.memo(() => {

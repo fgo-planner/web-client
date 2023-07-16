@@ -40,7 +40,7 @@ export const PlanRequirementsTableServantRowLevelTarget: React.FC<Props> = (prop
 
     const className = clsx(
         `${StyleClassPrefix}-root`,
-        !enabled && `${StyleClassPrefix}-disabled`,
+        !enabled && `${StyleClassPrefix}-disabled`
     );
 
     return (

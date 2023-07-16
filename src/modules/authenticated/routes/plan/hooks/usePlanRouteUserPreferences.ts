@@ -80,12 +80,12 @@ const LocalUserPreferencesTableLayoutSchema: Schema = {
     properties: {
         cells: {
             type: 'string',
-            enum: Object.keys(PlanRequirementsTableCellSize),  
+            enum: Object.keys(PlanRequirementsTableCellSize),
             required: false
         },
         rowHeader: {
             type: 'string',
-            enum: Object.keys(PlanRequirementsTableServantRowHeaderLayout), 
+            enum: Object.keys(PlanRequirementsTableServantRowHeaderLayout),
             required: false
         }
     }
@@ -145,7 +145,7 @@ const readUserPreferencesFromLocalStorage = (): PlanRouteLocalUserPreferences =>
     let localStorageData;
     try {
         localStorageData = StorageUtils.getItemWithValidation<Partial<PlanRouteLocalUserPreferences>>(
-            StorageKey, 
+            StorageKey,
             LocalUserPreferencesValidator,
             LocalUserPreferencesSchema
         );
@@ -190,6 +190,7 @@ export const usePlanRouteUserPreferences = (): PlanRouteUserPreferencesHookResul
     useEffect(() => {
         const subscription = SubscribablesContainer
             .get(SubscriptionTopics.User.CurrentUserPreferencesChange)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .subscribe((userPreferences) => {
                 // TODO Do something with this.
             });

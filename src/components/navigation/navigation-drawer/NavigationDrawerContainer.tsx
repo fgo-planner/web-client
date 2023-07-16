@@ -252,7 +252,7 @@ export const NavigationDrawerContainer = React.memo((props: Props) => {
                         key: 'logout',
                         icon: 'logout',
                         label: 'Log Out',
-                        onClick: () => authenticationService.logout()
+                        onClick: () => void authenticationService.logout()
                     }
                 ]
             });

@@ -25,7 +25,7 @@ const StyleProps = (theme: Theme) => ({
         background: theme.palette.background.paper
     },
     '&.show': {
-        height: theme.spacing(ThemeConstants.BottomBarHeightScale),
+        height: theme.spacing(ThemeConstants.BottomBarHeightScale)
     }
 } as SystemStyleObject<Theme>);
 

@@ -25,7 +25,7 @@ const StyleProps = (theme: Theme) => ({
 } as SystemStyleObject<Theme>);
 
 export const HomeRouteLinkSection = React.memo((props: Props) => {
-    
+
     const {
         title,
         children
@@ -33,7 +33,7 @@ export const HomeRouteLinkSection = React.memo((props: Props) => {
 
     return (
         <Box className={`${StyleClassPrefix}-root`} sx={StyleProps}>
-            {title && <PageTitle children={title} />}
+            {title && <PageTitle>{title}</PageTitle>}
             <div className={`${StyleClassPrefix}-container`}>
                 {children}
             </div>

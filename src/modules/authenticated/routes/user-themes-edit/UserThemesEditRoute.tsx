@@ -19,7 +19,7 @@ import { UserThemesEditRouteSection } from './components/UserThemesEditRouteSect
 export const UserThemesEditRoute = React.memo(() => {
 
     const navigate = useNavigate();
-    
+
     const {
         invokeLoadingIndicator,
         resetLoadingIndicator,
@@ -105,8 +105,9 @@ export const UserThemesEditRoute = React.memo(() => {
                     color='default'
                     onClick={handleCancelButtonClick}
                     disabled={isLoadingIndicatorActive}
-                    children={<Icon>clear</Icon>}
-                />
+                >
+                    <Icon>clear</Icon>
+                </Fab>
             </div>
         </Tooltip>,
         <Tooltip key='save' title='Save'>
@@ -115,8 +116,9 @@ export const UserThemesEditRoute = React.memo(() => {
                     color='primary'
                     onClick={handleSaveButtonClick}
                     disabled={isLoadingIndicatorActive}
-                    children={<Icon>save</Icon>}
-                />
+                >
+                    <Icon>save</Icon>
+                </Fab>
             </div>
         </Tooltip>
     ];
@@ -128,7 +130,9 @@ export const UserThemesEditRoute = React.memo(() => {
                 <UserThemesEditRouteSection userTheme={lightTheme} forThemeMode='light' />
                 <UserThemesEditRouteSection userTheme={darkTheme} forThemeMode='dark' />
             </AppBarElevateOnScroll>
-            <FabContainer children={fabContainerChildNodes} />
+            <FabContainer>
+                {fabContainerChildNodes}
+            </FabContainer>
         </Fragment>
     );
 });

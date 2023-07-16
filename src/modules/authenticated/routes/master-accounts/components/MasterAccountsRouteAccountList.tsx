@@ -57,14 +57,14 @@ const StyleProps = (theme: SystemTheme) => {
                     }
                 },
                 [`& .${MasterAccountsRouteAccountListRowStyleClassPrefix}-friend-id`]: {
-                    width: MasterAccountsRouteAccountListColumn.Properties.friendId.width,
+                    width: MasterAccountsRouteAccountListColumn.Properties.friendId.width
                 },
                 [`& .${MasterAccountsRouteAccountListRowStyleClassPrefix}-created`]: {
-                    width: MasterAccountsRouteAccountListColumn.Properties.created.width,
+                    width: MasterAccountsRouteAccountListColumn.Properties.created.width
                 },
                 [`& .${MasterAccountsRouteAccountListRowStyleClassPrefix}-modified`]: {
-                    width: MasterAccountsRouteAccountListColumn.Properties.modified.width,
-                },
+                    width: MasterAccountsRouteAccountListColumn.Properties.modified.width
+                }
             },
             [breakpoints.down('sm')]: {
                 minWidth: 0

@@ -579,7 +579,6 @@ export namespace PlanComputationUtils {
             const targetLevel = targetEnhancements.level || 0;
             const currentLevel = currentEnhancements.level || 0;
             if (targetLevel > currentLevel) {
-                console.log('computing grails');
                 /**
                  * Compute grail requirements.
                  */
@@ -616,7 +615,6 @@ export namespace PlanComputationUtils {
                             break;
                         }
                     }
-                    console.log('computed grails', enhancement);
                     /**
                      * Only update the requirements if the grail count is greater than zero.
                      */

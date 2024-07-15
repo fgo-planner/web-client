@@ -1,5 +1,5 @@
 import { CollectionUtils, Immutable, ImmutableArray, Nullable, ObjectUtils, ReadonlyRecord } from '@fgo-planner/common-core';
-import { GameEmberRarity, GameServant, GameServantEnhancement, GameServantSkillMaterials, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, MasterServant, MasterServantUpdate, MasterServantUpdateUtils, PlanServant, PlanServantAggregatedData, PlanServantUtils, PlanResources, Resources } from '@fgo-planner/data-core';
+import { GameEmberRarity, GameItemConstants, GameServant, GameServantConstants, GameServantEnhancement, GameServantSkillMaterials, InstantiatedServantAscensionLevel, InstantiatedServantConstants, InstantiatedServantSkillLevel, InstantiatedServantUtils, MasterServant, MasterServantUpdate, MasterServantUpdateUtils, PlanResources, PlanServant, PlanServantAggregatedData, PlanServantUtils, Resources } from '@fgo-planner/data-core';
 import { PlanEnhancementItemRequirements as EnhancementItemRequirements, PlanEnhancementRequirements as EnhancementRequirements, PlanEnhancementRequirements, PlanRequirements, PlanServantRequirements } from '../../types';
 
 
@@ -21,6 +21,11 @@ export namespace PlanComputationUtils {
     }>;
 
     type ServantEnhancements = Immutable<{
+        /**
+         * Only used for computing grails; computation of ascension materials uses the
+         * `ascension` property.
+         */
+        level?: Nullable<number>;
         ascension?: Nullable<InstantiatedServantAscensionLevel>;
         skills: SkillEnhancements;
         appendSkills: SkillEnhancements;
@@ -105,7 +110,6 @@ export namespace PlanComputationUtils {
 
 
     //#region
-
 
     /**
      * Returns a `MasterServantUpdate` and the resources that will effectively
@@ -557,23 +561,71 @@ export namespace PlanComputationUtils {
             );
         }
 
-        const targetAscension = targetEnhancements.ascension;
-        if (includeAscensions && targetAscension != null) {
-            if (gameServant.ascensionMaterials) {
+        if (includeAscensions) {
+            const targetAscension = targetEnhancements.ascension;
+            if (targetAscension != null && gameServant.ascensionMaterials) {
+                const currentAscension = currentEnhancements.ascension || 0;
                 for (const [key, ascension] of Object.entries(gameServant.ascensionMaterials)) {
                     const ascensionLevel = Number(key);
-                    const currentAscension = currentEnhancements.ascension || 0;
                     /**
-                     * Skip this ascension if the servant is already at least this level, or if this
-                     * level beyond the targeted level.
+                     * Add the requirements for this ascension only if its greater than the current
+                     * ascension, and also less than or equal to the target ascension.
                      */
-                    if (currentAscension >= ascensionLevel || ascensionLevel > targetAscension) {
-                        continue;
+                    if (currentAscension < ascensionLevel && ascensionLevel <= targetAscension) {
+                        _updateEnhancementRequirementResult(result, ascension, 'ascensions');
                     }
-                    _updateEnhancementRequirementResult(result, ascension, 'ascensions');
                 }
             }
-            // TODO Compute ember requirements
+            const targetLevel = targetEnhancements.level || 0;
+            const currentLevel = currentEnhancements.level || 0;
+            if (targetLevel > currentLevel) {
+                console.log('computing grails');
+                /**
+                 * Compute grail requirements.
+                 */
+                if (targetLevel > gameServant.maxLevel) {
+                    const palingenesisQpCostMap = GameServantConstants.PalingenesisQpCostMap[gameServant.rarity];
+                    /**
+                     * Container for storing the grail count and QP cost.
+                     */
+                    const enhancement: GameServantEnhancement = {
+                        qp: 0,
+                        materials: {
+                            [GameItemConstants.GrailItemId]: 0
+                        }
+                    };
+                    for (const [key, cost] of Object.entries(palingenesisQpCostMap)) {
+                        const levelThreshold = Number(key);
+                        /**
+                         * Add the requirements for this level threshold only if its greater than the
+                         * current level.
+                         */
+                        if (currentLevel < levelThreshold) {
+                            enhancement.materials[GameItemConstants.GrailItemId] += 1;
+                            enhancement.qp += cost;
+                        }
+                        /**
+                         * Break once the level threshold exceeds the target level. The requirements for
+                         * this level threshold is still included in the computation (e.g. target level
+                         * of 119 still requires the same amount of grails and QP as 120).
+                         * 
+                         * Note that this also assumes keys in the `PalingenesisQpCostMap` is sorted in
+                         * ascending order. 
+                         */
+                        if (levelThreshold >= targetLevel) {
+                            break;
+                        }
+                    }
+                    console.log('computed grails', enhancement);
+                    /**
+                     * Only update the requirements if the grail count is greater than zero.
+                     */
+                    if (enhancement.materials[GameItemConstants.GrailItemId] > 0) {
+                        _updateEnhancementRequirementResult(result, enhancement, 'ascensions');
+                    }
+                }
+                // TODO Compute ember requirements here.
+            }
         }
 
         if (includeCostumes) {
